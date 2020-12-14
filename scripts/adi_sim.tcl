@@ -27,6 +27,11 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   ## Create the bd
   ######################
   create_bd_design $design_name
+
+  global sys_zynq
+  set sys_zynq -1
+  source ../common/test_harness/test_harness_system_bd.tcl
+
   # Build the test harness based on the topology
   source system_bd.tcl
 

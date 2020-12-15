@@ -32,6 +32,12 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   set sys_zynq -1
   source ../common/test_harness/test_harness_system_bd.tcl
 
+  global ad_project_params
+  # transfer tcl parameters as defines to verilog
+  foreach {k v} [array get ad_project_params] {
+    adi_sim_add_define $k=$v
+  }
+
   # Build the test harness based on the topology
   source system_bd.tcl
 

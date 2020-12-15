@@ -115,7 +115,8 @@ adi_tpl_jesd204_tx_create dac_jesd204_transport $NUM_OF_LANES \
                                                 $NUM_OF_CONVERTERS \
                                                 $SAMPLES_PER_FRAME \
                                                 $SAMPLE_WIDTH \
-                                                $LL_OUT_BYTES
+                                                $LL_OUT_BYTES \
+                                                $DMA_SAMPLE_WIDTH
 
 # RX JESD204 PHY layer peripheral
 ad_ip_instance axi_adxcvr adc_jesd204_xcvr [list \
@@ -135,7 +136,8 @@ adi_tpl_jesd204_rx_create adc_jesd204_transport $NUM_OF_LANES \
                                                 $NUM_OF_CONVERTERS \
                                                 $SAMPLES_PER_FRAME \
                                                 $SAMPLE_WIDTH \
-                                                $LL_OUT_BYTES
+                                                $LL_OUT_BYTES \
+                                                $DMA_SAMPLE_WIDTH
 
 ad_ip_instance util_adxcvr util_jesd204_xcvr [list \
   RX_NUM_OF_LANES $NUM_OF_LANES \
@@ -147,8 +149,8 @@ ad_ip_instance util_adxcvr util_jesd204_xcvr [list \
   TX_OUT_DIV 1 \
 ]
 
-ad_xcvrcon util_jesd204_xcvr dac_jesd204_xcvr dac_jesd204_link {} device_clk
-ad_xcvrcon util_jesd204_xcvr adc_jesd204_xcvr adc_jesd204_link {} device_clk
+ad_xcvrcon util_jesd204_xcvr dac_jesd204_xcvr dac_jesd204_link {} {} device_clk
+ad_xcvrcon util_jesd204_xcvr adc_jesd204_xcvr adc_jesd204_link {} {} device_clk
 
 # connect link layer to transport layer
 ad_connect dac_jesd204_link/tx_data dac_jesd204_transport/link

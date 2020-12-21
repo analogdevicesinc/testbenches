@@ -49,6 +49,13 @@ import logger_pkg::*;
 `define ADC_TPL     32'h44a1_0000
 `define DAC_TPL     32'h44b1_0000
 
+`define PRBS_OFF 4'b0000
+`define PRBS_7   4'b0001
+`define PRBS_9   4'b0010
+`define PRBS_15  4'b0011
+`define PRBS_23  4'b0100
+`define PRBS_31  4'b0101
+
 parameter OUT_BYTES = (`JESD_F % 3 != 0) ? 4 : 6;
 
 program test_program;
@@ -92,6 +99,55 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.start_clock;
     `TH.`SYSREF_CLK.inst.IF.start_clock;
 
+    // -----------------------
+    // PHY INIT
+    // -----------------------
+    env.mng.RegWrite32(`ADC_XCVR+32'h0020,32'h00001003);   // RXOUTCLK uses DIV1
+    env.mng.RegWrite32(`DAC_XCVR+32'h0020,32'h00001003);
+
+    env.mng.RegWrite32(`ADC_XCVR+32'h0010,32'h00000001);
+    env.mng.RegWrite32(`DAC_XCVR+32'h0010,32'h00000001);
+
+    // Wait PLLs to lock
+    #5us;
+
+    // -----------------------
+    // Put XCVR in PRBS mode
+    // -----------------------
+    env.mng.RegWrite32(`DAC_XCVR+32'h0180, `PRBS_9);
+    env.mng.RegWrite32(`ADC_XCVR+32'h0180, `PRBS_7);
+
+    #1us;
+    // Error should be detected
+    env.mng.RegReadVerify32(`ADC_XCVR+32'h0184,1<<8 | 0);
+
+    // Check if error can be cleared
+    env.mng.RegWrite32(`DAC_XCVR+32'h0180, `PRBS_7);
+    env.mng.RegWrite32(`ADC_XCVR+32'h0180, 1 << 8); // Clear prbs err
+    env.mng.RegWrite32(`ADC_XCVR+32'h0180, `PRBS_7);
+
+    #1us;
+    // No error should be detected, Lock shoud be set
+    env.mng.RegReadVerify32(`ADC_XCVR+32'h0184,0<<8 | 1);
+
+    // -----------------------
+    // Check Error injection
+    // -----------------------
+    env.mng.RegWrite32(`DAC_XCVR+32'h0180, `PRBS_7 | 1<<15 ); // Enable Error inject
+    env.mng.RegWrite32(`ADC_XCVR+32'h0180, 1 << 8); // Clear prbs err
+    env.mng.RegWrite32(`ADC_XCVR+32'h0180, `PRBS_7);
+
+    #1us;
+    // Error should be detected
+    env.mng.RegReadVerify32(`ADC_XCVR+32'h0184,1<<8 | 0);
+
+    env.mng.RegWrite32(`DAC_XCVR+32'h0180, `PRBS_OFF);
+    env.mng.RegWrite32(`ADC_XCVR+32'h0180, 1 << 8); // Clear prbs err
+    env.mng.RegWrite32(`ADC_XCVR+32'h0180, `PRBS_OFF);
+
+    // -----------------------
+    // Configure TPL
+    // -----------------------
     for (int i = 0; i < `JESD_M; i++) begin
       if (use_dds) begin
         // Select DDS as source
@@ -108,7 +164,6 @@ program test_program;
     for (int i = 0; i < `JESD_M; i++) begin
       env.mng.RegWrite32(`ADC_TPL+'h40*i+32'h0400,32'h0000001);
     end
-
 
     env.mng.RegWrite32(`DAC_TPL+32'h0040,32'h00000003);
     env.mng.RegWrite32(`ADC_TPL+32'h0040,32'h00000003);
@@ -145,14 +200,6 @@ program test_program;
     env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0,32'h00000000);
     env.mng.RegWrite32(`AXI_JESD_TX+32'h00c0,32'h00000000);
 
-    //PHY INIT
-    //REG CTRL
-    env.mng.RegWrite32(`ADC_XCVR+32'h0020,32'h00001003);   // RXOUTCLK uses DIV1
-    env.mng.RegWrite32(`DAC_XCVR+32'h0020,32'h00001003);
-
-    env.mng.RegWrite32(`ADC_XCVR+32'h0010,32'h00000001);
-    env.mng.RegWrite32(`DAC_XCVR+32'h0010,32'h00000001);
-
     #10us;
     // Read status back
     env.mng.RegReadVerify32(`AXI_JESD_RX+32'h0280,3);
@@ -161,7 +208,7 @@ program test_program;
     env.mng.RegReadVerify32(`AXI_JESD_RX+32'h0318,32'h202f0f03);
     env.mng.RegReadVerify32(`AXI_JESD_RX+32'h031c,32'h47000000);
 
-    #10us;
+    #1us;
 
   end
 

@@ -1,36 +1,53 @@
 `include "utils.svh"
 `include "m_axi_sequencer.sv"
+`include "s_axi_sequencer.sv"
 
-`ifndef __ENVIRONMENT_SV__
-`define __ENVIRONMENT_SV__
+`ifndef __TEST_HARNESS_ENV_SV__
+`define __TEST_HARNESS_ENV_SV__
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import `PKGIFY(`TH, `MNG_AXI)::*;
+import `PKGIFY(`TH, `DDR_AXI)::*;
 
-class environment;
+class test_harness_env;
 
   // Agents
   `AGENT(`TH, `MNG_AXI, mst_t) mng_agent;
+  `AGENT(`TH, `DDR_AXI, slv_mem_t) ddr_axi_agent;
   // Sequencers
   m_axi_sequencer #(`AGENT(`TH, `MNG_AXI, mst_t)) mng;
+  s_axi_sequencer #(`AGENT(`TH, `DDR_AXI, slv_mem_t)) ddr_axi_seq;
 
   // Register accessors
   bit done = 0;
 
+  virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if;
+  virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if;
+  virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if;
 
   //============================================================================
   // Constructor
   //============================================================================
   function new(
-    virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(`TH, `MNG_AXI)) mng_vip_if
+    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
+    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
+    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
+    virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(`TH, `MNG_AXI)) mng_vip_if,
+    virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(`TH, `DDR_AXI)) ddr_vip_if
   );
+
+    this.sys_clk_vip_if = sys_clk_vip_if;
+    this.dma_clk_vip_if = dma_clk_vip_if;
+    this.ddr_clk_vip_if = ddr_clk_vip_if;
 
     // Creating the agents
     mng_agent = new("AXI Manager agent", mng_vip_if);
+    ddr_axi_agent = new("AXI DDR stub agent", ddr_vip_if);
 
     // Creating the sequencers
     mng = new(mng_agent);
+    ddr_axi_seq = new(ddr_axi_agent);
 
   endfunction
 
@@ -41,7 +58,11 @@ class environment;
   //============================================================================
   task start();
     mng_agent.start_master();
+    ddr_axi_agent.start_slave();
 
+    sys_clk_vip_if.start_clock;
+    dma_clk_vip_if.start_clock;
+    ddr_clk_vip_if.start_clock;
   endtask
 
   //============================================================================
@@ -76,6 +97,7 @@ class environment;
   //============================================================================
   task stop;
     mng_agent.stop_master();
+    ddr_axi_agent.stop_slave();
   endtask
 
   //============================================================================

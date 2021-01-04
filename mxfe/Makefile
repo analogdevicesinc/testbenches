@@ -17,7 +17,7 @@ SV_DEPS += ../common/sv/adi_regmap_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
 SV_DEPS += ../common/sv/dma_trans.sv
 SV_DEPS += ../common/sv/axi_dmac_pkg.sv
-SV_DEPS += environment.sv
+SV_DEPS += ../common/sv/test_harness_env.sv
 SV_DEPS += system_tb.sv
 
 ENV_DEPS += system_project.tcl

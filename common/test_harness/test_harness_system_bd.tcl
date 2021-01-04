@@ -70,7 +70,7 @@ adi_sim_add_define "DMA_CLK=dma_clk_vip"
 # DDR clock
 ad_ip_instance clk_vip ddr_clk_vip [ list \
   INTERFACE_MODE {MASTER} \
-  FREQ_HZ 300000000 \
+  FREQ_HZ 400000000 \
 ]
 adi_sim_add_define "DDR_CLK=ddr_clk_vip"
 

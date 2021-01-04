@@ -36,7 +36,7 @@
 //
 //
 `include "utils.svh"
-`include "environment.sv"
+`include "test_harness_env.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -58,7 +58,7 @@ parameter TX_OUT_BYTES = (`TX_JESD_F % 3 != 0) ? (`JESD_MODE == "64B66B") ? 8 : 
                                                : (`JESD_MODE == "64B66B") ? 12 : 6;
 program test_program;
 
-  environment env;
+  test_harness_env env;
   bit [31:0] val;
   int link_clk_freq;
   int device_clk_freq;
@@ -75,17 +75,16 @@ program test_program;
     int ref_sysref_status = (`JESD_MODE != "64B66B");
 
     //creating environment
-    env = new(`TH.`MNG_AXI.inst.IF,
+    env = new(`TH.`SYS_CLK.inst.IF,
+              `TH.`DMA_CLK.inst.IF,
+              `TH.`DDR_CLK.inst.IF,
+              `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF);
 
     #2ps;
 
     setLoggerVerbosity(6);
     env.start();
-
-    `TH.`SYS_CLK.inst.IF.start_clock;
-    `TH.`DMA_CLK.inst.IF.start_clock;
-    `TH.`DDR_CLK.inst.IF.start_clock;
 
     if (`JESD_MODE != "64B66B") begin
       link_clk_freq = lane_rate/40;

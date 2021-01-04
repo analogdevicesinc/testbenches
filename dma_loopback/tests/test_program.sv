@@ -36,7 +36,7 @@
 //
 //
 `include "utils.svh"
-`include "environment.sv"
+`include "test_harness_env.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -48,14 +48,17 @@ import logger_pkg::*;
 
 program test_program;
 
-  environment env;
+  test_harness_env env;
   bit [31:0] val;
   bit [31:0] src_addr;
 
   initial begin
 
     //creating environment
-    env = new(`TH.`MNG_AXI.inst.IF,
+    env = new(`TH.`SYS_CLK.inst.IF,
+              `TH.`DMA_CLK.inst.IF,
+              `TH.`DDR_CLK.inst.IF,
+              `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF);
 
     #2ps;
@@ -63,9 +66,6 @@ program test_program;
     setLoggerVerbosity(6);
     env.start();
 
-    `TH.`SYS_CLK.inst.IF.start_clock;
-    `TH.`DMA_CLK.inst.IF.start_clock;
-    `TH.`DDR_CLK.inst.IF.start_clock;
     `TH.`DEVICE_CLK.inst.IF.start_clock;
 
     //asserts all the resets for 100 ns

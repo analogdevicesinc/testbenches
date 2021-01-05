@@ -120,6 +120,9 @@ set sys_dma_resetn sys_dma_resetn
 
 ad_connect axi_intc/intr sys_concat_intc/dout
 
+# TODO : this should be a 500MHz clock
+set sys_iodelay_clk sys_mem_clk
+
 # defaults (interrupts)
 
 ad_connect sys_concat_intc/In0    GND

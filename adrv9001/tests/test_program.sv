@@ -258,7 +258,8 @@ program test_program;
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, rx_pattern_map[pattern]<<16);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, rx_pattern_map[pattern]<<16);
 
-    #10000;
+    // Allow initial OOS to propagate
+    #15000;
 
     // clear PN OOS and PN ERR
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h4, 7);

@@ -46,6 +46,31 @@ module system_tb();
 
   reg [`JESD_M*SAMPLES_PER_CHANNEL*DMA_NP-1:0] dac_data = 'h0;
 
+  reg sysref_s = 1'b0;
+  reg sysref_d = 1'b0;
+  reg [1:0] sysref_dly_sel = 2'b00;
+
+  always @(posedge device_clk) begin
+    sysref_d <= sysref;
+  end
+
+  always @(*) begin
+    case (sysref_dly_sel)
+      2'b00: begin
+        sysref_s = sysref;
+      end
+      2'b01: begin
+        sysref_s = sysref_d;
+      end
+      2'b10: begin
+        sysref_s = ~sysref;
+      end
+      default: begin
+        sysref_s = sysref;
+      end
+    endcase
+  end
+
   `TEST_PROGRAM test();
 
   test_harness `TH (
@@ -72,7 +97,7 @@ module system_tb();
     .rx_data_6_n(data_6_n),
     .rx_data_7_p(data_7_p),
     .rx_data_7_n(data_7_n),
-    .rx_sysref_0(sysref),
+    .rx_sysref_0(sysref_s),
     .rx_sync_0(sync_0),
 
     .tx_data_0_p(data_0_p),
@@ -91,7 +116,7 @@ module system_tb();
     .tx_data_6_n(data_6_n),
     .tx_data_7_p(data_7_p),
     .tx_data_7_n(data_7_n),
-    .tx_sysref_0(sysref),
+    .tx_sysref_0(sysref_s),
     .tx_sync_0(sync_0),
 
     .dac_data_0(dac_data[SAMPLES_PER_CHANNEL*DMA_NP*0 +: SAMPLES_PER_CHANNEL*DMA_NP]),

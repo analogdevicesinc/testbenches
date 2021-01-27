@@ -211,6 +211,31 @@ program test_program;
 
     #1us;
 
+    // Drift SYSREF with one device clock
+    //
+    system_tb.sysref_dly_sel = 2'b01;
+    #1us;
+    // Check SYSREF alignment ERROR
+    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h0108,32'h3);
+    env.mng.RegReadVerify32(`AXI_JESD_RX+32'h0108,32'h3);
+
+    env.mng.RegWrite32(`AXI_JESD_TX+32'h0108,32'h3);
+    env.mng.RegWrite32(`AXI_JESD_RX+32'h0108,32'h3);
+
+
+    // Invert SYSREF
+    //
+    system_tb.sysref_dly_sel = 2'b10;
+    #1us;
+    // Check SYSREF alignment ERROR
+    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h0108,32'h3);
+    env.mng.RegReadVerify32(`AXI_JESD_RX+32'h0108,32'h3);
+
+    env.mng.RegWrite32(`AXI_JESD_TX+32'h0108,32'h3);
+    env.mng.RegWrite32(`AXI_JESD_RX+32'h0108,32'h3);
+
+    #1us;
+
   end
 
 endprogram

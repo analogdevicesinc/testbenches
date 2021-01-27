@@ -62,6 +62,7 @@ proc adi_sim_generate {project_name } {
   set_property verilog_define $adi_sim_defines [get_filesets sim_1]
 
   set_property -name {xsim.simulate.runtime} -value {} -objects [get_filesets sim_1]
+  set_property -name {xsim.elaborate.debug_level} -value {all} -objects [get_filesets sim_1]
 
   set project_system_dir "./runs/$project_name/$project_name.srcs/sources_1/bd/$design_name"
 

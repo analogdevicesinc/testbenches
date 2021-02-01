@@ -7,17 +7,17 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
-import `PKGIFY(`TH, `MNG_AXI)::*;
-import `PKGIFY(`TH, `DDR_AXI)::*;
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 class test_harness_env;
 
   // Agents
-  `AGENT(`TH, `MNG_AXI, mst_t) mng_agent;
-  `AGENT(`TH, `DDR_AXI, slv_mem_t) ddr_axi_agent;
+  `AGENT(test_harness, mng_axi_vip, mst_t) mng_agent;
+  `AGENT(test_harness, ddr_axi_vip, slv_mem_t) ddr_axi_agent;
   // Sequencers
-  m_axi_sequencer #(`AGENT(`TH, `MNG_AXI, mst_t)) mng;
-  s_axi_sequencer #(`AGENT(`TH, `DDR_AXI, slv_mem_t)) ddr_axi_seq;
+  m_axi_sequencer #(`AGENT(test_harness, mng_axi_vip, mst_t)) mng;
+  s_axi_sequencer #(`AGENT(test_harness, ddr_axi_vip, slv_mem_t)) ddr_axi_seq;
 
   // Register accessors
   bit done = 0;
@@ -33,8 +33,8 @@ class test_harness_env;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
-    virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(`TH, `MNG_AXI)) mng_vip_if,
-    virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(`TH, `DDR_AXI)) ddr_vip_if
+    virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
+    virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
   );
 
     this.sys_clk_vip_if = sys_clk_vip_if;

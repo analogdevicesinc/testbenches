@@ -43,7 +43,7 @@ set JESD_F $ad_project_params(JESD_F)
 if {$JESD_F % 3 == 0} {
   set LL_OUT_BYTES [expr max($JESD_F,6)]
 } else {
-  set LL_OUT_BYTES 4
+  set LL_OUT_BYTES [expr max($JESD_F,4)]
 }
 
 set DMA_SAMPLE_WIDTH $ad_project_params(JESD_NP)

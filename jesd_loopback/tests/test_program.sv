@@ -57,7 +57,7 @@ import logger_pkg::*;
 `define PRBS_23  4'b0100
 `define PRBS_31  4'b0101
 
-parameter OUT_BYTES = (`JESD_F % 3 != 0) ? 4 : 6;
+parameter OUT_BYTES = `LL_OUT_BYTES;
 
 program test_program;
 
@@ -88,7 +88,7 @@ program test_program;
 
     link_clk_freq = lane_rate/40;
     data_path_width = 4;
-    tpl_data_path_width = (`JESD_NP==12) ? 6 : 4;
+    tpl_data_path_width = OUT_BYTES;
     device_clk_freq = link_clk_freq * data_path_width / tpl_data_path_width;
     sysref_freq = link_clk_freq*data_path_width/(`JESD_K*`JESD_F);
 

@@ -168,6 +168,9 @@ incr sys_cpu_interconnect_index
 global sys_mem_interconnect_index
 incr sys_mem_interconnect_index
 
-# Set DDR VIP to a range of 2G 
+# Set DDR VIP to a range of 2G
 create_bd_addr_seg -range 0x80000000 -offset 0x80000000 [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
   [get_bd_addr_segs ddr_axi_vip/S_AXI/Reg] SEG_mng_ddr_cntlr
+
+# Pass the test harness instance name to the simulation
+adi_sim_add_define "TH=$design_name"

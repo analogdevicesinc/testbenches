@@ -1,14 +1,25 @@
 # List of defines which will be passed to the simulation
 variable adi_sim_defines {}
+variable adi_sim_params {}
 variable design_name "test_harness"
+variable bd_enable 0
 
+# These values will end up as verilog defines
 proc adi_sim_add_define {value} {
   global adi_sim_defines
   lappend adi_sim_defines $value
 }
 
-proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
+# These values will end up as top level parameters/generics 
+# Useful for simulations without a block design
+proc adi_sim_add_param {value} {
+  global adi_sim_params
+  lappend adi_sim_params $value
+}
+
+proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"} {parameter_list {}}} {
   global design_name
+  global ad_project_params
 
   # Create project
   create_project ${project_name} ./runs/${project_name} -part $part -force
@@ -23,43 +34,55 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   # Rebuild user ip_repo's index before adding any source files
   update_ip_catalog -rebuild
 
-
-  ## Create the bd
-  ######################
-  create_bd_design $design_name
-
-  global sys_zynq
-  set sys_zynq -1
-  source ../common/test_harness/test_harness_system_bd.tcl
-
-  global ad_project_params
-  # transfer tcl parameters as defines to verilog
-  foreach {k v} [array get ad_project_params] {
-    adi_sim_add_define $k=$v
+  # Set parameters of the top level file
+  foreach {param value} $parameter_list {
+    set ad_project_params($param) $value
   }
 
-  # Build the test harness based on the topology
-  source system_bd.tcl
+  if {[file exists system_bd.tcl]} {
+    set bd_enable 1
+    ######################
+    ## Create the bd
+    ######################
+    create_bd_design $design_name
 
-  save_bd_design
-  validate_bd_design
+    global sys_zynq
+    set sys_zynq -1
+    source ../common/test_harness/test_harness_system_bd.tcl
 
-  # Pass the test harness instance name to the simulation
-  adi_sim_add_define "TH=$design_name"
+    # Build the test harness based on the topology
+    source system_bd.tcl
+
+    save_bd_design
+    validate_bd_design
+  } else {
+    puts "Skipping system_bd.tcl"
+  }
+
+  # transfer tcl parameters to verilog defines and generics
+  foreach {k v} [array get ad_project_params] {
+    #adi_sim_add_define $k=$v
+    adi_sim_add_param $k=$v
+  }
+
+
 }
 
-proc adi_sim_project_files {project_files} {
+proc adi_sim_project_files {project_files {sim_top "system_tb"}} {
   add_files -fileset sim_1 $project_files
   # Set 'sim_1' fileset properties
-  set_property -name "top" -value "system_tb" -objects [get_filesets sim_1]
+  set_property -name "top" -value $sim_top -objects [get_filesets sim_1]
 }
 
-proc adi_sim_generate {project_name } {
+proc adi_sim_generate {project_name} {
   global design_name
+  global bd_enable
   global adi_sim_defines
+  global adi_sim_params
 
   # Set the defines for simulation
   set_property verilog_define $adi_sim_defines [get_filesets sim_1]
+  set_property generic $adi_sim_params [get_filesets sim_1]
 
   set_property -name {xsim.simulate.runtime} -value {} -objects [get_filesets sim_1]
 
@@ -68,10 +91,10 @@ proc adi_sim_generate {project_name } {
   # Log all waves
   set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
 
-  set project_system_dir "./runs/$project_name/$project_name.srcs/sources_1/bd/$design_name"
-
-  generate_target Simulation [get_files $project_system_dir/$design_name.bd]
-
+  if {$bd_enable eq 1} {
+    set project_system_dir "./runs/$project_name/$project_name.srcs/sources_1/bd/$design_name"
+    generate_target Simulation [get_files $project_system_dir/$design_name.bd]
+  }
   set_property include_dirs . [get_filesets sim_1]
 }
 
@@ -80,15 +103,38 @@ proc adi_open_project {project_path} {
 }
 
 proc adi_update_define {name value} {
+  set defines_new {}
   set defines [get_property verilog_define [get_filesets sim_1]]
   foreach def $defines {
     set def [split $def {=}]
     if {[lindex $def 0] == $name} {
       set def [lreplace $def 1 1 $value]
-      puts "reaplacing"
       }
     lappend defines_new "[lindex $def 0]=[lindex $def 1]"
   }
   set_property verilog_define $defines_new [get_filesets sim_1]
 
+}
+
+proc adi_load_config {config_file} {
+    global adi_sim_generics
+
+    # read the data from the file
+    set fp [open $config_file r]
+    set config [split [read $fp] \n]
+    close $fp
+
+    #delete empty lines
+    for {set i [expr {[llength $config]-1}]} {$i >= 0} {incr i -1} {
+      if {[lindex $config $i] eq {}} {
+        set config [lreplace $config $i $i]
+      }
+    }
+
+    set l {}
+    foreach i $config {
+      lappend l [split $i {=}]
+    }
+
+    return [join $l]
 }

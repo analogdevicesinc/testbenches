@@ -60,9 +60,9 @@ program test_program;
 
   test_harness_env env;
   bit [31:0] val;
-  int link_clk_freq;
-  int device_clk_freq;
-  int sysref_freq;
+  bit [31:0] link_clk_freq;
+  bit [31:0] device_clk_freq;
+  bit [31:0] sysref_freq;
   int data_path_width;
   int tpl_data_path_width;
 

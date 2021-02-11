@@ -39,9 +39,46 @@
 
 module system_tb();
 
+parameter JESD_MODE = "8B10B";
+parameter REF_CLK_RATE = 500;
+parameter RX_RATE = 10;
+parameter TX_RATE = 10;
+parameter RX_NUM_LINKS = 1;
+parameter RX_JESD_M = 8;
+parameter RX_JESD_L = 4;
+parameter RX_JESD_S = 1;
+parameter RX_JESD_NP = 16;
+parameter RX_JESD_F = 4;
+parameter RX_JESD_K = 32;
+parameter TX_NUM_LINKS = 1;
+parameter TX_JESD_M = 8;
+parameter TX_JESD_L = 4;
+parameter TX_JESD_S = 1;
+parameter TX_JESD_NP = 16;
+parameter TX_JESD_F = 4;
+parameter TX_JESD_K = 32;
+
   wire rx_sync_0;
 
-  `TEST_PROGRAM test();
+  `TEST_PROGRAM #(
+                .JESD_MODE (JESD_MODE),
+                .REF_CLK_RATE (REF_CLK_RATE),
+                .RX_RATE  (RX_RATE),
+                .TX_RATE  (TX_RATE),
+                .RX_NUM_LINKS (RX_NUM_LINKS),
+                .RX_JESD_M  (RX_JESD_M),
+                .RX_JESD_L  (RX_JESD_L),
+                .RX_JESD_S  (RX_JESD_S),
+                .RX_JESD_NP (RX_JESD_NP),
+                .RX_JESD_F  (RX_JESD_F),
+                .RX_JESD_K  (RX_JESD_K),
+                .TX_NUM_LINKS (TX_NUM_LINKS),
+                .TX_JESD_M  (TX_JESD_M),
+                .TX_JESD_L  (TX_JESD_L),
+                .TX_JESD_S  (TX_JESD_S),
+                .TX_JESD_NP (TX_JESD_NP),
+                .TX_JESD_F  (TX_JESD_F),
+                .TX_JESD_K  (TX_JESD_K)) test ();
 
   test_harness `TH (
     .ref_clk_out    (ref_clk),

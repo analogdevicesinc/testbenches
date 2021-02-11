@@ -52,10 +52,29 @@ import logger_pkg::*;
 `define AXI_JESD_TX 32'h44b9_0000
 `define DDR_BASE    32'h8000_0000
 
-parameter RX_OUT_BYTES = (`RX_JESD_F % 3 != 0) ? (`JESD_MODE == "64B66B") ? 8 : 4
-                                               : (`JESD_MODE == "64B66B") ? 12 : 6;
-parameter TX_OUT_BYTES = (`TX_JESD_F % 3 != 0) ? (`JESD_MODE == "64B66B") ? 8 : 4
-                                               : (`JESD_MODE == "64B66B") ? 12 : 6;
+parameter JESD_MODE = "8B10B";
+parameter REF_CLK_RATE = 500;
+parameter RX_RATE = 10;
+parameter TX_RATE = 10;
+parameter RX_NUM_LINKS = 1;
+parameter RX_JESD_M = 8;
+parameter RX_JESD_L = 4;
+parameter RX_JESD_S = 1;
+parameter RX_JESD_NP = 16;
+parameter RX_JESD_F = 4;
+parameter RX_JESD_K = 32;
+parameter TX_NUM_LINKS = 1;
+parameter TX_JESD_M = 8;
+parameter TX_JESD_L = 4;
+parameter TX_JESD_S = 1;
+parameter TX_JESD_NP = 16;
+parameter TX_JESD_F = 4;
+parameter TX_JESD_K = 32;
+
+parameter RX_OUT_BYTES = (RX_JESD_F % 3 != 0) ? (JESD_MODE == "64B66B") ? 8 : 4
+                                               : (JESD_MODE == "64B66B") ? 12 : 6;
+parameter TX_OUT_BYTES = (TX_JESD_F % 3 != 0) ? (JESD_MODE == "64B66B") ? 8 : 4
+                                               : (JESD_MODE == "64B66B") ? 12 : 6;
 program test_program;
 
   test_harness_env env;
@@ -66,13 +85,13 @@ program test_program;
   int data_path_width;
   int tpl_data_path_width;
 
-  bit [31:0] lane_rate_khz = `RX_RATE*1000000;
+  bit [31:0] lane_rate_khz = RX_RATE*1000000;
   longint lane_rate = lane_rate_khz*1000;
 
   initial begin
 
     // There is no SYSREF in 64B66B
-    int ref_sysref_status = (`JESD_MODE != "64B66B");
+    int ref_sysref_status = (JESD_MODE != "64B66B");
 
     //creating environment
     env = new(`TH.`SYS_CLK.inst.IF,
@@ -86,19 +105,19 @@ program test_program;
     setLoggerVerbosity(6);
     env.start();
 
-    if (`JESD_MODE != "64B66B") begin
+    if (JESD_MODE != "64B66B") begin
       link_clk_freq = lane_rate/40;
       data_path_width = 4;
-      tpl_data_path_width = (`RX_JESD_NP==12) ? 6 : 4;
+      tpl_data_path_width = (RX_JESD_NP==12) ? 6 : 4;
     end else begin
       link_clk_freq = lane_rate/66;
       data_path_width = 8;
-      tpl_data_path_width = (`RX_JESD_NP==12) ? 12 : 8;
+      tpl_data_path_width = (RX_JESD_NP==12) ? 12 : 8;
     end
     device_clk_freq = link_clk_freq * data_path_width / tpl_data_path_width;
-    sysref_freq = link_clk_freq*data_path_width/(`RX_JESD_K*`RX_JESD_F);
+    sysref_freq = link_clk_freq*data_path_width/(RX_JESD_K*RX_JESD_F);
 
-    `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
+    `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(REF_CLK_RATE*1000000));
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(device_clk_freq));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(sysref_freq));
 
@@ -149,8 +168,8 @@ program test_program;
     env.mng.RegWrite32(`AXI_JESD_TX+32'h0100, 32'h00000000); // Enable SYSREF handling
 
     //CONF0
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h0210, (`TX_JESD_F-1)<<16 | (`TX_JESD_F*`TX_JESD_K-1));
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h021C,((`TX_JESD_F*`TX_JESD_K)/TX_OUT_BYTES-1));
+    env.mng.RegWrite32(`AXI_JESD_TX+32'h0210, (TX_JESD_F-1)<<16 | (TX_JESD_F*TX_JESD_K-1));
+    env.mng.RegWrite32(`AXI_JESD_TX+32'h021C,((TX_JESD_F*TX_JESD_K)/TX_OUT_BYTES-1));
     //CONF1
     env.mng.RegWrite32(`AXI_JESD_TX+32'h0214, 32'h00000000);  // Scrambler enable
 
@@ -168,8 +187,8 @@ program test_program;
     env.mng.RegWrite32(`AXI_JESD_RX+32'h0100, 32'h00000000); // Enable SYSREF handling
 
     //CONF0
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h0210, (`RX_JESD_F-1)<<16 | (`RX_JESD_F*`RX_JESD_K-1));
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h021C,((`RX_JESD_F*`RX_JESD_K)/RX_OUT_BYTES-1)); // Beats per multiframe
+    env.mng.RegWrite32(`AXI_JESD_RX+32'h0210, (RX_JESD_F-1)<<16 | (RX_JESD_F*RX_JESD_K-1));
+    env.mng.RegWrite32(`AXI_JESD_RX+32'h021C,((RX_JESD_F*RX_JESD_K)/RX_OUT_BYTES-1)); // Beats per multiframe
     //CONF1
     env.mng.RegWrite32(`AXI_JESD_RX+32'h0214, 32'h00000000);  // Scrambler enable
 
@@ -178,7 +197,7 @@ program test_program;
 
     //XCVR INIT
     //REG CTRL
-    if (`JESD_MODE != "64B66B") begin
+    if (JESD_MODE != "64B66B") begin
         env.mng.RegWrite32(`RX_XCVR+32'h0020,32'h00001004);   // RXOUTCLK uses DIV2
         env.mng.RegWrite32(`TX_XCVR+32'h0020,32'h00001004);
 

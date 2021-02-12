@@ -105,7 +105,7 @@ class m_axi_sequencer #( type T ) extends reg_accessor;
    RegRead32(.addr(addr),
              .data(data_out));
    if (data !== data_out) begin
-     `ERROR((" Data mismatch. Read data is : %h; expected is %h", data_out, data));
+     `ERROR((" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
    end
 
   endtask : RegReadVerify32

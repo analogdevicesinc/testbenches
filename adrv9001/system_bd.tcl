@@ -52,3 +52,5 @@ ad_connect ssi_clk_out ssi_clk_vip/clk_out
 #
 source $ad_hdl_dir/projects/adrv9001/common/adrv9001_bd.tcl
 
+ad_ip_parameter axi_adrv9001 CONFIG.USE_RX_CLK_FOR_TX $ad_project_params(USE_RX_CLK_FOR_TX)
+

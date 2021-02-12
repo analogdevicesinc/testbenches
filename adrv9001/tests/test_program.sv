@@ -58,6 +58,9 @@ program test_program;
   parameter SDR_DDR_N = 1;
   parameter SINGLE_LANE = 1;
   parameter R1_MODE = 0;
+  parameter USE_RX_CLK_FOR_TX = `USE_RX_CLK_FOR_TX;
+  parameter DDS_DISABLE = 0;
+  parameter IQCORRECTION_DISABLE = 1;
 
   parameter BASE = `AXI_ADRV9001;
 
@@ -171,12 +174,24 @@ program test_program;
   // --------------------------
   task sanity_test;
   begin
+
     //check ADC VERSION
     #100 axi_read_v (RX1_COMMON + 32'h0000000, 'h000a0162);
     #100 axi_read_v (RX2_COMMON + 32'h0000000, 'h000a0162);
     //check DAC VERSION
     #100 axi_read_v (TX1_COMMON + 32'h0000000, 'h00090162);
     #100 axi_read_v (TX2_COMMON + 32'h0000000, 'h00090162);
+    // check DAC CONFIG
+    #100 axi_read_v (TX1_COMMON + 32'h000000c, (USE_RX_CLK_FOR_TX * 1024) +
+                                               (CMOS_LVDS_N * 128) +
+                                               (R1_MODE * 16) +
+                                               (DDS_DISABLE * 64) +
+                                               (IQCORRECTION_DISABLE * 1));
+    #100 axi_read_v (TX2_COMMON + 32'h000000c, (USE_RX_CLK_FOR_TX * 1024) +
+                                               (CMOS_LVDS_N * 128) +
+                                               (1 * 16) +
+                                               (DDS_DISABLE * 64) +
+                                               (IQCORRECTION_DISABLE * 1));
   end
   endtask
 

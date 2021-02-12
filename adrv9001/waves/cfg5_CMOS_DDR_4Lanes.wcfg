@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv " />
+            <top_module name="\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) " />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="std" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="167439893084fs"></ZoomStartTime>
+      <ZoomEndTime time="168692195433fs"></ZoomEndTime>
+      <Cursor1Time time="167854100000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="177"></NameColumnWidth>
+      <ValueColumnWidth column_width="253"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="11" />
+   <wvobject fp_name="divider27" type="divider">
+      <obj_property name="label">AXI_ADRV9001 interface</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group28">
+      <obj_property name="label">Physical interface</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /mssi_sync">
+         <obj_property name="ElementShortName">mssi_sync</obj_property>
+         <obj_property name="ObjectShortName">mssi_sync</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /ssi_clk">
+         <obj_property name="ElementShortName">ssi_clk</obj_property>
+         <obj_property name="ObjectShortName">ssi_clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_dclk_out_n">
+         <obj_property name="ElementShortName">tx1_dclk_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx1_dclk_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_dclk_out_p">
+         <obj_property name="ElementShortName">tx1_dclk_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx1_dclk_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_idata_out_n">
+         <obj_property name="ElementShortName">tx1_idata_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx1_idata_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_idata_out_p">
+         <obj_property name="ElementShortName">tx1_idata_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx1_idata_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_qdata_out_n">
+         <obj_property name="ElementShortName">tx1_qdata_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx1_qdata_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_qdata_out_p">
+         <obj_property name="ElementShortName">tx1_qdata_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx1_qdata_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_strobe_out_n">
+         <obj_property name="ElementShortName">tx1_strobe_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx1_strobe_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_strobe_out_p">
+         <obj_property name="ElementShortName">tx1_strobe_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx1_strobe_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_dclk_out_n">
+         <obj_property name="ElementShortName">tx2_dclk_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx2_dclk_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_dclk_out_p">
+         <obj_property name="ElementShortName">tx2_dclk_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx2_dclk_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_idata_out_n">
+         <obj_property name="ElementShortName">tx2_idata_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx2_idata_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_idata_out_p">
+         <obj_property name="ElementShortName">tx2_idata_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx2_idata_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_qdata_out_n">
+         <obj_property name="ElementShortName">tx2_qdata_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx2_qdata_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_qdata_out_p">
+         <obj_property name="ElementShortName">tx2_qdata_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx2_qdata_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_strobe_out_n">
+         <obj_property name="ElementShortName">tx2_strobe_out_n</obj_property>
+         <obj_property name="ObjectShortName">tx2_strobe_out_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_strobe_out_p">
+         <obj_property name="ElementShortName">tx2_strobe_out_p</obj_property>
+         <obj_property name="ObjectShortName">tx2_strobe_out_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_dclk_in_n">
+         <obj_property name="ElementShortName">tx1_dclk_in_n</obj_property>
+         <obj_property name="ObjectShortName">tx1_dclk_in_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx1_dclk_in_p">
+         <obj_property name="ElementShortName">tx1_dclk_in_p</obj_property>
+         <obj_property name="ObjectShortName">tx1_dclk_in_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_dclk_in_n">
+         <obj_property name="ElementShortName">tx2_dclk_in_n</obj_property>
+         <obj_property name="ObjectShortName">tx2_dclk_in_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /tx2_dclk_in_p">
+         <obj_property name="ElementShortName">tx2_dclk_in_p</obj_property>
+         <obj_property name="ObjectShortName">tx2_dclk_in_p</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group52">
+      <obj_property name="label">Application interface</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_valid_i0">
+         <obj_property name="ElementShortName">adc_1_valid_i0</obj_property>
+         <obj_property name="ObjectShortName">adc_1_valid_i0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_enable_i0">
+         <obj_property name="ElementShortName">adc_1_enable_i0</obj_property>
+         <obj_property name="ObjectShortName">adc_1_enable_i0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_data_i0">
+         <obj_property name="ElementShortName">adc_1_data_i0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">adc_1_data_i0[15:0]</obj_property>
+         <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+         <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
+         <obj_property name="AnalogYRangeMin">14641</obj_property>
+         <obj_property name="AnalogYRRangeMax">58564</obj_property>
+         <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_LINEAR</obj_property>
+         <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+         <obj_property name="AnalogHorizLine">0.000000</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_valid_q0">
+         <obj_property name="ElementShortName">adc_1_valid_q0</obj_property>
+         <obj_property name="ObjectShortName">adc_1_valid_q0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_enable_q0">
+         <obj_property name="ElementShortName">adc_1_enable_q0</obj_property>
+         <obj_property name="ObjectShortName">adc_1_enable_q0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_data_q0">
+         <obj_property name="ElementShortName">adc_1_data_q0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">adc_1_data_q0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_valid_i1">
+         <obj_property name="ElementShortName">adc_1_valid_i1</obj_property>
+         <obj_property name="ObjectShortName">adc_1_valid_i1</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_enable_i1">
+         <obj_property name="ElementShortName">adc_1_enable_i1</obj_property>
+         <obj_property name="ObjectShortName">adc_1_enable_i1</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_data_i1">
+         <obj_property name="ElementShortName">adc_1_data_i1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">adc_1_data_i1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_valid_q1">
+         <obj_property name="ElementShortName">adc_1_valid_q1</obj_property>
+         <obj_property name="ObjectShortName">adc_1_valid_q1</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_enable_q1">
+         <obj_property name="ElementShortName">adc_1_enable_q1</obj_property>
+         <obj_property name="ObjectShortName">adc_1_enable_q1</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_data_q1">
+         <obj_property name="ElementShortName">adc_1_data_q1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">adc_1_data_q1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_1_dovf">
+         <obj_property name="ElementShortName">adc_1_dovf</obj_property>
+         <obj_property name="ObjectShortName">adc_1_dovf</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_clk">
+         <obj_property name="ElementShortName">adc_2_clk</obj_property>
+         <obj_property name="ObjectShortName">adc_2_clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_rst">
+         <obj_property name="ElementShortName">adc_2_rst</obj_property>
+         <obj_property name="ObjectShortName">adc_2_rst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_valid_i0">
+         <obj_property name="ElementShortName">adc_2_valid_i0</obj_property>
+         <obj_property name="ObjectShortName">adc_2_valid_i0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_enable_i0">
+         <obj_property name="ElementShortName">adc_2_enable_i0</obj_property>
+         <obj_property name="ObjectShortName">adc_2_enable_i0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_data_i0">
+         <obj_property name="ElementShortName">adc_2_data_i0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">adc_2_data_i0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_valid_q0">
+         <obj_property name="ElementShortName">adc_2_valid_q0</obj_property>
+         <obj_property name="ObjectShortName">adc_2_valid_q0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_enable_q0">
+         <obj_property name="ElementShortName">adc_2_enable_q0</obj_property>
+         <obj_property name="ObjectShortName">adc_2_enable_q0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_data_q0">
+         <obj_property name="ElementShortName">adc_2_data_q0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">adc_2_data_q0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/adc_2_dovf">
+         <obj_property name="ElementShortName">adc_2_dovf</obj_property>
+         <obj_property name="ObjectShortName">adc_2_dovf</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_clk">
+         <obj_property name="ElementShortName">dac_1_clk</obj_property>
+         <obj_property name="ObjectShortName">dac_1_clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_rst">
+         <obj_property name="ElementShortName">dac_1_rst</obj_property>
+         <obj_property name="ObjectShortName">dac_1_rst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_valid_i0">
+         <obj_property name="ElementShortName">dac_1_valid_i0</obj_property>
+         <obj_property name="ObjectShortName">dac_1_valid_i0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_enable_i0">
+         <obj_property name="ElementShortName">dac_1_enable_i0</obj_property>
+         <obj_property name="ObjectShortName">dac_1_enable_i0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_data_i0">
+         <obj_property name="ElementShortName">dac_1_data_i0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_1_data_i0[15:0]</obj_property>
+         <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_valid_q0">
+         <obj_property name="ElementShortName">dac_1_valid_q0</obj_property>
+         <obj_property name="ObjectShortName">dac_1_valid_q0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_enable_q0">
+         <obj_property name="ElementShortName">dac_1_enable_q0</obj_property>
+         <obj_property name="ObjectShortName">dac_1_enable_q0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_data_q0">
+         <obj_property name="ElementShortName">dac_1_data_q0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_1_data_q0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_valid_i1">
+         <obj_property name="ElementShortName">dac_1_valid_i1</obj_property>
+         <obj_property name="ObjectShortName">dac_1_valid_i1</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_enable_i1">
+         <obj_property name="ElementShortName">dac_1_enable_i1</obj_property>
+         <obj_property name="ObjectShortName">dac_1_enable_i1</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_data_i1">
+         <obj_property name="ElementShortName">dac_1_data_i1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_1_data_i1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_valid_q1">
+         <obj_property name="ElementShortName">dac_1_valid_q1</obj_property>
+         <obj_property name="ObjectShortName">dac_1_valid_q1</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_enable_q1">
+         <obj_property name="ElementShortName">dac_1_enable_q1</obj_property>
+         <obj_property name="ObjectShortName">dac_1_enable_q1</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_data_q1">
+         <obj_property name="ElementShortName">dac_1_data_q1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_1_data_q1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_1_dunf">
+         <obj_property name="ElementShortName">dac_1_dunf</obj_property>
+         <obj_property name="ObjectShortName">dac_1_dunf</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_clk">
+         <obj_property name="ElementShortName">dac_2_clk</obj_property>
+         <obj_property name="ObjectShortName">dac_2_clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_rst">
+         <obj_property name="ElementShortName">dac_2_rst</obj_property>
+         <obj_property name="ObjectShortName">dac_2_rst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_valid_i0">
+         <obj_property name="ElementShortName">dac_2_valid_i0</obj_property>
+         <obj_property name="ObjectShortName">dac_2_valid_i0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_enable_i0">
+         <obj_property name="ElementShortName">dac_2_enable_i0</obj_property>
+         <obj_property name="ObjectShortName">dac_2_enable_i0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_data_i0">
+         <obj_property name="ElementShortName">dac_2_data_i0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_2_data_i0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_valid_q0">
+         <obj_property name="ElementShortName">dac_2_valid_q0</obj_property>
+         <obj_property name="ObjectShortName">dac_2_valid_q0</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_enable_q0">
+         <obj_property name="ElementShortName">dac_2_enable_q0</obj_property>
+         <obj_property name="ObjectShortName">dac_2_enable_q0</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_data_q0">
+         <obj_property name="ElementShortName">dac_2_data_q0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_2_data_q0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/dac_2_dunf">
+         <obj_property name="ElementShortName">dac_2_dunf</obj_property>
+         <obj_property name="ObjectShortName">dac_2_dunf</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider27" type="divider">
+      <obj_property name="label">AXI_ADRV9001 internals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group253">
+      <obj_property name="label">core</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/tx1_data_i">
+         <obj_property name="ElementShortName">tx1_data_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">tx1_data_i[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/tx1_data_q">
+         <obj_property name="ElementShortName">tx1_data_q[15:0]</obj_property>
+         <obj_property name="ObjectShortName">tx1_data_q[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/tx2_data_i">
+         <obj_property name="ElementShortName">tx2_data_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">tx2_data_i[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/tx2_data_q">
+         <obj_property name="ElementShortName">tx2_data_q[15:0]</obj_property>
+         <obj_property name="ObjectShortName">tx2_data_q[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_i_A">
+         <obj_property name="ElementShortName">dac_data_i_A[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_i_A[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_q_A">
+         <obj_property name="ElementShortName">dac_data_q_A[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_q_A[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_i_B">
+         <obj_property name="ElementShortName">dac_data_i_B[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_i_B[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_q_B">
+         <obj_property name="ElementShortName">dac_data_q_B[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_q_B[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_i0">
+         <obj_property name="ElementShortName">dac_data_i0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_i0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_q0">
+         <obj_property name="ElementShortName">dac_data_q0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_q0[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_i1">
+         <obj_property name="ElementShortName">dac_data_i1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_i1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/dac_data_q1">
+         <obj_property name="ElementShortName">dac_data_q1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_data_q1[15:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group249">
+      <obj_property name="label">Tx2 link</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_tx_2_link/tx_data_valid">
+         <obj_property name="ElementShortName">tx_data_valid</obj_property>
+         <obj_property name="ObjectShortName">tx_data_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_tx_2_link/tx_data_i">
+         <obj_property name="ElementShortName">tx_data_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">tx_data_i[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_tx_2_link/tx_data_q">
+         <obj_property name="ElementShortName">tx_data_q[15:0]</obj_property>
+         <obj_property name="ObjectShortName">tx_data_q[15:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group246">
+      <obj_property name="label">Rx2 link</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_2_link/rx_data_i">
+         <obj_property name="ElementShortName">rx_data_i[15:0]</obj_property>
+         <obj_property name="ObjectShortName">rx_data_i[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_2_link/rx_data_q">
+         <obj_property name="ElementShortName">rx_data_q[15:0]</obj_property>
+         <obj_property name="ObjectShortName">rx_data_q[15:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group120">
+      <obj_property name="label">DDS CH0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/\core_enabled.i_tx_channel_1 /\genblk2.i_dds /dac_dds_data">
+         <obj_property name="ElementShortName">dac_dds_data[15:0]</obj_property>
+         <obj_property name="ObjectShortName">dac_dds_data[15:0]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_core/i_tx1/\core_enabled.i_tx_channel_1 /\genblk2.i_dds /dac_valid">
+         <obj_property name="ElementShortName">dac_valid</obj_property>
+         <obj_property name="ObjectShortName">dac_valid</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group157">
+      <obj_property name="label">Rx Phy</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_1_phy/adc_rst">
+         <obj_property name="ElementShortName">adc_rst</obj_property>
+         <obj_property name="ObjectShortName">adc_rst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_1_phy/adc_clk_div">
+         <obj_property name="ElementShortName">adc_clk_div</obj_property>
+         <obj_property name="ObjectShortName">adc_clk_div</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_1_phy/adc_valid">
+         <obj_property name="ElementShortName">adc_valid</obj_property>
+         <obj_property name="ObjectShortName">adc_valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_2_phy/adc_rst">
+         <obj_property name="ElementShortName">adc_rst</obj_property>
+         <obj_property name="ObjectShortName">adc_rst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_2_phy/adc_clk_div">
+         <obj_property name="ElementShortName">adc_clk_div</obj_property>
+         <obj_property name="ObjectShortName">adc_clk_div</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001/inst/i_if/i_rx_2_phy/adc_valid">
+         <obj_property name="ElementShortName">adc_valid</obj_property>
+         <obj_property name="ObjectShortName">adc_valid</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider27" type="divider">
+      <obj_property name="label">AXI_ADRV9001 externals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group122">
+      <obj_property name="label">RX DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="protoinst" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001_rx1_dma/s_axi">
+         <obj_property name="ElementShortName">s_axi</obj_property>
+         <obj_property name="ObjectShortName">s_axi</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001_rx1_dma/fifo_wr_xfer_req">
+         <obj_property name="ElementShortName">fifo_wr_xfer_req</obj_property>
+         <obj_property name="ObjectShortName">fifo_wr_xfer_req</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001_rx1_dma/fifo_wr_din">
+         <obj_property name="ElementShortName">fifo_wr_din[63:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_wr_din[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001_rx1_dma/fifo_wr_sync">
+         <obj_property name="ElementShortName">fifo_wr_sync</obj_property>
+         <obj_property name="ObjectShortName">fifo_wr_sync</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/\system_tb(SDR_DDR_N=0,SINGLE_LANE=0) /test_harness/axi_adrv9001_rx1_dma/fifo_wr_en">
+         <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+         <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>

@@ -189,7 +189,7 @@
 
 `define ERROR(m)  \
   do begin  \
-    PrintError($sformatf("[%m] %s \n found in %s:%0d", \
+    PrintError($sformatf(" %s \n found in %s:%0d", \
       $sformatf m , `__FILE__, `__LINE__)); \
   end while(0)
 

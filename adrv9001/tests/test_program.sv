@@ -54,11 +54,11 @@ import logger_pkg::*;
 
 program test_program;
 
-  parameter CMOS_LVDS_N = `CMOS_LVDS_N;
+  parameter CMOS_LVDS_N = 1;
   parameter SDR_DDR_N = 1;
   parameter SINGLE_LANE = 1;
   parameter R1_MODE = 0;
-  parameter USE_RX_CLK_FOR_TX = `USE_RX_CLK_FOR_TX;
+  parameter USE_RX_CLK_FOR_TX = 0;
   parameter DDS_DISABLE = 0;
   parameter IQCORRECTION_DISABLE = 1;
 
@@ -162,6 +162,8 @@ program test_program;
     pn_test(`FULL_RAMP);
     pn_test(`PN7);
     pn_test(`PN15);
+
+    dds_test;
 
     dma_test;
 
@@ -292,7 +294,129 @@ program test_program;
   end
   endtask
 
+  // --------------------------
+  // DDS test procedure
+  // --------------------------
+  task dds_test;
+  begin
 
+    //  -------------------------------------------------------
+    //  Test DDS path
+    //  -------------------------------------------------------
+
+    link_setup;
+
+    // Select DDS as source
+    #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, 0);
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 0);
+    #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, 0);
+    #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, 0);
+
+    // enable normal data path for RX1
+    #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, 0);
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
+    #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, 0);
+    #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, 0);
+
+    // Configure tone amplitude and frequency
+    #100 axi_write (TX1_CHANNEL + CH0 + 6'h0, 32'h00000fff);
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h0, 32'h000007ff);
+    #100 axi_write (TX1_CHANNEL + CH2 + 6'h0, 32'h000003ff);
+    #100 axi_write (TX1_CHANNEL + CH3 + 6'h0, 32'h000001ff);
+    #100 axi_write (TX1_CHANNEL + CH0 + 6'h4, 32'h00000100);
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h4, 32'h00000200);
+    #100 axi_write (TX1_CHANNEL + CH2 + 6'h4, 32'h00000400);
+    #100 axi_write (TX1_CHANNEL + CH3 + 6'h4, 32'h00000800);
+
+    // Enable Rx channel, enable sign extension
+    #100 axi_write (RX1_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    #100 axi_write (RX1_CHANNEL + CH2 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    #100 axi_write (RX1_CHANNEL + CH3 + 6'h0, 1 | (1 << 4) | (1 << 6));
+
+    // SYNC DAC channels
+    #100 axi_write (TX1_COMMON+32'h0044, 32'h00000001);
+    // SYNC ADC channels
+    #100 axi_write (RX1_COMMON+32'h0044, 1<<3);
+
+    #20000;
+
+    link_down;
+
+  end
+  endtask
+  
+   // --------------------------
+  // DMA test procedure
+  // --------------------------
+  task dma_test;
+  begin
+
+    //  -------------------------------------------------------
+    //  Test DMA path
+    //  -------------------------------------------------------
+
+    // Init test data
+    for (int i=0;i<2048*2 ;i=i+2) begin
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i ,15); 
+    end
+
+    // Configure TX DMA
+    env.mng.RegWrite32(`TX1_DMA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`TX1_DMA+32'h40c, 32'h00000001); // use CYCLIC
+    env.mng.RegWrite32(`TX1_DMA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
+    env.mng.RegWrite32(`TX1_DMA+32'h414, `DDR_BASE+32'h00000000); // SRC_ADDRESS
+    env.mng.RegWrite32(`TX1_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+
+    // Select DDS as source
+    #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, 2);
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 2);
+    #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, 2);
+    #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, 2);
+
+    // enable normal data path for RX1
+    #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, 0);
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
+    #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, 0);
+    #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, 0);
+
+    // Enable Rx channel, enable sign extension
+    #100 axi_write (RX1_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    #100 axi_write (RX1_CHANNEL + CH2 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    #100 axi_write (RX1_CHANNEL + CH3 + 6'h0, 1 | (1 << 4) | (1 << 6));
+
+    // SYNC DAC channels
+    #100 axi_write (TX1_COMMON+32'h0044, 32'h00000001);
+    // SYNC ADC channels
+    #100 axi_write (RX1_COMMON+32'h0044, 1<<3);
+
+    link_setup;
+
+    #20us;
+
+    // Configure RX DMA
+    env.mng.RegWrite32(`RX1_DMA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
+    env.mng.RegWrite32(`RX1_DMA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`RX1_DMA+32'h40c, 32'h00000006); // use TLAST
+    env.mng.RegWrite32(`RX1_DMA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`RX1_DMA+32'h410, `DDR_BASE+32'h00002000); // DEST_ADDRESS
+    env.mng.RegWrite32(`RX1_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+
+    @(posedge system_tb.test_harness.axi_adrv9001_rx1_dma.irq);
+    //Clear interrupt
+    env.mng.RegWrite32(`RX1_DMA+32'h084, 32'h00000002); 
+
+    check_captured_data(
+      .address (`DDR_BASE+'h00002000),
+      .length (1024),
+      .step (1),
+      .max_sample(2048)
+    );
+
+  end
+  endtask
+  
   // Check captured data against incremental pattern based on first sample
   // Pattern should be contiguous
   task check_captured_data(bit [31:0] address,
@@ -320,183 +444,6 @@ program test_program;
       end
 
     end
-  endtask
-
-  // --------------------------
-  // DMA test procedure
-  // --------------------------
-  task dma_test;
-  begin
-    /*
-    //  -------------------------------------------------------
-    //  Test DDS path
-    //  -------------------------------------------------------
-
-    // Configure Transport Layer for DDS
-    //
-
-    // Enable Rx channel
-    env.mng.RegWrite32(`ADC_TPL+32'h0400, 32'h00000001);
-
-    // Select DDS as source
-    env.mng.RegWrite32(`DAC_TPL+32'h0418, 32'h00000000);
-    // Configure tone amplitude and frequency
-    env.mng.RegWrite32(`DAC_TPL+32'h0400, 32'h00000fff);
-    env.mng.RegWrite32(`DAC_TPL+32'h0404, 32'h00000100);
-
-    // Pull out TPL cores from reset
-    env.mng.RegWrite32(`DAC_TPL+32'h0040, 32'h00000003);
-    env.mng.RegWrite32(`ADC_TPL+32'h0040, 32'h00000003);
-
-    // Sync DDS cores
-    env.mng.RegWrite32(`DAC_TPL+32'h0044, 32'h00000001);
-
-    //
-    // Configure TX Link Layer
-    //
-
-    //LINK DISABLE
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h00c0, 32'h00000001);
-
-    //SYSREFCONF
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h0100, 32'h00000000); // Enable SYSREF handling
-
-    //CONF0
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h0210, (`TX_JESD_F-1)<<16 | (`TX_JESD_F*`TX_JESD_K-1));
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h021C,((`TX_JESD_F*`TX_JESD_K)/TX_OUT_BYTES-1));
-    //CONF1
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h0214, 32'h00000000);  // Scrambler enable
-
-    //LINK ENABLE
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h00c0, 32'h00000000);
-
-    //
-    // Configure RX Link Layer
-    //
-
-    //LINK DISABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0, 32'h00000001);
-
-    //SYSREFCONF
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h0100, 32'h00000000); // Enable SYSREF handling
-
-    //CONF0
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h0210, (`RX_JESD_F-1)<<16 | (`RX_JESD_F*`RX_JESD_K-1));
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h021C,((`RX_JESD_F*`RX_JESD_K)/RX_OUT_BYTES-1)); // Beats per multiframe
-    //CONF1
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h0214, 32'h00000000);  // Scrambler enable
-
-    //LINK ENABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0, 32'h00000000);
-
-    //XCVR INIT
-    //REG CTRL
-    if (`JESD_MODE != "64B66B") begin
-        env.mng.RegWrite32(`RX_XCVR+32'h0020,32'h00001004);   // RXOUTCLK uses DIV2
-        env.mng.RegWrite32(`TX_XCVR+32'h0020,32'h00001004);
-
-        env.mng.RegWrite32(`RX_XCVR+32'h0010,32'h00000001);
-        env.mng.RegWrite32(`TX_XCVR+32'h0010,32'h00000001);
-    end
-
-    // Give time the PLLs to lock
-    #35us;
-
-    //Read status back
-    // Check SYSREF_STATUS
-    env.mng.RegReadVerify32(`AXI_JESD_RX+32'h108,1);
-    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h108,1);
-
-    // Check if in DATA state and SYNC is 1
-    env.mng.RegReadVerify32(`AXI_JESD_RX+32'h280,'h3);
-    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h280,'h3 | (ref_sysref_status << 4));
-
-    //LINK DISABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0, 32'h00000001);
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h00c0, 32'h00000001);
-
-    //  -------------------------------------------------------
-    //  Test DAC FIFO path and RX DMA capture
-    //  -------------------------------------------------------
-
-    // Init test data
-    // .step (1),
-    // .max_sample(2048)
-    for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
-    end
-
-    // Configure TX DMA
-    env.mng.RegWrite32(`TX_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`TX_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`TX_DMA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
-    env.mng.RegWrite32(`TX_DMA+32'h414, `DDR_BASE+32'h00000000); // SRC_ADDRESS
-    env.mng.RegWrite32(`TX_DMA+32'h408, 32'h00000001); // Submit transfer DMA
-
-    #5us;
-
-    // Configure Transport Layer for DMA
-    env.mng.RegWrite32(`DAC_TPL+32'h0418, 32'h00000002);
-
-    #1us;
-
-    //LINK ENABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0, 32'h00000000);
-    env.mng.RegWrite32(`AXI_JESD_TX+32'h00c0, 32'h00000000);
-
-
-    #25us;
-
-    //Read status back
-    // Check SYSREF_STATUS
-    env.mng.RegReadVerify32(`AXI_JESD_RX+32'h108,1);
-    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h108,1);
-
-    #1us;
-
-    // Check if in DATA state and SYNC is 1
-    env.mng.RegReadVerify32(`AXI_JESD_RX+32'h280,'h3);
-    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h280,'h3 | (ref_sysref_status << 4));
-
-    // Configure RX DMA
-    env.mng.RegWrite32(`RX_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`RX_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`RX_DMA+32'h418, 32'h000003DF); // X_LENGTH = 992-1
-    env.mng.RegWrite32(`RX_DMA+32'h410, `DDR_BASE+32'h00001000); // DEST_ADDRESS
-    env.mng.RegWrite32(`RX_DMA+32'h408, 32'h00000001); // Submit transfer DMA
-
-    #5us;
-    env.mng.RegWrite32(`ADC_TPL+32'h0400, 32'h00000000);
-    #5us;
-
-    check_captured_data(
-      .address (`DDR_BASE+'h00001000),
-      .length (992),
-      .step (1),
-      .max_sample(2048)
-    );
-
-    env.mng.RegWrite32(`ADC_TPL+32'h0400, 32'h00000001);
-    #5us;
-
-    // Configure RX DMA
-    env.mng.RegWrite32(`RX_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`RX_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`RX_DMA+32'h418, 32'h000003DF); // X_LENGHTH = 992-1
-    env.mng.RegWrite32(`RX_DMA+32'h410, `DDR_BASE+32'h00002000); // DEST_ADDRESS
-    env.mng.RegWrite32(`RX_DMA+32'h408, 32'h00000001); // Submit transfer DMA
-
-    #10us;
-
-    check_captured_data(
-      .address (`DDR_BASE+'h00002000),
-      .length (992),
-      .step (1),
-      .max_sample(2048)
-    );
-*/
-
-  end
   endtask
 
 endprogram

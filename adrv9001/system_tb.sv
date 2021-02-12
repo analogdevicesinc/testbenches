@@ -39,9 +39,19 @@
 
 module system_tb();
 
+  parameter CMOS_LVDS_N = 1;
+  parameter SDR_DDR_N = 1;
+  parameter SINGLE_LANE = 1;
+  parameter USE_RX_CLK_FOR_TX = 0;
+
   reg mssi_sync = 1'b0;
 
-  `TEST_PROGRAM test();
+  `TEST_PROGRAM #(
+    .CMOS_LVDS_N (CMOS_LVDS_N),
+    .SDR_DDR_N (SDR_DDR_N),
+    .SINGLE_LANE (SINGLE_LANE),
+    .USE_RX_CLK_FOR_TX (USE_RX_CLK_FOR_TX)
+  ) test();
 
   test_harness `TH (
     .ssi_clk_out (ssi_clk),

@@ -1,38 +1,3 @@
-// ***************************************************************************
-// ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
-//
-// In this HDL repository, there are many different and unique modules, consisting
-// of various HDL (Verilog or VHDL) components. The individual modules are
-// developed independently, and may be accompanied by separate and unique license
-// terms.
-//
-// The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
-//
-// This core is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE.
-//
-// Redistribution and use of source or resulting binaries, with or without modification
-// of this file, are permitted under one of the following two license terms:
-//
-//   1. The GNU General Public License version 2 as published by the
-//      Free Software Foundation, which can be found in the top level directory
-//      of this repository (LICENSE_GPL2), and also online at:
-//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
-//
-// OR
-//
-//   2. An ADI specific BSD license, which can be found in the top level directory
-//      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
-//      This will allow to generate bit files and not release the source code,
-//      as long as it attaches to an ADI device.
-//
-// ***************************************************************************
-// ***************************************************************************
-
 `include "utils.svh"
 
 `ifndef __S_AXIS_SEQUENCER_SV__
@@ -43,19 +8,53 @@ import logger_pkg::*;
 
 class s_axis_sequencer #(type T);
 
-    T agent;
-    xil_axi4stream_data_byte byte_stream [$];
+    protected T agent;
+    protected xil_axi4stream_data_byte byte_stream [$];
+    protected xil_axi4stream_ready_gen_policy_t mode;
+    protected xil_axi4stream_uint high_time;
+    protected xil_axi4stream_uint low_time;
 
   function new(T agent);
     this.agent = agent;
+    this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
+    this.low_time = 1;
+    this.high_time = 1;
   endfunction
+
+  function void set_mode(xil_axi4stream_ready_gen_policy_t mode);
+    this.mode = mode;
+  endfunction
+
+  function xil_axi4stream_ready_gen_policy_t get_mode();
+    return this.mode;
+  endfunction
+
+  function void set_high_time(xil_axi4stream_uint high_time);
+    this.high_time = high_time;
+  endfunction
+
+  function xil_axi4stream_uint get_high_time();
+    return this.high_time;
+  endfunction
+
+  function void set_low_time(xil_axi4stream_uint low_time);
+    this.low_time = low_time;
+  endfunction
+
+  function xil_axi4stream_uint get_low_time();
+    return this.low_time;
+  endfunction
+
+  // TODO: test different ready policies
 
   task user_gen_tready();
     axi4stream_ready_gen tready_gen;
-    tready_gen = agent.driver.create_ready("tready");
-    tready_gen.set_ready_policy(XIL_AXI4STREAM_READY_GEN_RANDOM);
-    tready_gen.set_low_time(1);
-    tready_gen.set_high_time(2);
+    tready_gen = agent.driver.create_ready("TREADY");
+    tready_gen.set_ready_policy(this.mode);
+    if (this.mode != XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE) begin
+      tready_gen.set_low_time(this.low_time);
+      tready_gen.set_high_time(this.high_time);
+    end
     agent.driver.send_tready(tready_gen);
   endtask
 
@@ -90,12 +89,7 @@ class s_axis_sequencer #(type T);
   endtask
 
   task run();
-    while (1) begin
-      if (agent.monitor.item_collected_port.get_item_cnt() >= 1)
-        get_transfer();
-      else
-        #1;
-    end
+    user_gen_tready();
   endtask
 
 endclass

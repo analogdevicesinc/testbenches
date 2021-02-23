@@ -30,7 +30,7 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   global sys_zynq
   set sys_zynq -1
-  source ../common/test_harness/test_harness_system_bd.tcl
+  ##source ../common/test_harness/test_harness_system_bd.tcl
 
   global ad_project_params
   # transfer tcl parameters as defines to verilog
@@ -81,6 +81,7 @@ proc adi_open_project {project_path} {
 
 proc adi_update_define {name value} {
   set defines [get_property verilog_define [get_filesets sim_1]]
+  set defines_new {}
   foreach def $defines {
     set def [split $def {=}]
     if {[lindex $def 0] == $name} {

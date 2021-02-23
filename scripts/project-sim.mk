@@ -117,6 +117,7 @@ all: $(BUILD_CFGS)
 clean:
 	-rm -rf runs
 	-rm -rf results
+	-rm -rf vivado*
 
 library:
 	@for lib in $(LIB_DEPS); do \

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv " />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="52649490384fs"></ZoomStartTime>
+      <ZoomEndTime time="52719290385fs"></ZoomEndTime>
+      <Cursor1Time time="52702000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="162"></NameColumnWidth>
+      <ValueColumnWidth column_width="139"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="44" />
+   <wave_markers>
+      <marker label="" time="52658000000" />
+      <marker label="" time="52690000000" />
+   </wave_markers>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/phy_block_sync">
+      <obj_property name="ElementShortName">phy_block_sync[15:0]</obj_property>
+      <obj_property name="ObjectShortName">phy_block_sync[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/inst/\mode_64b66b.all_emb_lock ">
+      <obj_property name="ElementShortName">\mode_64b66b.all_emb_lock </obj_property>
+      <obj_property name="ObjectShortName">\mode_64b66b.all_emb_lock </obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ext_sync">
+      <obj_property name="ElementShortName">ext_sync</obj_property>
+      <obj_property name="ObjectShortName">ext_sync</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_adc_fifo/adc_wr">
+      <obj_property name="ElementShortName">adc_wr</obj_property>
+      <obj_property name="ObjectShortName">adc_wr</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/mxfe_adc_fifo/adc_wdata">
+      <obj_property name="ElementShortName">adc_wdata[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_wdata[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_adc_fifo/dma_xfer_req">
+      <obj_property name="ElementShortName">dma_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">dma_xfer_req</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_mxfe_rx_dma/s_axis_ready">
+      <obj_property name="ElementShortName">s_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_mxfe_rx_dma/s_axis_valid">
+      <obj_property name="ElementShortName">s_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_tx_dma/m_src_axi_rdata">
+      <obj_property name="ElementShortName">m_src_axi_rdata[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_rdata[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_tx_dma/m_src_axi_araddr">
+      <obj_property name="ElementShortName">m_src_axi_araddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_araddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_mxfe_tx_dma/m_src_axi_arready">
+      <obj_property name="ElementShortName">m_src_axi_arready</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_arready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_mxfe_tx_dma/m_src_axi_arvalid">
+      <obj_property name="ElementShortName">m_src_axi_arvalid</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_arvalid</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider2266" type="divider">
+      <obj_property name="label">UPACK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_en">
+      <obj_property name="ElementShortName">fifo_rd_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_0">
+      <obj_property name="ElementShortName">fifo_rd_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_0[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_upack/s_axis_valid">
+      <obj_property name="ElementShortName">s_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_upack/s_axis_ready">
+      <obj_property name="ElementShortName">s_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/s_axis_data">
+      <obj_property name="ElementShortName">s_axis_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_data[1023:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider2268" type="divider">
+      <obj_property name="label">DAC FIFO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_dac_fifo/dma_xfer_req">
+      <obj_property name="ElementShortName">dma_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">dma_xfer_req</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_dac_fifo/dma_xfer_last">
+      <obj_property name="ElementShortName">dma_xfer_last</obj_property>
+      <obj_property name="ObjectShortName">dma_xfer_last</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_dac_fifo/dma_valid">
+      <obj_property name="ElementShortName">dma_valid</obj_property>
+      <obj_property name="ObjectShortName">dma_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_dac_fifo/dma_ready">
+      <obj_property name="ElementShortName">dma_ready</obj_property>
+      <obj_property name="ObjectShortName">dma_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/mxfe_dac_fifo/dma_data">
+      <obj_property name="ElementShortName">dma_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">dma_data[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_dac_fifo/dac_valid">
+      <obj_property name="ElementShortName">dac_valid</obj_property>
+      <obj_property name="ObjectShortName">dac_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/mxfe_dac_fifo/dac_data">
+      <obj_property name="ElementShortName">dac_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[1023:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider42" type="divider">
+      <obj_property name="label">DAC DDS CH0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider42" type="divider">
+      <obj_property name="label">DAC DDS CH31</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/link_valid">
+      <obj_property name="ElementShortName">link_valid</obj_property>
+      <obj_property name="ObjectShortName">link_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/dac_ddata">
+      <obj_property name="ElementShortName">dac_ddata[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_ddata[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/link_ready">
+      <obj_property name="ElementShortName">link_ready</obj_property>
+      <obj_property name="ObjectShortName">link_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/link_data">
+      <obj_property name="ElementShortName">link_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">link_data[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_tx_jesd/tx_axi_tx_cfg_lanes_disable">
+      <obj_property name="ElementShortName">tx_axi_tx_cfg_lanes_disable[15:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_axi_tx_cfg_lanes_disable[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/\g_channel[0].genblk1.channel_mux /data_in">
+      <obj_property name="ElementShortName">data_in[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/\g_channel[0].genblk1.channel_mux /data_out">
+      <obj_property name="ElementShortName">data_out[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_out[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_ad_iqcor/data_in">
+      <obj_property name="ElementShortName">data_in[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_ad_iqcor/data_out">
+      <obj_property name="ElementShortName">data_out[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_out[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /dac_data">
+      <obj_property name="ElementShortName">dac_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/i_framer/dac_data">
+      <obj_property name="ElementShortName">dac_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[1023:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider2119" type="divider">
+      <obj_property name="label">framer</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/i_framer/dac_data">
+      <obj_property name="ElementShortName">dac_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_core/i_framer/link_data">
+      <obj_property name="ElementShortName">link_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">link_data[1023:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider2122" type="divider">
+      <obj_property name="label">Tx Link</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_tx_jesd/tx/tx_data">
+      <obj_property name="ElementShortName">tx_data[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_data[1023:0]</obj_property>
+   </wvobject>
+</wave_config>

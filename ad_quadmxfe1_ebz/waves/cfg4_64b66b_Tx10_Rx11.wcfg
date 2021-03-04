@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv " />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="86385000001fs"></ZoomEndTime>
+      <Cursor1Time time="72508000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="231"></NameColumnWidth>
+      <ValueColumnWidth column_width="106"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="82" />
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx_data_tdata">
+      <obj_property name="ElementShortName">rx_data_tdata[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_data_tdata[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy_121_122/txoutclk">
+      <obj_property name="ElementShortName">txoutclk</obj_property>
+      <obj_property name="ObjectShortName">txoutclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy_121_122/rxoutclk">
+      <obj_property name="ElementShortName">rxoutclk</obj_property>
+      <obj_property name="ObjectShortName">rxoutclk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt0_txcharisk">
+      <obj_property name="ElementShortName">gt0_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt0_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt0_txheader">
+      <obj_property name="ElementShortName">gt0_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt0_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt0_txdata">
+      <obj_property name="ElementShortName">gt0_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt0_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt1_txcharisk">
+      <obj_property name="ElementShortName">gt1_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt1_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt1_txheader">
+      <obj_property name="ElementShortName">gt1_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt1_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt1_txdata">
+      <obj_property name="ElementShortName">gt1_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt1_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt2_txcharisk">
+      <obj_property name="ElementShortName">gt2_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt2_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt2_txheader">
+      <obj_property name="ElementShortName">gt2_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt2_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt2_txdata">
+      <obj_property name="ElementShortName">gt2_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt2_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt3_txcharisk">
+      <obj_property name="ElementShortName">gt3_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt3_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt3_txheader">
+      <obj_property name="ElementShortName">gt3_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt3_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt3_txdata">
+      <obj_property name="ElementShortName">gt3_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt3_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt4_txcharisk">
+      <obj_property name="ElementShortName">gt4_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt4_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt4_txheader">
+      <obj_property name="ElementShortName">gt4_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt4_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt4_txdata">
+      <obj_property name="ElementShortName">gt4_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt4_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt5_txcharisk">
+      <obj_property name="ElementShortName">gt5_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt5_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt5_txheader">
+      <obj_property name="ElementShortName">gt5_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt5_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt5_txdata">
+      <obj_property name="ElementShortName">gt5_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt5_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt6_txcharisk">
+      <obj_property name="ElementShortName">gt6_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt6_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt6_txheader">
+      <obj_property name="ElementShortName">gt6_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt6_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt6_txdata">
+      <obj_property name="ElementShortName">gt6_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt6_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt7_txcharisk">
+      <obj_property name="ElementShortName">gt7_txcharisk[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gt7_txcharisk[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt7_txheader">
+      <obj_property name="ElementShortName">gt7_txheader[1:0]</obj_property>
+      <obj_property name="ObjectShortName">gt7_txheader[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy_121_122/gt7_txdata">
+      <obj_property name="ElementShortName">gt7_txdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">gt7_txdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/inst/status_ctrl_state">
+      <obj_property name="ElementShortName">status_ctrl_state[1:0]</obj_property>
+      <obj_property name="ObjectShortName">status_ctrl_state[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/inst/status_lane_cgs_state">
+      <obj_property name="ElementShortName">status_lane_cgs_state[31:0]</obj_property>
+      <obj_property name="ObjectShortName">status_lane_cgs_state[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/inst/status_lane_emb_state">
+      <obj_property name="ElementShortName">status_lane_emb_state[47:0]</obj_property>
+      <obj_property name="ObjectShortName">status_lane_emb_state[47:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy_121_122/cpll_refclk">
+      <obj_property name="ElementShortName">cpll_refclk</obj_property>
+      <obj_property name="ObjectShortName">cpll_refclk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_0">
+      <obj_property name="ElementShortName">dac_data_0[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_0[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_1">
+      <obj_property name="ElementShortName">dac_data_1[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_1[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_10">
+      <obj_property name="ElementShortName">dac_data_10[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_10[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_11">
+      <obj_property name="ElementShortName">dac_data_11[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_11[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_12">
+      <obj_property name="ElementShortName">dac_data_12[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_12[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_13">
+      <obj_property name="ElementShortName">dac_data_13[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_13[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_14">
+      <obj_property name="ElementShortName">dac_data_14[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_14[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_15">
+      <obj_property name="ElementShortName">dac_data_15[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_15[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_2">
+      <obj_property name="ElementShortName">dac_data_2[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_2[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_3">
+      <obj_property name="ElementShortName">dac_data_3[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_3[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_4">
+      <obj_property name="ElementShortName">dac_data_4[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_4[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_5">
+      <obj_property name="ElementShortName">dac_data_5[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_5[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_6">
+      <obj_property name="ElementShortName">dac_data_6[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_6[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_7">
+      <obj_property name="ElementShortName">dac_data_7[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_7[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_8">
+      <obj_property name="ElementShortName">dac_data_8[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_8[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_9">
+      <obj_property name="ElementShortName">dac_data_9[63:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_9[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_dunf">
+      <obj_property name="ElementShortName">dac_dunf</obj_property>
+      <obj_property name="ObjectShortName">dac_dunf</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_0">
+      <obj_property name="ElementShortName">dac_enable_0[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_0[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_1">
+      <obj_property name="ElementShortName">dac_enable_1[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_1[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_10">
+      <obj_property name="ElementShortName">dac_enable_10[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_10[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_11">
+      <obj_property name="ElementShortName">dac_enable_11[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_11[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_12">
+      <obj_property name="ElementShortName">dac_enable_12[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_12[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_13">
+      <obj_property name="ElementShortName">dac_enable_13[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_13[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_14">
+      <obj_property name="ElementShortName">dac_enable_14[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_14[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_15">
+      <obj_property name="ElementShortName">dac_enable_15[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_15[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_2">
+      <obj_property name="ElementShortName">dac_enable_2[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_2[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_3">
+      <obj_property name="ElementShortName">dac_enable_3[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_3[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_4">
+      <obj_property name="ElementShortName">dac_enable_4[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_4[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_5">
+      <obj_property name="ElementShortName">dac_enable_5[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_5[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_6">
+      <obj_property name="ElementShortName">dac_enable_6[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_6[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_7">
+      <obj_property name="ElementShortName">dac_enable_7[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_7[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_8">
+      <obj_property name="ElementShortName">dac_enable_8[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_8[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_enable_9">
+      <obj_property name="ElementShortName">dac_enable_9[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_9[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_0">
+      <obj_property name="ElementShortName">dac_valid_0[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_0[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_1">
+      <obj_property name="ElementShortName">dac_valid_1[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_1[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_10">
+      <obj_property name="ElementShortName">dac_valid_10[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_10[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_11">
+      <obj_property name="ElementShortName">dac_valid_11[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_11[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_12">
+      <obj_property name="ElementShortName">dac_valid_12[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_12[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_13">
+      <obj_property name="ElementShortName">dac_valid_13[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_13[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_14">
+      <obj_property name="ElementShortName">dac_valid_14[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_14[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_15">
+      <obj_property name="ElementShortName">dac_valid_15[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_15[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_2">
+      <obj_property name="ElementShortName">dac_valid_2[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_2[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_3">
+      <obj_property name="ElementShortName">dac_valid_3[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_3[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_4">
+      <obj_property name="ElementShortName">dac_valid_4[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_4[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_5">
+      <obj_property name="ElementShortName">dac_valid_5[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_5[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_6">
+      <obj_property name="ElementShortName">dac_valid_6[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_6[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_7">
+      <obj_property name="ElementShortName">dac_valid_7[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_7[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_8">
+      <obj_property name="ElementShortName">dac_valid_8[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_8[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_valid_9">
+      <obj_property name="ElementShortName">dac_valid_9[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_valid_9[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/link_tdata">
+      <obj_property name="ElementShortName">link_tdata[1023:0]</obj_property>
+      <obj_property name="ObjectShortName">link_tdata[1023:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/link_tvalid">
+      <obj_property name="ElementShortName">link_tvalid</obj_property>
+      <obj_property name="ObjectShortName">link_tvalid</obj_property>
+   </wvobject>
+</wave_config>

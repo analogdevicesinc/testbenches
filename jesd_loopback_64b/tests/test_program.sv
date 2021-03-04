@@ -36,7 +36,7 @@
 //
 //
 `include "utils.svh"
-`include "environment.sv"
+`include "test_harness_env.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -52,7 +52,7 @@ parameter OUT_BYTES = (`JESD_F % 3 != 0) ? 8 : 12;
 
 program test_program;
 
-  environment env;
+  test_harness_env env;
   bit [31:0] val;
   int link_clk_freq_khz;
   int device_clk_freq_khz;
@@ -67,7 +67,11 @@ program test_program;
 
   initial begin
     //creating environment
-    env = new(`TH.`MNG_AXI.inst.IF);
+    env = new(`TH.`SYS_CLK.inst.IF,
+              `TH.`DMA_CLK.inst.IF,
+              `TH.`DDR_CLK.inst.IF,
+              `TH.`MNG_AXI.inst.IF,
+              `TH.`DDR_AXI.inst.IF);
 
     #2ps;
 
@@ -145,7 +149,24 @@ program test_program;
     env.mng.RegReadVerify32(`AXI_JESD_RX+32'h0280,3);
 
     #1us;
+    
+    // --------------------------------------
+    //  Attempt a second link bring-up
+    // --------------------------------------
+    
+    //LINK DISABLE
+    env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0,32'h00000001);
+    env.mng.RegWrite32(`AXI_JESD_TX+32'h00c0,32'h00000001);
+    
+    #1us;
+    
+    //LINK ENABLE
+    env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0,32'h00000000);
+    env.mng.RegWrite32(`AXI_JESD_TX+32'h00c0,32'h00000000);
 
+    #25us;
+    // Read status back
+    env.mng.RegReadVerify32(`AXI_JESD_RX+32'h0280,3);
   end
 
 endprogram

@@ -72,7 +72,7 @@ program test_program;
   initial begin
 
     // There is no SYSREF in 64B66B
-    int ref_sysref_status = (`JESD_MODE != "64B66B");
+    int ref_sync_status = (`JESD_MODE != "64B66B");
 
     //creating environment
     env = new(`TH.`SYS_CLK.inst.IF,
@@ -196,7 +196,7 @@ program test_program;
 
     // Check if in DATA state and SYNC is 1
     env.mng.RegReadVerify32(`AXI_JESD_RX+32'h280,'h3);
-    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h280,'h3 | (ref_sysref_status << 4));
+    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h280,'h3 | (ref_sync_status << 4));
 
     //LINK DISABLE
     env.mng.RegWrite32(`AXI_JESD_RX+32'h00c0, 32'h00000001);

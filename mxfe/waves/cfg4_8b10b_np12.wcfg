@@ -15,16 +15,100 @@
             <top_module name="system_tb" />
             <top_module name="test_harness_ddr_axi_vip_0_pkg" />
             <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
             <top_module name="xil_common_vip_pkg" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="-11fs"></ZoomEndTime>
-      <Cursor1Time time="0fs"></Cursor1Time>
+      <ZoomEndTime time="99305000001fs"></ZoomEndTime>
+      <Cursor1Time time="36093433000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
+      <NameColumnWidth column_width="177"></NameColumnWidth>
+      <ValueColumnWidth column_width="197"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="0" />
+   <WVObjectSize size="19" />
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /tx_out_clk">
+      <obj_property name="ElementShortName">tx_out_clk</obj_property>
+      <obj_property name="ObjectShortName">tx_out_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /rx_out_clk">
+      <obj_property name="ElementShortName">rx_out_clk</obj_property>
+      <obj_property name="ObjectShortName">rx_out_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /QPLL0CLK">
+      <obj_property name="ElementShortName">QPLL0CLK</obj_property>
+      <obj_property name="ObjectShortName">QPLL0CLK</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /QPLL1CLK">
+      <obj_property name="ElementShortName">QPLL1CLK</obj_property>
+      <obj_property name="ObjectShortName">QPLL1CLK</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk1.i_xcm_0 /\genblk4.i_gtye4_common /QPLL0LOCK">
+      <obj_property name="ElementShortName">QPLL0LOCK</obj_property>
+      <obj_property name="ObjectShortName">QPLL0LOCK</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk1.i_xcm_0 /\genblk4.i_gtye4_common /QPLL1LOCK">
+      <obj_property name="ElementShortName">QPLL1LOCK</obj_property>
+      <obj_property name="ObjectShortName">QPLL1LOCK</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /CPLLLOCKEN">
+      <obj_property name="ElementShortName">CPLLLOCKEN</obj_property>
+      <obj_property name="ObjectShortName">CPLLLOCKEN</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /TXPRGDIVRESETDONE">
+      <obj_property name="ElementShortName">TXPRGDIVRESETDONE</obj_property>
+      <obj_property name="ObjectShortName">TXPRGDIVRESETDONE</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /RXPRGDIVRESETDONE">
+      <obj_property name="ElementShortName">RXPRGDIVRESETDONE</obj_property>
+      <obj_property name="ObjectShortName">RXPRGDIVRESETDONE</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /RXRESETDONE">
+      <obj_property name="ElementShortName">RXRESETDONE</obj_property>
+      <obj_property name="ObjectShortName">RXRESETDONE</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /TXRESETDONE">
+      <obj_property name="ElementShortName">TXRESETDONE</obj_property>
+      <obj_property name="ObjectShortName">TXRESETDONE</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /GTRXRESET">
+      <obj_property name="ElementShortName">GTRXRESET</obj_property>
+      <obj_property name="ObjectShortName">GTRXRESET</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /GTTXRESET">
+      <obj_property name="ElementShortName">GTTXRESET</obj_property>
+      <obj_property name="ObjectShortName">GTTXRESET</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_xcvr/inst/\genblk2.i_xch_0 /\genblk12.i_gtye4_channel /RXPROGDIVRESET">
+      <obj_property name="ElementShortName">RXPROGDIVRESET</obj_property>
+      <obj_property name="ObjectShortName">RXPROGDIVRESET</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_data_0">
+      <obj_property name="ElementShortName">adc_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_0[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
+      <obj_property name="AnalogYRangeMin">1.84467e+19</obj_property>
+      <obj_property name="AnalogYRRangeMax">3824</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/up_rx_out_clk_sel_0">
+      <obj_property name="ElementShortName">up_rx_out_clk_sel_0[2:0]</obj_property>
+      <obj_property name="ObjectShortName">up_rx_out_clk_sel_0[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/up_tx_out_clk_sel_0">
+      <obj_property name="ElementShortName">up_tx_out_clk_sel_0[2:0]</obj_property>
+      <obj_property name="ObjectShortName">up_tx_out_clk_sel_0[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/up_rx_out_clk_sel_1">
+      <obj_property name="ElementShortName">up_rx_out_clk_sel_1[2:0]</obj_property>
+      <obj_property name="ObjectShortName">up_rx_out_clk_sel_1[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/up_tx_out_clk_sel_1">
+      <obj_property name="ElementShortName">up_tx_out_clk_sel_1[2:0]</obj_property>
+      <obj_property name="ObjectShortName">up_tx_out_clk_sel_1[2:0]</obj_property>
+   </wvobject>
 </wave_config>

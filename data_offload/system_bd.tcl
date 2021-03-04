@@ -14,14 +14,15 @@ set adc_offload_mem_type $ad_project_params(ADC_OFFLOAD_MEM_TYPE)
 set adc_offload_size $ad_project_params(ADC_OFFLOAD_SIZE)
 set adc_offload_src_dwidth $ad_project_params(ADC_OFFLOAD_SRC_DWIDTH)
 set adc_offload_dst_dwidth $ad_project_params(ADC_OFFLOAD_DST_DWIDTH)
-set adc_ddr_data_width $ad_project_params(ADC_DDR_DATA_WIDTH)
-set adc_ddr_address_width $ad_project_params(ADC_DDR_DATA_WIDTH)
 
 set dac_path_type $ad_project_params(DAC_PATH_TYPE)
 set dac_offload_mem_type $ad_project_params(DAC_OFFLOAD_MEM_TYPE)
 set dac_offload_size $ad_project_params(DAC_OFFLOAD_SIZE)
 set dac_offload_src_dwidth $ad_project_params(DAC_OFFLOAD_SRC_DWIDTH)
 set dac_offload_dst_dwidth $ad_project_params(DAC_OFFLOAD_DST_DWIDTH)
+
+set plddr_offload_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
+set plddr_offload_address_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 
 ################################################################################
 # Create interface ports -- clocks and resets
@@ -82,15 +83,17 @@ ad_data_offload_create RX_DUT \
                        $adc_offload_size \
                        $adc_offload_src_dwidth \
                        $adc_offload_dst_dwidth \
-                       $adc_ddr_data_width \
-                       $adc_ddr_address_width
+                       $plddr_offload_data_width \
+                       $plddr_offload_address_width
 
 ad_data_offload_create TX_DUT \
                        1 \
                        $dac_offload_mem_type \
                        $dac_offload_size \
                        $dac_offload_src_dwidth \
-                       $dac_offload_dst_dwidth
+                       $dac_offload_dst_dwidth \
+                       $plddr_offload_data_width \
+                       $plddr_offload_address_width
 
 
 ################################################################################

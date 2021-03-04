@@ -81,6 +81,7 @@ proc adi_open_project {project_path} {
 
 proc adi_update_define {name value} {
   set defines [get_property verilog_define [get_filesets sim_1]]
+  set defines_new {}
   foreach def $defines {
     set def [split $def {=}]
     if {[lindex $def 0] == $name} {

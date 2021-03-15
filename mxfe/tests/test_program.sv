@@ -243,7 +243,7 @@ program test_program;
 
     // Check if in DATA state and SYNC is 1
     env.mng.RegReadVerify32(`AXI_JESD_RX+32'h280,'h3);
-    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h280,'h3 | (ref_sysref_status << 4));
+    env.mng.RegReadVerify32(`AXI_JESD_TX+32'h280,'h3 | (ref_sync_status << 4));
 
     // Configure RX DMA
     env.mng.RegWrite32(`RX_DMA+32'h400, 32'h00000001); // Enable DMA

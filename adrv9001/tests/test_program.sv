@@ -43,7 +43,9 @@ import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 
 `define RX1_DMA      32'h44A3_0000
+`define RX2_DMA      32'h44A4_0000
 `define TX1_DMA      32'h44A5_0000
+`define TX2_DMA      32'h44A6_0000
 `define AXI_ADRV9001 32'h44A0_0000
 `define DDR_BASE     32'h8000_0000
 
@@ -57,7 +59,7 @@ program test_program;
   parameter CMOS_LVDS_N = 1;
   parameter SDR_DDR_N = 1;
   parameter SINGLE_LANE = 1;
-  parameter R1_MODE = 0;
+  parameter SYNTH_R1_MODE = 0;
   parameter USE_RX_CLK_FOR_TX = 0;
   parameter DDS_DISABLE = 0;
   parameter IQCORRECTION_DISABLE = 1;
@@ -90,6 +92,7 @@ program test_program;
 
   test_harness_env env;
   bit [31:0] val;
+  int R1_MODE = 0;
 
   // --------------------------
   // Wrapper function for AXI read verify
@@ -158,6 +161,9 @@ program test_program;
 
     sanity_test;
 
+    // R2T2 tests
+    R1_MODE = 0;
+
     pn_test(`NIBBLE_RAMP);
     pn_test(`FULL_RAMP);
     pn_test(`PN7);
@@ -166,6 +172,11 @@ program test_program;
     dds_test;
 
     dma_test;
+
+    // independent R1T1 tests
+    R1_MODE = 1;
+
+    dma_test_ch2;
 
     `INFO(("Test Done"));
 
@@ -186,7 +197,7 @@ program test_program;
     // check DAC CONFIG
     #100 axi_read_v (TX1_COMMON + 32'h000000c, (USE_RX_CLK_FOR_TX * 1024) +
                                                (CMOS_LVDS_N * 128) +
-                                               (R1_MODE * 16) +
+                                               (SYNTH_R1_MODE * 16) +
                                                (DDS_DISABLE * 64) +
                                                (IQCORRECTION_DISABLE * 1));
     #100 axi_read_v (TX2_COMMON + 32'h000000c, (USE_RX_CLK_FOR_TX * 1024) +
@@ -194,13 +205,19 @@ program test_program;
                                                (1 * 16) +
                                                (DDS_DISABLE * 64) +
                                                (IQCORRECTION_DISABLE * 1));
+     // Check dummy constant regs
+     #100 axi_read_v (RX1_COMMON + 32'h000008C, 'h8);
+     #100 axi_read_v (RX2_COMMON + 32'h000008C, 'h8);
   end
   endtask
 
   // --------------------------
   // Setup link
   // --------------------------
-  task link_setup;
+  task link_setup(bit rx1_en = 1,
+                  bit rx2_en = 1,
+                  bit tx1_en = 1,
+                  bit tx2_en = 1);
   begin
     // Configure Rx interface
     #100 axi_write (RX1_COMMON + 32'h00000044, (SDR_DDR_N << 16) | (SINGLE_LANE << 8) | (R1_MODE << 2));
@@ -213,14 +230,14 @@ program test_program;
     #100 axi_write (TX2_COMMON + 32'h0000004c, rate-1);
 
     // pull out TX of reset
-    #100 axi_write (TX1_COMMON + 32'h00000040, 3);
-    #100 axi_write (TX2_COMMON + 32'h00000040, 3);
+    #100 axi_write (TX1_COMMON + 32'h00000040, tx1_en << 1 | tx1_en << 0);
+    #100 axi_write (TX2_COMMON + 32'h00000040, tx2_en << 1 | tx2_en << 0);
 
     gen_mssi_sync;
 
     // pull out RX of reset
-    #100 axi_write (RX1_COMMON + 32'h00000040, 3);
-    #100 axi_write (RX2_COMMON + 32'h00000040, 3);
+    #100 axi_write (RX1_COMMON + 32'h00000040, rx1_en << 1 | rx1_en << 0);
+    #100 axi_write (RX2_COMMON + 32'h00000040, rx2_en << 1 | rx2_en << 0);
 
   end
   endtask
@@ -345,7 +362,7 @@ program test_program;
 
   end
   endtask
-  
+
    // --------------------------
   // DMA test procedure
   // --------------------------
@@ -358,7 +375,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i ,15); 
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i ,15);
     end
 
     // Configure TX DMA
@@ -405,7 +422,7 @@ program test_program;
 
     @(posedge system_tb.test_harness.axi_adrv9001_rx1_dma.irq);
     //Clear interrupt
-    env.mng.RegWrite32(`RX1_DMA+32'h084, 32'h00000002); 
+    env.mng.RegWrite32(`RX1_DMA+32'h084, 32'h00000002);
 
     check_captured_data(
       .address (`DDR_BASE+'h00002000),
@@ -416,7 +433,71 @@ program test_program;
 
   end
   endtask
-  
+
+  // --------------------------
+  // DMA test procedure for Rx2/Tx2 independent pairs
+  // --------------------------
+  task dma_test_ch2;
+  begin
+
+    //  -------------------------------------------------------
+    //  Test DMA path
+    //  -------------------------------------------------------
+
+    // Init test data
+    for (int i=0;i<2048*2 ;i=i+2) begin
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i ,15);
+    end
+
+    // Configure TX DMA
+    env.mng.RegWrite32(`TX2_DMA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`TX2_DMA+32'h40c, 32'h00000001); // use CYCLIC
+    env.mng.RegWrite32(`TX2_DMA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
+    env.mng.RegWrite32(`TX2_DMA+32'h414, `DDR_BASE+32'h00000000); // SRC_ADDRESS
+    env.mng.RegWrite32(`TX2_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+
+    // Select DDS as source
+    #100 axi_write (TX2_CHANNEL + CH0 + 6'h18, 2);
+    #100 axi_write (TX2_CHANNEL + CH1 + 6'h18, 2);
+
+    // enable normal data path for RX1
+    #100 axi_write (RX2_CHANNEL + CH0 + 6'h18, 0);
+    #100 axi_write (RX2_CHANNEL + CH1 + 6'h18, 0);
+
+    // Enable Rx channel, enable sign extension
+    #100 axi_write (RX2_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    #100 axi_write (RX2_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
+
+    // SYNC DAC channels
+    #100 axi_write (TX2_COMMON+32'h0044, 32'h00000001);
+    // SYNC ADC channels
+    #100 axi_write (RX2_COMMON+32'h0044, 1<<3);
+
+    link_setup(0,1,0,1);
+
+    #20us;
+
+    // Configure RX DMA
+    env.mng.RegWrite32(`RX2_DMA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
+    env.mng.RegWrite32(`RX2_DMA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`RX2_DMA+32'h40c, 32'h00000006); // use TLAST
+    env.mng.RegWrite32(`RX2_DMA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`RX2_DMA+32'h410, `DDR_BASE+32'h00002000); // DEST_ADDRESS
+    env.mng.RegWrite32(`RX2_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+
+    @(posedge system_tb.test_harness.axi_adrv9001_rx2_dma.irq);
+    //Clear interrupt
+    env.mng.RegWrite32(`RX2_DMA+32'h084, 32'h00000002);
+
+    check_captured_data(
+      .address (`DDR_BASE+'h00002000),
+      .length (1024),
+      .step (1),
+      .max_sample(2048)
+    );
+
+  end
+  endtask
   // Check captured data against incremental pattern based on first sample
   // Pattern should be contiguous
   task check_captured_data(bit [31:0] address,

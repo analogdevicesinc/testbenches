@@ -205,14 +205,18 @@ program test_program;
     // enable test data for TX1
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, 9);
     #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 9);
+    if (R1_MODE==0) begin
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, 9);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, 9);
+    end
 
     // enable test data check for RX1
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, 9<<16);
     #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 9<<16);
+    if (R1_MODE==0) begin
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, 9<<16);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, 9<<16);
+    end
 
     // SYNC DAC channels
     #100 axi_write (TX1_COMMON+32'h0044, 32'h00000001);
@@ -225,8 +229,10 @@ program test_program;
     // clear PN OOS and PN ERR
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h4, 7);
     #100 axi_write (RX1_CHANNEL + CH1 + 6'h4, 7);
+    if (R1_MODE==0) begin
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h4, 7);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h4, 7);
+    end
 
     #10000;
 
@@ -254,30 +260,40 @@ program test_program;
     // Select DDS as source
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, 0);
     #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 0);
+    if (R1_MODE==0) begin
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, 0);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, 0);
+    end
 
     // enable normal data path for RX1
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
+    if (R1_MODE==0) begin
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, 0);
+    end
 
     // Configure tone amplitude and frequency
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h0, 32'h00000fff);
     #100 axi_write (TX1_CHANNEL + CH1 + 6'h0, 32'h000007ff);
+    if (R1_MODE==0) begin
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h0, 32'h000003ff);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h0, 32'h000001ff);
+    end
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h4, 32'h00000100);
     #100 axi_write (TX1_CHANNEL + CH1 + 6'h4, 32'h00000200);
+    if (R1_MODE==0) begin
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h4, 32'h00000400);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h4, 32'h00000800);
+    end
 
     // Enable Rx channel, enable sign extension
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    if (R1_MODE==0) begin
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    end
 
     // SYNC DAC channels
     #100 axi_write (TX1_COMMON+32'h0044, 32'h00000001);
@@ -316,20 +332,26 @@ program test_program;
     // Select DDS as source
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, 2);
     #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 2);
+    if (R1_MODE==0) begin
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, 2);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, 2);
+    end
 
     // enable normal data path for RX1
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
+    if (R1_MODE==0) begin
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, 0);
+    end
 
     // Enable Rx channel, enable sign extension
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    if (R1_MODE==0) begin
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    end
 
     // SYNC DAC channels
     #100 axi_write (TX1_COMMON+32'h0044, 32'h00000001);

@@ -63,7 +63,7 @@ $(addprefix runs/,$(1)/system_project.log) : library $(addprefix cfgs/,$(1).tcl)
 	mkdir -p runs
 	mkdir -p $(addprefix runs/,$(1))
 	mkdir -p results
-	-$$(call simulate, \
+	$$(call simulate, \
 		$(CMD_PRE) $(M_VIVADO_BATCH) system_project.tcl -tclargs $(1).tcl $(CMD_POST), \
 		$$@, \
 		Building $(HL)$(strip $(1))$(NC) env, \

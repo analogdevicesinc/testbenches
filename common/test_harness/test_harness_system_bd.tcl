@@ -108,15 +108,15 @@ ad_connect sys_cpu_resetn /mng_axi_vip/aresetn
 ad_connect sys_cpu_resetn /ddr_axi_vip/aresetn
 
 # Clock and reset interface to system_bd
-set sys_mem_clk sys_mem_clk
+set sys_mem_clk [get_bd_pins ddr_clk_vip/clk_out] 
 
-set sys_cpu_clk sys_cpu_clk
-set sys_cpu_reset sys_cpu_reset
-set sys_cpu_resetn sys_cpu_resetn
+set sys_cpu_clk [get_bd_pins sys_clk_vip/clk_out]
+set sys_cpu_reset [get_bd_pins sys_rstgen/peripheral_reset]
+set sys_cpu_resetn [get_bd_pins sys_rstgen/peripheral_aresetn]
 
-set sys_dma_clk sys_dma_clk
-set sys_dma_reset sys_dma_reset
-set sys_dma_resetn sys_dma_resetn
+set sys_dma_clk [get_bd_pins dma_clk_vip/clk_out]
+set sys_dma_reset [get_bd_pins sys_dma_rstgen/peripheral_reset]
+set sys_dma_resetn [get_bd_pins sys_dma_rstgen/peripheral_aresetn]
 
 ad_connect axi_intc/intr sys_concat_intc/dout
 

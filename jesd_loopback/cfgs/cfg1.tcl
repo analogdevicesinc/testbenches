@@ -1,3 +1,5 @@
+set ad_project_params(JESD_MODE) 8B10B
+
 set ad_project_params(JESD_M) 1
 set ad_project_params(JESD_L) 1
 set ad_project_params(JESD_F) 2

@@ -38,12 +38,24 @@ source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
 
 global ad_project_params
 
+set JESD_MODE  $ad_project_params(JESD_MODE)
+
+if {$JESD_MODE == "8B10B"} {
+  set DATAPATH_WIDTH 4
+  set NP12_DATAPATH_WIDTH 6
+  set LINK_MODE 1
+} else {
+  set DATAPATH_WIDTH 8
+  set NP12_DATAPATH_WIDTH 12
+  set LINK_MODE 2
+}
+
 set JESD_F $ad_project_params(JESD_F)
 # For F=3,6,12 use dual clock
 if {$JESD_F % 3 == 0} {
-  set LL_OUT_BYTES [expr max($JESD_F,6)]
+  set LL_OUT_BYTES [expr max($JESD_F,$NP12_DATAPATH_WIDTH)]
 } else {
-  set LL_OUT_BYTES [expr max($JESD_F,4)]
+  set LL_OUT_BYTES [expr max($JESD_F,$DATAPATH_WIDTH)]
 }
 
 set DMA_SAMPLE_WIDTH $ad_project_params(JESD_NP)
@@ -62,6 +74,8 @@ set SAMPLES_PER_CHANNEL [expr $DAC_DATA_WIDTH / $NUM_OF_CONVERTERS / $SAMPLE_WID
 
 set MAX_CONVERTERS 16
 set MAX_LANES 8
+
+set NUM_LINKS 1
 
 # Ref clk
 ad_ip_instance clk_vip ref_clk_vip [ list \
@@ -107,7 +121,7 @@ ad_ip_instance axi_adxcvr dac_jesd204_xcvr [list \
 ]
 
 # TX JESD204 link layer peripheral
-adi_axi_jesd204_tx_create dac_jesd204_link $NUM_OF_LANES
+adi_axi_jesd204_tx_create dac_jesd204_link $NUM_OF_LANES $NUM_LINKS $LINK_MODE
 ad_ip_parameter dac_jesd204_link/tx CONFIG.TPL_DATA_PATH_WIDTH $LL_OUT_BYTES
 
 # TX JESD204 transport layer peripheral
@@ -128,7 +142,7 @@ ad_ip_instance axi_adxcvr adc_jesd204_xcvr [list \
 ]
 
 # RX JESD204 link layer peripheral
-adi_axi_jesd204_rx_create adc_jesd204_link $NUM_OF_LANES
+adi_axi_jesd204_rx_create adc_jesd204_link $NUM_OF_LANES $NUM_LINKS $LINK_MODE
 ad_ip_parameter adc_jesd204_link/rx CONFIG.TPL_DATA_PATH_WIDTH $LL_OUT_BYTES
 
 # RX JESD204 transport layer peripheral
@@ -140,6 +154,7 @@ adi_tpl_jesd204_rx_create adc_jesd204_transport $NUM_OF_LANES \
                                                 $DMA_SAMPLE_WIDTH
 
 ad_ip_instance util_adxcvr util_jesd204_xcvr [list \
+  LINK_MODE $LINK_MODE \
   RX_NUM_OF_LANES $NUM_OF_LANES \
   TX_NUM_OF_LANES $NUM_OF_LANES \
   CPLL_FBDIV 4 \

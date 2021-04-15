@@ -116,7 +116,8 @@ program test_program;
     env.mng.RegWrite32(`DAC_XCVR+32'h0010,32'h00000001);
 
     // Wait PLLs to lock
-    #5us;
+    //#5us;
+    #30us;
 
     // -----------------------
     // Put XCVR in PRBS mode

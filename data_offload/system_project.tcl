@@ -21,7 +21,7 @@ set project_name [file rootname $cfg_file]
 
 # Create the project
 #set bd_design_name "test_harness"
-set part "xc7z045ffg900-2"
+set part "xczu9eg-ffvb1156-2-e"
 
 adi_sim_project_xilinx $project_name $part
 

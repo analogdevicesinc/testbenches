@@ -58,7 +58,7 @@ import logger_pkg::*;
 `define DMAC_ADDR_FRAME_LOCK_CONFIG     32'h00454
 `define DMAC_ADDR_FRAME_LOCK_STRIDE     32'h00458
 
-`define ADC_TRANSFER_LENGTH 65536
+`define ADC_TRANSFER_LENGTH 32'h500
 
 module test_program();
 
@@ -103,7 +103,7 @@ module test_program();
     systemBringUp;
 
     //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
-    do_set_transfer_length(32'h4FF);
+    do_set_transfer_length(`ADC_TRANSFER_LENGTH);
 
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));
@@ -177,6 +177,9 @@ module test_program();
     `INFO(("Bring up TX Data Offload"));
     env.mng.RegWrite32(`TX_DOFF_BA + `DO_ADDR_CONTROL_1, 32'h1);
 
+    // Enable tx oneshot mode
+    env.mng.RegWrite32(`TX_DOFF_BA + `DO_ADDR_CONTROL_2, 32'b10);
+
     // bring up the DMAC instances from reset
 
     `INFO(("Bring up RX DMAC"));
@@ -195,14 +198,14 @@ module test_program();
   task rx_dma_transfer(int dma_baseaddr, int xfer_addr, int xfer_length);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_FLAGS, 32'h6);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_DEST_ADDR, xfer_addr);
-    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_X_LENGTH, xfer_length);
+    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_X_LENGTH, xfer_length - 1);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_TRANSFER_SUBMIT, 32'h1);
   endtask
 
   task tx_dma_transfer(int dma_baseaddr, int xfer_addr, int xfer_length);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_FLAGS, 32'b010);               // TLAST enabled
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_SRC_ADDR, xfer_addr);
-    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_X_LENGTH, xfer_length);
+    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_X_LENGTH, xfer_length - 1);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_TRANSFER_SUBMIT, 32'h1);
   endtask
 

@@ -169,25 +169,25 @@ create_bd_addr_seg -range 0x00010000 -offset 0x44A00000 \
     [get_bd_addr_spaces mng_axi/Master_AXI] \
     [get_bd_addr_segs RX_DUT/i_data_offload/s_axi/axi_lite] \
     SEG_rx_data_offload_0_axi_lite
-adi_sim_add_define "RX_DOFF_BA=\'h44A00000"
+adi_sim_add_define "RX_DOFF_BA=[format "%d" 0x44A00000]"
 
 create_bd_addr_seg -range 0x00010000 -offset 0x44800000 \
     [get_bd_addr_spaces mng_axi/Master_AXI] \
     [get_bd_addr_segs i_rx_dmac/s_axi/axi_lite] \
     SEG_rx_dmac_0_axi_lite
-adi_sim_add_define "RX_DMA_BA=\'h44800000"
+adi_sim_add_define "RX_DMA_BA=[format "%d" 0x44800000]"
 
 create_bd_addr_seg -range 0x00010000 -offset 0x44B00000 \
     [get_bd_addr_spaces mng_axi/Master_AXI] \
     [get_bd_addr_segs TX_DUT/i_data_offload/s_axi/axi_lite] \
     SEG_tx_data_offload_0_axi_lite
-adi_sim_add_define "TX_DOFF_BA=\'h44B00000"
+adi_sim_add_define "TX_DOFF_BA=[format "%d" 0x44B00000]"
 
 create_bd_addr_seg -range 0x00010000 -offset 0x44C00000 \
     [get_bd_addr_spaces mng_axi/Master_AXI] \
     [get_bd_addr_segs i_tx_dmac/s_axi/axi_lite] \
     SEG_tx_dmac_0_axi_lite
-adi_sim_add_define "TX_DMA_BA=\'h44C00000"
+adi_sim_add_define "TX_DMA_BA=[format "%d" 0x44C00000]"
 
 # source lock/reset
 
@@ -337,7 +337,7 @@ create_bd_addr_seg -range 2G -offset 0x80000000 \
     [get_bd_addr_spaces i_tx_dmac/m_src_axi] \
     [get_bd_addr_segs ddr_axi/S_AXI/Reg] \
     SEG_tx_dmac_0_mm_slave
-adi_sim_add_define "SYS_MEM_BA=\'h80000000"
+adi_sim_add_define "SYS_MEM_BA=[format "%d" 0x80000000]"
 
 ################################################################################
 # pl_ddr_axi_vip - AXI4 VIP for DDR stub
@@ -391,7 +391,7 @@ if {$adc_offload_mem_type || $dac_offload_mem_type} {
       [get_bd_addr_spaces $plddr_iname/fifo2axi_bridge/ddr_axi] \
       [get_bd_addr_segs plddr_axi/S_AXI/Reg] \
       SEG_plddr_0_mm_slave
-  adi_sim_add_define "PL_MEM_BA=\'h00000000"
+  adi_sim_add_define "PL_MEM_BA=[format "%d" 0x00000000]"
 
 }
 

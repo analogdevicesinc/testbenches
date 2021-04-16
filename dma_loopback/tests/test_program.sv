@@ -41,6 +41,7 @@
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import adi_regmap_dmac_pkg::*;
 
 `define RX_DMA      32'h7c42_0000
 `define TX_DMA      32'h7c43_0000
@@ -105,19 +106,28 @@ program test_program;
                    bit [31:0] length);
 
     // Configure TX DMA
-    env.mng.RegWrite32(`TX_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`TX_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`TX_DMA+32'h418, length-1); // X_LENGHT
-    env.mng.RegWrite32(`TX_DMA+32'h414, src_addr); // SRC_ADDRESS
-    env.mng.RegWrite32(`TX_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_CONTROL),
+                       `SET_dmac_CONTROL_ENABLE(1));
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_FLAGS),
+                       `SET_dmac_FLAGS_TLAST(32'h00000006));
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_X_LENGTH),
+                       `SET_dmac_X_LENGTH_X_LENGTH(length-1));
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_SRC_ADDRESS),
+                       `SET_dmac_SRC_ADDRESS_SRC_ADDRESS(src_addr));
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
+                       `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
     // Configure RX DMA
-    env.mng.RegWrite32(`RX_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`RX_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`RX_DMA+32'h418, length-1); // X_LENGHT
-    env.mng.RegWrite32(`RX_DMA+32'h410, dest_addr); // DEST_ADDRESS
-    env.mng.RegWrite32(`RX_DMA+32'h408, 32'h00000001); // Submit transfer DMA
-
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_CONTROL),
+                       `SET_dmac_CONTROL_ENABLE(1));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_FLAGS),
+                       `SET_dmac_FLAGS_TLAST(32'h00000006));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_X_LENGTH),
+                       `SET_dmac_X_LENGTH_X_LENGTH(length-1));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_DEST_ADDRESS),
+                       `SET_dmac_DEST_ADDRESS_DEST_ADDRESS(dest_addr));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
+                       `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
   endtask
 
 

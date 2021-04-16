@@ -35,7 +35,6 @@
 
 `include "utils.svh"
 `include "reg_accessor.sv"
-
 `ifndef __M_AXI_SEQUENCER_SV__
 `define __M_AXI_SEQUENCER_SV__
 
@@ -76,7 +75,6 @@ class m_axi_sequencer #( type T ) extends reg_accessor;
     writer_s.put(1);
 
   endtask : RegWrite32
-
   virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
                                    output bit [31:0]    data);
 

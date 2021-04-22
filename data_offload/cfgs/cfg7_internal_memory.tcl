@@ -11,7 +11,7 @@ set ad_project_params(ADC_OFFLOAD_DST_DWIDTH) 128  ; ## Destination data width
 
 set ad_project_params(DAC_PATH_TYPE) 0             ; ## TX
 set ad_project_params(DAC_OFFLOAD_MEM_TYPE) 0      ; ## Internal storage
-set ad_project_params(DAC_OFFLOAD_SIZE) 2048       ; ## Storage size in bytes
+set ad_project_params(DAC_OFFLOAD_SIZE) 1048576    ; ## Storage size in bytes
 set ad_project_params(DAC_OFFLOAD_SRC_DWIDTH) 128  ; ## Source data width
 set ad_project_params(DAC_OFFLOAD_DST_DWIDTH) 128  ; ## Destination data width
 

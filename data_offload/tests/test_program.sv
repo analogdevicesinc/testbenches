@@ -58,7 +58,7 @@ import logger_pkg::*;
 `define DMAC_ADDR_FRAME_LOCK_CONFIG     32'h00454
 `define DMAC_ADDR_FRAME_LOCK_STRIDE     32'h00458
 
-`define ADC_TRANSFER_LENGTH 32'h500
+`define ADC_TRANSFER_LENGTH 32'h600
 
 module test_program();
 
@@ -119,7 +119,7 @@ module test_program();
     init_mem_64(32'h80000000, 1024);
 
     `INFO(("Start TX DMA ..."));
-    tx_dma_transfer(`TX_DMA_BA, 32'h80000000, 1023);
+    tx_dma_transfer(`TX_DMA_BA, 32'h80000000, 1024);
 
     #30000
     env.stop();
@@ -203,7 +203,7 @@ module test_program();
   endtask
 
   task tx_dma_transfer(int dma_baseaddr, int xfer_addr, int xfer_length);
-    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_FLAGS, 32'b010);               // TLAST enabled
+    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_FLAGS, 32'b011);               // enable TLAST, CYCLIC
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_SRC_ADDR, xfer_addr);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_X_LENGTH, xfer_length - 1);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_TRANSFER_SUBMIT, 32'h1);

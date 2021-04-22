@@ -4,7 +4,7 @@
 ####################################################################################
 ####################################################################################
 
-# Assumes this file is in <HDL>/testbenches/scripts/project-sim.mk 
+# Assumes this file is in <HDL>/testbenches/scripts/project-sim.mk
 ADI_HDL_DIR := $(subst /testbenches/scripts/project-sim.mk,,$(abspath $(lastword $(MAKEFILE_LIST))))
 HDL_LIBRARY_PATH := $(ADI_HDL_DIR)/library/
 include $(ADI_HDL_DIR)/quiet.mk
@@ -48,14 +48,15 @@ endef
 ifeq ($(OS), Windows_NT)
 CMD_PRE = cmd /C "
 CMD_POST = "
-RUN_SIM_PATH = $(shell cygpath -w $(ADI_HDL_DIR)/testbenches/scripts/run_sim.tcl) 
+RUN_SIM_PATH = $(shell cygpath -w $(ADI_HDL_DIR)/testbenches/scripts/run_sim.tcl)
 else
 CMD_PRE =
 CMD_POST =
 RUN_SIM_PATH = $(ADI_HDL_DIR)/testbenches/scripts/run_sim.tcl
 endif
 
-# This rule template will build the environment
+# This rule template will build the environment;
+# For non IPI flow only create the directories
 # $(1): configuration name
 define build
 $(addprefix runs/,$(1)/system_project.log) : library $(addprefix cfgs/,$(1).tcl) $(ENV_DEPS)
@@ -110,7 +111,7 @@ BUILD_CFGS := $(sort $(BUILD_CFGS))
 
 .PHONY: all library clean $(BUILD_CFGS)
 
-all: $(BUILD_CFGS) 
+all: $(BUILD_CFGS)
 
 clean:
 	-rm -rf runs
@@ -132,8 +133,8 @@ $(foreach cfg_test, $(TESTS),\
 	$(eval $(call sim, $(cfg), $(test))) \
 )
 
-# Group sim targets based on env config so we can run easily all test 
-# from one configuration 
+# Group sim targets based on env config so we can run easily all test
+# from one configuration
 # e.g "make cfg1"  will run all tests associated to that configuration
 $(foreach cfg, $(BUILD_CFGS),\
 	$(eval $(cfg): $($(cfg))) \

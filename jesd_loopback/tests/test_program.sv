@@ -134,7 +134,7 @@ program test_program;
     // -----------------------
     // Check Error injection
     // -----------------------
-    env.mng.RegWrite32(`DAC_XCVR+32'h0180, `PRBS_7 | 1<<15 ); // Enable Error inject
+    env.mng.RegWrite32(`DAC_XCVR+32'h0180, `PRBS_7 | 1<<16 ); // Enable Error inject
     env.mng.RegWrite32(`ADC_XCVR+32'h0180, 1 << 8); // Clear prbs err
     env.mng.RegWrite32(`ADC_XCVR+32'h0180, `PRBS_7);
 

@@ -72,7 +72,7 @@ ad_ip_instance axi_dmac i_tx_dmac [list \
   DMA_LENGTH_WIDTH 24 \
   DMA_2D_TRANSFER 0 \
   MAX_BYTES_PER_BURST 4096 \
-  CYCLIC 0 \
+  CYCLIC 1 \
   DMA_DATA_WIDTH_SRC 64 \
   DMA_DATA_WIDTH_DEST $dac_offload_src_dwidth \
 ]

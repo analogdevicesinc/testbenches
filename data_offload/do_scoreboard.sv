@@ -3,7 +3,6 @@
 `ifndef __DO_SCOREBOARD_SV__
 `define __DO_SCOREBOARD_SV__
 
-import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import axi_vip_pkg::*;
 
@@ -16,11 +15,6 @@ class do_scoreboard extends xil_component;
   xil_analysis_port #(axi_monitor_transaction) ddr_axi_ap;
   xil_analysis_port #(axi4stream_monitor_transaction) tx_sink_axis_ap;
   xil_analysis_port #(axi4stream_monitor_transaction) rx_source_axis_ap;
-
-  // transaction variables
-  axi_monitor_transaction ddr_transaction;
-  axi4stream_monitor_transaction tx_sink_transaction;
-  axi4stream_monitor_transaction rx_source_transaction;
 
   // transaction queues (because the source and sink interface can have
   // different widths, byte streams are used)
@@ -156,11 +150,15 @@ class do_scoreboard extends xil_component;
           this.tx_sink_byte_stream.push_back(data_beat[j*8+:8]);
           this.tx_sink_byte_stream_size++;
         end
+
+        this.tx_all_transfer_size += this.tx_transfer_size;
+
+        // reset the TX source beat counter so we can initiate more than one
+        // DMA transfers in the test program and still check the cyclic mode
         if (transaction.get_last())
-          // reset the TX source beat counter so we can initiate more than one
-          // DMA transfers in the test program and still check the cyclic mode
           this.tx_transfer_size = 0;
-          this.tx_all_transfer_size += this.tx_transfer_size;
+
+        this.tx_all_transfer_size += this.tx_transfer_size;
       end
       #1;
     end

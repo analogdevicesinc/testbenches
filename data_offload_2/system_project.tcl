@@ -24,6 +24,8 @@ set part "xczu9eg-ffvb1156-2-e"
 
 adi_sim_project_xilinx $project_name $part
 
+set TST $::env(TST)
+
 # Add test files to the project
 adi_sim_project_files [list \
  "../common/sv/utils.svh" \
@@ -34,16 +36,13 @@ adi_sim_project_files [list \
  "../common/sv/m_axi_sequencer.sv" \
  "../common/sv/s_axi_sequencer.sv" \
  "environment.sv" \
- "tests/test_program.sv" \
+ "tests/$TST.sv" \
  "do_scoreboard.sv" \
  "system_tb.sv" \
  "data_offload_pkg.sv" \
 ]
 
 #set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_program"
+adi_sim_add_define "TEST_PROGRAM=$TST"
 
 adi_sim_generate $project_name
-
-#launch_simulation
-#run all

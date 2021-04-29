@@ -35,9 +35,10 @@ adi_sim_project_files [list \
  "../common/sv/s_axi_sequencer.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
+ "do_scoreboard.sv" \
  "system_tb.sv" \
+ "data_offload_pkg.sv" \
 ]
- # "do_scoreboard.sv" \
 
 #set a default test program
 adi_sim_add_define "TEST_PROGRAM=test_program"

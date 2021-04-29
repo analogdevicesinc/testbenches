@@ -1,10 +1,10 @@
 `include "utils.svh"
-`include "m_axi_sequencer.sv"
-`include "environment.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import m_axi_sequencer_pkg::*;
+import environment_pkg::*;
 
 //=============================================================================
 // Register Maps

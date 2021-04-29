@@ -34,199 +34,200 @@
 // ***************************************************************************
 
 `include "utils.svh"
-`include "reg_accessor.sv"
-`ifndef __M_AXI_SEQUENCER_SV__
-`define __M_AXI_SEQUENCER_SV__
 
-import axi_vip_pkg::*;
-import logger_pkg::*;
+package m_axi_sequencer_pkg;
 
-class m_axi_sequencer #( type T ) extends reg_accessor;
+  import axi_vip_pkg::*;
+  import logger_pkg::*;
+  import reg_accessor_pkg::*;
 
-  T agent;
+  class m_axi_sequencer #( type T ) extends reg_accessor;
 
-  semaphore reader_s;
-  semaphore writer_s;
+    T agent;
 
-  function new(T agent);
-    this.agent = agent;
-    reader_s = new(1);
-    writer_s = new(1);
-  endfunction
+    semaphore reader_s;
+    semaphore writer_s;
 
-  // ---------------------------------------------------------------------------
-  // Generic tasks
-  // ---------------------------------------------------------------------------
-  virtual task automatic RegWrite32(input xil_axi_ulong  addr =0,
-                                    input bit [31:0]    data);
+    function new(T agent);
+      this.agent = agent;
+      reader_s = new(1);
+      writer_s = new(1);
+    endfunction
 
-    static xil_axi_uint       id =0;
+    // ---------------------------------------------------------------------------
+    // Generic tasks
+    // ---------------------------------------------------------------------------
+    virtual task automatic RegWrite32(input xil_axi_ulong  addr =0,
+                                      input bit [31:0]    data);
 
-    writer_s.get(1);
-    `INFOV(("writing to address %h value %h", addr , data), 10);
+      static xil_axi_uint       id =0;
 
-    single_write_transaction_readback_api(.id(id),
-                                          .addr(addr),
-                                          .len(0),
-                                          .size(XIL_AXI_SIZE_4BYTE),
-                                          .burst(XIL_AXI_BURST_TYPE_INCR),
-                                          .data(data));
-    id++;
-    writer_s.put(1);
+      writer_s.get(1);
+      `INFOV(("writing to address %h value %h", addr , data), 10);
 
-  endtask : RegWrite32
-  virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
-                                   output bit [31:0]    data);
+      single_write_transaction_readback_api(.id(id),
+                                            .addr(addr),
+                                            .len(0),
+                                            .size(XIL_AXI_SIZE_4BYTE),
+                                            .burst(XIL_AXI_BURST_TYPE_INCR),
+                                            .data(data));
+      id++;
+      writer_s.put(1);
 
-    xil_axi_data_beat DataBeat_for_read[];
-    static xil_axi_uint       id =0;
+    endtask : RegWrite32
 
-    reader_s.get(1);
+    virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
+                                     output bit [31:0]    data);
 
-    single_read_transaction_readback_api (.id(id),
-                                          .addr(addr),
-                                          .len(0),
-                                          .size(XIL_AXI_SIZE_4BYTE),
-                                          .burst(XIL_AXI_BURST_TYPE_INCR),
-                                          .Rdatabeat(DataBeat_for_read));
-    id++;
-    data = DataBeat_for_read[0][0+:32];
-    `INFOV((" Reading data : %h @ 0x%h", data, addr), 10);
+      xil_axi_data_beat DataBeat_for_read[];
+      static xil_axi_uint       id =0;
 
-    reader_s.put(1);
+      reader_s.get(1);
 
-  endtask : RegRead32
+      single_read_transaction_readback_api (.id(id),
+                                            .addr(addr),
+                                            .len(0),
+                                            .size(XIL_AXI_SIZE_4BYTE),
+                                            .burst(XIL_AXI_BURST_TYPE_INCR),
+                                            .Rdatabeat(DataBeat_for_read));
+      id++;
+      data = DataBeat_for_read[0][0+:32];
+      `INFOV((" Reading data : %h @ 0x%h", data, addr), 10);
 
-  virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
-                                         input bit [31:0]     data);
-   bit [31:0]    data_out;
-   RegRead32(.addr(addr),
-             .data(data_out));
-   if (data !== data_out) begin
-     `ERROR((" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
-   end
+      reader_s.put(1);
 
-  endtask : RegReadVerify32
+    endtask : RegRead32
+
+    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
+                                           input bit [31:0]     data);
+     bit [31:0]    data_out;
+     RegRead32(.addr(addr),
+               .data(data_out));
+     if (data !== data_out) begin
+       `ERROR((" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
+     end
+
+    endtask : RegReadVerify32
 
 
-  // ---------------------------------------------------------------------------
-  // BFM specific tasks
-  // ---------------------------------------------------------------------------
-  task automatic single_write_transaction_api (
-                                input string            name ="single_write",
-                                input xil_axi_uint      id =0,
-                                input xil_axi_ulong     addr =0,
-                                input xil_axi_len_t     len =0,
-                                input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
-                                input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
-                                input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
-                                input xil_axi_cache_t   cache =3,
-                                input xil_axi_prot_t    prot =0,
-                                input xil_axi_region_t  region =0,
-                                input xil_axi_qos_t     qos =0,
-                                input bit [63:0]        data =0);
+    // ---------------------------------------------------------------------------
+    // BFM specific tasks
+    // ---------------------------------------------------------------------------
+    task automatic single_write_transaction_api (
+                                  input string            name ="single_write",
+                                  input xil_axi_uint      id =0,
+                                  input xil_axi_ulong     addr =0,
+                                  input xil_axi_len_t     len =0,
+                                  input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
+                                  input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
+                                  input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
+                                  input xil_axi_cache_t   cache =3,
+                                  input xil_axi_prot_t    prot =0,
+                                  input xil_axi_region_t  region =0,
+                                  input xil_axi_qos_t     qos =0,
+                                  input bit [63:0]        data =0);
 
-    axi_transaction  wr_trans;
-    wr_trans = agent.wr_driver.create_transaction(name);
-    wr_trans.set_write_cmd(addr, burst, id, len, size);
-    wr_trans.set_prot(prot);
-    wr_trans.set_lock(lock);
-    wr_trans.set_cache(cache);
-    wr_trans.set_region(region);
-    wr_trans.set_qos(qos);
-    wr_trans.set_data_block(data);
-    agent.wr_driver.send(wr_trans);
+      axi_transaction  wr_trans;
+      wr_trans = agent.wr_driver.create_transaction(name);
+      wr_trans.set_write_cmd(addr, burst, id, len, size);
+      wr_trans.set_prot(prot);
+      wr_trans.set_lock(lock);
+      wr_trans.set_cache(cache);
+      wr_trans.set_region(region);
+      wr_trans.set_qos(qos);
+      wr_trans.set_data_block(data);
+      agent.wr_driver.send(wr_trans);
 
-  endtask : single_write_transaction_api
+    endtask : single_write_transaction_api
 
-  task automatic single_write_transaction_readback_api (
-    input string            name ="single_write",
-    input xil_axi_uint      id =0,
-    input xil_axi_ulong     addr =0,
-    input xil_axi_len_t     len =0,
-    input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
-    input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
-    input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
-    input xil_axi_cache_t   cache =3,
-    input xil_axi_prot_t    prot =0,
-    input xil_axi_region_t  region =0,
-    input xil_axi_qos_t     qos =0,
-    input bit [63:0]        data =0);
+    task automatic single_write_transaction_readback_api (
+      input string            name ="single_write",
+      input xil_axi_uint      id =0,
+      input xil_axi_ulong     addr =0,
+      input xil_axi_len_t     len =0,
+      input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
+      input xil_axi_cache_t   cache =3,
+      input xil_axi_prot_t    prot =0,
+      input xil_axi_region_t  region =0,
+      input xil_axi_qos_t     qos =0,
+      input bit [63:0]        data =0);
 
-    axi_transaction  wr_trans;
-    wr_trans = agent.wr_driver.create_transaction(name);
-    wr_trans.set_write_cmd(addr, burst, id, len, size);
-    wr_trans.set_prot(prot);
-    wr_trans.set_lock(lock);
-    wr_trans.set_cache(cache);
-    wr_trans.set_region(region);
-    wr_trans.set_qos(qos);
-    wr_trans.set_data_block(data);
-    wr_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
-    agent.wr_driver.send(wr_trans);
-    agent.wr_driver.wait_rsp(wr_trans);
+      axi_transaction  wr_trans;
+      wr_trans = agent.wr_driver.create_transaction(name);
+      wr_trans.set_write_cmd(addr, burst, id, len, size);
+      wr_trans.set_prot(prot);
+      wr_trans.set_lock(lock);
+      wr_trans.set_cache(cache);
+      wr_trans.set_region(region);
+      wr_trans.set_qos(qos);
+      wr_trans.set_data_block(data);
+      wr_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
+      agent.wr_driver.send(wr_trans);
+      agent.wr_driver.wait_rsp(wr_trans);
 
-  endtask : single_write_transaction_readback_api
+    endtask : single_write_transaction_readback_api
 
-  task automatic single_read_transaction_api (
-    input string             name ="single_read",
-    input xil_axi_uint       id =0,
-    input xil_axi_ulong      addr =0,
-    input xil_axi_len_t      len =0,
-    input xil_axi_size_t     size =xil_axi_size_t'(xil_clog2((32)/8)),
-    input xil_axi_burst_t    burst =XIL_AXI_BURST_TYPE_INCR,
-    input xil_axi_lock_t     lock =XIL_AXI_ALOCK_NOLOCK ,
-    input xil_axi_cache_t    cache =3,
-    input xil_axi_prot_t     prot =0,
-    input xil_axi_region_t   region =0,
-    input xil_axi_qos_t      qos =0,
-    input xil_axi_data_beat  aruser =0);
+    task automatic single_read_transaction_api (
+      input string             name ="single_read",
+      input xil_axi_uint       id =0,
+      input xil_axi_ulong      addr =0,
+      input xil_axi_len_t      len =0,
+      input xil_axi_size_t     size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t    burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t     lock =XIL_AXI_ALOCK_NOLOCK ,
+      input xil_axi_cache_t    cache =3,
+      input xil_axi_prot_t     prot =0,
+      input xil_axi_region_t   region =0,
+      input xil_axi_qos_t      qos =0,
+      input xil_axi_data_beat  aruser =0);
 
-    axi_transaction   rd_trans;
-    rd_trans = agent.rd_driver.create_transaction(name);
-    rd_trans.set_read_cmd(addr, burst, id, len, size);
-    rd_trans.set_prot(prot);
-    rd_trans.set_lock(lock);
-    rd_trans.set_cache(cache);
-    rd_trans.set_region(region);
-    rd_trans.set_qos(qos);
-    agent.rd_driver.send(rd_trans);
-  endtask : single_read_transaction_api
+      axi_transaction   rd_trans;
+      rd_trans = agent.rd_driver.create_transaction(name);
+      rd_trans.set_read_cmd(addr, burst, id, len, size);
+      rd_trans.set_prot(prot);
+      rd_trans.set_lock(lock);
+      rd_trans.set_cache(cache);
+      rd_trans.set_region(region);
+      rd_trans.set_qos(qos);
+      agent.rd_driver.send(rd_trans);
+    endtask : single_read_transaction_api
 
-  task automatic single_read_transaction_readback_api (
-    input string             name ="single_read",
-    input xil_axi_uint       id =0,
-    input xil_axi_ulong      addr =0,
-    input xil_axi_len_t      len =0,
-    input xil_axi_size_t     size =xil_axi_size_t'(xil_clog2((32)/8)),
-    input xil_axi_burst_t    burst =XIL_AXI_BURST_TYPE_INCR,
-    input xil_axi_lock_t     lock =XIL_AXI_ALOCK_NOLOCK ,
-    input xil_axi_cache_t    cache =3,
-    input xil_axi_prot_t     prot =0,
-    input xil_axi_region_t   region =0,
-    input xil_axi_qos_t      qos =0,
-    input xil_axi_data_beat  aruser =0,
-    output xil_axi_data_beat Rdatabeat[]);
+    task automatic single_read_transaction_readback_api (
+      input string             name ="single_read",
+      input xil_axi_uint       id =0,
+      input xil_axi_ulong      addr =0,
+      input xil_axi_len_t      len =0,
+      input xil_axi_size_t     size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t    burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t     lock =XIL_AXI_ALOCK_NOLOCK ,
+      input xil_axi_cache_t    cache =3,
+      input xil_axi_prot_t     prot =0,
+      input xil_axi_region_t   region =0,
+      input xil_axi_qos_t      qos =0,
+      input xil_axi_data_beat  aruser =0,
+      output xil_axi_data_beat Rdatabeat[]);
 
-    axi_transaction   rd_trans;
-    rd_trans = agent.rd_driver.create_transaction(name);
-    rd_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
-    rd_trans.set_read_cmd(addr, burst, id, len, size);
-    rd_trans.set_prot(prot);
-    rd_trans.set_lock(lock);
-    rd_trans.set_cache(cache);
-    rd_trans.set_region(region);
-    rd_trans.set_qos(qos);
-    agent.rd_driver.send(rd_trans);
-    agent.rd_driver.wait_rsp(rd_trans);
-    Rdatabeat = new[rd_trans.get_len()+1];
-    for( xil_axi_uint beat=0; beat<rd_trans.get_len()+1; beat++) begin
-      Rdatabeat[beat] = rd_trans.get_data_beat(beat);
-      //$display("Read data from Driver: beat index %d, Data beat %h ", beat, Rdatabeat[beat]);
-    end
+      axi_transaction   rd_trans;
+      rd_trans = agent.rd_driver.create_transaction(name);
+      rd_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
+      rd_trans.set_read_cmd(addr, burst, id, len, size);
+      rd_trans.set_prot(prot);
+      rd_trans.set_lock(lock);
+      rd_trans.set_cache(cache);
+      rd_trans.set_region(region);
+      rd_trans.set_qos(qos);
+      agent.rd_driver.send(rd_trans);
+      agent.rd_driver.wait_rsp(rd_trans);
+      Rdatabeat = new[rd_trans.get_len()+1];
+      for( xil_axi_uint beat=0; beat<rd_trans.get_len()+1; beat++) begin
+        Rdatabeat[beat] = rd_trans.get_data_beat(beat);
+        //$display("Read data from Driver: beat index %d, Data beat %h ", beat, Rdatabeat[beat]);
+      end
 
-  endtask : single_read_transaction_readback_api
+    endtask : single_read_transaction_readback_api
 
-endclass
+  endclass
 
-`endif
+endpackage

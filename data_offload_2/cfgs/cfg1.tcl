@@ -13,6 +13,6 @@ set ad_project_params(PLDDR_OFFLOAD_ADDRESS_WIDTH) 28 ; ## PLDDR's AXI4 interfac
 set ad_project_params(SRC_CLOCK_FREQ) 250000000       ; ## Source clock frequency in Hz
 set ad_project_params(DST_CLOCK_FREQ) 300000000       ; ## Destination clock frequency in Hz
 
-set ad_project_params(DST_READY_MODE) XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE
+set ad_project_params(DST_READY_MODE) XIL_AXI4STREAM_READY_GEN_OSC
 set ad_project_params(DST_READY_HIGH) 1
 set ad_project_params(DST_READY_LOW) 3

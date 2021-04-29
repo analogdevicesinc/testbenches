@@ -85,9 +85,6 @@ package do_scoreboard_pkg;
         this.enabled = 1;
         get_src_transaction();
         get_dst_transaction();
-        // compare_tx_transaction();
-        // compare_rx_transaction();
-        // verify_tx_cyclic();
       join_none
     endtask /* run */
 
@@ -152,7 +149,7 @@ package do_scoreboard_pkg;
           data_beat = transaction.get_data_beat();
           
           if (this.byte_stream.size() == 0) begin
-            `INFO(("WARNING: Received data that we didn't send out. Is the data_offload running cyclically?"));
+            `INFO(("WARNING: Received unexpected transfer - is the data_offload running cyclically?"));
             continue;
           end
           

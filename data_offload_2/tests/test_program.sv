@@ -81,10 +81,9 @@ module test_program(
     env.src_axis_seq.enable();
 
     // DAC stub
-    env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-    // env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_OSC);
-    env.dst_axis_seq.set_high_time(1);
-    env.dst_axis_seq.set_low_time(3);
+    env.dst_axis_seq.set_mode(`DST_READY_MODE);
+    env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
+    env.dst_axis_seq.set_low_time(`DST_READY_LOW);
 
     //=========================================================================
 

@@ -37,7 +37,7 @@ package logger_pkg;
 
 // info    - 2
 // warning - 1
-// error   - 0 
+// error   - 0
 int verbosity = 2;
 
 int error_count = 0;

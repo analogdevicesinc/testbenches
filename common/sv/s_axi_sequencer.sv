@@ -35,56 +35,56 @@
 
 `include "utils.svh"
 
-`ifndef __S_AXI_SEQUENCER_SV__
-`define __S_AXI_SEQUENCER_SV__
+package s_axi_sequencer_pkg;
 
-import xil_common_vip_pkg::*;
-import axi_vip_pkg::*;
+  import xil_common_vip_pkg::*;
+  import axi_vip_pkg::*;
+  import logger_pkg::*;
 
-class s_axi_sequencer #( type T );
+  class s_axi_sequencer #( type T );
 
-  T agent;
+    T agent;
 
-  function new(T agent);
-    this.agent = agent;
-  endfunction
+    function new(T agent);
+      this.agent = agent;
+    endfunction
 
-  task get_byte_from_mem(xil_axi_ulong addr,
-                         output bit [7:0] data);
-    bit [31:0] four_bytes;
-    four_bytes = agent.mem_model.backdoor_memory_read_4byte(addr);
-    case (addr[1:0])
-      2'b00: data = four_bytes[0+:8];
-      2'b01: data = four_bytes[8+:8];
-      2'b10: data = four_bytes[16+:8];
-      2'b11: data = four_bytes[24+:8];
-    endcase
-  endtask
+    task get_byte_from_mem(xil_axi_ulong addr,
+                           output bit [7:0] data);
+      bit [31:0] four_bytes;
+      four_bytes = agent.mem_model.backdoor_memory_read_4byte(addr);
+      case (addr[1:0])
+        2'b00: data = four_bytes[0+:8];
+        2'b01: data = four_bytes[8+:8];
+        2'b10: data = four_bytes[16+:8];
+        2'b11: data = four_bytes[24+:8];
+      endcase
+    endtask
 
-  task set_byte_in_mem(xil_axi_ulong addr,
-                       input bit [7:0] data);
-    bit [3:0] strb;
-    case (addr[1:0])
-      2'b00: strb = 'b0001;
-      2'b01: strb = 'b0010;
-      2'b10: strb = 'b0100;
-      2'b11: strb = 'b1000;
-    endcase
-    agent.mem_model.backdoor_memory_write_4byte(.addr(addr),
-                                                .payload({4{data}}),
-                                                .strb(strb));
-  endtask
+    task set_byte_in_mem(xil_axi_ulong addr,
+                         input bit [7:0] data);
+      bit [3:0] strb;
+      case (addr[1:0])
+        2'b00: strb = 'b0001;
+        2'b01: strb = 'b0010;
+        2'b10: strb = 'b0100;
+        2'b11: strb = 'b1000;
+      endcase
+      agent.mem_model.backdoor_memory_write_4byte(.addr(addr),
+                                                  .payload({4{data}}),
+                                                  .strb(strb));
+    endtask
 
-  task verify_byte(xil_axi_ulong addr,
-                   input bit [7:0] refdata);
-    bit [7:0] data;
+    task verify_byte(xil_axi_ulong addr,
+                     input bit [7:0] refdata);
+      bit [7:0] data;
 
-    get_byte_from_mem (addr, data);
-    if (data !== refdata) begin
-      `ERROR(("Unexpected value at address %0h . Expected: %0h Found: %0h", addr, refdata, data));
-    end
-  endtask
+      get_byte_from_mem (addr, data);
+      if (data !== refdata) begin
+        `ERROR(("Unexpected value at address %0h . Expected: %0h Found: %0h", addr, refdata, data));
+      end
+    endtask
 
-endclass
+  endclass
 
-`endif
+endpackage

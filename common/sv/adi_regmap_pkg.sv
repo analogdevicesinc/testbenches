@@ -35,9 +35,6 @@
 
 `include "utils.svh"
 
-`ifndef __ADI_REGMAP_PKG_SV__
-`define __ADI_REGMAP_PKG_SV__
-
 package adi_regmap_pkg;
 
   import logger_pkg::*;
@@ -107,5 +104,3 @@ package adi_regmap_pkg;
   endfunction;
 
 endpackage
-
-`endif

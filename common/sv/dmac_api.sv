@@ -44,9 +44,10 @@ package dmac_api_pkg;
   import dma_trans_pkg::*;
   import axi_dmac_pkg::*;
 
-class dmac_api;
+  class dmac_api;
 
-  	reg_accessor mng;
+    reg_accessor mng;
+
     int DMAC_BA;
     // DMAC parameters
     axi_dmac_params_t p;
@@ -58,7 +59,7 @@ class dmac_api;
       this.DMAC_BA = DMAC_BA;
       this.p = p;
     endfunction
- 
+
     task enable_dma();
       mng.RegWrite32( DMAC_BA + GetAddrs(dmac_CONTROL),
                                 SetField(dmac_CONTROL, "ENABLE", 1));
@@ -235,6 +236,7 @@ class dmac_api;
                                 SetField(dmac_FLAGS, "TLAST", t.last)
                                 );
     */
+
       transfer_id_get(next_transfer_id);
       transfer_start();
 

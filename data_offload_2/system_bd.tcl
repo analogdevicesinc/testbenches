@@ -20,6 +20,13 @@ set plddr_offload_address_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 set src_clock_freq $ad_project_params(SRC_CLOCK_FREQ)
 set dst_clock_freq $ad_project_params(DST_CLOCK_FREQ)
 
+set dst_ready_mode $ad_project_params(DST_READY_MODE)
+set dst_ready_high $ad_project_params(DST_READY_HIGH)
+set dst_ready_low  $ad_project_params(DST_READY_LOW)
+adi_sim_add_define "DST_READY_MODE=$dst_ready_mode"
+adi_sim_add_define "DST_READY_HIGH=$dst_ready_high"
+adi_sim_add_define "DST_READY_LOW=$dst_ready_low"
+
 ################################################################################
 # Create interface ports -- clocks and resets
 ################################################################################

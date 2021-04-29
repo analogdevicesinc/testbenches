@@ -13,6 +13,7 @@ set offload_mem_type 0 ; ## Internal storage (BRAM)
 set offload_size $ad_project_params(OFFLOAD_SIZE)
 set offload_src_dwidth $ad_project_params(OFFLOAD_SRC_DWIDTH)
 set offload_dst_dwidth $ad_project_params(OFFLOAD_DST_DWIDTH)
+set offload_oneshot $ad_project_params(OFFLOAD_ONESHOT)
 
 set plddr_offload_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 set plddr_offload_address_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
@@ -23,9 +24,25 @@ set dst_clock_freq $ad_project_params(DST_CLOCK_FREQ)
 set dst_ready_mode $ad_project_params(DST_READY_MODE)
 set dst_ready_high $ad_project_params(DST_READY_HIGH)
 set dst_ready_low  $ad_project_params(DST_READY_LOW)
+
+set src_transfers_initial_count $ad_project_params(SRC_TRANSFERS_INITIAL_COUNT)
+set src_transfers_length $ad_project_params(SRC_TRANSFERS_LENGTH)
+set src_transfers_delay $ad_project_params(SRC_TRANSFERS_DELAY)
+set src_transfers_delayed_count $ad_project_params(SRC_TRANSFERS_DELAYED_COUNT)
+
+set time_to_wait $ad_project_params(TIME_TO_WAIT)
+
+## Define passthrough
+
 adi_sim_add_define "DST_READY_MODE=$dst_ready_mode"
 adi_sim_add_define "DST_READY_HIGH=$dst_ready_high"
 adi_sim_add_define "DST_READY_LOW=$dst_ready_low"
+adi_sim_add_define "SRC_TRANSFERS_INITIAL_COUNT=$src_transfers_initial_count"
+adi_sim_add_define "SRC_TRANSFERS_LENGTH=$src_transfers_length"
+adi_sim_add_define "SRC_TRANSFERS_DELAY=$src_transfers_delay"
+adi_sim_add_define "SRC_TRANSFERS_DELAYED_COUNT=$src_transfers_delayed_count"
+adi_sim_add_define "TIME_TO_WAIT=$time_to_wait"
+adi_sim_add_define "OFFLOAD_ONESHOT=$offload_oneshot"
 
 ################################################################################
 # Create interface ports -- clocks and resets

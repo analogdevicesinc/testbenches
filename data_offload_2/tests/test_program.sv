@@ -47,8 +47,6 @@ import data_offload_pkg::*;
 // Register Maps
 //=============================================================================
 
-`define TRANSFER_LENGTH 32'h200
-
 module test_program(
   output  reg       init_req = 1'b0,
   output  reg       sync_ext = 1'b0
@@ -75,8 +73,8 @@ module test_program(
 
     // ADC stub
     env.src_axis_seq.configure(1, 0);
-    for (int i = 0; i < 20; i++)
-      env.src_axis_seq.update(`TRANSFER_LENGTH, 1, 0);
+    for (int i = 0; i < `SRC_TRANSFERS_INITIAL_COUNT; i++)
+      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
 
     env.src_axis_seq.enable();
 
@@ -88,7 +86,9 @@ module test_program(
     //=========================================================================
 
     setLoggerVerbosity(250);
-
+    
+    env.scoreboard.set_oneshot(`OFFLOAD_ONESHOT);
+    
     start_clocks;
     sys_reset;
 
@@ -105,11 +105,27 @@ module test_program(
     
     init_req <= 1'b1;
     
-    #10000
-    // env.src_axis_seq.update(`TRANSFER_LENGTH, 1, 0);
-    #400
+    if (!`OFFLOAD_ONESHOT) begin
+      @env.src_axis_seq.queue_empty;
+      init_req <= 1'b0;
+    end
+    
+    #`SRC_TRANSFERS_DELAY
+    
+    init_req <= 1'b1;
+    
+    #100
+    
+    for (int i = 0; i < `SRC_TRANSFERS_DELAYED_COUNT; i++)
+      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
+      
+    if (!`OFFLOAD_ONESHOT) begin
+      @env.src_axis_seq.queue_empty;
+      init_req <= 1'b0;
+    end
 
-    #30000
+    #`TIME_TO_WAIT
+    
     env.stop();
 
     stop_clocks;
@@ -154,7 +170,9 @@ module test_program(
 
     // bring up the Data Offload instances from reset
     `INFO(("Bring up TX Data Offload"));
-    dut.set_oneshot(1'b1);
+
+    dut.set_oneshot(`OFFLOAD_ONESHOT);
+
     // dut.set_transfer_length(`TRANSFER_LENGTH);
     
     dut.set_resetn(1'b1);

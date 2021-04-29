@@ -45,8 +45,11 @@ package do_scoreboard_pkg;
 
   class do_scoreboard extends xil_component;
 
-    typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
-    sink_type_t sink_type;
+    typedef enum bit { CYCLIC=0, ONESHOT } do_mode_t;
+    do_mode_t do_mode;
+    
+    bit reading = 1'b0;
+    semaphore reading_lock;
 
     // List of analysis ports from the monitors
     xil_analysis_port #(axi4stream_monitor_transaction) src_axis_ap;
@@ -67,8 +70,10 @@ package do_scoreboard_pkg;
       super.new(name);
       this.enabled = 0;
       
-      this.sink_type = CYCLIC;
+      this.do_mode = CYCLIC;
       this.transfer_size = 0;
+      
+      reading_lock = new(1);
     endfunction /* new */
 
     // connect the analysis ports of the monitor to the scoreboard
@@ -88,22 +93,18 @@ package do_scoreboard_pkg;
       join_none
     endtask /* run */
 
-    // set sink type
-    function void set_sink_type(input bit sink_type);
+    function void set_oneshot(input bit do_mode);
       if (!this.enabled) begin
-        this.sink_type = sink_type_t'(sink_type);
+        this.do_mode = do_mode_t'(do_mode);
       end else begin
-        `ERROR(("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
+        `ERROR(("ERROR Scoreboard: Can not configure oneshot mode while scoreboard is running."));
       end
     endfunction
 
-    // get sink type
-    function bit get_sink_type();
-      return this.sink_type;
+    function bit get_oneshot();
+      return this.do_mode;
     endfunction
 
-    // collect data from the AXI4Strean interface of the DAC stub, this task
-    // handles both ONESHOT and CYCLIC scenarios
     task get_src_transaction();
 
       axi4stream_transaction transaction;
@@ -117,6 +118,15 @@ package do_scoreboard_pkg;
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
           data_beat = transaction.get_data_beat();
+          
+          reading_lock.get();
+          
+          if (reading == 1 && this.do_mode == CYCLIC)
+            this.byte_stream.delete();
+            
+          reading = 0;
+          reading_lock.put();
+          
           for (int j=0; j<num_bytes; j++) begin
             this.byte_stream.push_back(data_beat[j*8+:8]);
           end
@@ -148,6 +158,10 @@ package do_scoreboard_pkg;
           num_bytes = transaction.get_data_width()/8;
           data_beat = transaction.get_data_beat();
           
+          reading_lock.get();
+          reading = 1;
+          reading_lock.put();
+          
           if (this.byte_stream.size() == 0) begin
             `INFO(("WARNING: Received unexpected transfer - is the data_offload running cyclically?"));
             continue;
@@ -155,6 +169,9 @@ package do_scoreboard_pkg;
           
           for (int j=0; j<num_bytes; j++) begin
             queue_byte = this.byte_stream.pop_front();
+            if (this.do_mode == CYCLIC)
+              this.byte_stream.push_back(queue_byte);
+              
             if (queue_byte !== data_beat[j*8+:8]) begin
               `ERROR(("ERROR: Failed rx stream comparison! tx != rx: %d != %d", queue_byte, data_beat[j*8+:8]));
             end;
@@ -169,7 +186,7 @@ package do_scoreboard_pkg;
       if (this.enabled == 0) begin
         `INFO(("Scoreboard was inactive."));
       end else begin
-          if (this.byte_stream.size() > 0) begin
+          if (this.do_mode == ONESHOT && this.byte_stream.size() > 0) begin
             `ERROR(("ERROR: Not all samples have arrived yet!"));
           end else begin
             `INFO(("Scoreboard passed!"));

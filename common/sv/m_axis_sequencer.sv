@@ -54,6 +54,7 @@ package m_axis_sequencer_pkg;
 
     event data_av_ev;
     event beat_done;
+    event queue_empty;
     axi4stream_transaction trans;
 
     T agent;
@@ -105,6 +106,8 @@ package m_axis_sequencer_pkg;
           #10;
           if (byte_count_q.size() > 0)
             packetize();
+          else
+            -> queue_empty;
         end
       end
     endtask

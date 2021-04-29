@@ -89,11 +89,22 @@ package data_offload_pkg;
     
     task set_transfer_length(input bit [31:0] length);
       if (length == 0) begin
-        `ERROR(("ERROR: Attempted to set transfer_length of %x to 0!", this.base_address));
+        `ERROR(("data_offload: Attempted to set transfer_length of %x to 0!", this.base_address));
       end
       
       this.bus.RegWrite32(this.base_address + `DO_ADDR_TRANSFER_LENGTH, length - 1);
     endtask : set_transfer_length;
+
+    task set_sync_config(input bit [1:0] sync_config);
+      if (sync_config == 3)
+        `ERROR(("data_offload: Invalid sync_config mode 3 requested!"));
+
+      this.bus.RegWrite32(this.base_address + `DO_ADDR_SYNC_CONFIG, {30'h0, sync_config});
+    endtask : set_sync_config;
+
+    task trigger_sync();
+      this.bus.RegWrite32(this.base_address + `DO_ADDR_SYNC_CONFIG, 32'h1);
+    endtask : trigger_sync;
     
   endclass
 

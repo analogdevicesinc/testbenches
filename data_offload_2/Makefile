@@ -12,9 +12,10 @@ SV_DEPS += ../common/sv/m_axis_sequencer.sv
 SV_DEPS += ../common/sv/s_axis_sequencer.sv
 SV_DEPS += ../common/sv/m_axi_sequencer.sv
 SV_DEPS += ../common/sv/s_axi_sequencer.sv
-# SV_DEPS += do_scoreboard.sv
+SV_DEPS += do_scoreboard.sv
 SV_DEPS += environment.sv
 SV_DEPS += system_tb.sv
+SV_DEPS += data_offload_pkg.sv
 
 ENV_DEPS += cfgs/common_cfg.tcl
 ENV_DEPS += system_project.tcl

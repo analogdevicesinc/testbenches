@@ -1,51 +1,73 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright 2021 (c) Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsabilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
+
 `include "utils.svh"
-`include "m_axi_sequencer.sv"
-`include "environment.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 
+import environment_pkg::*;
+import data_offload_pkg::*;
+
 //=============================================================================
 // Register Maps
 //=============================================================================
 
-`define DO_ADDR_VERSION                 32'h00000
-`define DO_ADDR_ID                      32'h00004
-`define DO_ADDR_SCRATCH                 32'h00008
-`define DO_ADDR_MAGIC                   32'h0000C
-`define DO_ADDR_MEM_TYPE                32'h00010
-`define DO_ADDR_MEM_SIZE_LSB            32'h00014
-`define DO_ADDR_MEM_SIZE_MSB            32'h00018
-`define DO_ADDR_TRANSFER_LENGTH         32'h0001C
-`define DO_ADDR_DDR_CALIB_DONE          32'h00080
-`define DO_ADDR_CONTROL_1               32'h00084
-`define DO_ADDR_CONTROL_2               32'h00088
-`define DO_ADDR_SYNC                    32'h00100
-`define DO_ADDR_SYNC_CONFIG             32'h00104
-`define DO_ADDR_DBG_FSM                 32'h00200
-`define DO_ADDR_DBG_SMP_LSB_COUNTER     32'h00204
-`define DO_ADDR_DBG_SMP_MSB_COUNTER     32'h00208
+`define TRANSFER_LENGTH 32'h200
 
-`define	DO_CORE_VERSION 			          32'h00000100
-`define	DO_CORE_MAGIC   			          32'h44414F46
-
-`define GPIO_DATA                       32'h00000
-
-`define TRANSFER_LENGTH 32'h600
-
-module test_program();
+module test_program(
+  output  reg       init_req = 1'b0,
+  output  reg       sync_ext = 1'b0
+);
 
   //declaring environment instance
-  environment env;
+  environment                       env;
   xil_axi4stream_ready_gen_policy_t dac_mode;
-
+  
+  data_offload                      dut;
+  
   initial begin
     //creating environment
     env = new(`TH.`MNG_AXI.inst.IF,
               `TH.`SRC_AXIS.inst.IF,
               `TH.`DST_AXIS.inst.IF
              );
+             
+    dut = new(env.mng, `DOFF_BA);
 
     //=========================================================================
     // Setup generator/monitor stubs
@@ -53,14 +75,16 @@ module test_program();
 
     // ADC stub
     env.src_axis_seq.configure(1, 0);
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 20; i++)
       env.src_axis_seq.update(`TRANSFER_LENGTH, 1, 0);
-    
+
     env.src_axis_seq.enable();
 
     // DAC stub
-    dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
-    env.dst_axis_seq.set_mode(dac_mode);
+    env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    // env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_OSC);
+    env.dst_axis_seq.set_high_time(1);
+    env.dst_axis_seq.set_low_time(3);
 
     //=========================================================================
 
@@ -76,12 +100,15 @@ module test_program();
     `INFO(("Bring up IP from reset."));
     systemBringUp;
 
-    //do_set_transfer_length(`TRANSFER_LENGTH);
-    //do_set_transfer_length(`TRANSFER_LENGTH);
-
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));
     env.run();
+    
+    init_req <= 1'b1;
+    
+    #10000
+    // env.src_axis_seq.update(`TRANSFER_LENGTH, 1, 0);
+    #400
 
     #30000
     env.stop();
@@ -128,18 +155,11 @@ module test_program();
 
     // bring up the Data Offload instances from reset
     `INFO(("Bring up TX Data Offload"));
-    env.mng.RegWrite32(`DOFF_BA + `DO_ADDR_CONTROL_1, 32'h1);
-
-    // Enable tx oneshot mode
-    env.mng.RegWrite32(`DOFF_BA + `DO_ADDR_CONTROL_2, 32'b10);
+    dut.set_oneshot(1'b1);
+    // dut.set_transfer_length(`TRANSFER_LENGTH);
     
-    // Enable GPIO
-    env.mng.RegWrite32(`CTRL_GPIO_BA + `GPIO_DATA, 32'b1);
-
-  endtask
-
-  task do_set_transfer_length(int length);
-    env.mng.RegWrite32(`DOFF_BA + `DO_ADDR_TRANSFER_LENGTH, length-1);
+    dut.set_resetn(1'b1);
+    
   endtask
 
 endmodule

@@ -52,17 +52,24 @@ ad_data_offload_create DUT \
                        $plddr_offload_data_width \
                        $plddr_offload_address_width
 
+
+create_bd_port -dir I -type data init_req
+ad_connect init_req DUT/init_req
+
+create_bd_port -dir I -type data sync_ext
+ad_connect sync_ext DUT/sync_ext
+
 ################################################################################
 # mng_axi - AXI4 VIP for configuration
 ################################################################################
 
-ad_ip_instance axi_interconnect axi_cfg_interconnect [ list \
-  NUM_SI {1} \
-  NUM_MI {2} \
-]
+# ad_ip_instance axi_interconnect axi_cfg_interconnect [ list \
+#   NUM_SI {1} \
+#   NUM_MI {2} \
+# ]
 
-ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/ACLK
-ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/ARESETN
+# ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/ACLK
+# ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/ARESETN
 
 ad_ip_instance axi_vip mng_axi
 adi_sim_add_define "MNG_AXI=mng_axi"
@@ -92,8 +99,7 @@ set_property -dict [list CONFIG.ADDR_WIDTH {32} \
 
 # Connect AXI VIP to DUT
 
-ad_connect axi_cfg_interconnect/S00_AXI mng_axi/M_AXI
-ad_connect axi_cfg_interconnect/M00_AXI DUT/s_axi
+ad_connect DUT/s_axi mng_axi/M_AXI
 
 ad_connect sys_clk_vip/clk_out DUT/s_axi_aclk
 ad_connect sys_clk_vip/clk_out mng_axi/aclk
@@ -101,11 +107,11 @@ ad_connect sys_clk_vip/clk_out mng_axi/aclk
 ad_connect sys_rst_vip/rst_out DUT/s_axi_aresetn
 ad_connect sys_rst_vip/rst_out mng_axi/aresetn
 
-ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/S00_ACLK
-ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/M00_ACLK
+# ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/S00_ACLK
+# ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/M00_ACLK
 
-ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/S00_ARESETN
-ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/M00_ARESETN
+# ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/S00_ARESETN
+# ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/M00_ARESETN
 
 # Create address segments
 
@@ -129,8 +135,8 @@ ad_ip_parameter src_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
 ad_ip_parameter src_rst_vip CONFIG.ASYNCHRONOUS {NO}
 ad_connect src_clk_vip/clk_out src_rst_vip/sync_clk
 
-ad_connect src_clk_vip/clk_out axi_cfg_interconnect/M01_ACLK
-ad_connect src_rst_vip/rst_out axi_cfg_interconnect/M01_ARESETN
+# ad_connect src_clk_vip/clk_out axi_cfg_interconnect/M01_ACLK
+# ad_connect src_rst_vip/rst_out axi_cfg_interconnect/M01_ARESETN
 
 # destination clock/reset
 
@@ -187,27 +193,4 @@ ad_connect dst_rst_vip/rst_out DUT/m_axis_aresetn
 
 ad_connect DUT/m_axis dst_axis/s_axis
 
-################################################################################
-# AXI GPIO pins
-################################################################################
-
-ad_ip_instance axi_gpio ctrl_gpio
-adi_sim_add_define "CTRL_GPIO=ctrl_gpio"
-ad_ip_parameter ctrl_gpio CONFIG.C_GPIO_WIDTH {1}
-ad_ip_parameter ctrl_gpio CONFIG.C_ALL_OUTPUTS {1}
-
-ad_connect axi_cfg_interconnect/M01_AXI ctrl_gpio/S_AXI
-ad_connect src_clk_vip/clk_out ctrl_gpio/s_axi_aclk
-ad_connect src_rst_vip/rst_out ctrl_gpio/s_axi_aresetn
-
-ad_connect ctrl_gpio/gpio_io_o DUT/init_req
-
-create_bd_addr_seg -range 0x00000100 -offset 0x44B00000 \
-    [get_bd_addr_spaces mng_axi/Master_AXI] \
-    [get_bd_addr_segs ctrl_gpio/S_AXI/Reg] \
-    SEG_ctrl_gpio_axi_lite
-adi_sim_add_define "CTRL_GPIO_BA=[format "%d" 0x44B00000]"
-
-# Not using external SYNC at the moment
-ad_connect DUT/sync_ext GND
 

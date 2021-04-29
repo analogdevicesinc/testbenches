@@ -1,92 +1,91 @@
-`ifndef __ADI_REGMAP_SV__
-`define __ADI_REGMAP_SV__
-
 `include "utils.svh"
 
-import logger_pkg::*;
+package adi_regmap_pkg::*;
 
-class adi_regmap;
+  import logger_pkg::*;
 
-  typedef enum {RO, RW, RW1C, RW1S} acc_t;
+  class adi_regmap;
 
-  typedef struct {
-    int msb;
-    int lsb;
-    int value;
-  } field_t;
+    typedef enum {RO, RW, RW1C, RW1S} acc_t;
 
-  typedef struct{
-    int addr;
-    string name;
-    acc_t access;
-    field_t fields[string];
-  } reg_t;
+    typedef struct {
+      int msb;
+      int lsb;
+      int value;
+    } field_t;
 
-  reg_t regmap_array[];
+    typedef struct{
+      int addr;
+      string name;
+      acc_t access;
+      field_t fields[string];
+    } reg_t;
 
-  // Constructor
-  function new();
+    reg_t regmap_array[];
 
-  endfunction;
+    // Constructor
+    function new();
 
-  function automatic void setRegister(ref reg_t register,
-                                      int value);
+    endfunction;
 
-    foreach ( register.fields [ field ]) begin
-      automatic int msb = register.fields[field].msb;
-      automatic int lsb = register.fields[field].lsb;
-      for(int i=lsb; i<=msb; i++)
-        register.fields[field].value[i] = value[i];
-    end
+    function automatic void setRegister(ref reg_t register,
+                                        int value);
 
-  endfunction;
+      foreach ( register.fields [ field ]) begin
+        automatic int msb = register.fields[field].msb;
+        automatic int lsb = register.fields[field].lsb;
+        for(int i=lsb; i<=msb; i++)
+          register.fields[field].value[i] = value[i];
+      end
 
-  function automatic int getRegister(input reg_t register);
+    endfunction;
 
-    automatic int value = 0;
+    function automatic int getRegister(input reg_t register);
 
-    foreach ( register.fields[field] ) begin
-      value |= register.fields[field].value << register.fields[field].lsb;
-    end
+      automatic int value = 0;
 
-    return value;
-  endfunction;
+      foreach ( register.fields[field] ) begin
+        value |= register.fields[field].value << register.fields[field].lsb;
+      end
 
-  function automatic void setField(ref reg_t register,
-                                   string field,
-                                   int value);
-    automatic int lsb, msb;
+      return value;
+    endfunction;
 
-    if (!register.fields.exists(field))
-      `ERROR(("Field %s in reg %s does not exists", field, register.name));
+    function automatic void setField(ref reg_t register,
+                                     string field,
+                                     int value);
+      automatic int lsb, msb;
 
-    lsb = register.fields[field].lsb;
-    msb = register.fields[field].msb;
+      if (!register.fields.exists(field))
+        `ERROR(("Field %s in reg %s does not exists", field, register.name));
 
-    register.fields[field].value = value << lsb;
-    for (int i=msb+1; i<=31; i++) begin
-      register.fields[field].value[i]=1'b0;
-    end
+      lsb = register.fields[field].lsb;
+      msb = register.fields[field].msb;
 
-    `INFOV(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value), 4);
+      register.fields[field].value = value << lsb;
+      for (int i=msb+1; i<=31; i++) begin
+        register.fields[field].value[i]=1'b0;
+      end
 
-  endfunction;
+      `INFOV(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value), 4);
 
-  function automatic int getField(reg_t register,
-                                  string field);
+    endfunction;
 
-    automatic int lsb, msb;
+    function automatic int getField(reg_t register,
+                                    string field);
 
-    if (!register.fields.exists(field))
-      `ERROR(("Field %s in reg %s does not exists", field, register.name));
+      automatic int lsb, msb;
 
-    return register.fields[field].value;
-  endfunction;
+      if (!register.fields.exists(field))
+        `ERROR(("Field %s in reg %s does not exists", field, register.name));
 
-  function automatic int getAddrs(reg_t register);
-    return register.addr;
-  endfunction;
+      return register.fields[field].value;
+    endfunction;
 
-endclass
+    function automatic int getAddrs(reg_t register);
+      return register.addr;
+    endfunction;
 
-`endif
+  endclass
+
+endpackage

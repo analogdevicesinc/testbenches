@@ -203,7 +203,7 @@ module test_program();
   endtask
 
   task tx_dma_transfer(int dma_baseaddr, int xfer_addr, int xfer_length);
-    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_FLAGS, 32'b011);               // enable TLAST, CYCLIC
+    env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_FLAGS, 32'b010);               // enable TLAST, CYCLIC
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_SRC_ADDR, xfer_addr);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_X_LENGTH, xfer_length - 1);
     env.mng.RegWrite32(dma_baseaddr + `DMAC_ADDR_TRANSFER_SUBMIT, 32'h1);

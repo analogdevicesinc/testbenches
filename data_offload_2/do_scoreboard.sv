@@ -163,7 +163,7 @@ package do_scoreboard_pkg;
           reading_lock.put();
           
           if (this.byte_stream.size() == 0) begin
-            `INFO(("WARNING: Received unexpected transfer - is the data_offload running cyclically?"));
+            `ERROR(("ERROR: Received unexpected transfer - is the data_offload running cyclically?"));
             continue;
           end
           

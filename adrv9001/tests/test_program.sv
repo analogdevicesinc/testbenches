@@ -76,8 +76,7 @@ program test_program;
   parameter CH3 = 8'h30 * 4;
 
   parameter RX1_COMMON  = BASE + 'h00_00 * 4;
-  parameter RX1_CHANNEL = BASE + 'h01_00 * 4;
-
+  parameter RX1_CHANNEL = BASE;
   parameter RX1_DLY = BASE + 'h02_00 * 4;
 
   parameter RX2_COMMON  = BASE + 'h04_00 * 4;
@@ -86,7 +85,7 @@ program test_program;
   parameter RX2_DLY = BASE + 'h06_00 * 4;
 
   parameter TX1_COMMON  = BASE + 'h08_00 * 4;
-  parameter TX1_CHANNEL = BASE + 'h09_00 * 4;
+  parameter TX1_CHANNEL = BASE + 32'h0000_2000;
 
   parameter TX2_COMMON  = BASE + 'h10_00 * 4;
   parameter TX2_CHANNEL = BASE + 'h11_00 * 4;
@@ -161,7 +160,6 @@ program test_program;
     `TH.`SYS_RST.inst.IF.deassert_reset;
 
     #1us;
-
     sanity_test;
 
     pn_test(`NIBBLE_RAMP);
@@ -170,7 +168,6 @@ program test_program;
     pn_test(`PN15);
 
     dma_test;
-
     `INFO(("Test Done"));
 
   end
@@ -189,8 +186,8 @@ program test_program;
     //check DAC VERSION
     #100 axi_read_v (TX1_COMMON + GetAddrs(REG_VERSION),
                     `SET_REG_VERSION_VERSION('h00090162));
-     axi_read_v (TX2_COMMON + GetAddrs(REG_VERSION),
-                `SET_REG_VERSION_VERSION('h00090162));
+    #100 axi_read_v (TX2_COMMON + GetAddrs(REG_VERSION),
+                    `SET_REG_VERSION_VERSION('h00090162));
     // check DAC CONFIG
     #100 axi_read_v (TX1_COMMON + GetAddrs(REG_CONFIG), (USE_RX_CLK_FOR_TX * 1024) +
                                                (CMOS_LVDS_N * 128) +
@@ -201,18 +198,8 @@ program test_program;
                                                (CMOS_LVDS_N * 128) +
                                                (1 * 16) +
                                                (DDS_DISABLE * 64) +
-                                               (IQCORRECTION_DISABLE * 1));*/
-    #100 axi_read_v (TX1_COMMON + GetAddrs(REG_CONFIG),(USE_RX_CLK_FOR_TX * 1024) +
-                                               (CMOS_LVDS_N * 128) +
-                                               (R1_MODE * 16) +
-                                               (DDS_DISABLE * 64) +
                                                (IQCORRECTION_DISABLE * 1));
-    #100 axi_read_v (TX2_COMMON + GetAddrs(REG_CONFIG), (USE_RX_CLK_FOR_TX * 1024) +
-                                               (CMOS_LVDS_N * 128) +
-                                               (1 * 16) +
-                                               (DDS_DISABLE * 64) +
-                                               (IQCORRECTION_DISABLE * 1));
-  end
+    end
   endtask
 
   // --------------------------
@@ -295,58 +282,48 @@ program test_program;
     link_setup;
 
     // enable test data for TX1
-    axi_write (TX1_CHANNEL + CH0 + 6'h18,
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
-    axi_write (TX1_CHANNEL + CH1 + 6'h18,
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
-    axi_write (TX1_CHANNEL + CH2 + 6'h18,
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
-    axi_write (TX1_CHANNEL + CH3 + 6'h18,
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
 
     // enable test data check for RX1
-    axi_write (RX1_CHANNEL + CH0 + 6'h18,
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
-    axi_write (RX1_CHANNEL + CH1 + 6'h18,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
-    axi_write (RX1_CHANNEL + CH2 + 6'h18,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
-    axi_write (RX1_CHANNEL + CH3 + 6'h18,
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
 
     // Allow initial OOS to propagate
     #15000;
 
     // clear PN OOS and PN ERR
-    axi_write (RX1_CHANNEL + CH0 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH0 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH0 + 6'h4,
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h4,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH2 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH2 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH2 + 6'h4,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1)); 
     #10000;
 
     // check PN OOS and PN ERR flags
-    //#100 axi_read_v (RX1_COMMON + 32'h000005c, 'h001);
     axi_read_v (RX1_COMMON + GetAddrs(adc_common_REG_STATUS),
                `SET_adc_common_REG_STATUS_STATUS('h1));
     link_down;

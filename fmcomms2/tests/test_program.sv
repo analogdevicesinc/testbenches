@@ -60,12 +60,12 @@ program test_program;
   parameter CH3 = 8'h30 * 4;
 
   parameter RX1_COMMON  = BASE + 'h00_00 * 4;
-  parameter RX1_CHANNEL = BASE + 'h01_00 * 4;
+  parameter RX1_CHANNEL = BASE;
 
   parameter RX1_DLY = BASE + 'h02_00 * 4;
 
   parameter TX1_COMMON  = BASE + 'h10_00 * 4;
-  parameter TX1_CHANNEL = BASE + 'h11_00 * 4;
+  parameter TX1_CHANNEL = BASE + 32'h0000_4000;
 
   parameter TDD1 = BASE + 'h12_00 * 4;
   
@@ -142,7 +142,6 @@ program test_program;
     dma_test;
 
     //dma_test;
-
     `INFO(("Test Done"));
 
   end
@@ -211,26 +210,26 @@ program test_program;
     link_setup;
 
     // enable test data for TX1
-    axi_write (TX1_CHANNEL + CH0 + 6'h18,
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(9));
-    axi_write (TX1_CHANNEL + CH1 + 6'h18,
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(9));
     if (R1_MODE==0) begin
-    axi_write (TX1_CHANNEL + CH2 + 6'h18,
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(9));
-    axi_write (TX1_CHANNEL + CH3 + 6'h18,
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(9));
     end
 
     // enable test data check for RX1
-    axi_write (RX1_CHANNEL + CH0 + 6'h18,
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(9));
-    axi_write (RX1_CHANNEL + CH1 + 6'h18,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(9));
     if (R1_MODE==0) begin
-    axi_write (RX1_CHANNEL + CH2 + 6'h18,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(9));
-    axi_write (RX1_CHANNEL + CH3 + 6'h18,
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(9));
     end
  
@@ -244,31 +243,23 @@ program test_program;
     // Allow initial OOS to propagate
     #15000;
 
-    // clear PN OOS and PN ERR
-    axi_write (RX1_CHANNEL + CH0 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH0 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH0 + 6'h4,
+    // clear PN OOS and PN ER   
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h4,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
     if (R1_MODE==0) begin
-    axi_write (RX1_CHANNEL + CH2 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH2 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH2 + 6'h4,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h4,
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h4,
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_STATUS),
+              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
     end
     
@@ -296,66 +287,66 @@ program test_program;
     link_setup;
 
     // Select DDS as source
-    axi_write (TX1_CHANNEL + CH0 + 6'h18,
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
-    axi_write (TX1_CHANNEL + CH1 + 6'h18, 
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7), 
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
     if (R1_MODE==0) begin
-    axi_write (TX1_CHANNEL + CH2 + 6'h18,
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
-    axi_write (TX1_CHANNEL + CH3 + 6'h18,
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
     end
 
     // enable normal data path for RX1
-    axi_write (RX1_CHANNEL + CH0 + 6'h18,
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
-    axi_write (RX1_CHANNEL + CH1 + 6'h18,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
     if (R1_MODE==0) begin
-    axi_write (RX1_CHANNEL + CH2 + 6'h18,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
-    axi_write (RX1_CHANNEL + CH3 + 6'h18,
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
     end
 
     // Configure tone amplitude and frequency
-    axi_write (TX1_CHANNEL + CH0 + 6'h0,
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(dac_channel_REG_CHAN_CNTRL_1),
               `SET_dac_channel_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
-    axi_write (TX1_CHANNEL + CH1 + 6'h0, 
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(dac_channel_REG_CHAN_CNTRL_1), 
               `SET_dac_channel_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h07ff));
     if (R1_MODE==0) begin
-    axi_write (TX1_CHANNEL + CH2 + 6'h0, 
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(dac_channel_REG_CHAN_CNTRL_1), 
               `SET_dac_channel_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h03ff));
-    axi_write (TX1_CHANNEL + CH3 + 6'h0, 
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(dac_channel_REG_CHAN_CNTRL_1), 
               `SET_dac_channel_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h01ff));
     end
-    axi_write (TX1_CHANNEL + CH0 + 6'h4, 
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(dac_channel_REG_CHAN_CNTRL_2), 
               `SET_dac_channel_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
-    axi_write (TX1_CHANNEL + CH1 + 6'h4, 
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(dac_channel_REG_CHAN_CNTRL_2), 
               `SET_dac_channel_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0200));
     if (R1_MODE==0) begin
-    axi_write (TX1_CHANNEL + CH2 + 6'h4, 
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(dac_channel_REG_CHAN_CNTRL_2), 
               `SET_dac_channel_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0400));
-    axi_write (TX1_CHANNEL + CH3 + 6'h4, 
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(dac_channel_REG_CHAN_CNTRL_2), 
               `SET_dac_channel_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0800));
     end    
 
     // Enable Rx channel, enable sign extension
-    axi_write (RX1_CHANNEL + CH0 + 6'h0,
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h0,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     if (R1_MODE==0) begin
-    axi_write (RX1_CHANNEL + CH2 + 6'h0,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h0,
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
@@ -400,47 +391,47 @@ program test_program;
     axi_write (`TX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
                `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
     // Select DDS as source
-    axi_write (TX1_CHANNEL + CH0 + 6'h18,
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
-    axi_write (TX1_CHANNEL + CH1 + 6'h18,
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
     if (R1_MODE==0) begin
-    axi_write (TX1_CHANNEL + CH2 + 6'h18,
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
-    axi_write (TX1_CHANNEL + CH3 + 6'h18,
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
     end
 
 
     // enable normal data path for RX1
-    axi_write (RX1_CHANNEL + CH0 + 6'h18,
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
-    axi_write (RX1_CHANNEL + CH1 + 6'h18,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
     if (R1_MODE==0) begin
-    axi_write (RX1_CHANNEL + CH2 + 6'h18,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
-    axi_write (RX1_CHANNEL + CH3 + 6'h18,
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
               `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(0));
     end
 
 
     // Enable Rx channel, enable sign extension
 
-    axi_write (RX1_CHANNEL + CH0 + 6'h0,
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
-    axi_write (RX1_CHANNEL + CH1 + 6'h0,
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     if (R1_MODE==0) begin
-    axi_write (RX1_CHANNEL + CH2 + 6'h0,
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
-    axi_write (RX1_CHANNEL + CH3 + 6'h0,
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_CNTRL),
               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
               `SET_adc_channel_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));

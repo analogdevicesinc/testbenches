@@ -37,7 +37,6 @@
 `include "adi_regmap_dmac_pkg.sv"
 `include "dma_trans.sv"
 `include "reg_accessor.sv"
-
 `ifndef __DMAC_API_SV__
 `define __DMAC_API_SV__
 
@@ -45,10 +44,10 @@ import logger_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_pkg::*;
 
+
 class dmac_api;
 
   reg_accessor mng;
-
   int DMAC_BA;
   // DMAC parameters
   axi_dmac_params_t p;
@@ -60,15 +59,12 @@ class dmac_api;
     this.DMAC_BA = DMAC_BA;
     this.p = p;
   endfunction
-
+  
   task enable_dma();
-    mng.RegWrite32( DMAC_BA + GetAddrs(dmac_CONTROL),
-                              SetField(dmac_CONTROL, "ENABLE", 1));
+       mng.RegWrite32( DMAC_BA + GetAddrs(dmac_CONTROL),.data(SetField(dmac_CONTROL, "ENABLE",1)));
   endtask
-
   task disable_dma();
-    mng.RegWrite32( DMAC_BA + GetAddrs(dmac_CONTROL),
-                              SetField(dmac_CONTROL, "ENABLE", 0));
+    mng.RegWrite32( DMAC_BA + GetAddrs(dmac_CONTROL),.data(SetField(dmac_CONTROL,"ENABLE",0)));
   endtask
 
   task wait_transfer_submission;
@@ -217,7 +213,7 @@ class dmac_api;
       end
     end
 
-    if ($cast(t_fl_2d,t)) begin
+    /*if ($cast(t_fl_2d,t)) begin
       flock_en = t_fl_2d.flock_en;
       mng.RegWrite32( DMAC_BA + GetAddrs(dmac_FRAME_LOCK_CONFIG),
                                 SetField(dmac_FRAME_LOCK_CONFIG, "FLOCK_NUMFRAMES", t_fl_2d.num_of_buffers) |
@@ -236,7 +232,7 @@ class dmac_api;
                               SetField(dmac_FLAGS, "CYCLIC", t.cyclic) |
                               SetField(dmac_FLAGS, "TLAST", t.last)
                               );
-
+    */
     transfer_id_get(next_transfer_id);
     transfer_start();
 

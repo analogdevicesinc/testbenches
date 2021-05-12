@@ -42,7 +42,7 @@ package adi_regmap_pkg;
 
   import logger_pkg::*;
 
-  typedef enum {RO, RW, RW1C, RW1S} acc_t;
+  typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S} acc_t;
 
   typedef struct {
     int msb;

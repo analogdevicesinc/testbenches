@@ -54,16 +54,16 @@ module test_program(
   //declaring environment instance
   environment                       env;
   xil_axi4stream_ready_gen_policy_t dac_mode;
-  
+
   data_offload                      dut;
-  
+
   initial begin
     //creating environment
     env = new(`TH.`MNG_AXI.inst.IF,
               `TH.`SRC_AXIS.inst.IF,
               `TH.`DST_AXIS.inst.IF
              );
-             
+
     dut = new(env.mng, `DOFF_BA);
 
     //=========================================================================
@@ -71,7 +71,7 @@ module test_program(
     //=========================================================================
 
     env.src_axis_seq.configure(1, 0);
-    
+
     env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
 
     env.src_axis_seq.enable();
@@ -83,9 +83,9 @@ module test_program(
     //=========================================================================
 
     setLoggerVerbosity(250);
-    
+
     env.scoreboard.set_oneshot(1);
-    
+
     start_clocks;
     sys_reset;
 
@@ -99,23 +99,23 @@ module test_program(
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));
     env.run();
-    
+
     init_req <= 1'b1;
-    
+
     @env.src_axis_seq.queue_empty;
     init_req <= 1'b0;
     #100
     sync_ext <= 1'b1;
     @(posedge `TH.`DST_CLK.clk_out);
     sync_ext <= 1'b0;
-    
+
     #`SRC_TRANSFERS_DELAY
-    
+
 
     init_req <= 1'b1;
     #100
     env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
-      
+
     @env.src_axis_seq.queue_empty;
     init_req <= 1'b0;
 
@@ -125,7 +125,7 @@ module test_program(
     sync_ext <= 1'b0;
 
     #`TIME_TO_WAIT
-    
+
     env.stop();
 
     stop_clocks;
@@ -150,7 +150,7 @@ module test_program(
     `TH.`SRC_CLK.inst.IF.stop_clock;
     `TH.`DST_CLK.inst.IF.stop_clock;
     `TH.`SYS_CLK.inst.IF.stop_clock;
-    
+
   endtask
 
   task sys_reset;
@@ -158,7 +158,7 @@ module test_program(
     `TH.`SRC_RST.inst.IF.assert_reset;
     `TH.`DST_RST.inst.IF.assert_reset;
     `TH.`SYS_RST.inst.IF.assert_reset;
-    
+
     #500
     `TH.`SRC_RST.inst.IF.deassert_reset;
     `TH.`DST_RST.inst.IF.deassert_reset;
@@ -175,9 +175,9 @@ module test_program(
     dut.set_sync_config(1); // Hardware Sync
 
     // dut.set_transfer_length(`TRANSFER_LENGTH);
-    
+
     dut.set_resetn(1'b1);
-    
+
   endtask
 
 endmodule

@@ -54,16 +54,16 @@ module test_program(
   //declaring environment instance
   environment                       env;
   xil_axi4stream_ready_gen_policy_t dac_mode;
-  
+
   data_offload                      dut;
-  
+
   initial begin
     //creating environment
     env = new(`TH.`MNG_AXI.inst.IF,
               `TH.`SRC_AXIS.inst.IF,
               `TH.`DST_AXIS.inst.IF
              );
-             
+
     dut = new(env.mng, `DOFF_BA);
 
     //=========================================================================
@@ -72,7 +72,7 @@ module test_program(
 
     env.src_axis_seq.configure(1, 0);
     for (int i = 0; i < `SRC_TRANSFERS_INITIAL_COUNT; i++)
-      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
+      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
 
     env.src_axis_seq.enable();
 
@@ -83,9 +83,10 @@ module test_program(
     //=========================================================================
 
     setLoggerVerbosity(250);
-    
+
     env.scoreboard.set_oneshot(`OFFLOAD_ONESHOT);
-    
+    env.scoreboard.set_path_type(`OFFLOAD_PATH_TYPE);
+
     start_clocks;
     sys_reset;
 
@@ -99,30 +100,30 @@ module test_program(
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));
     env.run();
-    
+
     init_req <= 1'b1;
-    
+
     if (!`OFFLOAD_ONESHOT) begin
       @env.src_axis_seq.queue_empty;
       init_req <= 1'b0;
     end
-    
+
     #`SRC_TRANSFERS_DELAY
-    
+
     init_req <= 1'b1;
-    
+
     #100
-    
+
     for (int i = 0; i < `SRC_TRANSFERS_DELAYED_COUNT; i++)
-      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
-      
+      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
+
     if (!`OFFLOAD_ONESHOT) begin
       @env.src_axis_seq.queue_empty;
       init_req <= 1'b0;
     end
 
     #`TIME_TO_WAIT
-    
+
     env.stop();
 
     stop_clocks;
@@ -147,7 +148,7 @@ module test_program(
     `TH.`SRC_CLK.inst.IF.stop_clock;
     `TH.`DST_CLK.inst.IF.stop_clock;
     `TH.`SYS_CLK.inst.IF.stop_clock;
-    
+
   endtask
 
   task sys_reset;
@@ -155,7 +156,7 @@ module test_program(
     `TH.`SRC_RST.inst.IF.assert_reset;
     `TH.`DST_RST.inst.IF.assert_reset;
     `TH.`SYS_RST.inst.IF.assert_reset;
-    
+
     #500
     `TH.`SRC_RST.inst.IF.deassert_reset;
     `TH.`DST_RST.inst.IF.deassert_reset;
@@ -170,10 +171,12 @@ module test_program(
 
     dut.set_oneshot(`OFFLOAD_ONESHOT);
 
-    // dut.set_transfer_length(`TRANSFER_LENGTH);
-    
+`ifdef OFFLOAD_TRANSFER_LENGTH
+    dut.set_transfer_length(`OFFLOAD_TRANSFER_LENGTH);
+`endif
+
     dut.set_resetn(1'b1);
-    
+
   endtask
 
 endmodule

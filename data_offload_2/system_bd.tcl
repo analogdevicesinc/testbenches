@@ -34,6 +34,11 @@ set time_to_wait $ad_project_params(TIME_TO_WAIT)
 
 ## Define passthrough
 
+if {[info exists ad_project_params(OFFLOAD_TRANSFER_LENGTH)]} {
+  set offload_transfer_length $ad_project_params(OFFLOAD_TRANSFER_LENGTH)
+  adi_sim_add_define "OFFLOAD_TRANSFER_LENGTH=$offload_transfer_length"
+}
+adi_sim_add_define "OFFLOAD_PATH_TYPE=$path_type"
 adi_sim_add_define "DST_READY_MODE=$dst_ready_mode"
 adi_sim_add_define "DST_READY_HIGH=$dst_ready_high"
 adi_sim_add_define "DST_READY_LOW=$dst_ready_low"
@@ -87,14 +92,6 @@ ad_connect sync_ext DUT/sync_ext
 # mng_axi - AXI4 VIP for configuration
 ################################################################################
 
-# ad_ip_instance axi_interconnect axi_cfg_interconnect [ list \
-#   NUM_SI {1} \
-#   NUM_MI {2} \
-# ]
-
-# ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/ACLK
-# ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/ARESETN
-
 ad_ip_instance axi_vip mng_axi
 adi_sim_add_define "MNG_AXI=mng_axi"
 set_property -dict [list CONFIG.ADDR_WIDTH {32} \
@@ -131,12 +128,6 @@ ad_connect sys_clk_vip/clk_out mng_axi/aclk
 ad_connect sys_rst_vip/rst_out DUT/s_axi_aresetn
 ad_connect sys_rst_vip/rst_out mng_axi/aresetn
 
-# ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/S00_ACLK
-# ad_connect sys_clk_vip/clk_out axi_cfg_interconnect/M00_ACLK
-
-# ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/S00_ARESETN
-# ad_connect sys_rst_vip/rst_out axi_cfg_interconnect/M00_ARESETN
-
 # Create address segments
 
 create_bd_addr_seg -range 0x00010000 -offset 0x44A00000 \
@@ -158,9 +149,6 @@ ad_ip_parameter src_rst_vip CONFIG.INTERFACE_MODE {MASTER}
 ad_ip_parameter src_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
 ad_ip_parameter src_rst_vip CONFIG.ASYNCHRONOUS {NO}
 ad_connect src_clk_vip/clk_out src_rst_vip/sync_clk
-
-# ad_connect src_clk_vip/clk_out axi_cfg_interconnect/M01_ACLK
-# ad_connect src_rst_vip/rst_out axi_cfg_interconnect/M01_ARESETN
 
 # destination clock/reset
 
@@ -194,8 +182,12 @@ ad_connect src_clk_vip/clk_out DUT/s_axis_aclk
 ad_connect src_rst_vip/rst_out DUT/s_axis_aresetn
 
 ad_connect src_axis/m_axis DUT/s_axis
+# Always assert tready for RX tests
+if !$path_type {
+  ad_connect src_axis/m_axis_tready VCC
+}
 
-if ($offload_mem_type) {
+if $offload_mem_type {
   ad_connect DUT/i_data_offload/ddr_calib_done VCC
 }
 

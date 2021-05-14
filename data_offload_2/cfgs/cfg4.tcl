@@ -1,4 +1,4 @@
-# TX / oneshot / oscillating ready
+# TX / oneshot / 100% transfer length
 global ad_project_params
 
 set ad_project_params(DATA_PATH_WIDTH) 16             ; ## 16 bytes
@@ -17,13 +17,13 @@ set ad_project_params(DST_CLOCK_FREQ) 300000000       ; ## Destination clock fre
 
 set ad_project_params(SRC_TRANSFERS_INITIAL_COUNT) 20 ; ## Count of transfers initially queued up.
                                                       ; ## These will be transferred back to back
-set ad_project_params(SRC_TRANSFERS_LENGTH) 512       ; ## Transfer length
-set ad_project_params(SRC_TRANSFERS_DELAY) 20000      ; ## Delay in ns before the next batch is queued
+set ad_project_params(SRC_TRANSFERS_LENGTH) 1024      ; ## Transfer length
+set ad_project_params(SRC_TRANSFERS_DELAY) 10000      ; ## Delay in ns before the next batch is queued
 set ad_project_params(SRC_TRANSFERS_DELAYED_COUNT) 1  ; ## Count of transfers queued in second batch
 
-set ad_project_params(DST_READY_MODE) XIL_AXI4STREAM_READY_GEN_OSC
+set ad_project_params(DST_READY_MODE) XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE
 set ad_project_params(DST_READY_HIGH) 1
-set ad_project_params(DST_READY_LOW) 3
+set ad_project_params(DST_READY_LOW) 0
 
-set ad_project_params(TIME_TO_WAIT) 10000             ; ## Delay after queuing the second batch
+set ad_project_params(TIME_TO_WAIT) 1500              ; ## Delay after queuing the second batch
                                                       ; ## before exiting the simulation

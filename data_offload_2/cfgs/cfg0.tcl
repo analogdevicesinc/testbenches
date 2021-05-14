@@ -1,3 +1,4 @@
+# TX / oneshot
 global ad_project_params
 
 set ad_project_params(DATA_PATH_WIDTH) 16             ; ## 16 bytes

@@ -47,7 +47,10 @@ package do_scoreboard_pkg;
 
     typedef enum bit { CYCLIC=0, ONESHOT } do_mode_t;
     do_mode_t do_mode;
-    
+
+    typedef enum bit { RX=0, TX } path_type_t;
+    path_type_t path_type;
+
     bit reading = 1'b0;
     semaphore reading_lock;
 
@@ -69,10 +72,11 @@ package do_scoreboard_pkg;
     function new(input string name);
       super.new(name);
       this.enabled = 0;
-      
+
       this.do_mode = CYCLIC;
+      this.path_type = RX;
       this.transfer_size = 0;
-      
+
       reading_lock = new(1);
     endfunction /* new */
 
@@ -86,11 +90,13 @@ package do_scoreboard_pkg;
 
     // run task
     task run();
-      fork
-        this.enabled = 1;
-        get_src_transaction();
-        get_dst_transaction();
-      join_none
+      if (this.path_type == TX) begin
+        fork
+          this.enabled = 1;
+          get_src_transaction();
+          get_dst_transaction();
+        join_none
+      end
     endtask /* run */
 
     function void set_oneshot(input bit do_mode);
@@ -101,8 +107,20 @@ package do_scoreboard_pkg;
       end
     endfunction
 
+    function void set_path_type(input bit path_type);
+      if (!this.enabled) begin
+        this.path_type = path_type_t'(path_type);
+      end else begin
+        `ERROR(("ERROR Scoreboard: Can not configure path type while scoreboard is running!"));
+      end
+    endfunction
+
     function bit get_oneshot();
       return this.do_mode;
+    endfunction
+
+    function bit get_path_type();
+      return this.path_type;
     endfunction
 
     task get_src_transaction();
@@ -118,15 +136,15 @@ package do_scoreboard_pkg;
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
           data_beat = transaction.get_data_beat();
-          
+
           reading_lock.get();
-          
+
           if (reading == 1 && this.do_mode == CYCLIC)
             this.byte_stream.delete();
-            
+
           reading = 0;
           reading_lock.put();
-          
+
           for (int j=0; j<num_bytes; j++) begin
             this.byte_stream.push_back(data_beat[j*8+:8]);
           end
@@ -157,21 +175,21 @@ package do_scoreboard_pkg;
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
           data_beat = transaction.get_data_beat();
-          
+
           reading_lock.get();
           reading = 1;
           reading_lock.put();
-          
+
           if (this.byte_stream.size() == 0) begin
             `ERROR(("ERROR: Received unexpected transfer - is the data_offload running cyclically?"));
             continue;
           end
-          
+
           for (int j=0; j<num_bytes; j++) begin
             queue_byte = this.byte_stream.pop_front();
             if (this.do_mode == CYCLIC)
               this.byte_stream.push_back(queue_byte);
-              
+
             if (queue_byte !== data_beat[j*8+:8]) begin
               `ERROR(("ERROR: Failed rx stream comparison! tx != rx: %d != %d", queue_byte, data_beat[j*8+:8]));
             end;
@@ -179,7 +197,7 @@ package do_scoreboard_pkg;
         end
         #1;
       end
-  
+
     endtask /* get_rx_source_transaction */
 
     function void post_test();
@@ -193,7 +211,7 @@ package do_scoreboard_pkg;
           end
       end
     endfunction /* post_tx_test */
-  
+
   endclass
 
 endpackage

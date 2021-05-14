@@ -65,34 +65,35 @@ package data_offload_pkg;
   class data_offload;
     reg_accessor  bus;
     xil_axi_ulong base_address;
-    
+
     bit [1:0] reg_control;
-    
+
     function new (reg_accessor bus, xil_axi_ulong base_address);
       this.bus = bus;
       this.base_address = base_address;
     endfunction
-    
+
     task set_oneshot(input bit oneshot);
       this.reg_control[1] = oneshot;
       this.bus.RegWrite32(this.base_address + `DO_ADDR_CONTROL_2, {30'b0, this.reg_control});
     endtask : set_oneshot;
-    
+
     task set_bypass(input bit bypass);
       this.reg_control[0] = bypass;
       this.bus.RegWrite32(this.base_address + `DO_ADDR_CONTROL_2, {30'b0, this.reg_control});
     endtask : set_bypass;
-    
+
     task set_resetn(input bit resetn);
       this.bus.RegWrite32(this.base_address + `DO_ADDR_CONTROL_1, {31'b0, resetn});
     endtask : set_resetn;
-    
-    task set_transfer_length(input bit [31:0] length);
-      if (length == 0) begin
-        `ERROR(("data_offload: Attempted to set transfer_length of %x to 0!", this.base_address));
+
+    task set_transfer_length(input bit [33:0] length);
+      if (length & 34'h3f) begin
+        // Transfer length not divisble by 64
+        `ERROR(("data_offload: Attempted to set transfer_length %x mod 64 != 0!", length));
       end
-      
-      this.bus.RegWrite32(this.base_address + `DO_ADDR_TRANSFER_LENGTH, length - 1);
+      `INFO(("data_offload: Writing transfer length! %x", length));
+      this.bus.RegWrite32(this.base_address + `DO_ADDR_TRANSFER_LENGTH, length >> 6);
     endtask : set_transfer_length;
 
     task set_sync_config(input bit [1:0] sync_config);
@@ -105,7 +106,7 @@ package data_offload_pkg;
     task trigger_sync();
       this.bus.RegWrite32(this.base_address + `DO_ADDR_SYNC_CONFIG, 32'h1);
     endtask : trigger_sync;
-    
+
   endclass
 
 endpackage

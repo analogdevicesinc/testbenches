@@ -37,7 +37,7 @@ TP := test_program
 CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 $(warning $(CFG_FILES))
 
-# List of tests and configuration combinations that has to be run 
+# List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 

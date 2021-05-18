@@ -85,20 +85,20 @@ package adi_regmap_dac_pkg;
   `define SET_dac_common_REG_FRAME_FRAME(x) SetField(dac_common_REG_FRAME,"FRAME",x)
   `define GET_dac_common_REG_FRAME_FRAME(x) GetField(dac_common_REG_FRAME,"FRAME",x)
 
-  const reg_t dac_common_REG_STATUS = '{ 'h0054, "REG_STATUS" , '{
+  const reg_t dac_common_REG_STATUS1 = '{ 'h0054, "REG_STATUS1" , '{
     "CLK_FREQ": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_dac_common_REG_STATUS_CLK_FREQ(x) SetField(dac_common_REG_STATUS,"CLK_FREQ",x)
-  `define GET_dac_common_REG_STATUS_CLK_FREQ(x) GetField(dac_common_REG_STATUS,"CLK_FREQ",x)
+  `define SET_dac_common_REG_STATUS_CLK_FREQ(x) SetField(dac_common_REG_STATUS1,"CLK_FREQ",x)
+  `define GET_dac_common_REG_STATUS_CLK_FREQ(x) GetField(dac_common_REG_STATUS1,"CLK_FREQ",x)
 
-  const reg_t dac_common_REG_STATUS = '{ 'h0058, "REG_STATUS" , '{
+  const reg_t dac_common_REG_STATUS2 = '{ 'h0058, "REG_STATUS2" , '{
     "CLK_RATIO": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_dac_common_REG_STATUS_CLK_RATIO(x) SetField(dac_common_REG_STATUS,"CLK_RATIO",x)
-  `define GET_dac_common_REG_STATUS_CLK_RATIO(x) GetField(dac_common_REG_STATUS,"CLK_RATIO",x)
+  `define SET_dac_common_REG_STATUS_CLK_RATIO(x) SetField(dac_common_REG_STATUS2,"CLK_RATIO",x)
+  `define GET_dac_common_REG_STATUS_CLK_RATIO(x) GetField(dac_common_REG_STATUS2,"CLK_RATIO",x)
 
-  const reg_t dac_common_REG_STATUS = '{ 'h005c, "REG_STATUS" , '{
+  const reg_t dac_common_REG_STATUS3 = '{ 'h005c, "REG_STATUS3" , '{
     "STATUS": '{ 0, 0, RO, 'h0 }}};
-  `define SET_dac_common_REG_STATUS_STATUS(x) SetField(dac_common_REG_STATUS,"STATUS",x)
-  `define GET_dac_common_REG_STATUS_STATUS(x) GetField(dac_common_REG_STATUS,"STATUS",x)
+  `define SET_dac_common_REG_STATUS_STATUS(x) SetField(dac_common_REG_STATUS3,"STATUS",x)
+  `define GET_dac_common_REG_STATUS_STATUS(x) GetField(dac_common_REG_STATUS3,"STATUS",x)
 
   const reg_t dac_common_REG_DAC_CLKSEL = '{ 'h0060, "REG_DAC_CLKSEL" , '{
     "DAC_CLKSEL": '{ 0, 0, RW, 'h0 }}};

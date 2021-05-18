@@ -36,12 +36,12 @@
 //
 //
 `include "utils.svh"
-`include "test_harness_env.sv"
-`include "m_axi_sequencer.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_jesd_tx_pkg::*;
 import adi_regmap_jesd_rx_pkg::*;

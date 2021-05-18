@@ -38,16 +38,17 @@ source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
 
 global ad_project_params
 
-set JESD_MODE  $ad_project_params(JESD_MODE)
+set LINK_MODE  $ad_project_params(LINK_MODE)
 
-if {$JESD_MODE == "8B10B"} {
+set JESD_8B10B 1
+set JESD_64B66B 2
+
+if {$LINK_MODE == $JESD_8B10B} {
   set DATAPATH_WIDTH 4
   set NP12_DATAPATH_WIDTH 6
-  set LINK_MODE 1
 } else {
   set DATAPATH_WIDTH 8
   set NP12_DATAPATH_WIDTH 12
-  set LINK_MODE 2
 }
 
 set JESD_F $ad_project_params(JESD_F)
@@ -113,8 +114,9 @@ create_bd_port -dir I device_clk
 
 # TX JESD204 PHY layer peripheral
 ad_ip_instance axi_adxcvr dac_jesd204_xcvr [list \
+  LINK_MODE $LINK_MODE \
   NUM_OF_LANES $NUM_OF_LANES \
-  QPLL_ENABLE 0 \
+  QPLL_ENABLE 1 \
   TX_OR_RX_N 1 \
   OUT_CLK_SEL 3 \
   SYS_CLK_SEL 0
@@ -134,6 +136,7 @@ adi_tpl_jesd204_tx_create dac_jesd204_transport $NUM_OF_LANES \
 
 # RX JESD204 PHY layer peripheral
 ad_ip_instance axi_adxcvr adc_jesd204_xcvr [list \
+  LINK_MODE $LINK_MODE \
   NUM_OF_LANES $NUM_OF_LANES \
   QPLL_ENABLE 0 \
   TX_OR_RX_N 0 \

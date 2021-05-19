@@ -42,7 +42,9 @@ package dmac_api_pkg;
   import adi_regmap_pkg::*;
   import reg_accessor_pkg::*;
   import dma_trans_pkg::*;
+  import axi_dmac_pkg::*;
 
+class dmac_api;
 
   	reg_accessor mng;
     int DMAC_BA;

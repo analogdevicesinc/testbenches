@@ -17,6 +17,7 @@ ENV_DEPS += $(foreach dep,$(LIB_DEPS),$(HDL_LIBRARY_PATH)$(dep)/component.xml)
 # $(3): Textual description of the task
 # $(4): configuration name
 # $(5): test  name
+FOLDER=$(shell basename $(CURDIR))
 define simulate
 @echo -n "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."
 START=$$(date +%s); \
@@ -26,21 +27,22 @@ END=$$(date +%s); \
 DIFF=$$(( $$END - $$START )); \
 ERRS=`grep -v ^# $(2) | grep -w -i -e error -e fatal -e fatal_error -C 10`; \
 if [[ $$ERRS > 0 ]] ; then ERR=1; fi;\
-JF='results/$(strip $(4))_$(strip $(5)).xml'; \
-echo \<testsuite\> > $$JF; \
-echo \<testcase classname=\"$(strip $(4))\" name=\"$(strip $(5))\" time=\"$$DIFF\" \> >> $$JF; \
+JUnitFile='results/$(strip $(4))_$(strip $(5)).xml'; \
+echo \<testsuite\> > $$JUnitFile; \
+echo \<testcase classname=\"$(FOLDER)_$(strip $(4))\" name=\"$(strip $(5))\" time=\"$$DIFF\" \> >> $$JUnitFile; \
 if [ $$ERR = 0 ]; then \
 	echo " $(GREEN)OK$(NC)"; \
+	echo \<passed\/\> >> $$JUnitFile; \
 else \
 	echo " $(RED)FAILED$(NC)"; \
 	echo "For details see $(HL)$(CURDIR)/$(strip $(2))$(NC)"; \
 	echo ""; \
-	echo \<failure\> >> $$JF; \
-	echo "$$ERRS" >>  $$JF; \
-	echo \<\/failure\> >> $$JF; \
+	echo \<failure\> >> $$JUnitFile; \
+	echo "$$ERRS" >>  $$JUnitFile; \
+	echo \<\/failure\> >> $$JUnitFile; \
 fi; \
-echo \<\/testcase\> >> $$JF; \
-echo \<\/testsuite\> >> $$JF; \
+echo \<\/testcase\> >> $$JUnitFile; \
+echo \<\/testsuite\> >> $$JUnitFile; \
 exit $$ERR)
 endef
 

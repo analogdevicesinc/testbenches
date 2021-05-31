@@ -17,8 +17,8 @@ set project_name [file rootname $cfg_file]
 
 # Create the project
 #adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"; # GTY4
-#adi_sim_project_xilinx $project_name "xczu9eg-ffvb1156-2-e"; # GTH4
-adi_sim_project_xilinx $project_name "xcku040-ffva1156-2-e"; # GTH3
+adi_sim_project_xilinx $project_name "xczu9eg-ffvb1156-2-e"; # GTH4
+#adi_sim_project_xilinx $project_name "xcku040-ffva1156-2-e"; # GTH3
 
 # Add test files to the project
 adi_sim_project_files [list \
@@ -37,6 +37,10 @@ adi_sim_project_files [list \
  "../common/sv/adi_regmap_adc_pkg.sv" \
  "../common/sv/adi_regmap_jesd_tx_pkg.sv" \
  "../common/sv/adi_regmap_jesd_rx_pkg.sv" \
+ "../common/sv/adi_regmap_xcvr_pkg.sv" \
+ "../common/sv/adi_jesd204_pkg.sv" \
+ "../common/sv/adi_peripheral_pkg.sv" \
+ "../common/sv/adi_xcvr_pkg.sv" \
  "../common/sv/dma_trans.sv" \
  "../common/sv/axi_dmac_pkg.sv" \
  "../common/sv/test_harness_env.sv" \

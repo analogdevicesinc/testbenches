@@ -1,4 +1,6 @@
-set ad_project_params(JESD_MODE) 8B10B
+source [file dirname [file normalize [info script]]]/common.tcl
+
+set ad_project_params(LINK_MODE) $JESD_8B10B
 
 set ad_project_params(JESD_M) 1
 set ad_project_params(JESD_L) 1

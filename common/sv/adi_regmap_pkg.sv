@@ -41,6 +41,9 @@ package adi_regmap_pkg;
 
   typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S} acc_t;
 
+  // Used in generic definitions
+  const int n = 0;
+
   typedef struct {
     int msb;
     int lsb;

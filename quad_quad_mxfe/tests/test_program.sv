@@ -158,8 +158,8 @@ program test_program;
     // ---------------
     //PHY INIT
     //REG CTRL
-    env.mng.RegWrite32(`DAC_XCVR_0 + 32'h0020,32'h00001004);
-    env.mng.RegWrite32(`DAC_XCVR_1 + 32'h0020,32'h00001004);
+    env.mng.RegWrite32(`DAC_XCVR_0 + 32'h0020,32'h00001034); // Use QPLL0 and ODIV2
+    env.mng.RegWrite32(`DAC_XCVR_1 + 32'h0020,32'h00001034); // Use QPLL0 and ODIV2
 
     env.mng.RegWrite32(`DAC_XCVR_0 + 32'h0010,32'h00000001);
     env.mng.RegWrite32(`DAC_XCVR_1 + 32'h0010,32'h00000001);
@@ -188,6 +188,12 @@ program test_program;
 
     env.mng.RegWrite32(`ADC_XCVR_0 + 32'h0010,32'h00000001);
     env.mng.RegWrite32(`ADC_XCVR_1 + 32'h0010,32'h00000001);
+
+    // Wait until XCVR is ready 
+    // takes 30 us the CPLL to lock for GTY4
+    #30us;
+    wait(`TH.qmxfe0.axi_mxfe_rx_xcvr.inst.i_up.up_ch_pll_locked &
+         `TH.qmxfe1.axi_mxfe_rx_xcvr.inst.i_up.up_ch_pll_locked);
 
     // Configure Rx Link Layer
     SetJesdLink(`AXI_JESD_RX_0);

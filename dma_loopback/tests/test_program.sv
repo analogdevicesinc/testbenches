@@ -36,8 +36,9 @@
 //
 //
 `include "utils.svh"
-`include "test_harness_env.sv"
 
+import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;

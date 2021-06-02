@@ -36,8 +36,9 @@
 //
 //
 `include "utils.svh"
-`include "test_harness_env.sv"
 
+import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
@@ -208,33 +209,33 @@ program test_program;
   task link_setup;
   begin
     // Configure Rx interface
-    axi_write (RX1_COMMON + GetAddrs(adc_common_REG_CNTRL),
-              `SET_adc_common_REG_CNTRL_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
-    axi_write (RX2_COMMON + GetAddrs(adc_common_REG_CNTRL),
-              `SET_adc_common_REG_CNTRL_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
+    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),
+              `SET_ADC_COMMON_REG_CNTRL_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
+    axi_write (RX2_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),
+              `SET_ADC_COMMON_REG_CNTRL_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
     // Configure Tx interface
-    axi_write (TX1_COMMON + GetAddrs(dac_common_REG_CNTRL_2),
-              `SET_dac_common_REG_CNTRL_2_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
-    axi_write (TX2_COMMON + GetAddrs(dac_common_REG_CNTRL_2),
-              `SET_dac_common_REG_CNTRL_2_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
-    axi_write (TX1_COMMON + GetAddrs(dac_common_REG_RATECNTRL),
-              `SET_dac_common_REG_RATECNTRL_RATE(rate-1));
-    axi_write (TX2_COMMON + GetAddrs(dac_common_REG_RATECNTRL),
-              `SET_dac_common_REG_RATECNTRL_RATE(rate-1));
+    axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_2),
+              `SET_DAC_COMMON_REG_CNTRL_2_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
+    axi_write (TX2_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_2),
+              `SET_DAC_COMMON_REG_CNTRL_2_R1_MODE(1) | (SDR_DDR_N << 16) | (SINGLE_LANE << 8));
+    axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_RATECNTRL),
+              `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate-1));
+    axi_write (TX2_COMMON + GetAddrs(DAC_COMMON_REG_RATECNTRL),
+              `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate-1));
 
     // pull out TX of reset
-    axi_write (TX1_COMMON + GetAddrs(dac_common_REG_RSTN),
-              `SET_dac_common_REG_RSTN_RSTN(1));
-    axi_write (TX2_COMMON + GetAddrs(dac_common_REG_RSTN),
-              `SET_dac_common_REG_RSTN_RSTN(1));
+    axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_RSTN),
+              `SET_DAC_COMMON_REG_RSTN_RSTN(1));
+    axi_write (TX2_COMMON + GetAddrs(DAC_COMMON_REG_RSTN),
+              `SET_DAC_COMMON_REG_RSTN_RSTN(1));
 
     gen_mssi_sync;
 
     // pull out RX of reset
-    axi_write (RX1_COMMON + GetAddrs(adc_common_REG_RSTN),
-              `SET_adc_common_REG_RSTN_RSTN(1));
-    axi_write (RX2_COMMON + GetAddrs(adc_common_REG_RSTN),
-              `SET_adc_common_REG_RSTN_RSTN(1));
+    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
+              `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    axi_write (RX2_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
+              `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
   end
   endtask
@@ -245,15 +246,15 @@ program test_program;
   task link_down;
   begin
     // put RX in reset
-    axi_write (RX1_COMMON + GetAddrs(adc_common_REG_RSTN), 
-              `SET_adc_common_REG_RSTN_RSTN(0));
-    axi_write (RX2_COMMON + GetAddrs(adc_common_REG_RSTN),
-              `SET_adc_common_REG_RSTN_RSTN(0));
+    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN), 
+              `SET_ADC_COMMON_REG_RSTN_RSTN(0));
+    axi_write (RX2_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
+              `SET_ADC_COMMON_REG_RSTN_RSTN(0));
     // put TX in reset
-    axi_write (TX1_COMMON + GetAddrs(dac_common_REG_RSTN),
-              `SET_dac_common_REG_RSTN_RSTN(0));
-    axi_write (TX2_COMMON + GetAddrs(dac_common_REG_RSTN),
-              `SET_dac_common_REG_RSTN_RSTN(0));
+    axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_RSTN),
+              `SET_DAC_COMMON_REG_RSTN_RSTN(0));
+    axi_write (TX2_COMMON + GetAddrs(DAC_COMMON_REG_RSTN),
+              `SET_DAC_COMMON_REG_RSTN_RSTN(0));
 
     #1000;
   end
@@ -282,50 +283,50 @@ program test_program;
     link_setup;
 
     // enable test data for TX1
-    axi_write (TX1_CHANNEL + CH0 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
-              `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
-    axi_write (TX1_CHANNEL + CH1 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
-              `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
-    axi_write (TX1_CHANNEL + CH2 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
-              `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
-    axi_write (TX1_CHANNEL + CH3 + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
-              `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+              `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+              `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+              `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+              `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
 
     // enable test data check for RX1
-    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
-              `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
-    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
-              `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
-    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
-              `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
-    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_CNTRL_3),
-              `SET_adc_channel_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_PN_SEL(rx_pattern_map[pattern]));
 
     // Allow initial OOS to propagate
     #15000;
 
     // clear PN OOS and PN ERR
-    axi_write (RX1_CHANNEL + CH0 + GetAddrs(adc_channel_REG_CHAN_STATUS),
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH1 + GetAddrs(adc_channel_REG_CHAN_STATUS),
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH2 + GetAddrs(adc_channel_REG_CHAN_STATUS),
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1));
-    axi_write (RX1_CHANNEL + CH3 + GetAddrs(adc_channel_REG_CHAN_STATUS),
-              `SET_adc_channel_REG_CHAN_STATUS_PN_ERR(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_PN_OOS(1) |
-              `SET_adc_channel_REG_CHAN_STATUS_OVER_RANGE(1)); 
+    axi_write (RX1_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS),
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(1));
+    axi_write (RX1_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS),
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(1));
+    axi_write (RX1_CHANNEL + CH2 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS),
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(1));
+    axi_write (RX1_CHANNEL + CH3 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS),
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_ERR(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(1)); 
     #10000;
 
     // check PN OOS and PN ERR flags
-    axi_read_v (RX1_COMMON + GetAddrs(adc_common_REG_STATUS),
-               `SET_adc_common_REG_STATUS_STATUS('h1));
+    axi_read_v (RX1_COMMON + GetAddrs(ADC_COMMON_REG_STATUS),
+               `SET_ADC_COMMON_REG_STATUS_STATUS('h1));
     link_down;
 
   end
@@ -375,68 +376,68 @@ program test_program;
     //
 
     
-    axi_write (`ADC_TPL + GetAddrs(adc_channel_REG_CHAN_CNTRL),
-               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1));
-    axi_write (`DAC_TPL + GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
-               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
-    axi_write (`DAC_TPL + GetAddrs(dac_channel_REG_CHAN_CNTRL_1),
-               `SET_dac_channel_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
-    axi_write (`DAC_TPL + GetAddrs(dac_channel_REG_CHAN_CNTRL_1),
-               `SET_dac_channel_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
+    axi_write (`ADC_TPL + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+    axi_write (`DAC_TPL + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
+    axi_write (`DAC_TPL + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
+               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
+    axi_write (`DAC_TPL + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
+               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
 
     // Pull out TPL cores from reset
-    axi_write (`DAC_TPL + GetAddrs(dac_common_REG_RSTN),
-               `SET_dac_common_REG_RSTN_RSTN(1));
-    axi_write (`ADC_TPL +  GetAddrs(adc_common_REG_RSTN),
-               `SET_adc_common_REG_RSTN_RSTN(1));
+    axi_write (`DAC_TPL + GetAddrs(DAC_COMMON_REG_RSTN),
+               `SET_DAC_COMMON_REG_RSTN_RSTN(1));
+    axi_write (`ADC_TPL +  GetAddrs(ADC_COMMON_REG_RSTN),
+               `SET_ADC_COMMON_REG_RSTN_RSTN(1));
     // Sync DDS cores
-    axi_write (`DAC_TPL + GetAddrs(dac_common_REG_CNTRL_1),
-               `SET_dac_common_REG_CNTRL_1_SYNC(1));
+    axi_write (`DAC_TPL + GetAddrs(DAC_COMMON_REG_CNTRL_1),
+               `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
     //
     // Configure TX Link Layer
     //
 
     //LINK DISABLE
-    axi_write (`AXI_JESD_TX + GetAddrs(jesd_tx_LINK_DISABLE),
-               `SET_jesd_tx_LINK_DISABLE_LINK_DISABLE(1));
+    axi_write (`AXI_JESD_TX + GetAddrs(JESD_TX_LINK_DISABLE),
+               `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(1));
     //SYSREFCONF
-    axi_write (`AXI_JESD_TX + GetAddrs(jesd_tx_SYSREF_CONF),
-               `SET_jesd_tx_SYSREF_CONF_SYSREF_DISABLE(0));
+    axi_write (`AXI_JESD_TX + GetAddrs(JESD_TX_SYSREF_CONF),
+               `SET_JESD_TX_SYSREF_CONF_SYSREF_DISABLE(0));
     //CONF0
-    axi_write (`AXI_JESD_TX+GetAddrs(jesd_tx_LINK_CONF0), 
-               `SET_jesd_tx_LINK_CONF0_OCTETS_PER_FRAME(`TX_JESD_F-1) | 
-               `SET_jesd_tx_LINK_CONF0_OCTETS_PER_MULTIFRAME(`TX_JESD_F*`TX_JESD_K-1));
-    axi_write (`AXI_JESD_TX+GetAddrs(jesd_tx_LINK_CONF4),
-               `SET_jesd_tx_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`TX_JESD_F*`TX_JESD_K)/TX_OUT_BYTES-1));
+    axi_write (`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_CONF0), 
+               `SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(`TX_JESD_F-1) | 
+               `SET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(`TX_JESD_F*`TX_JESD_K-1));
+    axi_write (`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_CONF4),
+               `SET_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`TX_JESD_F*`TX_JESD_K)/TX_OUT_BYTES-1));
     //CONF1
-    axi_write (`AXI_JESD_TX + GetAddrs(jesd_tx_LINK_CONF1),
-               `SET_jesd_tx_LINK_CONF1_SCRAMBLER_DISABLE(0));
+    axi_write (`AXI_JESD_TX + GetAddrs(JESD_TX_LINK_CONF1),
+               `SET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(0));
     //LINK ENABLE
-    axi_write (`AXI_JESD_TX + GetAddrs(jesd_tx_LINK_DISABLE),
-               `SET_jesd_tx_LINK_DISABLE_LINK_DISABLE(0));
+    axi_write (`AXI_JESD_TX + GetAddrs(JESD_TX_LINK_DISABLE),
+               `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(0));
     //
     // Configure RX Link Layer
     //
 
     //LINK DISABLE
-    axi_write (`AXI_JESD_RX + GetAddrs(jesd_rx_LINK_DISABLE),
-               `SET_jesd_rx_LINK_DISABLE_LINK_DISABLE(1));
+    axi_write (`AXI_JESD_RX + GetAddrs(JESD_RX_LINK_DISABLE),
+               `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(1));
     //SYSREFCONF
-    axi_write (`AXI_JESD_RX + GetAddrs(jesd_rx_SYSREF_CONF),
-               `SET_jesd_rx_SYSREF_CONF_SYSREF_DISABLE(0));
+    axi_write (`AXI_JESD_RX + GetAddrs(JESD_RX_SYSREF_CONF),
+               `SET_JESD_RX_SYSREF_CONF_SYSREF_DISABLE(0));
     //CONF0
-    axi_write (`AXI_JESD_RX + GetAddrs(jesd_rx_LINK_CONF0),
-               `SET_jesd_rx_LINK_CONF0_OCTETS_PER_FRAME(`RX_JESD_F-1) | 
-               `SET_jesd_rx_LINK_CONF0_OCTETS_PER_MULTIFRAME(`RX_JESD_F*`RX_JESD_K-1));
-    axi_write(`AXI_JESD_RX + GetAddrs(jesd_rx_LINK_CONF4),
-              `SET_jesd_rx_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`RX_JESD_F*`RX_JESD_K)/RX_OUT_BYTES-1));
+    axi_write (`AXI_JESD_RX + GetAddrs(JESD_RX_LINK_CONF0),
+               `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME(`RX_JESD_F-1) | 
+               `SET_JESD_RX_LINK_CONF0_OCTETS_PER_MULTIFRAME(`RX_JESD_F*`RX_JESD_K-1));
+    axi_write(`AXI_JESD_RX + GetAddrs(JESD_RX_LINK_CONF4),
+              `SET_JESD_RX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`RX_JESD_F*`RX_JESD_K)/RX_OUT_BYTES-1));
 
     //CONF1
-    axi_write (`AXI_JESD_RX + GetAddrs(jesd_rx_LINK_CONF1),
-               `SET_jesd_rx_LINK_CONF1_DESCRAMBLER_DISABLE(0));
+    axi_write (`AXI_JESD_RX + GetAddrs(JESD_RX_LINK_CONF1),
+               `SET_JESD_RX_LINK_CONF1_DESCRAMBLER_DISABLE(0));
     //LINK ENABLE
-    axi_write (`AXI_JESD_RX + GetAddrs(jesd_rx_LINK_DISABLE),
-               `SET_jesd_rx_LINK_DISABLE_LINK_DISABLE(0));
+    axi_write (`AXI_JESD_RX + GetAddrs(JESD_RX_LINK_DISABLE),
+               `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
     //XCVR INIT
     //REG CTRL
     if (`JESD_MODE != "64B66B") begin
@@ -452,22 +453,22 @@ program test_program;
 
     //Read status back
     // Check SYSREF_STATUS
-    axi_read_v (`AXI_JESD_TX+GetAddrs(jesd_tx_SYSREF_STATUS),
-                `SET_jesd_tx_SYSREF_STATUS_SYSREF_DETECTED(1));
-    axi_read_v (`AXI_JESD_RX+GetAddrs(jesd_rx_SYSREF_STATUS),
-                `SET_jesd_rx_SYSREF_STATUS_SYSREF_DETECTED(1));
+    axi_read_v (`AXI_JESD_TX+GetAddrs(JESD_TX_SYSREF_STATUS),
+                `SET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(1));
+    axi_read_v (`AXI_JESD_RX+GetAddrs(JESD_RX_SYSREF_STATUS),
+                `SET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(1));
     // Check if in DATA state and SYNC is 1
-    axi_read_v (`AXI_JESD_RX+GetAddrs(jesd_rx_LINK_STATUS),
-                `SET_jesd_rx_LINK_STATUS_STATUS_STATE(3));
-    axi_read_v (`AXI_JESD_TX+GetAddrs(jesd_tx_LINK_STATUS),
-                `SET_jesd_tx_LINK_STATUS_STATUS_STATE('h3) | 
-                `SET_jesd_tx_LINK_STATUS_STATUS_SYNC(ref_sync_status));
+    axi_read_v (`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_STATUS),
+                `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
+    axi_read_v (`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_STATUS),
+                `SET_JESD_TX_LINK_STATUS_STATUS_STATE('h3) | 
+                `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(ref_sync_status));
 
     //LINK DISABLE
-    axi_write (`AXI_JESD_RX + GetAddrs(jesd_rx_LINK_DISABLE),
-               `SET_jesd_rx_LINK_DISABLE_LINK_DISABLE(1));
-    axi_write (`AXI_JESD_TX + GetAddrs(jesd_tx_LINK_DISABLE),
-               `SET_jesd_tx_LINK_DISABLE_LINK_DISABLE(1));
+    axi_write (`AXI_JESD_RX + GetAddrs(JESD_RX_LINK_DISABLE),
+               `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(1));
+    axi_write (`AXI_JESD_TX + GetAddrs(JESD_TX_LINK_DISABLE),
+               `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(1));
 
     //  -------------------------------------------------------
     //  Test DAC FIFO path and RX DMA capture
@@ -494,34 +495,34 @@ program test_program;
     #5us;
 
     // Configure Transport Layer for DMA
-    axi_write (`DAC_TPL+'h40*i+GetAddrs(dac_channel_REG_CHAN_CNTRL_7),
-               `SET_dac_channel_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));  
+    axi_write (`DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));  
     #1us;
 
     //LINK ENABLE
-    axi_write (`AXI_JESD_RX + GetAddrs(jesd_rx_LINK_DISABLE),
-               `SET_jesd_rx_LINK_DISABLE_LINK_DISABLE(0));
-    axi_write (`AXI_JESD_TX + GetAddrs(jesd_tx_LINK_DISABLE),
-               `SET_jesd_tx_LINK_DISABLE_LINK_DISABLE(0));
+    axi_write (`AXI_JESD_RX + GetAddrs(JESD_RX_LINK_DISABLE),
+               `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
+    axi_write (`AXI_JESD_TX + GetAddrs(JESD_TX_LINK_DISABLE),
+               `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(0));
  
 
     #25us;
 
     //Read status back
     // Check SYSREF_STATUS
-    axi_read_v (`AXI_JESD_TX+GetAddrs(jesd_tx_SYSREF_STATUS),
-                `SET_jesd_tx_SYSREF_STATUS_SYSREF_DETECTED(1));
-    axi_read_v (`AXI_JESD_RX+GetAddrs(jesd_rx_SYSREF_STATUS),
-                `SET_jesd_rx_SYSREF_STATUS_SYSREF_DETECTED(1));
+    axi_read_v (`AXI_JESD_TX+GetAddrs(JESD_TX_SYSREF_STATUS),
+                `SET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(1));
+    axi_read_v (`AXI_JESD_RX+GetAddrs(JESD_RX_SYSREF_STATUS),
+                `SET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(1));
 
     #1us;
 
     // Check if in DATA state and SYNC is 1
-    axi_read_v (`AXI_JESD_TX+GetAddrs(jesd_tx_LINK_STATUS),
-                `SET_jesd_tx_LINK_STATUS_STATUS_STATE('h3));
-    axi_read_v (`AXI_JESD_TX+GetAddrs(jesd_tx_LINK_STATUS),
-                `SET_jesd_tx_LINK_STATUS_STATUS_STATE('h3) | 
-                `SET_jesd_tx_LINK_STATUS_STATUS_SYNC(ref_sync_status));
+    axi_read_v (`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_STATUS),
+                `SET_JESD_TX_LINK_STATUS_STATUS_STATE('h3));
+    axi_read_v (`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_STATUS),
+                `SET_JESD_TX_LINK_STATUS_STATUS_STATE('h3) | 
+                `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(ref_sync_status));
  
     // Configure RX DMA
     axi_write (`RX_DMA+GetAddrs(dmac_CONTROL),
@@ -535,8 +536,8 @@ program test_program;
     axi_write (`RX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
                `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
     #5us;
-    axi_write (`ADC_TPL+GetAddrs(adc_channel_REG_CHAN_CNTRL),
-               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(0));
+    axi_write (`ADC_TPL+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(0));
     #5us;
 
     check_captured_data(
@@ -546,8 +547,8 @@ program test_program;
       .max_sample(2048)
     );
 
-    axi_write (`ADC_TPL+GetAddrs(adc_channel_REG_CHAN_CNTRL),
-               `SET_adc_channel_REG_CHAN_CNTRL_ENABLE(1));
+    axi_write (`ADC_TPL+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     #5us;
 
     // Configure RX DMA

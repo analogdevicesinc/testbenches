@@ -20,12 +20,12 @@
 //   1. The GNU General Public License version 2 as published by the
 //      Free Software Foundation, which can be found in the top level directory
 //      of this repository (LICENSE_GPL2), and also online at:
-//      <https://www.gnu.org/licenses/old_licenses/gpl_2.0.html>
+//      <https://www.gnu.org/licenses/old_licenses/gpl-2.0.html>
 //
 // OR
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
-//      of this repository (LICENSE_ADIBSD), and also on_line at:
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
 //      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.

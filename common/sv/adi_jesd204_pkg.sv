@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 _ 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -20,7 +20,7 @@
 //   1. The GNU General Public License version 2 as published by the
 //      Free Software Foundation, which can be found in the top level directory
 //      of this repository (LICENSE_GPL2), and also online at:
-//      <https://www.gnu.org/licenses/old_licenses/gpl-2.0.html>
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
 //
 // OR
 //
@@ -43,16 +43,16 @@ package adi_jesd204_pkg;
   import adi_regmap_jesd_tx_pkg::*;
   import adi_regmap_jesd_rx_pkg::*;
 
-  `define set_member(T,name) function set_``name (input T val); name = val; endfunction
+  `define set_member(T, name) function set_``name (input T val); name = val; endfunction
 
-  typedef enum bit [1:0] {sc0=0, sc1=1, sc2=2} subclass_t;
-  typedef enum bit [1:0] {v204A=0, v204B=1, v204C=2} version_t;
-  typedef enum bit [0:0] {enc8b10b=0,enc64b66b=1} encoding_t;
-  const string encoding_s [2] = {"8B10B","64B66B"};
-  const string rx_link_states_8b10b [4] = {"RESET","WAIT_FOR_PHY","CGS","DATA"};
-  const string rx_link_states_64b66b [4] = {"RESET","WAIT_BS","BLOCK_SYNC","DATA"};
-  const string tx_link_states_8b10b [4] = {"WAIT","CGS","ILAS","DATA"};
-  const string tx_link_states_64b66b [4] = {"RESET","N/A","N/A","DATA"};
+  typedef enum bit [1:0] {sc0 = 0, sc1 = 1, sc2 = 2} subclass_t;
+  typedef enum bit [1:0] {v204A = 0, v204B = 1, v204C = 2} version_t;
+  typedef enum bit [0:0] {enc8b10b = 0, enc64b66b = 1} encoding_t;
+  const string encoding_s [2] = {"8B10B", "64B66B"};
+  const string rx_link_states_8b10b [4] = {"RESET", "WAIT_FOR_PHY", "CGS", "DATA"};
+  const string rx_link_states_64b66b [4] = {"RESET", "WAIT_BS", "BLOCK_SYNC", "DATA"};
+  const string tx_link_states_8b10b [4] = {"WAIT", "CGS", "ILAS", "DATA"};
+  const string tx_link_states_64b66b [4] = {"RESET", "N/A", "N/A", "DATA"};
 
   //============================================================================
   // JESD 204C link class
@@ -96,17 +96,17 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    `set_member(int,L);
-    `set_member(int,M);
-    `set_member(int,F);
-    `set_member(int,S);
-    `set_member(int,K);
-    `set_member(int,E);
-    `set_member(int,N);
-    `set_member(int,NP);
-    `set_member(int,CS);
-    `set_member(int,HD);
-    `set_member(longint unsigned,lane_rate);
+    `set_member(int, L);
+    `set_member(int, M);
+    `set_member(int, F);
+    `set_member(int, S);
+    `set_member(int, K);
+    `set_member(int, E);
+    `set_member(int, N);
+    `set_member(int, NP);
+    `set_member(int, CS);
+    `set_member(int, HD);
+    `set_member(longint unsigned, lane_rate);
 
     // -----------------
     //
@@ -115,19 +115,19 @@ package adi_jesd204_pkg;
       `INFO(("--------------------------"));
       `INFO(("--Link parameters---------"));
       `INFO(("--------------------------"));
-      `INFO(("L         is %0d",L));
-      `INFO(("M         is %0d",M));
-      `INFO(("F         is %0d",F));
-      `INFO(("S         is %0d",S));
-      `INFO(("K         is %0d",K));
-      `INFO(("E         is %0d",E));
-      `INFO(("N         is %0d",N));
-      `INFO(("N'        is %0d",NP));
-      `INFO(("CS        is %0d",CS));
-      `INFO(("HD        is %0d",HD));
-      `INFO(("SCR       is %0d",SCR));
-      `INFO(("SUBCLASSV is %0d",SUBCLASSV));
-      `INFO(("ENCODING  is %s",encoding_s[encoding]));
+      `INFO(("L         is %0d", L));
+      `INFO(("M         is %0d", M));
+      `INFO(("F         is %0d", F));
+      `INFO(("S         is %0d", S));
+      `INFO(("K         is %0d", K));
+      `INFO(("E         is %0d", E));
+      `INFO(("N         is %0d", N));
+      `INFO(("N'        is %0d", NP));
+      `INFO(("CS        is %0d", CS));
+      `INFO(("HD        is %0d", HD));
+      `INFO(("SCR       is %0d", SCR));
+      `INFO(("SUBCLASSV is %0d", SUBCLASSV));
+      `INFO(("ENCODING  is %s", encoding_s[encoding]));
     endfunction
 
     // -----------------
@@ -148,16 +148,16 @@ package adi_jesd204_pkg;
     function bit[7:0] calc_checksum(int LID);
       bit [7:0] val;
       val = (LID +
-             L-1 +
+             L - 1 +
              SCR +
-             F-1 +
-             K-1 +
-             M-1 +
-             N-1 +
+             F - 1 +
+             K - 1 +
+             M - 1 +
+             N - 1 +
              CS +
-             NP-1 +
+             NP - 1 +
              SUBCLASSV +
-             S-1 +
+             S - 1 +
              JESDV +
              CF +
              HD);
@@ -182,9 +182,9 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    function new (reg_accessor bus, bit [31:0] base_address, jesd_link link);
+    function new (string name, reg_accessor bus, bit [31:0] base_address, jesd_link link);
 
-      super.new(bus,base_address);
+      super.new(name, bus, base_address);
       this.link = link;
 
     endfunction
@@ -222,7 +222,7 @@ package adi_jesd204_pkg;
     //
     // -----------------
     function int unsigned calc_link_clk();
-      link_clk = link.lane_rate/(dp_width*8*link.encoding_ratio);
+      link_clk = link.lane_rate/(dp_width * 8 * link.encoding_ratio);
       return link_clk;
     endfunction : calc_link_clk
 
@@ -240,7 +240,7 @@ package adi_jesd204_pkg;
     // -----------------
     function int unsigned calc_sysref_clk();
       if (link_clk == 0) calc_link_clk;
-      sysref_clk = link_clk * dp_width / (link.K*link.F);
+      sysref_clk = link_clk * dp_width / (link.K * link.F);
       return sysref_clk;
     endfunction : calc_sysref_clk;
 
@@ -254,8 +254,8 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    function new (reg_accessor bus, bit [31:0] base_address, jesd_link link);
-      super.new(bus, base_address, link);
+    function new (string name, reg_accessor bus, bit [31:0] base_address, jesd_link link);
+      super.new(name, bus, base_address, link);
     endfunction
 
     // -----------------
@@ -272,14 +272,14 @@ package adi_jesd204_pkg;
 
       //CONF0
       this.bus.RegWrite32(this.base_address + GetAddrs(JESD_RX_LINK_CONF0),
-                         `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME(link.F-1) |
-                         `SET_JESD_RX_LINK_CONF0_OCTETS_PER_MULTIFRAME(link.F*link.K-1));
+                         `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME(link.F - 1) |
+                         `SET_JESD_RX_LINK_CONF0_OCTETS_PER_MULTIFRAME(link.F * link.K - 1));
       //CONF4
       this.bus.RegWrite32(this.base_address + GetAddrs(JESD_RX_LINK_CONF4),
-                         `SET_JESD_RX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((link.F*link.K)/tpl_dp_width-1));
+                         `SET_JESD_RX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((link.F * link.K) / tpl_dp_width - 1));
       //CONF1
       this.bus.RegWrite32(this.base_address + GetAddrs(JESD_RX_LINK_CONF1),
-                         `SET_JESD_RX_LINK_CONF1_DESCRAMBLER_DISABLE(link.SCR==0));
+                         `SET_JESD_RX_LINK_CONF1_DESCRAMBLER_DISABLE(link.SCR == 0));
 
       //LINK ENABLE
       this.bus.RegWrite32(this.base_address + GetAddrs(JESD_RX_LINK_DISABLE),
@@ -295,9 +295,9 @@ package adi_jesd204_pkg;
       int timeout = 20;
       bit [1:0] link_state;
       // wait until link is not in DATA
-      while (link_state!=3 && timeout > 0) begin
+      while (link_state != 3 && timeout > 0) begin
         #1us;
-        this.bus.RegRead32(this.base_address+GetAddrs(JESD_RX_LINK_STATUS), val);
+        this.bus.RegRead32(this.base_address + GetAddrs(JESD_RX_LINK_STATUS), val);
         link_state = `GET_JESD_RX_LINK_STATUS_STATUS_STATE(val);
         timeout--;
       end
@@ -324,28 +324,28 @@ package adi_jesd204_pkg;
                               `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
 
       // Check SYSREF alignment ERROR
-      this.bus.RegReadVerify32(this.base_address+GetAddrs(JESD_RX_SYSREF_STATUS),
+      this.bus.RegReadVerify32(this.base_address + GetAddrs(JESD_RX_SYSREF_STATUS),
                                `SET_JESD_RX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(0) |
-                               `SET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(link.SUBCLASSV==sc1));
+                               `SET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(link.SUBCLASSV == sc1));
 
       // Check received ILAS
       if (link.encoding == enc8b10b) begin
         for (int i = 0; i < link.L; i++) begin
-          this.bus.RegReadVerify32(this.base_address + i*'h8 + GetAddrs(JESD_TX_LANEn_ILAS1),
+          this.bus.RegReadVerify32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS1),
                                    `SET_JESD_RX_LANEn_ILAS1_LID(i) |
-                                   `SET_JESD_RX_LANEn_ILAS1_L(link.L-1) |
+                                   `SET_JESD_RX_LANEn_ILAS1_L(link.L - 1) |
                                    `SET_JESD_RX_LANEn_ILAS1_SCR(link.SCR) |
-                                   `SET_JESD_RX_LANEn_ILAS1_F(link.F-1) |
-                                   `SET_JESD_RX_LANEn_ILAS1_K(link.K-1));
-          this.bus.RegReadVerify32(this.base_address + i*'h8 + GetAddrs(JESD_TX_LANEn_ILAS2),
-                                   `SET_JESD_RX_LANEn_ILAS2_M(link.M-1) |
-                                   `SET_JESD_RX_LANEn_ILAS2_N(link.N-1) |
+                                   `SET_JESD_RX_LANEn_ILAS1_F(link.F - 1) |
+                                   `SET_JESD_RX_LANEn_ILAS1_K(link.K - 1));
+          this.bus.RegReadVerify32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS2),
+                                   `SET_JESD_RX_LANEn_ILAS2_M(link.M - 1) |
+                                   `SET_JESD_RX_LANEn_ILAS2_N(link.N - 1) |
                                    `SET_JESD_RX_LANEn_ILAS2_CS(link.CS) |
-                                   `SET_JESD_RX_LANEn_ILAS2_NP(link.NP-1) |
+                                   `SET_JESD_RX_LANEn_ILAS2_NP(link.NP - 1) |
                                    `SET_JESD_RX_LANEn_ILAS2_SUBCLASSV(link.SUBCLASSV) |
-                                   `SET_JESD_RX_LANEn_ILAS2_S(link.S-1) |
+                                   `SET_JESD_RX_LANEn_ILAS2_S(link.S - 1) |
                                    `SET_JESD_RX_LANEn_ILAS2_JESDV(link.JESDV));
-          this.bus.RegReadVerify32(this.base_address + i*'h8 + GetAddrs(JESD_TX_LANEn_ILAS3),
+          this.bus.RegReadVerify32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS3),
                                    `SET_JESD_RX_LANEn_ILAS3_CF(link.CF) |
                                    `SET_JESD_RX_LANEn_ILAS3_HD(link.HD) |
                                    `SET_JESD_RX_LANEn_ILAS3_FCHK(link.calc_checksum(i)));
@@ -359,17 +359,17 @@ package adi_jesd204_pkg;
     // -----------------
     task link_status_print();
       bit [31:0] val;
-      this.bus.RegRead32(this.base_address+GetAddrs(JESD_RX_LINK_STATUS),val);
+      this.bus.RegRead32(this.base_address + GetAddrs(JESD_RX_LINK_STATUS), val);
       if (link.encoding == enc8b10b) begin
-        `INFO(("Link status : %s",rx_link_states_8b10b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]));
+        `INFO(("Link status : %s", rx_link_states_8b10b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]));
       end else begin
-        `INFO(("Link status : %s",rx_link_states_64b66b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]));
+        `INFO(("Link status : %s", rx_link_states_64b66b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]));
       end
 
       // Check SYSREF alignment ERROR
-      this.bus.RegRead32(this.base_address+GetAddrs(JESD_RX_SYSREF_STATUS),val);
-      `INFO(("SYSREF captured : %s",`GET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"));
-      `INFO(("SYSREF alignment error : %s",`GET_JESD_RX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"));
+      this.bus.RegRead32(this.base_address + GetAddrs(JESD_RX_SYSREF_STATUS), val);
+      `INFO(("SYSREF captured : %s", `GET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"));
+      `INFO(("SYSREF alignment error : %s", `GET_JESD_RX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"));
 
     endtask : link_status_print
 
@@ -383,8 +383,8 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    function new (reg_accessor bus, bit [31:0] base_address, jesd_link link);
-      super.new(bus, base_address, link);
+    function new (string name, reg_accessor bus, bit [31:0] base_address, jesd_link link);
+      super.new(name, bus, base_address, link);
     endfunction
 
     // -----------------
@@ -401,33 +401,33 @@ package adi_jesd204_pkg;
 
       //CONF0
       this.bus.RegWrite32(this.base_address + GetAddrs(JESD_TX_LINK_CONF0),
-                         `SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(link.F-1) |
-                         `SET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(link.F*link.K-1));
+                         `SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(link.F - 1) |
+                         `SET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(link.F * link.K - 1));
       //CONF4
       this.bus.RegWrite32(this.base_address + GetAddrs(JESD_TX_LINK_CONF4),
-                         `SET_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((link.F*link.K)/tpl_dp_width-1));
+                         `SET_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((link.F * link.K) / tpl_dp_width - 1));
       //CONF1
       this.bus.RegWrite32(this.base_address + GetAddrs(JESD_TX_LINK_CONF1),
-                         `SET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(link.SCR==0));
+                         `SET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(link.SCR == 0));
 
       //ILAS
       if (link.encoding == enc8b10b) begin
         for (int i = 0; i < link.L; i++) begin
-          this.bus.RegWrite32(this.base_address + i*'h8 + GetAddrs(JESD_TX_LANEn_ILAS1),
+          this.bus.RegWrite32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS1),
                              `SET_JESD_TX_LANEn_ILAS1_LID(i) |
-                             `SET_JESD_TX_LANEn_ILAS1_L(link.L-1) |
+                             `SET_JESD_TX_LANEn_ILAS1_L(link.L - 1) |
                              `SET_JESD_TX_LANEn_ILAS1_SCR(link.SCR) |
-                             `SET_JESD_TX_LANEn_ILAS1_F(link.F-1) |
-                             `SET_JESD_TX_LANEn_ILAS1_K(link.K-1));
-          this.bus.RegWrite32(this.base_address + i*'h8 + GetAddrs(JESD_TX_LANEn_ILAS2),
-                             `SET_JESD_TX_LANEn_ILAS2_M(link.M-1) |
-                             `SET_JESD_TX_LANEn_ILAS2_N(link.N-1) |
+                             `SET_JESD_TX_LANEn_ILAS1_F(link.F - 1) |
+                             `SET_JESD_TX_LANEn_ILAS1_K(link.K - 1));
+          this.bus.RegWrite32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS2),
+                             `SET_JESD_TX_LANEn_ILAS2_M(link.M - 1) |
+                             `SET_JESD_TX_LANEn_ILAS2_N(link.N - 1) |
                              `SET_JESD_TX_LANEn_ILAS2_CS(link.CS) |
-                             `SET_JESD_TX_LANEn_ILAS2_NP(link.NP-1) |
+                             `SET_JESD_TX_LANEn_ILAS2_NP(link.NP - 1) |
                              `SET_JESD_TX_LANEn_ILAS2_SUBCLASSV(link.SUBCLASSV) |
-                             `SET_JESD_TX_LANEn_ILAS2_S(link.S-1) |
+                             `SET_JESD_TX_LANEn_ILAS2_S(link.S - 1) |
                              `SET_JESD_TX_LANEn_ILAS2_JESDV(link.JESDV));
-          this.bus.RegWrite32(this.base_address + i*'h8 + GetAddrs(JESD_TX_LANEn_ILAS3),
+          this.bus.RegWrite32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS3),
                              `SET_JESD_TX_LANEn_ILAS3_CF(link.CF) |
                              `SET_JESD_TX_LANEn_ILAS3_HD(link.HD) |
                              `SET_JESD_TX_LANEn_ILAS3_FCHK(link.calc_checksum(i)));
@@ -451,7 +451,7 @@ package adi_jesd204_pkg;
       // wait until link is not in DATA
       while (link_state!=3 && timeout > 0) begin
         #1us;
-        this.bus.RegRead32(this.base_address+GetAddrs(JESD_TX_LINK_STATUS), val);
+        this.bus.RegRead32(this.base_address + GetAddrs(JESD_TX_LINK_STATUS), val);
         link_state = `GET_JESD_TX_LINK_STATUS_STATUS_STATE(val);
         timeout--;
       end
@@ -475,13 +475,13 @@ package adi_jesd204_pkg;
       link_status_print();
 
       // There is no SYNC signal in 64b66b
-      this.bus.RegReadVerify32(this.base_address+GetAddrs(JESD_TX_LINK_STATUS),
-                               `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(link.encoding==enc8b10b) |
+      this.bus.RegReadVerify32(this.base_address + GetAddrs(JESD_TX_LINK_STATUS),
+                               `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(link.encoding == enc8b10b) |
                                `SET_JESD_TX_LINK_STATUS_STATUS_STATE(3));
       // Check SYSREF alignment ERROR
-      this.bus.RegReadVerify32(this.base_address+GetAddrs(JESD_TX_SYSREF_STATUS),
+      this.bus.RegReadVerify32(this.base_address + GetAddrs(JESD_TX_SYSREF_STATUS),
                                `SET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(0) |
-                               `SET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(link.SUBCLASSV==sc1));
+                               `SET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(link.SUBCLASSV == sc1));
     endtask : link_verify
 
     // -----------------
@@ -490,21 +490,20 @@ package adi_jesd204_pkg;
     task link_status_print();
       bit [31:0] val;
       // There is no SYNC signal in 64b66b
-      this.bus.RegRead32(this.base_address+GetAddrs(JESD_TX_LINK_STATUS),val);
+      this.bus.RegRead32(this.base_address + GetAddrs(JESD_TX_LINK_STATUS), val);
       if (link.encoding == enc8b10b) begin
-        `INFO(("Link status : %s",tx_link_states_8b10b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]));
+        `INFO(("Link status : %s", tx_link_states_8b10b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]));
         `INFO(("SYNC~ : %s", `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(val) ? "deasserted" : "asserted"));
       end else begin
-        `INFO(("Link status %s",tx_link_states_64b66b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]));
+        `INFO(("Link status %s", tx_link_states_64b66b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]));
       end
 
       // Check SYSREF alignment ERROR
-      this.bus.RegRead32(this.base_address+GetAddrs(JESD_TX_SYSREF_STATUS),val);
-      `INFO(("SYSREF captured : %s",`GET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"));
-      `INFO(("SYSREF alignment error : %s",`GET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"));
+      this.bus.RegRead32(this.base_address + GetAddrs(JESD_TX_SYSREF_STATUS), val);
+      `INFO(("SYSREF captured : %s", `GET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"));
+      `INFO(("SYSREF alignment error : %s", `GET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"));
 
     endtask : link_status_print
-
 
   endclass : tx_link_layer
 

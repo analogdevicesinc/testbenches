@@ -20,7 +20,7 @@
 //   1. The GNU General Public License version 2 as published by the
 //      Free Software Foundation, which can be found in the top level directory
 //      of this repository (LICENSE_GPL2), and also online at:
-//      <https://www.gnu.org/licenses/old_licenses/gpl-2.0.html>
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
 //
 // OR
 //
@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Fri May 28 12:27:32 2021 */
+/* Thu Jun 10 09:59:59 2021 */
 
 package adi_regmap_xcvr_pkg;
   import adi_regmap_pkg::*;
@@ -62,7 +62,10 @@ package adi_regmap_xcvr_pkg;
   `define GET_XCVR_RESETN_RESETN(x) GetField(XCVR_RESETN,"RESETN",x)
 
   const reg_t XCVR_STATUS = '{ 'h0014, "STATUS" , '{
+    "PLL_LOCK_N": '{ 4, 4, RO, 'h00 },
     "STATUS": '{ 0, 0, RO, 'h00 }}};
+  `define SET_XCVR_STATUS_PLL_LOCK_N(x) SetField(XCVR_STATUS,"PLL_LOCK_N",x)
+  `define GET_XCVR_STATUS_PLL_LOCK_N(x) GetField(XCVR_STATUS,"PLL_LOCK_N",x)
   `define SET_XCVR_STATUS_STATUS(x) SetField(XCVR_STATUS,"STATUS",x)
   `define GET_XCVR_STATUS_STATUS(x) GetField(XCVR_STATUS,"STATUS",x)
 

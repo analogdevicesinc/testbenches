@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 _ 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -20,7 +20,7 @@
 //   1. The GNU General Public License version 2 as published by the
 //      Free Software Foundation, which can be found in the top level directory
 //      of this repository (LICENSE_GPL2), and also online at:
-//      <https://www.gnu.org/licenses/old_licenses/gpl-2.0.html>
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
 //
 // OR
 //
@@ -51,10 +51,13 @@ package adi_peripheral_pkg;
     bit [7:0] ver_minor;
     bit [7:0] ver_patch;
 
+    string name;
+
     // -----------------
     //
     // -----------------
-    function new (reg_accessor bus, bit [31:0] base_address);
+    function new (string name, reg_accessor bus, bit [31:0] base_address);
+      this.name = name;
       this.bus = bus;
       this.base_address = base_address;
     endfunction
@@ -65,8 +68,8 @@ package adi_peripheral_pkg;
     virtual task probe();
       bit [31:0] val;
       this.bus.RegRead32(this.base_address + 'h0, val);
-      {ver_major,ver_minor,ver_patch} = val;
-      `INFO(("Found peripheral version: %0d.%0d.%s",ver_major,ver_minor,ver_patch));
+      {ver_major, ver_minor, ver_patch} = val;
+      `INFO(("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch));
     endtask
 
   endclass

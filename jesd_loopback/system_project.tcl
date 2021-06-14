@@ -19,6 +19,7 @@ set project_name [file rootname $cfg_file]
 #adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"; # GTY4
 adi_sim_project_xilinx $project_name "xczu9eg-ffvb1156-2-e"; # GTH4
 #adi_sim_project_xilinx $project_name "xcku040-ffva1156-2-e"; # GTH3
+#adi_sim_project_xilinx $project_name; # GTX2
 
 # Add test files to the project
 adi_sim_project_files [list \
@@ -29,7 +30,6 @@ adi_sim_project_files [list \
  "../common/sv/s_axis_sequencer.sv" \
  "../common/sv/m_axi_sequencer.sv" \
  "../common/sv/s_axi_sequencer.sv" \
- "../common/sv/dmac_api.sv" \
  "../common/sv/adi_regmap_pkg.sv" \
  "../common/sv/adi_regmap_dmac_pkg.sv" \
  "../common/sv/adi_regmap_dac_pkg.sv" \

@@ -10,4 +10,4 @@ set ad_project_params(JESD_S) 1
 set ad_project_params(JESD_NP) 16
 
 set ad_project_params(REF_CLK_RATE) 250
-set ad_project_params(LANE_RATE) 10
+set ad_project_params(LANE_RATE) 5

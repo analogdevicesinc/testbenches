@@ -4,8 +4,8 @@ set ad_project_params(JESD_MODE) 8B10B
 
 set ad_project_params(REF_CLK_RATE) 500
 
-set ad_project_params(RX_RATE) 10
-set ad_project_params(TX_RATE) 10
+set ad_project_params(RX_LANE_RATE) 10
+set ad_project_params(TX_LANE_RATE) 10
 
 set ad_project_params(RX_NUM_LINKS) 1
 set ad_project_params(RX_JESD_M) 8

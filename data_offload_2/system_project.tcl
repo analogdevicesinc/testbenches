@@ -10,6 +10,11 @@ if {$argc < 1} {
   set cfg_file [lindex $argv 0]
 }
 
+global ad_project_params
+
+# Disable default harness
+set ad_project_params(CUSTOM_HARNESS) 1
+
 # Read common configuration file
 source "cfgs/common_cfg.tcl"
 # Read configuration file with topology information

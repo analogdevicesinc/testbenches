@@ -9,6 +9,7 @@ proc adi_sim_add_define {value} {
 
 proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   global design_name
+  global ad_project_params
 
   # Create project
   create_project ${project_name} ./runs/${project_name} -part $part -force
@@ -23,16 +24,16 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   # Rebuild user ip_repo's index before adding any source files
   update_ip_catalog -rebuild
 
-
   ## Create the bd
   ######################
   create_bd_design $design_name
 
   global sys_zynq
   set sys_zynq -1
-  ##source ../common/test_harness/test_harness_system_bd.tcl
+  if { ![info exists ad_project_params(CUSTOM_HARNESS)] || !$ad_project_params(CUSTOM_HARNESS) } {
+    source ../common/test_harness/test_harness_system_bd.tcl
+  }
 
-  global ad_project_params
   # transfer tcl parameters as defines to verilog
   foreach {k v} [array get ad_project_params] {
     adi_sim_add_define $k=$v

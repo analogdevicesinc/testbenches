@@ -209,4 +209,3 @@ ad_connect dst_rst_vip/rst_out DUT/m_axis_aresetn
 
 ad_connect DUT/m_axis dst_axis/s_axis
 
-

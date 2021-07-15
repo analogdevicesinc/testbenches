@@ -102,22 +102,47 @@ module test_program(
 
     init_req <= 1'b1;
 
-    @env.src_axis_seq.queue_empty;
-    init_req <= 1'b0;
+    // @env.src_axis_seq.queue_empty;
+    // init_req <= 1'b0;
     #100
+
+
     sync_ext <= 1'b1;
     @(posedge `TH.`DST_CLK.clk_out);
+    @(posedge `TH.`DST_CLK.clk_out);
     sync_ext <= 1'b0;
+    # 1000
+
+    sync_ext <= 1'b1;
+    @(posedge `TH.`DST_CLK.clk_out);
+    @(posedge `TH.`DST_CLK.clk_out);
+    sync_ext <= 1'b0;
+    # 1000
+
+    sync_ext <= 1'b1;
+    @(posedge `TH.`DST_CLK.clk_out);
+    @(posedge `TH.`DST_CLK.clk_out);
+    sync_ext <= 1'b0;
+    # 1000
+
+    // init_req <= 1'b1;
+
+    sync_ext <= 1'b1;
+    @(posedge `TH.`DST_CLK.clk_out);
+    @(posedge `TH.`DST_CLK.clk_out);
+
+    sync_ext <= 1'b0;
+    # 1000
 
     #`SRC_TRANSFERS_DELAY
 
 
-    init_req <= 1'b1;
+    //init_req <= 1'b1;
     #100
-    env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
+    // env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, 1, 0);
 
-    @env.src_axis_seq.queue_empty;
-    init_req <= 1'b0;
+    // @env.src_axis_seq.queue_empty;
+    // init_req <= 1'b0;
 
     #300
     sync_ext <= 1'b1;
@@ -171,7 +196,7 @@ module test_program(
     // bring up the Data Offload instances from reset
     `INFO(("Bring up TX Data Offload"));
 
-    dut.set_oneshot(1);
+    dut.set_oneshot(0);
     dut.set_sync_config(1); // Hardware Sync
 
     // dut.set_transfer_length(`TRANSFER_LENGTH);

@@ -11,6 +11,8 @@ include $(ADI_HDL_DIR)/quiet.mk
 
 ENV_DEPS += $(foreach dep,$(LIB_DEPS),$(HDL_LIBRARY_PATH)$(dep)/component.xml)
 
+SHELL:=/bin/bash
+
 # simulate - Run a sim command and look in logfile for errors; creates JUnit XML
 # $(1): Command to execute
 # $(2): Logfile name

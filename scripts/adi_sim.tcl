@@ -93,3 +93,14 @@ proc adi_update_define {name value} {
   set_property verilog_define $defines_new [get_filesets sim_1]
 
 }
+
+proc adi_project_files {project_files} {
+
+  foreach pfile $project_files {
+    if {[string range $pfile [expr 1 + [string last . $pfile]] end] == "xdc"} {
+      add_files -norecurse -fileset constrs_1 $pfile
+    } else {
+      add_files -norecurse -fileset sources_1 $pfile
+    }
+  }
+}

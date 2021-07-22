@@ -25,7 +25,7 @@ $(strip $(1)) >> $(strip $(2)) 2>&1; \
 (ERR=$$?; \
 END=$$(date +%s); \
 DIFF=$$(( $$END - $$START )); \
-ERRS=`grep -v ^# $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -C 10`; \
+ERRS=`grep -v ^# $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -e "\[ERROR\]" -C 10`; \
 if [[ $$ERRS > 0 ]] ; then ERR=1; fi;\
 JUnitFile='results/$(strip $(4))_$(strip $(5)).xml'; \
 echo \<testsuite\> > $$JUnitFile; \

@@ -224,6 +224,8 @@ program test_program;
     //
     system_tb.sysref_dly_sel = 2'b01;
     #1us;
+    @(posedge system_tb.sysref);
+    @(negedge system_tb.sysref);
     // Check SYSREF alignment ERROR
     env.mng.RegReadVerify32(`AXI_JESD_TX + GetAddrs(JESD_TX_SYSREF_STATUS),
                        `SET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(1) |
@@ -243,6 +245,8 @@ program test_program;
     //
     system_tb.sysref_dly_sel = 2'b10;
     #1us;
+    @(posedge system_tb.sysref);
+    @(negedge system_tb.sysref);
     // Check SYSREF alignment ERROR
     env.mng.RegReadVerify32(`AXI_JESD_TX + GetAddrs(JESD_TX_SYSREF_STATUS),
                        `SET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(1) |

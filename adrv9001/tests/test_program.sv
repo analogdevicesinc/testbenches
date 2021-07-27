@@ -63,7 +63,8 @@ program test_program;
   parameter USE_RX_CLK_FOR_TX = 0;
   parameter DDS_DISABLE = 0;
   parameter IQCORRECTION_DISABLE = 1;
-
+  parameter SYMB_OP = 0;
+  parameter SYMB_8_16B = 0;
   parameter BASE = `AXI_ADRV9001;
 
   parameter CH0 = 8'h00 * 4;
@@ -120,13 +121,17 @@ program test_program;
 
   integer rate;
   initial begin
-    case ({CMOS_LVDS_N[0],SINGLE_LANE[0],SDR_DDR_N[0]})
-      3'b000 : rate = 2;
-      3'b010 : rate = 4;
-      3'b111 : rate = 8;
-      3'b110 : rate = 4;
-      3'b100 : rate = 1;
-      3'b101 : rate = 2;
+    case ({CMOS_LVDS_N[0],SINGLE_LANE[0],SDR_DDR_N[0],SYMB_OP[0],SYMB_8_16B[0]})
+      5'b00000 : rate = 2;
+      5'b01000 : rate = 4;
+      5'b11100 : rate = 8;
+      5'b11000 : rate = 4;
+      5'b10000 : rate = 1;
+      5'b10100 : rate = 2;
+      5'b11111 : rate = 2;//SYMB 8b SDR
+      5'b11011 : rate = 1;//SYMB 8b DDR
+      5'b11110 : rate = 4;//SYMB 16b SDR
+      5'b11010 : rate = 2;//SYMB 16b DDR
       default : rate = 1;
     endcase
   end
@@ -163,12 +168,14 @@ program test_program;
 
     // R2T2 tests
     R1_MODE = 0;
-
+    if((SYMB_OP[0] & SYMB_8_16B[0])) begin
+    `INFO(("PN Test Skipped in 8 bits symbol mode"));
+    end else begin
     pn_test(`NIBBLE_RAMP);
     pn_test(`FULL_RAMP);
     pn_test(`PN7);
     pn_test(`PN15);
-
+    end
     dds_test;
 
     dma_test;
@@ -220,12 +227,12 @@ program test_program;
                   bit tx2_en = 1);
   begin
     // Configure Rx interface
-    #100 axi_write (RX1_COMMON + 32'h00000044, (SDR_DDR_N << 16) | (SINGLE_LANE << 8) | (R1_MODE << 2));
-    #100 axi_write (RX2_COMMON + 32'h00000044, (SDR_DDR_N << 16) | (SINGLE_LANE << 8) | (R1_MODE << 2));
+    #100 axi_write (RX1_COMMON + 32'h00000044, (SDR_DDR_N << 16) | (SYMB_OP << 15) | (SYMB_8_16B << 14) | (SINGLE_LANE << 8) | (R1_MODE << 2));
+    #100 axi_write (RX2_COMMON + 32'h00000044, (SDR_DDR_N << 16) | (SYMB_OP << 15) | (SYMB_8_16B << 14) | (SINGLE_LANE << 8) | (R1_MODE << 2));
 
     // Configure Tx interface
-    #100 axi_write (TX1_COMMON + 32'h00000048, (SDR_DDR_N << 16) | (SINGLE_LANE << 8) | (R1_MODE << 5));
-    #100 axi_write (TX2_COMMON + 32'h00000048, (SDR_DDR_N << 16) | (SINGLE_LANE << 8) | (R1_MODE << 5));
+    #100 axi_write (TX1_COMMON + 32'h00000048, (SDR_DDR_N << 16) | (SYMB_OP << 15) | (SYMB_8_16B << 14) | (SINGLE_LANE << 8) | (R1_MODE << 5));
+    #100 axi_write (TX2_COMMON + 32'h00000048, (SDR_DDR_N << 16) | (SYMB_OP << 15) | (SYMB_8_16B << 14) | (SINGLE_LANE << 8) | (R1_MODE << 5));
     #100 axi_write (TX1_COMMON + 32'h0000004c, rate-1);
     #100 axi_write (TX2_COMMON + 32'h0000004c, rate-1);
 
@@ -279,27 +286,32 @@ program test_program;
     rx_pattern_map[`FULL_RAMP] = 11;
 
     link_setup;
-
     // enable test data for TX1
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, tx_pattern_map[pattern]);
-    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, tx_pattern_map[pattern]);
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, tx_pattern_map[pattern]);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, tx_pattern_map[pattern]);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, tx_pattern_map[pattern]);
+    end
 
     // enable test data check for RX1
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, rx_pattern_map[pattern]<<16);
-    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, rx_pattern_map[pattern]<<16);
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, rx_pattern_map[pattern]<<16);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, rx_pattern_map[pattern]<<16);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, rx_pattern_map[pattern]<<16);
+    end
 
     // Allow initial OOS to propagate
     #15000;
 
     // clear PN OOS and PN ERR
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h4, 7);
-    #100 axi_write (RX1_CHANNEL + CH1 + 6'h4, 7);
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h4, 7);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h4, 7);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h4, 7);
+    end
 
     #10000;
 
@@ -325,31 +337,41 @@ program test_program;
 
     // Select DDS as source
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, 0);
-    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 0);
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, 0);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 0);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, 0);
+    end
 
     // enable normal data path for RX1
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, 0);
-    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, 0);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, 0);
+    end
 
     // Configure tone amplitude and frequency
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h0, 32'h00000fff);
-    #100 axi_write (TX1_CHANNEL + CH1 + 6'h0, 32'h000007ff);
-    #100 axi_write (TX1_CHANNEL + CH2 + 6'h0, 32'h000003ff);
+    #100 axi_write (TX1_CHANNEL + CH2 + 6'h0, 32'h000007ff);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h0, 32'h000003ff);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h0, 32'h000001ff);
+    end
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h4, 32'h00000100);
-    #100 axi_write (TX1_CHANNEL + CH1 + 6'h4, 32'h00000200);
-    #100 axi_write (TX1_CHANNEL + CH2 + 6'h4, 32'h00000400);
+    #100 axi_write (TX1_CHANNEL + CH2 + 6'h4, 32'h00000200);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h4, 32'h00000400);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h4, 32'h00000800);
+    end
 
     // Enable Rx channel, enable sign extension
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
-    #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    end
 
     // SYNC DAC channels
     #100 axi_write (TX1_COMMON+32'h0044, 32'h00000001);
@@ -375,7 +397,11 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i ,15);
+      if(SYMB_OP[0] & SYMB_8_16B[0]) begin
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
+      end else begin
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i,15);
+      end
     end
 
     // Configure TX DMA
@@ -387,22 +413,28 @@ program test_program;
 
     // Select DDS as source
     #100 axi_write (TX1_CHANNEL + CH0 + 6'h18, 2);
-    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 2);
     #100 axi_write (TX1_CHANNEL + CH2 + 6'h18, 2);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (TX1_CHANNEL + CH1 + 6'h18, 2);
     #100 axi_write (TX1_CHANNEL + CH3 + 6'h18, 2);
+    end
 
     // enable normal data path for RX1
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h18, 0);
-    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h18, 0);
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h18, 0);
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h18, 0);
+    end
 
     // Enable Rx channel, enable sign extension
     #100 axi_write (RX1_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
-    #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH2 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (RX1_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
     #100 axi_write (RX1_CHANNEL + CH3 + 6'h0, 1 | (1 << 4) | (1 << 6));
-
+    end
+     
     // SYNC DAC channels
     #100 axi_write (TX1_COMMON+32'h0044, 32'h00000001);
     // SYNC ADC channels
@@ -446,7 +478,11 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i ,15);
+      if(SYMB_OP[0] & SYMB_8_16B[0]) begin
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
+      end else begin
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i,15);
+      end
     end
 
     // Configure TX DMA
@@ -458,15 +494,21 @@ program test_program;
 
     // Select DDS as source
     #100 axi_write (TX2_CHANNEL + CH0 + 6'h18, 2);
+    if(!(SYMB_OP[0])) begin
     #100 axi_write (TX2_CHANNEL + CH1 + 6'h18, 2);
+    end
 
     // enable normal data path for RX1
     #100 axi_write (RX2_CHANNEL + CH0 + 6'h18, 0);
+    if(!(SYMB_OP[0])) begin
     #100 axi_write (RX2_CHANNEL + CH1 + 6'h18, 0);
+    end
 
     // Enable Rx channel, enable sign extension
     #100 axi_write (RX2_CHANNEL + CH0 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    if(!(SYMB_OP[0])) begin
     #100 axi_write (RX2_CHANNEL + CH1 + 6'h0, 1 | (1 << 4) | (1 << 6));
+    end
 
     // SYNC DAC channels
     #100 axi_write (TX2_COMMON+32'h0044, 32'h00000001);
@@ -514,11 +556,20 @@ program test_program;
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
       captured_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_address);
+      if (SYMB_OP[0] & SYMB_8_16B[0]) begin 
+        captured_word = captured_word & 32'h00ff00ff;
+      end
       if (i==0) begin
+        if(SYMB_OP[0] & SYMB_8_16B[0]) begin
+        first = captured_word[7:0];
+        end else begin
         first = captured_word[15:0];
+        end
       end else begin
         reference_word = (((first + (i+1)*step)%max_sample) << 16) | ((first + (i*step))%max_sample);
-
+        if (SYMB_OP[0] & SYMB_8_16B[0]) begin
+            reference_word = reference_word & 32'h00ff00ff;
+        end
         if (captured_word !== reference_word) begin
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end

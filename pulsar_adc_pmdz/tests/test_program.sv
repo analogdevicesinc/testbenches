@@ -36,11 +36,11 @@
 //
 
 `include "utils.svh"
-`include "test_harness_env.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import test_harness_env_pkg::*;
 
 `define PULSAR_ADC_DMA                  32'h44A3_0000
 `define PULSAR_ADC_REGMAP               32'h44A0_0000
@@ -265,13 +265,13 @@ end
 //---------------------------------------------------------------------------
 // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
 //---------------------------------------------------------------------------
-    
+
   reg     [SDI_PHY_DELAY:0] echo_delay_sclk = {SDI_PHY_DELAY{1'b0}};
   reg     delay_clk = 0;
   wire    m_spi_sclk;
 
   assign  m_spi_sclk = pulsar_adc_spi_sclk;
-  
+
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
     while(1) begin
@@ -285,7 +285,7 @@ end
 initial begin
   while(1) begin
     #0.5   delay_clk = ~delay_clk;
-  end 
+  end
 end
 
 

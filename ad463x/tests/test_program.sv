@@ -36,11 +36,11 @@
 //
 
 `include "utils.svh"
-`include "test_harness_env.sv"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import test_harness_env_pkg::*;
 
 `define AD469X_DMA                  32'h44A3_0000
 `define AD469X_REGMAP               32'h44A0_0000

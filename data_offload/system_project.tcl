@@ -39,8 +39,6 @@ adi_sim_project_files [list \
  "../common/sv/s_axis_sequencer.sv" \
  "../common/sv/m_axi_sequencer.sv" \
  "../common/sv/s_axi_sequencer.sv" \
- "adi_regmap.sv" \
- "adi_regmap_doffload.sv" \
  "do_scoreboard.sv" \
  "environment.sv" \
  "tests/test_program.sv" \

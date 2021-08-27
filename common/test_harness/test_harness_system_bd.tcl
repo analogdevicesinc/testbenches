@@ -159,8 +159,6 @@ incr sys_mem_clk_index
 set_property CONFIG.NUM_CLKS [expr $sys_mem_clk_index +1] [get_bd_cells axi_mem_interconnect]
 ad_connect sys_cpu_clk axi_mem_interconnect/ACLK$sys_mem_clk_index
 
-ad_connect sys_cpu_clk axi_cpu_interconnect/M01_ACLK
-ad_connect sys_cpu_resetn axi_cpu_interconnect/M01_ARESETN
 #fake an ad_cpu_interconnect
 global sys_cpu_interconnect_index
 incr sys_cpu_interconnect_index

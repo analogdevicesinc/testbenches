@@ -142,6 +142,10 @@ program test_program;
     // JESD LINK TEST
     // =======================
     jesd_link_test();
+    
+    // Check link restart counter
+    env.mng.RegReadVerify32(`AXI_JESD_RX + 'h2c4, 1);
+
 
     `INFO(("======================="));
     `INFO(("      TB   DONE        "));

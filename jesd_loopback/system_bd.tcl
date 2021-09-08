@@ -147,6 +147,7 @@ ad_ip_instance axi_adxcvr adc_jesd204_xcvr [list \
 # RX JESD204 link layer peripheral
 adi_axi_jesd204_rx_create adc_jesd204_link $NUM_OF_LANES $NUM_LINKS $LINK_MODE
 ad_ip_parameter adc_jesd204_link/rx CONFIG.TPL_DATA_PATH_WIDTH $LL_OUT_BYTES
+ad_ip_parameter adc_jesd204_link/rx_axi CONFIG.ENABLE_LINK_STATS 1
 
 # RX JESD204 transport layer peripheral
 adi_tpl_jesd204_rx_create adc_jesd204_transport $NUM_OF_LANES \

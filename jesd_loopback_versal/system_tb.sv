@@ -56,16 +56,13 @@ module system_tb();
     .device_clk_out (device_clk),
     .sysref_clk_out (sysref),
 
-    .ref_clk(ref_clk),
     .drp_clk(drp_clk),
     .device_clk(device_clk),
 
     .sysref(sysref),
 
-    .ch0_txoutclk_0 (txoutclk),
-    .ch0_rxoutclk_0 (rxoutclk),
-    .txoutclk_in (txoutclk),
-    .rxoutclk_in (rxoutclk),
+    .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_p(ref_clk),
+    .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_n(~ref_clk),
 
     .GT_Serial_0_grx_n(serial_lane_n),
     .GT_Serial_0_grx_p(serial_lane_p),

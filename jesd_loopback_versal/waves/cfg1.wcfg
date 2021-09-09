@@ -29,15 +29,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="5194551821fs"></ZoomStartTime>
-      <ZoomEndTime time="25008551822fs"></ZoomEndTime>
-      <Cursor1Time time="21706218488fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="113325000001fs"></ZoomEndTime>
+      <Cursor1Time time="66178000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="177"></NameColumnWidth>
-      <ValueColumnWidth column_width="233"></ValueColumnWidth>
+      <ValueColumnWidth column_width="221"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="42" />
+   <WVObjectSize size="49" />
    <wvobject type="logic" fp_name="/system_tb/test_harness/dac_jesd204_link/tx/inst/\mode_64b66b.gen_lane[0].i_lane /i_scrambler/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -82,86 +82,6 @@
       <obj_property name="ElementShortName">error_event[3:0]</obj_property>
       <obj_property name="ObjectShortName">error_event[3:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ch0_rxoutclk_0">
-      <obj_property name="ElementShortName">ch0_rxoutclk_0</obj_property>
-      <obj_property name="ObjectShortName">ch0_rxoutclk_0</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ch0_txoutclk_0">
-      <obj_property name="ElementShortName">ch0_txoutclk_0</obj_property>
-      <obj_property name="ObjectShortName">ch0_txoutclk_0</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/ch0_txuserrdy">
-      <obj_property name="ElementShortName">ch0_txuserrdy</obj_property>
-      <obj_property name="ObjectShortName">ch0_txuserrdy</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/ch1_txuserrdy">
-      <obj_property name="ElementShortName">ch1_txuserrdy</obj_property>
-      <obj_property name="ObjectShortName">ch1_txuserrdy</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/ch2_txuserrdy">
-      <obj_property name="ElementShortName">ch2_txuserrdy</obj_property>
-      <obj_property name="ObjectShortName">ch2_txuserrdy</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/ch3_txuserrdy">
-      <obj_property name="ElementShortName">ch3_txuserrdy</obj_property>
-      <obj_property name="ObjectShortName">ch3_txuserrdy</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/hsclk0_lcplllock">
-      <obj_property name="ElementShortName">hsclk0_lcplllock</obj_property>
-      <obj_property name="ObjectShortName">hsclk0_lcplllock</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/ch0_txresetdone">
-      <obj_property name="ElementShortName">ch0_txresetdone</obj_property>
-      <obj_property name="ObjectShortName">ch0_txresetdone</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_adapt_0/gtrxreset">
-      <obj_property name="ElementShortName">gtrxreset</obj_property>
-      <obj_property name="ObjectShortName">gtrxreset</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_adapt_0/rxprogdivreset">
-      <obj_property name="ElementShortName">rxprogdivreset</obj_property>
-      <obj_property name="ObjectShortName">rxprogdivreset</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_adapt_0/rxuserrdy">
-      <obj_property name="ElementShortName">rxuserrdy</obj_property>
-      <obj_property name="ObjectShortName">rxuserrdy</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_adapt_0/rxresetdone">
-      <obj_property name="ElementShortName">rxresetdone</obj_property>
-      <obj_property name="ObjectShortName">rxresetdone</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_RXPROGDIVRESETDONE">
-      <obj_property name="ElementShortName">CH0_RXPROGDIVRESETDONE</obj_property>
-      <obj_property name="ObjectShortName">CH0_RXPROGDIVRESETDONE</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_TXPROGDIVRESETDONE">
-      <obj_property name="ElementShortName">CH0_TXPROGDIVRESETDONE</obj_property>
-      <obj_property name="ObjectShortName">CH0_TXPROGDIVRESETDONE</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_RXPMARESETDONE">
-      <obj_property name="ElementShortName">CH0_RXPMARESETDONE</obj_property>
-      <obj_property name="ObjectShortName">CH0_RXPMARESETDONE</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_TXPMARESETDONE">
-      <obj_property name="ElementShortName">CH0_TXPMARESETDONE</obj_property>
-      <obj_property name="ObjectShortName">CH0_TXPMARESETDONE</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_ILORESETDONE">
-      <obj_property name="ElementShortName">CH0_ILORESETDONE</obj_property>
-      <obj_property name="ObjectShortName">CH0_ILORESETDONE</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_ILORESET">
-      <obj_property name="ElementShortName">CH0_ILORESET</obj_property>
-      <obj_property name="ObjectShortName">CH0_ILORESET</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_RXUSRCLK">
-      <obj_property name="ElementShortName">CH0_RXUSRCLK</obj_property>
-      <obj_property name="ObjectShortName">CH0_RXUSRCLK</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/inst/quad_inst/CH0_TXUSRCLK">
-      <obj_property name="ElementShortName">CH0_TXUSRCLK</obj_property>
-      <obj_property name="ObjectShortName">CH0_TXUSRCLK</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/rx_adapt_0/rxdata">
       <obj_property name="ElementShortName">rxdata[127:0]</obj_property>
       <obj_property name="ObjectShortName">rxdata[127:0]</obj_property>
@@ -205,5 +125,113 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/rx_adapt_0/inst/rx_bitslip_done_cnt">
       <obj_property name="ElementShortName">rx_bitslip_done_cnt[4:0]</obj_property>
       <obj_property name="ObjectShortName">rx_bitslip_done_cnt[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_reset_gt_bridge_ip_0">
+      <obj_property name="ElementShortName">gt_reset_gt_bridge_ip_0</obj_property>
+      <obj_property name="ObjectShortName">gt_reset_gt_bridge_ip_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/reset_rx_pll_and_datapath_in">
+      <obj_property name="ElementShortName">reset_rx_pll_and_datapath_in</obj_property>
+      <obj_property name="ObjectShortName">reset_rx_pll_and_datapath_in</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/reset_rx_datapath_in">
+      <obj_property name="ElementShortName">reset_rx_datapath_in</obj_property>
+      <obj_property name="ObjectShortName">reset_rx_datapath_in</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/rx_resetdone_out_gt_bridge_ip_0">
+      <obj_property name="ElementShortName">rx_resetdone_out_gt_bridge_ip_0</obj_property>
+      <obj_property name="ObjectShortName">rx_resetdone_out_gt_bridge_ip_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/tx_resetdone_out_gt_bridge_ip_0">
+      <obj_property name="ElementShortName">tx_resetdone_out_gt_bridge_ip_0</obj_property>
+      <obj_property name="ObjectShortName">tx_resetdone_out_gt_bridge_ip_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_gttxreset">
+      <obj_property name="ElementShortName">ch0_gttxreset</obj_property>
+      <obj_property name="ObjectShortName">ch0_gttxreset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_txmstreset">
+      <obj_property name="ElementShortName">ch0_txmstreset</obj_property>
+      <obj_property name="ObjectShortName">ch0_txmstreset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_rxmstreset">
+      <obj_property name="ElementShortName">ch0_rxmstreset</obj_property>
+      <obj_property name="ObjectShortName">ch0_rxmstreset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_txmstresetdone">
+      <obj_property name="ElementShortName">ch0_txmstresetdone</obj_property>
+      <obj_property name="ObjectShortName">ch0_txmstresetdone</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_txuserrdy">
+      <obj_property name="ElementShortName">ch0_txuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch0_txuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch1_txuserrdy">
+      <obj_property name="ElementShortName">ch1_txuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch1_txuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch2_txuserrdy">
+      <obj_property name="ElementShortName">ch2_txuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch2_txuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch3_txuserrdy">
+      <obj_property name="ElementShortName">ch3_txuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch3_txuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_rxuserrdy">
+      <obj_property name="ElementShortName">ch0_rxuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch0_rxuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch1_rxuserrdy">
+      <obj_property name="ElementShortName">ch1_rxuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch1_rxuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch2_rxuserrdy">
+      <obj_property name="ElementShortName">ch2_rxuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch2_rxuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch3_rxuserrdy">
+      <obj_property name="ElementShortName">ch3_rxuserrdy</obj_property>
+      <obj_property name="ObjectShortName">ch3_rxuserrdy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/altclk">
+      <obj_property name="ElementShortName">altclk</obj_property>
+      <obj_property name="ObjectShortName">altclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/gtpowergood">
+      <obj_property name="ElementShortName">gtpowergood</obj_property>
+      <obj_property name="ObjectShortName">gtpowergood</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/hsclk0_lcplllock">
+      <obj_property name="ElementShortName">hsclk0_lcplllock</obj_property>
+      <obj_property name="ObjectShortName">hsclk0_lcplllock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/hsclk1_lcplllock">
+      <obj_property name="ElementShortName">hsclk1_lcplllock</obj_property>
+      <obj_property name="ObjectShortName">hsclk1_lcplllock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/hsclk0_rplllock">
+      <obj_property name="ElementShortName">hsclk0_rplllock</obj_property>
+      <obj_property name="ObjectShortName">hsclk0_rplllock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/hsclk1_rplllock">
+      <obj_property name="ElementShortName">hsclk1_rplllock</obj_property>
+      <obj_property name="ObjectShortName">hsclk1_rplllock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_txresetdone">
+      <obj_property name="ElementShortName">ch0_txresetdone</obj_property>
+      <obj_property name="ObjectShortName">ch0_txresetdone</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_rxelecidle">
+      <obj_property name="ElementShortName">ch0_rxelecidle</obj_property>
+      <obj_property name="ObjectShortName">ch0_rxelecidle</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_phyready">
+      <obj_property name="ElementShortName">ch0_phyready</obj_property>
+      <obj_property name="ObjectShortName">ch0_phyready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch1_bufgtrst">
+      <obj_property name="ElementShortName">ch1_bufgtrst</obj_property>
+      <obj_property name="ObjectShortName">ch1_bufgtrst</obj_property>
    </wvobject>
 </wave_config>

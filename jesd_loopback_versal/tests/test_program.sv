@@ -181,7 +181,7 @@ program test_program;
     env.mng.RegWrite32(`AXI_XCVR_TX+'h10, 1);
     env.mng.RegWrite32(`AXI_XCVR_RX+'h10, 1);
                        
-    #25us;
+    #75us;
     // Read status back
     env.mng.RegReadVerify32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_STATUS),
                             `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));

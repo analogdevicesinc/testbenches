@@ -109,6 +109,7 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 create_bd_port -dir I -type clk drp_clk
 create_bd_port -dir I -type clk device_clk
 create_bd_port -dir I -type clk sysref
+create_bd_port -dir I -type clk ref_clk 
 
 set_property CONFIG.FREQ_HZ 250000000 [get_bd_ports device_clk]
 
@@ -171,13 +172,13 @@ make_bd_intf_pins_external  [get_bd_intf_pins jesd204_phy/GT_Serial]
 
 ad_connect GND jesd204_phy/rate_sel_gt_bridge_ip_0
 
-ad_connect GND jesd204_phy/reset_rx_pll_and_datapath_in
-ad_connect GND jesd204_phy/reset_tx_pll_and_datapath_in
+ad_connect GND jesd204_phy/reset_rx_datapath_in
+ad_connect GND jesd204_phy/reset_tx_datapath_in
 
 ad_connect GND jesd204_phy/gt_reset_gt_bridge_ip_0
 
-ad_connect adc_jesd204_link/rx_axi/device_reset jesd204_phy/reset_rx_datapath_in
-ad_connect dac_jesd204_link/tx_axi/device_reset jesd204_phy/reset_tx_datapath_in
+ad_connect adc_jesd204_link/rx_axi/device_reset jesd204_phy/reset_rx_pll_and_datapath_in
+ad_connect dac_jesd204_link/tx_axi/device_reset jesd204_phy/reset_tx_pll_and_datapath_in
 
 # Connect PHY to Link Layer
 for {set j 0}  {$j < $NUM_OF_LANES} {incr j} {
@@ -238,3 +239,47 @@ for {set i $NUM_OF_CONVERTERS} {$i < $MAX_CONVERTERS} {incr i} {
 
 make_bd_pins_external  [get_bd_pins /dac_jesd204_transport/dac_dunf]
 make_bd_pins_external  [get_bd_pins /adc_jesd204_transport/adc_dovf]
+
+source ../common/test_harness/jesd_exerciser.tcl
+
+create_jesd_exerciser rx_jesd_exerciser 0
+create_bd_cell -type container -reference rx_jesd_exerciser i_rx_jesd_exerciser
+
+create_jesd_exerciser tx_jesd_exerciser 1
+create_bd_cell -type container -reference tx_jesd_exerciser i_tx_jesd_exerciser
+
+# Rx exerciser
+for {set i 0} {$i < $NUM_OF_LANES} {incr i} {
+  ad_connect rx_data_${i}_n i_rx_jesd_exerciser/rx_data_${i}_n
+  ad_connect rx_data_${i}_p i_rx_jesd_exerciser/rx_data_${i}_p
+}
+ad_connect sysref i_rx_jesd_exerciser/rx_sysref_0
+
+ad_connect $sys_cpu_clk i_rx_jesd_exerciser/sys_cpu_clk
+ad_connect $sys_cpu_resetn i_rx_jesd_exerciser/sys_cpu_resetn
+
+ad_connect device_clk i_rx_jesd_exerciser/device_clk
+
+ad_connect ref_clk i_rx_jesd_exerciser/ref_clk
+
+set_property -dict [list CONFIG.NUM_MI {7}] [get_bd_cells axi_cpu_interconnect]
+ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M06_AXI
+
+# Tx exerciser
+for {set i 0} {$i < $NUM_OF_LANES} {incr i} {
+  ad_connect tx_data_${i}_n i_tx_jesd_exerciser/tx_data_${i}_n
+  ad_connect tx_data_${i}_p i_tx_jesd_exerciser/tx_data_${i}_p
+}
+ad_connect sysref i_tx_jesd_exerciser/tx_sysref_0
+
+ad_connect $sys_cpu_clk i_tx_jesd_exerciser/sys_cpu_clk
+ad_connect $sys_cpu_resetn i_tx_jesd_exerciser/sys_cpu_resetn
+
+ad_connect device_clk i_tx_jesd_exerciser/device_clk
+
+ad_connect ref_clk i_tx_jesd_exerciser/ref_clk
+
+set_property -dict [list CONFIG.NUM_MI {8}] [get_bd_cells axi_cpu_interconnect]
+ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M07_AXI
+
+assign_bd_address

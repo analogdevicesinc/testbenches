@@ -45,8 +45,11 @@ module system_tb();
 
   reg [`JESD_M*SAMPLES_PER_CHANNEL*DMA_NP-1:0] dac_data = 'h0;
 
-  wire [3:0] serial_lane_n;
-  wire [3:0] serial_lane_p;
+  wire [3:0] ex2dut_serial_lane_n;
+  wire [3:0] ex2dut_serial_lane_p;
+
+  wire [3:0] dut2ext_serial_lane_n;
+  wire [3:0] dut2ext_serial_lane_p;
 
   `TEST_PROGRAM test();
 
@@ -58,17 +61,36 @@ module system_tb();
 
     .drp_clk(drp_clk),
     .device_clk(device_clk),
+    .ref_clk(ref_clk),
 
     .sysref(sysref),
 
     .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_p(ref_clk),
     .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_n(~ref_clk),
 
-    .GT_Serial_0_grx_n(serial_lane_n),
-    .GT_Serial_0_grx_p(serial_lane_p),
+    .GT_Serial_0_grx_n(ex2dut_serial_lane_n),
+    .GT_Serial_0_grx_p(ex2dut_serial_lane_p),
 
-    .GT_Serial_0_gtx_n(serial_lane_n),
-    .GT_Serial_0_gtx_p(serial_lane_p),
+    .GT_Serial_0_gtx_n(dut2ex_serial_lane_n),
+    .GT_Serial_0_gtx_p(dut2ex_serial_lane_p),
+
+    .rx_data_0_p(dut2ex_serial_lane_p[0]),
+    .rx_data_0_n(dut2ex_serial_lane_n[0]),
+    .rx_data_1_p(dut2ex_serial_lane_p[1]),
+    .rx_data_1_n(dut2ex_serial_lane_n[1]),
+    .rx_data_2_p(dut2ex_serial_lane_p[2]),
+    .rx_data_2_n(dut2ex_serial_lane_n[2]),
+    .rx_data_3_p(dut2ex_serial_lane_p[3]),
+    .rx_data_3_n(dut2ex_serial_lane_n[3]),
+
+    .tx_data_0_p(ex2dut_serial_lane_p[0]),
+    .tx_data_0_n(ex2dut_serial_lane_n[0]),
+    .tx_data_1_p(ex2dut_serial_lane_p[1]),
+    .tx_data_1_n(ex2dut_serial_lane_n[1]),
+    .tx_data_2_p(ex2dut_serial_lane_p[2]),
+    .tx_data_2_n(ex2dut_serial_lane_n[2]),
+    .tx_data_3_p(ex2dut_serial_lane_p[3]),
+    .tx_data_3_n(ex2dut_serial_lane_n[3]),
 
     .dac_data_0(dac_data[SAMPLES_PER_CHANNEL*DMA_NP*0 +: SAMPLES_PER_CHANNEL*DMA_NP]),
     .dac_data_1(dac_data[SAMPLES_PER_CHANNEL*DMA_NP*1 +: SAMPLES_PER_CHANNEL*DMA_NP]),

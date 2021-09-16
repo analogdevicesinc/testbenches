@@ -29,15 +29,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="113325000001fs"></ZoomEndTime>
-      <Cursor1Time time="66178000000fs"></Cursor1Time>
+      <ZoomStartTime time="61779055844fs"></ZoomStartTime>
+      <ZoomEndTime time="62116339599fs"></ZoomEndTime>
+      <Cursor1Time time="113325000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="177"></NameColumnWidth>
-      <ValueColumnWidth column_width="221"></ValueColumnWidth>
+      <ValueColumnWidth column_width="217"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="49" />
+   <WVObjectSize size="59" />
    <wvobject type="logic" fp_name="/system_tb/test_harness/dac_jesd204_link/tx/inst/\mode_64b66b.gen_lane[0].i_lane /i_scrambler/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -105,6 +105,22 @@
    <wvobject type="logic" fp_name="/system_tb/test_harness/rx_adapt_0/rx_block_sync">
       <obj_property name="ElementShortName">rx_block_sync</obj_property>
       <obj_property name="ObjectShortName">rx_block_sync</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/adc_jesd204_link/rx/inst/\mode_64b66b.gen_lane[0].i_lane /i_rx_header/eoemb">
+      <obj_property name="ElementShortName">eoemb</obj_property>
+      <obj_property name="ObjectShortName">eoemb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/adc_jesd204_link/rx/inst/\mode_64b66b.gen_lane[0].i_lane /i_rx_header/valid_eomb">
+      <obj_property name="ElementShortName">valid_eomb</obj_property>
+      <obj_property name="ObjectShortName">valid_eomb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/adc_jesd204_link/rx/inst/\mode_64b66b.gen_lane[0].i_lane /i_rx_header/valid_eoemb">
+      <obj_property name="ElementShortName">valid_eoemb</obj_property>
+      <obj_property name="ObjectShortName">valid_eoemb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/adc_jesd204_link/rx/inst/\mode_64b66b.gen_lane[0].i_lane /i_rx_header/eomb">
+      <obj_property name="ElementShortName">eomb</obj_property>
+      <obj_property name="ObjectShortName">eomb</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/rx_adapt_0/inst/i_sync_header_align/i_slip">
       <obj_property name="ElementShortName">i_slip</obj_property>
@@ -233,5 +249,32 @@
    <wvobject type="logic" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch1_bufgtrst">
       <obj_property name="ElementShortName">ch1_bufgtrst</obj_property>
       <obj_property name="ObjectShortName">ch1_bufgtrst</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy/ch0_rxheader_ext">
+      <obj_property name="ElementShortName">ch0_rxheader_ext[5:0]</obj_property>
+      <obj_property name="ObjectShortName">ch0_rxheader_ext[5:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_txheader">
+      <obj_property name="ElementShortName">ch0_txheader[5:0]</obj_property>
+      <obj_property name="ObjectShortName">ch0_txheader[5:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/ch0_rxheader">
+      <obj_property name="ElementShortName">ch0_rxheader[5:0]</obj_property>
+      <obj_property name="ObjectShortName">ch0_rxheader[5:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy/ch1_txheader_ext">
+      <obj_property name="ElementShortName">ch1_txheader_ext[5:0]</obj_property>
+      <obj_property name="ObjectShortName">ch1_txheader_ext[5:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/inst/quad_inst/CH0_RXHEADER">
+      <obj_property name="ElementShortName">CH0_RXHEADER[5:0]</obj_property>
+      <obj_property name="ObjectShortName">CH0_RXHEADER[5:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/jesd204_phy/gt_quad_base/inst/quad_inst/CH0_TXHEADER">
+      <obj_property name="ElementShortName">CH0_TXHEADER[5:0]</obj_property>
+      <obj_property name="ObjectShortName">CH0_TXHEADER[5:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
 </wave_config>

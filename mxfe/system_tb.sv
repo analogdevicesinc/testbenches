@@ -40,6 +40,8 @@
 module system_tb();
 
   wire rx_sync_0;
+  wire [3:0] tx_data_p;
+  wire [3:0] tx_data_n;
 
   `TEST_PROGRAM test();
 
@@ -50,45 +52,20 @@ module system_tb();
 
     .rx_device_clk  (device_clk),      //-dir I
     .tx_device_clk  (device_clk),      //-dir I
-    .rx_data_0_n    (data_0_n),        //-dir I
-    .rx_data_0_p    (data_0_p),        //-dir I
-    .rx_data_1_n    (data_1_n),        //-dir I
-    .rx_data_1_p    (data_1_p),        //-dir I
-    .rx_data_2_n    (data_2_n),        //-dir I
-    .rx_data_2_p    (data_2_p),        //-dir I
-    .rx_data_3_n    (data_3_n),        //-dir I
-    .rx_data_3_p    (data_3_p),        //-dir I
-    .rx_data_4_n    (data_4_n),        //-dir I
-    .rx_data_4_p    (data_4_p),        //-dir I
-    .rx_data_5_n    (data_5_n),        //-dir I
-    .rx_data_5_p    (data_5_p),        //-dir I
-    .rx_data_6_n    (data_6_n),        //-dir I
-    .rx_data_6_p    (data_6_p),        //-dir I
-    .rx_data_7_n    (data_7_n),        //-dir I
-    .rx_data_7_p    (data_7_p),        //-dir I
-    .tx_data_0_n    (data_0_n),        //-dir O
-    .tx_data_0_p    (data_0_p),        //-dir O
-    .tx_data_1_n    (data_1_n),        //-dir O
-    .tx_data_1_p    (data_1_p),        //-dir O
-    .tx_data_2_n    (data_2_n),        //-dir O
-    .tx_data_2_p    (data_2_p),        //-dir O
-    .tx_data_3_n    (data_3_n),        //-dir O
-    .tx_data_3_p    (data_3_p),        //-dir O
-    .tx_data_4_n    (data_4_n),        //-dir O
-    .tx_data_4_p    (data_4_p),        //-dir O
-    .tx_data_5_n    (data_5_n),        //-dir O
-    .tx_data_5_p    (data_5_p),        //-dir O
-    .tx_data_6_n    (data_6_n),        //-dir O
-    .tx_data_6_p    (data_6_p),        //-dir O
-    .tx_data_7_n    (data_7_n),        //-dir O
-    .tx_data_7_p    (data_7_p),        //-dir O
+    .GT_Serial_0_gtx_p (tx_data_p[3:0]),
+    .GT_Serial_0_gtx_n (tx_data_n[3:0]),
+    .GT_Serial_0_grx_p (tx_data_p[3:0]),
+    .GT_Serial_0_grx_n (tx_data_n[3:0]),
+
+    .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_p(ref_clk),
+    .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_n(~ref_clk),
+
     .rx_sysref_0    (sysref),          //-dir I
-    .tx_sysref_0    (sysref),          //-dir I
-    .rx_sync_0      (rx_sync_0),       //-dir O
-    .tx_sync_0      (rx_sync_0),       //-dir I
-    .ref_clk_q0     (ref_clk),         //-dir I
-    .ref_clk_q1     (ref_clk),         //-dir I
-    .dac_fifo_bypass(1'b0)             //-dir I
+    .tx_sysref_0    (sysref)//,          //-dir I
+    //.rx_sync_0      (rx_sync_0),       //-dir O
+    //.tx_sync_0      (rx_sync_0),       //-dir I
+    //.ref_clk_q0     (ref_clk),         //-dir I
+    //.ref_clk_q1     (ref_clk)          //-dir I
 
   );
 

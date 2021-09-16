@@ -209,7 +209,7 @@ program test_program;
     end
 
     // Give time the PLLs to lock
-    #35us;
+    #75us;
 
     //Read status back
     // Check SYSREF_STATUS

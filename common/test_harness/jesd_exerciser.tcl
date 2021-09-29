@@ -73,6 +73,8 @@ proc create_jesd_exerciser { \
   ad_ip_parameter util_xcvr CONFIG.RX_NUM_OF_LANES $RX_NUM_OF_LANES
   ad_ip_parameter util_xcvr CONFIG.LINK_MODE $ENCODER_SEL
   ad_ip_parameter util_xcvr CONFIG.TX_LANE_RATE $LANE_RATE
+  ad_ip_parameter util_xcvr CONFIG.XCVR_TYPE.VALUE_SRC USER
+  ad_ip_parameter util_xcvr CONFIG.XCVR_TYPE {9}
 
   ad_ip_instance axi_adxcvr axi_xcvr
   ad_ip_parameter axi_xcvr CONFIG.ID 0
@@ -80,6 +82,8 @@ proc create_jesd_exerciser { \
   ad_ip_parameter axi_xcvr CONFIG.NUM_OF_LANES $NUM_OF_LANES
   ad_ip_parameter axi_xcvr CONFIG.TX_OR_RX_N $TX_OR_RX_N
   ad_ip_parameter axi_xcvr CONFIG.QPLL_ENABLE 1
+  ad_ip_parameter axi_xcvr CONFIG.XCVR_TYPE.VALUE_SRC USER
+  ad_ip_parameter axi_xcvr CONFIG.XCVR_TYPE {9}
 
   adi_axi_jesd204_${rxtx}_create axi_jesd $NUM_OF_LANES $NUM_LINKS $ENCODER_SEL
   ad_ip_parameter axi_jesd/${rxtx} CONFIG.TPL_DATA_PATH_WIDTH $TPL_DATAPATH_WIDTH
@@ -106,6 +110,13 @@ proc create_jesd_exerciser { \
   ad_connect  sys_cpu_clk    util_xcvr/up_clk
 
   ad_connect device_clk $tpl_core/link_clk
+
+  if {$TX_OR_RX_N == 1} {
+    ad_connect tx_tpl_core/link axi_jesd/tx_data
+  } else {
+    ad_connect axi_jesd/rx_data_tdata  rx_tpl_core/link_data
+    ad_connect axi_jesd/rx_data_tvalid rx_tpl_core/link_valid
+  }
 
   # connections
 

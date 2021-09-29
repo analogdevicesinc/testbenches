@@ -6,7 +6,10 @@ set ad_project_params(JESD_K) 256
 set ad_project_params(JESD_NP) 12
 
 set ad_project_params(LANE_RATE) 24.750
-set ad_project_params(REF_CLK_RATE) 375
+
+# clock gen can't generate 375 MHZ !!! use 500 instead
+set ad_project_params(REF_CLK_RATE) 500
+
 #   [RX/TX]_PLL_SEL :  Used PLL in the Xilinx PHY used in 64B66B mode
 #                      Encoding is:
 #                         0 - CPLL

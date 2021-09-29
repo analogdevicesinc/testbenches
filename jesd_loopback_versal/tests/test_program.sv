@@ -48,31 +48,44 @@ import adi_regmap_jesd_rx_pkg::*;
 import adi_regmap_common_pkg::*;
 import adi_regmap_dac_pkg::*;
 import adi_regmap_adc_pkg::*;
+import adi_jesd204_pkg::*;
+import adi_xcvr_pkg::*;
 
-`define AXI_XCVR_RX 32'h44a4_0000
-`define AXI_XCVR_TX 32'h44a5_0000
+
 `define JESD_PHY    32'h44a6_0000
 `define AXI_JESD_RX 32'h44a9_0000
 `define AXI_JESD_TX 32'h44b9_0000
 `define ADC_TPL     32'h44a1_0000
 `define DAC_TPL     32'h44b1_0000
 
-parameter OUT_BYTES = (`JESD_F % 3 != 0) ? 8 : 12;
+`define EX_AXI_XCVR_RX 32'h44a2_0000
+`define EX_AXI_XCVR_TX 32'h44a5_0000
+`define EX_AXI_JESD_RX 32'h44A0_0000
+`define EX_AXI_JESD_TX 32'h44A4_0000
+
+`define LINK_MODE 2
+`define MODE_8B10B 1
+`define MODE_64B66B 2
 
 program test_program;
 
   test_harness_env env;
   bit [31:0] val;
-  int link_clk_freq_khz;
-  int device_clk_freq_khz;
-  int sysref_freq_khz;
-  int data_path_width;
-  int tpl_data_path_width;
 
   bit [31:0] lane_rate_khz = `LANE_RATE*1000000;
   longint lane_rate = lane_rate_khz*1000;
 
   int use_dds = 0;
+
+  jesd_link link;
+  rx_link_layer ex_rx_ll;
+  tx_link_layer ex_tx_ll;
+  xcvr ex_rx_xcvr;
+  xcvr ex_tx_xcvr;
+
+  rx_link_layer dut_rx_ll;
+  tx_link_layer dut_tx_ll;
+
 
   initial begin
     //creating environment
@@ -87,24 +100,49 @@ program test_program;
     setLoggerVerbosity(6);
     env.start();
 
-    `TH.`SYS_CLK.inst.IF.start_clock;
-    `TH.`DMA_CLK.inst.IF.start_clock;
-    `TH.`DDR_CLK.inst.IF.start_clock;
+    link = new;
+    link.set_L(`JESD_L);
+    link.set_M(`JESD_M);
+    link.set_F(`JESD_F);
+    link.set_S(`JESD_S);
+    link.set_K(`JESD_K);
+    link.set_N(`JESD_NP);
+    link.set_NP(`JESD_NP);
+    link.set_encoding(`LINK_MODE == `MODE_8B10B ? enc8b10b : enc64b66b);
+    link.set_lane_rate(lane_rate);
 
-    link_clk_freq_khz = lane_rate_khz/66;
-    data_path_width = 8;
-    tpl_data_path_width = (`JESD_NP==12) ? 12 : 8;
-    device_clk_freq_khz = link_clk_freq_khz * data_path_width / tpl_data_path_width;
-    sysref_freq_khz = link_clk_freq_khz * data_path_width/(`JESD_K*`JESD_F);
+    ex_rx_ll = new("RX_LINK_LAYER", env.mng, `EX_AXI_JESD_RX, link);
+    ex_rx_ll.probe();
+
+    ex_tx_ll = new("TX_LINK_LAYER", env.mng, `EX_AXI_JESD_TX, link);
+    ex_tx_ll.probe();
+
+    ex_rx_xcvr = new("RX_XCVR", env.mng, `EX_AXI_XCVR_RX);
+    ex_rx_xcvr.probe();
+
+    ex_tx_xcvr = new("TX_XCVR", env.mng, `EX_AXI_XCVR_TX);
+    ex_tx_xcvr.probe();
+
+
+    dut_rx_ll = new("DUT RX_LINK_LAYER", env.mng, `AXI_JESD_RX, link);
+    dut_rx_ll.probe();
+
+    dut_tx_ll = new("DUT TX_LINK_LAYER", env.mng, `AXI_JESD_TX, link);
+    dut_tx_ll.probe();
 
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
-    `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(device_clk_freq_khz*1000));
-    `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(sysref_freq_khz*1000));
+    `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(ex_rx_ll.calc_device_clk()));
+    `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(ex_rx_ll.calc_sysref_clk()));
 
     `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DRP_CLK.inst.IF.start_clock;
     `TH.`DEVICE_CLK.inst.IF.start_clock;
     `TH.`SYSREF_CLK.inst.IF.start_clock;
+
+    ex_rx_xcvr.setup_clocks(lane_rate,
+                            `REF_CLK_RATE*1000000);
+
+    ex_tx_xcvr.setup_clocks(lane_rate,
+                           `REF_CLK_RATE*1000000);
 
     for (int i = 0; i < `JESD_M; i++) begin
       if (use_dds) begin
@@ -139,83 +177,43 @@ program test_program;
     // Sync DDS cores
     env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
                        `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-    //LINK DISABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_DISABLE),
-                       `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(1));
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_DISABLE),
-                       `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(1));
 
-    //SYSREFCONF
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_SYSREF_CONF),
-                       `SET_JESD_RX_SYSREF_CONF_SYSREF_DISABLE(0)); 
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_SYSREF_CONF),
-                       `SET_JESD_TX_SYSREF_CONF_SYSREF_DISABLE(0));
 
-    //CONF0
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_CONF0),
-                       `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME(`JESD_F-1) | 
-                       `SET_JESD_RX_LINK_CONF0_OCTETS_PER_MULTIFRAME(`JESD_F*`JESD_K-1));
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_CONF0),
-                       `SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(`JESD_F-1) | 
-                       `SET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(`JESD_F*`JESD_K-1));
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_CONF4),
-                       `SET_JESD_RX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`JESD_F*`JESD_K)/`LL_OUT_BYTES-1));
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_CONF4),
-                       `SET_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`JESD_F*`JESD_K)/`LL_OUT_BYTES-1));
-    //CONF1
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_CONF1),
-                       `SET_JESD_RX_LINK_CONF1_DESCRAMBLER_DISABLE(0)); 
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_CONF1),
-                       `SET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(0)); 
+    // -----------------------
+    // bringup DUT TX path
+    // -----------------------
+    dut_tx_ll.link_up();
 
-    //CONF2
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_CONF2),
-                       `SET_JESD_TX_LINK_CONF2_CONTINUOUS_CGS(0));
-    //LINK ENABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_DISABLE),
-                       `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_DISABLE),
-                       `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(0));
-                       
-    // Pull XCVR aout of reset
-    env.mng.RegWrite32(`AXI_XCVR_TX+'h10, 1);
-    env.mng.RegWrite32(`AXI_XCVR_RX+'h10, 1);
-                       
-    #75us;
-    // Read status back
-    env.mng.RegReadVerify32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_STATUS),
-                            `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
-    #1us;
-    
-    // --------------------------------------
-    //  Attempt a second link bring-up
-    // --------------------------------------
-    
-    //LINK DISABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_DISABLE),
-                       `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(1));
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_DISABLE),
-                       `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(1));
-    // Reset XCVR
-    env.mng.RegWrite32(`AXI_XCVR_TX+'h10, 0);
-    env.mng.RegWrite32(`AXI_XCVR_RX+'h10, 0);
+    ex_rx_xcvr.up();
+    ex_rx_ll.link_up();
 
-    #1us;
-    // Enable XCVR
-    env.mng.RegWrite32(`AXI_XCVR_TX+'h10, 1);
-    env.mng.RegWrite32(`AXI_XCVR_RX+'h10, 1);
+    dut_tx_ll.wait_link_up();
+    ex_rx_ll.wait_link_up();
 
-    
-    //LINK ENABLE
-    env.mng.RegWrite32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_DISABLE),
-                       `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
-    env.mng.RegWrite32(`AXI_JESD_TX+GetAddrs(JESD_TX_LINK_DISABLE),
-                       `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(0));
 
-    #25us;
-    // Read status back
-    env.mng.RegReadVerify32(`AXI_JESD_RX+GetAddrs(JESD_RX_LINK_STATUS),
-                            `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
+    // -----------------------
+    // bringup DUT RX path
+    // -----------------------
+    ex_tx_xcvr.up();
+    ex_tx_ll.link_up();
+
+    dut_rx_ll.link_up();
+
+    ex_tx_ll.wait_link_up();
+    dut_rx_ll.wait_link_up();
+
+
+    // Move data around
+    #10us;
+
+    ex_rx_xcvr.down();
+    ex_tx_xcvr.down();
+
+    `INFO(("======================="));
+    `INFO(("  JESD LINK TEST DONE  "));
+    `INFO(("======================="));
+
+
   end
 
 endprogram

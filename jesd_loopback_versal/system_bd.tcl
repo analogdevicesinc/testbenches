@@ -172,13 +172,13 @@ make_bd_intf_pins_external  [get_bd_intf_pins jesd204_phy/GT_Serial]
 
 ad_connect GND jesd204_phy/rate_sel_gt_bridge_ip_0
 
-ad_connect GND jesd204_phy/reset_rx_datapath_in
-ad_connect GND jesd204_phy/reset_tx_datapath_in
+ad_connect adc_jesd204_link/rx_axi/device_reset jesd204_phy/reset_rx_datapath_in
+ad_connect dac_jesd204_link/tx_axi/device_reset jesd204_phy/reset_tx_datapath_in
 
 ad_connect GND jesd204_phy/gt_reset_gt_bridge_ip_0
 
-ad_connect adc_jesd204_link/rx_axi/device_reset jesd204_phy/reset_rx_pll_and_datapath_in
-ad_connect dac_jesd204_link/tx_axi/device_reset jesd204_phy/reset_tx_pll_and_datapath_in
+ad_connect GND jesd204_phy/reset_rx_pll_and_datapath_in
+ad_connect GND jesd204_phy/reset_tx_pll_and_datapath_in
 
 # Connect PHY to Link Layer
 for {set j 0}  {$j < $NUM_OF_LANES} {incr j} {
@@ -283,3 +283,5 @@ set_property -dict [list CONFIG.NUM_MI {8}] [get_bd_cells axi_cpu_interconnect]
 ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M07_AXI
 
 assign_bd_address
+
+

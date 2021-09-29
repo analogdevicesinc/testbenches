@@ -48,8 +48,8 @@ module system_tb();
   wire [3:0] ex2dut_serial_lane_n;
   wire [3:0] ex2dut_serial_lane_p;
 
-  wire [3:0] dut2ext_serial_lane_n;
-  wire [3:0] dut2ext_serial_lane_p;
+  wire [3:0] dut2ex_serial_lane_n;
+  wire [3:0] dut2ex_serial_lane_p;
 
   `TEST_PROGRAM test();
 

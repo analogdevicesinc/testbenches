@@ -557,10 +557,8 @@ package adi_xcvr_pkg;
           CPLL:
             calc_cpll(lane_rate, ref_clk, pll_success, out_div);
           QPLL1:
-            //if (qpll_enable)
               calc_qpll(lane_rate, ref_clk, 1, pll_success, out_div);
           QPLL0:
-            //if (qpll_enable)
               calc_qpll(lane_rate, ref_clk, 0, pll_success, out_div);
           default:
             `ERROR(("Case not supported"));
@@ -770,7 +768,10 @@ package adi_xcvr_pkg;
       for (int ch_idx = 0; ch_idx < num_lanes; ch_idx++) begin
 
         if (ch_idx % 4 == 0) begin
-          set_qpll_divs(ch_idx % 4, is_qpll1, f_refclk_div, f_fbdiv, qpll_clkoutrate);
+          if (qpll_enable)
+            set_qpll_divs(ch_idx, is_qpll1, f_refclk_div, f_fbdiv, qpll_clkoutrate);
+          else
+            `INFO(("WARNING: Skipping QPLL configuration. Current AXI_XCVR does not have access to the CM ports"));        
         end
 
       end

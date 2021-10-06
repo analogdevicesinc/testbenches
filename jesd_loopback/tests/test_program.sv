@@ -345,8 +345,8 @@ program test_program;
 
     // Check if error can be cleared
     env.mng.RegWrite32(`DAC_XCVR + 32'h0180, `PRBS_7);
-    env.mng.RegWrite32(`ADC_XCVR + 32'h0180, 1 << 8); // Clear prbs err
-    env.mng.RegWrite32(`ADC_XCVR + 32'h0180, `PRBS_7);
+    env.mng.RegWrite32(`ADC_XCVR + 32'h0180, `PRBS_7 | 1 << 8); // Set prbs err cntr reset
+    env.mng.RegWrite32(`ADC_XCVR + 32'h0180, `PRBS_7 | 0 << 8); // Clear prbs err cntr reset
 
     #1us;
     // No error should be detected, Lock should be set

@@ -133,6 +133,9 @@ adi_tpl_jesd204_tx_create dac_jesd204_transport $NUM_OF_LANES \
                                                 $SAMPLE_WIDTH \
                                                 $LL_OUT_BYTES \
                                                 $DMA_SAMPLE_WIDTH
+# Enable DAC external sync
+ad_ip_parameter dac_jesd204_transport/dac_tpl_core CONFIG.EXT_SYNC 1
+make_bd_pins_external  [get_bd_pins dac_jesd204_transport/dac_tpl_core/dac_sync_in]
 
 # RX JESD204 PHY layer peripheral
 ad_ip_instance axi_adxcvr adc_jesd204_xcvr [list \

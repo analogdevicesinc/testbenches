@@ -33,15 +33,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="20874999166fs"></ZoomStartTime>
-      <ZoomEndTime time="114439000167fs"></ZoomEndTime>
-      <Cursor1Time time="41255276611fs"></Cursor1Time>
+      <ZoomStartTime time="62.676000000 us"></ZoomStartTime>
+      <ZoomEndTime time="68.286000001 us"></ZoomEndTime>
+      <Cursor1Time time="66.116000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="342"></NameColumnWidth>
-      <ValueColumnWidth column_width="133"></ValueColumnWidth>
+      <ValueColumnWidth column_width="125"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="82" />
+   <WVObjectSize size="74" />
    <wave_markers>
       <marker time="3990023000" label="" />
       <marker time="2286857452" label="" />
@@ -362,88 +362,69 @@
       <obj_property name="ElementShortName">tx_out_clk</obj_property>
       <obj_property name="ObjectShortName">tx_out_clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXOUTCLK" type="logic">
-      <obj_property name="ElementShortName">RXOUTCLK</obj_property>
-      <obj_property name="ObjectShortName">RXOUTCLK</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /TXOUTCLKSEL" type="array">
-      <obj_property name="ElementShortName">TXOUTCLKSEL[2:0]</obj_property>
-      <obj_property name="ObjectShortName">TXOUTCLKSEL[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXOUTCLKSEL" type="array">
-      <obj_property name="ElementShortName">RXOUTCLKSEL[2:0]</obj_property>
-      <obj_property name="ObjectShortName">RXOUTCLKSEL[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXPRGDIVRESETDONE" type="logic">
-      <obj_property name="ElementShortName">RXPRGDIVRESETDONE</obj_property>
-      <obj_property name="ObjectShortName">RXPRGDIVRESETDONE</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXRESETDONE" type="logic">
-      <obj_property name="ElementShortName">RXRESETDONE</obj_property>
-      <obj_property name="ObjectShortName">RXRESETDONE</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /TXRESETDONE" type="logic">
-      <obj_property name="ElementShortName">TXRESETDONE</obj_property>
-      <obj_property name="ObjectShortName">TXRESETDONE</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /CPLLLOCK" type="logic">
-      <obj_property name="ElementShortName">CPLLLOCK</obj_property>
-      <obj_property name="ObjectShortName">CPLLLOCK</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /CPLLRESET" type="logic">
-      <obj_property name="ElementShortName">CPLLRESET</obj_property>
-      <obj_property name="ObjectShortName">CPLLRESET</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /GTRXRESET" type="logic">
-      <obj_property name="ElementShortName">GTRXRESET</obj_property>
-      <obj_property name="ObjectShortName">GTRXRESET</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /GTTXRESET" type="logic">
-      <obj_property name="ElementShortName">GTTXRESET</obj_property>
-      <obj_property name="ObjectShortName">GTTXRESET</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXOUTCLKFABRIC" type="logic">
-      <obj_property name="ElementShortName">RXOUTCLKFABRIC</obj_property>
-      <obj_property name="ObjectShortName">RXOUTCLKFABRIC</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXOUTCLKPCS" type="logic">
-      <obj_property name="ElementShortName">RXOUTCLKPCS</obj_property>
-      <obj_property name="ObjectShortName">RXOUTCLKPCS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /TXOUTCLKPCS" type="logic">
-      <obj_property name="ElementShortName">TXOUTCLKPCS</obj_property>
-      <obj_property name="ObjectShortName">TXOUTCLKPCS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXSYSCLKSEL" type="array">
-      <obj_property name="ElementShortName">RXSYSCLKSEL[1:0]</obj_property>
-      <obj_property name="ObjectShortName">RXSYSCLKSEL[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /TXSYSCLKSEL" type="array">
-      <obj_property name="ElementShortName">TXSYSCLKSEL[1:0]</obj_property>
-      <obj_property name="ObjectShortName">TXSYSCLKSEL[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /TXPLLCLKSEL" type="array">
-      <obj_property name="ElementShortName">TXPLLCLKSEL[1:0]</obj_property>
-      <obj_property name="ObjectShortName">TXPLLCLKSEL[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXPLLCLKSEL" type="array">
-      <obj_property name="ElementShortName">RXPLLCLKSEL[1:0]</obj_property>
-      <obj_property name="ObjectShortName">RXPLLCLKSEL[1:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /qpll2ch_clk" type="logic">
       <obj_property name="ElementShortName">qpll2ch_clk</obj_property>
       <obj_property name="ObjectShortName">qpll2ch_clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXPRBSERR" type="logic">
-      <obj_property name="ElementShortName">RXPRBSERR</obj_property>
-      <obj_property name="ObjectShortName">RXPRBSERR</obj_property>
+   <wvobject fp_name="/system_tb/dac_sync" type="logic">
+      <obj_property name="ElementShortName">dac_sync</obj_property>
+      <obj_property name="ObjectShortName">dac_sync</obj_property>
    </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /RXBUFSTATUS" type="array">
-      <obj_property name="ElementShortName">RXBUFSTATUS[2:0]</obj_property>
-      <obj_property name="ObjectShortName">RXBUFSTATUS[2:0]</obj_property>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/dac_sync_int" type="logic">
+      <obj_property name="ElementShortName">dac_sync_int</obj_property>
+      <obj_property name="ObjectShortName">dac_sync_int</obj_property>
    </wvobject>
-   <wvobject fp_name="/system_tb/test_harness/util_jesd204_xcvr/inst/\genblk2.i_xch_0 /\genblk13.i_gtye4_channel /TXBUFSTATUS" type="array">
-      <obj_property name="ElementShortName">TXBUFSTATUS[1:0]</obj_property>
-      <obj_property name="ObjectShortName">TXBUFSTATUS[1:0]</obj_property>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_dds/\genblk1.sync_min_pulse_m [1]" type="logic">
+      <obj_property name="ElementShortName">[1]</obj_property>
+      <obj_property name="ObjectShortName">[1]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_dds/dac_data_sync" type="logic">
+      <obj_property name="ElementShortName">dac_data_sync</obj_property>
+      <obj_property name="ObjectShortName">dac_data_sync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_dds/\genblk1.sync_min_pulse_m " type="array">
+      <obj_property name="ElementShortName">\genblk1.sync_min_pulse_m [1:2]</obj_property>
+      <obj_property name="ObjectShortName">\genblk1.sync_min_pulse_m [1:2]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_dds/\genblk1.dac_dds_phase_0 " type="array">
+      <obj_property name="ElementShortName">\genblk1.dac_dds_phase_0 [1:2][15:0]</obj_property>
+      <obj_property name="ObjectShortName">\genblk1.dac_dds_phase_0 [1:2][15:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_dds/\genblk1.dds_phase[1].i_dds_2 /dds_data" type="array">
+      <obj_property name="ElementShortName">dds_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dds_data[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_AUTO</obj_property>
+      <obj_property name="AnalogYRangeMin">0.000000</obj_property>
+      <obj_property name="AnalogYRRangeMax">0.000000</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_LINEAR</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/\g_channel[0].i_channel /i_dds/\genblk1.dds_phase[2].i_dds_2 /dds_data" type="array">
+      <obj_property name="ElementShortName">dds_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dds_data[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/dac_sync_in_armed" type="logic">
+      <obj_property name="ElementShortName">dac_sync_in_armed</obj_property>
+      <obj_property name="ObjectShortName">dac_sync_in_armed</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_core/dac_ext_sync_arm" type="logic">
+      <obj_property name="ElementShortName">dac_ext_sync_arm</obj_property>
+      <obj_property name="ObjectShortName">dac_ext_sync_arm</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_regmap/dac_ext_sync_arm" type="logic">
+      <obj_property name="ElementShortName">dac_ext_sync_arm</obj_property>
+      <obj_property name="ObjectShortName">dac_ext_sync_arm</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/test_harness/dac_jesd204_transport/dac_tpl_core/inst/i_regmap/i_up_dac_common/up_dac_ext_sync_arm" type="logic">
+      <obj_property name="ElementShortName">up_dac_ext_sync_arm</obj_property>
+      <obj_property name="ObjectShortName">up_dac_ext_sync_arm</obj_property>
    </wvobject>
 </wave_config>

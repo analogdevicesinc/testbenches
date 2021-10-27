@@ -79,7 +79,7 @@ program test_program;
   xcvr rx_xcvr;
   xcvr tx_xcvr;
 
-  int use_dds = 0;
+  int use_dds = 1;
   bit [31:0] lane_rate_khz = `LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
@@ -142,7 +142,7 @@ program test_program;
     // JESD LINK TEST
     // =======================
     jesd_link_test();
-    
+
     // Check link restart counter
     env.mng.RegReadVerify32(`AXI_JESD_RX + 'h2c4, 1);
 
@@ -219,6 +219,27 @@ program test_program;
 
     // Move data around for a while
     #5us;
+
+    // Arm external sync
+    env.mng.RegWrite32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_CNTRL_1),2);
+    #1us;
+    // Check if armed
+    env.mng.RegReadVerify32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
+                            `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(1));
+    #1us;
+    // Trigger external sync
+    @(posedge system_tb.device_clk);
+    system_tb.dac_sync <= 1'b1;
+    @(posedge system_tb.device_clk);
+    system_tb.dac_sync <= 1'b0;
+
+    #1us;
+    // Check if trigger captured
+    env.mng.RegReadVerify32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
+                            `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(0));
+
+    #5us;
+
 
     // =======================
     // Test SYSREF alignment

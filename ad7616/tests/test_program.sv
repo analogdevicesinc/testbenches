@@ -42,10 +42,8 @@ import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
-`define AD7616_DMA                  32'h44A3_0000 //to be checked
-`define AD7616_REGMAP               32'h44A0_0000 //to be checked
-`define AD7616_CLKGEN               32'h44A7_0000 //to be checked
-`define AD7616_CNV                  32'h44B0_0000 //to be checked
+`define AD7616_DMA                      32'h44A3_0000
+`define AD7616_REGMAP                   32'h44A0_0000
 `define DDR_BASE                        32'h8000_0000
 
 localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
@@ -113,15 +111,15 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
 
 localparam AD7616_BASE = `AD7616_REGMAP;
-localparam AD7616_CLKGEN_BASE = `AD7616_CLKGEN;
-localparam AD7616_CNV_BASE = `AD7616_CNV;
 
 program test_program (
-  input pulsar_adc_irq,
-  input pulsar_adc_spi_sclk,
-  input pulsar_adc_spi_cs,
-  input pulsar_adc_spi_clk,
-  input [(`NUM_OF_SDI - 1):0] pulsar_adc_spi_sdi);
+  input       rx_cnvst,
+  input       rx_sclk,
+  input       rx_sdo,
+  input [1:0] rx_sdi,
+  input       rx_cs_n,
+  input       rx_busy);
+
 
 test_harness_env env;
 
@@ -227,12 +225,12 @@ endtask
 // IRQ callback
 //---------------------------------------------------------------------------
 
-reg [4:0] irq_pending = 0;
+/* reg [4:0] irq_pending = 0;
 reg [7:0] sync_id = 0;
 
 initial begin
   while (1) begin
-    @(posedge pulsar_adc_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
+    @(posedge ad7616_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
     axi_read (`AD7616_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
     // IRQ launched by Offload SYNC command
@@ -260,7 +258,7 @@ initial begin
     // Clear all pending IRQs
     axi_write (`AD7616_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
   end
-end
+end */
 
 //---------------------------------------------------------------------------
 // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
@@ -268,19 +266,19 @@ end
 
   reg     [SDI_PHY_DELAY:0] echo_delay_sclk = {SDI_PHY_DELAY{1'b0}};
   reg     delay_clk = 0;
-  wire    m_spi_sclk;
+  wire    m_rx_sclk;
 
-  assign  m_spi_sclk = pulsar_adc_spi_sclk;
+  assign  m_rx_sclk = rx_sclk;
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
     while(1) begin
       @(posedge delay_clk) begin
-        echo_delay_sclk <= {echo_delay_sclk, m_spi_sclk};
+        echo_delay_sclk <= {echo_delay_sclk, m_rx_sclk};
        end
     end
   end
-  assign pulsar_adc_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
+  assign ad7616_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
 initial begin
   while(1) begin
@@ -294,19 +292,19 @@ end
 //---------------------------------------------------------------------------
 
 wire          end_of_word;
-wire          spi_sclk_bfm = pulsar_adc_echo_sclk;
+wire          rx_sclk_bfm = ad7616_echo_sclk;
 wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = &pulsar_adc_spi_cs;
+wire          m_spi_csn_int_s = &rx_cs_n;
 bit           m_spi_csn_int_d = 0;
 bit   [31:0]  sdi_shiftreg;
-bit   [7:0]   spi_sclk_pos_counter = 0;
-bit   [7:0]   spi_sclk_neg_counter = 0;
+bit   [7:0]   rx_sclk_pos_counter = 0;
+bit   [7:0]   rx_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
 
 initial begin
   while(1) begin
-    @(posedge pulsar_adc_spi_clk);
+    @(posedge rx_sclk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
 end
@@ -314,32 +312,32 @@ end
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
-for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign pulsar_adc_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+for (i = 0; i < 1; i++) begin
+  assign rx_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
-                     (spi_sclk_pos_counter == DATA_DLENGTH) :
-                     (spi_sclk_neg_counter == DATA_DLENGTH);
+                     (rx_sclk_pos_counter == DATA_DLENGTH) :
+                     (rx_sclk_neg_counter == DATA_DLENGTH);
 
 initial begin
   while(1) begin
-    @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
+    @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
-      spi_sclk_pos_counter <= 8'b0;
+      rx_sclk_pos_counter <= 8'b0;
     end else begin
-      spi_sclk_pos_counter <= (spi_sclk_pos_counter == DATA_DLENGTH) ? 0 : spi_sclk_pos_counter+1;
+      rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH) ? 0 : rx_sclk_pos_counter+1;
     end
   end
 end
 
 initial begin
   while(1) begin
-    @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
+    @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
-      spi_sclk_neg_counter <= 8'b0;
+      rx_sclk_neg_counter <= 8'b0;
     end else begin
-      spi_sclk_neg_counter <= (spi_sclk_neg_counter == DATA_DLENGTH) ? 0 : spi_sclk_neg_counter+1;
+      rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH) ? 0 : rx_sclk_neg_counter+1;
     end
   end
 end
@@ -349,9 +347,9 @@ initial begin
   while(1) begin
     // synchronization
     if (CPHA ^ CPOL)
-      @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
+      @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     else
-      @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
+      @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     if ((m_spi_csn_negedge_s) || (end_of_word)) begin
       // delete the last word at end_of_word
       if (end_of_word) begin
@@ -373,7 +371,7 @@ initial begin
                         sdi_preg[$] :
                         sdi_nreg[$];
       end
-      if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
+      if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
       sdi_shiftreg <= {sdi_shiftreg[30:0], 1'b0};
     end
@@ -386,7 +384,7 @@ end
 
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
-bit [15:0]  sdi_store_cnt = (`NUM_OF_SDI == 1) ? 'h1 : 'h0;
+bit [15:0]  sdi_store_cnt = 'h1;
 bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
@@ -399,20 +397,15 @@ assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
 
 initial begin
   while(1) begin
-    @(posedge pulsar_adc_echo_sclk);
+    @(posedge ad7616_echo_sclk);
     sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
-          sdi_store_cnt <= sdi_store_cnt + 1;
-        end else begin
-          sdi_store_cnt <= sdi_store_cnt + 2;
-        end
+       sdi_store_cnt <= sdi_store_cnt + 1;
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
           sdi_shiftreg_old <= sdi_shiftreg;
           if (sdi_store_cnt [0] == 'h1 ) begin
             for (int i=0; i<16; i=i+1) begin
@@ -421,51 +414,7 @@ initial begin
               offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
               offload_sdi_data_store_arr[sdi_store_cnt][16 + i] =  sdi_shiftreg[2*i];
             end
-          end
-        end else if (`NUM_OF_SDI == 2) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
-            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
-          end
-        end else if (`NUM_OF_SDI == 4) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*4)+:4] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*4)+:4] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            for (int i=0; i<16; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt][2*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][2*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i+1] = sdi_shiftreg[i];
-            end
-          end
-        end else if (`NUM_OF_SDI == 8) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*8)+:8] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*8)+:8] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            for (int i=0; i<8; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+2] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+3] = sdi_shiftreg[i];
-
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+2] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+3] = sdi_shiftreg[i];
-            end
-          end
-        end
+          end  
       end else begin
         sdi_fifo_data_store = sdi_shiftreg;
       end
@@ -522,11 +471,7 @@ task offload_spi_test;
     axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started.", $time);
 
-    if (`NUM_OF_SDI == 1) begin
-      wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
-    end else begin
-      wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-    end
+    wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
 
     axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
     offload_status = 0;
@@ -540,11 +485,11 @@ task offload_spi_test;
       offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
     end
 
-    if (irq_pending == 'h0) begin
+/*     if (irq_pending == 'h0) begin
       `ERROR(("IRQ Test FAILED"));
     end else begin
       `INFO(("IRQ Test PASSED"));
-    end
+    end */
 
     if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("Offload Test FAILED"));
@@ -563,15 +508,6 @@ bit   [31:0]  sdi_fifo_data = 0;
 
 task fifo_spi_test;
 begin
-
-  //start spi clk generator
-  #100 axi_write (AD7616_CLKGEN_BASE + 32'h00000040, 32'h0000003);
-
-  //config cnv
-  #100 axi_write (AD7616_CNV_BASE + 32'h00000010, 32'h00000000);
-//  #100 axi_write (AD7616_CNV_BASE + 32'h00000040, 'h64 * 'h32);
-//  #100 axi_write (AD7616_CNV_BASE + 32'h0000004c,'h64 * 'h32);
-  #100 axi_write (AD7616_CNV_BASE + 32'h00000010, 32'h00000002);
 
   // Enable SPI Engine
   axi_write (AD7616_BASE + SPI_ENG_ADDR_ENABLE, 0);
@@ -594,7 +530,7 @@ begin
   generate_transfer_cmd(1);
 
   #100
-  wait(sync_id == 1);
+  //wait(sync_id == 1);
   #100
 
   repeat (NUM_OF_WORDS) begin

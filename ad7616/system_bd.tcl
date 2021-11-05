@@ -43,3 +43,9 @@ global ad_project_params
 #
 
 source ../../projects/ad7616_sdz/common/ad7616_bd.tcl
+
+create_bd_port -dir O spi_clk
+create_bd_port -dir O irq
+
+ad_connect spi_clk sys_cpu_clk
+ad_connect irq axi_ad7616/irq

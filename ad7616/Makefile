@@ -28,6 +28,7 @@ ENV_DEPS +=../scripts/adi_sim.tcl
 ENV_DEPS +=../scripts/run_sim.tcl
 
 LIB_DEPS += axi_clkgen
+LIB_DEPS += axi_ad7616
 LIB_DEPS += axi_pwm_gen
 LIB_DEPS += axi_dmac
 LIB_DEPS += axi_sysid

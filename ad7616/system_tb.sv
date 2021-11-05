@@ -44,20 +44,30 @@ module system_tb();
     wire [1:0] spi_sdi;
     wire       spi_cs_n;
     wire       adc_busy;
+    wire       spi_clk;
+    wire       irq;
 
   `TEST_PROGRAM test(
-    .rx_cnvst (adc_convst),
+//    .rx_cnvst (adc_convst),
     .rx_sclk (spi_sclk),
+    .spi_clk (spi_clk),
+    .irq (irq),
     .rx_sdi (spi_sdi),
-    .rx_cs_n (spi_cs_n),
-    .rx_busy (adc_busy));
+    .rx_cs_n (spi_cs_n)
+//    .rx_busy (adc_busy)
+    );
     
   test_harness `TH (
     .rx_cnvst (adc_convst),
     .rx_sclk (spi_sclk),
+    .spi_clk (spi_clk),
+    .irq (irq),
     .rx_sdo (spi_sdo),
     .rx_sdi (spi_sdi),
     .rx_cs_n (spi_cs_n),
     .rx_busy (adc_busy));
+    
+    
+    assign adc_busy = adc_convst;
     
 endmodule

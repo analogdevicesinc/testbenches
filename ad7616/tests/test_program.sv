@@ -66,6 +66,10 @@ localparam SPI_ENG_ADDR_OFFLOAD_RESET = 32'h0000_0108;
 localparam SPI_ENG_ADDR_OFFLOAD_CMD   = 32'h0000_0110;
 localparam SPI_ENG_ADDR_OFFLOAD_SDO   = 32'h0000_0114;
 
+localparam AD7616_CNVST_EN            = 32'h0000_0440;
+localparam AD7616_CNVST_RATE          = 32'h0000_0444;
+//localparam SPI_ENG_ADDR_OFFLOAD_SDO   = 32'h0000_0114;
+
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
@@ -115,16 +119,18 @@ localparam AD7616_BASE = `AD7616_REGMAP;
 program test_program (
   input       rx_cnvst,
   input       rx_sclk,
+  input       spi_clk,
+  input       irq,
   input       rx_sdo,
   input [1:0] rx_sdi,
   input       rx_cs_n,
-  input       rx_busy);
+  output      rx_busy);
 
 
 test_harness_env env;
 
 // --------------------------
-// Wrapper function for AXI read verify
+// Wrapper function for AXI read verif
 // --------------------------
 task axi_read_v(
     input   [31:0]  raddr,
@@ -294,7 +300,7 @@ end
 wire          end_of_word;
 wire          rx_sclk_bfm = ad7616_echo_sclk;
 wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = &rx_cs_n;
+wire          m_spi_csn_int_s = rx_cs_n;
 bit           m_spi_csn_int_d = 0;
 bit   [31:0]  sdi_shiftreg;
 bit   [7:0]   rx_sclk_pos_counter = 0;
@@ -304,7 +310,7 @@ bit   [31:0]  sdi_nreg[$];
 
 initial begin
   while(1) begin
-    @(posedge rx_sclk);
+    @(posedge spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
 end
@@ -312,7 +318,7 @@ end
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
-for (i = 0; i < 1; i++) begin
+for (i = 0; i < 2; i++) begin
   assign rx_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
 end
 
@@ -519,6 +525,10 @@ begin
 
   // Set up the interrupts
   axi_write (AD7616_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
+
+  axi_write (AD7616_BASE + AD7616_CNVST_EN, 32'h00000003);
+  axi_write (AD7616_BASE + AD7616_CNVST_RATE, 32'h00000128);
+
 
   #100
   // Generate a FIFO transaction, write SDO first

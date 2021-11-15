@@ -151,21 +151,21 @@ ad_cpu_interconnect 0x41200000 axi_intc
 ad_mem_hp0_interconnect sys_mem_clk ddr_axi_vip/S_AXI
 
 # connect mng_vip to ddr_vip
-set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells axi_cpu_interconnect]
-ad_connect axi_cpu_interconnect/M01_AXI /axi_mem_interconnect/S00_AXI
+# set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells axi_cpu_interconnect]
+#ad_connect axi_cpu_interconnect/M01_AXI /axi_mem_interconnect/S00_AXI
 
-global sys_mem_clk_index
-incr sys_mem_clk_index
-set_property CONFIG.NUM_CLKS [expr $sys_mem_clk_index +1] [get_bd_cells axi_mem_interconnect]
-ad_connect sys_cpu_clk axi_mem_interconnect/ACLK$sys_mem_clk_index
+#global sys_mem_clk_index
+# incr sys_mem_clk_index
+# set_property CONFIG.NUM_CLKS [expr $sys_mem_clk_index +1] [get_bd_cells axi_mem_interconnect]
+# ad_connect sys_cpu_clk axi_mem_interconnect/ACLK$sys_mem_clk_index
 
 #fake an ad_cpu_interconnect
-global sys_cpu_interconnect_index
-incr sys_cpu_interconnect_index
-#fake an ad_mem_hpx_interconnect
-global sys_mem_interconnect_index
-incr sys_mem_interconnect_index
+# global sys_cpu_interconnect_index
+# incr sys_cpu_interconnect_index
+# #fake an ad_mem_hpx_interconnect
+# global sys_mem_interconnect_index
+# incr sys_mem_interconnect_index
 
-# Set DDR VIP to a range of 2G 
-create_bd_addr_seg -range 0x80000000 -offset 0x80000000 [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
-  [get_bd_addr_segs ddr_axi_vip/S_AXI/Reg] SEG_mng_ddr_cntlr
+# # Set DDR VIP to a range of 2G 
+# create_bd_addr_seg -range 0x80000000 -offset 0x80000000 [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
+#   [get_bd_addr_segs ddr_axi_vip/S_AXI/Reg] SEG_mng_ddr_cntlr

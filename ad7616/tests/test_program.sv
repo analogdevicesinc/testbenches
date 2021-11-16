@@ -77,7 +77,7 @@ localparam PCORE_VERSION              = 32'h0001_0071;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 32;
-localparam DATA_DLENGTH               = 32;
+localparam DATA_DLENGTH               = 8;
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
 localparam SDI_DELAY                  = 0;
@@ -86,8 +86,8 @@ localparam THREE_WIRE                 = 0;
 localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
-localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 10;
+localparam NUM_OF_WORDS               = 2;
+localparam NUM_OF_TRANSFERS           = 20;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -231,12 +231,12 @@ endtask
 // IRQ callback
 //---------------------------------------------------------------------------
 
-/* reg [4:0] irq_pending = 0;
+reg [4:0] irq_pending = 0;
 reg [7:0] sync_id = 0;
 
 initial begin
   while (1) begin
-    @(posedge ad7616_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
+    @(posedge irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
     axi_read (`AD7616_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
     // IRQ launched by Offload SYNC command
@@ -264,7 +264,7 @@ initial begin
     // Clear all pending IRQs
     axi_write (`AD7616_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
   end
-end */
+end
 
 //---------------------------------------------------------------------------
 // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
@@ -515,6 +515,9 @@ bit   [31:0]  sdi_fifo_data = 0;
 task fifo_spi_test;
 begin
 
+  axi_write (AD7616_BASE + AD7616_CNVST_EN, 32'h00000003);
+  axi_write (AD7616_BASE + AD7616_CNVST_RATE, 32'h00000128);
+  
   // Enable SPI Engine
   axi_write (AD7616_BASE + SPI_ENG_ADDR_ENABLE, 0);
 
@@ -526,10 +529,6 @@ begin
   // Set up the interrupts
   axi_write (AD7616_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
-  axi_write (AD7616_BASE + AD7616_CNVST_EN, 32'h00000003);
-  axi_write (AD7616_BASE + AD7616_CNVST_RATE, 32'h00000128);
-
-
   #100
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
@@ -540,7 +539,7 @@ begin
   generate_transfer_cmd(1);
 
   #100
-  //wait(sync_id == 1);
+  wait(sync_id == 1);
   #100
 
   repeat (NUM_OF_WORDS) begin
@@ -548,11 +547,14 @@ begin
     axi_read (AD7616_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
   end
 
-  if (sdi_fifo_data != sdi_fifo_data_store)
-    `ERROR(("Fifo Read Test FAILED"));
-
-  `INFO(("Fifo Read Test PASSED"));
-
+  if (sdi_fifo_data != sdi_fifo_data_store) begin
+    $display("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store);
+//    `ERROR(("Fifo Read Test FAILED"));
+  end else begin
+    $display("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store);
+    `INFO(("Fifo Read Test PASSED"));
+  end
+  
 end
 endtask
 

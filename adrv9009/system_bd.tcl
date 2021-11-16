@@ -42,8 +42,8 @@ source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
 source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl
 
 set dac_fifo_address_width $ad_project_params(DAC_FIFO_ADDRESS_WIDTH)
-set ENCODER_SEL 2
-set LANE_RATE 24.75
+set ENCODER_SEL 1
+set LANE_RATE $ad_project_params(LANE_RATE)
 
 set TX_NUM_OF_LANES $ad_project_params(TX_JESD_L)
 set TX_NUM_OF_CONVERTERS $ad_project_params(TX_JESD_M)

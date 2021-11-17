@@ -38,7 +38,11 @@
 `include "utils.svh"
 
 module system_tb();
-
+ 
+  wire rx_sync;
+  wire tx_sync;
+  wire tx_os_sync;
+  
   wire [3:0] ex2dut_serial_lane_n;
   wire [3:0] ex2dut_serial_lane_p;
 
@@ -48,57 +52,70 @@ module system_tb();
   `TEST_PROGRAM test();
 
   test_harness `TH (
-    .ref_clk_out    (ref_clk),
-    .tx_device_clk_out (tx_device_clk),
+    .tx_ref_clk_0 (ref_clk),
+    .rx_ref_clk_0 (ref_clk),
+    .rx_ref_clk_2 (ref_clk),
+    .ref_clk_out  (ref_clk),
     .rx_device_clk_out (rx_device_clk),
-    .rx_os_device_clk_out (rx_os_device_clk),
+    .tx_device_clk_out (tx_device_clk),
+    .tx_os_device_clk_out (tx_os_device_clk),
     .sysref_clk_out (sysref),
 
-    .tx_device_clk(tx_device_clk),
     .rx_device_clk(rx_device_clk),
-    .rx_os_device_clk(rx_os_device_clk),
+    .tx_device_clk(tx_device_clk),
+    .tx_os_device_clk(tx_os_device_clk),
     .ref_clk(ref_clk),
     .sysref(sysref),
+    .tx_sysref_0(sysref),
+    .rx_sysref_0(sysref),
+    .rx_sysref_2(sysref),
 
-    // .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_p(ref_clk),
-    // .gt_bridge_ip_0_diff_gt_ref_clock_0_clk_n(~ref_clk),
+    .tx_sync_0(rx_sync),
+    .ex_rx_sync(rx_sync),
+
+    .rx_sync_0(tx_sync),
+    .ex_tx_sync(tx_sync),
+
+    .rx_sync_2(tx_os_sync),
+    .ex_tx_os_sync(tx_os_sync),
+
+    .rx_data1_0_n(dut2ex_serial_lane_n[0]),
+    .rx_data1_0_p(dut2ex_serial_lane_p[0]),
+    .rx_data1_1_n(dut2ex_serial_lane_n[1]),
+    .rx_data1_1_p(dut2ex_serial_lane_p[1]),
+    .rx_data1_2_n(dut2ex_serial_lane_n[2]),
+    .rx_data1_2_p(dut2ex_serial_lane_p[2]),
+    .rx_data1_3_n(dut2ex_serial_lane_n[3]),
+    .rx_data1_3_p(dut2ex_serial_lane_p[3]),
     
-    .rx_data1_0_p(ex2dut_serial_lane_p[0]),
-    .rx_data1_0_n(ex2dut_serial_lane_n[0]),
-    .rx_data1_1_p(ex2dut_serial_lane_p[1]),
-    .rx_data1_1_n(ex2dut_serial_lane_n[1]),
+    .tx_data1_0_n(ex2dut_serial_lane_n[0]),
+    .tx_data1_0_p(ex2dut_serial_lane_p[0]),
+    .tx_data1_1_n(ex2dut_serial_lane_n[1]),
+    .tx_data1_1_p(ex2dut_serial_lane_p[1]),
 
-    .rx_os_data1_0_p(ex2dut_serial_lane_p[2]),
-    .rx_os_data1_0_n(ex2dut_serial_lane_n[2]),
-    .rx_os_data1_1_p(ex2dut_serial_lane_p[3]),
-    .rx_os_data1_1_n(ex2dut_serial_lane_n[3]),
+    .tx_os_data1_0_n(ex2dut_serial_lane_n[2]),
+    .tx_os_data1_0_p(ex2dut_serial_lane_p[2]),
+    .tx_os_data1_1_n(ex2dut_serial_lane_n[3]),
+    .tx_os_data1_1_p(ex2dut_serial_lane_p[3]),
 
-    .tx_data1_0_p(dut2ex_serial_lane_p[0]),
-    .tx_data1_0_n(dut2ex_serial_lane_n[0]),
-    .tx_data1_1_p(dut2ex_serial_lane_p[1]),
-    .tx_data1_1_n(dut2ex_serial_lane_n[1]),
-    .tx_data1_2_p(dut2ex_serial_lane_p[2]),
-    .tx_data1_2_n(dut2ex_serial_lane_n[2]),
-    .tx_data1_3_p(dut2ex_serial_lane_p[3]),
-    .tx_data1_3_n(dut2ex_serial_lane_n[3]),
-
-    .rx_data_0_p(dut2ex_serial_lane_p[0]),
-    .rx_data_0_n(dut2ex_serial_lane_n[0]),
-    .rx_data_1_p(dut2ex_serial_lane_p[1]),
-    .rx_data_1_n(dut2ex_serial_lane_n[1]),
-    .rx_data_2_p(dut2ex_serial_lane_p[2]),
-    .rx_data_2_n(dut2ex_serial_lane_n[2]),
-    .rx_data_3_p(dut2ex_serial_lane_p[3]),
-    .rx_data_3_n(dut2ex_serial_lane_n[3]),
-
-    .tx_data_0_p(ex2dut_serial_lane_p[0]),
-    .tx_data_0_n(ex2dut_serial_lane_n[0]),
-    .tx_data_1_p(ex2dut_serial_lane_p[1]),
-    .tx_data_1_n(ex2dut_serial_lane_n[1]),
-    .tx_data_2_p(ex2dut_serial_lane_p[2]),
-    .tx_data_2_n(ex2dut_serial_lane_n[2]),
-    .tx_data_3_p(ex2dut_serial_lane_p[3]),
-    .tx_data_3_n(ex2dut_serial_lane_n[3])
+    .rx_data_0_n(ex2dut_serial_lane_n[0]),
+    .rx_data_0_p(ex2dut_serial_lane_p[0]),
+    .rx_data_1_n(ex2dut_serial_lane_n[1]),
+    .rx_data_1_p(ex2dut_serial_lane_p[1]),
+    .rx_data_2_n(ex2dut_serial_lane_n[2]),
+    .rx_data_2_p(ex2dut_serial_lane_p[2]),
+    .rx_data_3_n(ex2dut_serial_lane_n[3]),
+    .rx_data_3_p(ex2dut_serial_lane_p[3]),
+       
+    .tx_data_0_n(dut2ex_serial_lane_n[0]),
+    .tx_data_0_p(dut2ex_serial_lane_p[0]),
+    .tx_data_1_n(dut2ex_serial_lane_n[1]),
+    .tx_data_1_p(dut2ex_serial_lane_p[1]),
+    .tx_data_2_n(dut2ex_serial_lane_n[2]),
+    .tx_data_2_p(dut2ex_serial_lane_p[2]),
+    .tx_data_3_n(dut2ex_serial_lane_n[3]),
+    .tx_data_3_p(dut2ex_serial_lane_p[3])
   );
 
 endmodule
+

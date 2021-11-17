@@ -54,15 +54,26 @@ import adi_xcvr_pkg::*;
 
 `define AXI_JESD_RX 32'h44aa_0000
 `define AXI_JESD_TX 32'h44a9_0000
+
 `define ADC_TPL     32'h44a0_0000
+`define ADC_OS_TPL  32'h44a0_8000
 `define DAC_TPL     32'h44a0_4000
+
 `define DUT_AXI_XCVR_RX 32'h44a6_0000
 `define DUT_AXI_XCVR_TX 32'h44a8_0000
 
 `define EX_AXI_XCVR_RX 32'h0000_0000
-`define EX_AXI_XCVR_TX 32'h0002_0000
 `define EX_AXI_JESD_RX 32'h0003_0000
-`define EX_AXI_JESD_TX 32'h0005_0000
+
+`define EX_AXI_XCVR_TX 32'h0001_0000
+`define EX_AXI_JESD_TX 32'h0004_0000
+
+`define EX_AXI_XCVR_TX_OS 32'h0002_0000
+`define EX_AXI_JESD_TX_OS 32'h0005_0000
+
+`define AXI_CLKGEN_TX    32'h43c0_0000
+`define AXI_CLKGEN_RX    32'h43c1_0000
+`define AXI_CLKGEN_RX_OS 32'h43c2_0000
 
 
 `define LINK_MODE 2
@@ -115,17 +126,17 @@ program test_program;
     link.set_encoding(enc8b10b);
     link.set_lane_rate(lane_rate);
 
-    ex_rx_ll = new("RX_LINK_LAYER", env.mng, `EX_AXI_JESD_RX, link);
+    ex_rx_ll = new("EX RX_LINK_LAYER", env.mng, `EX_AXI_JESD_RX, link);
     ex_rx_ll.probe();
 
     // ex_tx_ll = new("TX_LINK_LAYER", env.mng, `EX_AXI_JESD_TX, link);
     // ex_tx_ll.probe();
 
-    ex_rx_xcvr = new("RX_XCVR", env.mng, `EX_AXI_XCVR_RX);
+    ex_rx_xcvr = new("EX RX_XCVR", env.mng, `EX_AXI_XCVR_RX);
     ex_rx_xcvr.probe();
 
-    dut_rx_xcvr = new("DUT RX_XCVR", env.mng, `DUT_AXI_XCVR_RX);
-    dut_rx_xcvr.probe();
+    // dut_rx_xcvr = new("DUT RX_XCVR", env.mng, `DUT_AXI_XCVR_RX);
+    // dut_rx_xcvr.probe();
 
     dut_tx_xcvr = new("DUT TX_XCVR", env.mng, `DUT_AXI_XCVR_TX);
     dut_tx_xcvr.probe();
@@ -141,11 +152,11 @@ program test_program;
     dut_tx_ll.probe();
 
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
-    `TH.`TX_DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(ex_rx_ll.calc_device_clk()));
+    `TH.`RX_DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(ex_rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(ex_rx_ll.calc_sysref_clk()));
 
     `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`TX_DEVICE_CLK.inst.IF.start_clock;
+    `TH.`RX_DEVICE_CLK.inst.IF.start_clock;
     `TH.`SYSREF_CLK.inst.IF.start_clock;
 
     ex_rx_xcvr.setup_clocks(lane_rate,
@@ -195,6 +206,7 @@ program test_program;
     // -----------------------
     // bringup DUT TX path
     // -----------------------
+    env.mng.RegWrite32(`AXI_CLKGEN_TX + 'h40, 3);
     dut_tx_xcvr.up();
     dut_tx_ll.link_up();
 
@@ -219,9 +231,8 @@ program test_program;
 
     // Move data around
     #10us;
-
     ex_rx_xcvr.down();
-    ex_tx_xcvr.down();
+    //ex_tx_xcvr.down();
     dut_tx_xcvr.down();
 
     `INFO(("======================="));

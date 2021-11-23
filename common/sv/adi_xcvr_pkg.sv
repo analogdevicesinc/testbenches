@@ -524,20 +524,26 @@ package adi_xcvr_pkg;
     //    ref clock
     // -----------------
     task setup_clocks(longint unsigned lane_rate,
-                      int unsigned ref_clk);
+                      int unsigned ref_clk,
+                      pll_type_t plls_to_try[] = {});
 
       int pll_idx;
       pll_type_t pll_type;
+      pll_type_t invalid_plls[$];
       out_clk_sel_t out_clk_sel;
       int out_div;
       int pll_success = 0;
 
-      pll_type_t plls_to_try[];
-
       case (xcvr_type)
         GTXE2:
           begin
-            plls_to_try = '{QPLL0, CPLL};
+            if (plls_to_try.size() == 0)
+              plls_to_try = '{QPLL0, CPLL};
+
+            invalid_plls = plls_to_try.find(x) with (x == QPLL1);
+            if (invalid_plls.size() != 0)
+              `ERROR(("QPLL1 is not supported on GTXE2"));
+
             out_clk_sel = OUTCLKPMA;
           end
         GTHE3,
@@ -545,7 +551,8 @@ package adi_xcvr_pkg;
         GTYE3_NOT_SUPPORTED,
         GTYE4:
           begin
-            plls_to_try = '{QPLL0, QPLL1, CPLL};
+            if (plls_to_try.size() == 0)
+              plls_to_try = '{QPLL0, QPLL1, CPLL};
             out_clk_sel = PROGDIVCLK;
           end
         default:

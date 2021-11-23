@@ -48,6 +48,8 @@ package adi_jesd204_pkg;
   typedef enum bit [1:0] {sc0 = 0, sc1 = 1, sc2 = 2} subclass_t;
   typedef enum bit [1:0] {v204A = 0, v204B = 1, v204C = 2} version_t;
   typedef enum bit [0:0] {enc8b10b = 0, enc64b66b = 1} encoding_t;
+  typedef enum bit [1:0] {ls_8b10b_init = 0, ls_8b10b_check = 1, ls_8b10b_data = 2} lanestate_8b10b_t;
+  typedef enum bit [2:0] {ls_64b66b_emb_init = 1, ls_64b66b_emb_hunt = 2, ls_64b66b_emb_lock = 4} lanestate_64b66b_t;
   const string encoding_s [2] = {"8B10B", "64B66B"};
   const string rx_link_states_8b10b [4] = {"RESET", "WAIT_FOR_PHY", "CGS", "DATA"};
   const string rx_link_states_64b66b [4] = {"RESET", "WAIT_BS", "BLOCK_SYNC", "DATA"};
@@ -187,7 +189,8 @@ package adi_jesd204_pkg;
 
     int unsigned link_clk;
     int unsigned device_clk;
-    int unsigned sysref_clk;
+    real sysref_clk;
+    real sysref_clk_fract;
 
     // -----------------
     //
@@ -248,9 +251,12 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    function int unsigned calc_sysref_clk();
+    function real calc_sysref_clk();
       if (link_clk == 0) calc_link_clk;
       sysref_clk = link_clk * dp_width / (link.K * link.F);
+      sysref_clk_fract = sysref_clk - $floor(sysref_clk);
+      if (sysref_clk_fract != 0)
+        `ERROR(("Current clock generator can't generate this exact frequency: %f", sysref_clk));
       return sysref_clk;
     endfunction : calc_sysref_clk;
 
@@ -317,11 +323,11 @@ package adi_jesd204_pkg;
           this.bus.RegRead32(this.base_address + i * 'h20 + GetAddrs(JESD_RX_LANEn_STATUS), val);
           if (link.encoding == enc8b10b) begin
             lane_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
-            if (lane_state != 3)
+            if (lane_state != ls_8b10b_data)
               all_lanes_in_data = 0;
           end else begin
             lane_state = `GET_JESD_RX_LANEn_STATUS_EMB_STATE(val);
-            if (lane_state != 4)
+            if (lane_state != ls_64b66b_emb_lock)
               all_lanes_in_data = 0;
           end
         end
@@ -360,11 +366,11 @@ package adi_jesd204_pkg;
         this.bus.RegRead32(this.base_address + i * 'h20 + GetAddrs(JESD_RX_LANEn_STATUS), val);
         if (link.encoding == enc8b10b) begin
           lane_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
-          if (lane_state != 2)
+          if (lane_state != ls_8b10b_data)
             `ERROR(("Lane %d state %s",i,rx_lane_states_8b10b[i]));
         end else begin
           lane_state = `GET_JESD_RX_LANEn_STATUS_EMB_STATE(val);
-          if (lane_state != 4)
+          if (lane_state != ls_64b66b_emb_lock)
             `ERROR(("Lane %d state %s",i,rx_lane_states_64b66b[i]));
         end
       end

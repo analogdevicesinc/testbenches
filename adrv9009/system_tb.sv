@@ -109,12 +109,12 @@ module system_tb();
        
     .tx_data_0_n(dut2ex_serial_lane_n[0]),
     .tx_data_0_p(dut2ex_serial_lane_p[0]),
-    .tx_data_1_n(dut2ex_serial_lane_n[1]),
-    .tx_data_1_p(dut2ex_serial_lane_p[1]),
+    .tx_data_1_n(dut2ex_serial_lane_n[3]),
+    .tx_data_1_p(dut2ex_serial_lane_p[3]),
     .tx_data_2_n(dut2ex_serial_lane_n[2]),
     .tx_data_2_p(dut2ex_serial_lane_p[2]),
-    .tx_data_3_n(dut2ex_serial_lane_n[3]),
-    .tx_data_3_p(dut2ex_serial_lane_p[3])
+    .tx_data_3_n(dut2ex_serial_lane_n[1]),
+    .tx_data_3_p(dut2ex_serial_lane_p[1])
   );
 
 endmodule

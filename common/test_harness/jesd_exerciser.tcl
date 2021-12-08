@@ -95,6 +95,9 @@ proc create_jesd_exerciser { \
                                                   $SAMPLE_WIDTH \
                                                   $TPL_DATAPATH_WIDTH \
                                                   $DMA_SAMPLE_WIDTH
+  if {$TX_OR_RX_N == 0} {
+    ad_ip_parameter ${rxtx}_tpl_core/adc_tpl_core CONFIG.EN_FRAME_ALIGN {0}
+  }
 
   for {set i 0} {$i < $NUM_OF_LANES} {incr i} {
     ad_xcvrpll  ref_clk  util_xcvr/cpll_ref_clk_$i

@@ -60,6 +60,8 @@ import adi_xcvr_pkg::*;
 `define ADC_OS_TPL  32'h44a0_8000
 `define DAC_TPL     32'h44a0_4000
 
+`define EX_ADC_TPL  32'h0006_0000
+
 `define DUT_AXI_XCVR_RX_OS 32'h44a5_0000
 `define DUT_AXI_XCVR_RX    32'h44a6_0000
 `define DUT_AXI_XCVR_TX    32'h44a8_0000
@@ -257,14 +259,14 @@ program test_program;
     end
 
     for (int i = 0; i < `TX_JESD_M; i++) begin
-      env.mng.RegWrite32(`ADC_TPL+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+      env.mng.RegWrite32(`EX_ADC_TPL+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
                          `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     end
 
 
     env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_RSTN),
                        `SET_DAC_COMMON_REG_RSTN_RSTN(1));
-    env.mng.RegWrite32(`ADC_TPL+GetAddrs(ADC_COMMON_REG_RSTN),
+    env.mng.RegWrite32(`EX_ADC_TPL+GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
 

@@ -56,28 +56,36 @@ import adi_xcvr_pkg::*;
 `define AXI_JESD_RX    32'h44aa_0000
 `define AXI_JESD_TX    32'h44a9_0000
 
-`define ADC_TPL     32'h44a0_0000
-`define ADC_OS_TPL  32'h44a0_8000
-`define DAC_TPL     32'h44a0_4000
+`define TX_DMA    32'h7C42_0000
+`define RX_DMA    32'h7C40_0000
+`define RX_OS_DMA 32'h7C44_0000
 
-`define EX_ADC_TPL  32'h0006_0000
+`define ADC_TPL    32'h44a0_0000
+`define ADC_OS_TPL 32'h44a0_8000
+`define DAC_TPL    32'h44a0_4000
+
+`define EX_ADC_TPL    32'h44a3_0000
+`define EX_DAC_TPL    32'h44ac_0000
+`define EX_DAC_OS_TPL 32'h44af_0000
 
 `define DUT_AXI_XCVR_RX_OS 32'h44a5_0000
 `define DUT_AXI_XCVR_RX    32'h44a6_0000
 `define DUT_AXI_XCVR_TX    32'h44a8_0000
 
-`define EX_AXI_XCVR_RX 32'h0000_0000
-`define EX_AXI_JESD_RX 32'h0003_0000
+`define EX_AXI_XCVR_RX 32'h44a2_0000
+`define EX_AXI_JESD_RX 32'h44a1_0000
 
-`define EX_AXI_XCVR_TX 32'h0001_0000
-`define EX_AXI_JESD_TX 32'h0004_0000
+`define EX_AXI_XCVR_TX 32'h44a7_0000
+`define EX_AXI_JESD_TX 32'h44a4_0000
 
-`define EX_AXI_XCVR_TX_OS 32'h0002_0000
-`define EX_AXI_JESD_TX_OS 32'h0005_0000
+`define EX_AXI_XCVR_TX_OS 32'h44ae_0000
+`define EX_AXI_JESD_TX_OS 32'h44ad_0000
 
 `define AXI_CLKGEN_TX    32'h43c0_0000
 `define AXI_CLKGEN_RX    32'h43c1_0000
 `define AXI_CLKGEN_RX_OS 32'h43c2_0000
+
+`define DDR_BASE 32'h44A0_0000
 
 `define LINK_MODE 2
 `define MODE_8B10B 1
@@ -93,7 +101,6 @@ program test_program;
   bit [31:0] lane_rate_khz = `LANE_RATE*1000000;
   longint lane_rate = lane_rate_khz*1000;
 
-  int use_dds = 1;
   real rx_sysref_clk, tx_sysref_clk, tx_os_sysref_clk, common_sysref_clk;
 
   jesd_link tx_link;
@@ -130,7 +137,7 @@ program test_program;
     tx_link = new;
     tx_link.set_L(`TX_JESD_L);
     tx_link.set_M(`TX_JESD_M);
-    tx_link.set_F(2);
+    tx_link.set_F(`TX_JESD_F);
     tx_link.set_S(`TX_JESD_S);
     tx_link.set_K(32);
     tx_link.set_N(`TX_JESD_NP);
@@ -141,7 +148,7 @@ program test_program;
     rx_link = new;
     rx_link.set_L(`RX_JESD_L);
     rx_link.set_M(`RX_JESD_M);
-    rx_link.set_F(4);
+    rx_link.set_F(`RX_JESD_F);
     rx_link.set_S(`RX_JESD_S);
     rx_link.set_K(32);
     rx_link.set_N(`RX_JESD_NP);
@@ -152,7 +159,7 @@ program test_program;
     rx_os_link = new;
     rx_os_link.set_L(`RX_OS_JESD_L);
     rx_os_link.set_M(`RX_OS_JESD_M);
-    rx_os_link.set_F(2);
+    rx_os_link.set_F(`RX_OS_JESD_F);
     rx_os_link.set_S(`RX_OS_JESD_S);
     rx_os_link.set_K(32);
     rx_os_link.set_N(`RX_OS_JESD_NP);
@@ -205,13 +212,26 @@ program test_program;
     tx_sysref_clk = ex_tx_ll.calc_sysref_clk();
     tx_os_sysref_clk = ex_tx_os_ll.calc_sysref_clk();
     
-    // Add tx_os_sysref_clk logic!
-    if (tx_sysref_clk > rx_sysref_clk && `fmod(tx_sysref_clk, rx_sysref_clk) == 0)
-      common_sysref_clk = rx_sysref_clk;
-    else if (tx_sysref_clk < rx_sysref_clk && `fmod(rx_sysref_clk, tx_sysref_clk) == 0) begin
-      common_sysref_clk = tx_sysref_clk;
-    end else
-      `ERROR(("RX_SYSREF_CLK and TX_SYSREF_CLK are not divisible\n RX_SYSREF_CLK: %f\n TX_SYSREF_CLK: %f", rx_sysref_clk, tx_sysref_clk));
+    //comment
+    if (tx_sysref_clk >= rx_sysref_clk && `fmod(tx_sysref_clk, rx_sysref_clk) == 0) begin
+      if (rx_sysref_clk >= tx_os_sysref_clk && `fmod(rx_sysref_clk, tx_os_sysref_clk) == 0) begin
+        common_sysref_clk = tx_os_sysref_clk;
+      end else if (rx_sysref_clk < tx_os_sysref_clk && `fmod(tx_os_sysref_clk, rx_sysref_clk) == 0) begin
+        common_sysref_clk = rx_sysref_clk;
+      end else begin
+        `ERROR(("RX_SYSREF_CLK and TX_OS_SYSREF_CLK are not divisible!\n RX_SYSREF_CLK: %f\n TX_OS_SYSREF_CLK: %f\n", rx_sysref_clk, tx_os_sysref_clk));
+      end
+    end else if (tx_sysref_clk < rx_sysref_clk && `fmod(rx_sysref_clk, tx_sysref_clk) == 0) begin
+      if (tx_sysref_clk >= tx_os_sysref_clk && `fmod(tx_sysref_clk, tx_os_sysref_clk) == 0) begin
+        common_sysref_clk = tx_os_sysref_clk;
+      end else if (tx_sysref_clk < tx_os_sysref_clk && `fmod(tx_os_sysref_clk, tx_sysref_clk) == 0) begin
+        common_sysref_clk = tx_sysref_clk;
+      end else begin
+        `ERROR(("TX_SYSREF_CLK and TX_OS_SYSREF_CLK are not divisible!\n TX_SYSREF_CLK: %f\n TX_OS_SYSREF_CLK: %f\n", tx_sysref_clk, tx_os_sysref_clk));
+      end
+    end else begin
+      `ERROR(("RX_SYSREF_CLK and TX_SYSREF_CLK are not divisible!\n RX_SYSREF_CLK: %f\n TX_SYSREF_CLK: %f\n", rx_sysref_clk, tx_sysref_clk));
+    end
 
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(common_sysref_clk));
 
@@ -238,7 +258,37 @@ program test_program;
 
     dut_rx_os_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000, '{CPLL});
+    
+    tx_tpl_test(.use_dds(0));
+    rx_tpl_test(.use_dds (0));
+    rx_os_tpl_test(.use_dds (0));
 
+    `INFO(("======================="));
+    `INFO(("  JESD LINK TEST DONE  "));
+    `INFO(("======================="));
+
+
+  end
+
+  task tx_tpl_test(int use_dds);
+    if (!use_dds) begin
+      for (int i=0;i<2048*2 ;i=i+2) begin
+        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
+      end
+
+      // Configure TX DMA
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_CONTROL),
+                         `SET_DMAC_CONTROL_ENABLE(1));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_FLAGS),
+                         `SET_DMAC_FLAGS_TLAST(1));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_X_LENGTH),
+                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h00000FFF));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_SRC_ADDRESS),
+                         `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BASE+32'h00000000));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+      #5us;
+    end
 
     for (int i = 0; i < `TX_JESD_M; i++) begin
       if (use_dds) begin
@@ -269,11 +319,11 @@ program test_program;
     env.mng.RegWrite32(`EX_ADC_TPL+GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
-
-    // Sync DDS cores
-    env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
-                       `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-
+    if (use_dds) begin
+      // Sync DDS cores
+      env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
+                         `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
+    end
 
     // -----------------------
     // bringup DUT TX path
@@ -288,7 +338,41 @@ program test_program;
     dut_tx_ll.wait_link_up();
     ex_rx_ll.wait_link_up();
 
+    #10us;
+    
+    ex_rx_xcvr.down();
+    dut_tx_xcvr.down();
+  endtask
+ 
+  task rx_tpl_test(int use_dds);
+    for (int i = 0; i < `RX_JESD_M; i++) begin
+      if (use_dds) begin
+        // Select DDS as source
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
+        // Configure tone amplitude and frequency
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
 
+      end else begin
+        // Set DMA as source for DAC TPL
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
+      end
+    end
+
+    for (int i = 0; i < `RX_JESD_M; i++) begin
+      env.mng.RegWrite32(`ADC_TPL+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+                         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+    end
+
+    env.mng.RegWrite32(`EX_DAC_TPL+GetAddrs(DAC_COMMON_REG_RSTN),
+                       `SET_DAC_COMMON_REG_RSTN_RSTN(1));
+    env.mng.RegWrite32(`ADC_TPL+GetAddrs(ADC_COMMON_REG_RSTN),
+                       `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    
     // -----------------------
     // bringup DUT RX path
     // -----------------------
@@ -302,9 +386,73 @@ program test_program;
     ex_tx_ll.wait_link_up();
     dut_rx_ll.wait_link_up();
 
+    #10us;
+    
+    // Configure RX DMA
+    if (!use_dds) begin
+      env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_CONTROL),
+                         `SET_DMAC_CONTROL_ENABLE(1));
+      env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_FLAGS),
+                         `SET_DMAC_FLAGS_TLAST(1));
+      env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_X_LENGTH),
+                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003DF));
+      env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_DEST_ADDRESS),
+                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00001000));
+      env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  
+      #5us;
+  
+      check_captured_data(
+        .address (`DDR_BASE+'h00001000),
+        .length (992),
+        .step (1),
+        .max_sample(2048),
+        .num_of_converters(`RX_JESD_M),
+        .num_of_lanes(`RX_JESD_L),
+        .samples_per_frame(`RX_JESD_S),
+        .octets_per_frame(`RX_JESD_F)
+      );
+      
+      #10us;
+    end
+
+    dut_rx_xcvr.down();
+    ex_tx_xcvr.down();
+
+  endtask
+
+  task rx_os_tpl_test(int use_dds);
+    for (int i = 0; i < `RX_OS_JESD_M; i++) begin
+      if (use_dds) begin
+        // Select DDS as source
+        env.mng.RegWrite32(`EX_DAC_OS_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
+        // Configure tone amplitude and frequency
+        env.mng.RegWrite32(`EX_DAC_OS_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
+        env.mng.RegWrite32(`EX_DAC_OS_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
+
+      end else begin
+        // Set DMA as source for DAC TPL
+        env.mng.RegWrite32(`EX_DAC_OS_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
+      end
+    end
+
+    for (int i = 0; i < `RX_OS_JESD_M; i++) begin
+      env.mng.RegWrite32(`ADC_OS_TPL+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+                         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+    end
+
+    env.mng.RegWrite32(`EX_DAC_OS_TPL+GetAddrs(DAC_COMMON_REG_RSTN),
+                       `SET_DAC_COMMON_REG_RSTN_RSTN(1));
+    env.mng.RegWrite32(`ADC_OS_TPL+GetAddrs(ADC_COMMON_REG_RSTN),
+                       `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
     // -----------------------
-    // bringup DUT RX Observation path
+    // bringup DUT RX OBS path
     // -----------------------
     env.mng.RegWrite32(`AXI_CLKGEN_RX_OS + 'h40, 3);
     ex_tx_os_xcvr.up();
@@ -316,22 +464,101 @@ program test_program;
     ex_tx_os_ll.wait_link_up();
     dut_rx_os_ll.wait_link_up();
 
-
-    // Move data around
     #10us;
+    
+    // Configure RX OBS DMA
+    if (!use_dds) begin
+      env.mng.RegWrite32(`RX_OS_DMA+GetAddrs(DMAC_CONTROL),
+                         `SET_DMAC_CONTROL_ENABLE(1));
+      env.mng.RegWrite32(`RX_OS_DMA+GetAddrs(DMAC_FLAGS),
+                         `SET_DMAC_FLAGS_TLAST(1));
+      env.mng.RegWrite32(`RX_OS_DMA+GetAddrs(DMAC_X_LENGTH),
+                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003DF));
+      env.mng.RegWrite32(`RX_OS_DMA+GetAddrs(DMAC_DEST_ADDRESS),
+                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00001000));
+      env.mng.RegWrite32(`RX_OS_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  
+      #5us;
+  
+      check_captured_data(
+        .address (`DDR_BASE+'h00001000),
+        .length (992),
+        .step (1),
+        .max_sample(2048),
+        .num_of_converters(`RX_OS_JESD_M),
+        .num_of_lanes(`RX_OS_JESD_L),
+        .samples_per_frame(`RX_OS_JESD_S),
+        .octets_per_frame(`RX_OS_JESD_F)
+      );
+    end
+
     ex_tx_os_xcvr.down();
     dut_rx_os_xcvr.down();
-    ex_rx_xcvr.down();
-    dut_rx_xcvr.down();
-    ex_tx_xcvr.down();
-    dut_tx_xcvr.down();
 
+  endtask
 
-    `INFO(("======================="));
-    `INFO(("  JESD LINK TEST DONE  "));
-    `INFO(("======================="));
+  task check_captured_data(bit [31:0] address,
+                           int length = 1024,
+                           int step = 1,
+                           int max_sample = 2048,
+                           int num_of_converters = 4,
+                           int num_of_lanes = 2,
+                           int samples_per_frame = 1,
+                           int octets_per_frame = 4
+                          );
 
+    bit [31:0] current_address;
+    bit [31:0] captured_word;
+    bit [31:0] reference_word;
+    bit [7:0] first, second;
+    bit empty_line = 1'b0, bypass = 1'b0;
 
-  end
+    if (num_of_lanes == 2 && num_of_converters < 4) begin
+      empty_line = 1'b1;
+    end
+
+    for (int i=0;i<length/2;i=i+2) begin
+      current_address = address+(i*2);
+      captured_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_address);
+      if (i==0 || bypass) begin
+        first = captured_word[15:8];
+        second = captured_word[7:0];
+        
+        if (num_of_lanes > 1 && first == 8'h00 && first == second) begin
+          bypass = 1'b1;
+          continue;
+        end
+        bypass = 1'b0;
+      end else begin
+        if (empty_line) begin
+          reference_word = 32'h00000000;
+        end else if (num_of_converters == 1) begin
+          reference_word = {24'h000000, second};
+        end else begin
+          reference_word = {(first + 8'h10), second, first, second};
+        end
+
+        if (num_of_lanes == 2 && num_of_converters < 4) begin
+          empty_line = !empty_line;
+        end
+
+        `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
+        
+        if (i == 20 && captured_word !== reference_word) begin
+          `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
+        end
+      end
+      
+      if (!empty_line) begin 
+        first = (first + 8'h20);
+        if (first[7:4] >= num_of_converters || num_of_converters == 1) begin
+          first = 8'h00;
+          second = second + (4 / (octets_per_frame / samples_per_frame));
+        end
+      end
+
+    end
+  endtask
 
 endprogram

@@ -39,6 +39,15 @@
 
 module system_tb();
  
+  localparam RX_SAMPLES_PER_CHANNEL = (`RX_JESD_L*`LL_OUT_BYTES*8) / `RX_JESD_M / `RX_JESD_NP;
+  localparam RX_DMA_NP = `RX_JESD_NP == 12 ? 16 : `RX_JESD_NP;
+
+  localparam RX_OS_SAMPLES_PER_CHANNEL = (`RX_OS_JESD_L*`LL_OUT_BYTES1*8) / `RX_OS_JESD_M / `RX_OS_JESD_NP;
+  localparam RX_OS_DMA_NP = `RX_OS_JESD_NP == 12 ? 16 : `RX_OS_JESD_NP;
+  
+  reg [`RX_JESD_M*RX_SAMPLES_PER_CHANNEL*RX_DMA_NP-1:0] tx_ex_dac_data = 'h0;
+  reg [`RX_OS_JESD_M*RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP-1:0] tx_os_ex_dac_data = 'h0;
+
   wire rx_sync;
   wire tx_sync;
   wire tx_os_sync;
@@ -52,19 +61,20 @@ module system_tb();
   `TEST_PROGRAM test();
 
   test_harness `TH (
-    .tx_ref_clk_0 (ref_clk),
-    .rx_ref_clk_0 (ref_clk),
-    .rx_ref_clk_2 (ref_clk),
-    .ref_clk_out  (ref_clk),
-    .rx_device_clk_out (rx_device_clk),
-    .tx_device_clk_out (tx_device_clk),
-    .tx_os_device_clk_out (tx_os_device_clk),
-    .sysref_clk_out (sysref),
+    .tx_ref_clk_0(ref_clk_ex),
+    .rx_ref_clk_0(ref_clk_ex),
+    .rx_ref_clk_2(ref_clk_ex),
+    .ref_clk_out(ref_clk_ex),
+    .rx_device_clk_out(rx_device_clk),
+    .tx_device_clk_out(tx_device_clk),
+    .tx_os_device_clk_out(tx_os_device_clk),
+    .sysref_clk_out(sysref),
 
     .rx_device_clk(rx_device_clk),
     .tx_device_clk(tx_device_clk),
     .tx_os_device_clk(tx_os_device_clk),
-    .ref_clk(ref_clk),
+    .ref_clk(tx_device_clk),
+    .ref_clk_ex(ref_clk_ex),
     .sysref(sysref),
     .tx_sysref_0(sysref),
     .rx_sysref_0(sysref),
@@ -114,8 +124,60 @@ module system_tb();
     .tx_data_2_n(dut2ex_serial_lane_n[2]),
     .tx_data_2_p(dut2ex_serial_lane_p[2]),
     .tx_data_3_n(dut2ex_serial_lane_n[1]),
-    .tx_data_3_p(dut2ex_serial_lane_p[1])
+    .tx_data_3_p(dut2ex_serial_lane_p[1]),
+    
+    .dac_data_0(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*0 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+    .dac_data_1(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*1 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+    .dac_data_2(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*2 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+    .dac_data_3(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*3 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+
+    .dac_os_data_0(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*0 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
+    .dac_os_data_1(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*1 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
+    .dac_os_data_2(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*2 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
+    .dac_os_data_3(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*3 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
+    
+    .dac_fir_filter_active (1'b0),
+    .adc_fir_filter_active (1'b0),
+    .dac_fifo_bypass (1'b0)
   );
+
+  reg [RX_DMA_NP-1:0] sample = 'h0;
+  integer sample_counter = 0;
+  always @(posedge tx_device_clk) begin
+    for (int i = 0; i < `RX_JESD_M; i++) begin
+      for (int j = 0; j < RX_SAMPLES_PER_CHANNEL; j++) begin
+        // First 256 sample is channel count on each nibble
+        // Next 256 sample is channel count on MS nibble and incr pattern
+        if (sample_counter[9] | 1) begin
+          sample[RX_DMA_NP-1 -: 4] = i;
+          sample[7:0] = sample_counter+j;
+        end else begin
+          sample = {4{i[3:0]}};
+        end
+        tx_ex_dac_data[RX_DMA_NP*(RX_SAMPLES_PER_CHANNEL*i+j) +:RX_DMA_NP] = sample;
+      end
+    end
+    sample_counter = sample_counter + RX_SAMPLES_PER_CHANNEL;
+  end
+
+  reg [RX_OS_DMA_NP-1:0] sample1 = 'h0;
+  integer sample_counter1 = 0;
+  always @(posedge tx_os_device_clk) begin
+    for (int i = 0; i < `RX_OS_JESD_M; i++) begin
+      for (int j = 0; j < RX_OS_SAMPLES_PER_CHANNEL; j++) begin
+        // First 256 sample is channel count on each nibble
+        // Next 256 sample is channel count on MS nibble and incr pattern
+        if (sample_counter1[9] | 1) begin
+          sample1[RX_OS_DMA_NP-1 -: 4] = i;
+          sample1[7:0] = sample_counter1+j;
+        end else begin
+          sample1 = {4{i[3:0]}};
+        end
+        tx_os_ex_dac_data[RX_OS_DMA_NP*(RX_OS_SAMPLES_PER_CHANNEL*i+j) +:RX_OS_DMA_NP] = sample1;
+      end
+    end
+    sample_counter1 = sample_counter1 + RX_OS_SAMPLES_PER_CHANNEL;
+  end
 
 endmodule
 

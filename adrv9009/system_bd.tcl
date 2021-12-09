@@ -41,24 +41,74 @@ global ad_project_params
 source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
 source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl
 
+set LINK_MODE  $ad_project_params(LINK_MODE)
+
+set JESD_8B10B 1
+set JESD_64B66B 2
+
+if {$LINK_MODE == $JESD_8B10B} {
+  set DATAPATH_WIDTH 4
+  set NP12_DATAPATH_WIDTH 6
+} else {
+  set DATAPATH_WIDTH 8
+  set NP12_DATAPATH_WIDTH 12
+}
+
 set dac_fifo_address_width $ad_project_params(DAC_FIFO_ADDRESS_WIDTH)
 set ENCODER_SEL 1
 set LANE_RATE $ad_project_params(LANE_RATE)
+set MAX_NUM_OF_CONVERTERS 4
 
 set TX_NUM_OF_LANES $ad_project_params(TX_JESD_L)
 set TX_NUM_OF_CONVERTERS $ad_project_params(TX_JESD_M)
 set TX_SAMPLES_PER_FRAME $ad_project_params(TX_JESD_S)
 set TX_SAMPLE_WIDTH $ad_project_params(TX_JESD_NP)
+set TX_JESD_F $ad_project_params(TX_JESD_F)
 
 set RX_NUM_OF_LANES $ad_project_params(RX_JESD_L)
 set RX_NUM_OF_CONVERTERS $ad_project_params(RX_JESD_M)
 set RX_SAMPLES_PER_FRAME $ad_project_params(RX_JESD_S)
 set RX_SAMPLE_WIDTH $ad_project_params(RX_JESD_NP)
+set RX_JESD_F $ad_project_params(RX_JESD_F)
 
 set RX_OS_NUM_OF_LANES $ad_project_params(RX_OS_JESD_L)
 set RX_OS_NUM_OF_CONVERTERS $ad_project_params(RX_OS_JESD_M)
 set RX_OS_SAMPLES_PER_FRAME $ad_project_params(RX_OS_JESD_S)
 set RX_OS_SAMPLE_WIDTH $ad_project_params(RX_OS_JESD_NP)
+set RX_OS_JESD_F $ad_project_params(RX_OS_JESD_F)
+
+# For F=3,6,12 use dual clock
+if {$RX_JESD_F % 3 == 0} {
+  set LL_OUT_BYTES [expr max($RX_JESD_F,$NP12_DATAPATH_WIDTH)]
+} else {
+  set LL_OUT_BYTES [expr max($RX_JESD_F,$DATAPATH_WIDTH)]
+}
+
+# For F=3,6,12 use dual clock
+if {$RX_OS_JESD_F % 3 == 0} {
+  set LL_OUT_BYTES1 [expr max($RX_OS_JESD_F,$NP12_DATAPATH_WIDTH)]
+} else {
+  set LL_OUT_BYTES1 [expr max($RX_OS_JESD_F,$DATAPATH_WIDTH)]
+}
+
+adi_sim_add_define LL_OUT_BYTES=$LL_OUT_BYTES
+adi_sim_add_define LL_OUT_BYTES1=$LL_OUT_BYTES1
+
+set RX_DMA_SAMPLE_WIDTH $ad_project_params(RX_JESD_NP)
+if {$RX_DMA_SAMPLE_WIDTH == 12} {
+  set RX_DMA_SAMPLE_WIDTH 16
+}
+
+set RX_OS_DMA_SAMPLE_WIDTH $ad_project_params(RX_OS_JESD_NP)
+if {$RX_OS_DMA_SAMPLE_WIDTH == 12} {
+  set RX_OS_DMA_SAMPLE_WIDTH 16
+}
+
+set TX_EX_DAC_DATA_WIDTH [expr $RX_NUM_OF_LANES * $LL_OUT_BYTES * 8]
+set TX_EX_SAMPLES_PER_CHANNEL [expr $TX_EX_DAC_DATA_WIDTH / $RX_NUM_OF_CONVERTERS / $RX_SAMPLE_WIDTH]
+
+set TX_OS_EX_DAC_DATA_WIDTH [expr $RX_OS_NUM_OF_LANES * $LL_OUT_BYTES1 * 8]
+set TX_OS_EX_SAMPLES_PER_CHANNEL [expr $TX_OS_EX_DAC_DATA_WIDTH / $RX_OS_NUM_OF_CONVERTERS / $RX_OS_SAMPLE_WIDTH]
 
 set TX_MAX_LANES 4
 set RX_MAX_LANES 2
@@ -112,7 +162,7 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 #  Block design under test
 #
 
-create_bd_port -dir I -type clk ref_clk 
+create_bd_port -dir I -type clk ref_clk_ex
 create_bd_port -dir I -type clk rx_device_clk
 create_bd_port -dir I -type clk tx_device_clk
 create_bd_port -dir I -type clk tx_os_device_clk
@@ -174,7 +224,7 @@ ad_connect $sys_cpu_resetn i_rx_jesd_exerciser/sys_cpu_resetn
 
 ad_connect rx_device_clk i_rx_jesd_exerciser/device_clk
 
-ad_connect ref_clk i_rx_jesd_exerciser/ref_clk
+ad_connect ref_clk_ex i_rx_jesd_exerciser/ref_clk
 
 set_property -dict [list CONFIG.NUM_MI {17}] [get_bd_cells axi_cpu_interconnect]
 ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M16_AXI
@@ -194,13 +244,22 @@ ad_connect $sys_cpu_resetn i_tx_jesd_exerciser/sys_cpu_resetn
 
 ad_connect tx_device_clk i_tx_jesd_exerciser/device_clk
 
-ad_connect ref_clk i_tx_jesd_exerciser/ref_clk
+ad_connect ref_clk_ex i_tx_jesd_exerciser/ref_clk
 
 set_property -dict [list CONFIG.NUM_MI {18}] [get_bd_cells axi_cpu_interconnect]
 ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M17_AXI
 
 create_bd_port -dir I ex_tx_sync
 ad_connect ex_tx_sync i_tx_jesd_exerciser/tx_sync_0
+
+for {set i 0} {$i < $MAX_NUM_OF_CONVERTERS} {incr i} {
+  create_bd_port -dir I -from [expr $TX_EX_SAMPLES_PER_CHANNEL*$RX_DMA_SAMPLE_WIDTH-1] -to 0 dac_data_$i
+  create_bd_port -dir I -from [expr $TX_OS_EX_SAMPLES_PER_CHANNEL*$RX_OS_DMA_SAMPLE_WIDTH-1] -to 0 dac_os_data_$i
+}
+
+for {set i 0} {$i < $RX_NUM_OF_CONVERTERS} {incr i} {
+  ad_connect dac_data_$i i_tx_jesd_exerciser/dac_data_${i}_0
+}
 
 # Tx Observation exerciser
 for {set i 0} {$i < $RX_OS_NUM_OF_LANES} {incr i} {
@@ -214,12 +273,16 @@ ad_connect $sys_cpu_resetn i_tx_os_jesd_exerciser/sys_cpu_resetn
 
 ad_connect tx_os_device_clk i_tx_os_jesd_exerciser/device_clk
 
-ad_connect ref_clk i_tx_os_jesd_exerciser/ref_clk
+ad_connect ref_clk_ex i_tx_os_jesd_exerciser/ref_clk
 
 set_property -dict [list CONFIG.NUM_MI {19}] [get_bd_cells axi_cpu_interconnect]
 ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M18_AXI
 
 create_bd_port -dir I ex_tx_os_sync
 ad_connect ex_tx_os_sync i_tx_os_jesd_exerciser/tx_sync_0
+
+for {set i 0} {$i < $RX_OS_NUM_OF_CONVERTERS} {incr i} {
+  ad_connect dac_os_data_$i i_tx_os_jesd_exerciser/dac_data_${i}_0
+}
 
 assign_bd_address

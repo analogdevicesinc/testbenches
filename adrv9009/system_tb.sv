@@ -114,7 +114,10 @@ module system_tb();
     .tx_data_2_n(dut2ex_serial_lane_n[2]),
     .tx_data_2_p(dut2ex_serial_lane_p[2]),
     .tx_data_3_n(dut2ex_serial_lane_n[1]),
-    .tx_data_3_p(dut2ex_serial_lane_p[1])
+    .tx_data_3_p(dut2ex_serial_lane_p[1]),
+    
+    .dac_fir_filter_active (1'b0),
+    .dac_fifo_bypass (1'b0)
   );
 
 endmodule

@@ -56,6 +56,8 @@ import adi_xcvr_pkg::*;
 `define AXI_JESD_RX    32'h44aa_0000
 `define AXI_JESD_TX    32'h44a9_0000
 
+`define TX_DMA  32'h7C42_0000
+
 `define ADC_TPL     32'h44a0_0000
 `define ADC_OS_TPL  32'h44a0_8000
 `define DAC_TPL     32'h44a0_4000
@@ -79,6 +81,8 @@ import adi_xcvr_pkg::*;
 `define AXI_CLKGEN_RX    32'h43c1_0000
 `define AXI_CLKGEN_RX_OS 32'h43c2_0000
 
+`define DDR_BASE  32'h44A0_0000
+
 `define LINK_MODE 2
 `define MODE_8B10B 1
 `define MODE_64B66B 2
@@ -93,7 +97,7 @@ program test_program;
   bit [31:0] lane_rate_khz = `LANE_RATE*1000000;
   longint lane_rate = lane_rate_khz*1000;
 
-  int use_dds = 1;
+  int use_dds = 0;
   real rx_sysref_clk, tx_sysref_clk, tx_os_sysref_clk, common_sysref_clk;
 
   jesd_link tx_link;
@@ -239,6 +243,24 @@ program test_program;
     dut_rx_os_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000, '{CPLL});
 
+    if (!use_dds) begin
+      for (int i=0;i<2048*2 ;i=i+2) begin
+        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
+      end
+
+      // Configure TX DMA
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_CONTROL),
+                         `SET_dmac_CONTROL_ENABLE(1));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_FLAGS),
+                         `SET_dmac_FLAGS_TLAST(1));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_X_LENGTH),
+                         `SET_dmac_X_LENGTH_X_LENGTH(32'h00000FFF));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_SRC_ADDRESS),
+                         `SET_dmac_SRC_ADDRESS_SRC_ADDRESS(`DDR_BASE+32'h00000000));
+      env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
+                         `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+      #5us;
+    end
 
     for (int i = 0; i < `TX_JESD_M; i++) begin
       if (use_dds) begin
@@ -271,8 +293,8 @@ program test_program;
 
 
     // Sync DDS cores
-    env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
-                       `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
+    // env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
+    //                    `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
 
 
     // -----------------------
@@ -292,38 +314,38 @@ program test_program;
     // -----------------------
     // bringup DUT RX path
     // -----------------------
-    env.mng.RegWrite32(`AXI_CLKGEN_RX + 'h40, 3);
-    ex_tx_xcvr.up();
-    ex_tx_ll.link_up();
+    // env.mng.RegWrite32(`AXI_CLKGEN_RX + 'h40, 3);
+    // ex_tx_xcvr.up();
+    // ex_tx_ll.link_up();
 
-    dut_rx_xcvr.up();
-    dut_rx_ll.link_up();
+    // dut_rx_xcvr.up();
+    // dut_rx_ll.link_up();
 
-    ex_tx_ll.wait_link_up();
-    dut_rx_ll.wait_link_up();
+    // ex_tx_ll.wait_link_up();
+    // dut_rx_ll.wait_link_up();
 
 
     // -----------------------
     // bringup DUT RX Observation path
     // -----------------------
-    env.mng.RegWrite32(`AXI_CLKGEN_RX_OS + 'h40, 3);
-    ex_tx_os_xcvr.up();
-    ex_tx_os_ll.link_up();
+    // env.mng.RegWrite32(`AXI_CLKGEN_RX_OS + 'h40, 3);
+    // ex_tx_os_xcvr.up();
+    // ex_tx_os_ll.link_up();
 
-    dut_rx_os_xcvr.up();
-    dut_rx_os_ll.link_up();
+    // dut_rx_os_xcvr.up();
+    // dut_rx_os_ll.link_up();
 
-    ex_tx_os_ll.wait_link_up();
-    dut_rx_os_ll.wait_link_up();
+    // ex_tx_os_ll.wait_link_up();
+    // dut_rx_os_ll.wait_link_up();
 
 
     // Move data around
     #10us;
-    ex_tx_os_xcvr.down();
-    dut_rx_os_xcvr.down();
+    // ex_tx_os_xcvr.down();
+    // dut_rx_os_xcvr.down();
     ex_rx_xcvr.down();
-    dut_rx_xcvr.down();
-    ex_tx_xcvr.down();
+    // dut_rx_xcvr.down();
+    // ex_tx_xcvr.down();
     dut_tx_xcvr.down();
 
 

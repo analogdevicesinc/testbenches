@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="adi_regmap_adc_pkg" />
+            <top_module name="adi_regmap_common_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="96.513344 us"></ZoomStartTime>
+      <ZoomEndTime time="109.347566 us"></ZoomEndTime>
+      <Cursor1Time time="103.240230 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="220"></NameColumnWidth>
+      <ValueColumnWidth column_width="169"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="42" />
+   <wvobject type="logic" fp_name="/system_tb/sync_n">
+      <obj_property name="ElementShortName">sync_n</obj_property>
+      <obj_property name="ObjectShortName">sync_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/sdr_ddr_n">
+      <obj_property name="ElementShortName">sdr_ddr_n</obj_property>
+      <obj_property name="ObjectShortName">sdr_ddr_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/ddr_edge_sel">
+      <obj_property name="ElementShortName">ddr_edge_sel</obj_property>
+      <obj_property name="ObjectShortName">ddr_edge_sel</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/num_lanes">
+      <obj_property name="ElementShortName">num_lanes[4:0]</obj_property>
+      <obj_property name="ObjectShortName">num_lanes[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/adc_rst">
+      <obj_property name="ElementShortName">adc_rst</obj_property>
+      <obj_property name="ObjectShortName">adc_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ssi_clk">
+      <obj_property name="ElementShortName">ssi_clk</obj_property>
+      <obj_property name="ObjectShortName">ssi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/cnv_clk">
+      <obj_property name="ElementShortName">cnv_clk</obj_property>
+      <obj_property name="ObjectShortName">cnv_clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/sample">
+      <obj_property name="ElementShortName">sample[19:0]</obj_property>
+      <obj_property name="ObjectShortName">sample[19:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/da_p">
+      <obj_property name="ElementShortName">da_p</obj_property>
+      <obj_property name="ObjectShortName">da_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/da_n">
+      <obj_property name="ElementShortName">da_n</obj_property>
+      <obj_property name="ObjectShortName">da_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/db_p">
+      <obj_property name="ElementShortName">db_p</obj_property>
+      <obj_property name="ObjectShortName">db_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/db_n">
+      <obj_property name="ElementShortName">db_n</obj_property>
+      <obj_property name="ObjectShortName">db_n</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/adc_data">
+      <obj_property name="ElementShortName">adc_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/adc_valid">
+      <obj_property name="ElementShortName">adc_valid</obj_property>
+      <obj_property name="ObjectShortName">adc_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/sync_n">
+      <obj_property name="ElementShortName">sync_n</obj_property>
+      <obj_property name="ObjectShortName">sync_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider21" type="divider">
+      <obj_property name="label">PHY Internals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group56">
+      <obj_property name="label">Clk divider</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/\genblk1.i_div_clk_buf /O">
+         <obj_property name="ElementShortName">O</obj_property>
+         <obj_property name="ObjectShortName">O</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/\genblk1.i_div_clk_buf /CLR">
+         <obj_property name="ElementShortName">CLR</obj_property>
+         <obj_property name="ObjectShortName">CLR</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/\genblk1.i_div_clk_buf /I">
+         <obj_property name="ElementShortName">I</obj_property>
+         <obj_property name="ObjectShortName">I</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/i_serdes/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/i_serdes/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/i_serdes/div_clk">
+      <obj_property name="ElementShortName">div_clk</obj_property>
+      <obj_property name="ObjectShortName">div_clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/serdes_data_0">
+      <obj_property name="ElementShortName">serdes_data_0[7:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_data_0[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/serdes_data_4_lane0">
+      <obj_property name="ElementShortName">serdes_data_4_lane0[3:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_data_4_lane0[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/serdes_valid[1]">
+      <obj_property name="ElementShortName">[1]</obj_property>
+      <obj_property name="ObjectShortName">[1]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/packed_4_20">
+      <obj_property name="ElementShortName">packed_4_20[19:0]</obj_property>
+      <obj_property name="ObjectShortName">packed_4_20[19:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/pack4_valid">
+      <obj_property name="ElementShortName">pack4_valid</obj_property>
+      <obj_property name="ObjectShortName">pack4_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/serdes_valid">
+      <obj_property name="ElementShortName">serdes_valid[1:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_valid[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/shift_cnt">
+      <obj_property name="ElementShortName">shift_cnt[4:0]</obj_property>
+      <obj_property name="ObjectShortName">shift_cnt[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider21" type="divider">
+      <obj_property name="label">DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_dma/fifo_wr_xfer_req">
+      <obj_property name="ElementShortName">fifo_wr_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_xfer_req</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_dma/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_dma/fifo_wr_din">
+      <obj_property name="ElementShortName">fifo_wr_din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_din[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_ad4080_dma/m_dest_axi">
+      <obj_property name="ElementShortName">m_dest_axi</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi</obj_property>
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/axi_ad4080_dma/m_dest_axi.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/adc_valid">
+      <obj_property name="ElementShortName">adc_valid</obj_property>
+      <obj_property name="ObjectShortName">adc_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/adc_rst">
+      <obj_property name="ElementShortName">adc_rst</obj_property>
+      <obj_property name="ObjectShortName">adc_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/packed_data_valid">
+      <obj_property name="ElementShortName">packed_data_valid</obj_property>
+      <obj_property name="ObjectShortName">packed_data_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/packed_data">
+      <obj_property name="ElementShortName">packed_data[19:0]</obj_property>
+      <obj_property name="ObjectShortName">packed_data[19:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/packed_data_d">
+      <obj_property name="ElementShortName">packed_data_d[19:0]</obj_property>
+      <obj_property name="ObjectShortName">packed_data_d[19:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/adc_data_shifted">
+      <obj_property name="ElementShortName">adc_data_shifted[19:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_shifted[19:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/adc_valid">
+      <obj_property name="ElementShortName">adc_valid</obj_property>
+      <obj_property name="ObjectShortName">adc_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/shift_cnt">
+      <obj_property name="ElementShortName">shift_cnt[4:0]</obj_property>
+      <obj_property name="ObjectShortName">shift_cnt[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/i_ad_pack_4/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/i_ad_pack_4/ivalid">
+      <obj_property name="ElementShortName">ivalid</obj_property>
+      <obj_property name="ObjectShortName">ivalid</obj_property>
+   </wvobject>
+</wave_config>

@@ -116,6 +116,10 @@ proc create_jesd_exerciser { \
 
   if {$TX_OR_RX_N == 1} {
     ad_connect tx_tpl_core/link axi_jesd/tx_data
+
+    for {set i 0} {$i < $NUM_OF_CONVERTERS} {incr i} {
+      make_bd_pins_external [get_bd_pins tx_tpl_core/dac_data_$i]
+    }
   } else {
     ad_connect axi_jesd/rx_data_tdata  rx_tpl_core/link_data
     ad_connect axi_jesd/rx_data_tvalid rx_tpl_core/link_valid

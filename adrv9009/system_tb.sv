@@ -39,6 +39,11 @@
 
 module system_tb();
  
+  localparam RX_SAMPLES_PER_CHANNEL = (`RX_JESD_L*`LL_OUT_BYTES*8) / `RX_JESD_M / `RX_JESD_NP;
+  localparam RX_DMA_NP = `RX_JESD_NP == 12 ? 16 : `RX_JESD_NP;
+  
+  reg [`RX_JESD_M*RX_SAMPLES_PER_CHANNEL*RX_DMA_NP-1:0] tx_ex_dac_data = 'h0;
+
   wire rx_sync;
   wire tx_sync;
   wire tx_os_sync;
@@ -116,9 +121,34 @@ module system_tb();
     .tx_data_3_n(dut2ex_serial_lane_n[1]),
     .tx_data_3_p(dut2ex_serial_lane_p[1]),
     
+    .dac_data_0(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*0 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+    .dac_data_1(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*1 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+    .dac_data_2(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*2 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+    .dac_data_3(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*3 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
+    
     .dac_fir_filter_active (1'b0),
+    .adc_fir_filter_active (1'b0),
     .dac_fifo_bypass (1'b0)
   );
+
+  reg [RX_DMA_NP-1:0] sample = 'h0;
+  integer sample_couter = 0;
+  always @(posedge tx_device_clk) begin
+    for (int i = 0; i < `RX_JESD_M; i++) begin
+      for (int j = 0; j < RX_SAMPLES_PER_CHANNEL; j++) begin
+        // First 256 sample is channel count on each nibble
+        // Next 256 sample is channel count on MS nibble and incr pattern
+        if (sample_couter[9] | 1) begin
+          sample[RX_DMA_NP-1 -: 4] = i;
+          sample[7:0] = sample_couter+j;
+        end else begin
+          sample = {4{i[3:0]}};
+        end
+        tx_ex_dac_data[RX_DMA_NP*(RX_SAMPLES_PER_CHANNEL*i+j) +:RX_DMA_NP] = sample;
+      end
+    end
+    sample_couter = sample_couter + RX_SAMPLES_PER_CHANNEL;
+  end
 
 endmodule
 

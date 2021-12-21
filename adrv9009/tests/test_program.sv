@@ -57,12 +57,14 @@ import adi_xcvr_pkg::*;
 `define AXI_JESD_TX    32'h44a9_0000
 
 `define TX_DMA  32'h7C42_0000
+`define RX_DMA  32'h7C40_0000
 
 `define ADC_TPL     32'h44a0_0000
 `define ADC_OS_TPL  32'h44a0_8000
 `define DAC_TPL     32'h44a0_4000
 
 `define EX_ADC_TPL  32'h0006_0000
+`define EX_DAC_TPL  32'h0007_0000
 
 `define DUT_AXI_XCVR_RX_OS 32'h44a5_0000
 `define DUT_AXI_XCVR_RX    32'h44a6_0000
@@ -243,6 +245,179 @@ program test_program;
     dut_rx_os_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000, '{CPLL});
 
+    // if (!use_dds) begin
+    //   for (int i=0;i<2048*2 ;i=i+2) begin
+    //     env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
+    //   end
+
+    //   // Configure TX DMA
+    //   env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_CONTROL),
+    //                      `SET_dmac_CONTROL_ENABLE(1));
+    //   env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_FLAGS),
+    //                      `SET_dmac_FLAGS_TLAST(1));
+    //   env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_X_LENGTH),
+    //                      `SET_dmac_X_LENGTH_X_LENGTH(32'h00000FFF));
+    //   env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_SRC_ADDRESS),
+    //                      `SET_dmac_SRC_ADDRESS_SRC_ADDRESS(`DDR_BASE+32'h00000000));
+    //   env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
+    //                      `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+    //   #5us;
+    // end
+
+    for (int i = 0; i < `RX_JESD_M; i++) begin
+      if (use_dds) begin
+        // Select DDS as source
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
+        // Configure tone amplitude and frequency
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
+
+      end else begin
+        // Set DMA as source for DAC TPL
+        env.mng.RegWrite32(`EX_DAC_TPL+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
+                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
+      end
+    end
+
+    for (int i = 0; i < `RX_JESD_M; i++) begin
+      env.mng.RegWrite32(`ADC_TPL+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+                         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+    end
+
+
+    env.mng.RegWrite32(`EX_DAC_TPL+GetAddrs(DAC_COMMON_REG_RSTN),
+                       `SET_DAC_COMMON_REG_RSTN_RSTN(1));
+    env.mng.RegWrite32(`ADC_TPL+GetAddrs(ADC_COMMON_REG_RSTN),
+                       `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+
+
+    // Sync DDS cores
+    // env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
+    //                    `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
+
+
+    // -----------------------
+    // bringup DUT TX path
+    // -----------------------
+    // env.mng.RegWrite32(`AXI_CLKGEN_TX + 'h40, 3);
+    // dut_tx_xcvr.up();
+    // dut_tx_ll.link_up();
+
+    // ex_rx_xcvr.up();
+    // ex_rx_ll.link_up();
+
+    // dut_tx_ll.wait_link_up();
+    // ex_rx_ll.wait_link_up();
+
+    
+    // -----------------------
+    // bringup DUT RX path
+    // -----------------------
+
+    // Configure RX DMA
+    env.mng.RegWrite32(`AXI_CLKGEN_RX + 'h40, 3);
+    ex_tx_xcvr.up();
+    ex_tx_ll.link_up();
+
+    dut_rx_xcvr.up();
+    dut_rx_ll.link_up();
+
+    ex_tx_ll.wait_link_up();
+    dut_rx_ll.wait_link_up();
+
+    #10us;
+
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_CONTROL),
+                       `SET_dmac_CONTROL_ENABLE(1));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_FLAGS),
+                       `SET_dmac_FLAGS_TLAST(1));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_X_LENGTH),
+                       `SET_dmac_X_LENGTH_X_LENGTH(32'h000003DF));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_DEST_ADDRESS),
+                       `SET_dmac_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00001000));
+    env.mng.RegWrite32(`RX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
+                       `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+
+    #5us;
+
+    check_captured_data(
+      .address (`DDR_BASE+'h00001000),
+      .length (992),
+      .step (1),
+      .max_sample(2048)
+    );
+    // -----------------------
+    // bringup DUT RX Observation path
+    // -----------------------
+    // env.mng.RegWrite32(`AXI_CLKGEN_RX_OS + 'h40, 3);
+    // ex_tx_os_xcvr.up();
+    // ex_tx_os_ll.link_up();
+
+    // dut_rx_os_xcvr.up();
+    // dut_rx_os_ll.link_up();
+
+    // ex_tx_os_ll.wait_link_up();
+    // dut_rx_os_ll.wait_link_up();
+
+
+    // Move data around
+    #10us;
+    // ex_tx_os_xcvr.down();
+    // dut_rx_os_xcvr.down();
+    // ex_rx_xcvr.down();
+    dut_rx_xcvr.down();
+    ex_tx_xcvr.down();
+    // dut_tx_xcvr.down();
+
+
+    `INFO(("======================="));
+    `INFO(("  JESD LINK TEST DONE  "));
+    `INFO(("======================="));
+
+
+  end
+ 
+  task check_captured_data(bit [31:0] address,
+                           int length = 1024,
+                           int step = 1,
+                           int max_sample = 2048
+                          );
+
+    bit [31:0] current_address;
+    bit [31:0] captured_word;
+    bit [31:0] reference_word;
+    bit [7:0] first, second;
+
+    for (int i=0;i<length/2;i=i+2) begin
+      current_address = address+(i*2);
+      captured_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_address);
+      if (i==0) begin
+        first = captured_word[15:8];
+        second = captured_word[7:0];
+        //`INFO(("Capture Word: 0x%h First: 0x%h, Second: 0x%h\n",captured_word, first, second));
+      end else begin
+        // reference_word = (((first  + (i+1)*step)%max_sample) << 16) | ((first + (i*step))%max_sample);
+        reference_word = {(first + 8'h10), second, first, second};
+
+        if (captured_word !== reference_word) begin
+          `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
+        end
+      end
+
+      if (first == 8'h20) begin
+        first = 8'h00;
+        second = second + 1'h1;
+      end else begin
+        first = 8'h20;
+      end
+
+    end
+  endtask
+
+  task tx_tpl_test();
     if (!use_dds) begin
       for (int i=0;i<2048*2 ;i=i+2) begin
         env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
@@ -291,69 +466,11 @@ program test_program;
     env.mng.RegWrite32(`EX_ADC_TPL+GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
-
-    // Sync DDS cores
-    // env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
-    //                    `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-
-
-    // -----------------------
-    // bringup DUT TX path
-    // -----------------------
-    env.mng.RegWrite32(`AXI_CLKGEN_TX + 'h40, 3);
-    dut_tx_xcvr.up();
-    dut_tx_ll.link_up();
-
-    ex_rx_xcvr.up();
-    ex_rx_ll.link_up();
-
-    dut_tx_ll.wait_link_up();
-    ex_rx_ll.wait_link_up();
-
-
-    // -----------------------
-    // bringup DUT RX path
-    // -----------------------
-    // env.mng.RegWrite32(`AXI_CLKGEN_RX + 'h40, 3);
-    // ex_tx_xcvr.up();
-    // ex_tx_ll.link_up();
-
-    // dut_rx_xcvr.up();
-    // dut_rx_ll.link_up();
-
-    // ex_tx_ll.wait_link_up();
-    // dut_rx_ll.wait_link_up();
-
-
-    // -----------------------
-    // bringup DUT RX Observation path
-    // -----------------------
-    // env.mng.RegWrite32(`AXI_CLKGEN_RX_OS + 'h40, 3);
-    // ex_tx_os_xcvr.up();
-    // ex_tx_os_ll.link_up();
-
-    // dut_rx_os_xcvr.up();
-    // dut_rx_os_ll.link_up();
-
-    // ex_tx_os_ll.wait_link_up();
-    // dut_rx_os_ll.wait_link_up();
-
-
-    // Move data around
-    #10us;
-    // ex_tx_os_xcvr.down();
-    // dut_rx_os_xcvr.down();
-    ex_rx_xcvr.down();
-    // dut_rx_xcvr.down();
-    // ex_tx_xcvr.down();
-    dut_tx_xcvr.down();
-
-
-    `INFO(("======================="));
-    `INFO(("  JESD LINK TEST DONE  "));
-    `INFO(("======================="));
-
-
-  end
+    if (use_dds) begin
+      // Sync DDS cores
+      env.mng.RegWrite32(`DAC_TPL+GetAddrs(DAC_COMMON_REG_CNTRL_1),
+                         `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
+    end
+  endtask
 
 endprogram

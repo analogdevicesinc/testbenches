@@ -1,6 +1,6 @@
 global ad_project_params
 
-set ad_project_params(JESD_MODE) 8B10B
+set ad_project_params(LINK_MODE) 1
 
 set ad_project_params(REF_CLK_RATE) 500
 set ad_project_params(LANE_RATE) 10

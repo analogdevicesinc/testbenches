@@ -41,6 +41,19 @@ global ad_project_params
 source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
 source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl
 
+set LINK_MODE  $ad_project_params(LINK_MODE)
+
+set JESD_8B10B 1
+set JESD_64B66B 2
+
+if {$LINK_MODE == $JESD_8B10B} {
+  set DATAPATH_WIDTH 4
+  set NP12_DATAPATH_WIDTH 6
+} else {
+  set DATAPATH_WIDTH 8
+  set NP12_DATAPATH_WIDTH 12
+}
+
 set dac_fifo_address_width $ad_project_params(DAC_FIFO_ADDRESS_WIDTH)
 set ENCODER_SEL 1
 set LANE_RATE $ad_project_params(LANE_RATE)
@@ -54,6 +67,24 @@ set RX_NUM_OF_LANES $ad_project_params(RX_JESD_L)
 set RX_NUM_OF_CONVERTERS $ad_project_params(RX_JESD_M)
 set RX_SAMPLES_PER_FRAME $ad_project_params(RX_JESD_S)
 set RX_SAMPLE_WIDTH $ad_project_params(RX_JESD_NP)
+
+set RX_JESD_F $ad_project_params(RX_JESD_F)
+# For F=3,6,12 use dual clock
+if {$RX_JESD_F % 3 == 0} {
+  set LL_OUT_BYTES [expr max($RX_JESD_F,$NP12_DATAPATH_WIDTH)]
+} else {
+  set LL_OUT_BYTES [expr max($RX_JESD_F,$DATAPATH_WIDTH)]
+}
+
+adi_sim_add_define LL_OUT_BYTES=$LL_OUT_BYTES
+
+set RX_DMA_SAMPLE_WIDTH $ad_project_params(RX_JESD_NP)
+if {$RX_DMA_SAMPLE_WIDTH == 12} {
+  set RX_DMA_SAMPLE_WIDTH 16
+}
+
+set TX_EX_DAC_DATA_WIDTH [expr $RX_NUM_OF_LANES * $LL_OUT_BYTES * 8]
+set TX_EX_SAMPLES_PER_CHANNEL [expr $TX_EX_DAC_DATA_WIDTH / $RX_NUM_OF_CONVERTERS / $RX_SAMPLE_WIDTH]
 
 set RX_OS_NUM_OF_LANES $ad_project_params(RX_OS_JESD_L)
 set RX_OS_NUM_OF_CONVERTERS $ad_project_params(RX_OS_JESD_M)
@@ -201,6 +232,12 @@ ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M17_AXI
 
 create_bd_port -dir I ex_tx_sync
 ad_connect ex_tx_sync i_tx_jesd_exerciser/tx_sync_0
+
+for {set i 0} {$i < $RX_NUM_OF_CONVERTERS} {incr i} {
+  create_bd_port -dir I -from [expr $TX_EX_SAMPLES_PER_CHANNEL*$RX_DMA_SAMPLE_WIDTH-1] -to 0 dac_data_$i
+  ad_connect dac_data_$i i_tx_jesd_exerciser/dac_data_${i}_0
+}
+
 
 # Tx Observation exerciser
 for {set i 0} {$i < $RX_OS_NUM_OF_LANES} {incr i} {

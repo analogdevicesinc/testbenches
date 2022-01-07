@@ -6,3 +6,5 @@ set ad_project_params(SINGLE_LANE) 0
 set ad_project_params(USE_RX_CLK_FOR_TX) 0
 set ad_project_params(SYMB_OP) 0
 set ad_project_params(SYMB_8_16B) 0
+set ad_project_params(DDS_DISABLE) 0
+

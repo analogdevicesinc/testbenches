@@ -191,8 +191,17 @@ program test_program;
 
     // independent R1T1 tests
     R1_MODE = 1;
-
+    // enable normal data path for RX2
+    #100 axi_write (RX2_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(0));
+    if(!(SYMB_OP[0])) begin
+    #100 axi_write (RX2_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(0));
+    end
     dma_test_ch2;
+
+    // Test internal loopback DAC2->ADC2
+    loopback_test_ch2;
 
     `INFO(("Test Done"));
 
@@ -490,6 +499,8 @@ program test_program;
       end else begin
       env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i,15);
       end
+      // Clear destination region
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+'h2000+i*2,'hBEEF,15);
     end
 
     // Configure TX DMA
@@ -593,6 +604,8 @@ program test_program;
       end else begin
       env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i,15);
       end
+      // Clear destination region
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+'h2000+i*2,'hBEEF,15);
     end
 
     // Configure TX DMA
@@ -610,13 +623,7 @@ program test_program;
       `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
     end
 
-    // enable normal data path for RX1
-    #100 axi_write (RX2_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
-      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(0));
-    if(!(SYMB_OP[0])) begin
-    #100 axi_write (RX2_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
-      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(0));
-    end
+
 
     // Enable Rx channel, enable sign extension
     #100 axi_write (RX2_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
@@ -700,6 +707,15 @@ program test_program;
 
     end
   endtask
+
+  task loopback_test_ch2();
+    // Enable internal loopback
+    #100 axi_write (RX2_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
+    #100 axi_write (RX2_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
+    dma_test_ch2;
+  endtask: loopback_test_ch2
 
 endprogram
 

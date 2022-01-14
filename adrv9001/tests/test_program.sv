@@ -474,9 +474,6 @@ program test_program;
     // SYNC DAC channels
     axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_1),
       `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-    // SYNC ADC channels
-    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),
-      `SET_ADC_COMMON_REG_CNTRL_SYNC(1));
 
     #20000;
 
@@ -560,9 +557,6 @@ program test_program;
     // SYNC DAC channels
     axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_1),
       `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-    // SYNC ADC channels
-    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),
-      `SET_ADC_COMMON_REG_CNTRL_SYNC(1));
 
     link_setup;
 
@@ -641,9 +635,6 @@ program test_program;
     // SYNC DAC channels
     axi_write (TX2_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_1),
       `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-    // SYNC ADC channels
-    axi_write (RX2_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),
-      `SET_ADC_COMMON_REG_CNTRL_SYNC(1));
 
     link_setup(0,1,0,1);
 

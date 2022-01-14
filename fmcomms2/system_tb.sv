@@ -41,13 +41,17 @@ module system_tb();
 
   wire [5:0] tx_data_out_n;
   wire [5:0] tx_data_out_p;
+  wire       tdd_sync_ext;
 
-  `TEST_PROGRAM test();
+  `TEST_PROGRAM test(
+    .tdd_sync_ext(tdd_sync_ext)
+  );
 
   test_harness `TH (
     .ssi_clk_out (ssi_clk),
 
     .enable (enable),
+    .tdd_sync_ext (tdd_sync_ext),
 
     .rx_clk_in_n (rx_clk_in_n),
     .rx_clk_in_p (rx_clk_in_p),

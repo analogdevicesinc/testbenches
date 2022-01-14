@@ -17,6 +17,7 @@ SV_DEPS += ../common/sv/adi_regmap_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_dac_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_adc_pkg.sv
+SV_DEPS += ../common/sv/adi_regmap_tdd_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_common_pkg.sv
 SV_DEPS += ../common/sv/dma_trans.sv
 SV_DEPS += ../common/sv/axi_dmac_pkg.sv
@@ -38,6 +39,7 @@ LIB_DEPS += util_rfifo
 LIB_DEPS += util_tdd_sync
 LIB_DEPS += util_wfifo
 LIB_DEPS += xilinx/util_clkdiv
+LIB_DEPS += axi_tdd
 
 # default test program
 TP := test_program

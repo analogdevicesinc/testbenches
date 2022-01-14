@@ -200,11 +200,13 @@ program test_program;
 
     // Test internal loopback DAC2->ADC2
     // Enable internal loopback
-    axi_write (RX2_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
-      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
-    axi_write (RX2_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
-      `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
-    dma_test_ch2;
+    if (!(SYMB_OP[0] & SYMB_8_16B[0])) begin
+      axi_write (RX2_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
+      axi_write (RX2_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
+      dma_test_ch2;
+    end
 
     `INFO(("Test Done"));
 

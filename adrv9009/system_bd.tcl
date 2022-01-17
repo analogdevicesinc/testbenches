@@ -68,7 +68,13 @@ set RX_NUM_OF_CONVERTERS $ad_project_params(RX_JESD_M)
 set RX_SAMPLES_PER_FRAME $ad_project_params(RX_JESD_S)
 set RX_SAMPLE_WIDTH $ad_project_params(RX_JESD_NP)
 
+set RX_OS_NUM_OF_LANES $ad_project_params(RX_OS_JESD_L)
+set RX_OS_NUM_OF_CONVERTERS $ad_project_params(RX_OS_JESD_M)
+set RX_OS_SAMPLES_PER_FRAME $ad_project_params(RX_OS_JESD_S)
+set RX_OS_SAMPLE_WIDTH $ad_project_params(RX_OS_JESD_NP)
+
 set RX_JESD_F $ad_project_params(RX_JESD_F)
+set RX_OS_JESD_F $ad_project_params(RX_OS_JESD_F)
 # For F=3,6,12 use dual clock
 if {$RX_JESD_F % 3 == 0} {
   set LL_OUT_BYTES [expr max($RX_JESD_F,$NP12_DATAPATH_WIDTH)]
@@ -76,20 +82,31 @@ if {$RX_JESD_F % 3 == 0} {
   set LL_OUT_BYTES [expr max($RX_JESD_F,$DATAPATH_WIDTH)]
 }
 
+# For F=3,6,12 use dual clock
+if {$RX_OS_JESD_F % 3 == 0} {
+  set LL_OUT_BYTES1 [expr max($RX_OS_JESD_F,$NP12_DATAPATH_WIDTH)]
+} else {
+  set LL_OUT_BYTES1 [expr max($RX_OS_JESD_F,$DATAPATH_WIDTH)]
+}
+
 adi_sim_add_define LL_OUT_BYTES=$LL_OUT_BYTES
+adi_sim_add_define LL_OUT_BYTES1=$LL_OUT_BYTES1
 
 set RX_DMA_SAMPLE_WIDTH $ad_project_params(RX_JESD_NP)
 if {$RX_DMA_SAMPLE_WIDTH == 12} {
   set RX_DMA_SAMPLE_WIDTH 16
 }
 
+set RX_OS_DMA_SAMPLE_WIDTH $ad_project_params(RX_OS_JESD_NP)
+if {$RX_OS_DMA_SAMPLE_WIDTH == 12} {
+  set RX_OS_DMA_SAMPLE_WIDTH 16
+}
+
 set TX_EX_DAC_DATA_WIDTH [expr $RX_NUM_OF_LANES * $LL_OUT_BYTES * 8]
 set TX_EX_SAMPLES_PER_CHANNEL [expr $TX_EX_DAC_DATA_WIDTH / $RX_NUM_OF_CONVERTERS / $RX_SAMPLE_WIDTH]
 
-set RX_OS_NUM_OF_LANES $ad_project_params(RX_OS_JESD_L)
-set RX_OS_NUM_OF_CONVERTERS $ad_project_params(RX_OS_JESD_M)
-set RX_OS_SAMPLES_PER_FRAME $ad_project_params(RX_OS_JESD_S)
-set RX_OS_SAMPLE_WIDTH $ad_project_params(RX_OS_JESD_NP)
+set TX_OS_EX_DAC_DATA_WIDTH [expr $RX_OS_NUM_OF_LANES * $LL_OUT_BYTES1 * 8]
+set TX_OS_EX_SAMPLES_PER_CHANNEL [expr $TX_OS_EX_DAC_DATA_WIDTH / $RX_OS_NUM_OF_CONVERTERS / $RX_OS_SAMPLE_WIDTH]
 
 set TX_MAX_LANES 4
 set RX_MAX_LANES 2
@@ -258,5 +275,10 @@ ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M18_AXI
 
 create_bd_port -dir I ex_tx_os_sync
 ad_connect ex_tx_os_sync i_tx_os_jesd_exerciser/tx_sync_0
+
+for {set i 0} {$i < $RX_OS_NUM_OF_CONVERTERS} {incr i} {
+  create_bd_port -dir I -from [expr $TX_OS_EX_SAMPLES_PER_CHANNEL*$RX_OS_DMA_SAMPLE_WIDTH-1] -to 0 dac_os_data_$i
+  ad_connect dac_os_data_$i i_tx_os_jesd_exerciser/dac_data_${i}_0
+}
 
 assign_bd_address

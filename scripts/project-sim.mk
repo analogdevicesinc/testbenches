@@ -67,7 +67,7 @@ $(addprefix runs/,$(1)/system_project.log) : library $(addprefix cfgs/,$(1).tcl)
 	mkdir -p runs
 	mkdir -p $(addprefix runs/,$(1))
 	mkdir -p results
-	$$(call simulate, \
+	$(RUN_PRE_OPT)$$(call simulate, \
 		$(CMD_PRE) $(M_VIVADO_BATCH) system_project.tcl -tclargs $(1).tcl $(CMD_POST), \
 		$$@, \
 		Building $(HL)$(strip $(1))$(NC) env, \
@@ -81,7 +81,7 @@ endef
 define sim
 $(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
 $(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS)
-	-$$(call simulate, \
+	$(RUN_PRE_OPT)$$(call simulate, \
 		$(CMD_PRE) $(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST), \
 		$$@, \
 		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
@@ -99,6 +99,14 @@ endif
 endif
 
 MODE ?= "batch"
+
+STOP_ON_ERROR ?= y
+
+ifeq ($(STOP_ON_ERROR), y)
+	RUN_PRE_OPT =
+else
+	RUN_PRE_OPT = -
+endif
 
 M_VIVADO := vivado -nolog -nojournal -mode ${MODE} -source
 M_VIVADO_BATCH := vivado -nolog -nojournal -mode batch -source

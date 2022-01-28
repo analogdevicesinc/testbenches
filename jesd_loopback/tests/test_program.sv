@@ -146,6 +146,11 @@ program test_program;
     // Check link restart counter
     env.mng.RegReadVerify32(`AXI_JESD_RX + 'h2c4, 1);
 
+    // =======================
+    // TPL SYNC control test 
+    // =======================
+    arm_disarm_test();
+
 
     `INFO(("======================="));
     `INFO(("      TB   DONE        "));
@@ -222,16 +227,19 @@ program test_program;
 
     // Arm external sync
     env.mng.RegWrite32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_CNTRL_1),2);
+    env.mng.RegWrite32(`ADC_TPL + 'h48,2);
     #1us;
     // Check if armed
     env.mng.RegReadVerify32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(1));
+    env.mng.RegReadVerify32(`ADC_TPL + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
+                            `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(1));
     #1us;
     // Trigger external sync
     @(posedge system_tb.device_clk);
-    system_tb.dac_sync <= 1'b1;
+    system_tb.ext_sync <= 1'b1;
     @(posedge system_tb.device_clk);
-    system_tb.dac_sync <= 1'b0;
+    system_tb.ext_sync <= 1'b0;
 
     #1us;
     // Check if trigger captured
@@ -297,6 +305,38 @@ program test_program;
     `INFO(("======================="));
 
   endtask : jesd_link_test
+
+  // -----------------
+  //
+  // -----------------
+  task arm_disarm_test();
+    // Arm external sync
+    env.mng.RegWrite32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_CNTRL_1),2);
+    env.mng.RegWrite32(`ADC_TPL + 'h48,2);
+    #1us;
+    
+    // Check if armed
+    env.mng.RegReadVerify32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
+                            `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(1));
+    env.mng.RegReadVerify32(`ADC_TPL + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
+                            `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(1));
+                            
+    // DisArm external sync
+    env.mng.RegWrite32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_CNTRL_1),4);
+    env.mng.RegWrite32(`ADC_TPL + 'h48,4);    
+    #1us;
+                              
+    // Check if disarmed
+    env.mng.RegReadVerify32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
+                            `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(0));
+    env.mng.RegReadVerify32(`ADC_TPL + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
+                            `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(0));                           
+    `INFO(("======================="));
+    `INFO(("  ARM-DISARM TEST DONE "));
+    `INFO(("======================="));
+                            
+  endtask : arm_disarm_test
+
 
   // -----------------
   //

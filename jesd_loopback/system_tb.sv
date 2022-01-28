@@ -45,7 +45,7 @@ module system_tb();
   localparam MAX_CHANNLES = 32;
 
   reg [`JESD_M*SAMPLES_PER_CHANNEL*DMA_NP-1:0] dac_data = 'h0;
-  reg dac_sync = 1'b0;
+  reg ext_sync = 1'b0;
 
   reg sysref_s = 1'b0;
   reg sysref_d = 1'b0;
@@ -152,7 +152,7 @@ module system_tb();
     .tx_sysref_0(sysref_s),
     .tx_sync_0(sync_0),
 
-    .dac_sync_in_0 (dac_sync),
+    .ext_sync_in(ext_sync),
 
     .dac_data_0(dac_data[SAMPLES_PER_CHANNEL*DMA_NP*0 +: SAMPLES_PER_CHANNEL*DMA_NP]),
     .dac_data_1(dac_data[SAMPLES_PER_CHANNEL*DMA_NP*1 +: SAMPLES_PER_CHANNEL*DMA_NP]),

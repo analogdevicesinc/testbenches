@@ -133,9 +133,12 @@ adi_tpl_jesd204_tx_create dac_jesd204_transport $NUM_OF_LANES \
                                                 $SAMPLE_WIDTH \
                                                 $LL_OUT_BYTES \
                                                 $DMA_SAMPLE_WIDTH
+
+create_bd_port -dir I ext_sync_in
+
 # Enable DAC external sync
 ad_ip_parameter dac_jesd204_transport/dac_tpl_core CONFIG.EXT_SYNC 1
-make_bd_pins_external  [get_bd_pins dac_jesd204_transport/dac_tpl_core/dac_sync_in]
+ad_connect ext_sync_in dac_jesd204_transport/dac_tpl_core/dac_sync_in
 
 # RX JESD204 PHY layer peripheral
 ad_ip_instance axi_adxcvr adc_jesd204_xcvr [list \
@@ -159,6 +162,9 @@ adi_tpl_jesd204_rx_create adc_jesd204_transport $NUM_OF_LANES \
                                                 $SAMPLE_WIDTH \
                                                 $LL_OUT_BYTES \
                                                 $DMA_SAMPLE_WIDTH
+# Enable ADC external sync
+ad_ip_parameter adc_jesd204_transport/adc_tpl_core CONFIG.EXT_SYNC 1
+ad_connect ext_sync_in adc_jesd204_transport/adc_tpl_core/adc_sync_in
 
 ad_ip_instance util_adxcvr util_jesd204_xcvr [list \
   LINK_MODE $LINK_MODE \
@@ -225,4 +231,17 @@ for {set i $NUM_OF_CONVERTERS} {$i < $MAX_CONVERTERS} {incr i} {
 
 make_bd_pins_external  [get_bd_pins /dac_jesd204_transport/dac_dunf]
 make_bd_pins_external  [get_bd_pins /adc_jesd204_transport/adc_dovf]
+
+
+
+ad_ip_instance util_vector_logic manual_sync_or [list \
+  C_SIZE 1 \
+  C_OPERATION {or} \
+]
+
+ad_connect adc_jesd204_transport/adc_tpl_core/adc_sync_manual_req_out manual_sync_or/Op1
+ad_connect dac_jesd204_transport/dac_tpl_core/dac_sync_manual_req_out manual_sync_or/Op2
+
+ad_connect manual_sync_or/Res dac_jesd204_transport/dac_tpl_core/dac_sync_manual_req_in
+ad_connect manual_sync_or/Res adc_jesd204_transport/adc_tpl_core/adc_sync_manual_req_in
 

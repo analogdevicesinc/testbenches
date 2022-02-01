@@ -86,10 +86,10 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 #
 source $ad_hdl_dir/projects/ad9081_fmca_ebz/common/ad9081_fmca_ebz_bd.tcl
 
-if {$ad_project_params(JESD_MODE) == "8B10B"} {
-} else {
-  ad_connect  drp_clk_vip/clk_out jesd204_phy_121/drpclk
-  ad_connect  drp_clk_vip/clk_out jesd204_phy_126/drpclk
-}
+#if {$ad_project_params(JESD_MODE) == "8B10B"} {
+#} else {
+#  ad_connect  drp_clk_vip/clk_out jesd204_phy_121/drpclk
+#  ad_connect  drp_clk_vip/clk_out jesd204_phy_126/drpclk
+#}
 
 adi_sim_add_define "JESD_MODE=\"$JESD_MODE\""

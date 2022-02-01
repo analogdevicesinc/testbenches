@@ -40,6 +40,7 @@
 module system_tb();
 
   wire rx_sync_0;
+  reg ext_sync = 1'b0;
 
   `TEST_PROGRAM test();
 
@@ -88,7 +89,7 @@ module system_tb();
     .tx_sync_0      (rx_sync_0),       //-dir I
     .ref_clk_q0     (ref_clk),         //-dir I
     .ref_clk_q1     (ref_clk),         //-dir I
-    .dac_fifo_bypass(1'b0)             //-dir I
+    .ext_sync_in    (ext_sync)
 
   );
 

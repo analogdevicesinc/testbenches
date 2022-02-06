@@ -38,27 +38,27 @@
 `include "utils.svh"
 
 module system_tb();
-  wire pulsar_adc_spi_cs;
-  wire pulsar_adc_spi_sclk;
-  wire pulsar_adc_spi_clk;
-  wire pulsar_adc_spi_sdi;
-  wire pulsar_adc_spi_sdo;
-  wire pulsar_adc_irq;
+  wire ad3552r_dac_spi_cs;
+  wire ad3552r_dac_spi_sclk;
+  wire ad3552r_dac_spi_clk;
+  wire ad3552r_dac_spi_sdi;
+  wire ad3552r_dac_spi_sdo;
+  wire ad3552r_dac_irq;
 
   `TEST_PROGRAM test(
-    .pulsar_adc_irq(pulsar_adc_irq),
-    .pulsar_adc_spi_sclk(pulsar_adc_spi_sclk),
-    .pulsar_adc_spi_cs(pulsar_adc_spi_cs),
-    .pulsar_adc_spi_clk(pulsar_adc_spi_clk),
-    .pulsar_adc_spi_sdi(pulsar_adc_spi_sdi),
-    .pulsar_adc_spi_sdo(pulsar_adc_spi_sdo));
+    .ad3552r_dac_irq(ad3552r_dac_irq),
+    .ad3552r_dac_spi_sclk(ad3552r_dac_spi_sclk),
+    .ad3552r_dac_spi_cs(ad3552r_dac_spi_cs),
+    .ad3552r_dac_spi_clk(ad3552r_dac_spi_clk),
+    .ad3552r_dac_spi_sdi(ad3552r_dac_spi_sdi),
+    .ad3552r_dac_spi_sdo(ad3552r_dac_spi_sdo));
 
   test_harness `TH (
-    .pulsar_adc_irq(pulsar_adc_irq),
-    .pulsar_adc_spi_cs(pulsar_adc_spi_cs),
-    .pulsar_adc_spi_sclk(pulsar_adc_spi_sclk),
-    .pulsar_adc_spi_clk(pulsar_adc_spi_clk),
-    .pulsar_adc_spi_sdi(pulsar_adc_spi_sdi),
-    .pulsar_adc_spi_sdo(pulsar_adc_spi_sdo));
+    .ad3552r_dac_irq(ad3552r_dac_irq),
+    .ad3552r_dac_spi_cs(ad3552r_dac_spi_cs),
+    .ad3552r_dac_spi_sclk(ad3552r_dac_spi_sclk),
+    .ad3552r_dac_spi_clk(ad3552r_dac_spi_clk),
+    .ad3552r_dac_spi_sdi(ad3552r_dac_spi_sdi),
+    .ad3552r_dac_spi_sdo(ad3552r_dac_spi_sdo));
 
 endmodule

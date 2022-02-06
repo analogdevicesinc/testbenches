@@ -49,9 +49,9 @@ adi_project_files [list \
 
 source ../../projects/ad3552r/common/pulsar_adc_pmdz_bd.tcl
 
-create_bd_port -dir O pulsar_adc_spi_clk
-create_bd_port -dir O pulsar_adc_irq
+create_bd_port -dir O ad3552r_dac_spi_clk
+create_bd_port -dir O ad3552r_dac_irq
 
-ad_connect pulsar_adc_spi_clk spi_clkgen/clk_0
-ad_connect pulsar_adc_irq spi_pulsar_adc/irq
+ad_connect ad3552r_dac_spi_clk spi_clkgen/clk_0
+ad_connect ad3552r_dac_irq spi_ad3552r_dac/irq
 

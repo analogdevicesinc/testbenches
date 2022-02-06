@@ -86,7 +86,7 @@ localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
 localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 20;
+localparam NUM_OF_TRANSFERS           = 200;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -119,12 +119,12 @@ localparam PULSAR_ADC_CNV_BASE = `PULSAR_ADC_CNV;
 localparam SPI_DDS = `SPI_DDS;
 
 program test_program (
-  input pulsar_adc_irq,
-  input pulsar_adc_spi_sclk,
-  input pulsar_adc_spi_cs,
-  input pulsar_adc_spi_clk,
-  input [(`NUM_OF_SDI - 1):0] pulsar_adc_spi_sdi,
-  input pulsar_adc_spi_sdo);
+  input ad3552r_dac_irq,
+  input ad3552r_dac_spi_sclk,
+  input ad3552r_dac_spi_cs,
+  input ad3552r_dac_spi_clk,
+  input [(`NUM_OF_SDI - 1):0] ad3552r_dac_spi_sdi,
+  input ad3552r_dac_spi_sdo);
 
 test_harness_env env;
 
@@ -235,7 +235,7 @@ reg [7:0] sync_id = 0;
 
 initial begin
   while (1) begin
-    @(posedge pulsar_adc_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
+    @(posedge ad3552r_dac_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
     axi_read (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
     // IRQ launched by Offload SYNC command
@@ -273,7 +273,7 @@ end
   reg     delay_clk = 0;
   wire    m_spi_sclk;
 
-  assign  m_spi_sclk = pulsar_adc_spi_sclk;
+  assign  m_spi_sclk = ad3552r_dac_spi_sclk;
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
@@ -283,7 +283,7 @@ end
        end
     end
   end
-  assign pulsar_adc_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
+  assign ad3552r_dac_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
 initial begin
   while(1) begin
@@ -297,9 +297,9 @@ end
 //---------------------------------------------------------------------------
 
 wire          end_of_word;
-wire          spi_sclk_bfm = pulsar_adc_echo_sclk;
+wire          spi_sclk_bfm = ad3552r_dac_echo_sclk;
 wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = &pulsar_adc_spi_cs;
+wire          m_spi_csn_int_s = &ad3552r_dac_spi_cs;
 bit           m_spi_csn_int_d = 0;
 bit   [31:0]  sdi_shiftreg;
 bit   [7:0]   spi_sclk_pos_counter = 0;
@@ -309,7 +309,7 @@ bit   [31:0]  sdi_nreg[$];
 
 initial begin
   while(1) begin
-    @(posedge pulsar_adc_spi_clk);
+    @(posedge ad3552r_dac_spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
 end
@@ -318,7 +318,7 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign pulsar_adc_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+  assign ad3552r_dac_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
@@ -397,7 +397,7 @@ initial begin
     if ((m_spi_csn_negedge_s) || (end_of_word)) begin
       if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdo_shiftreg <= {sdo_shiftreg[30:0], pulsar_adc_spi_sdo};
+      sdo_shiftreg <= {sdo_shiftreg[30:0], ad3552r_dac_spi_sdo};
     end
   end
 end
@@ -458,7 +458,7 @@ assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
 
 initial begin
   while(1) begin
-    @(posedge pulsar_adc_echo_sclk);
+    @(posedge ad3552r_dac_echo_sclk);
     sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;

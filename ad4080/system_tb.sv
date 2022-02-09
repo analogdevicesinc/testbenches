@@ -98,6 +98,8 @@ module system_tb #(
   reg [19:0] sample = 'h000001;
   reg da_p = 1'b0;
   reg da_n = 1'b1;
+  reg db_p = 1'b0;
+  reg db_n = 1'b1;
 
   always @(negedge cnv_clk) begin
     repeat (LATENCY) @(posedge ssi_clk);
@@ -110,11 +112,16 @@ module system_tb #(
   end
 
   task automatic drive_sample(bit [19:0] sample_t);
-    for (int i = 19; i >= 0; i=i-1) begin
+    int num_lanes = (`SINGLE_LANE==1) ? 1 : 2;
+    for (int i = 19; i >= 0; i=i-num_lanes) begin
       @(negedge ssi_clk);
       #1;
       da_p <= sample_t[i];
       da_n <= ~sample_t[i];
+      if (`SINGLE_LANE == 0) begin
+        db_p <= sample_t[i-1];
+        db_n <= ~sample_t[i-1];
+      end
     end
   endtask
 

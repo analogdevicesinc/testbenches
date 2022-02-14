@@ -38,11 +38,12 @@
 `include "utils.svh"
 
 module system_tb();
+
   wire ad3552r_dac_spi_cs;
   wire ad3552r_dac_spi_sclk;
   wire ad3552r_dac_spi_clk;
   wire ad3552r_dac_spi_sdi;
-  wire ad3552r_dac_spi_sdo;
+  wire [1:0] ad3552r_dac_spi_sdo; //ADD PARAM
   wire ad3552r_dac_irq;
 
   `TEST_PROGRAM test(

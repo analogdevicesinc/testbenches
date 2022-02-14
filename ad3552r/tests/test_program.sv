@@ -49,6 +49,8 @@ import test_harness_env_pkg::*;
 `define SPI_DDS                         32'h44C0_0000
 `define DDR_BASE                        32'h8000_0000
 
+`define NUM_OF_SDO 2
+
 localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
 localparam SPI_ENG_ADDR_ID            = 32'h0000_0004;
 localparam SPI_ENG_ADDR_SCRATCH       = 32'h0000_0008;
@@ -77,6 +79,7 @@ localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 32;
 localparam DATA_DLENGTH               = 32;
+localparam DATA_DLENGTH_REG           = 16;
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
 localparam SDI_DELAY                  = 0;
@@ -86,7 +89,7 @@ localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
 localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 200;
+localparam NUM_OF_TRANSFERS           = 20;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -105,13 +108,24 @@ localparam INST_WRD                   = 32'h0000_0300 | (NUM_OF_WORDS-1);
 localparam INST_CFG                   = 32'h0000_2100 | (THREE_WIRE << 2) | (CPOL << 1) | CPHA;
 localparam INST_PRESCALE              = 32'h0000_2000 | CLOCK_DIVIDER;
 localparam INST_DLENGTH               = 32'h0000_2200 | DATA_DLENGTH;
+localparam INST_DLENGTH_ADDR          = 32'h0000_2200 | DATA_DLENGTH_REG;
 
 // Synchronization
 localparam INST_SYNC                  = 32'h0000_3000;
 
 // Sleep instruction
 localparam INST_SLEEP                 = 32'h0000_3100;
-`define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
+`define sleep(a)                      = INST_SLEEP | (a & 8'hFF);
+
+
+localparam DAC_WR                     = 8'h00;
+localparam DAC_RD                     = 8'h80;
+
+localparam DAC_REG_ADDR               = 8'h7A;
+
+localparam DAC_WREG                   = DAC_WR | DAC_REG_ADDR;
+localparam DAC_RREG                   = DAC_RD | DAC_REG_ADDR;
+
 
 localparam PULSAR_ADC_BASE = `PULSAR_ADC_REGMAP;
 localparam PULSAR_ADC_CLKGEN_BASE = `PULSAR_ADC_CLKGEN;
@@ -124,7 +138,7 @@ program test_program (
   input ad3552r_dac_spi_cs,
   input ad3552r_dac_spi_clk,
   input [(`NUM_OF_SDI - 1):0] ad3552r_dac_spi_sdi,
-  input ad3552r_dac_spi_sdo);
+  input [(`NUM_OF_SDO - 1):0] ad3552r_dac_spi_sdo);
 
 test_harness_env env;
 
@@ -185,7 +199,7 @@ initial begin
 
   fifo_spi_test;
 
-  #100
+//  #100
 
   offload_spi_test;
   `INFO(("Test Done"));
@@ -297,7 +311,8 @@ end
 //---------------------------------------------------------------------------
 
 wire          end_of_word;
-wire          spi_sclk_bfm = ad3552r_dac_echo_sclk;
+//wire          spi_sclk_bfm = ad3552r_dac_echo_sclk;
+wire          spi_sclk_bfm = m_spi_sclk;
 wire          m_spi_csn_negedge_s;
 wire          m_spi_csn_int_s = &ad3552r_dac_spi_cs;
 bit           m_spi_csn_int_d = 0;
@@ -387,6 +402,8 @@ bit [31:0] sdo_shiftreg = 'h0;
 bit [31:0] sdo_shiftreg2 = 'h0;
 bit [31:0] sdo_shiftreg_store_arr [NUM_OF_TRANSFERS - 1:0];
 bit [15:0] sdo_store_cnt = 'h0;
+bit [5:0]  sclk_counter = 'h0;
+bit [31:0] offload_transfer_cnt;
 
 //// SDO shift register
 initial begin
@@ -394,51 +411,33 @@ initial begin
     // synchronization
     @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
 
-    if ((m_spi_csn_negedge_s) || (end_of_word)) begin
+    if (m_spi_csn_negedge_s) begin
       if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
-    end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdo_shiftreg <= {sdo_shiftreg[30:0], ad3552r_dac_spi_sdo};
+    end else begin
+      if (offload_status) begin
+        sdo_shiftreg <= {sdo_shiftreg[29:0], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
+        if (sclk_counter == 'd15) begin
+          sclk_counter <= 'h0;
+        end else begin
+          sclk_counter <= sclk_counter + 1'h1;
+        end
+      end else begin
+        sdo_shiftreg2 <= {sdo_shiftreg2[29:0], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
+      end
     end
   end
 end
 
-
 initial begin
   while(1) begin
-    @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-      if (m_spi_csn_int_s) begin
-        sdo_shiftreg_store_arr [sdo_store_cnt] = sdo_shiftreg & 16'hffff;
-        sdo_store_cnt = sdo_store_cnt + 'h1;
-      end
+    @(negedge sclk_counter [3]) begin
+      sdo_shiftreg_store_arr [sdo_store_cnt] = sdo_shiftreg;
+      sdo_store_cnt = sdo_store_cnt + 'h1;
+      offload_transfer_cnt <= offload_transfer_cnt + 'h1;
+    end
   end
 end
 
-//initial begin
-//  while(1) begin
-//    @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-//    if (m_spi_csn_negedge_s) begin
-//      spi_sclk_neg_counter <= 8'b0;
-//    end else begin
-//      spi_sclk_neg_counter <= (spi_sclk_neg_counter == DATA_DLENGTH) ? 0 : spi_sclk_neg_counter+1;
-//    end
-//  end
-//end
-
-//initial begin
-//  while(1) begin
-//    // synchronization
-//    if (CPHA ^ CPOL) begin
-//      @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-//    end else begin
-//      @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-//    end
-//    if ((m_spi_csn_negedge_s) || (end_of_word)) begin
-//      if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
-//    end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-//      sdo_shiftreg_store_arr [0] <= sdo_shiftreg;
-//    end
-//  end
-//end
 //---------------------------------------------------------------------------
 // Storing SDI Data for later comparison
 //---------------------------------------------------------------------------
@@ -453,99 +452,6 @@ bit [31:0]  sdi_shiftreg2;
 bit [31:0]  sdi_shiftreg_aux;
 bit [31:0]  sdi_shiftreg_aux_old;
 bit [31:0]  sdi_shiftreg_old;
-
-assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
-
-initial begin
-  while(1) begin
-    @(posedge ad3552r_dac_echo_sclk);
-    sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
-    if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
-      shiftreg_sampled <= 'h0;
-      if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
-          sdi_store_cnt <= sdi_store_cnt + 1;
-        end else begin
-          sdi_store_cnt <= sdi_store_cnt + 2;
-        end
-      end
-    end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
-      if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
-          sdi_shiftreg_old <= sdi_shiftreg;
-          if (sdi_store_cnt [0] == 'h1 ) begin
-            for (int i=0; i<16; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt-1][16 + i] = sdi_shiftreg[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt-1][i] = sdi_shiftreg_old[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
-              offload_sdi_data_store_arr[sdi_store_cnt][16 + i] =  sdi_shiftreg[2*i];
-            end
-          end
-        end else if (`NUM_OF_SDI == 2) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
-            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
-          end
-        end else if (`NUM_OF_SDI == 4) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*4)+:4] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*4)+:4] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            for (int i=0; i<16; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt][2*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][2*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i+1] = sdi_shiftreg[i];
-            end
-          end
-        end else if (`NUM_OF_SDI == 8) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*8)+:8] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*8)+:8] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            for (int i=0; i<8; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+2] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+3] = sdi_shiftreg[i];
-
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+2] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+3] = sdi_shiftreg[i];
-            end
-          end
-        end
-      end else begin
-        sdi_fifo_data_store = sdi_shiftreg;
-      end
-      shiftreg_sampled <= 'h1;
-    end
-  end
-end
-
-//---------------------------------------------------------------------------
-// Offload Transfer Counter
-//---------------------------------------------------------------------------
-
-bit [31:0] offload_transfer_cnt;
-
-initial begin
-  while(1) begin
-    @(posedge shiftreg_sampled && offload_status);
-      offload_transfer_cnt <= offload_transfer_cnt + 'h1;
-  end
-end
-
 
 //---------------------------------------------------------------------------
 // Offload SPI Test
@@ -565,8 +471,6 @@ task offload_spi_test;
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Start DDS
-
-
     axi_write (SPI_DDS + 32'h40, 32'h1);
     axi_write (SPI_DDS + 32'h44, 32'h1);
     axi_write (SPI_DDS + 32'h400, 32'hfff);
@@ -575,15 +479,22 @@ task offload_spi_test;
 
 
     // Configure the Offload module
-
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WRD);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR);
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+
+
+//write SDO FIFO data 
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, DAC_WREG);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_WRD);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 1));
+
 
     offload_status = 1;
 
@@ -592,14 +503,16 @@ task offload_spi_test;
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started.", $time);
 
-    if (`NUM_OF_SDI == 1) begin
-      wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
-    end else begin
-      wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-    end
+    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
     offload_status = 0;
+    
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
+     #100
+
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
+
+    
 
     $display("[%t] Offload stopped.", $time);
 
@@ -639,8 +552,7 @@ begin
 
   //config cnv
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
-//  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'h64 * 'h32);
-//  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h0000004c,'h64 * 'h32);
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'd41);
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
   // Enable SPI Engine
@@ -649,33 +561,10 @@ begin
   // Configure the execution module
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CFG);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_ADDR);
 
   // Set up the interrupts
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
-
-  #100
-  // Generate a FIFO transaction, write SDO first
-  repeat (NUM_OF_WORDS) begin
-    #100
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
-  end
-
-  generate_transfer_cmd(1);
-
-  #100
-  wait(sync_id == 1);
-  #100
-
-  repeat (NUM_OF_WORDS) begin
-  #100
-    axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
-  end
-
-  if (sdi_fifo_data != sdi_fifo_data_store)
-    `ERROR(("Fifo Read Test FAILED"));
-
-  `INFO(("Fifo Read Test PASSED"));
 
 end
 endtask

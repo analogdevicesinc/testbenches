@@ -198,14 +198,14 @@ program test_program;
     end
 
     // Configure TX DMA
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_CONTROL),
-                       `SET_dmac_CONTROL_ENABLE(1));
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_FLAGS),
-                       `SET_dmac_FLAGS_TLAST(1));
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_X_LENGTH),
-                       `SET_dmac_X_LENGTH_X_LENGTH(32'h000003FF));
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
-                       `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));   
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_CONTROL),
+                       `SET_DMAC_CONTROL_ENABLE(1));
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_FLAGS),
+                       `SET_DMAC_FLAGS_TLAST(1));
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_X_LENGTH),
+                       `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003FF));
+    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+                       `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));   
     #5us;
 
     // Configure Transport Layer for DMA  CH0

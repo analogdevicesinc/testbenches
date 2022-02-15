@@ -68,7 +68,6 @@ localparam SPI_ENG_ADDR_OFFLOAD_SDO   = 32'h0000_0114;
 
 localparam AD7616_CNVST_EN            = 32'h0000_0440;
 localparam AD7616_CNVST_RATE          = 32'h0000_0444;
-//localparam SPI_ENG_ADDR_OFFLOAD_SDO   = 32'h0000_0114;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -321,11 +320,31 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 genvar i;
 for (i = 0; i < 2; i++) begin
   assign rx_sdi[i] = sdi_shiftreg[15]; // all SDI lanes got the same data
+  
 end
 
+//wire [15:0] data_a; 
+//wire [15:0] data_b; 
+//reg  [3:0] ramp = 'h0; 
+//reg  [2:0] channel_a = 'h0; 
+//reg  [2:0] channel_b = 'h0; 
+
+
+//assign  data_a = 4'hA000 | ramp << 8 | channel_a << 4 | ramp;
+//assign  data_b = 4'hB000 | ramp << 8 | channel_b << 4 | ramp;
+
+
+//initial begin
+//  while(1) begin
+//    @(posedge rx_cnvst);
+//  ramp = ramp + 1;
+//  channel_a = channel_a +  channel_b = channel_b + 1;
+//  end
+//end
+
 assign end_of_word = (CPOL ^ CPHA) ?
-                     (rx_sclk_pos_counter == DATA_DLENGTH) :
-                     (rx_sclk_neg_counter == DATA_DLENGTH);
+                     (rx_sclk_pos_counter == DATA_DLENGTH * NUM_OF_WORDS) :
+                     (rx_sclk_neg_counter == DATA_DLENGTH * NUM_OF_WORDS);
 
 initial begin
   while(1) begin
@@ -395,9 +414,6 @@ bit [15:0]  sdi_store_cnt = 'h1;
 bit [15:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
 bit [15:0]  sdi_fifo_data_store;
 bit [15:0]  sdi_data_store;
-bit [15:0]  sdi_shiftreg2;
-
-assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[15:1]};
 
 initial begin
   while(1) begin
@@ -413,7 +429,7 @@ initial begin
         if (sdi_store_cnt [0] == 'h1 ) begin
           offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
           offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
-        end  
+         end  
       end else begin
         sdi_fifo_data_store = sdi_shiftreg;
       end
@@ -462,6 +478,7 @@ task offload_spi_test;
     axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
     axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
     axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
 
     offload_status = 1;
 

@@ -86,7 +86,7 @@ localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
 localparam NUM_OF_WORDS               = 2;
-localparam NUM_OF_TRANSFERS           = 5;
+localparam NUM_OF_TRANSFERS           = 10;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -301,7 +301,6 @@ wire          rx_sclk_bfm = ad7616_echo_sclk;
 wire          m_spi_csn_negedge_s;
 wire          m_spi_csn_int_s = rx_cs_n;
 bit           m_spi_csn_int_d = 0;
-//bit   [31:0]  sdi_shiftreg;
 bit   [15:0]   sdi_shiftreg;
 bit   [7:0]   rx_sclk_pos_counter = 0;
 bit   [7:0]   rx_sclk_neg_counter = 0;
@@ -317,17 +316,18 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-genvar i;
-for (i = 0; i < 2; i++) begin
-  assign rx_sdi[i] = sdi_shiftreg[15]; // all SDI lanes got the same data
-  
-end
+//genvar i;
+//for (i = 0; i < 2; i++) begin
+  assign rx_sdi[0] = sdi_shiftreg[14]; // all SDI lanes got the same data
+  assign rx_sdi[1] = sdi_shiftreg[15]; // all SDI lanes got the same data
 
-//wire [15:0] data_a; 
-//wire [15:0] data_b; 
-//reg  [3:0] ramp = 'h0; 
-//reg  [2:0] channel_a = 'h0; 
-//reg  [2:0] channel_b = 'h0; 
+//end
+
+//wire [15:0] data_a;
+//wire [15:0] data_b;
+//reg  [3:0] ramp = 'h0;
+//reg  [2:0] channel_a = 'h0;
+//reg  [2:0] channel_b = 'h0;
 
 
 //assign  data_a = 4'hA000 | ramp << 8 | channel_a << 4 | ramp;
@@ -343,8 +343,8 @@ end
 //end
 
 assign end_of_word = (CPOL ^ CPHA) ?
-                     (rx_sclk_pos_counter == DATA_DLENGTH * NUM_OF_WORDS) :
-                     (rx_sclk_neg_counter == DATA_DLENGTH * NUM_OF_WORDS);
+                     (rx_sclk_pos_counter == 16) :
+                     (rx_sclk_neg_counter == 16);
 
 initial begin
   while(1) begin
@@ -352,7 +352,7 @@ initial begin
     if (m_spi_csn_negedge_s) begin
       rx_sclk_pos_counter <= 8'b0;
     end else begin
-      rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH) ? 0 : rx_sclk_pos_counter+1;
+      rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH*2) ? 0 : rx_sclk_pos_counter+1;
     end
   end
 end
@@ -363,7 +363,7 @@ initial begin
     if (m_spi_csn_negedge_s) begin
       rx_sclk_neg_counter <= 8'b0;
     end else begin
-      rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH) ? 0 : rx_sclk_neg_counter+1;
+      rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH*2) ? 0 : rx_sclk_neg_counter+1;
     end
   end
 end
@@ -410,26 +410,26 @@ end
 
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
-bit [15:0]  sdi_store_cnt = 'h1;
+bit [15:0]  sdi_store_cnt = 'h0;
 bit [15:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
-bit [15:0]  sdi_fifo_data_store;
+bit [31:0]  sdi_fifo_data_store;
 bit [15:0]  sdi_data_store;
 
 initial begin
   while(1) begin
     @(posedge ad7616_echo_sclk);
-    sdi_data_store <= {sdi_shiftreg[11:0], 4'b0};
+    sdi_data_store <= {sdi_shiftreg[13:0], 2'b00};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
-        sdi_store_cnt <= sdi_store_cnt + 2;
+        sdi_store_cnt <= sdi_store_cnt + 1;
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-        if (sdi_store_cnt [0] == 'h1 ) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
-          offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
-         end  
+//        if (sdi_store_cnt [0] == 'h1 ) begin
+          offload_sdi_data_store_arr [sdi_store_cnt] = (sdi_shiftreg & 16'hff00) | ((sdi_shiftreg >> 7) & 16'h00ff) ;
+//          offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
+//        end
       end else begin
         sdi_fifo_data_store = sdi_shiftreg;
       end
@@ -527,7 +527,7 @@ begin
 
   axi_write (AD7616_BASE + AD7616_CNVST_EN, 32'h00000003);
   axi_write (AD7616_BASE + AD7616_CNVST_RATE, 32'h00000128);
-  
+
   // Enable SPI Engine
   axi_write (AD7616_BASE + SPI_ENG_ADDR_ENABLE, 0);
 
@@ -564,7 +564,7 @@ begin
     $display("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store);
     `INFO(("Fifo Read Test PASSED"));
   end
-  
+
 end
 endtask
 

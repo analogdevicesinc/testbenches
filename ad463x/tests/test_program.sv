@@ -289,7 +289,7 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign ad463x_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+  assign ad463x_spi_sdi[i] = sdi_shiftreg[31-i]; // all SDI lanes got the same data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
@@ -475,7 +475,7 @@ task offload_spi_test;
 
     env.mng.RegWrite32(`AD469X_DMA+32'h400, 32'h00000001); // Enable DMA
     env.mng.RegWrite32(`AD469X_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`AD469X_DMA+32'h418, (NUM_OF_TRANSFERS*4*2)-1); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`AD469X_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
     env.mng.RegWrite32(`AD469X_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
     env.mng.RegWrite32(`AD469X_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 

@@ -115,6 +115,7 @@ set sys_cpu_reset sys_cpu_reset
 set sys_cpu_resetn sys_cpu_resetn
 
 set sys_dma_clk sys_dma_clk
+set sys_dma_clk_source dma_clk_vip/clk_out
 set sys_dma_reset sys_dma_reset
 set sys_dma_resetn sys_dma_resetn
 

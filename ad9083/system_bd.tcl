@@ -177,11 +177,11 @@ ad_cpu_interconnect 0x44b10000 dac_jesd204_transport
 #
 source $ad_hdl_dir/projects/ad9083_evb/common/ad9083_evb_bd.tcl
 
-if {$ad_project_params(JESD_MODE) == "8B10B"} {
-} else {
-  ad_connect  drp_clk_vip/clk_out jesd204_phy_121/drpclk
-  ad_connect  drp_clk_vip/clk_out jesd204_phy_126/drpclk
-}
+#if {$ad_project_params(JESD_MODE) == "8B10B"} {
+#} else {
+#  ad_connect  drp_clk_vip/clk_out jesd204_phy_121/drpclk
+#  ad_connect  drp_clk_vip/clk_out jesd204_phy_126/drpclk
+#}
 
-adi_sim_add_define "JESD_MODE=\"$JESD_MODE\""
+#adi_sim_add_define "JESD_MODE=\"$JESD_MODE\""
 

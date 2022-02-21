@@ -42,7 +42,9 @@ module system_tb();
   wire ad3552r_dac_spi_cs;
   wire ad3552r_dac_spi_sclk;
   wire ad3552r_dac_spi_clk;
-  wire ad3552r_dac_spi_sdi;
+  wire [1:0] ad3552r_dac_spi_sdi;
+  wire [1:0] ad3552_dac_spi_sdio;
+  wire ad3552r_dac_spi_sdo_t;
   wire [1:0] ad3552r_dac_spi_sdo; //ADD PARAM
   wire ad3552r_dac_irq;
 
@@ -51,7 +53,8 @@ module system_tb();
     .ad3552r_dac_spi_sclk(ad3552r_dac_spi_sclk),
     .ad3552r_dac_spi_cs(ad3552r_dac_spi_cs),
     .ad3552r_dac_spi_clk(ad3552r_dac_spi_clk),
-    .ad3552r_dac_spi_sdi(ad3552r_dac_spi_sdi),
+    .ad3552r_dac_spi_sdi(ad3552_dac_spi_sdio),
+    .ad3552r_dac_spi_sdo_t(ad3552r_dac_spi_sdo_t),
     .ad3552r_dac_spi_sdo(ad3552r_dac_spi_sdo));
 
   test_harness `TH (
@@ -60,6 +63,15 @@ module system_tb();
     .ad3552r_dac_spi_sclk(ad3552r_dac_spi_sclk),
     .ad3552r_dac_spi_clk(ad3552r_dac_spi_clk),
     .ad3552r_dac_spi_sdi(ad3552r_dac_spi_sdi),
+    .ad3552r_dac_spi_sdo_t(ad3552r_dac_spi_sdo_t),
     .ad3552r_dac_spi_sdo(ad3552r_dac_spi_sdo));
+
+  ad_iobuf #(
+    .DATA_WIDTH(4)
+  ) i_ad3552_spi_iobuf (
+    .dio_t({ad3552r_dac_spi_sdo_t, ad3552r_dac_spi_sdo_t, ad3552r_dac_spi_sdo_t, ad3552r_dac_spi_sdo_t}),
+    .dio_i(ad3552r_dac_spi_sdo),
+    .dio_o(ad3552r_dac_spi_sdi),
+    .dio_p(ad3552_dac_spi_sdio));
 
 endmodule

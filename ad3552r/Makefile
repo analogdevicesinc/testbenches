@@ -21,6 +21,7 @@ SV_DEPS += system_tb.sv
 
 ENV_DEPS +=../../library/util_cdc/sync_bits.v
 ENV_DEPS +=../../library/common/ad_edge_detect.v
+ENV_DEPS +=../../library/common/ad_iobuf.v
 
 ENV_DEPS += system_project.tcl
 ENV_DEPS += system_bd.tcl

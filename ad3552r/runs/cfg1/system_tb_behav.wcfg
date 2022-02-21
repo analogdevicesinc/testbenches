@@ -25,15 +25,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="9.563334 us"></ZoomStartTime>
-      <ZoomEndTime time="22.173335 us"></ZoomEndTime>
-      <Cursor1Time time="11.665000 us"></Cursor1Time>
+      <ZoomStartTime time="9,764.417 ns"></ZoomStartTime>
+      <ZoomEndTime time="10,117.918 ns"></ZoomEndTime>
+      <Cursor1Time time="9,920.417 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="237"></NameColumnWidth>
-      <ValueColumnWidth column_width="71"></ValueColumnWidth>
+      <NameColumnWidth column_width="226"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="16" />
+   <WVObjectSize size="25" />
    <wvobject type="logic" fp_name="/system_tb/ad3552r_dac_spi_cs">
       <obj_property name="ElementShortName">ad3552r_dac_spi_cs</obj_property>
       <obj_property name="ObjectShortName">ad3552r_dac_spi_cs</obj_property>
@@ -41,10 +41,6 @@
    <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/sclk">
       <obj_property name="ElementShortName">sclk</obj_property>
       <obj_property name="ObjectShortName">sclk</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/ad3552r_dac_spi_sdo">
-      <obj_property name="ElementShortName">ad3552r_dac_spi_sdo[1:0]</obj_property>
-      <obj_property name="ObjectShortName">ad3552r_dac_spi_sdo[1:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/offload/trigger">
       <obj_property name="ElementShortName">trigger</obj_property>
@@ -96,5 +92,45 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/sdo_data">
       <obj_property name="ElementShortName">sdo_data[31:0]</obj_property>
       <obj_property name="ObjectShortName">sdo_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/offload_status">
+      <obj_property name="ElementShortName">offload_status</obj_property>
+      <obj_property name="ObjectShortName">offload_status</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/ad3552r_dac_spi_sdi">
+      <obj_property name="ElementShortName">ad3552r_dac_spi_sdi[1:0]</obj_property>
+      <obj_property name="ObjectShortName">ad3552r_dac_spi_sdi[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ad3552r_dac_spi_sdo_t">
+      <obj_property name="ElementShortName">ad3552r_dac_spi_sdo_t</obj_property>
+      <obj_property name="ObjectShortName">ad3552r_dac_spi_sdo_t</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/ad3552r_dac_spi_sdo">
+      <obj_property name="ElementShortName">ad3552r_dac_spi_sdo[1:0]</obj_property>
+      <obj_property name="ObjectShortName">ad3552r_dac_spi_sdo[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/ad3552_dac_spi_sdio">
+      <obj_property name="ElementShortName">ad3552_dac_spi_sdio[1:0]</obj_property>
+      <obj_property name="ObjectShortName">ad3552_dac_spi_sdio[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_shiftreg">
+      <obj_property name="ElementShortName">sdi_shiftreg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_shiftreg[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/i_ad3552_spi_iobuf/dio_t">
+      <obj_property name="ElementShortName">dio_t[3:0]</obj_property>
+      <obj_property name="ObjectShortName">dio_t[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/i_ad3552_spi_iobuf/dio_i">
+      <obj_property name="ElementShortName">dio_i[3:0]</obj_property>
+      <obj_property name="ObjectShortName">dio_i[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/i_ad3552_spi_iobuf/dio_o">
+      <obj_property name="ElementShortName">dio_o[3:0]</obj_property>
+      <obj_property name="ObjectShortName">dio_o[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/i_ad3552_spi_iobuf/dio_p">
+      <obj_property name="ElementShortName">dio_p[3:0]</obj_property>
+      <obj_property name="ObjectShortName">dio_p[3:0]</obj_property>
    </wvobject>
 </wave_config>

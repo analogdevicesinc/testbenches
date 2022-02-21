@@ -108,7 +108,8 @@ localparam INST_WRD                   = 32'h0000_0300 | (NUM_OF_WORDS-1);
 localparam INST_CFG                   = 32'h0000_2100 | (THREE_WIRE << 2) | (CPOL << 1) | CPHA;
 localparam INST_PRESCALE              = 32'h0000_2000 | CLOCK_DIVIDER;
 localparam INST_DLENGTH               = 32'h0000_2200 | DATA_DLENGTH;
-localparam INST_DLENGTH_ADDR          = 32'h0000_2200 | DATA_DLENGTH_REG;
+localparam INST_DLENGTH_RBK           = 32'h0000_2200 | 16;
+localparam INST_DLENGTH_ADDR          = 32'h0000_2200 | 14;
 
 // Synchronization
 localparam INST_SYNC                  = 32'h0000_3000;
@@ -118,10 +119,10 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                      = INST_SLEEP | (a & 8'hFF);
 
 
-localparam DAC_WR                     = 8'h00;
-localparam DAC_RD                     = 8'h80;
+localparam DAC_WR                     = 7'h00;
+localparam DAC_RD                     = 7'h40;
 
-localparam DAC_REG_ADDR               = 8'h7A;
+localparam DAC_REG_ADDR               = 7'h3D;
 
 localparam DAC_WREG                   = DAC_WR | DAC_REG_ADDR;
 localparam DAC_RREG                   = DAC_RD | DAC_REG_ADDR;
@@ -137,6 +138,7 @@ program test_program (
   input ad3552r_dac_spi_sclk,
   input ad3552r_dac_spi_cs,
   input ad3552r_dac_spi_clk,
+  input ad3552r_dac_spi_sdo_t,
   input [(`NUM_OF_SDI - 1):0] ad3552r_dac_spi_sdi,
   input [(`NUM_OF_SDO - 1):0] ad3552r_dac_spi_sdo);
 
@@ -149,6 +151,7 @@ task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 begin
+  #50
   env.mng.RegReadVerify32(raddr,vdata);
 end
 endtask
@@ -157,6 +160,7 @@ task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 begin
+  #50
   env.mng.RegRead32(raddr,data);
 end
 endtask
@@ -168,6 +172,7 @@ task axi_write;
   input [31:0]  waddr;
   input [31:0]  wdata;
 begin
+  #50
   env.mng.RegWrite32(waddr,wdata);
 end
 endtask
@@ -197,9 +202,13 @@ initial begin
 
   #100
 
+  init;
+
+  #100
+
   fifo_spi_test;
 
-//  #100
+  #100
 
   offload_spi_test;
   `INFO(("Test Done"));
@@ -214,9 +223,9 @@ end
 
 task sanity_test;
 begin
-  #100 axi_read_v (PULSAR_ADC_BASE + 32'h0000000, 'h0001_0071);
-  #100 axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
-  #100 axi_read_v (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
+  axi_read_v (PULSAR_ADC_BASE + 32'h0000000, 'h0001_0071);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
+  axi_read_v (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -333,7 +342,7 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign ad3552r_dac_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+  assign ad3552r_dac_spi_sdi[i] = (ad3552r_dac_spi_sdo_t == 'h1) ? sdi_shiftreg[31] : 'hz; // all SDI lanes got the same data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
@@ -454,6 +463,64 @@ bit [31:0]  sdi_shiftreg_aux_old;
 bit [31:0]  sdi_shiftreg_old;
 
 //---------------------------------------------------------------------------
+// SPI Init
+//---------------------------------------------------------------------------
+
+task init;
+begin
+
+  //start spi clk generator
+  axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+
+  //config cnv
+  axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
+  axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'd41);
+  axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
+
+  // Enable SPI Engine
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
+
+  // Set up the interrupts
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
+
+  // Start DDS
+  axi_write (SPI_DDS + 32'h40, 32'h1);
+  axi_write (SPI_DDS + 32'h44, 32'h1);
+  axi_write (SPI_DDS + 32'h400, 32'hfff);
+  axi_write (SPI_DDS + 32'h408, 32'hfff);
+  axi_write (SPI_DDS + 32'h404, 32'hf);
+
+end
+endtask
+
+//---------------------------------------------------------------------------
+// FIFO SPI Test
+//---------------------------------------------------------------------------
+
+bit   [31:0]  sdi_fifo_data = 0;
+
+task fifo_spi_test;
+begin
+
+  // Configure the execution module
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CFG);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_ADDR);
+
+  //write SDO FIFO data
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, DAC_RREG);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_WR);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 2));
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_RBK);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_RD);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 3));
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
+  
+end
+endtask
+
+//---------------------------------------------------------------------------
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
@@ -463,20 +530,16 @@ task offload_spi_test;
   begin
 
     //Configure DMA
-
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4*2)-1); // X_LENGHTH = 1024-1
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
-    // Start DDS
-    axi_write (SPI_DDS + 32'h40, 32'h1);
-    axi_write (SPI_DDS + 32'h44, 32'h1);
-    axi_write (SPI_DDS + 32'h400, 32'hfff);
-    axi_write (SPI_DDS + 32'h408, 32'hfff);
-    axi_write (SPI_DDS + 32'h404, 32'hf);
-
+    // Configure the execution module
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CFG);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_ADDR);
 
     // Configure the Offload module
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
@@ -486,38 +549,29 @@ task offload_spi_test;
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR);
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 4);
 
-
-//write SDO FIFO data 
+    //write SDO FIFO data
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, DAC_WREG);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_WRD);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 1));
-
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 5));
 
     offload_status = 1;
 
     // Start the offload
-    #100
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started.", $time);
 
     wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-
     offload_status = 0;
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
-     #100
-
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
-
-    
 
     $display("[%t] Offload stopped.", $time);
 
     #2000
-
     for (int i=0; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
       offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
@@ -536,37 +590,6 @@ task offload_spi_test;
     end
 
   end
-endtask
-
-//---------------------------------------------------------------------------
-// FIFO SPI Test
-//---------------------------------------------------------------------------
-
-bit   [31:0]  sdi_fifo_data = 0;
-
-task fifo_spi_test;
-begin
-
-  //start spi clk generator
-  #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
-
-  //config cnv
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'd41);
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
-
-  // Enable SPI Engine
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
-
-  // Configure the execution module
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CFG);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_ADDR);
-
-  // Set up the interrupts
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
-
-end
 endtask
 
 endprogram

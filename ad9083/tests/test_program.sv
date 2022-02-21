@@ -36,11 +36,20 @@
 //
 //
 `include "utils.svh"
-`include "environment.sv"
 
+import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import adi_regmap_dmac_pkg::*;
+import adi_regmap_jesd_tx_pkg::*;
+import adi_regmap_jesd_rx_pkg::*;
+import adi_regmap_common_pkg::*;
+import adi_regmap_dac_pkg::*;
+import adi_regmap_adc_pkg::*;
+import adi_jesd204_pkg::*;
+import adi_xcvr_pkg::*;
 
 `define RX_DMA      32'h7c40_0000
 `define RX_XCVR     32'h44a6_0000
@@ -58,7 +67,7 @@ parameter RX_OUT_BYTES = 8;
 parameter TX_OUT_BYTES = 8;
 program test_program;
 
-  environment env;
+  test_harness_env env;
   bit [31:0] val;
   int link_clk_freq;
   int device_clk_freq;
@@ -72,10 +81,13 @@ program test_program;
   initial begin
 
     // There is no SYSREF in 64B66B
-    int ref_sysref_status = (`JESD_MODE != "64B66B");
+    int ref_sysref_status = 1;
 
     //creating environment
-    env = new(`TH.`MNG_AXI.inst.IF,
+    env = new(`TH.`SYS_CLK.inst.IF,
+              `TH.`DMA_CLK.inst.IF,
+              `TH.`DDR_CLK.inst.IF,
+              `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF);
 
     #2ps;
@@ -87,15 +99,9 @@ program test_program;
     `TH.`DMA_CLK.inst.IF.start_clock;
     `TH.`DDR_CLK.inst.IF.start_clock;
 
-    if (`JESD_MODE != "64B66B") begin
-      link_clk_freq = lane_rate/40;
-      data_path_width = 4;
-      tpl_data_path_width = 8;
-    end else begin
-      link_clk_freq = lane_rate/66;
-      data_path_width = 8;
-      tpl_data_path_width = (`RX_JESD_NP==12) ? 12 : 8;
-    end
+    link_clk_freq = lane_rate/40;
+    data_path_width = 4;
+    tpl_data_path_width = 8;
     device_clk_freq = link_clk_freq * data_path_width / tpl_data_path_width;
     sysref_freq = link_clk_freq*data_path_width/(`RX_JESD_K*`RX_JESD_F);
 
@@ -179,13 +185,11 @@ program test_program;
 
     //XCVR INIT
     //REG CTRL
-    if (`JESD_MODE != "64B66B") begin
-        env.mng.RegWrite32(`RX_XCVR+32'h0020,32'h00001004);  // RXOUTCLK uses DIV2
-        env.mng.RegWrite32(`TX_XCVR+32'h0020,32'h00001004);  // TXOUTCLK uses DIV2
+    env.mng.RegWrite32(`RX_XCVR+32'h0020,32'h00001004);  // RXOUTCLK uses DIV2
+    env.mng.RegWrite32(`TX_XCVR+32'h0020,32'h00001004);  // TXOUTCLK uses DIV2
 
-        env.mng.RegWrite32(`RX_XCVR+32'h0010,32'h00000001);
-        env.mng.RegWrite32(`TX_XCVR+32'h0010,32'h00000001);
-    end
+    env.mng.RegWrite32(`RX_XCVR+32'h0010,32'h00000001);
+    env.mng.RegWrite32(`TX_XCVR+32'h0010,32'h00000001);
 
     // Give time the PLLs to lock
     #50us;

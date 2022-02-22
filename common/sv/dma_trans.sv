@@ -37,12 +37,14 @@
 
 package dma_trans_pkg;
 
-  import axi_dmac_pkg::*;
   import logger_pkg::*;
+  import axi_dmac_pkg::*;
 
+  //==========================================================================
   /*
     dma_segment
   */
+  //==========================================================================
   class dma_segment;
     // DMAC parameters
     axi_dmac_params_t p;
@@ -54,7 +56,6 @@ package dma_trans_pkg;
     bit last = 1;
     bit skip = 0;
     bit cyclic = 0;
-    bit autorun = 0;
 
     // do not test large addresses
     constraint saddr_range {src_addr <= 2**16;}
@@ -65,6 +66,20 @@ package dma_trans_pkg;
     int dst_res;
     int res;
 
+    // -----------------
+    //
+    // -----------------
+    function new(axi_dmac_params_t p);
+      this.p = p;
+
+      this.src_res = p.DMA_DATA_WIDTH_SRC/8;
+      this.dst_res = p.DMA_DATA_WIDTH_DEST/8;
+      this.res = `MAX(src_res, dst_res);
+    endfunction
+
+    // -----------------
+    //
+    // -----------------
     function copy(dma_segment ds);
       ds.p = p;
       ds.src_addr = src_addr;
@@ -76,16 +91,11 @@ package dma_trans_pkg;
       ds.cyclic = cyclic;
     endfunction
 
-    function set_params(axi_dmac_params_t p);
-      this.p = p;
-
-      this.src_res = p.DMA_DATA_WIDTH_SRC/8;
-      this.dst_res = p.DMA_DATA_WIDTH_DEST/8;
-      this.res = `MAX(src_res, dst_res);
-    endfunction
-
     constraint transfer_length {length > res; length <= 4096;}
 
+    // -----------------
+    //
+    // -----------------
     virtual function void print();
       `INFO(("--------------------------"));
       `INFO(("src_addr is 0x%h",src_addr));
@@ -96,14 +106,23 @@ package dma_trans_pkg;
       `INFO(("skip     is %0d",skip));
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function int get_bytes_in_transfer();
       return length;
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function int get_actual_bytes_in_segment();
       return get_bytes_in_transfer();
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     function void post_randomize();
       // Address needs to be aligned to the width of the MM interface
       src_addr =  src_addr & ~(src_res - 1);
@@ -115,19 +134,34 @@ package dma_trans_pkg;
       length = length & ~(res - 1);
     endfunction
 
-  endclass
+  endclass : dma_segment
 
+  //==========================================================================
   /*
     dma_partial_segment
   */
+  //==========================================================================
   class dma_partial_segment extends dma_segment;
     rand int reduced_length;
 
+    // -----------------
+    //
+    // -----------------
+    function new(axi_dmac_params_t p);
+      super.new(p);
+    endfunction
+
+    // -----------------
+    //
+    // -----------------
     function copy(dma_partial_segment ds);
       super.copy(ds);
       ds.reduced_length = reduced_length;
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function void print();
       super.print();
       `INFO(("partial length is %0d", reduced_length));
@@ -136,6 +170,9 @@ package dma_trans_pkg;
     // length resolution
     constraint partial_length {reduced_length > src_res; reduced_length < length;};
 
+    // -----------------
+    //
+    // -----------------
     function void post_randomize();
       super.post_randomize();
       reduced_length = reduced_length & ~(src_res - 1);
@@ -144,15 +181,20 @@ package dma_trans_pkg;
       end
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function int get_actual_bytes_in_segment();
       return reduced_length;
     endfunction
 
-  endclass
+  endclass : dma_partial_segment
 
+  //==========================================================================
   /*
     dma_2d_segment
   */
+  //==========================================================================
   class dma_2d_segment extends dma_segment;
 
     typedef dma_segment dma_segment_array_t[];
@@ -161,6 +203,16 @@ package dma_trans_pkg;
     rand int unsigned dst_stride;
     rand int unsigned ylength;
 
+    // -----------------
+    //
+    // -----------------
+    function new(axi_dmac_params_t p);
+      super.new(p);
+    endfunction
+
+    // -----------------
+    //
+    // -----------------
     function copy(dma_2d_segment ds);
       super.copy(ds);
       ds.src_stride = src_stride;
@@ -182,10 +234,16 @@ package dma_trans_pkg;
       ylength > 1 && ylength < 10;
     }
 
-   virtual function int get_bytes_in_transfer();
+    // -----------------
+    //
+    // -----------------
+    virtual function int get_bytes_in_transfer();
       return length*ylength;
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     function void post_randomize();
       super.post_randomize();
       // stride needs to be aligned so the 4kB boundary won't be crossed
@@ -193,6 +251,9 @@ package dma_trans_pkg;
       dst_stride =  dst_stride & ~(p.MAX_BYTES_PER_BURST - 1);
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function void print();
       super.print();
       `INFO(("ylength    is %0d", ylength));
@@ -200,18 +261,20 @@ package dma_trans_pkg;
       `INFO(("dst_stride is 0x%0h", dst_stride));
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function dma_segment_array_t build_segments();
       dma_segment_array_t sa;
       dma_segment s;
       sa = new[ylength];
       for (int i=0; i<ylength; i++) begin
-        s = new();
-        s.set_params(p);
+        s = new(p);
         s.src_addr = src_addr + i*src_stride;
         s.dst_addr = dst_addr + i*dst_stride;
         s.length = length;
         if (i != ylength-1)
-          s.last = (p.DMA_2D_TLAST_MODE == 1) & this.last;
+          s.last = 0;
         if (i > 0)
           s.first = 0;
         sa[i] = s;
@@ -219,16 +282,28 @@ package dma_trans_pkg;
      return sa;
     endfunction
 
-  endclass
+  endclass : dma_2d_segment
 
+  //==========================================================================
   /*
     dma_partial_2d_segment
   */
+  //==========================================================================
   class dma_partial_2d_segment extends dma_2d_segment;
 
     rand int partial_segment_no;
     rand int reduced_length;
 
+    // -----------------
+    //
+    // -----------------
+    function new(axi_dmac_params_t p);
+      super.new(p);
+    endfunction
+
+    // -----------------
+    //
+    // -----------------
     function copy(dma_partial_2d_segment ds);
       super.copy(ds);
       ds.partial_segment_no = partial_segment_no;
@@ -242,22 +317,34 @@ package dma_trans_pkg;
       reduced_length >= src_res && reduced_length < length;
     }
 
+    // -----------------
+    //
+    // -----------------
     virtual function int get_bytes_in_transfer();
       return length*partial_segment_no + reduced_length;
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     function void post_randomize();
       super.post_randomize();
       // align partial length to source width
       reduced_length =  reduced_length & ~(src_res - 1);
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function void print();
       super.print();
       `INFO(("partial_segment_no is %0d", partial_segment_no));
       `INFO(("reduced_length is %0d", reduced_length));
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     virtual function dma_segment_array_t build_segments();
       dma_segment_array_t sa;
       dma_segment s;
@@ -267,8 +354,7 @@ package dma_trans_pkg;
       sa = new[ylength];
       for (int i=0; i<ylength; i++) begin
         if (i != partial_segment_no) begin
-          s = new();
-          s.set_params(p);
+          s = new(p);
           s.src_addr = src_addr + i*src_stride;
           s.dst_addr = dst_addr + i*dst_stride;
           s.length = length;
@@ -279,8 +365,7 @@ package dma_trans_pkg;
           `INFO((" generating segment "));
           s.print();
         end else begin
-          ps = new();
-          ps.set_params(p);
+          ps = new(p);
           ps.src_addr = src_addr + i*src_stride;
           ps.dst_addr = dst_addr + i*dst_stride;
           ps.length = length;
@@ -296,64 +381,20 @@ package dma_trans_pkg;
      return sa;
     endfunction
 
-  endclass
+  endclass : dma_partial_2d_segment
 
-  /*
-    dma_flocked_2d_segment
-  */
-  class dma_flocked_2d_segment extends dma_2d_segment;
-
-    rand int unsigned num_of_buffers;
-    rand int unsigned frame_distance;
-    int unsigned frame_stride;
-    int flock_en = 1;
-    int flock_mode = 0;  // 0 - dynamic. 1 - simple
-    int flock_wait_master = 1;
-
-    function copy(dma_flocked_2d_segment ds);
-      super.copy(ds);
-      ds.num_of_buffers = num_of_buffers;
-      ds.frame_distance = frame_distance;
-      ds.frame_stride = frame_stride;
-      ds.flock_mode = flock_mode;
-      ds.flock_wait_master = flock_wait_master;
-    endfunction
-
-    constraint c_buf_num  {num_of_buffers < p.MAX_NUM_FRAMES;};
-    constraint c_frm_dist {frame_distance < num_of_buffers;};
-
-    virtual function void print();
-      super.print();
-      `INFO(("num_of_buffers is %0d", num_of_buffers));
-      `INFO(("frame_distance is %0d", frame_distance));
-      `INFO(("frame_stride is 0x%0h", frame_stride));
-    endfunction
-
-    function void post_randomize();
-      super.post_randomize();
-      frame_stride =  length *  ylength;
-      cyclic = 1;
-    endfunction
-
-    function dma_flocked_2d_segment toSlaveSeg;
-      dma_flocked_2d_segment seg;
-      seg = new;
-      this.copy(seg);
-      seg.src_addr = seg.dst_addr;
-      seg.src_stride = seg.dst_stride;
-      return seg;
-    endfunction
-
-
-  endclass
-
+  //==========================================================================
   /*
     dma_transfer
   */
+  //==========================================================================
   class dma_transfer;
     axi_dmac_params_t p;
 
-    function set_params(axi_dmac_params_t p);
+    // -----------------
+    //
+    // -----------------
+    function new(axi_dmac_params_t p);
       this.p = p;
     endfunction
 
@@ -367,6 +408,9 @@ package dma_trans_pkg;
       group.size() == size;
     }
 
+    // -----------------
+    //
+    // -----------------
     virtual function void print();
       `INFO(("transfer S"));
       for (int i=0; i<group.size(); i++) begin
@@ -375,13 +419,15 @@ package dma_trans_pkg;
       `INFO(("transfer E"));
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     function void post_randomize();
       dma_segment s;
       group = new[size];
       `INFO(("groups size %0d",group.size()));
       for (int i=0;i<size;i++) begin
-        s = new();
-        s.set_params(p);
+        s = new(p);
         if (i != size-1)
           s.last = 0;
         if (i > 0)
@@ -393,6 +439,9 @@ package dma_trans_pkg;
       end
     endfunction
 
+    // -----------------
+    //
+    // -----------------
     // Add element to the group
     function void add(dma_segment s);
 
@@ -409,23 +458,26 @@ package dma_trans_pkg;
       size++;
     endfunction
 
-  endclass
+  endclass : dma_transfer
 
+  //==========================================================================
   /*
     dma_transfer_group
   */
+  //==========================================================================
   class dma_transfer_group;
 
     dma_transfer group[];
     rand int size;
-    bit autorun = 0;
 
     constraint default_size {
       size > 0 && size < 5;
       group.size() == size;
     }
 
-
+    // -----------------
+    //
+    // -----------------
     // Add element to the group
     function void add(dma_transfer t);
       group = new[group.size()+1] (group);
@@ -433,6 +485,6 @@ package dma_trans_pkg;
       size++;
     endfunction
 
-  endclass
+  endclass : dma_transfer_group
 
 endpackage

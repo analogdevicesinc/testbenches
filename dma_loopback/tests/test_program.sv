@@ -38,11 +38,13 @@
 `include "utils.svh"
 
 import test_harness_env_pkg::*;
-import adi_regmap_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
+import dmac_api_pkg::*;
+import dma_trans_pkg::*;
 
 `define RX_DMA      32'h7c42_0000
 `define TX_DMA      32'h7c43_0000
@@ -51,8 +53,9 @@ import adi_regmap_dmac_pkg::*;
 program test_program;
 
   test_harness_env env;
-  bit [31:0] val;
-  bit [31:0] src_addr;
+  // Register accessors
+  dmac_api m_dmac_api;
+  dmac_api s_dmac_api;
 
   initial begin
 
@@ -68,12 +71,14 @@ program test_program;
     setLoggerVerbosity(6);
     env.start();
 
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
+    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA);
+    m_dmac_api.probe();
 
-    //asserts all the resets for 100 ns
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    #100
-    `TH.`SYS_RST.inst.IF.deassert_reset;
+    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA);
+    s_dmac_api.probe();
+
+    start_clocks();
+    sys_reset();
 
     #1us;
 
@@ -83,7 +88,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+src_addr+i*2,(((i+1)) << 16) | i ,'hF);
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,'hF);
     end
 
     do_transfer(
@@ -106,29 +111,29 @@ program test_program;
                    bit [31:0] dest_addr,
                    bit [31:0] length);
 
-    // Configure TX DMA
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_CONTROL),
-                       `SET_DMAC_CONTROL_ENABLE(1));
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_FLAGS),
-                       `SET_DMAC_FLAGS_TLAST(32'h00000006));
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_X_LENGTH),
-                       `SET_DMAC_X_LENGTH_X_LENGTH(length-1));
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_SRC_ADDRESS),
-                       `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(src_addr));
-    env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-                       `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+    dma_segment m_seg, s_seg;
+    int m_tid, s_tid;
 
-    // Configure RX DMA
-    env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_CONTROL),
-                       `SET_DMAC_CONTROL_ENABLE(1));
-    env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_FLAGS),
-                       `SET_DMAC_FLAGS_TLAST(32'h00000006));
-    env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_X_LENGTH),
-                       `SET_DMAC_X_LENGTH_X_LENGTH(length-1));
-    env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_DEST_ADDRESS),
-                       `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(dest_addr));
-    env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-                       `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+    m_dmac_api.enable_dma();
+    m_dmac_api.set_flags(0);
+
+    s_dmac_api.enable_dma();
+    s_dmac_api.set_flags(0);
+
+    m_seg = new(m_dmac_api.get_params());
+    m_seg.length = length;
+    m_seg.src_addr = src_addr;
+
+    s_seg = new(s_dmac_api.get_params());
+    s_seg.length = length;
+    s_seg.dst_addr = dest_addr;
+
+    m_dmac_api.submit_transfer(m_seg, m_tid);
+    s_dmac_api.submit_transfer(s_seg, s_tid);
+
+    m_dmac_api.wait_transfer_done(m_tid);
+    s_dmac_api.wait_transfer_done(s_tid);
+
   endtask
 
 
@@ -154,5 +159,27 @@ program test_program;
 
     end
   endtask
+
+  task start_clocks;
+
+    `TH.`DEVICE_CLK.inst.IF.start_clock;
+
+  endtask
+
+  task stop_clocks;
+
+    `TH.`DEVICE_CLK.inst.IF.stop_clock;
+
+  endtask
+
+  task sys_reset;
+
+    //asserts all the resets for 100 ns
+    `TH.`SYS_RST.inst.IF.assert_reset;
+    #100
+    `TH.`SYS_RST.inst.IF.deassert_reset;
+
+  endtask
+
 
 endprogram

@@ -411,7 +411,7 @@ end
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
-bit [15:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
+bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [15:0]  sdi_data_store;
 
@@ -427,8 +427,8 @@ initial begin
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
 //        if (sdi_store_cnt [0] == 'h1 ) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] = (sdi_shiftreg & 16'hff00) | ((sdi_shiftreg >> 7) & 16'h00ff) ;
-//          offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
+          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = (sdi_shiftreg & 16'hff00) | ((sdi_shiftreg >> 7) & 16'h00ff);
+          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = ((sdi_shiftreg & 16'h00ff) << 8) | ((sdi_shiftreg << 1) & 16'h00ff);
 //        end
       end else begin
         sdi_fifo_data_store = sdi_shiftreg;
@@ -456,7 +456,7 @@ end
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [15:0] offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test;
   begin

@@ -20,6 +20,7 @@ set plddr_offload_address_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 
 set src_clock_freq $ad_project_params(SRC_CLOCK_FREQ)
 set dst_clock_freq $ad_project_params(DST_CLOCK_FREQ)
+set mem_clock_freq 300
 
 set dst_ready_mode $ad_project_params(DST_READY_MODE)
 set dst_ready_high $ad_project_params(DST_READY_HIGH)
@@ -163,6 +164,21 @@ ad_ip_parameter dst_rst_vip CONFIG.INTERFACE_MODE {MASTER}
 ad_ip_parameter dst_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
 ad_ip_parameter dst_rst_vip CONFIG.ASYNCHRONOUS {NO}
 ad_connect dst_clk_vip/clk_out dst_rst_vip/sync_clk
+
+# DDR/HBM clock/reset
+
+ad_ip_instance clk_vip mem_clk_vip
+adi_sim_add_define "MEM_CLK=mem_clk_vip"
+ad_ip_parameter mem_clk_vip CONFIG.INTERFACE_MODE {MASTER}
+ad_ip_parameter mem_clk_vip CONFIG.FREQ_HZ $mem_clock_freq
+
+ad_ip_instance rst_vip mem_rst_vip
+adi_sim_add_define "MEM_RST=mem_rst_vip"
+ad_ip_parameter mem_rst_vip CONFIG.INTERFACE_MODE {MASTER}
+ad_ip_parameter mem_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
+ad_ip_parameter mem_rst_vip CONFIG.ASYNCHRONOUS {NO}
+ad_connect mem_clk_vip/clk_out mem_rst_vip/sync_clk
+
 
 ################################################################################
 # src_m_axis_vip  - Master AXIS VIP for source interface

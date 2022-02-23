@@ -9,7 +9,7 @@ global ad_project_params
 set data_path_width $ad_project_params(DATA_PATH_WIDTH)
 
 set path_type $ad_project_params(PATH_TYPE)
-set offload_mem_type 0 ; ## Internal storage (BRAM)
+set offload_mem_type $ad_project_params(MEM_TYPE)
 set offload_size $ad_project_params(OFFLOAD_SIZE)
 set offload_src_dwidth $ad_project_params(OFFLOAD_SRC_DWIDTH)
 set offload_dst_dwidth $ad_project_params(OFFLOAD_DST_DWIDTH)

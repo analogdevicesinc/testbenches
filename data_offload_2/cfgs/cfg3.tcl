@@ -3,6 +3,7 @@ global ad_project_params
 
 set ad_project_params(DATA_PATH_WIDTH) 16             ; ## 16 bytes
 
+set ad_project_params(MEM_TYPE) 0                     ; ## Internal storage (BRAM)
 set ad_project_params(PATH_TYPE) 0                    ; ## RX
 set ad_project_params(OFFLOAD_SIZE) 1024              ; ## 1 KiB
 set ad_project_params(OFFLOAD_TRANSFER_LENGTH) 512    ; ## 512 bytes

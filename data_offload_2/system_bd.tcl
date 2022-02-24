@@ -15,12 +15,11 @@ set offload_src_dwidth $ad_project_params(OFFLOAD_SRC_DWIDTH)
 set offload_dst_dwidth $ad_project_params(OFFLOAD_DST_DWIDTH)
 set offload_oneshot $ad_project_params(OFFLOAD_ONESHOT)
 
-set plddr_offload_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
-set plddr_offload_address_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
+set ext_mem_axi_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 
 set src_clock_freq $ad_project_params(SRC_CLOCK_FREQ)
 set dst_clock_freq $ad_project_params(DST_CLOCK_FREQ)
-set mem_clock_freq 300
+set mem_clock_freq 300000000
 
 set dst_ready_mode $ad_project_params(DST_READY_MODE)
 set dst_ready_high $ad_project_params(DST_READY_HIGH)
@@ -79,8 +78,7 @@ ad_data_offload_create DUT \
                        $offload_size \
                        $offload_src_dwidth \
                        $offload_dst_dwidth \
-                       $plddr_offload_data_width \
-                       $plddr_offload_address_width
+                       $ext_mem_axi_data_width \
 
 
 create_bd_port -dir I -type data init_req
@@ -172,12 +170,8 @@ adi_sim_add_define "MEM_CLK=mem_clk_vip"
 ad_ip_parameter mem_clk_vip CONFIG.INTERFACE_MODE {MASTER}
 ad_ip_parameter mem_clk_vip CONFIG.FREQ_HZ $mem_clock_freq
 
-ad_ip_instance rst_vip mem_rst_vip
-adi_sim_add_define "MEM_RST=mem_rst_vip"
-ad_ip_parameter mem_rst_vip CONFIG.INTERFACE_MODE {MASTER}
-ad_ip_parameter mem_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
-ad_ip_parameter mem_rst_vip CONFIG.ASYNCHRONOUS {NO}
-ad_connect mem_clk_vip/clk_out mem_rst_vip/sync_clk
+create_bd_port -dir I mem_rst_n
+
 
 
 ################################################################################
@@ -189,7 +183,7 @@ adi_sim_add_define "SRC_AXIS=src_axis"
 ad_ip_parameter src_axis CONFIG.INTERFACE_MODE {MASTER}
 ad_ip_parameter src_axis CONFIG.HAS_TREADY {1}
 ad_ip_parameter src_axis CONFIG.HAS_TLAST {1}
-ad_ip_parameter src_axis CONFIG.TDATA_NUM_BYTES $data_path_width
+ad_ip_parameter src_axis CONFIG.TDATA_NUM_BYTES [expr $offload_src_dwidth/8]
 
 ad_connect src_clk_vip/clk_out src_axis/aclk
 ad_connect src_rst_vip/rst_out src_axis/aresetn
@@ -214,7 +208,7 @@ if $offload_mem_type {
 ad_ip_instance axi4stream_vip dst_axis
 adi_sim_add_define "DST_AXIS=dst_axis"
 ad_ip_parameter dst_axis CONFIG.INTERFACE_MODE {SLAVE}
-ad_ip_parameter dst_axis CONFIG.TDATA_NUM_BYTES $data_path_width
+ad_ip_parameter dst_axis CONFIG.TDATA_NUM_BYTES [expr $offload_dst_dwidth/8]
 ad_ip_parameter dst_axis CONFIG.HAS_TLAST {1}
 
 ad_connect dst_clk_vip/clk_out dst_axis/aclk
@@ -225,3 +219,27 @@ ad_connect dst_rst_vip/rst_out DUT/m_axis_aresetn
 
 ad_connect DUT/m_axis dst_axis/s_axis
 
+if {$offload_mem_type == 2} {
+
+  source $ad_hdl_dir/library/util_hbm/scripts/adi_util_hbm.tcl
+
+  set hbm_clk mem_clk_vip/clk_out
+  set hbm_reset  mem_rst_n
+
+  global hbm_sim
+  set hbm_sim 1
+  ad_create_hbm HBM_VIP
+
+  ad_connect_hbm HBM_VIP DUT/storage_unit $hbm_clk $hbm_reset
+
+  #ad_connect HBM_VIP/HBM_REF_CLK_0 $sys_cpu_clk
+  #ad_connect HBM_VIP/APB_0_PCLK $sys_cpu_clk
+
+  assign_bd_address
+  set num_m [get_property CONFIG.NUM_M [get_bd_cells /DUT/storage_unit]]
+  for {set i 0} {$i < $num_m} {incr i} {
+    set_property offset 0x00000000 [get_bd_addr_segs DUT/storage_unit/MAXI_${i}/SEG_HBM_VIP_Reg]
+    set_property range 4G [get_bd_addr_segs DUT/storage_unit/MAXI_${i}/SEG_HBM_VIP_Reg]
+  }
+
+}

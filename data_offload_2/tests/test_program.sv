@@ -42,13 +42,18 @@ import logger_pkg::*;
 import environment_pkg::*;
 import data_offload_pkg::*;
 
+`ifdef HBM_AXI
+import `PKGIFY(test_harness, HBM_VIP)::*;
+`endif
+
 //=============================================================================
 // Register Maps
 //=============================================================================
 
 module test_program(
   output  reg       init_req = 1'b0,
-  output  reg       sync_ext = 1'b0
+  output  reg       sync_ext = 1'b0,
+  output  reg       mem_rst_n = 1'b0
 );
 
   //declaring environment instance
@@ -56,6 +61,10 @@ module test_program(
   xil_axi4stream_ready_gen_policy_t dac_mode;
 
   data_offload                      dut;
+
+  `ifdef HBM_AXI
+  `AGENT(test_harness, HBM_VIP, slv_mem_t) hbm_axi_agent;
+  `endif
 
   initial begin
     //creating environment
@@ -92,6 +101,13 @@ module test_program(
 
     #1
     env.start();
+
+    `ifdef HBM_AXI
+    if (`MEM_TYPE == 2) begin
+      hbm_axi_agent = new("AXI HBM stub agent", `TH.`HBM_AXI.inst.IF);
+      hbm_axi_agent.start_slave();
+    end
+    `endif
 
     #100
     `INFO(("Bring up IP from reset."));
@@ -141,6 +157,9 @@ module test_program(
     `TH.`DST_CLK.inst.IF.start_clock;
     #1
     `TH.`SYS_CLK.inst.IF.start_clock;
+    #1
+    `TH.`MEM_CLK.inst.IF.start_clock;
+
   endtask
 
   task stop_clocks;
@@ -148,6 +167,7 @@ module test_program(
     `TH.`SRC_CLK.inst.IF.stop_clock;
     `TH.`DST_CLK.inst.IF.stop_clock;
     `TH.`SYS_CLK.inst.IF.stop_clock;
+    `TH.`MEM_CLK.inst.IF.stop_clock;
 
   endtask
 
@@ -161,6 +181,7 @@ module test_program(
     `TH.`SRC_RST.inst.IF.deassert_reset;
     `TH.`DST_RST.inst.IF.deassert_reset;
     `TH.`SYS_RST.inst.IF.deassert_reset;
+    mem_rst_n = 1'b1;
 
   endtask
 

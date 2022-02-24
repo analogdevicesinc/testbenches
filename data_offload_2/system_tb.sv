@@ -43,11 +43,13 @@ module system_tb();
 
     test_program test(
       .init_req (init_req),
-      .sync_ext (sync_ext)
+      .sync_ext (sync_ext),
+      .mem_rst_n (mem_rst_n)
       );
     test_harness `TH (
       .init_req (init_req),
-      .sync_ext (sync_ext)
+      .sync_ext (sync_ext),
+      .mem_rst_n (mem_rst_n)
     );
 
 endmodule

@@ -11,7 +11,6 @@ set ad_project_params(OFFLOAD_DST_DWIDTH) 128         ; ## Destination data widt
 set ad_project_params(OFFLOAD_ONESHOT) 1              ; ## Enable oneshot mode
 
 set ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH) 512   ; ## PLDDR's AXI4 interface data width
-set ad_project_params(PLDDR_OFFLOAD_ADDRESS_WIDTH) 28 ; ## PLDDR's AXI4 interface address width
 
 set ad_project_params(SRC_CLOCK_FREQ) 250000000       ; ## Source clock frequency in Hz
 set ad_project_params(DST_CLOCK_FREQ) 300000000       ; ## Destination clock frequency in Hz

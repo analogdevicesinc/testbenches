@@ -46,7 +46,7 @@ import data_offload_pkg::*;
 // Register Maps
 //=============================================================================
 
-module test_program(
+module test_program_sync (
   output  reg       init_req = 1'b0,  
   output  reg       sync_ext = 1'b0,
   output  reg       mem_rst_n = 1'b0  

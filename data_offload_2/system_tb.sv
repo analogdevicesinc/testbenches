@@ -41,7 +41,7 @@ module system_tb();
     wire init_req;
     wire sync_ext;
 
-    test_program test(
+    `TEST_PROGRAM test(
       .init_req (init_req),
       .sync_ext (sync_ext),
       .mem_rst_n (mem_rst_n)

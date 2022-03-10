@@ -40,6 +40,7 @@ $(warning $(CFG_FILES))
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
+TESTS += cfg3:test_program_sync
 
 include ../scripts/project-sim.mk
 

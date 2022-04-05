@@ -38,36 +38,32 @@
 `include "utils.svh"
 
 module system_tb();
-    wire       adc_convst;
-    wire       spi_sclk;
-    wire       spi_sdo;
-    wire [1:0] spi_sdi;
-    wire       spi_cs_n;
+    wire       ad7616_spi_sclk;
+    wire       ad7616_spi_sdo;
+    wire [1:0] ad7616_spi_sdi;
+    wire       ad7616_spi_cs;
     wire       adc_busy;
+    wire       adc_cnvst;
     wire       spi_clk;
-    wire       irq;
+    wire       ad7616_irq;
 
   `TEST_PROGRAM test(
-//    .rx_cnvst (adc_convst),
-    .rx_sclk (spi_sclk),
     .spi_clk (spi_clk),
-    .irq (irq),
-    .rx_sdi (spi_sdi),
-    .rx_cs_n (spi_cs_n)
-//    .rx_busy (adc_busy)
-    );
-    
+    .ad7616_irq (ad7616_irq),
+    .ad7616_spi_sdi(ad7616_spi_sdi),
+    .ad7616_spi_cs (ad7616_spi_cs),
+    .ad7616_spi_sclk (ad7616_spi_sclk));   
+
   test_harness `TH (
-    .rx_cnvst (adc_convst),
-    .rx_sclk (spi_sclk),
     .spi_clk (spi_clk),
-    .irq (irq),
-    .rx_sdo (spi_sdo),
-    .rx_sdi (spi_sdi),
-    .rx_cs_n (spi_cs_n),
-    .rx_busy (adc_busy));
+    .ad7616_irq (ad7616_irq),
+    .rx_busy (adc_busy),
+    .rx_cnvst (adc_cnvst),
+    .ad7616_spi_sdo (ad7616_spi_sdo),  
+    .ad7616_spi_sdi (ad7616_spi_sdi),  
+    .ad7616_spi_cs (ad7616_spi_cs),
+    .ad7616_spi_sclk (ad7616_spi_sclk));
     
-    
-    assign adc_busy = adc_convst;
+    assign adc_busy = adc_cnvst;
     
 endmodule

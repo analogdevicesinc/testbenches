@@ -116,13 +116,13 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 localparam AD7616_BASE = `AD7616_REGMAP;
 
 program test_program (
-  input       rx_cnvst,
-  input       rx_sclk,
   input       spi_clk,
-  input       irq,
-  input       rx_sdo,
-  input [1:0] rx_sdi,
-  input       rx_cs_n,
+  input       ad7616_irq,
+  input       ad7616_spi_sclk,
+  input       ad7616_spi_sdo,
+  input [1:0] ad7616_spi_sdi,
+  input       ad7616_spi_cs,
+  input       rx_cnvst,
   output      rx_busy);
 
 
@@ -301,7 +301,7 @@ wire          rx_sclk_bfm = ad7616_echo_sclk;
 wire          m_spi_csn_negedge_s;
 wire          m_spi_csn_int_s = rx_cs_n;
 bit           m_spi_csn_int_d = 0;
-bit   [15:0]   sdi_shiftreg;
+bit   [15:0]  sdi_shiftreg;
 bit   [7:0]   rx_sclk_pos_counter = 0;
 bit   [7:0]   rx_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
@@ -316,31 +316,8 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-//genvar i;
-//for (i = 0; i < 2; i++) begin
-  assign rx_sdi[0] = sdi_shiftreg[14]; // all SDI lanes got the same data
-  assign rx_sdi[1] = sdi_shiftreg[15]; // all SDI lanes got the same data
-
-//end
-
-//wire [15:0] data_a;
-//wire [15:0] data_b;
-//reg  [3:0] ramp = 'h0;
-//reg  [2:0] channel_a = 'h0;
-//reg  [2:0] channel_b = 'h0;
-
-
-//assign  data_a = 4'hA000 | ramp << 8 | channel_a << 4 | ramp;
-//assign  data_b = 4'hB000 | ramp << 8 | channel_b << 4 | ramp;
-
-
-//initial begin
-//  while(1) begin
-//    @(posedge rx_cnvst);
-//  ramp = ramp + 1;
-//  channel_a = channel_a +  channel_b = channel_b + 1;
-//  end
-//end
+assign rx_sdi[0] = sdi_shiftreg[14]; // all SDI lanes got the same data
+assign rx_sdi[1] = sdi_shiftreg[15]; // all SDI lanes got the same data
 
 assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_pos_counter == 16) :

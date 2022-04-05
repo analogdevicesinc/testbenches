@@ -37,6 +37,10 @@ source ../../library/scripts/adi_env.tcl
 
 global ad_project_params
 
+adi_project_files [list \
+	"../../library/common/ad_edge_detect.v" \
+	"../../library/util_cdc/sync_bits.v" \
+]
 
 #
 #  Block design under test
@@ -48,4 +52,4 @@ create_bd_port -dir O spi_clk
 create_bd_port -dir O irq
 
 ad_connect spi_clk sys_cpu_clk
-ad_connect irq axi_ad7616/irq
+#ad_connect irq axi_ad7616/irq

@@ -22,7 +22,6 @@ set dac_offload_src_dwidth $ad_project_params(DAC_OFFLOAD_SRC_DWIDTH)
 set dac_offload_dst_dwidth $ad_project_params(DAC_OFFLOAD_DST_DWIDTH)
 
 set plddr_offload_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
-set plddr_offload_address_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 
 ################################################################################
 # Create interface ports -- clocks and resets
@@ -83,8 +82,7 @@ ad_data_offload_create RX_DUT \
                        $adc_offload_size \
                        $adc_offload_src_dwidth \
                        $adc_offload_dst_dwidth \
-                       $plddr_offload_data_width \
-                       $plddr_offload_address_width
+                       $plddr_offload_data_width
 
 ad_data_offload_create TX_DUT \
                        1 \
@@ -92,8 +90,7 @@ ad_data_offload_create TX_DUT \
                        $dac_offload_size \
                        $dac_offload_src_dwidth \
                        $dac_offload_dst_dwidth \
-                       $plddr_offload_data_width \
-                       $plddr_offload_address_width
+                       $plddr_offload_data_width
 
 
 ################################################################################
@@ -382,13 +379,13 @@ ad_connect plddr_rst_vip/rst_out plddr_axi/aresetn
 if {$adc_offload_mem_type || $dac_offload_mem_type} {
 
   # clocks and resets for the DUT
-  ad_connect plddr_clk_vip/clk_out $plddr_iname/fifo2axi_bridge/axi_clk
-  ad_connect plddr_rst_vip/rst_out $plddr_iname/fifo2axi_bridge/axi_resetn
+  ad_connect plddr_clk_vip/clk_out $plddr_iname/storage_unit/m_axi_aclk
+  ad_connect plddr_rst_vip/rst_out $plddr_iname/storage_unit/m_axi_aresetn
 
-  ad_connect plddr_axi/S_AXI $plddr_iname/fifo2axi_bridge/ddr_axi
+  ad_connect plddr_axi/S_AXI $plddr_iname/storage_unit/MAXI_0
 
   create_bd_addr_seg -range 2G -offset 0x00000000 \
-      [get_bd_addr_spaces $plddr_iname/fifo2axi_bridge/ddr_axi] \
+      [get_bd_addr_spaces $plddr_iname/storage_unit/MAXI_0] \
       [get_bd_addr_segs plddr_axi/S_AXI/Reg] \
       SEG_plddr_0_mm_slave
   adi_sim_add_define "PL_MEM_BA=[format "%d" 0x00000000]"

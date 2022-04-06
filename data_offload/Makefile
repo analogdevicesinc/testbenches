@@ -26,9 +26,9 @@ LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
 LIB_DEPS += axi_dmac
 LIB_DEPS += data_offload
-LIB_DEPS += util_fifo2axi_bridge
+LIB_DEPS += util_hbm
 
-#util_fifo2axi_bridge test program
+#util_hbm test program
 TP := test_program
 
 # config files should have the following format

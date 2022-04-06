@@ -91,10 +91,13 @@ module test_program();
     //=========================================================================
 
     setLoggerVerbosity(250);
-
+    
+    `TH.`PLDDR_RST.inst.IF.assert_reset;
+    #1;
+    
     start_clocks;
     sys_reset;
-
+          
     #1
     env.start();
 
@@ -103,7 +106,7 @@ module test_program();
     systemBringUp;
 
     //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
-    do_set_transfer_length(`ADC_TRANSFER_LENGTH);
+    do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
 
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));

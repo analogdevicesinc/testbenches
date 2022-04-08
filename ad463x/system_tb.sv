@@ -56,6 +56,7 @@ module system_tb();
     .ad463x_spi_sclk(ad463x_spi_sclk),
     .ad463x_spi_cs(ad463x_spi_cs),
     .ad463x_spi_clk(ad463x_spi_clk),
+    .ad463x_spi_sdo(ad463x_spi_sdo),
     .ad463x_spi_sdi(ad463x_spi_sdi));
 
   test_harness `TH (

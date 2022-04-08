@@ -47,7 +47,7 @@ adi_project_files [list \
 #  Block design under test
 #
 
-source ../../projects/ad3552r/common/pulsar_adc_pmdz_bd.tcl
+source ../../projects/ad3552r/common/ad3552r_bd.tcl
 
 create_bd_port -dir O ad3552r_dac_spi_clk
 create_bd_port -dir O ad3552r_dac_irq

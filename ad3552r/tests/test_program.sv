@@ -65,6 +65,7 @@ localparam SPI_ENG_ADDR_SDIFIFO_LEVEL = 32'h0000_00D8;
 localparam SPI_ENG_ADDR_CMDFIFO       = 32'h0000_00E0;
 localparam SPI_ENG_ADDR_SDOFIFO       = 32'h0000_00E4;
 localparam SPI_ENG_ADDR_SDIFIFO       = 32'h0000_00E8;
+localparam SPI_ENG_ADDR_SDIFIFO_MSB   = 32'h0000_00EC;
 localparam SPI_ENG_ADDR_SDIFIFO_PEEK  = 32'h0000_00F0;
 localparam SPI_ENG_ADDR_OFFLOAD_EN    = 32'h0000_0100;
 localparam SPI_ENG_ADDR_OFFLOAD_RESET = 32'h0000_0108;
@@ -78,8 +79,11 @@ localparam PCORE_VERSION              = 32'h0001_0071;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 32;
+
 localparam DATA_DLENGTH               = 32;
-localparam DATA_DLENGTH_REG           = 16;
+localparam INST_DLENGTH_RBK           = 32'h0000_2200 | 16;
+localparam INST_DLENGTH_ADDR          = 32'h0000_2200 | 16;
+
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
 localparam SDI_DELAY                  = 0;
@@ -108,8 +112,7 @@ localparam INST_WRD                   = 32'h0000_0300 | (NUM_OF_WORDS-1);
 localparam INST_CFG                   = 32'h0000_2100 | (THREE_WIRE << 2) | (CPOL << 1) | CPHA;
 localparam INST_PRESCALE              = 32'h0000_2000 | CLOCK_DIVIDER;
 localparam INST_DLENGTH               = 32'h0000_2200 | DATA_DLENGTH;
-localparam INST_DLENGTH_RBK           = 32'h0000_2200 | 16;
-localparam INST_DLENGTH_ADDR          = 32'h0000_2200 | 14;
+
 
 // Synchronization
 localparam INST_SYNC                  = 32'h0000_3000;
@@ -340,10 +343,15 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-genvar i;
-for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign ad3552r_dac_spi_sdi[i] = (ad3552r_dac_spi_sdo_t == 'h1) ? sdi_shiftreg[31] : 'hz; // all SDI lanes got the same data
-end
+assign ad3552r_dac_spi_sdi[0] = (ad3552r_dac_spi_sdo_t == 'h1) ? sdi_shiftreg[28] : 'hz;
+assign ad3552r_dac_spi_sdi[1] = (ad3552r_dac_spi_sdo_t == 'h1) ? sdi_shiftreg[29] : 'hz;
+assign ad3552r_dac_spi_sdi[2] = (ad3552r_dac_spi_sdo_t == 'h1) ? sdi_shiftreg[30] : 'hz;
+assign ad3552r_dac_spi_sdi[3] = (ad3552r_dac_spi_sdo_t == 'h1) ? sdi_shiftreg[31] : 'hz;
+
+//genvar i;
+//for (i = 0; i < `NUM_OF_SDI; i++) begin
+//  assign ad3552r_dac_spi_sdi[i] = (ad3552r_dac_spi_sdo_t == 'h1) ? sdi_shiftreg[31] : 'hz; // all SDI lanes got the same data
+//end
 
 assign end_of_word = (CPOL ^ CPHA) ?
                      (spi_sclk_pos_counter == DATA_DLENGTH) :
@@ -424,14 +432,16 @@ initial begin
       if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin
       if (offload_status) begin
-        sdo_shiftreg <= {sdo_shiftreg[29:0], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
+        sdo_shiftreg <= {sdo_shiftreg[27:0], ad3552r_dac_spi_sdo[3], ad3552r_dac_spi_sdo[2], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
+//        sdo_shiftreg <= {sdo_shiftreg[29:0], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
         if (sclk_counter == 'd15) begin
           sclk_counter <= 'h0;
         end else begin
           sclk_counter <= sclk_counter + 1'h1;
         end
       end else begin
-        sdo_shiftreg2 <= {sdo_shiftreg2[29:0], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
+        sdo_shiftreg2 <= {sdo_shiftreg[27:0], ad3552r_dac_spi_sdo[3], ad3552r_dac_spi_sdo[2], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
+//        sdo_shiftreg2 <= {sdo_shiftreg2[29:0], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
       end
     end
   end
@@ -439,7 +449,7 @@ end
 
 initial begin
   while(1) begin
-    @(negedge sclk_counter [3]) begin
+    @(negedge sclk_counter [2]) begin
       sdo_shiftreg_store_arr [sdo_store_cnt] = sdo_shiftreg;
       sdo_store_cnt = sdo_store_cnt + 'h1;
       offload_transfer_cnt <= offload_transfer_cnt + 'h1;
@@ -498,6 +508,7 @@ endtask
 //---------------------------------------------------------------------------
 
 bit   [31:0]  sdi_fifo_data = 0;
+bit   [31:0]  sdi_fifo_data2 = 0;
 
 task fifo_spi_test;
 begin
@@ -508,15 +519,28 @@ begin
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_ADDR);
 
   //write SDO FIFO data
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, DAC_RREG);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, 16'hdead);
+//  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, 16'hbeef);
+//  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, DAC_RREG);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_WR);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 2));
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_RBK);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_RD);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 3));
+
+//  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_RBK);
+//  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_RD);
+//  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_RD);
+//  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 3));
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
-  
+
+  axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+  axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+  axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+  axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+
+//  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 2));
+//  axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+//  axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO_MSB, sdi_fifo_data2);
+
 end
 endtask
 

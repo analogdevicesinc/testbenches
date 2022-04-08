@@ -42,10 +42,10 @@ module system_tb();
   wire ad3552r_dac_spi_cs;
   wire ad3552r_dac_spi_sclk;
   wire ad3552r_dac_spi_clk;
-  wire [1:0] ad3552r_dac_spi_sdi;
-  wire [1:0] ad3552_dac_spi_sdio;
+  wire [`NUM_OF_SDI-1:0] ad3552r_dac_spi_sdi;
+  wire [`NUM_OF_SDO-1:0] ad3552_dac_spi_sdio;
   wire ad3552r_dac_spi_sdo_t;
-  wire [1:0] ad3552r_dac_spi_sdo; //ADD PARAM
+  wire [`NUM_OF_SDO-1:0] ad3552r_dac_spi_sdo; //ADD PARAM
   wire ad3552r_dac_irq;
 
   `TEST_PROGRAM test(

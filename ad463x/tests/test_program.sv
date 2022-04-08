@@ -122,6 +122,7 @@ program test_program (
   input ad463x_spi_sclk,
   input ad463x_spi_cs,
   input ad463x_spi_clk,
+  input ad463x_spi_sdo,
   input [(`NUM_OF_SDI - 1):0] ad463x_spi_sdi);
 
 test_harness_env env;
@@ -448,6 +449,36 @@ initial begin
   end
 end
 
+bit [31:0] sdo_shiftreg = 'h0;
+bit [31:0] sdo_shiftreg2 = 'h0;
+bit [31:0] sdo_shiftreg_store_arr [NUM_OF_TRANSFERS - 1:0];
+bit [15:0] sdo_store_cnt = 'h0;
+bit [5:0]  sclk_counter = 'h0;
+bit [31:0] offload_transfer_cnt;
+
+//// SDO shift register
+initial begin
+  while(1) begin
+    // synchronization
+    @(negedge ad463x_spi_sclk or posedge m_spi_csn_negedge_s);
+
+    if (m_spi_csn_negedge_s) begin
+      if (m_spi_csn_negedge_s) @(posedge ad463x_spi_sclk); // NOTE: when PHA=1 first shift should be at the second positive edge
+    end else begin
+      if (offload_status) begin
+        sdo_shiftreg <= {sdo_shiftreg[30:0], ad463x_spi_sdo};
+        if (sclk_counter == 'd15) begin
+          sclk_counter <= 'h0;
+        end else begin
+          sclk_counter <= sclk_counter + 1'h1;
+        end
+      end else begin
+        sdo_shiftreg2 <= {sdo_shiftreg2[30:0], ad463x_spi_sdo};
+      end
+    end
+  end
+end
+
 //---------------------------------------------------------------------------
 // Offload Transfer Counter
 //---------------------------------------------------------------------------
@@ -562,7 +593,7 @@ begin
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
     #100
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_SDOFIFO, (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
+    axi_write (AD469X_BASE + SPI_ENG_ADDR_SDOFIFO, (32'hDEADBEEF << (DATA_WIDTH - DATA_DLENGTH)));
   end
 
   generate_transfer_cmd(1);

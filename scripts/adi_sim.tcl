@@ -47,6 +47,9 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   # Pass the test harness instance name to the simulation
   adi_sim_add_define "TH=$design_name"
+
+  # Use a define for the top module
+  adi_sim_add_define "TB=system_tb"
 }
 
 proc adi_sim_project_files {project_files} {

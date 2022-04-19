@@ -85,7 +85,7 @@ localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
 localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 10;
+localparam NUM_OF_TRANSFERS           = 32;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -110,7 +110,7 @@ localparam INST_SYNC                  = 32'h0000_3000;
 
 // Sleep instruction
 localparam INST_SLEEP                 = 32'h0000_3100;
-`define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
+`define sleep(a)                      = INST_SLEEP | (a & 8'hFF);
 
 localparam PULSAR_ADC_BASE = `PULSAR_ADC_REGMAP;
 localparam PULSAR_ADC_CLKGEN_BASE = `PULSAR_ADC_CLKGEN;
@@ -386,8 +386,8 @@ end
 
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
-bit [15:0]  sdi_store_cnt = (`NUM_OF_SDI == 1) ? 'h1 : 'h0;
-bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
+bit [15:0]  sdi_store_cnt = 'h0;
+bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
 bit [31:0]  sdi_shiftreg2;
@@ -404,68 +404,11 @@ initial begin
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
-          sdi_store_cnt <= sdi_store_cnt + 1;
-        end else begin
-          sdi_store_cnt <= sdi_store_cnt + 2;
-        end
+        sdi_store_cnt <= sdi_store_cnt + 1;
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
-          sdi_shiftreg_old <= sdi_shiftreg;
-          if (sdi_store_cnt [0] == 'h1 ) begin
-            for (int i=0; i<16; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt-1][16 + i] = sdi_shiftreg[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt-1][i] = sdi_shiftreg_old[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
-              offload_sdi_data_store_arr[sdi_store_cnt][16 + i] =  sdi_shiftreg[2*i];
-            end
-          end
-        end else if (`NUM_OF_SDI == 2) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
-            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
-          end
-        end else if (`NUM_OF_SDI == 4) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*4)+:4] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*4)+:4] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            for (int i=0; i<16; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt][2*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][2*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i+1] = sdi_shiftreg[i];
-            end
-          end
-        end else if (`NUM_OF_SDI == 8) begin
-          if (`DDR_EN == 1) begin
-            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
-              offload_sdi_data_store_arr [sdi_store_cnt][(j*8)+:8] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*8)+:8] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j]};
-            end
-          end else begin
-            for (int i=0; i<8; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+2] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt][4*i+3] = sdi_shiftreg[i];
-
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i  ] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+1] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+2] = sdi_shiftreg[i];
-              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+3] = sdi_shiftreg[i];
-            end
-          end
-        end
+        offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
       end else begin
         sdi_fifo_data_store = sdi_shiftreg;
       end
@@ -487,12 +430,11 @@ initial begin
   end
 end
 
-
 //---------------------------------------------------------------------------
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [31:0] offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test;
   begin
@@ -501,7 +443,7 @@ task offload_spi_test;
 
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4*2)-1); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
@@ -522,11 +464,7 @@ task offload_spi_test;
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started.", $time);
 
-    if (`NUM_OF_SDI == 1) begin
-      wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
-    end else begin
-      wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-    end
+    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
     offload_status = 0;
@@ -535,7 +473,7 @@ task offload_spi_test;
 
     #2000
 
-    for (int i=0; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
+    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
       offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
     end
@@ -546,7 +484,7 @@ task offload_spi_test;
       `INFO(("IRQ Test PASSED"));
     end
 
-    if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
+    if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("Offload Test FAILED"));
     end else begin
       `INFO(("Offload Test PASSED"));
@@ -569,8 +507,6 @@ begin
 
   //config cnv
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
-//  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'h64 * 'h32);
-//  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h0000004c,'h64 * 'h32);
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
   // Enable SPI Engine

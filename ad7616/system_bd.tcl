@@ -52,4 +52,4 @@ create_bd_port -dir O spi_clk
 create_bd_port -dir O irq
 
 ad_connect spi_clk sys_cpu_clk
-#ad_connect irq axi_ad7616/irq
+ad_connect irq spi_ad7616/irq

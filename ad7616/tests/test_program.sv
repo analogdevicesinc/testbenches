@@ -44,6 +44,7 @@ import test_harness_env_pkg::*;
 
 `define AD7616_DMA                      32'h44A3_0000
 `define AD7616_REGMAP                   32'h44A0_0000
+`define AXI_PWMGEN                      32'h44B0_0000
 `define DDR_BASE                        32'h8000_0000
 
 localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
@@ -114,6 +115,7 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
 
 localparam AD7616_BASE = `AD7616_REGMAP;
+localparam AXI_PWMGEN = `AXI_PWMGEN;
 
 program test_program (
   input       spi_clk,
@@ -188,6 +190,7 @@ initial begin
   #100
 
   offload_spi_test;
+
   `INFO(("Test Done"));
 
   $finish;
@@ -309,7 +312,7 @@ bit   [31:0]  sdi_nreg[$];
 
 initial begin
   while(1) begin
-    @(posedge ad7616_spi_sclk);
+    @(posedge spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
 end
@@ -438,11 +441,16 @@ bit [31:0] offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) -1 :0];
 task offload_spi_test;
   begin
 
+    //config cnv
+    #100 axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000000);
+    #100 axi_write (AXI_PWMGEN + 32'h00000040, 'h64);
+    #100 axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000002);
+
     //Configure DMA
 
     env.mng.RegWrite32(`AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
     env.mng.RegWrite32(`AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4*2)-1); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4*4)-1); // X_LENGHTH = 1024-1
     env.mng.RegWrite32(`AD7616_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
     env.mng.RegWrite32(`AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 

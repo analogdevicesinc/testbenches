@@ -20,7 +20,7 @@
 //   1. The GNU General Public License version 2 as published by the
 //      Free Software Foundation, which can be found in the top level directory
 //      of this repository (LICENSE_GPL2), and also online at:
-//      <https://www.gnu.org/licenses/old_licenses/gpl-2.0.html>
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
 //
 // OR
 //
@@ -33,9 +33,9 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Fri May 28 12:27:32 2021 */
+/* Wed Oct 12 14:15:25 2022 */
 
-package adi_regmap_tdd_pkg;
+package adi_regmap_tdd_trans_pkg;
   import adi_regmap_pkg::*;
 
 

@@ -117,7 +117,7 @@ localparam AD7616_BASE = `AD7616_REGMAP;
 
 program test_program (
   input       spi_clk,
-  input       ad7616_irq,
+  input       irq,
   input       ad7616_spi_sclk,
   input       ad7616_spi_sdo,
   input [1:0] ad7616_spi_sdi,
@@ -273,7 +273,7 @@ end
   reg     delay_clk = 0;
   wire    m_rx_sclk;
 
-  assign  m_rx_sclk = rx_sclk;
+  assign  m_rx_sclk = ad7616_spi_sclk;
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
@@ -299,7 +299,7 @@ end
 wire          end_of_word;
 wire          rx_sclk_bfm = ad7616_echo_sclk;
 wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = rx_cs_n;
+wire          m_spi_csn_int_s = ad7616_spi_cs;
 bit           m_spi_csn_int_d = 0;
 bit   [15:0]  sdi_shiftreg;
 bit   [7:0]   rx_sclk_pos_counter = 0;
@@ -316,8 +316,8 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-assign rx_sdi[0] = sdi_shiftreg[14]; // all SDI lanes got the same data
-assign rx_sdi[1] = sdi_shiftreg[15]; // all SDI lanes got the same data
+assign ad7616_spi_sdi[0] = sdi_shiftreg[14]; // all SDI lanes got the same data
+assign ad7616_spi_sdi[1] = sdi_shiftreg[15]; // all SDI lanes got the same data
 
 assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_pos_counter == 16) :

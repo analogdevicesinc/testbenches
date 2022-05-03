@@ -45,18 +45,18 @@ module system_tb();
     wire       adc_busy;
     wire       adc_cnvst;
     wire       spi_clk;
-    wire       ad7616_irq;
+    wire       irq;
 
   `TEST_PROGRAM test(
     .spi_clk (spi_clk),
-    .ad7616_irq (ad7616_irq),
+    .irq (irq),
     .ad7616_spi_sdi(ad7616_spi_sdi),
     .ad7616_spi_cs (ad7616_spi_cs),
     .ad7616_spi_sclk (ad7616_spi_sclk));   
 
   test_harness `TH (
     .spi_clk (spi_clk),
-    .ad7616_irq (ad7616_irq),
+    .irq (irq),
     .rx_busy (adc_busy),
     .rx_cnvst (adc_cnvst),
     .ad7616_spi_sdo (ad7616_spi_sdo),  

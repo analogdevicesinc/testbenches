@@ -1,0 +1,476 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsabilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+/* Auto generated Register Map */
+/* Wed Oct 12 14:15:25 2022 */
+
+package adi_regmap_tdd_gen_pkg;
+  import adi_regmap_pkg::*;
+
+
+/* Generic TDD Control (axi_tdd) */
+
+  const reg_t TDDN_CNTRL_VERSION = '{ 'h0000, "VERSION" , '{
+    "VERSION_MAJOR": '{ 31, 16, R, 'h0002 },
+    "VERSION_MINOR": '{ 15, 8, R, 'h00 },
+    "VERSION_PATCH": '{ 7, 0, R, 'h61 }}};
+  `define SET_TDDN_CNTRL_VERSION_VERSION_MAJOR(x) SetField(TDDN_CNTRL_VERSION,"VERSION_MAJOR",x)
+  `define GET_TDDN_CNTRL_VERSION_VERSION_MAJOR(x) GetField(TDDN_CNTRL_VERSION,"VERSION_MAJOR",x)
+  `define SET_TDDN_CNTRL_VERSION_VERSION_MINOR(x) SetField(TDDN_CNTRL_VERSION,"VERSION_MINOR",x)
+  `define GET_TDDN_CNTRL_VERSION_VERSION_MINOR(x) GetField(TDDN_CNTRL_VERSION,"VERSION_MINOR",x)
+  `define SET_TDDN_CNTRL_VERSION_VERSION_PATCH(x) SetField(TDDN_CNTRL_VERSION,"VERSION_PATCH",x)
+  `define GET_TDDN_CNTRL_VERSION_VERSION_PATCH(x) GetField(TDDN_CNTRL_VERSION,"VERSION_PATCH",x)
+
+  const reg_t TDDN_CNTRL_PERIPHERAL_ID = '{ 'h0004, "PERIPHERAL_ID" , '{
+    "PERIPHERAL_ID": '{ 31, 0, R, 0 }}};
+  `define SET_TDDN_CNTRL_PERIPHERAL_ID_PERIPHERAL_ID(x) SetField(TDDN_CNTRL_PERIPHERAL_ID,"PERIPHERAL_ID",x)
+  `define GET_TDDN_CNTRL_PERIPHERAL_ID_PERIPHERAL_ID(x) GetField(TDDN_CNTRL_PERIPHERAL_ID,"PERIPHERAL_ID",x)
+
+  const reg_t TDDN_CNTRL_SCRATCH = '{ 'h0008, "SCRATCH" , '{
+    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_SCRATCH_SCRATCH(x) SetField(TDDN_CNTRL_SCRATCH,"SCRATCH",x)
+  `define GET_TDDN_CNTRL_SCRATCH_SCRATCH(x) GetField(TDDN_CNTRL_SCRATCH,"SCRATCH",x)
+
+  const reg_t TDDN_CNTRL_IDENTIFICATION = '{ 'h000c, "IDENTIFICATION" , '{
+    "IDENTIFICATION": '{ 31, 0, R, 'h5444444E }}};
+  `define SET_TDDN_CNTRL_IDENTIFICATION_IDENTIFICATION(x) SetField(TDDN_CNTRL_IDENTIFICATION,"IDENTIFICATION",x)
+  `define GET_TDDN_CNTRL_IDENTIFICATION_IDENTIFICATION(x) GetField(TDDN_CNTRL_IDENTIFICATION,"IDENTIFICATION",x)
+
+  const reg_t TDDN_CNTRL_INTERFACE_DESCRIPTION = '{ 'h0010, "INTERFACE_DESCRIPTION" , '{
+    "SYNC_COUNT_WIDTH": '{ 30, 24, R, 0 },
+    "BURST_COUNT_WIDTH": '{ 21, 16, R, 0 },
+    "REGISTER_WIDTH": '{ 13, 8, R, 0 },
+    "SYNC_EXTERNAL_CDC": '{ 7, 7, R, 0 },
+    "SYNC_EXTERNAL": '{ 6, 6, R, 0 },
+    "SYNC_INTERNAL": '{ 5, 5, R, 0 },
+    "CHANNEL_COUNT_EXTRA": '{ 4, 0, R, 0 }}};
+  `define SET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_COUNT_WIDTH(x) SetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_COUNT_WIDTH",x)
+  `define GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_COUNT_WIDTH(x) GetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_COUNT_WIDTH",x)
+  `define SET_TDDN_CNTRL_INTERFACE_DESCRIPTION_BURST_COUNT_WIDTH(x) SetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"BURST_COUNT_WIDTH",x)
+  `define GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_BURST_COUNT_WIDTH(x) GetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"BURST_COUNT_WIDTH",x)
+  `define SET_TDDN_CNTRL_INTERFACE_DESCRIPTION_REGISTER_WIDTH(x) SetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"REGISTER_WIDTH",x)
+  `define GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_REGISTER_WIDTH(x) GetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"REGISTER_WIDTH",x)
+  `define SET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_EXTERNAL_CDC(x) SetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_EXTERNAL_CDC",x)
+  `define GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_EXTERNAL_CDC(x) GetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_EXTERNAL_CDC",x)
+  `define SET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_EXTERNAL(x) SetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_EXTERNAL",x)
+  `define GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_EXTERNAL(x) GetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_EXTERNAL",x)
+  `define SET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_INTERNAL(x) SetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_INTERNAL",x)
+  `define GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_INTERNAL(x) GetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"SYNC_INTERNAL",x)
+  `define SET_TDDN_CNTRL_INTERFACE_DESCRIPTION_CHANNEL_COUNT_EXTRA(x) SetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"CHANNEL_COUNT_EXTRA",x)
+  `define GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_CHANNEL_COUNT_EXTRA(x) GetField(TDDN_CNTRL_INTERFACE_DESCRIPTION,"CHANNEL_COUNT_EXTRA",x)
+
+  const reg_t TDDN_CNTRL_DEFAULT_POLARITY = '{ 'h0014, "DEFAULT_POLARITY" , '{
+    "DEFAULT_POLARITY": '{ 31, 0, R, 0 }}};
+  `define SET_TDDN_CNTRL_DEFAULT_POLARITY_DEFAULT_POLARITY(x) SetField(TDDN_CNTRL_DEFAULT_POLARITY,"DEFAULT_POLARITY",x)
+  `define GET_TDDN_CNTRL_DEFAULT_POLARITY_DEFAULT_POLARITY(x) GetField(TDDN_CNTRL_DEFAULT_POLARITY,"DEFAULT_POLARITY",x)
+
+  const reg_t TDDN_CNTRL_CONTROL = '{ 'h0040, "CONTROL" , '{
+    "SYNC_SOFT": '{ 4, 4, RW, 'h0 },
+    "SYNC_EXT": '{ 3, 3, RW, 'h0 },
+    "SYNC_INT": '{ 2, 2, RW, 'h0 },
+    "SYNC_RST": '{ 1, 1, RW, 'h0 },
+    "ENABLE": '{ 0, 0, RW, 'h0 }}};
+  `define SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(x) SetField(TDDN_CNTRL_CONTROL,"SYNC_SOFT",x)
+  `define GET_TDDN_CNTRL_CONTROL_SYNC_SOFT(x) GetField(TDDN_CNTRL_CONTROL,"SYNC_SOFT",x)
+  `define SET_TDDN_CNTRL_CONTROL_SYNC_EXT(x) SetField(TDDN_CNTRL_CONTROL,"SYNC_EXT",x)
+  `define GET_TDDN_CNTRL_CONTROL_SYNC_EXT(x) GetField(TDDN_CNTRL_CONTROL,"SYNC_EXT",x)
+  `define SET_TDDN_CNTRL_CONTROL_SYNC_INT(x) SetField(TDDN_CNTRL_CONTROL,"SYNC_INT",x)
+  `define GET_TDDN_CNTRL_CONTROL_SYNC_INT(x) GetField(TDDN_CNTRL_CONTROL,"SYNC_INT",x)
+  `define SET_TDDN_CNTRL_CONTROL_SYNC_RST(x) SetField(TDDN_CNTRL_CONTROL,"SYNC_RST",x)
+  `define GET_TDDN_CNTRL_CONTROL_SYNC_RST(x) GetField(TDDN_CNTRL_CONTROL,"SYNC_RST",x)
+  `define SET_TDDN_CNTRL_CONTROL_ENABLE(x) SetField(TDDN_CNTRL_CONTROL,"ENABLE",x)
+  `define GET_TDDN_CNTRL_CONTROL_ENABLE(x) GetField(TDDN_CNTRL_CONTROL,"ENABLE",x)
+
+  const reg_t TDDN_CNTRL_CHANNEL_ENABLE = '{ 'h0044, "CHANNEL_ENABLE" , '{
+    "CHANNEL_ENABLE": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(x) SetField(TDDN_CNTRL_CHANNEL_ENABLE,"CHANNEL_ENABLE",x)
+  `define GET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(x) GetField(TDDN_CNTRL_CHANNEL_ENABLE,"CHANNEL_ENABLE",x)
+
+  const reg_t TDDN_CNTRL_CHANNEL_POLARITY = '{ 'h0048, "CHANNEL_POLARITY" , '{
+    "CHANNEL_POLARITY": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(x) SetField(TDDN_CNTRL_CHANNEL_POLARITY,"CHANNEL_POLARITY",x)
+  `define GET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(x) GetField(TDDN_CNTRL_CHANNEL_POLARITY,"CHANNEL_POLARITY",x)
+
+  const reg_t TDDN_CNTRL_BURST_COUNT = '{ 'h004c, "BURST_COUNT" , '{
+    "BURST_COUNT": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(x) SetField(TDDN_CNTRL_BURST_COUNT,"BURST_COUNT",x)
+  `define GET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(x) GetField(TDDN_CNTRL_BURST_COUNT,"BURST_COUNT",x)
+
+  const reg_t TDDN_CNTRL_STARTUP_DELAY = '{ 'h0050, "STARTUP_DELAY" , '{
+    "STARTUP_DELAY": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(x) SetField(TDDN_CNTRL_STARTUP_DELAY,"STARTUP_DELAY",x)
+  `define GET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(x) GetField(TDDN_CNTRL_STARTUP_DELAY,"STARTUP_DELAY",x)
+
+  const reg_t TDDN_CNTRL_FRAME_LENGTH = '{ 'h0054, "FRAME_LENGTH" , '{
+    "FRAME_LENGTH": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(x) SetField(TDDN_CNTRL_FRAME_LENGTH,"FRAME_LENGTH",x)
+  `define GET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(x) GetField(TDDN_CNTRL_FRAME_LENGTH,"FRAME_LENGTH",x)
+
+  const reg_t TDDN_CNTRL_SYNC_COUNTER_LOW = '{ 'h0058, "SYNC_COUNTER_LOW" , '{
+    "SYNC_COUNTER_LOW": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_SYNC_COUNTER_LOW_SYNC_COUNTER_LOW(x) SetField(TDDN_CNTRL_SYNC_COUNTER_LOW,"SYNC_COUNTER_LOW",x)
+  `define GET_TDDN_CNTRL_SYNC_COUNTER_LOW_SYNC_COUNTER_LOW(x) GetField(TDDN_CNTRL_SYNC_COUNTER_LOW,"SYNC_COUNTER_LOW",x)
+
+  const reg_t TDDN_CNTRL_SYNC_COUNTER_HIGH = '{ 'h005c, "SYNC_COUNTER_HIGH" , '{
+    "SYNC_COUNTER_HIGH": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_SYNC_COUNTER_HIGH_SYNC_COUNTER_HIGH(x) SetField(TDDN_CNTRL_SYNC_COUNTER_HIGH,"SYNC_COUNTER_HIGH",x)
+  `define GET_TDDN_CNTRL_SYNC_COUNTER_HIGH_SYNC_COUNTER_HIGH(x) GetField(TDDN_CNTRL_SYNC_COUNTER_HIGH,"SYNC_COUNTER_HIGH",x)
+
+  const reg_t TDDN_CNTRL_STATUS = '{ 'h0060, "STATUS" , '{
+    "STATE": '{ 1, 0, R, 'h0 }}};
+  `define SET_TDDN_CNTRL_STATUS_STATE(x) SetField(TDDN_CNTRL_STATUS,"STATE",x)
+  `define GET_TDDN_CNTRL_STATUS_STATE(x) GetField(TDDN_CNTRL_STATUS,"STATE",x)
+
+  const reg_t TDDN_CNTRL_CH0_ON = '{ 'h0080, "CH0_ON" , '{
+    "CH0_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH0_ON_CH0_ON(x) SetField(TDDN_CNTRL_CH0_ON,"CH0_ON",x)
+  `define GET_TDDN_CNTRL_CH0_ON_CH0_ON(x) GetField(TDDN_CNTRL_CH0_ON,"CH0_ON",x)
+
+  const reg_t TDDN_CNTRL_CH0_OFF = '{ 'h0084, "CH0_OFF" , '{
+    "CH0_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(x) SetField(TDDN_CNTRL_CH0_OFF,"CH0_OFF",x)
+  `define GET_TDDN_CNTRL_CH0_OFF_CH0_OFF(x) GetField(TDDN_CNTRL_CH0_OFF,"CH0_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH1_ON = '{ 'h0088, "CH1_ON" , '{
+    "CH1_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH1_ON_CH1_ON(x) SetField(TDDN_CNTRL_CH1_ON,"CH1_ON",x)
+  `define GET_TDDN_CNTRL_CH1_ON_CH1_ON(x) GetField(TDDN_CNTRL_CH1_ON,"CH1_ON",x)
+
+  const reg_t TDDN_CNTRL_CH1_OFF = '{ 'h008c, "CH1_OFF" , '{
+    "CH1_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH1_OFF_CH1_OFF(x) SetField(TDDN_CNTRL_CH1_OFF,"CH1_OFF",x)
+  `define GET_TDDN_CNTRL_CH1_OFF_CH1_OFF(x) GetField(TDDN_CNTRL_CH1_OFF,"CH1_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH2_ON = '{ 'h0090, "CH2_ON" , '{
+    "CH2_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH2_ON_CH2_ON(x) SetField(TDDN_CNTRL_CH2_ON,"CH2_ON",x)
+  `define GET_TDDN_CNTRL_CH2_ON_CH2_ON(x) GetField(TDDN_CNTRL_CH2_ON,"CH2_ON",x)
+
+  const reg_t TDDN_CNTRL_CH2_OFF = '{ 'h0094, "CH2_OFF" , '{
+    "CH2_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH2_OFF_CH2_OFF(x) SetField(TDDN_CNTRL_CH2_OFF,"CH2_OFF",x)
+  `define GET_TDDN_CNTRL_CH2_OFF_CH2_OFF(x) GetField(TDDN_CNTRL_CH2_OFF,"CH2_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH3_ON = '{ 'h0098, "CH3_ON" , '{
+    "CH3_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH3_ON_CH3_ON(x) SetField(TDDN_CNTRL_CH3_ON,"CH3_ON",x)
+  `define GET_TDDN_CNTRL_CH3_ON_CH3_ON(x) GetField(TDDN_CNTRL_CH3_ON,"CH3_ON",x)
+
+  const reg_t TDDN_CNTRL_CH3_OFF = '{ 'h009c, "CH3_OFF" , '{
+    "CH3_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH3_OFF_CH3_OFF(x) SetField(TDDN_CNTRL_CH3_OFF,"CH3_OFF",x)
+  `define GET_TDDN_CNTRL_CH3_OFF_CH3_OFF(x) GetField(TDDN_CNTRL_CH3_OFF,"CH3_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH4_ON = '{ 'h00a0, "CH4_ON" , '{
+    "CH4_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH4_ON_CH4_ON(x) SetField(TDDN_CNTRL_CH4_ON,"CH4_ON",x)
+  `define GET_TDDN_CNTRL_CH4_ON_CH4_ON(x) GetField(TDDN_CNTRL_CH4_ON,"CH4_ON",x)
+
+  const reg_t TDDN_CNTRL_CH4_OFF = '{ 'h00a4, "CH4_OFF" , '{
+    "CH4_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH4_OFF_CH4_OFF(x) SetField(TDDN_CNTRL_CH4_OFF,"CH4_OFF",x)
+  `define GET_TDDN_CNTRL_CH4_OFF_CH4_OFF(x) GetField(TDDN_CNTRL_CH4_OFF,"CH4_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH5_ON = '{ 'h00a8, "CH5_ON" , '{
+    "CH5_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH5_ON_CH5_ON(x) SetField(TDDN_CNTRL_CH5_ON,"CH5_ON",x)
+  `define GET_TDDN_CNTRL_CH5_ON_CH5_ON(x) GetField(TDDN_CNTRL_CH5_ON,"CH5_ON",x)
+
+  const reg_t TDDN_CNTRL_CH5_OFF = '{ 'h00ac, "CH5_OFF" , '{
+    "CH5_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH5_OFF_CH5_OFF(x) SetField(TDDN_CNTRL_CH5_OFF,"CH5_OFF",x)
+  `define GET_TDDN_CNTRL_CH5_OFF_CH5_OFF(x) GetField(TDDN_CNTRL_CH5_OFF,"CH5_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH6_ON = '{ 'h00b0, "CH6_ON" , '{
+    "CH6_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH6_ON_CH6_ON(x) SetField(TDDN_CNTRL_CH6_ON,"CH6_ON",x)
+  `define GET_TDDN_CNTRL_CH6_ON_CH6_ON(x) GetField(TDDN_CNTRL_CH6_ON,"CH6_ON",x)
+
+  const reg_t TDDN_CNTRL_CH6_OFF = '{ 'h00b4, "CH6_OFF" , '{
+    "CH6_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH6_OFF_CH6_OFF(x) SetField(TDDN_CNTRL_CH6_OFF,"CH6_OFF",x)
+  `define GET_TDDN_CNTRL_CH6_OFF_CH6_OFF(x) GetField(TDDN_CNTRL_CH6_OFF,"CH6_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH7_ON = '{ 'h00b8, "CH7_ON" , '{
+    "CH7_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH7_ON_CH7_ON(x) SetField(TDDN_CNTRL_CH7_ON,"CH7_ON",x)
+  `define GET_TDDN_CNTRL_CH7_ON_CH7_ON(x) GetField(TDDN_CNTRL_CH7_ON,"CH7_ON",x)
+
+  const reg_t TDDN_CNTRL_CH7_OFF = '{ 'h00bc, "CH7_OFF" , '{
+    "CH7_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH7_OFF_CH7_OFF(x) SetField(TDDN_CNTRL_CH7_OFF,"CH7_OFF",x)
+  `define GET_TDDN_CNTRL_CH7_OFF_CH7_OFF(x) GetField(TDDN_CNTRL_CH7_OFF,"CH7_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH8_ON = '{ 'h00c0, "CH8_ON" , '{
+    "CH8_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH8_ON_CH8_ON(x) SetField(TDDN_CNTRL_CH8_ON,"CH8_ON",x)
+  `define GET_TDDN_CNTRL_CH8_ON_CH8_ON(x) GetField(TDDN_CNTRL_CH8_ON,"CH8_ON",x)
+
+  const reg_t TDDN_CNTRL_CH8_OFF = '{ 'h00c4, "CH8_OFF" , '{
+    "CH8_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH8_OFF_CH8_OFF(x) SetField(TDDN_CNTRL_CH8_OFF,"CH8_OFF",x)
+  `define GET_TDDN_CNTRL_CH8_OFF_CH8_OFF(x) GetField(TDDN_CNTRL_CH8_OFF,"CH8_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH9_ON = '{ 'h00c8, "CH9_ON" , '{
+    "CH9_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH9_ON_CH9_ON(x) SetField(TDDN_CNTRL_CH9_ON,"CH9_ON",x)
+  `define GET_TDDN_CNTRL_CH9_ON_CH9_ON(x) GetField(TDDN_CNTRL_CH9_ON,"CH9_ON",x)
+
+  const reg_t TDDN_CNTRL_CH9_OFF = '{ 'h00cc, "CH9_OFF" , '{
+    "CH9_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH9_OFF_CH9_OFF(x) SetField(TDDN_CNTRL_CH9_OFF,"CH9_OFF",x)
+  `define GET_TDDN_CNTRL_CH9_OFF_CH9_OFF(x) GetField(TDDN_CNTRL_CH9_OFF,"CH9_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH10_ON = '{ 'h00d0, "CH10_ON" , '{
+    "CH10_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH10_ON_CH10_ON(x) SetField(TDDN_CNTRL_CH10_ON,"CH10_ON",x)
+  `define GET_TDDN_CNTRL_CH10_ON_CH10_ON(x) GetField(TDDN_CNTRL_CH10_ON,"CH10_ON",x)
+
+  const reg_t TDDN_CNTRL_CH10_OFF = '{ 'h00d4, "CH10_OFF" , '{
+    "CH10_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH10_OFF_CH10_OFF(x) SetField(TDDN_CNTRL_CH10_OFF,"CH10_OFF",x)
+  `define GET_TDDN_CNTRL_CH10_OFF_CH10_OFF(x) GetField(TDDN_CNTRL_CH10_OFF,"CH10_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH11_ON = '{ 'h00d8, "CH11_ON" , '{
+    "CH11_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH11_ON_CH11_ON(x) SetField(TDDN_CNTRL_CH11_ON,"CH11_ON",x)
+  `define GET_TDDN_CNTRL_CH11_ON_CH11_ON(x) GetField(TDDN_CNTRL_CH11_ON,"CH11_ON",x)
+
+  const reg_t TDDN_CNTRL_CH11_OFF = '{ 'h00dc, "CH11_OFF" , '{
+    "CH11_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH11_OFF_CH11_OFF(x) SetField(TDDN_CNTRL_CH11_OFF,"CH11_OFF",x)
+  `define GET_TDDN_CNTRL_CH11_OFF_CH11_OFF(x) GetField(TDDN_CNTRL_CH11_OFF,"CH11_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH12_ON = '{ 'h00e0, "CH12_ON" , '{
+    "CH12_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH12_ON_CH12_ON(x) SetField(TDDN_CNTRL_CH12_ON,"CH12_ON",x)
+  `define GET_TDDN_CNTRL_CH12_ON_CH12_ON(x) GetField(TDDN_CNTRL_CH12_ON,"CH12_ON",x)
+
+  const reg_t TDDN_CNTRL_CH12_OFF = '{ 'h00e4, "CH12_OFF" , '{
+    "CH12_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH12_OFF_CH12_OFF(x) SetField(TDDN_CNTRL_CH12_OFF,"CH12_OFF",x)
+  `define GET_TDDN_CNTRL_CH12_OFF_CH12_OFF(x) GetField(TDDN_CNTRL_CH12_OFF,"CH12_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH13_ON = '{ 'h00e8, "CH13_ON" , '{
+    "CH13_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH13_ON_CH13_ON(x) SetField(TDDN_CNTRL_CH13_ON,"CH13_ON",x)
+  `define GET_TDDN_CNTRL_CH13_ON_CH13_ON(x) GetField(TDDN_CNTRL_CH13_ON,"CH13_ON",x)
+
+  const reg_t TDDN_CNTRL_CH13_OFF = '{ 'h00ec, "CH13_OFF" , '{
+    "CH13_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH13_OFF_CH13_OFF(x) SetField(TDDN_CNTRL_CH13_OFF,"CH13_OFF",x)
+  `define GET_TDDN_CNTRL_CH13_OFF_CH13_OFF(x) GetField(TDDN_CNTRL_CH13_OFF,"CH13_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH14_ON = '{ 'h00f0, "CH14_ON" , '{
+    "CH14_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH14_ON_CH14_ON(x) SetField(TDDN_CNTRL_CH14_ON,"CH14_ON",x)
+  `define GET_TDDN_CNTRL_CH14_ON_CH14_ON(x) GetField(TDDN_CNTRL_CH14_ON,"CH14_ON",x)
+
+  const reg_t TDDN_CNTRL_CH14_OFF = '{ 'h00f4, "CH14_OFF" , '{
+    "CH14_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH14_OFF_CH14_OFF(x) SetField(TDDN_CNTRL_CH14_OFF,"CH14_OFF",x)
+  `define GET_TDDN_CNTRL_CH14_OFF_CH14_OFF(x) GetField(TDDN_CNTRL_CH14_OFF,"CH14_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH15_ON = '{ 'h00f8, "CH15_ON" , '{
+    "CH15_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH15_ON_CH15_ON(x) SetField(TDDN_CNTRL_CH15_ON,"CH15_ON",x)
+  `define GET_TDDN_CNTRL_CH15_ON_CH15_ON(x) GetField(TDDN_CNTRL_CH15_ON,"CH15_ON",x)
+
+  const reg_t TDDN_CNTRL_CH15_OFF = '{ 'h00fc, "CH15_OFF" , '{
+    "CH15_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH15_OFF_CH15_OFF(x) SetField(TDDN_CNTRL_CH15_OFF,"CH15_OFF",x)
+  `define GET_TDDN_CNTRL_CH15_OFF_CH15_OFF(x) GetField(TDDN_CNTRL_CH15_OFF,"CH15_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH16_ON = '{ 'h0100, "CH16_ON" , '{
+    "CH16_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH16_ON_CH16_ON(x) SetField(TDDN_CNTRL_CH16_ON,"CH16_ON",x)
+  `define GET_TDDN_CNTRL_CH16_ON_CH16_ON(x) GetField(TDDN_CNTRL_CH16_ON,"CH16_ON",x)
+
+  const reg_t TDDN_CNTRL_CH16_OFF = '{ 'h0104, "CH16_OFF" , '{
+    "CH16_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH16_OFF_CH16_OFF(x) SetField(TDDN_CNTRL_CH16_OFF,"CH16_OFF",x)
+  `define GET_TDDN_CNTRL_CH16_OFF_CH16_OFF(x) GetField(TDDN_CNTRL_CH16_OFF,"CH16_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH17_ON = '{ 'h0108, "CH17_ON" , '{
+    "CH17_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH17_ON_CH17_ON(x) SetField(TDDN_CNTRL_CH17_ON,"CH17_ON",x)
+  `define GET_TDDN_CNTRL_CH17_ON_CH17_ON(x) GetField(TDDN_CNTRL_CH17_ON,"CH17_ON",x)
+
+  const reg_t TDDN_CNTRL_CH17_OFF = '{ 'h010c, "CH17_OFF" , '{
+    "CH17_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH17_OFF_CH17_OFF(x) SetField(TDDN_CNTRL_CH17_OFF,"CH17_OFF",x)
+  `define GET_TDDN_CNTRL_CH17_OFF_CH17_OFF(x) GetField(TDDN_CNTRL_CH17_OFF,"CH17_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH18_ON = '{ 'h0110, "CH18_ON" , '{
+    "CH18_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH18_ON_CH18_ON(x) SetField(TDDN_CNTRL_CH18_ON,"CH18_ON",x)
+  `define GET_TDDN_CNTRL_CH18_ON_CH18_ON(x) GetField(TDDN_CNTRL_CH18_ON,"CH18_ON",x)
+
+  const reg_t TDDN_CNTRL_CH18_OFF = '{ 'h0114, "CH18_OFF" , '{
+    "CH18_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH18_OFF_CH18_OFF(x) SetField(TDDN_CNTRL_CH18_OFF,"CH18_OFF",x)
+  `define GET_TDDN_CNTRL_CH18_OFF_CH18_OFF(x) GetField(TDDN_CNTRL_CH18_OFF,"CH18_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH19_ON = '{ 'h0118, "CH19_ON" , '{
+    "CH19_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH19_ON_CH19_ON(x) SetField(TDDN_CNTRL_CH19_ON,"CH19_ON",x)
+  `define GET_TDDN_CNTRL_CH19_ON_CH19_ON(x) GetField(TDDN_CNTRL_CH19_ON,"CH19_ON",x)
+
+  const reg_t TDDN_CNTRL_CH19_OFF = '{ 'h011c, "CH19_OFF" , '{
+    "CH19_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH19_OFF_CH19_OFF(x) SetField(TDDN_CNTRL_CH19_OFF,"CH19_OFF",x)
+  `define GET_TDDN_CNTRL_CH19_OFF_CH19_OFF(x) GetField(TDDN_CNTRL_CH19_OFF,"CH19_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH20_ON = '{ 'h0120, "CH20_ON" , '{
+    "CH20_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH20_ON_CH20_ON(x) SetField(TDDN_CNTRL_CH20_ON,"CH20_ON",x)
+  `define GET_TDDN_CNTRL_CH20_ON_CH20_ON(x) GetField(TDDN_CNTRL_CH20_ON,"CH20_ON",x)
+
+  const reg_t TDDN_CNTRL_CH20_OFF = '{ 'h0124, "CH20_OFF" , '{
+    "CH20_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH20_OFF_CH20_OFF(x) SetField(TDDN_CNTRL_CH20_OFF,"CH20_OFF",x)
+  `define GET_TDDN_CNTRL_CH20_OFF_CH20_OFF(x) GetField(TDDN_CNTRL_CH20_OFF,"CH20_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH21_ON = '{ 'h0128, "CH21_ON" , '{
+    "CH21_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH21_ON_CH21_ON(x) SetField(TDDN_CNTRL_CH21_ON,"CH21_ON",x)
+  `define GET_TDDN_CNTRL_CH21_ON_CH21_ON(x) GetField(TDDN_CNTRL_CH21_ON,"CH21_ON",x)
+
+  const reg_t TDDN_CNTRL_CH21_OFF = '{ 'h012c, "CH21_OFF" , '{
+    "CH21_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH21_OFF_CH21_OFF(x) SetField(TDDN_CNTRL_CH21_OFF,"CH21_OFF",x)
+  `define GET_TDDN_CNTRL_CH21_OFF_CH21_OFF(x) GetField(TDDN_CNTRL_CH21_OFF,"CH21_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH22_ON = '{ 'h0130, "CH22_ON" , '{
+    "CH22_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH22_ON_CH22_ON(x) SetField(TDDN_CNTRL_CH22_ON,"CH22_ON",x)
+  `define GET_TDDN_CNTRL_CH22_ON_CH22_ON(x) GetField(TDDN_CNTRL_CH22_ON,"CH22_ON",x)
+
+  const reg_t TDDN_CNTRL_CH22_OFF = '{ 'h0134, "CH22_OFF" , '{
+    "CH22_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH22_OFF_CH22_OFF(x) SetField(TDDN_CNTRL_CH22_OFF,"CH22_OFF",x)
+  `define GET_TDDN_CNTRL_CH22_OFF_CH22_OFF(x) GetField(TDDN_CNTRL_CH22_OFF,"CH22_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH23_ON = '{ 'h0138, "CH23_ON" , '{
+    "CH23_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH23_ON_CH23_ON(x) SetField(TDDN_CNTRL_CH23_ON,"CH23_ON",x)
+  `define GET_TDDN_CNTRL_CH23_ON_CH23_ON(x) GetField(TDDN_CNTRL_CH23_ON,"CH23_ON",x)
+
+  const reg_t TDDN_CNTRL_CH23_OFF = '{ 'h013c, "CH23_OFF" , '{
+    "CH23_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH23_OFF_CH23_OFF(x) SetField(TDDN_CNTRL_CH23_OFF,"CH23_OFF",x)
+  `define GET_TDDN_CNTRL_CH23_OFF_CH23_OFF(x) GetField(TDDN_CNTRL_CH23_OFF,"CH23_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH24_ON = '{ 'h0140, "CH24_ON" , '{
+    "CH24_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH24_ON_CH24_ON(x) SetField(TDDN_CNTRL_CH24_ON,"CH24_ON",x)
+  `define GET_TDDN_CNTRL_CH24_ON_CH24_ON(x) GetField(TDDN_CNTRL_CH24_ON,"CH24_ON",x)
+
+  const reg_t TDDN_CNTRL_CH24_OFF = '{ 'h0144, "CH24_OFF" , '{
+    "CH24_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH24_OFF_CH24_OFF(x) SetField(TDDN_CNTRL_CH24_OFF,"CH24_OFF",x)
+  `define GET_TDDN_CNTRL_CH24_OFF_CH24_OFF(x) GetField(TDDN_CNTRL_CH24_OFF,"CH24_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH25_ON = '{ 'h0148, "CH25_ON" , '{
+    "CH25_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH25_ON_CH25_ON(x) SetField(TDDN_CNTRL_CH25_ON,"CH25_ON",x)
+  `define GET_TDDN_CNTRL_CH25_ON_CH25_ON(x) GetField(TDDN_CNTRL_CH25_ON,"CH25_ON",x)
+
+  const reg_t TDDN_CNTRL_CH25_OFF = '{ 'h014c, "CH25_OFF" , '{
+    "CH25_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH25_OFF_CH25_OFF(x) SetField(TDDN_CNTRL_CH25_OFF,"CH25_OFF",x)
+  `define GET_TDDN_CNTRL_CH25_OFF_CH25_OFF(x) GetField(TDDN_CNTRL_CH25_OFF,"CH25_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH26_ON = '{ 'h0150, "CH26_ON" , '{
+    "CH26_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH26_ON_CH26_ON(x) SetField(TDDN_CNTRL_CH26_ON,"CH26_ON",x)
+  `define GET_TDDN_CNTRL_CH26_ON_CH26_ON(x) GetField(TDDN_CNTRL_CH26_ON,"CH26_ON",x)
+
+  const reg_t TDDN_CNTRL_CH26_OFF = '{ 'h0154, "CH26_OFF" , '{
+    "CH26_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH26_OFF_CH26_OFF(x) SetField(TDDN_CNTRL_CH26_OFF,"CH26_OFF",x)
+  `define GET_TDDN_CNTRL_CH26_OFF_CH26_OFF(x) GetField(TDDN_CNTRL_CH26_OFF,"CH26_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH27_ON = '{ 'h0158, "CH27_ON" , '{
+    "CH27_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH27_ON_CH27_ON(x) SetField(TDDN_CNTRL_CH27_ON,"CH27_ON",x)
+  `define GET_TDDN_CNTRL_CH27_ON_CH27_ON(x) GetField(TDDN_CNTRL_CH27_ON,"CH27_ON",x)
+
+  const reg_t TDDN_CNTRL_CH27_OFF = '{ 'h015c, "CH27_OFF" , '{
+    "CH27_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH27_OFF_CH27_OFF(x) SetField(TDDN_CNTRL_CH27_OFF,"CH27_OFF",x)
+  `define GET_TDDN_CNTRL_CH27_OFF_CH27_OFF(x) GetField(TDDN_CNTRL_CH27_OFF,"CH27_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH28_ON = '{ 'h0160, "CH28_ON" , '{
+    "CH28_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH28_ON_CH28_ON(x) SetField(TDDN_CNTRL_CH28_ON,"CH28_ON",x)
+  `define GET_TDDN_CNTRL_CH28_ON_CH28_ON(x) GetField(TDDN_CNTRL_CH28_ON,"CH28_ON",x)
+
+  const reg_t TDDN_CNTRL_CH28_OFF = '{ 'h0164, "CH28_OFF" , '{
+    "CH28_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH28_OFF_CH28_OFF(x) SetField(TDDN_CNTRL_CH28_OFF,"CH28_OFF",x)
+  `define GET_TDDN_CNTRL_CH28_OFF_CH28_OFF(x) GetField(TDDN_CNTRL_CH28_OFF,"CH28_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH29_ON = '{ 'h0168, "CH29_ON" , '{
+    "CH29_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH29_ON_CH29_ON(x) SetField(TDDN_CNTRL_CH29_ON,"CH29_ON",x)
+  `define GET_TDDN_CNTRL_CH29_ON_CH29_ON(x) GetField(TDDN_CNTRL_CH29_ON,"CH29_ON",x)
+
+  const reg_t TDDN_CNTRL_CH29_OFF = '{ 'h016c, "CH29_OFF" , '{
+    "CH29_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH29_OFF_CH29_OFF(x) SetField(TDDN_CNTRL_CH29_OFF,"CH29_OFF",x)
+  `define GET_TDDN_CNTRL_CH29_OFF_CH29_OFF(x) GetField(TDDN_CNTRL_CH29_OFF,"CH29_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH30_ON = '{ 'h0170, "CH30_ON" , '{
+    "CH30_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH30_ON_CH30_ON(x) SetField(TDDN_CNTRL_CH30_ON,"CH30_ON",x)
+  `define GET_TDDN_CNTRL_CH30_ON_CH30_ON(x) GetField(TDDN_CNTRL_CH30_ON,"CH30_ON",x)
+
+  const reg_t TDDN_CNTRL_CH30_OFF = '{ 'h0174, "CH30_OFF" , '{
+    "CH30_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH30_OFF_CH30_OFF(x) SetField(TDDN_CNTRL_CH30_OFF,"CH30_OFF",x)
+  `define GET_TDDN_CNTRL_CH30_OFF_CH30_OFF(x) GetField(TDDN_CNTRL_CH30_OFF,"CH30_OFF",x)
+
+  const reg_t TDDN_CNTRL_CH31_ON = '{ 'h0178, "CH31_ON" , '{
+    "CH31_ON": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH31_ON_CH31_ON(x) SetField(TDDN_CNTRL_CH31_ON,"CH31_ON",x)
+  `define GET_TDDN_CNTRL_CH31_ON_CH31_ON(x) GetField(TDDN_CNTRL_CH31_ON,"CH31_ON",x)
+
+  const reg_t TDDN_CNTRL_CH31_OFF = '{ 'h017c, "CH31_OFF" , '{
+    "CH31_OFF": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_TDDN_CNTRL_CH31_OFF_CH31_OFF(x) SetField(TDDN_CNTRL_CH31_OFF,"CH31_OFF",x)
+  `define GET_TDDN_CNTRL_CH31_OFF_CH31_OFF(x) GetField(TDDN_CNTRL_CH31_OFF,"CH31_OFF",x)
+
+
+endpackage

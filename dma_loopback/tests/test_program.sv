@@ -48,7 +48,7 @@ import dma_trans_pkg::*;
 
 `define RX_DMA      32'h7c42_0000
 `define TX_DMA      32'h7c43_0000
-`define DDR_BASE    32'h8000_0000
+`define DDR_BASE    32'h44A0_0000
 
 program test_program;
 

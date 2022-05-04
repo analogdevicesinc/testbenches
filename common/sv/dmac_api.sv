@@ -75,7 +75,15 @@ package dmac_api_pkg;
       p.DMA_TYPE_SRC = `GET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_SRC(val);
       bpb_width_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BURST_WIDTH(val);            
       p.MAX_BYTES_PER_BURST = 2**bpb_width_log2;
-      p.DMA_2D_TRANSFER = `GET_DMAC_INTERFACE_DESCRIPTION_DMA_2D_TRANSFER(val);               
+      this.bus.RegWrite32(this.base_address + GetAddrs(DMAC_Y_LENGTH),
+                                SetField(DMAC_Y_LENGTH, "Y_LENGTH", 32'hFFFFFFFF));
+      this.bus.RegRead32(this.base_address + GetAddrs(DMAC_Y_LENGTH), val);
+      if (val==0) begin
+        p.DMA_2D_TRANSFER = 0;
+      end else begin 
+        p.DMA_2D_TRANSFER = 1;
+        this.bus.RegWrite32(this.base_address + GetAddrs(DMAC_Y_LENGTH), 32'h0);
+      end
     endtask : discover_params
 
     // -----------------

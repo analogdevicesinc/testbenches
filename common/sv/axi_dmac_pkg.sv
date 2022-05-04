@@ -39,24 +39,10 @@ typedef struct {
   int ID;
   int DMA_DATA_WIDTH_SRC;
   int DMA_DATA_WIDTH_DEST;
-//  int DMA_LENGTH_WIDTH;
   int DMA_2D_TRANSFER;
-//  int ASYNC_CLK_REQ_SRC;
-//  int ASYNC_CLK_SRC_DEST;
-//  int ASYNC_CLK_DEST_REQ;
-//  int AXI_SLICE_DEST;
-//  int AXI_SLICE_SRC;
-//  int SYNC_TRANSFER_START;
-//  int CYCLIC;
-//  int DMA_AXI_PROTOCOL_SRC;
-//  int DMA_AXI_PROTOCOL_DEST;
   int DMA_TYPE_SRC;
   int DMA_TYPE_DEST;
-//  int DMA_AXI_ADDR_WIDTH;
   int MAX_BYTES_PER_BURST;
-//  int FIFO_SIZE;
-//  int DISABLE_DEBUG_REGISTERS;
-//  int ENABLE_DIAGNOSTICS_IF;
 } axi_dmac_params_t;
 
 endpackage

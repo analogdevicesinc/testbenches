@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Mon Feb  7 12:05:09 2022 */
+/* Tue May  3 15:36:59 2022 */
 
 package adi_regmap_dmac_pkg;
   import adi_regmap_pkg::*;
@@ -72,8 +72,7 @@ package adi_regmap_dmac_pkg;
     "DMA_TYPE_DEST": '{ 5, 4, R, 0 },
     "BYTES_PER_BEAT_SRC_LOG2": '{ 11, 8, R, 0 },
     "DMA_TYPE_SRC": '{ 13, 12, R, 0 },
-    "BYTES_PER_BURST_WIDTH": '{ 19, 16, R, 0 },
-    "DMA_2D_TRANSFER": '{ 20, 20, R, 0 }}};
+    "BYTES_PER_BURST_WIDTH": '{ 19, 16, R, 0 }}};
   `define SET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BEAT_DEST_LOG2(x) SetField(DMAC_INTERFACE_DESCRIPTION,"BYTES_PER_BEAT_DEST_LOG2",x)
   `define GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BEAT_DEST_LOG2(x) GetField(DMAC_INTERFACE_DESCRIPTION,"BYTES_PER_BEAT_DEST_LOG2",x)
   `define SET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_DEST(x) SetField(DMAC_INTERFACE_DESCRIPTION,"DMA_TYPE_DEST",x)
@@ -84,8 +83,6 @@ package adi_regmap_dmac_pkg;
   `define GET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_SRC(x) GetField(DMAC_INTERFACE_DESCRIPTION,"DMA_TYPE_SRC",x)
   `define SET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BURST_WIDTH(x) SetField(DMAC_INTERFACE_DESCRIPTION,"BYTES_PER_BURST_WIDTH",x)
   `define GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BURST_WIDTH(x) GetField(DMAC_INTERFACE_DESCRIPTION,"BYTES_PER_BURST_WIDTH",x)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_DMA_2D_TRANSFER(x) SetField(DMAC_INTERFACE_DESCRIPTION,"DMA_2D_TRANSFER",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_DMA_2D_TRANSFER(x) GetField(DMAC_INTERFACE_DESCRIPTION,"DMA_2D_TRANSFER",x)
 
   const reg_t DMAC_IRQ_MASK = '{ 'h0080, "IRQ_MASK" , '{
     "TRANSFER_COMPLETED": '{ 1, 1, RW, 'h1 },

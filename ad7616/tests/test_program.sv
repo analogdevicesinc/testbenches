@@ -76,7 +76,7 @@ localparam AD7616_CNVST_RATE          = 32'h0000_0444;
 localparam PCORE_VERSION              = 32'h0001_0071;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
-localparam DATA_WIDTH                 = 32;
+localparam DATA_WIDTH                 = 16;
 localparam DATA_DLENGTH               = 8;
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
@@ -305,6 +305,7 @@ wire          m_spi_csn_negedge_s;
 wire          m_spi_csn_int_s = ad7616_spi_cs;
 bit           m_spi_csn_int_d = 0;
 bit   [15:0]  sdi_shiftreg;
+bit   [15:0]  sdi_shiftreg2;
 bit   [7:0]   rx_sclk_pos_counter = 0;
 bit   [7:0]   rx_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
@@ -319,8 +320,8 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-assign ad7616_spi_sdi[0] = sdi_shiftreg[14]; // all SDI lanes got the same data
-assign ad7616_spi_sdi[1] = sdi_shiftreg[15]; // all SDI lanes got the same data
+assign ad7616_spi_sdi[0] = sdi_shiftreg2[15];
+assign ad7616_spi_sdi[1] = sdi_shiftreg[15];
 
 assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_pos_counter == 16) :
@@ -372,14 +373,17 @@ initial begin
         sdi_shiftreg <= (CPOL ^ CPHA) ?
                         sdi_preg[$] :
                         sdi_nreg[$];
+        sdi_shiftreg2 <= 16'hAAAA;               
       end else begin
         sdi_shiftreg <= (CPOL ^ CPHA) ?
                         sdi_preg[$] :
                         sdi_nreg[$];
+        sdi_shiftreg2 <= 16'hAAAA;
       end
       if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdi_shiftreg <= {sdi_shiftreg[14:0], 1'b0};
+      sdi_shiftreg <= {sdi_shiftreg[15:0], 1'b0};
+      sdi_shiftreg2 <= {sdi_shiftreg2[15:0], 1'b0};
     end
   end
 end
@@ -393,11 +397,11 @@ bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
 bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
-bit [15:0]  sdi_data_store;
+bit [31:0]  sdi_data_store;
 
 initial begin
   while(1) begin
-    @(posedge ad7616_echo_sclk);
+    @(posedge rx_sclk_bfm);
     sdi_data_store <= {sdi_shiftreg[13:0], 2'b00};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
@@ -407,11 +411,16 @@ initial begin
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
 //        if (sdi_store_cnt [0] == 'h1 ) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = (sdi_shiftreg & 16'hff00) | ((sdi_shiftreg >> 7) & 16'h00ff);
-          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = ((sdi_shiftreg & 16'h00ff) << 8) | ((sdi_shiftreg << 1) & 16'h00ff);
+          
+          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg2;
+          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg;
+          
+//          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = (sdi_shiftreg & 16'hff00) | ((sdi_shiftreg >> 7) & 16'h00ff);
+//          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = ((sdi_shiftreg & 16'h00ff) << 8) | ((sdi_shiftreg << 1) & 16'h00ff);
 //        end
       end else begin
-        sdi_fifo_data_store = sdi_shiftreg;
+        sdi_fifo_data_store[31:16] = sdi_shiftreg2;
+        sdi_fifo_data_store[15:0] = sdi_shiftreg;
       end
       shiftreg_sampled <= 'h1;
     end

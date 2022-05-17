@@ -196,16 +196,16 @@ program test_program;
     #1us;
 
     // Configure RX DMA
-    axi_write (`RX_DMA+GetAddrs(dmac_CONTROL),
-               `SET_dmac_CONTROL_ENABLE(1));
-    axi_write (`RX_DMA+GetAddrs(dmac_FLAGS),
-               `SET_dmac_FLAGS_TLAST(1));
-    axi_write (`RX_DMA+GetAddrs(dmac_X_LENGTH),
-               `SET_dmac_X_LENGTH_X_LENGTH(128*4-1));
-    axi_write (`RX_DMA+GetAddrs(dmac_DEST_ADDRESS),
-               `SET_dmac_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00002000));
-    axi_write (`RX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
-               `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+    axi_write (`RX_DMA+GetAddrs(DMAC_CONTROL),
+               `SET_DMAC_CONTROL_ENABLE(1));
+    axi_write (`RX_DMA+GetAddrs(DMAC_FLAGS),
+               `SET_DMAC_FLAGS_TLAST(1));
+    axi_write (`RX_DMA+GetAddrs(DMAC_X_LENGTH),
+               `SET_DMAC_X_LENGTH_X_LENGTH(128*4-1));
+    axi_write (`RX_DMA+GetAddrs(DMAC_DEST_ADDRESS),
+               `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00002000));
+    axi_write (`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
     #100us;
 

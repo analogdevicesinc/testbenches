@@ -41,19 +41,24 @@ module system_tb #(
 ) ();
 
   localparam DCO_HALF_PERIOD = 10;
-  localparam CNV_HALF_PERIOD = DCO_HALF_PERIOD*10*(1+`SINGLE_LANE);
-  localparam LATENCY = `SINGLE_LANE ? 6 : 5;
+  localparam BITS_PER_CYCLE = (`SINGLE_LANE ? 1 : 2) * (`SDR_DDR_N==1 ? 1 : 2);
+  localparam CNV_HALF_PERIOD = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
+  localparam LATENCY = `SDR_DDR_N ? `SINGLE_LANE ? 6 : 5
+                                  : `SINGLE_LANE ? 4 : 3;
 
   reg sync_n = 1'b0;
   reg ssi_clk = 1'b0;
   reg cnv_clk = 1'b0;
 
+  reg dco_p = 1'b0;
+  reg dco_n = 1'b1;
+
   `TEST_PROGRAM test();
 
   test_harness `TH (
 
-    .dco_p (ssi_clk),
-    .dco_n (~ssi_clk),
+    .dco_p (dco_p),
+    .dco_n (dco_n),
     .da_p (da_p),
     .da_n (da_n),
     .db_p (db_p),
@@ -65,6 +70,11 @@ module system_tb #(
   reg sync_n_d = 1'b0;
   // Add some transport delay to simulate PCB and clock chip propagation delay
   always @(*) sync_n_d <=  #25 sync_n;
+
+  // Add transport delay to the DCO clock to simulate longer internal delay of
+  // the clock path inside the FPGA
+  always @(*) dco_p <=  #3 ssi_clk;
+  always @(*) dco_n <=  #3 ~ssi_clk;
 
   //
   // Clock generation
@@ -101,7 +111,11 @@ module system_tb #(
   reg db_p = 1'b0;
   reg db_n = 1'b1;
 
+  `ifdef M1
   always @(negedge cnv_clk) begin
+  `else
+  always @(posedge cnv_clk) begin
+  `endif
     repeat (LATENCY) @(posedge ssi_clk);
     fork
       drive_sample(sample);
@@ -113,7 +127,8 @@ module system_tb #(
 
   task automatic drive_sample(bit [19:0] sample_t);
     int num_lanes = (`SINGLE_LANE==1) ? 1 : 2;
-    for (int i = 19; i >= 0; i=i-num_lanes) begin
+    int bits_per_cycle = num_lanes * (`SDR_DDR_N==1 ? 1 : 2);
+    for (int i = 19; i >= 0; i=i-bits_per_cycle) begin
       @(negedge ssi_clk);
       #1;
       da_p <= sample_t[i];
@@ -121,6 +136,19 @@ module system_tb #(
       if (`SINGLE_LANE == 0) begin
         db_p <= sample_t[i-1];
         db_n <= ~sample_t[i-1];
+      end
+      if (`SDR_DDR_N == 0) begin
+        @(posedge ssi_clk);
+        #1;
+        if (`SINGLE_LANE == 1) begin
+          da_p <= sample_t[i-1];
+          da_n <= ~sample_t[i-1];
+        end else begin
+          da_p <= sample_t[i-2];
+          da_n <= ~sample_t[i-2];
+          db_p <= sample_t[i-3];
+          db_n <= ~sample_t[i-3];
+        end
       end
     end
   endtask

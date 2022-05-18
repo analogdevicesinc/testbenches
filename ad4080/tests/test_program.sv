@@ -149,7 +149,7 @@ program test_program;
   begin
 
     int num_lanes = (`SINGLE_LANE==1) ? 1 : 2;
-    int sdr_ddr_n = 1;
+    int sdr_ddr_n = `SDR_DDR_N;
 
     // Configure Rx interface
     axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),

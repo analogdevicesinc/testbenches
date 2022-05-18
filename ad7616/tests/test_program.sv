@@ -77,7 +77,7 @@ localparam PCORE_VERSION              = 32'h0001_0071;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 16;
-localparam DATA_DLENGTH               = 8;
+localparam DATA_DLENGTH               = 16;
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
 localparam SDI_DELAY                  = 0;
@@ -86,7 +86,7 @@ localparam THREE_WIRE                 = 0;
 localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
-localparam NUM_OF_WORDS               = 2;
+localparam NUM_OF_WORDS               = 1;
 localparam NUM_OF_TRANSFERS           = 10;
 
 //---------------------------------------------------------------------------
@@ -395,7 +395,7 @@ end
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
-bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
+bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
 
@@ -412,15 +412,15 @@ initial begin
       if (offload_status) begin
 //        if (sdi_store_cnt [0] == 'h1 ) begin
           
-          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg2;
-          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg;
+          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg;
+          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg2;
           
 //          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = (sdi_shiftreg & 16'hff00) | ((sdi_shiftreg >> 7) & 16'h00ff);
 //          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = ((sdi_shiftreg & 16'h00ff) << 8) | ((sdi_shiftreg << 1) & 16'h00ff);
 //        end
       end else begin
-        sdi_fifo_data_store[31:16] = sdi_shiftreg2;
-        sdi_fifo_data_store[15:0] = sdi_shiftreg;
+        sdi_fifo_data_store[31:16] = sdi_shiftreg;
+        sdi_fifo_data_store[15:0] = sdi_shiftreg2;
       end
       shiftreg_sampled <= 'h1;
     end
@@ -445,7 +445,7 @@ end
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [31:0] offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test;
   begin
@@ -459,7 +459,7 @@ task offload_spi_test;
 
     env.mng.RegWrite32(`AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
     env.mng.RegWrite32(`AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4*4)-1); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
     env.mng.RegWrite32(`AD7616_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
     env.mng.RegWrite32(`AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
@@ -481,7 +481,7 @@ task offload_spi_test;
     axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started.", $time);
 
-    wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
+    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
     axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
     offload_status = 0;
@@ -490,7 +490,7 @@ task offload_spi_test;
 
     #2000
 
-    for (int i=0; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
+    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
       offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
     end
@@ -501,7 +501,7 @@ task offload_spi_test;
       `INFO(("IRQ Test PASSED"));
     end */
 
-    if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
+    if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("Offload Test FAILED"));
     end else begin
       `INFO(("Offload Test PASSED"));
@@ -548,7 +548,7 @@ begin
 
   repeat (NUM_OF_WORDS) begin
   #100
-    axi_read (AD7616_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+    axi_read (AD7616_BASE + SPI_ENG_ADDR_SDIFIFO_PEEK, sdi_fifo_data);
   end
 
   if (sdi_fifo_data != sdi_fifo_data_store) begin

@@ -83,18 +83,79 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 
 ###
 
-set NUM_OF_LANES 4
-set NUM_OF_CONVERTERS 16
-set SAMPLES_PER_FRAME 1
-set SAMPLE_WIDTH 16
-#set LL_OUT_BYTES
-set DMA_SAMPLE_WIDTH 16
-set SAMPLES_PER_CHANNEL 1
+# TX parameters
+set TX_NUM_OF_LINKS $ad_project_params(TX_NUM_LINKS)
+
+# TX JESD parameter per link
+set TX_JESD_M     $ad_project_params(TX_JESD_M)
+set TX_JESD_L     $ad_project_params(TX_JESD_L)
+set TX_JESD_S     $ad_project_params(TX_JESD_S)
+set TX_JESD_NP    $ad_project_params(TX_JESD_NP)
+
+set NUM_OF_LANES      [expr $TX_JESD_L * $TX_NUM_OF_LINKS]
+set NUM_OF_CONVERTERS [expr $TX_JESD_M * $TX_NUM_OF_LINKS]
+set SAMPLES_PER_FRAME $TX_JESD_S
+set SAMPLE_WIDTH      $TX_JESD_NP
+set DMA_SAMPLE_WIDTH  $TX_JESD_NP
+if {$DMA_SAMPLE_WIDTH == 12} {
+  set DMA_SAMPLE_WIDTH 16
+}
+set DATAPATH_WIDTH [adi_jesd204_calc_tpl_width 4 $TX_JESD_L $TX_JESD_M $TX_JESD_S $TX_JESD_NP]
+
+set SAMPLES_PER_CHANNEL [expr $NUM_OF_LANES * 8*$DATAPATH_WIDTH / ($NUM_OF_CONVERTERS * $SAMPLE_WIDTH)]
+
+set DAC_DMA_DATA_WIDTH   [expr $DMA_SAMPLE_WIDTH*$NUM_OF_CONVERTERS*$SAMPLES_PER_CHANNEL]
+
+set dac_fifo_name ad9083_dac_fifo
+set dac_data_width [expr $SAMPLE_WIDTH*$NUM_OF_CONVERTERS*$SAMPLES_PER_CHANNEL]
+set dac_dma_data_width [expr $DMA_SAMPLE_WIDTH*$NUM_OF_CONVERTERS*$SAMPLES_PER_CHANNEL]
+set dac_fifo_address_width [expr int(ceil(log(($dac_fifo_samples_per_converter*$NUM_OF_CONVERTERS) / ($dac_data_width/$SAMPLE_WIDTH))/log(2)))]
 
 create_bd_port -dir I vip_ref_clk
 create_bd_port -dir I vip_device_clk
 
-ad_connect vip_device_clk_s vip_device_clk
+ad_ip_instance axi_dmac axi_ad9083_tx_dma [list \
+  DMA_TYPE_SRC 0 \
+  DMA_TYPE_DEST 1 \
+  ID 0 \
+  AXI_SLICE_SRC 1 \
+  AXI_SLICE_DEST 1 \
+  SYNC_TRANSFER_START 0 \
+  DMA_LENGTH_WIDTH 24 \
+  DMA_2D_TRANSFER 0 \
+  CYCLIC 1 \
+  DMA_DATA_WIDTH_SRC 512 \
+  DMA_DATA_WIDTH_DEST $DAC_DMA_DATA_WIDTH \
+  MAX_BYTES_PER_BURST 4096 \
+]
+
+ad_connect $sys_dma_clk axi_ad9083_tx_dma/m_axis_aclk
+
+ad_mem_hp1_interconnect $sys_dma_clk axi_ad9083_tx_dma/m_src_axi
+
+ad_ip_instance util_upack2 util_mxfe_upack [list \
+  NUM_OF_CHANNELS $NUM_OF_CONVERTERS \
+  SAMPLES_PER_CHANNEL $SAMPLES_PER_CHANNEL \
+  SAMPLE_DATA_WIDTH $SAMPLE_WIDTH \
+]
+
+ad_dacfifo_create $dac_fifo_name $dac_data_width $dac_data_width $dac_fifo_address_width
+
+ad_connect  vip_device_clk util_mxfe_upack/clk
+
+ad_connect  vip_device_clk ad9083_dac_fifo/dac_clk
+ad_connect  $sys_dma_clk ad9083_dac_fifo/dma_clk
+
+ad_connect  util_mxfe_upack/s_axis_valid VCC
+ad_connect  util_mxfe_upack/s_axis_ready ad9083_dac_fifo/dac_valid
+ad_connect  util_mxfe_upack/s_axis_data ad9083_dac_fifo/dac_data
+
+# DMA to DAC FIFO
+ad_connect  ad9083_dac_fifo/dma_valid axi_ad9083_tx_dma/m_axis_valid
+ad_connect  axi_ad9083_tx_dma/m_axis_data ad9083_dac_fifo/dma_data
+ad_connect  ad9083_dac_fifo/dma_ready axi_ad9083_tx_dma/m_axis_ready
+ad_connect  ad9083_dac_fifo/dma_xfer_req axi_ad9083_tx_dma/m_axis_xfer_req
+ad_connect  ad9083_dac_fifo/dma_xfer_last axi_ad9083_tx_dma/m_axis_last
 
 # TX JESD204 PHY layer peripheral
 ad_ip_instance axi_adxcvr dac_jesd204_xcvr [list \
@@ -107,7 +168,6 @@ ad_ip_instance axi_adxcvr dac_jesd204_xcvr [list \
 
 # TX JESD204 link layer peripheral
 adi_axi_jesd204_tx_create dac_jesd204_link $NUM_OF_LANES
-#ad_ip_parameter dac_jesd204_link/tx CONFIG.TPL_DATA_PATH_WIDTH $LL_OUT_BYTES
 ad_ip_parameter dac_jesd204_link/tx CONFIG.TPL_DATA_PATH_WIDTH 8
 
 # TX JESD204 transport layer peripheral
@@ -147,11 +207,27 @@ ad_ip_instance util_adxcvr util_jesd204_xcvr [list \
   RXCDR_CFG3_GEN4 0x0 \
   ]
 
+ad_connect  dac_jesd204_transport/dac_valid_0 util_mxfe_upack/fifo_rd_en
+for {set i 0} {$i < $NUM_OF_CONVERTERS} {incr i} {
+  ad_connect  util_mxfe_upack/fifo_rd_data_$i dac_jesd204_transport/dac_data_$i
+  ad_connect  dac_jesd204_transport/dac_enable_$i  util_mxfe_upack/enable_$i
+}
+
+ad_connect  ad9083_dac_fifo/dac_dunf dac_jesd204_transport/dac_dunf
+
 ad_xcvrcon util_jesd204_xcvr dac_jesd204_xcvr dac_jesd204_link {} {} vip_device_clk
 ad_connect dac_jesd204_link/tx_data dac_jesd204_transport/link
 ad_xcvrpll dac_jesd204_xcvr/up_pll_rst util_jesd204_xcvr/up_qpll_rst_*
 ad_xcvrpll dac_jesd204_xcvr/up_pll_rst util_jesd204_xcvr/up_cpll_rst_*
 ad_connect  $sys_cpu_resetn util_jesd204_xcvr/up_rstn
+
+ad_disconnect $sys_cpu_resetn axi_mem_interconnect/aresetn
+ad_connect    $sys_dma_resetn axi_mem_interconnect/aresetn
+
+ad_connect  sys_dma_rstgen/peripheral_reset ad9083_dac_fifo/dma_rst
+ad_connect  sys_dma_rstgen/peripheral_aresetn axi_ad9083_tx_dma/m_src_axi_aresetn
+ad_connect  vip_device_clk_rstgen/peripheral_reset util_mxfe_upack/reset
+ad_connect  vip_device_clk_rstgen/peripheral_reset ad9083_dac_fifo/dac_rst
 
 ad_connect device_clk dac_jesd204_transport/link_clk
 
@@ -161,27 +237,16 @@ ad_xcvrpll vip_ref_clk util_jesd204_xcvr/cpll_ref_clk_*
 ad_connect $sys_cpu_clk util_jesd204_xcvr/up_clk
 ad_connect vip_device_clk dac_jesd204_transport/link_clk
 
-for {set i 0} {$i < $NUM_OF_CONVERTERS} {incr i} {
-  create_bd_port -dir I -from [expr $SAMPLES_PER_CHANNEL*$DMA_SAMPLE_WIDTH-1] -to 0 dac_data_$i
-  ad_connect dac_data_$i dac_jesd204_transport/dac_data_$i
-}
 make_bd_pins_external  [get_bd_pins /dac_jesd204_transport/dac_dunf]
 
 ad_cpu_interconnect 0x44b60000 dac_jesd204_xcvr
 ad_cpu_interconnect 0x44b90000 dac_jesd204_link
 ad_cpu_interconnect 0x44b10000 dac_jesd204_transport
+ad_cpu_interconnect 0x7c430000 axi_ad9083_tx_dma
 
 #
 #  Block design under test
 #
 #
 source $ad_hdl_dir/projects/ad9083_evb/common/ad9083_evb_bd.tcl
-
-#if {$ad_project_params(JESD_MODE) == "8B10B"} {
-#} else {
-#  ad_connect  drp_clk_vip/clk_out jesd204_phy_121/drpclk
-#  ad_connect  drp_clk_vip/clk_out jesd204_phy_126/drpclk
-#}
-
-#adi_sim_add_define "JESD_MODE=\"$JESD_MODE\""
 

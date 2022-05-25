@@ -186,6 +186,7 @@ package adi_jesd204_pkg;
     jesd_link link;
     int dp_width = 4;  // Data width towards Phy
     int tpl_dp_width = 4;  // Data width towards Transport Layer
+    int num_links = 1;
 
     int unsigned link_clk;
     int unsigned device_clk;
@@ -219,6 +220,8 @@ package adi_jesd204_pkg;
       this.bus.RegRead32(this.base_address + GetAddrs(JESD_RX_SYNTH_DATA_PATH_WIDTH), val);
       tpl_dp_width = `GET_JESD_RX_SYNTH_DATA_PATH_WIDTH_TPL_DATA_PATH_WIDTH(val);
       dp_width = 2**`GET_JESD_RX_SYNTH_DATA_PATH_WIDTH_SYNTH_DATA_PATH_WIDTH(val);
+      this.bus.RegRead32(this.base_address + GetAddrs(JESD_RX_SYNTH_REG_1), val);
+      num_links = `GET_JESD_RX_SYNTH_REG_1_NUM_LINKS(val);
     endtask : discover_capabs
 
     // -----------------
@@ -308,7 +311,7 @@ package adi_jesd204_pkg;
     // -----------------
     task wait_link_up();
       bit [31:0] val;
-      int timeout = 20;
+      int timeout = 30;
       bit [1:0] link_state;
       bit [2:0] lane_state;
       bit all_lanes_in_data = 1'b0;
@@ -519,11 +522,20 @@ package adi_jesd204_pkg;
     // -----------------
     task link_verify();
 
+      bit [7:0] status_sync = 8'h00;
+
       link_status_print();
+
+      for (int i=0; i<num_links; i++) begin
+        if (link.encoding == enc8b10b) begin
+          status_sync = status_sync << 1;
+          status_sync = status_sync | 1'b1;
+        end
+      end
 
       // There is no SYNC signal in 64b66b
       this.bus.RegReadVerify32(this.base_address + GetAddrs(JESD_TX_LINK_STATUS),
-                               `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(link.encoding == enc8b10b) |
+                               `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(status_sync) |
                                `SET_JESD_TX_LINK_STATUS_STATUS_STATE(3));
       // Check SYSREF alignment ERROR
       this.bus.RegReadVerify32(this.base_address + GetAddrs(JESD_TX_SYSREF_STATUS),

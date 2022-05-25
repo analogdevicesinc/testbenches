@@ -210,7 +210,11 @@ program test_program;
       // .step (1),
       // .max_sample(2048)
       for (int i=0;i<2048*2 ;i=i+2) begin
-        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
+        if (`TX_JESD_NP == 12) begin
+          env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 20) | (i << 4) ,15);
+        end else begin
+          env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
+        end
       end
       // Configure TX DMA
       env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_CONTROL),
@@ -376,7 +380,11 @@ program test_program;
       // .step (1),
       // .max_sample(2048)
       for (int i=0;i<2048*2 ;i=i+2) begin
-        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
+        if (`TX_JESD_NP == 12) begin
+          env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 20) | (i << 4) ,15);
+        end else begin
+          env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,15);
+        end
       end
 
       // Configure TX DMA

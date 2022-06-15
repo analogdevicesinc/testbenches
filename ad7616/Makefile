@@ -40,6 +40,7 @@ LIB_DEPS += sysid_rom
 
 # default test program
 TP := test_program
+#TP := test_program_pi
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl

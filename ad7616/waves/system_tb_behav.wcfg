@@ -25,149 +25,87 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="17,406.666 ns"></ZoomStartTime>
-      <ZoomEndTime time="18,052.667 ns"></ZoomEndTime>
-      <Cursor1Time time="17,945.000 ns"></Cursor1Time>
+      <ZoomStartTime time="3,940.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="5,170.001 ns"></ZoomEndTime>
+      <Cursor1Time time="4,145.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="218"></NameColumnWidth>
-      <ValueColumnWidth column_width="77"></ValueColumnWidth>
+      <NameColumnWidth column_width="235"></NameColumnWidth>
+      <ValueColumnWidth column_width="149"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="30" />
-   <wvobject type="logic" fp_name="/system_tb/ad7616_spi_sclk">
-      <obj_property name="ElementShortName">ad7616_spi_sclk</obj_property>
-      <obj_property name="ObjectShortName">ad7616_spi_sclk</obj_property>
+   <WVObjectSize size="17" />
+   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_busy">
+      <obj_property name="ElementShortName">rx_busy</obj_property>
+      <obj_property name="ObjectShortName">rx_busy</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/ad7616_spi_sdo">
-      <obj_property name="ElementShortName">ad7616_spi_sdo</obj_property>
-      <obj_property name="ObjectShortName">ad7616_spi_sdo</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_cnvst">
+      <obj_property name="ElementShortName">rx_cnvst</obj_property>
+      <obj_property name="ObjectShortName">rx_cnvst</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/ad7616_spi_sdi">
-      <obj_property name="ElementShortName">ad7616_spi_sdi[1:0]</obj_property>
-      <obj_property name="ObjectShortName">ad7616_spi_sdi[1:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_cs_n">
+      <obj_property name="ElementShortName">rx_cs_n</obj_property>
+      <obj_property name="ObjectShortName">rx_cs_n</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/ad7616_spi_cs">
-      <obj_property name="ElementShortName">ad7616_spi_cs</obj_property>
-      <obj_property name="ObjectShortName">ad7616_spi_cs</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/rx_db_i">
+      <obj_property name="ElementShortName">rx_db_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_db_i[15:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/adc_busy">
-      <obj_property name="ElementShortName">adc_busy</obj_property>
-      <obj_property name="ObjectShortName">adc_busy</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/rx_db_o">
+      <obj_property name="ElementShortName">rx_db_o[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_db_o[15:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/adc_cnvst">
-      <obj_property name="ElementShortName">adc_cnvst</obj_property>
-      <obj_property name="ObjectShortName">adc_cnvst</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_db_t">
+      <obj_property name="ElementShortName">rx_db_t</obj_property>
+      <obj_property name="ObjectShortName">rx_db_t</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/spi_clk">
-      <obj_property name="ElementShortName">spi_clk</obj_property>
-      <obj_property name="ObjectShortName">spi_clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_rd_n">
+      <obj_property name="ElementShortName">rx_rd_n</obj_property>
+      <obj_property name="ObjectShortName">rx_rd_n</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/irq">
-      <obj_property name="ElementShortName">irq</obj_property>
-      <obj_property name="ObjectShortName">irq</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_wr_n">
+      <obj_property name="ElementShortName">rx_wr_n</obj_property>
+      <obj_property name="ObjectShortName">rx_wr_n</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/offload_transfer_cnt">
-      <obj_property name="ElementShortName">offload_transfer_cnt[31:0]</obj_property>
-      <obj_property name="ObjectShortName">offload_transfer_cnt[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="divider221" type="divider">
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/offload_status">
-      <obj_property name="ElementShortName">offload_status</obj_property>
-      <obj_property name="ObjectShortName">offload_status</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test/rdata_reg">
+      <obj_property name="ElementShortName">rdata_reg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rdata_reg[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdi_shiftreg">
-      <obj_property name="ElementShortName">sdi_shiftreg[15:0]</obj_property>
-      <obj_property name="ObjectShortName">sdi_shiftreg[15:0]</obj_property>
+   <wvobject fp_name="divider223" type="divider">
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/offload_sdi_data_store_arr">
-      <obj_property name="ElementShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad7616/inst/adc_valid">
+      <obj_property name="ElementShortName">adc_valid</obj_property>
+      <obj_property name="ObjectShortName">adc_valid</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/offload_captured_word_arr">
-      <obj_property name="ElementShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad7616/inst/adc_data">
+      <obj_property name="ElementShortName">adc_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[15:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/rx_sclk_bfm">
-      <obj_property name="ElementShortName">rx_sclk_bfm</obj_property>
-      <obj_property name="ObjectShortName">rx_sclk_bfm</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad7616/inst/adc_sync">
+      <obj_property name="ElementShortName">adc_sync</obj_property>
+      <obj_property name="ObjectShortName">adc_sync</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/ad7616_spi_sclk">
-      <obj_property name="ElementShortName">ad7616_spi_sclk</obj_property>
-      <obj_property name="ObjectShortName">ad7616_spi_sclk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test/sys_clk">
+      <obj_property name="ElementShortName">sys_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/ad7616_spi_cs">
-      <obj_property name="ElementShortName">ad7616_spi_cs</obj_property>
-      <obj_property name="ObjectShortName">ad7616_spi_cs</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/spi_clk">
-      <obj_property name="ElementShortName">spi_clk</obj_property>
-      <obj_property name="ObjectShortName">spi_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/shiftreg_sampled">
-      <obj_property name="ElementShortName">shiftreg_sampled</obj_property>
-      <obj_property name="ObjectShortName">shiftreg_sampled</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdi_data_store">
-      <obj_property name="ElementShortName">sdi_data_store[15:0]</obj_property>
-      <obj_property name="ObjectShortName">sdi_data_store[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdi_store_cnt">
-      <obj_property name="ElementShortName">sdi_store_cnt[15:0]</obj_property>
-      <obj_property name="ObjectShortName">sdi_store_cnt[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/ad7616_echo_sclk">
-      <obj_property name="ElementShortName">ad7616_echo_sclk</obj_property>
-      <obj_property name="ObjectShortName">ad7616_echo_sclk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/rx_sclk_bfm">
-      <obj_property name="ElementShortName">rx_sclk_bfm</obj_property>
-      <obj_property name="ObjectShortName">rx_sclk_bfm</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7616/offload/offload_sdi_valid">
-      <obj_property name="ElementShortName">offload_sdi_valid</obj_property>
-      <obj_property name="ObjectShortName">offload_sdi_valid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7616/offload/offload_sdi_ready">
-      <obj_property name="ElementShortName">offload_sdi_ready</obj_property>
-      <obj_property name="ObjectShortName">offload_sdi_ready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad7616/offload/offload_sdi_data">
-      <obj_property name="ElementShortName">offload_sdi_data[63:0]</obj_property>
-      <obj_property name="ObjectShortName">offload_sdi_data[63:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ad7616_pwm_gen/pwm_0">
-      <obj_property name="ElementShortName">pwm_0</obj_property>
-      <obj_property name="ObjectShortName">pwm_0</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/adc_cnvst">
-      <obj_property name="ElementShortName">adc_cnvst</obj_property>
-      <obj_property name="ObjectShortName">adc_cnvst</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7616/offload/inst/trigger">
-      <obj_property name="ElementShortName">trigger</obj_property>
-      <obj_property name="ObjectShortName">trigger</obj_property>
-   </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_ad7616_dma/s_axis">
-      <obj_property name="children_use_element_short_name">true</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
-      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="CustomSignalColor">#00E600</obj_property>
-      <obj_property name="Render_Data">/system_tb/test_harness/axi_ad7616_dma/s_axis.streamWaveData</obj_property>
-      <obj_property name="Number_Overlay">2</obj_property>
-      <obj_property name="Overlay_Object_0">/system_tb/test_harness/axi_ad7616_dma/s_axis.linkStarve</obj_property>
-      <obj_property name="Overlay_Color_0">#99E600</obj_property>
-      <obj_property name="Overlay_Object_1">/system_tb/test_harness/axi_ad7616_dma/s_axis.linkStall</obj_property>
-      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
-      <obj_property name="Detail_Data">/system_tb/test_harness/axi_ad7616_dma/s_axis.streamTooltipData</obj_property>
-      <obj_property name="ElementShortName">s_axis</obj_property>
-      <obj_property name="ObjectShortName">s_axis</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="array" fp_name="/system_tb/test/tx_data_buf">
+      <obj_property name="ElementShortName">tx_data_buf[15:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_data_buf[15:0]</obj_property>
    </wvobject>
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_ad7616_dma/m_dest_axi">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/axi_ad7616_dma/m_dest_axi.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
       <obj_property name="ElementShortName">m_dest_axi</obj_property>
       <obj_property name="ObjectShortName">m_dest_axi</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
 </wave_config>

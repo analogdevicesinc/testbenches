@@ -39,5 +39,6 @@ adi_sim_project_files [list \
 
 #set a default test program
 adi_sim_add_define "TEST_PROGRAM=test_program"
+#adi_sim_add_define "TEST_PROGRAM=test_program_si"
 
 adi_sim_generate $project_name

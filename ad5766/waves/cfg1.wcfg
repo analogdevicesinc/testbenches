@@ -26,46 +26,32 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="133.600001 us"></ZoomEndTime>
+      <ZoomEndTime time="166.566236 us"></ZoomEndTime>
       <Cursor1Time time="29.885000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="204"></NameColumnWidth>
-      <ValueColumnWidth column_width="127"></ValueColumnWidth>
+      <ValueColumnWidth column_width="123"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="8" />
-   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_cs">
-      <obj_property name="ElementShortName">pulsar_adc_spi_cs</obj_property>
-      <obj_property name="ObjectShortName">pulsar_adc_spi_cs</obj_property>
+   <WVObjectSize size="5" />
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_clk">
+      <obj_property name="ElementShortName">spi_clk</obj_property>
+      <obj_property name="ObjectShortName">spi_clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_sclk">
-      <obj_property name="ElementShortName">pulsar_adc_spi_sclk</obj_property>
-      <obj_property name="ObjectShortName">pulsar_adc_spi_sclk</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_cs">
+      <obj_property name="ElementShortName">spi_cs[0:0]</obj_property>
+      <obj_property name="ObjectShortName">spi_cs[0:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_clk">
-      <obj_property name="ElementShortName">pulsar_adc_spi_clk</obj_property>
-      <obj_property name="ObjectShortName">pulsar_adc_spi_clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_sclk">
+      <obj_property name="ElementShortName">spi_sclk</obj_property>
+      <obj_property name="ObjectShortName">spi_sclk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_sdi">
-      <obj_property name="ElementShortName">pulsar_adc_spi_sdi</obj_property>
-      <obj_property name="ObjectShortName">pulsar_adc_spi_sdi</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_sdi">
+      <obj_property name="ElementShortName">spi_sdi[0:0]</obj_property>
+      <obj_property name="ObjectShortName">spi_sdi[0:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_sdo">
-      <obj_property name="ElementShortName">pulsar_adc_spi_sdo</obj_property>
-      <obj_property name="ObjectShortName">pulsar_adc_spi_sdo</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_irq">
-      <obj_property name="ElementShortName">pulsar_adc_irq</obj_property>
-      <obj_property name="ObjectShortName">pulsar_adc_irq</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/offload_captured_word_arr">
-      <obj_property name="ElementShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/offload_sdi_data_store_arr">
-      <obj_property name="ElementShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_sdo">
+      <obj_property name="ElementShortName">spi_sdo</obj_property>
+      <obj_property name="ObjectShortName">spi_sdo</obj_property>
    </wvobject>
 </wave_config>

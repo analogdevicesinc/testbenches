@@ -121,7 +121,8 @@ program test_program (
   input pulsar_adc_spi_sclk,
   input pulsar_adc_spi_cs,
   input pulsar_adc_spi_clk,
-  input [(`NUM_OF_SDI - 1):0] pulsar_adc_spi_sdi);
+  input [(`NUM_OF_SDI - 1):0] pulsar_adc_spi_sdo,
+  output [(`NUM_OF_SDI - 1):0] pulsar_adc_spi_sdi);
 
 test_harness_env env;
 
@@ -502,13 +503,7 @@ bit   [31:0]  sdi_fifo_data = 0;
 task fifo_spi_test;
 begin
 
-  //start spi clk generator
-  #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
-
-  //config cnv
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
-
+  
   // Enable SPI Engine
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
 

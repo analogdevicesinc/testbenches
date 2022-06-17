@@ -38,26 +38,27 @@
 `include "utils.svh"
 
 module system_tb();
-  wire pulsar_adc_spi_cs;
-  wire pulsar_adc_spi_sclk;
+  wire spi_cs;
+  wire spi_sclk;
   wire spi_clk;
-  wire pulsar_adc_spi_sdi;
-  wire pulsar_adc_spi_sdo;
+  wire spi_sdi;
+  wire spi_sdo;
   wire spi_irq;
 
   `TEST_PROGRAM test(
     .pulsar_adc_irq(spi_irq),
-    .pulsar_adc_spi_sclk(pulsar_adc_spi_sclk),
-    .pulsar_adc_spi_cs(pulsar_adc_spi_cs),
+    .pulsar_adc_spi_sclk(spi_sclk),
+    .pulsar_adc_spi_cs(spi_cs),
     .pulsar_adc_spi_clk(spi_clk),
-    .pulsar_adc_spi_sdi(pulsar_adc_spi_sdi));
+    .pulsar_adc_spi_sdo(spi_sdo),
+    .pulsar_adc_spi_sdi(spi_sdi));
 
   test_harness `TH (
     .spi_irq(spi_irq),
-    .spi_cs(pulsar_adc_spi_cs),
-    .spi_sclk(pulsar_adc_spi_sclk),
+    .spi_cs(spi_cs),
+    .spi_sclk(spi_sclk),
     .spi_clk(spi_clk),
-    .spi_sdi(pulsar_adc_spi_sdi),
-    .spi_sdo(pulsar_adc_spi_sdo));
+    .spi_sdi(spi_sdi),
+    .spi_sdo(spi_sdo));
 
 endmodule

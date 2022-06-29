@@ -29,6 +29,7 @@ set mng_axi_cfg [ list \
 
 set ddr_axi_cfg [list \
  INTERFACE_MODE {SLAVE} \
+ DATA_WIDTH {512} \
 ]
 
 # Create instance: mng_axi , and set properties

@@ -41,9 +41,11 @@ source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
 source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl
 
 ## ADC FIFO depth in samples per converter
-set adc_fifo_samples_per_converter [expr 4*1024]
+#set adc_fifo_samples_per_converter [expr 4*1024]
+set adc_fifo_samples_per_converter [expr 512]
 ## DAC FIFO depth in samples per converter
-set dac_fifo_samples_per_converter [expr 4*1024]
+#set dac_fifo_samples_per_converter [expr 4*1024]
+set dac_fifo_samples_per_converter [expr 512]
 
 # DRP clk for 204C phy
 ad_ip_instance clk_vip drp_clk_vip [ list \

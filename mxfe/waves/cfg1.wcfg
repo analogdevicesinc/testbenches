@@ -34,15 +34,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="120,106.249137 ns"></ZoomStartTime>
-      <ZoomEndTime time="120,230.668947 ns"></ZoomEndTime>
-      <Cursor1Time time="120,151.735949 ns"></Cursor1Time>
+      <ZoomStartTime time="189.217954545 us"></ZoomStartTime>
+      <ZoomEndTime time="331.618409091 us"></ZoomEndTime>
+      <Cursor1Time time="307.885000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="177"></NameColumnWidth>
-      <ValueColumnWidth column_width="245"></ValueColumnWidth>
+      <ValueColumnWidth column_width="233"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="75" />
+   <WVObjectSize size="105" />
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/phy_data">
       <obj_property name="ElementShortName">phy_data[127:0]</obj_property>
       <obj_property name="ObjectShortName">phy_data[127:0]</obj_property>
@@ -343,5 +343,335 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/inst/i_core/\g_channel[0].i_channel /\g_datafmt[0].i_ad_datafmt /data_out">
       <obj_property name="ElementShortName">data_out[15:0]</obj_property>
       <obj_property name="ObjectShortName">data_out[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis">
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.streamTooltipData</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.streamTooltipData</obj_property>
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/init_req">
+      <obj_property name="ElementShortName">init_req</obj_property>
+      <obj_property name="ObjectShortName">init_req</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider522" type="divider">
+      <obj_property name="label">TX DO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/s_axis">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/s_axis.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/s_axis.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/s_axis.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/s_axis.streamTooltipData</obj_property>
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/m_axis">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/m_axis.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/m_axis.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/m_axis.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/m_axis.streamTooltipData</obj_property>
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_ready">
+      <obj_property name="ElementShortName">s_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_valid">
+      <obj_property name="ElementShortName">s_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data">
+      <obj_property name="ElementShortName">s_axis_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_data[127:0]</obj_property>
+   </wvobject>
+   <wvobject type="vbus" fp_name="vbus658">
+      <obj_property name="label">New Virtual Bus 1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_data[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_ready">
+      <obj_property name="ElementShortName">m_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_valid">
+      <obj_property name="ElementShortName">m_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data">
+      <obj_property name="ElementShortName">m_axis_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_data[127:0]</obj_property>
+   </wvobject>
+   <wvobject type="vbus" fp_name="vbus513">
+      <obj_property name="label">New Virtual Bus</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /m_axis_data[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider1061" type="divider">
+      <obj_property name="label">RX cpack</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_mxfe_cpack/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider1061" type="divider">
+      <obj_property name="label">RX DO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/init_req">
+      <obj_property name="ElementShortName">init_req</obj_property>
+      <obj_property name="ObjectShortName">init_req</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.streamTooltipData</obj_property>
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.streamTooltipData</obj_property>
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="divider1190" type="divider">
+      <obj_property name="label">RX DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_mxfe_rx_dma/s_axis_xfer_req">
+      <obj_property name="ElementShortName">s_axis_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">s_axis_xfer_req</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_mxfe_rx_dma/s_axis">
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider1192" type="divider">
+      <obj_property name="label">RX offload internals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/inst/src_bypass_s">
+      <obj_property name="ElementShortName">src_bypass_s</obj_property>
+      <obj_property name="ObjectShortName">src_bypass_s</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/inst/dst_bypass_s">
+      <obj_property name="ElementShortName">dst_bypass_s</obj_property>
+      <obj_property name="ObjectShortName">dst_bypass_s</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/inst/i_bypass_fifo/m_axis_valid">
+      <obj_property name="ElementShortName">m_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/inst/i_bypass_fifo/m_axis_ready">
+      <obj_property name="ElementShortName">m_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/inst/i_bypass_fifo/s_axis_valid">
+      <obj_property name="ElementShortName">s_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/inst/i_bypass_fifo/s_axis_ready">
+      <obj_property name="ElementShortName">s_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ready</obj_property>
    </wvobject>
 </wave_config>

@@ -118,6 +118,7 @@ program test_program;
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
+    `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
 
     `TH.`REF_CLK.inst.IF.start_clock;
     `TH.`DEVICE_CLK.inst.IF.start_clock;
@@ -140,6 +141,12 @@ program test_program;
     jesd_link_test(0);
 
     // =======================
+    // JESD LINK TEST - DMA - RX/TX BYPASS
+    // =======================
+    jesd_link_test(0,1,1);
+    //jesd_link_test(0,1,1);
+
+    // =======================
     // JESD LINK TEST - DDS - EXT_SYNC
     // =======================
     jesd_link_test_ext_sync(1);
@@ -157,11 +164,12 @@ program test_program;
   // -----------------
   //
   // -----------------
-  task jesd_link_test(input use_dds = 1);
+  task jesd_link_test(input use_dds = 1, input rx_bypass = 0, input tx_bypass = 0);
 
     `INFO(("======================="));
     `INFO(("      JESD TEST        "+(use_dds ? "DDS" : "DMA")));
     `INFO(("======================="));
+
     // -----------------------
     // TX PHY INIT
     // -----------------------
@@ -200,9 +208,12 @@ program test_program;
     // Configure Offload
     //
     // Transfer length
-    env.mng.RegWrite32(`RX_OFFLOAD+'h1C, 'h1000/64);
-    // One shot
-    env.mng.RegWrite32(`RX_OFFLOAD+'h88, 2);
+    //env.mng.RegWrite32(`RX_OFFLOAD+'h1C, 'h1000/64);
+    // Set One shot and bypass
+    env.mng.RegWrite32(`RX_OFFLOAD+'h88, 2 | rx_bypass);
+
+    // Set Tx offload bypass
+    env.mng.RegWrite32(`TX_OFFLOAD+'h88, tx_bypass);
 
     if (~use_dds) begin
 
@@ -220,9 +231,10 @@ program test_program;
       env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_CONTROL),
                          `SET_DMAC_CONTROL_ENABLE(1));
       env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_FLAGS),
+                         `SET_DMAC_FLAGS_CYCLIC(tx_bypass) |
                          `SET_DMAC_FLAGS_TLAST(1));
       env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_X_LENGTH),
-                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h00000FFF));
+                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h00001FFF));
       env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_SRC_ADDRESS),
                          `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BASE+32'h00000000));
       env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
@@ -233,9 +245,9 @@ program test_program;
       env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_FLAGS),
                          `SET_DMAC_FLAGS_TLAST(1));
       env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_X_LENGTH),
-                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003DF));
+                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h000007FF));
       env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_DEST_ADDRESS),
-                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00001000));
+                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00002000));
       env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       // Wait until data propagates through the dma+offload
@@ -270,14 +282,19 @@ program test_program;
 
     if (~use_dds) begin
       check_captured_data(
-        .address (`DDR_BASE+'h00001000),
-        .length (992),
+        .address (`DDR_BASE+'h00002000),
+        .length (1024),
         .step (1),
-        .max_sample(2048)
+        .max_sample(4096)
       );
     end
     rx_ll.link_down();
     tx_ll.link_down();
+
+    env.mng.RegWrite32(`ADC_TPL + GetAddrs(ADC_COMMON_REG_RSTN),
+                       `SET_ADC_COMMON_REG_RSTN_RSTN(0));
+    env.mng.RegWrite32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_RSTN),
+                       `SET_DAC_COMMON_REG_RSTN_RSTN(0));
 
     rx_xcvr.down();
     tx_xcvr.down();
@@ -406,7 +423,7 @@ program test_program;
       env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_X_LENGTH),
                          `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003DF));
       env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_DEST_ADDRESS),
-                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00001000));
+                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00002000));
       env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       // Wait until data propagates through the dma+offload
@@ -429,6 +446,11 @@ program test_program;
 
     rx_ll.link_down();
     tx_ll.link_down();
+
+    env.mng.RegWrite32(`ADC_TPL + GetAddrs(ADC_COMMON_REG_RSTN),
+                       `SET_ADC_COMMON_REG_RSTN_RSTN(0));
+    env.mng.RegWrite32(`DAC_TPL + GetAddrs(DAC_COMMON_REG_RSTN),
+                       `SET_DAC_COMMON_REG_RSTN_RSTN(0));
 
     rx_xcvr.down();
     tx_xcvr.down();

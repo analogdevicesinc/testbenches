@@ -46,7 +46,7 @@ import test_harness_env_pkg::*;
 `define AD469X_REGMAP               32'h44A0_0000
 `define AD469X_CLKGEN               32'h44A7_0000
 `define AD469X_CNV                  32'h44B0_0000
-`define DDR_BASE                    32'h44A0_0000
+`define DDR_BASE                    32'h8000_0000
 
 localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
 localparam SPI_ENG_ADDR_ID            = 32'h0000_0004;

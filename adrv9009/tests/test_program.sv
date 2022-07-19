@@ -407,11 +407,7 @@ program test_program;
         .address (`DDR_BASE+'h00001000),
         .length (992),
         .step (1),
-        .max_sample(2048),
-        .num_of_converters(`RX_JESD_M),
-        .num_of_lanes(`RX_JESD_L),
-        .samples_per_frame(`RX_JESD_S),
-        .octets_per_frame(`RX_JESD_F)
+        .max_sample(2048)
       );
       
       #10us;
@@ -485,11 +481,7 @@ program test_program;
         .address (`DDR_BASE+'h00001000),
         .length (992),
         .step (1),
-        .max_sample(2048),
-        .num_of_converters(`RX_OS_JESD_M),
-        .num_of_lanes(`RX_OS_JESD_L),
-        .samples_per_frame(`RX_OS_JESD_S),
-        .octets_per_frame(`RX_OS_JESD_F)
+        .max_sample(2048)
       );
     end
 
@@ -501,63 +493,35 @@ program test_program;
   task check_captured_data(bit [31:0] address,
                            int length = 1024,
                            int step = 1,
-                           int max_sample = 2048,
-                           int num_of_converters = 4,
-                           int num_of_lanes = 2,
-                           int samples_per_frame = 1,
-                           int octets_per_frame = 4
+                           int max_sample = 2048
                           );
 
     bit [31:0] current_address;
     bit [31:0] captured_word;
     bit [31:0] reference_word;
     bit [7:0] first, second;
-    bit empty_line = 1'b0, bypass = 1'b0;
-
-    if (num_of_lanes == 2 && num_of_converters < 4) begin
-      empty_line = 1'b1;
-    end
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
       captured_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_address);
-      if (i==0 || bypass) begin
+      if (i==0) begin
         first = captured_word[15:8];
         second = captured_word[7:0];
         
-        if (num_of_lanes > 1 && first == 8'h00 && first == second) begin
-          bypass = 1'b1;
-          continue;
-        end
-        bypass = 1'b0;
       end else begin
-        if (empty_line) begin
-          reference_word = 32'h00000000;
-        end else if (num_of_converters == 1) begin
-          reference_word = {24'h000000, second};
-        end else begin
-          reference_word = {(first + 8'h10), second, first, second};
-        end
+        second = (second + 8'h02); 
+        reference_word = {first, (second+ 8'h01), first, second};
 
-        if (num_of_lanes == 2 && num_of_converters < 4) begin
-          empty_line = !empty_line;
+        if (second == 8'hfe) begin
+          first = (first + 8'h01);
         end
-
+      
         `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         
-        if (i == 20 && captured_word !== reference_word) begin
+        if (i > 20 && captured_word !== reference_word) begin
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end
       end
-      
-      if (!empty_line) begin 
-        first = (first + 8'h20);
-        if (first[7:4] >= num_of_converters || num_of_converters == 1) begin
-          first = 8'h00;
-          second = second + (4 / (octets_per_frame / samples_per_frame));
-        end
-      end
-
     end
   endtask
 

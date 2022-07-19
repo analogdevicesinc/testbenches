@@ -48,6 +48,7 @@ import adi_regmap_jesd_rx_pkg::*;
 import adi_regmap_common_pkg::*;
 import adi_regmap_dac_pkg::*;
 import adi_regmap_adc_pkg::*;
+import adi_regmap_tdd_pkg::*;
 import adi_jesd204_pkg::*;
 import adi_xcvr_pkg::*;
 
@@ -63,6 +64,7 @@ import adi_xcvr_pkg::*;
 `define DDR_BASE    32'h8000_0000
 `define RX_OFFLOAD  32'h7C45_0000
 `define TX_OFFLOAD  32'h7C44_0000
+`define TDD         32'h7C46_0000
 
 program test_program;
 
@@ -147,6 +149,11 @@ program test_program;
     //jesd_link_test(0,1,1);
 
     // =======================
+    // JESD LINK TEST - DMA - DO -TDD
+    // =======================
+    jesd_link_test(0,0,0,1);
+
+    // =======================
     // JESD LINK TEST - DDS - EXT_SYNC
     // =======================
     jesd_link_test_ext_sync(1);
@@ -164,7 +171,10 @@ program test_program;
   // -----------------
   //
   // -----------------
-  task jesd_link_test(input use_dds = 1, input rx_bypass = 0, input tx_bypass = 0);
+  task jesd_link_test(input use_dds = 1,
+                      input rx_bypass = 0,
+                      input tx_bypass = 0,
+                      input tdd_enabled = 0);
 
     `INFO(("======================="));
     `INFO(("      JESD TEST        "+(use_dds ? "DDS" : "DMA")));
@@ -213,7 +223,34 @@ program test_program;
     env.mng.RegWrite32(`RX_OFFLOAD+'h88, 2 | rx_bypass);
 
     // Set Tx offload bypass
-    env.mng.RegWrite32(`TX_OFFLOAD+'h88, tx_bypass);
+    // for TDD set single shot
+    env.mng.RegWrite32(`TX_OFFLOAD+'h88, 2*tdd_enabled | tx_bypass);
+    // Sync option set for hw sync
+    env.mng.RegWrite32(`TX_OFFLOAD+'h104, tdd_enabled);
+    env.mng.RegWrite32(`RX_OFFLOAD+'h104, tdd_enabled);
+
+    if (tdd_enabled) begin
+      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_FRAME_LENGTH),
+          `SET_TDD_CNTRL_REG_TDD_FRAME_LENGTH_TDD_FRAME_LENGTH(2048));
+
+      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_TX_DP_ON_1),
+          `SET_TDD_CNTRL_REG_TDD_TX_DP_ON_1_TDD_TX_DP_ON_1(0));
+
+      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_TX_DP_OFF_1),
+          `SET_TDD_CNTRL_REG_TDD_TX_DP_OFF_1_TDD_TX_DP_OFF_1(10));
+
+      // Trigger RX capture later due rountrip latency ~96 cycles
+      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_RX_DP_ON_1),
+          `SET_TDD_CNTRL_REG_TDD_RX_DP_ON_1_TDD_RX_DP_ON_1(96));
+
+      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_RX_DP_OFF_1),
+          `SET_TDD_CNTRL_REG_TDD_RX_DP_OFF_1_TDD_RX_DP_OFF_1(106));
+
+      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_CONTROL_0),
+          `SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_TX_DMAPATH(1) |
+          `SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_RX_DMAPATH(1) |
+          `SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_ENABLE(1));
+    end
 
     if (~use_dds) begin
 

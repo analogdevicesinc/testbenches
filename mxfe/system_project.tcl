@@ -36,6 +36,7 @@ adi_sim_project_files [list \
  "../common/sv/adi_regmap_jesd_tx_pkg.sv" \
  "../common/sv/adi_regmap_jesd_rx_pkg.sv" \
  "../common/sv/adi_regmap_xcvr_pkg.sv" \
+ "../common/sv/adi_regmap_tdd_pkg.sv" \
  "../common/sv/dma_trans.sv" \
  "../common/sv/adi_jesd204_pkg.sv" \
  "../common/sv/adi_peripheral_pkg.sv" \

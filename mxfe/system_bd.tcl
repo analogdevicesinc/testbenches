@@ -88,6 +88,11 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 #
 source $ad_hdl_dir/projects/ad9081_fmca_ebz/common/ad9081_fmca_ebz_bd.tcl
 
+
+if {$TDD_SUPPORT} {
+  ad_ip_parameter tdd_sync_0 CONFIG.TDD_SYNC_PERIOD [expr 1024*32]; # can't simualte 1 PPS, use smaller period
+}
+
 #if {$ad_project_params(JESD_MODE) == "8B10B"} {
 #} else {
 #  ad_connect  drp_clk_vip/clk_out jesd204_phy_121/drpclk

@@ -201,7 +201,7 @@ program test_program;
     axi_write (`RX_DMA+GetAddrs(DMAC_FLAGS),
                `SET_DMAC_FLAGS_TLAST(1));
     axi_write (`RX_DMA+GetAddrs(DMAC_X_LENGTH),
-               `SET_DMAC_X_LENGTH_X_LENGTH(128*4-1));
+               `SET_DMAC_X_LENGTH_X_LENGTH(64*4-1));
     axi_write (`RX_DMA+GetAddrs(DMAC_DEST_ADDRESS),
                `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00002000));
     axi_write (`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
@@ -211,7 +211,7 @@ program test_program;
 
     check_captured_data(
       .address (`DDR_BASE+'h00002000),
-      .length (128),
+      .length (64),
       .step (1),
       .max_sample(2048)
     );

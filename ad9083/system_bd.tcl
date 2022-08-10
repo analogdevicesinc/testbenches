@@ -33,7 +33,7 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../library/scripts/adi_env.tcl
+source ../../scripts/adi_env.tcl
 
 source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
 

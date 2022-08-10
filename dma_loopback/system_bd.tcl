@@ -33,7 +33,7 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../library/scripts/adi_env.tcl
+source ../../scripts/adi_env.tcl
 
 # Device clk
 ad_ip_instance clk_vip device_clk_vip [ list \

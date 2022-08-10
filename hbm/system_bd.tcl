@@ -33,7 +33,7 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../library/scripts/adi_env.tcl
+source ../../scripts/adi_env.tcl
 source ../../library/util_hbm/scripts/adi_util_hbm.tcl
 
 # hbm clk/reset

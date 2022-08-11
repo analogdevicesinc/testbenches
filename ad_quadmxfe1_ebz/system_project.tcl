@@ -1,5 +1,5 @@
 source ../scripts/adi_sim.tcl
-source ../../library/scripts/adi_env.tcl
+source ../../scripts/adi_env.tcl
 source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
 

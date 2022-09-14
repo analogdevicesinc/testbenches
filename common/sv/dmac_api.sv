@@ -264,11 +264,15 @@ package dmac_api_pkg;
       end
       if (p.DMA_TYPE_SRC == 0) begin
         this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_SRC_ADDRESS),
-                                  SetField(DMAC_SRC_ADDRESS, "SRC_ADDRESS", t.src_addr));
+                                  SetField(DMAC_SRC_ADDRESS, "SRC_ADDRESS", t.src_addr[31:0]));
+        this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_SRC_ADDRESS_HIGH),
+                                  SetField(DMAC_SRC_ADDRESS_HIGH, "SRC_ADDRESS_HIGH", t.src_addr[63:32]));
       end
       if (p.DMA_TYPE_DEST == 0) begin
         this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_DEST_ADDRESS),
-                                  SetField(DMAC_DEST_ADDRESS, "DEST_ADDRESS", t.dst_addr));
+                                  SetField(DMAC_DEST_ADDRESS, "DEST_ADDRESS", t.dst_addr[31:0]));
+        this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_DEST_ADDRESS_HIGH),
+                                  SetField(DMAC_DEST_ADDRESS_HIGH, "DEST_ADDRESS_HIGH", t.dst_addr[63:32]));
       end
       this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_X_LENGTH),
                                 SetField(DMAC_X_LENGTH, "X_LENGTH", t.length-1));

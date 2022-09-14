@@ -49,8 +49,8 @@ package dma_trans_pkg;
     // DMAC parameters
     axi_dmac_params_t p;
 
-    rand int unsigned src_addr;
-    rand int unsigned dst_addr;
+    rand longint unsigned src_addr;
+    rand longint unsigned dst_addr;
     rand int unsigned length;
     bit first = 1;
     bit last = 1;
@@ -58,8 +58,8 @@ package dma_trans_pkg;
     bit cyclic = 0;
 
     // do not test large addresses
-    constraint saddr_range {src_addr <= 2**16;}
-    constraint daddr_range {dst_addr <= 2**16;}
+    constraint saddr_range {src_addr <= 2**32;}
+    constraint daddr_range {dst_addr <= 2**32;}
 
     // length resolution
     int src_res;

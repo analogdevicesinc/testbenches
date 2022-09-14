@@ -48,7 +48,7 @@ import dma_trans_pkg::*;
 
 `define RX_DMA      32'h7c42_0000
 `define TX_DMA      32'h7c43_0000
-`define DDR_BASE    32'h8000_0000
+`define DDR_BASE    36'h1_0000_0000
 
 program test_program;
 
@@ -107,8 +107,8 @@ program test_program;
 
   end
 
-  task do_transfer(bit [31:0] src_addr,
-                   bit [31:0] dest_addr,
+  task do_transfer(bit [35:0] src_addr,
+                   bit [35:0] dest_addr,
                    bit [31:0] length);
 
     dma_segment m_seg, s_seg;
@@ -138,12 +138,12 @@ program test_program;
 
 
   // Check captured data 
-  task check_data(bit [31:0] src_addr,
-                  bit [31:0] dest_addr,
+  task check_data(bit [35:0] src_addr,
+                  bit [35:0] dest_addr,
                   bit [31:0] length);
 
-    bit [31:0] current_dest_address;
-    bit [31:0] current_src_address;
+    bit [35:0] current_dest_address;
+    bit [35:0] current_src_address;
     bit [31:0] captured_word;
     bit [31:0] reference_word;
 

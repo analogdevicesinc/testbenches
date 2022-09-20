@@ -32,13 +32,12 @@ LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_pwm_gen
 LIB_DEPS += axi_dmac
 LIB_DEPS += axi_sysid
+LIB_DEPS += spi_engine/axi_dds
 LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
-LIB_DEPS += spi_engine/spi_engine_offload
 LIB_DEPS += sysid_rom
-LIB_DEPS += spi_engine/ad_ip_jesd204_tpl_dac
 
 # default test program
 TP := test_program

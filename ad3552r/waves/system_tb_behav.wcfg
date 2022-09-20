@@ -25,145 +25,191 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="7.300001 us"></ZoomEndTime>
-      <Cursor1Time time="0.000000 us"></Cursor1Time>
+      <ZoomStartTime time="12,000.197 ns"></ZoomStartTime>
+      <ZoomEndTime time="12,066.298 ns"></ZoomEndTime>
+      <Cursor1Time time="12,013.297 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="255"></NameColumnWidth>
-      <ValueColumnWidth column_width="151"></ValueColumnWidth>
+      <NameColumnWidth column_width="246"></NameColumnWidth>
+      <ValueColumnWidth column_width="92"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="33" />
+   <WVObjectSize size="49" />
+   <wave_markers>
+      <marker label="" time="6019946" />
+   </wave_markers>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_dds/inst/spi_clk">
+      <obj_property name="ElementShortName">spi_clk</obj_property>
+      <obj_property name="ObjectShortName">spi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/ddr_en">
+      <obj_property name="ElementShortName">ddr_en</obj_property>
+      <obj_property name="ObjectShortName">ddr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider108" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_dds/inst/m_axis_dds_ready">
+      <obj_property name="ElementShortName">m_axis_dds_ready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_dds_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_dds/inst/m_axis_dds_valid">
+      <obj_property name="ElementShortName">m_axis_dds_valid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_dds_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_dds/inst/m_axis_dds_data">
+      <obj_property name="ElementShortName">m_axis_dds_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_dds_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/pulsar_adc_trigger_gen/inst/pwm_0">
+      <obj_property name="ElementShortName">pwm_0</obj_property>
+      <obj_property name="ObjectShortName">pwm_0</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider51" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/sdo_t">
+      <obj_property name="ElementShortName">sdo_t</obj_property>
+      <obj_property name="ObjectShortName">sdo_t</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/sdo_enabled">
+      <obj_property name="ElementShortName">sdo_enabled</obj_property>
+      <obj_property name="ObjectShortName">sdo_enabled</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/system_tb/ad3552r_dac_spi_cs">
       <obj_property name="ElementShortName">ad3552r_dac_spi_cs</obj_property>
       <obj_property name="ObjectShortName">ad3552r_dac_spi_cs</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/offload/trigger">
-      <obj_property name="ElementShortName">trigger</obj_property>
-      <obj_property name="ObjectShortName">trigger</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdi_shiftreg">
-      <obj_property name="ElementShortName">sdi_shiftreg[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdi_shiftreg[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdo_shiftreg">
-      <obj_property name="ElementShortName">sdo_shiftreg[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_shiftreg[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdo_shiftreg2">
-      <obj_property name="ElementShortName">sdo_shiftreg2[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_shiftreg2[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdo_shiftreg_store_arr">
-      <obj_property name="ElementShortName">sdo_shiftreg_store_arr[19:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_shiftreg_store_arr[19:0][31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider131" type="divider">
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sclk_counter">
-      <obj_property name="ElementShortName">sclk_counter[5:0]</obj_property>
-      <obj_property name="ObjectShortName">sclk_counter[5:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_clkgen/clk_0">
-      <obj_property name="ElementShortName">clk_0</obj_property>
-      <obj_property name="ObjectShortName">clk_0</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/cmd_ready">
-      <obj_property name="ElementShortName">cmd_ready</obj_property>
-      <obj_property name="ObjectShortName">cmd_ready</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/cmd_valid">
-      <obj_property name="ElementShortName">cmd_valid</obj_property>
-      <obj_property name="ObjectShortName">cmd_valid</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/cmd">
-      <obj_property name="ElementShortName">cmd[15:0]</obj_property>
-      <obj_property name="ObjectShortName">cmd[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/sdo_data_valid">
-      <obj_property name="ElementShortName">sdo_data_valid</obj_property>
-      <obj_property name="ObjectShortName">sdo_data_valid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/sdo_data_ready">
-      <obj_property name="ElementShortName">sdo_data_ready</obj_property>
-      <obj_property name="ObjectShortName">sdo_data_ready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/sdo_data">
-      <obj_property name="ElementShortName">sdo_data[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_data[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/offload_status">
-      <obj_property name="ElementShortName">offload_status</obj_property>
-      <obj_property name="ObjectShortName">offload_status</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/sclk">
-      <obj_property name="ElementShortName">sclk</obj_property>
-      <obj_property name="ObjectShortName">sclk</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/ad3552r_dac_spi_sdi">
-      <obj_property name="ElementShortName">ad3552r_dac_spi_sdi[3:0]</obj_property>
-      <obj_property name="ObjectShortName">ad3552r_dac_spi_sdi[3:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/ad3552r_dac_spi_sdo_t">
-      <obj_property name="ElementShortName">ad3552r_dac_spi_sdo_t</obj_property>
-      <obj_property name="ObjectShortName">ad3552r_dac_spi_sdo_t</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/ad3552r_dac_spi_sdo">
-      <obj_property name="ElementShortName">ad3552r_dac_spi_sdo[3:0]</obj_property>
-      <obj_property name="ObjectShortName">ad3552r_dac_spi_sdo[3:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/ad3552_dac_spi_sdio">
       <obj_property name="ElementShortName">ad3552_dac_spi_sdio[3:0]</obj_property>
       <obj_property name="ObjectShortName">ad3552_dac_spi_sdio[3:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/sdi_fifo_data">
-      <obj_property name="ElementShortName">sdi_fifo_data[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdi_fifo_data[31:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/ad3552r_dac_spi_sclk">
+      <obj_property name="ElementShortName">ad3552r_dac_spi_sclk</obj_property>
+      <obj_property name="ObjectShortName">ad3552r_dac_spi_sclk</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/sdi_data">
-      <obj_property name="ElementShortName">sdi_data[127:0]</obj_property>
-      <obj_property name="ObjectShortName">sdi_data[127:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/oddr_out">
+      <obj_property name="ElementShortName">oddr_out[3:0]</obj_property>
+      <obj_property name="ObjectShortName">oddr_out[3:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/sdi_data_valid">
-      <obj_property name="ElementShortName">sdi_data_valid</obj_property>
-      <obj_property name="ObjectShortName">sdi_data_valid</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/sdo_data_valid">
+      <obj_property name="ElementShortName">sdo_data_valid</obj_property>
+      <obj_property name="ObjectShortName">sdo_data_valid</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/sdi_data_ready">
-      <obj_property name="ElementShortName">sdi_data_ready</obj_property>
-      <obj_property name="ObjectShortName">sdi_data_ready</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/sdo_data_ready">
+      <obj_property name="ElementShortName">sdo_data_ready</obj_property>
+      <obj_property name="ObjectShortName">sdo_data_ready</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/last_sdi_bit">
-      <obj_property name="ElementShortName">last_sdi_bit</obj_property>
-      <obj_property name="ObjectShortName">last_sdi_bit</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/sdo_data">
+      <obj_property name="ElementShortName">sdo_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_data[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/\g_sclk_miso_latch.g_sdi_shift_reg[0].data_sdi_shift ">
-      <obj_property name="ElementShortName">\g_sclk_miso_latch.g_sdi_shift_reg[0].data_sdi_shift [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\g_sclk_miso_latch.g_sdi_shift_reg[0].data_sdi_shift [31:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/data_sdo_shift4">
+      <obj_property name="ElementShortName">data_sdo_shift4[63:0]</obj_property>
+      <obj_property name="ObjectShortName">data_sdo_shift4[63:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/\g_sclk_miso_latch.g_sdi_shift_reg[3].data_sdi_shift ">
-      <obj_property name="ElementShortName">\g_sclk_miso_latch.g_sdi_shift_reg[3].data_sdi_shift [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\g_sclk_miso_latch.g_sdi_shift_reg[3].data_sdi_shift [31:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/data_sdo_shift3">
+      <obj_property name="ElementShortName">data_sdo_shift3[63:0]</obj_property>
+      <obj_property name="ObjectShortName">data_sdo_shift3[63:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/\g_sclk_miso_latch.g_sdi_shift_reg[1].data_sdi_shift ">
-      <obj_property name="ElementShortName">\g_sclk_miso_latch.g_sdi_shift_reg[1].data_sdi_shift [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\g_sclk_miso_latch.g_sdi_shift_reg[1].data_sdi_shift [31:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/data_sdo_shift2">
+      <obj_property name="ElementShortName">data_sdo_shift2[63:0]</obj_property>
+      <obj_property name="ObjectShortName">data_sdo_shift2[63:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/\g_sclk_miso_latch.g_sdi_shift_reg[2].data_sdi_shift ">
-      <obj_property name="ElementShortName">\g_sclk_miso_latch.g_sdi_shift_reg[2].data_sdi_shift [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\g_sclk_miso_latch.g_sdi_shift_reg[2].data_sdi_shift [31:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/data_sdo_shift">
+      <obj_property name="ElementShortName">data_sdo_shift[63:0]</obj_property>
+      <obj_property name="ObjectShortName">data_sdo_shift[63:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/echo_sclk">
-      <obj_property name="ElementShortName">echo_sclk</obj_property>
-      <obj_property name="ObjectShortName">echo_sclk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/cmd_ready">
+      <obj_property name="ElementShortName">cmd_ready</obj_property>
+      <obj_property name="ObjectShortName">cmd_ready</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/cmd_valid">
+      <obj_property name="ElementShortName">cmd_valid</obj_property>
+      <obj_property name="ObjectShortName">cmd_valid</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/execution/inst/trigger_rx_s">
-      <obj_property name="ElementShortName">trigger_rx_s</obj_property>
-      <obj_property name="ObjectShortName">trigger_rx_s</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/cmd">
+      <obj_property name="ElementShortName">cmd[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cmd[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/cmd_d">
+      <obj_property name="ElementShortName">cmd_d[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cmd_d[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/cmd_valid_d">
+      <obj_property name="ElementShortName">cmd_valid_d</obj_property>
+      <obj_property name="ObjectShortName">cmd_valid_d</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/stream_mode">
+      <obj_property name="ElementShortName">stream_mode</obj_property>
+      <obj_property name="ObjectShortName">stream_mode</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/stream_mode_ed">
+      <obj_property name="ElementShortName">stream_mode_ed</obj_property>
+      <obj_property name="ObjectShortName">stream_mode_ed</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_offload/inst/ctrl_enable">
+      <obj_property name="ElementShortName">ctrl_enable</obj_property>
+      <obj_property name="ObjectShortName">ctrl_enable</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_offload/inst/ctrl_enabled">
+      <obj_property name="ElementShortName">ctrl_enabled</obj_property>
+      <obj_property name="ObjectShortName">ctrl_enabled</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/transfer_counter">
+      <obj_property name="ElementShortName">transfer_counter[7:0]</obj_property>
+      <obj_property name="ObjectShortName">transfer_counter[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/last_transfer">
+      <obj_property name="ElementShortName">last_transfer</obj_property>
+      <obj_property name="ObjectShortName">last_transfer</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/transfer_active_s">
+      <obj_property name="ElementShortName">transfer_active_s</obj_property>
+      <obj_property name="ObjectShortName">transfer_active_s</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/transfer_active">
+      <obj_property name="ElementShortName">transfer_active</obj_property>
+      <obj_property name="ObjectShortName">transfer_active</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/transfer_active_d">
+      <obj_property name="ElementShortName">transfer_active_d[3:0]</obj_property>
+      <obj_property name="ObjectShortName">transfer_active_d[3:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="divider52" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_offload/inst/ctrl_enable">
+      <obj_property name="ElementShortName">ctrl_enable</obj_property>
+      <obj_property name="ObjectShortName">ctrl_enable</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_offload/inst/ctrl_enabled">
+      <obj_property name="ElementShortName">ctrl_enabled</obj_property>
+      <obj_property name="ObjectShortName">ctrl_enabled</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider87" type="divider">
+   </wvobject>
+   <wvobject fp_name="divider97" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/cpha">
+      <obj_property name="ElementShortName">cpha</obj_property>
+      <obj_property name="ObjectShortName">cpha</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/cpol">
+      <obj_property name="ElementShortName">cpol</obj_property>
+      <obj_property name="ObjectShortName">cpol</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider114" type="divider">
+   </wvobject>
+   <wvobject fp_name="divider66" type="divider">
+   </wvobject>
+   <wvobject fp_name="divider78" type="divider">
+   </wvobject>
+   <wvobject fp_name="divider65" type="divider">
+   </wvobject>
+   <wvobject fp_name="divider79" type="divider">
+   </wvobject>
+   <wvobject fp_name="divider109" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad3552r_dac/spi_ad3552r_dac_execution/inst/wait_for_io">
+      <obj_property name="ElementShortName">wait_for_io</obj_property>
+      <obj_property name="ObjectShortName">wait_for_io</obj_property>
    </wvobject>
 </wave_config>

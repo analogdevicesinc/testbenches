@@ -2,7 +2,7 @@
 #global mng_axi_cfg
 # axi lite management port
 set mng_axi_cfg [ list \
-   ADDR_WIDTH {32} \
+   ADDR_WIDTH {36} \
    ARUSER_WIDTH {0} \
    AWUSER_WIDTH {0} \
    BUSER_WIDTH {0} \
@@ -169,5 +169,5 @@ global sys_mem_interconnect_index
 incr sys_mem_interconnect_index
 
 # Set DDR VIP to a range of 2G 
-create_bd_addr_seg -range 0x80000000 -offset 0x80000000 [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
+create_bd_addr_seg -range 0x80000000 -offset 0x100000000 [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
   [get_bd_addr_segs ddr_axi_vip/S_AXI/Reg] SEG_mng_ddr_cntlr

@@ -90,7 +90,7 @@ localparam SDI_DELAY                  = 0;
 localparam NUM_OF_CS                  = 1;
 localparam THREE_WIRE                 = 0;
 localparam CPOL                       = 0;
-localparam CPHA                       = 0;
+localparam CPHA                       = 1;
 localparam DDR_EN                     = 1;
 localparam CLOCK_DIVIDER              = 0;
 localparam NUM_OF_WORDS               = 1;
@@ -203,14 +203,14 @@ initial begin
   #100
 
   sanity_test;
-  
+
   #100
-  
+
   init;
 
   #100
 
-  fifo_spi_test;
+//  fifo_spi_test;
 
   #100
 
@@ -335,6 +335,7 @@ bit   [7:0]   spi_sclk_pos_counter = 0;
 bit   [7:0]   spi_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
+bit   [31:0]  offload_test_cnt;
 
 initial begin
   while(1) begin
@@ -444,7 +445,7 @@ initial begin
         end else begin
           sclk_counter_flag <= 'h0;
         end
-        
+
       end else begin
         sdo_shiftreg2 <= {sdo_shiftreg2[27:0], ad3552r_dac_spi_sdo[3], ad3552r_dac_spi_sdo[2], ad3552r_dac_spi_sdo[1], ad3552r_dac_spi_sdo[0]};
       end
@@ -505,7 +506,7 @@ begin
   axi_write (SPI_DDS + 32'h404, 32'hff);
   axi_write (SPI_DDS + 32'h408, 32'h1f);
   axi_write (SPI_DDS + 32'h40c, 32'h1f1f);
-  
+
 end
 endtask
 
@@ -518,6 +519,77 @@ bit [31:0] offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) -1 :0];
 task offload_spi_test;
   begin
 
+//    for (int i=0;i<2048*2 ;i=i+2) begin
+//      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,'hF);
+//    end
+//  //Configure DMA
+//    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
+//    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
+//    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4*2)-1); // X_LENGHTH = 1024-1
+//    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h414, `DDR_BASE); // SRC_ADDRESS
+//    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hdead);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hbeef);
+
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG | 16'h8000);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE | 16'h8000);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_16 | 16'h8000);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | 16'h8000);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 1 | 16'h8000);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 5 | 16'h8000);
+
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_32);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR );
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 6);
+
+//    offload_status = 1;
+
+//    // Start the offload
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+//    $display("[%t] Offload started 0.", $time);
+
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h0);
+
+//#2000
+
+//scenario with offload CMD MEM empty. bug used to keep INTERCONNECT jamed (idle=0)
+
+    axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'd20);  //CLOCK_DIVIDER=0
+    axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
+
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'h56);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'h78);
+
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_8 | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 1 | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG_DDR | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_32 | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 'hff | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 0 | 16'h8000);
+
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h1);
+
+    offload_status = 1;
+
+    // Start the offload
+
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    offload_test_cnt <= 0;
+    $display("[%t] Offload started: %d.", $time, offload_test_cnt);
+
+#3000
+
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
+
+//    fifo_spi_test;
+
     //Configure DMA
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
@@ -525,51 +597,51 @@ task offload_spi_test;
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
     env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 0);
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hdead);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hbeef);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_16 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 1 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 5 | 16'h8000);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_32);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR );
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 6);
 
-    offload_status = 1;
-
     // Start the offload
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
-    $display("[%t] Offload started 0.", $time);
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS/2);
-    offload_status = 0;
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    offload_test_cnt <= offload_test_cnt + 1'h1; //1
+    $display("[%t] Offload started: %d.", $time, offload_test_cnt);
+
+#3000
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
 
-#2000
-    
     axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'd20);  //CLOCK_DIVIDER=0
     axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 0);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
-    
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'had);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hde);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_8 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | 16'h8000);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 1 | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG_DDR | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_32 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 7 | 16'h8000);
@@ -578,109 +650,108 @@ task offload_spi_test;
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 8);
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h1);
-    
+
     offload_status = 1;
 
     // Start the offload
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
-    $display("[%t] Offload started 1.", $time);
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-    offload_status = 0;
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    offload_test_cnt <= offload_test_cnt + 1'h1; //2
+    $display("[%t] Offload started: %d.", $time, offload_test_cnt);
+
+#3000
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
 
-#2000
-    
     axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 'd14);  //CLOCK_DIVIDER=0
     axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 0);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
-    
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'had);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hde);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_8 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 1 | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 10 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG_DDR | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_32 | 16'h8000);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 'hff | 16'h8000);
-    
+
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 10 | 16'h8000);
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 11 );
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h1);
-    
+
     offload_status = 1;
 
     // Start the offload
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
-    $display("[%t] Offload started 2.", $time);
+    offload_test_cnt <= offload_test_cnt + 1'h1; //3
+    $display("[%t] Offload started: %d.", $time, offload_test_cnt);
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-
-#25000
+#3000
 
     offload_status = 0;
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
 
-   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 0);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
-    
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'had);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hde);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_8 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 1 | 16'h8000);
+    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 10 | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG_DDR | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_32 | 16'h8000);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 'hff | 16'h8000);
-    
+
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 10 | 16'h8000);
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 11 );
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h1);
-    
+
     offload_status = 1;
 
     // Start the offload
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
-    $display("[%t] Offload started 3.", $time);
+    offload_test_cnt <= offload_test_cnt + 1'h1; //4
+    $display("[%t] Offload started: %d.", $time, offload_test_cnt);
 
-//    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-
-#25000
+#3000
 
     offload_status = 0;
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
-    
+
 ///////////
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 0);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
-    
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);
+//    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'had);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 32'hde);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_8 | 16'h8000);
@@ -688,26 +759,21 @@ task offload_spi_test;
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 1 | 16'h8000);
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG_DDR | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH_32 | 16'h8000);
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_WR | 'hff | 16'h8000);
-    
+
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF | 16'h8000);
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 10 | 16'h8000);
 //    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 11 );
-    
+
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h1);
-    
-    offload_status = 1;
 
     // Start the offload
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
-    $display("[%t] Offload started 4.", $time);
+    offload_test_cnt <= offload_test_cnt + 1'h1; //5
+    $display("[%t] Offload started: %d.", $time, offload_test_cnt);
 
-//    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-
-#25000
-
-    offload_status = 0;
+#3000
 
     axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
 
@@ -748,7 +814,7 @@ begin
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CFG);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH_16);
-  
+
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h0);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h1);
 //  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_AXIS_SW, 1'h0);
@@ -757,17 +823,17 @@ begin
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, 32'h200);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 1));
-  
+
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, 32'h200);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 2));
-  
+
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, 32'h200);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | 3));
-  
+
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, 32'h200);
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);

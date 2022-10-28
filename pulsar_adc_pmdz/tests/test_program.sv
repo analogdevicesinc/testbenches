@@ -75,7 +75,7 @@ localparam PCORE_VERSION              = 32'h0001_0071;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 32;
-localparam DATA_DLENGTH               = 32;
+localparam DATA_DLENGTH               = 18;
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
 localparam SDI_DELAY                  = 0;
@@ -85,7 +85,7 @@ localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
 localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 32;
+localparam NUM_OF_TRANSFERS           = 8;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -315,7 +315,7 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign pulsar_adc_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+  assign pulsar_adc_spi_sdi[i] = sdi_shiftreg[DATA_DLENGTH-1]; // all SDI lanes got the same data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
@@ -375,7 +375,7 @@ initial begin
       end
       if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdi_shiftreg <= {sdi_shiftreg[30:0], 1'b0};
+      sdi_shiftreg <= {sdi_shiftreg[DATA_DLENGTH-2:0], 1'b0};
     end
   end
 end
@@ -389,13 +389,7 @@ bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
 bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
-bit [31:0]  sdi_data_store;
-bit [31:0]  sdi_shiftreg2;
-bit [31:0]  sdi_shiftreg_aux;
-bit [31:0]  sdi_shiftreg_aux_old;
-bit [31:0]  sdi_shiftreg_old;
-
-assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
+bit [DATA_DLENGTH-1:0]  sdi_data_store;
 
 initial begin
   while(1) begin
@@ -507,6 +501,7 @@ begin
 
   //config cnv
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00000121);
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
   // Enable SPI Engine

@@ -220,9 +220,9 @@ program test_program;
 
     //check ADC VERSION
     axi_read_v (RX1_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h000a0162));
+                    `SET_REG_VERSION_VERSION('h000a0262));
     axi_read_v (RX2_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h000a0162));
+                    `SET_REG_VERSION_VERSION('h000a0262));
     //check DAC VERSION
     axi_read_v (TX1_COMMON + GetAddrs(REG_VERSION),
                     `SET_REG_VERSION_VERSION('h00090162));

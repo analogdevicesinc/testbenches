@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv " />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="5,643.091 ns"></ZoomStartTime>
+      <ZoomEndTime time="8,388.092 ns"></ZoomEndTime>
+      <Cursor1Time time="8,215.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="302"></NameColumnWidth>
+      <ValueColumnWidth column_width="148"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="27" />
+   <wvobject type="logic" fp_name="/system_tb/test/spi_clk">
+      <obj_property name="ElementShortName">spi_clk</obj_property>
+      <obj_property name="ObjectShortName">spi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/adc_busy">
+      <obj_property name="ElementShortName">adc_busy</obj_property>
+      <obj_property name="ObjectShortName">adc_busy</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/ad7606_spi_cs">
+      <obj_property name="ElementShortName">ad7606_spi_cs</obj_property>
+      <obj_property name="ObjectShortName">ad7606_spi_cs</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ad7606_spi_sclk">
+      <obj_property name="ElementShortName">ad7606_spi_sclk</obj_property>
+      <obj_property name="ObjectShortName">ad7606_spi_sclk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ad7606_spi_sdi">
+      <obj_property name="ElementShortName">ad7606_spi_sdi[3:0]</obj_property>
+      <obj_property name="ObjectShortName">ad7606_spi_sdi[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/m_spi_csn_negedge_s">
+      <obj_property name="ElementShortName">m_spi_csn_negedge_s</obj_property>
+      <obj_property name="ObjectShortName">m_spi_csn_negedge_s</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_shiftreg">
+      <obj_property name="ElementShortName">sdi_shiftreg[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_shiftreg[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/end_of_word">
+      <obj_property name="ElementShortName">end_of_word</obj_property>
+      <obj_property name="ObjectShortName">end_of_word</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/shiftreg_sampled">
+      <obj_property name="ElementShortName">shiftreg_sampled</obj_property>
+      <obj_property name="ObjectShortName">shiftreg_sampled</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/rx_sclk_bfm">
+      <obj_property name="ElementShortName">rx_sclk_bfm</obj_property>
+      <obj_property name="ObjectShortName">rx_sclk_bfm</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_data_store">
+      <obj_property name="ElementShortName">sdi_data_store[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_data_store[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_store_cnt">
+      <obj_property name="ElementShortName">sdi_store_cnt[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_store_cnt[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad7606/axi_regmap/inst/sdi_fifo_out_data">
+      <obj_property name="ElementShortName">sdi_fifo_out_data[63:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_fifo_out_data[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_fifo_data">
+      <obj_property name="ElementShortName">sdi_fifo_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_fifo_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_fifo_data_store">
+      <obj_property name="ElementShortName">sdi_fifo_data_store[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_fifo_data_store[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/offload_status">
+      <obj_property name="ElementShortName">offload_status</obj_property>
+      <obj_property name="ObjectShortName">offload_status</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/offload_sdi_data_store_arr">
+      <obj_property name="ElementShortName">offload_sdi_data_store_arr[9:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">offload_sdi_data_store_arr[9:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/offload_captured_word_arr">
+      <obj_property name="ElementShortName">offload_captured_word_arr[9:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">offload_captured_word_arr[9:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7606/execution/cmd_ready">
+      <obj_property name="ElementShortName">cmd_ready</obj_property>
+      <obj_property name="ObjectShortName">cmd_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7606/execution/cmd_valid">
+      <obj_property name="ElementShortName">cmd_valid</obj_property>
+      <obj_property name="ObjectShortName">cmd_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad7606/execution/cmd">
+      <obj_property name="ElementShortName">cmd[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cmd[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7606/execution/sdi_data_ready">
+      <obj_property name="ElementShortName">sdi_data_ready</obj_property>
+      <obj_property name="ObjectShortName">sdi_data_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7606/execution/sdi_data_valid">
+      <obj_property name="ElementShortName">sdi_data_valid</obj_property>
+      <obj_property name="ObjectShortName">sdi_data_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad7606/execution/sdi_data">
+      <obj_property name="ElementShortName">sdi_data[63:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_data[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_ad7606/axi_regmap/inst/sdi_data">
+      <obj_property name="ElementShortName">sdi_data[63:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_data[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7606/axi_regmap/inst/sdi_data_valid">
+      <obj_property name="ElementShortName">sdi_data_valid</obj_property>
+      <obj_property name="ObjectShortName">sdi_data_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_ad7606/axi_regmap/inst/sdi_data_ready">
+      <obj_property name="ElementShortName">sdi_data_ready</obj_property>
+      <obj_property name="ObjectShortName">sdi_data_ready</obj_property>
+   </wvobject>
+</wave_config>

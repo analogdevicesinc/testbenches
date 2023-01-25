@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv " />
+            <top_module name="adi_regmap_adc_pkg" />
+            <top_module name="adi_regmap_common_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_regmap_pwm_gen_pkg" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="33.375001 us"></ZoomEndTime>
+      <Cursor1Time time="33.276000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="389"></NameColumnWidth>
+      <ValueColumnWidth column_width="191"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="19" />
+   <wvobject type="array" fp_name="/system_tb/adc_config_mode">
+      <obj_property name="ElementShortName">adc_config_mode[1:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_config_mode[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_cnvst_n">
+      <obj_property name="ElementShortName">rx_cnvst_n</obj_property>
+      <obj_property name="ObjectShortName">rx_cnvst_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_busy">
+      <obj_property name="ElementShortName">rx_busy</obj_property>
+      <obj_property name="ObjectShortName">rx_busy</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/rx_db_i">
+      <obj_property name="ElementShortName">rx_db_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_db_i[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/rx_db_o">
+      <obj_property name="ElementShortName">rx_db_o[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_db_o[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_db_t">
+      <obj_property name="ElementShortName">rx_db_t</obj_property>
+      <obj_property name="ObjectShortName">rx_db_t</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_rd_n">
+      <obj_property name="ElementShortName">rx_rd_n</obj_property>
+      <obj_property name="ObjectShortName">rx_rd_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_wr_n">
+      <obj_property name="ElementShortName">rx_wr_n</obj_property>
+      <obj_property name="ObjectShortName">rx_wr_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_cs_n">
+      <obj_property name="ElementShortName">rx_cs_n</obj_property>
+      <obj_property name="ObjectShortName">rx_cs_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_first_data">
+      <obj_property name="ElementShortName">rx_first_data</obj_property>
+      <obj_property name="ObjectShortName">rx_first_data</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_data_ready">
+      <obj_property name="ElementShortName">rx_data_ready</obj_property>
+      <obj_property name="ObjectShortName">rx_data_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/rx_ch_count">
+      <obj_property name="ElementShortName">rx_ch_count[3:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_ch_count[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/sys_clk">
+      <obj_property name="ElementShortName">sys_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_cnvst_n_d">
+      <obj_property name="ElementShortName">rx_cnvst_n_d</obj_property>
+      <obj_property name="ObjectShortName">rx_cnvst_n_d</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rx_rd_n_d">
+      <obj_property name="ElementShortName">rx_rd_n_d</obj_property>
+      <obj_property name="ObjectShortName">rx_rd_n_d</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/rx_ch_count_d">
+      <obj_property name="ElementShortName">rx_ch_count_d[3:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_ch_count_d[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/num_chs">
+      <obj_property name="ElementShortName">num_chs[4:0]</obj_property>
+      <obj_property name="ObjectShortName">num_chs[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/DEV_CONFIG">
+      <obj_property name="ElementShortName">DEV_CONFIG[31:0]</obj_property>
+      <obj_property name="ObjectShortName">DEV_CONFIG[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/NEG_EDGE">
+      <obj_property name="ElementShortName">NEG_EDGE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">NEG_EDGE[31:0]</obj_property>
+   </wvobject>
+</wave_config>

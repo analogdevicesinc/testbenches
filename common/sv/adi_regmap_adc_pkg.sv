@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2023 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -20,7 +20,7 @@
 //   1. The GNU General Public License version 2 as published by the
 //      Free Software Foundation, which can be found in the top level directory
 //      of this repository (LICENSE_GPL2), and also online at:
-//      <https://www.gnu.org/licenses/old_licenses/gpl-2.0.html>
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
 //
 // OR
 //
@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Fri May 28 12:27:32 2021 */
+/* Mon Feb  6 09:33:17 2023 */
 
 package adi_regmap_adc_pkg;
   import adi_regmap_pkg::*;
@@ -53,10 +53,22 @@ package adi_regmap_adc_pkg;
   `define GET_ADC_COMMON_REG_RSTN_RSTN(x) GetField(ADC_COMMON_REG_RSTN,"RSTN",x)
 
   const reg_t ADC_COMMON_REG_CNTRL = '{ 'h0044, "REG_CNTRL" , '{
+    "SDR_DDR_N": '{ 16, 16, RW, 'h0 },
+    "SYMB_OP": '{ 15, 15, RW, 'h0 },
+    "SYMB_8_16B": '{ 14, 14, RW, 'h0 },
+    "NUM_LANES": '{ 12, 8, RW, 'h0 },
     "SYNC": '{ 3, 3, RW, 'h0 },
     "R1_MODE": '{ 2, 2, RW, 'h0 },
     "DDR_EDGESEL": '{ 1, 1, RW, 'h0 },
     "PIN_MODE": '{ 0, 0, RW, 'h0 }}};
+  `define SET_ADC_COMMON_REG_CNTRL_SDR_DDR_N(x) SetField(ADC_COMMON_REG_CNTRL,"SDR_DDR_N",x)
+  `define GET_ADC_COMMON_REG_CNTRL_SDR_DDR_N(x) GetField(ADC_COMMON_REG_CNTRL,"SDR_DDR_N",x)
+  `define SET_ADC_COMMON_REG_CNTRL_SYMB_OP(x) SetField(ADC_COMMON_REG_CNTRL,"SYMB_OP",x)
+  `define GET_ADC_COMMON_REG_CNTRL_SYMB_OP(x) GetField(ADC_COMMON_REG_CNTRL,"SYMB_OP",x)
+  `define SET_ADC_COMMON_REG_CNTRL_SYMB_8_16B(x) SetField(ADC_COMMON_REG_CNTRL,"SYMB_8_16B",x)
+  `define GET_ADC_COMMON_REG_CNTRL_SYMB_8_16B(x) GetField(ADC_COMMON_REG_CNTRL,"SYMB_8_16B",x)
+  `define SET_ADC_COMMON_REG_CNTRL_NUM_LANES(x) SetField(ADC_COMMON_REG_CNTRL,"NUM_LANES",x)
+  `define GET_ADC_COMMON_REG_CNTRL_NUM_LANES(x) GetField(ADC_COMMON_REG_CNTRL,"NUM_LANES",x)
   `define SET_ADC_COMMON_REG_CNTRL_SYNC(x) SetField(ADC_COMMON_REG_CNTRL,"SYNC",x)
   `define GET_ADC_COMMON_REG_CNTRL_SYNC(x) GetField(ADC_COMMON_REG_CNTRL,"SYNC",x)
   `define SET_ADC_COMMON_REG_CNTRL_R1_MODE(x) SetField(ADC_COMMON_REG_CNTRL,"R1_MODE",x)
@@ -65,6 +77,17 @@ package adi_regmap_adc_pkg;
   `define GET_ADC_COMMON_REG_CNTRL_DDR_EDGESEL(x) GetField(ADC_COMMON_REG_CNTRL,"DDR_EDGESEL",x)
   `define SET_ADC_COMMON_REG_CNTRL_PIN_MODE(x) SetField(ADC_COMMON_REG_CNTRL,"PIN_MODE",x)
   `define GET_ADC_COMMON_REG_CNTRL_PIN_MODE(x) GetField(ADC_COMMON_REG_CNTRL,"PIN_MODE",x)
+
+  const reg_t ADC_COMMON_REG_CNTRL_2 = '{ 'h0048, "REG_CNTRL_2" , '{
+    "EXT_SYNC_ARM": '{ 1, 1, RW, 'h0 },
+    "EXT_SYNC_DISARM": '{ 2, 2, RW, 'h0 },
+    "MANUAL_SYNC_REQUEST": '{ 8, 8, RW, 'h0 }}};
+  `define SET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_ARM(x) SetField(ADC_COMMON_REG_CNTRL_2,"EXT_SYNC_ARM",x)
+  `define GET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_ARM(x) GetField(ADC_COMMON_REG_CNTRL_2,"EXT_SYNC_ARM",x)
+  `define SET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_DISARM(x) SetField(ADC_COMMON_REG_CNTRL_2,"EXT_SYNC_DISARM",x)
+  `define GET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_DISARM(x) GetField(ADC_COMMON_REG_CNTRL_2,"EXT_SYNC_DISARM",x)
+  `define SET_ADC_COMMON_REG_CNTRL_2_MANUAL_SYNC_REQUEST(x) SetField(ADC_COMMON_REG_CNTRL_2,"MANUAL_SYNC_REQUEST",x)
+  `define GET_ADC_COMMON_REG_CNTRL_2_MANUAL_SYNC_REQUEST(x) GetField(ADC_COMMON_REG_CNTRL_2,"MANUAL_SYNC_REQUEST",x)
 
   const reg_t ADC_COMMON_REG_CLK_FREQ = '{ 'h0054, "REG_CLK_FREQ" , '{
     "CLK_FREQ": '{ 31, 0, RO, 'h0000 }}};
@@ -77,10 +100,13 @@ package adi_regmap_adc_pkg;
   `define GET_ADC_COMMON_REG_CLK_RATIO_CLK_RATIO(x) GetField(ADC_COMMON_REG_CLK_RATIO,"CLK_RATIO",x)
 
   const reg_t ADC_COMMON_REG_STATUS = '{ 'h005c, "REG_STATUS" , '{
+    "ADC_CTRL_STATUS": '{ 4, 4, RO, 'h0 },
     "PN_ERR": '{ 3, 3, RO, 'h0 },
     "PN_OOS": '{ 2, 2, RO, 'h0 },
     "OVER_RANGE": '{ 1, 1, RO, 'h0 },
     "STATUS": '{ 0, 0, RO, 'h0 }}};
+  `define SET_ADC_COMMON_REG_STATUS_ADC_CTRL_STATUS(x) SetField(ADC_COMMON_REG_STATUS,"ADC_CTRL_STATUS",x)
+  `define GET_ADC_COMMON_REG_STATUS_ADC_CTRL_STATUS(x) GetField(ADC_COMMON_REG_STATUS,"ADC_CTRL_STATUS",x)
   `define SET_ADC_COMMON_REG_STATUS_PN_ERR(x) SetField(ADC_COMMON_REG_STATUS,"PN_ERR",x)
   `define GET_ADC_COMMON_REG_STATUS_PN_ERR(x) GetField(ADC_COMMON_REG_STATUS,"PN_ERR",x)
   `define SET_ADC_COMMON_REG_STATUS_PN_OOS(x) SetField(ADC_COMMON_REG_STATUS,"PN_OOS",x)
@@ -152,6 +178,16 @@ package adi_regmap_adc_pkg;
   `define SET_ADC_COMMON_REG_DRP_RDATA_DRP_RDATA(x) SetField(ADC_COMMON_REG_DRP_RDATA,"DRP_RDATA",x)
   `define GET_ADC_COMMON_REG_DRP_RDATA_DRP_RDATA(x) GetField(ADC_COMMON_REG_DRP_RDATA,"DRP_RDATA",x)
 
+  const reg_t ADC_COMMON_REG_ADC_CONFIG_WR = '{ 'h0080, "REG_ADC_CONFIG_WR" , '{
+    "ADC_CONFIG_WR": '{ 31, 0, RW, 'h0000 }}};
+  `define SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(x) SetField(ADC_COMMON_REG_ADC_CONFIG_WR,"ADC_CONFIG_WR",x)
+  `define GET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(x) GetField(ADC_COMMON_REG_ADC_CONFIG_WR,"ADC_CONFIG_WR",x)
+
+  const reg_t ADC_COMMON_REG_ADC_CONFIG_RD = '{ 'h0084, "REG_ADC_CONFIG_RD" , '{
+    "ADC_CONFIG_RD": '{ 31, 0, RO, 'h0000 }}};
+  `define SET_ADC_COMMON_REG_ADC_CONFIG_RD_ADC_CONFIG_RD(x) SetField(ADC_COMMON_REG_ADC_CONFIG_RD,"ADC_CONFIG_RD",x)
+  `define GET_ADC_COMMON_REG_ADC_CONFIG_RD_ADC_CONFIG_RD(x) GetField(ADC_COMMON_REG_ADC_CONFIG_RD,"ADC_CONFIG_RD",x)
+
   const reg_t ADC_COMMON_REG_UI_STATUS = '{ 'h0088, "REG_UI_STATUS" , '{
     "UI_OVF": '{ 2, 2, RW1C, 'h0 },
     "UI_UNF": '{ 1, 1, RW1C, 'h0 },
@@ -162,6 +198,11 @@ package adi_regmap_adc_pkg;
   `define GET_ADC_COMMON_REG_UI_STATUS_UI_UNF(x) GetField(ADC_COMMON_REG_UI_STATUS,"UI_UNF",x)
   `define SET_ADC_COMMON_REG_UI_STATUS_UI_RESERVED(x) SetField(ADC_COMMON_REG_UI_STATUS,"UI_RESERVED",x)
   `define GET_ADC_COMMON_REG_UI_STATUS_UI_RESERVED(x) GetField(ADC_COMMON_REG_UI_STATUS,"UI_RESERVED",x)
+
+  const reg_t ADC_COMMON_REG_ADC_CONFIG_CTRL = '{ 'h008c, "REG_ADC_CONFIG_CTRL" , '{
+    "ADC_CONFIG_CTRL": '{ 31, 0, RW, 'h0000 }}};
+  `define SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(x) SetField(ADC_COMMON_REG_ADC_CONFIG_CTRL,"ADC_CONFIG_CTRL",x)
+  `define GET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(x) GetField(ADC_COMMON_REG_ADC_CONFIG_CTRL,"ADC_CONFIG_CTRL",x)
 
   const reg_t ADC_COMMON_REG_USR_CNTRL_1 = '{ 'h00a0, "REG_USR_CNTRL_1" , '{
     "USR_CHANMAX": '{ 7, 0, RW, 'h00 }}};
@@ -241,6 +282,11 @@ package adi_regmap_adc_pkg;
   `define GET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(x) GetField(ADC_CHANNEL_REG_CHAN_STATUS,"PN_OOS",x)
   `define SET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(x) SetField(ADC_CHANNEL_REG_CHAN_STATUS,"OVER_RANGE",x)
   `define GET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(x) GetField(ADC_CHANNEL_REG_CHAN_STATUS,"OVER_RANGE",x)
+
+  const reg_t ADC_CHANNEL_REG_CHAN_RAW_DATA = '{ 'h0408, "REG_CHAN_RAW_DATA" , '{
+    "ADC_READ_DATA": '{ 31, 0, RO, 'h0000 }}};
+  `define SET_ADC_CHANNEL_REG_CHAN_RAW_DATA_ADC_READ_DATA(x) SetField(ADC_CHANNEL_REG_CHAN_RAW_DATA,"ADC_READ_DATA",x)
+  `define GET_ADC_CHANNEL_REG_CHAN_RAW_DATA_ADC_READ_DATA(x) GetField(ADC_CHANNEL_REG_CHAN_RAW_DATA,"ADC_READ_DATA",x)
 
   const reg_t ADC_CHANNEL_REG_CHAN_CNTRL_1 = '{ 'h0410, "REG_CHAN_CNTRL_1" , '{
     "DCFILT_OFFSET": '{ 31, 16, RW, 'h0000 },

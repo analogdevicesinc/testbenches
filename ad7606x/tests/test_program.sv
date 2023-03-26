@@ -182,7 +182,7 @@ task sanity_test;
   begin
     // check ADC VERSION
     axi_read_v (AD7606X_BASE + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h000a0262));
+                    `SET_REG_VERSION_VERSION('h000a0300));
     $display("[%t] Sanity Test Done.", $time);
   end
 endtask

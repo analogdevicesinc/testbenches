@@ -48,7 +48,7 @@ import adi_regmap_jesd_rx_pkg::*;
 import adi_regmap_common_pkg::*;
 import adi_regmap_dac_pkg::*;
 import adi_regmap_adc_pkg::*;
-import adi_regmap_tdd_pkg::*;
+import adi_regmap_tdd_gen_pkg::*;
 import adi_jesd204_pkg::*;
 import adi_xcvr_pkg::*;
 
@@ -146,7 +146,6 @@ program test_program;
     // JESD LINK TEST - DMA - RX/TX BYPASS
     // =======================
     jesd_link_test(0,1,1);
-    //jesd_link_test(0,1,1);
 
     // =======================
     // JESD LINK TEST - DMA - DO -TDD
@@ -230,26 +229,31 @@ program test_program;
     env.mng.RegWrite32(`RX_OFFLOAD+'h104, tdd_enabled);
 
     if (tdd_enabled) begin
-      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_FRAME_LENGTH),
-          `SET_TDD_CNTRL_REG_TDD_FRAME_LENGTH_TDD_FRAME_LENGTH(2048));
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_FRAME_LENGTH),
+                         `SET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(2048));
 
-      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_TX_DP_ON_1),
-          `SET_TDD_CNTRL_REG_TDD_TX_DP_ON_1_TDD_TX_DP_ON_1(0));
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_CH0_ON),
+                         `SET_TDDN_CNTRL_CH0_ON_CH0_ON(0));
 
-      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_TX_DP_OFF_1),
-          `SET_TDD_CNTRL_REG_TDD_TX_DP_OFF_1_TDD_TX_DP_OFF_1(10));
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_CH0_OFF),
+                         `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(10));
 
       // Trigger RX capture later due rountrip latency ~96 cycles
-      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_RX_DP_ON_1),
-          `SET_TDD_CNTRL_REG_TDD_RX_DP_ON_1_TDD_RX_DP_ON_1(96));
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_CH1_ON),
+                         `SET_TDDN_CNTRL_CH1_ON_CH1_ON(96));
 
-      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_RX_DP_OFF_1),
-          `SET_TDD_CNTRL_REG_TDD_RX_DP_OFF_1_TDD_RX_DP_OFF_1(106));
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_CH1_OFF),
+                         `SET_TDDN_CNTRL_CH1_OFF_CH1_OFF(106));
 
-      env.mng.RegWrite32(`TDD+GetAddrs(TDD_CNTRL_REG_TDD_CONTROL_0),
-          `SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_TX_DMAPATH(1) |
-          `SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_RX_DMAPATH(1) |
-          `SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_ENABLE(1));
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
+                         `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(3));
+
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_LOW),
+                         `SET_TDDN_CNTRL_SYNC_COUNTER_LOW_SYNC_COUNTER_LOW(8192));
+
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_CONTROL),
+                         `SET_TDDN_CNTRL_CONTROL_SYNC_INT(1) |
+                         `SET_TDDN_CNTRL_CONTROL_ENABLE(1));
     end
 
     if (~use_dds) begin
@@ -325,6 +329,12 @@ program test_program;
         .max_sample(4096)
       );
     end
+
+    if (tdd_enabled) begin
+      env.mng.RegWrite32(`TDD+GetAddrs(TDDN_CNTRL_CONTROL),
+                         `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
+    end
+
     rx_ll.link_down();
     tx_ll.link_down();
 

@@ -75,6 +75,10 @@ package dmac_api_pkg;
       p.DMA_TYPE_SRC = `GET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_SRC(val);
       bpb_width_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BURST_WIDTH(val);            
       p.MAX_BYTES_PER_BURST = 2**bpb_width_log2;
+      this.bus.RegWrite32(this.base_address + GetAddrs(DMAC_X_LENGTH),
+                                SetField(DMAC_X_LENGTH, "X_LENGTH", 32'h0));
+      this.bus.RegRead32(this.base_address + GetAddrs(DMAC_X_LENGTH), val);
+      p.DMA_LENGTH_ALIGN = `GET_DMAC_X_LENGTH_X_LENGTH(val)+1;
       this.bus.RegWrite32(this.base_address + GetAddrs(DMAC_Y_LENGTH),
                                 SetField(DMAC_Y_LENGTH, "Y_LENGTH", 32'hFFFFFFFF));
       this.bus.RegRead32(this.base_address + GetAddrs(DMAC_Y_LENGTH), val);
@@ -93,11 +97,12 @@ package dmac_api_pkg;
       super.probe();
       discover_params();
       `INFO(("Found %0s destination interface of %0d bit data width\n\t\tFound %0s source interface of %0d bit data width" ,
-        p.DMA_TYPE_DEST == 0 ? "AXI MemoryMap" : p.DMA_TYPE_DEST == 1 ? "AXI Stream" : p.DMA_TYPE_DEST == 2 ? "FIFO" : "Unknown",                                                             
+        p.DMA_TYPE_DEST == 0 ? "AXI MemoryMap" : p.DMA_TYPE_DEST == 1 ? "AXI Stream" : p.DMA_TYPE_DEST == 2 ? "FIFO" : "Unknown",
         p.DMA_DATA_WIDTH_DEST,
-        p.DMA_TYPE_SRC == 0 ? "AXI MemoryMap" : p.DMA_TYPE_SRC == 1 ? "AXI Stream" : p.DMA_TYPE_SRC == 2 ? "FIFO" : "Unknown",                                                                
+        p.DMA_TYPE_SRC == 0 ? "AXI MemoryMap" : p.DMA_TYPE_SRC == 1 ? "AXI Stream" : p.DMA_TYPE_SRC == 2 ? "FIFO" : "Unknown",
         p.DMA_DATA_WIDTH_SRC));
       `INFO(("Found %0d max bytes per burst" , p.MAX_BYTES_PER_BURST));
+      `INFO(("Transfer length alignment requirement: %0d bytes" , p.DMA_LENGTH_ALIGN));
       `INFO(("Enabled support for 2D transfers: %0d" , p.DMA_2D_TRANSFER));
     endtask : probe
 
@@ -251,16 +256,14 @@ package dmac_api_pkg;
                          output int next_transfer_id);
 
       dma_2d_segment t_2d;
-      int bus_max_width = `MAX(p.DMA_DATA_WIDTH_SRC, p.DMA_DATA_WIDTH_DEST)/8;
-      int partial_reporting_en = 1;
 
       wait_transfer_submission();
       `INFO((" Submitting up a segment of : "));
       t.print();
       `INFO((" --------------------------"));
 
-      if (t.length % bus_max_width > 0) begin
-        `ERROR(("Transfer length (%0d) must be multiple of largest interface (%0d)", t.length, bus_max_width));
+      if (t.length % p.DMA_LENGTH_ALIGN > 0) begin
+        `ERROR(("Transfer length (%0d) must be multiple of largest interface (%0d)", t.length, p.DMA_LENGTH_ALIGN));
       end
       if (p.DMA_TYPE_SRC == 0) begin
         this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_SRC_ADDRESS),
@@ -295,7 +298,6 @@ package dmac_api_pkg;
 
       transfer_id_get(next_transfer_id);
       transfer_start();
-
 
     endtask : submit_transfer;
   endclass

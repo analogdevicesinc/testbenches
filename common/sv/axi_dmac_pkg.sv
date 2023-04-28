@@ -42,6 +42,7 @@ typedef struct {
   int DMA_2D_TRANSFER;
   int DMA_TYPE_SRC;
   int DMA_TYPE_DEST;
+  int DMA_LENGTH_ALIGN;
   int MAX_BYTES_PER_BURST;
 } axi_dmac_params_t;
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2023 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -154,7 +154,7 @@ program test_program;
   begin
     //check ADC VERSION
     axi_read_v (RX1_COMMON + GetAddrs(REG_VERSION),
-               `SET_REG_VERSION_VERSION('h000a0262));
+               `SET_REG_VERSION_VERSION('h000a0300));
     //check DAC VERSION
     axi_read_v (TX1_COMMON + GetAddrs(REG_VERSION),
                `SET_REG_VERSION_VERSION('h00090162));

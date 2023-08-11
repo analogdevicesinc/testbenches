@@ -220,14 +220,14 @@ program test_program;
 
     //check ADC VERSION
     axi_read_v (RX1_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h000a0262));
+                    `SET_REG_VERSION_VERSION('h000a0300));
     axi_read_v (RX2_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h000a0262));
+                    `SET_REG_VERSION_VERSION('h000a0300));
     //check DAC VERSION
     axi_read_v (TX1_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h00090162));
+                    `SET_REG_VERSION_VERSION('h00090262));
     axi_read_v (TX2_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h00090162));
+                    `SET_REG_VERSION_VERSION('h00090262));
     // check DAC CONFIG
     axi_read_v (TX1_COMMON + GetAddrs(REG_CONFIG), (USE_RX_CLK_FOR_TX * 1024) +
                                                (CMOS_LVDS_N * 128) +
@@ -239,9 +239,6 @@ program test_program;
                                                (1 * 16) +
                                                (DDS_DISABLE * 64) +
                                                (IQCORRECTION_DISABLE * 1));
-     // Check dummy constant regs
-     axi_read_v (RX1_COMMON + 32'h000008C, 'h8);
-     axi_read_v (RX2_COMMON + 32'h000008C, 'h8);
   end
   endtask
 

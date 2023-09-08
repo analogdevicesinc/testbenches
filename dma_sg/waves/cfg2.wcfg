@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="adi_peripheral_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_dmac_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="dma_trans_pkg" />
+            <top_module name="dmac_api_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="850.000001 us"></ZoomEndTime>
+      <Cursor1Time time="77.145000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="160"></NameColumnWidth>
+      <ValueColumnWidth column_width="85"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="46" />
+   <wvobject fp_name="divider244" type="divider">
+      <obj_property name="label">TX DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/dut_tx_dma/m_src_axi">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/dut_tx_dma/m_src_axi.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
+      <obj_property name="ElementShortName">m_src_axi</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/dut_tx_dma/m_sg_axi">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/dut_tx_dma/m_sg_axi.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
+      <obj_property name="ElementShortName">m_sg_axi</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider200" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /hwdesc_id">
+      <obj_property name="ElementShortName">hwdesc_id[31:0]</obj_property>
+      <obj_property name="ObjectShortName">hwdesc_id[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /dest_addr">
+      <obj_property name="ElementShortName">dest_addr[31:3]</obj_property>
+      <obj_property name="ObjectShortName">dest_addr[31:3]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /src_addr">
+      <obj_property name="ElementShortName">src_addr[31:3]</obj_property>
+      <obj_property name="ObjectShortName">src_addr[31:3]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /next_desc_addr">
+      <obj_property name="ElementShortName">next_desc_addr[31:3]</obj_property>
+      <obj_property name="ObjectShortName">next_desc_addr[31:3]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /x_length">
+      <obj_property name="ElementShortName">x_length[23:0]</obj_property>
+      <obj_property name="ObjectShortName">x_length[23:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider206" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /out_src_address">
+      <obj_property name="ElementShortName">out_src_address[31:3]</obj_property>
+      <obj_property name="ObjectShortName">out_src_address[31:3]</obj_property>
+      <obj_property name="CustomSignalColor">#00FF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider208" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/m_src_axi_araddr">
+      <obj_property name="ElementShortName">m_src_axi_araddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_araddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider210" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/i_request_arb/\genblk4.i_src_dma_mm /i_addr_gen/address">
+      <obj_property name="ElementShortName">address[28:0]</obj_property>
+      <obj_property name="ObjectShortName">address[28:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/i_request_arb/\genblk4.i_src_dma_mm /i_addr_gen/req_ready">
+      <obj_property name="ElementShortName">req_ready</obj_property>
+      <obj_property name="ObjectShortName">req_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/i_request_arb/\genblk4.i_src_dma_mm /i_addr_gen/req_address">
+      <obj_property name="ElementShortName">req_address[31:3]</obj_property>
+      <obj_property name="ObjectShortName">req_address[31:3]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/i_request_arb/src_req_src_address">
+      <obj_property name="ElementShortName">src_req_src_address[28:0]</obj_property>
+      <obj_property name="ObjectShortName">src_req_src_address[28:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider216" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/i_request_arb/req_src_address">
+      <obj_property name="ElementShortName">req_src_address[31:3]</obj_property>
+      <obj_property name="ObjectShortName">req_src_address[31:3]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider217" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /out_src_address">
+      <obj_property name="ElementShortName">out_src_address[31:3]</obj_property>
+      <obj_property name="ObjectShortName">out_src_address[31:3]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_transfer/\genblk1.i_dmac_sg /src_addr">
+      <obj_property name="ElementShortName">src_addr[31:3]</obj_property>
+      <obj_property name="ObjectShortName">src_addr[31:3]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider220" type="divider">
+      <obj_property name="label">SG READ DATA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_rdata">
+      <obj_property name="ElementShortName">m_sg_axi_rdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_rdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_rready">
+      <obj_property name="ElementShortName">m_sg_axi_rready</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_rready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_rvalid">
+      <obj_property name="ElementShortName">m_sg_axi_rvalid</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_rvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_rresp">
+      <obj_property name="ElementShortName">m_sg_axi_rresp[1:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_rresp[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider225" type="divider">
+      <obj_property name="label">SG READ ADDRESS</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_arready">
+      <obj_property name="ElementShortName">m_sg_axi_arready</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_arready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_arvalid">
+      <obj_property name="ElementShortName">m_sg_axi_arvalid</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_arvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_araddr">
+      <obj_property name="ElementShortName">m_sg_axi_araddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_araddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_arlen">
+      <obj_property name="ElementShortName">m_sg_axi_arlen[3:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_arlen[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_arsize">
+      <obj_property name="ElementShortName">m_sg_axi_arsize[2:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_arsize[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_arburst">
+      <obj_property name="ElementShortName">m_sg_axi_arburst[1:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_arburst[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_arprot">
+      <obj_property name="ElementShortName">m_sg_axi_arprot[2:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_arprot[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_tx_dma/inst/m_sg_axi_arcache">
+      <obj_property name="ElementShortName">m_sg_axi_arcache[3:0]</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi_arcache[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider135" type="divider">
+      <obj_property name="label">RX DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/dut_rx_dma/m_sg_axi">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/dut_rx_dma/m_sg_axi.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
+      <obj_property name="ElementShortName">m_sg_axi</obj_property>
+      <obj_property name="ObjectShortName">m_sg_axi</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/dut_rx_dma/m_dest_axi">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/dut_rx_dma/m_dest_axi.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
+      <obj_property name="ElementShortName">m_dest_axi</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="divider172" type="divider">
+      <obj_property name="label">TX Transfer</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_regmap/up_sot">
+      <obj_property name="ElementShortName">up_sot</obj_property>
+      <obj_property name="ObjectShortName">up_sot</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_tx_dma/inst/i_regmap/up_eot">
+      <obj_property name="ElementShortName">up_eot</obj_property>
+      <obj_property name="ObjectShortName">up_eot</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider329" type="divider">
+      <obj_property name="label">RX Transfer</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_rx_dma/inst/i_regmap/up_sot">
+      <obj_property name="ElementShortName">up_sot</obj_property>
+      <obj_property name="ObjectShortName">up_sot</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_rx_dma/inst/i_regmap/up_eot">
+      <obj_property name="ElementShortName">up_eot</obj_property>
+      <obj_property name="ObjectShortName">up_eot</obj_property>
+   </wvobject>
+</wave_config>

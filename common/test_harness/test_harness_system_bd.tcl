@@ -153,8 +153,21 @@ ad_cpu_interconnect 0x41200000 axi_intc
 ad_mem_hp0_interconnect sys_mem_clk ddr_axi_vip/S_AXI
 
 # connect mng_vip to ddr_vip
-set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells axi_cpu_interconnect]
-ad_connect axi_cpu_interconnect/M01_AXI /axi_mem_interconnect/S00_AXI
+ad_ip_instance smartconnect interconnect [list \
+  NUM_MI 2 \
+  NUM_SI 1 \
+  NUM_CLKS 2 \
+]
+
+delete_bd_objs [get_bd_intf_nets mng_axi_vip_M_AXI]
+
+ad_connect sys_cpu_clk interconnect/aclk
+ad_connect sys_mem_clk interconnect/aclk1
+ad_connect sys_cpu_resetn interconnect/aresetn
+
+ad_connect mng_axi_vip/M_AXI interconnect/S00_AXI
+ad_connect interconnect/M00_AXI axi_cpu_interconnect/S00_AXI
+ad_connect interconnect/M01_AXI axi_mem_interconnect/S00_AXI
 
 global sys_mem_clk_index
 incr sys_mem_clk_index

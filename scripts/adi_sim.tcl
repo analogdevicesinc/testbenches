@@ -72,6 +72,8 @@ proc adi_sim_generate {project_name } {
   # Log all waves
   set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
 
+  set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed random} -objects [get_filesets sim_1]
+
   set project_system_dir "./runs/$project_name/$project_name.srcs/sources_1/bd/$design_name"
 
   generate_target Simulation [get_files $project_system_dir/$design_name.bd]

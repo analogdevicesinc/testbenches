@@ -102,8 +102,23 @@ package adi_regmap_pkg;
     return ret;
   endfunction;
 
+  function bit [31:0] UpdateRegister(bit [31:0] regvalue,
+                                     bit [31:0] fieldvalue,
+                                     bit [31:0] mask);
+    bit [31:0] ret = regvalue;
+    ret = ret & (~mask);
+    ret = ret | fieldvalue;
+
+    return ret;
+  endfunction;
+
   function int GetAddrs(reg_t register);
     return register.addr;
+  endfunction;
+
+  function int GetResetValue(reg_t register, 
+                             string field);
+    return register.fields[field].reset_value;
   endfunction;
 
 endpackage

@@ -16,7 +16,7 @@ source "cfgs/${cfg_file}"
 set project_name [file rootname $cfg_file]
 
 # Create the project
-adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
+adi_sim_project_xilinx $project_name "xc7z007sclg400-1"
 
 # Add test files to the project
 adi_sim_project_files [list \
@@ -34,6 +34,8 @@ adi_sim_project_files [list \
  "../common/sv/axi_dmac_pkg.sv" \
  "../common/sv/test_harness_env.sv" \
  "tests/test_program.sv" \
+ "tests/test_cs_delay.sv" \
+ "tests/test_sleep_delay.sv"\
  "system_tb.sv" \
  ]
 

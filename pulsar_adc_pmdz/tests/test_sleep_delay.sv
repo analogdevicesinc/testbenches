@@ -118,7 +118,7 @@ localparam PULSAR_ADC_BASE = `PULSAR_ADC_REGMAP;
 localparam PULSAR_ADC_CLKGEN_BASE = `PULSAR_ADC_CLKGEN;
 localparam PULSAR_ADC_CNV_BASE = `PULSAR_ADC_CNV;
 
-program test_cs_delay (
+program test_sleep_delay (
   input pulsar_adc_irq,
   input pulsar_adc_spi_sclk,
   input pulsar_adc_spi_cs,
@@ -425,10 +425,11 @@ initial begin
   sleep_current_duration = 0;
   while(1) begin
     @(posedge pulsar_adc_spi_clk);
+      if (idle && (cmd_d1[15:8] == 8'h31)) begin
+        sleep_instr_time.push_front(sleep_current_duration+1); // add one to account for this cycle
+      end
       if (cmd_valid && cmd_ready && (cmd[15:8] == 8'h31)) begin
         sleep_current_duration = 0;
-      end else if (idle && (cmd_d1[15:10] == 8'h31)) begin
-        sleep_instr_time.push_front(sleep_current_duration+1);
       end else begin
         sleep_current_duration = sleep_current_duration+1;
       end
@@ -442,7 +443,6 @@ end
 bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 bit [31:0] sleep_time;
 bit [31:0] expected_sleep_time;
-bit [31:0] cs_deactivate_time;
 bit [31:0] expected_sleep_time;
 bit [31:0] sleep_arg;
 
@@ -451,41 +451,41 @@ task sleep_delay_test;
 begin
 
 
-    //start spi clk generator
-    #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+  //start spi clk generator
+  #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
 
-    //config cnv
-    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
-    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00001000);
-    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
+  //config cnv
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00001000);
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
-    // Enable SPI Engine
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);    
+  // Enable SPI Engine
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);    
 
-    // Set up the interrupts
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
+  // Set up the interrupts
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
-    // Configure the Offload module
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
+  // Configure the Offload module
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
 
-    expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*2); //as per wiki (https://wiki.analog.com/resources/fpga/peripherals/spi_engine/instruction_format#sleep_instruction)
-    // likely intent (2 extra cycles for comparison and switching commands): expected_sleep_time = 2+(sleep_param+1)*((CLOCK_DIVIDER+1)*2)
-    // behaviour as of 4d676ca: expected_sleep_time = 2+(sleep_param+1)*((CLOCK_DIVIDER+1)*4)
+  expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*2); //as per wiki (https://wiki.analog.com/resources/fpga/peripherals/spi_engine/instruction_format#sleep_instruction)
+  // likely intent (2 extra cycles for comparison and switching commands): expected_sleep_time = 2+(sleep_param+1)*((CLOCK_DIVIDER+1)*2)
+  // behaviour as of 4d676ca: expected_sleep_time = 2+(sleep_param+1)*((CLOCK_DIVIDER+1)*4)
 
-    // Start the test
-    #100
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_SLEEP | (7 & 8'hFF));
+  // Start the test
+  #100
+  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_SLEEP | (7 & 8'hFF));
 
-    #2000
-    sleep_time = sleep_instr_time.pop_back();
-    if ((sleep_time != expected_sleep_time)) begin
-        `ERROR(("Offload Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));        
-    end else begin
-        `INFO(("Offload Test PASSED)"));  
-    end
-
+  #2000
+  sleep_time = sleep_instr_time.pop_back();
+  if ((sleep_time != expected_sleep_time)) begin
+      `ERROR(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));        
+  end else begin
+      `INFO(("Sleep Test PASSED)"));  
+  end
+end
 endtask
 
 endprogram

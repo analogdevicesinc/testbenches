@@ -483,8 +483,7 @@ begin
   axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
 
   expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*2); //as per wiki (https://wiki.analog.com/resources/fpga/peripherals/spi_engine/instruction_format#sleep_instruction)
-  // likely intent (2 extra cycles for comparison and switching commands): expected_sleep_time = 2+(sleep_param+1)*((CLOCK_DIVIDER+1)*2)
-  // behaviour as of 4d676ca: expected_sleep_time = 2+(sleep_param+1)*((CLOCK_DIVIDER+1)*4)
+  // behaviour as of 4d676ca: expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*4)
 
   // Start the test
   #100

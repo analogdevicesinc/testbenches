@@ -36,37 +36,18 @@
 //
 
 `include "utils.svh"
+`include "spi_engine.svh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
-`define PULSAR_ADC_DMA                  32'h44A3_0000
-`define PULSAR_ADC_REGMAP               32'h44A0_0000
-`define PULSAR_ADC_CLKGEN               32'h44A7_0000
-`define PULSAR_ADC_CNV                  32'h44B0_0000
-`define DDR_BASE                        32'h8000_0000
-
-localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
-localparam SPI_ENG_ADDR_ID            = 32'h0000_0004;
-localparam SPI_ENG_ADDR_SCRATCH       = 32'h0000_0008;
-localparam SPI_ENG_ADDR_ENABLE        = 32'h0000_0040;
-localparam SPI_ENG_ADDR_IRQMASK       = 32'h0000_0080;
-localparam SPI_ENG_ADDR_IRQPEND       = 32'h0000_0084;
-localparam SPI_ENG_ADDR_IRQSRC        = 32'h0000_0088;
-localparam SPI_ENG_ADDR_SYNCID        = 32'h0000_00C0;
-localparam SPI_ENG_ADDR_CMDFIFO_ROOM  = 32'h0000_00D0;
-localparam SPI_ENG_ADDR_SDOFIFO_ROOM  = 32'h0000_00D4;
-localparam SPI_ENG_ADDR_SDIFIFO_LEVEL = 32'h0000_00D8;
-localparam SPI_ENG_ADDR_CMDFIFO       = 32'h0000_00E0;
-localparam SPI_ENG_ADDR_SDOFIFO       = 32'h0000_00E4;
-localparam SPI_ENG_ADDR_SDIFIFO       = 32'h0000_00E8;
-localparam SPI_ENG_ADDR_SDIFIFO_PEEK  = 32'h0000_00F0;
-localparam SPI_ENG_ADDR_OFFLOAD_EN    = 32'h0000_0100;
-localparam SPI_ENG_ADDR_OFFLOAD_RESET = 32'h0000_0108;
-localparam SPI_ENG_ADDR_OFFLOAD_CMD   = 32'h0000_0110;
-localparam SPI_ENG_ADDR_OFFLOAD_SDO   = 32'h0000_0114;
+localparam PULSAR_ADC_DMA             = 32'h44A3_0000;
+localparam PULSAR_ADC_BASE            = 32'h44A0_0000;
+localparam PULSAR_ADC_CLKGEN_BASE     = 32'h44A7_0000;
+localparam PULSAR_ADC_CNV_BASE        = 32'h44B0_0000;
+localparam DDR_BASE                   = 32'h8000_0000;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -111,10 +92,6 @@ localparam INST_SYNC                  = 32'h0000_3000;
 // Sleep instruction
 localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                      = INST_SLEEP | (a & 8'hFF);
-
-localparam PULSAR_ADC_BASE = `PULSAR_ADC_REGMAP;
-localparam PULSAR_ADC_CLKGEN_BASE = `PULSAR_ADC_CLKGEN;
-localparam PULSAR_ADC_CNV_BASE = `PULSAR_ADC_CNV;
 
 program test_program (
   input pulsar_adc_irq,
@@ -198,8 +175,8 @@ end
 task sanity_test;
 begin
   #100 axi_read_v (PULSAR_ADC_BASE + 32'h0000000, 'h0001_0071);
-  #100 axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
-  #100 axi_read_v (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_read_v (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -212,13 +189,13 @@ task generate_transfer_cmd;
   input [7:0] sync_id;
   begin
     // assert CSN
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
     // transfer data
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_WRD);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_WRD);
     // de-assert CSN
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
     // SYNC command to generate interrupt
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | sync_id));
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | sync_id));
     $display("[%t] NOTE: Transfer generation finished.", $time);
   end
 endtask
@@ -234,15 +211,15 @@ initial begin
   while (1) begin
     @(posedge pulsar_adc_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
-    axi_read (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
+    axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQPEND, irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
-      axi_read (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_SYNCID, sync_id);
+      axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SYNCID, sync_id);
       $display("[%t] NOTE: Offload SYNC %d IRQ. An offload transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
-      axi_read (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_SYNCID, sync_id);
+      axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SYNCID, sync_id);
       $display("[%t] NOTE: SYNC %d IRQ. FIFO transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SDI FIFO
@@ -258,7 +235,7 @@ initial begin
       $display("[%t] NOTE: CMD FIFO IRQ.", $time);
     end
     // Clear all pending IRQs
-    axi_write (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQPEND, irq_pending);
   end
 end
 
@@ -287,7 +264,6 @@ initial begin
     #0.5   delay_clk = ~delay_clk;
   end
 end
-
 
 //---------------------------------------------------------------------------
 // SDI data generator
@@ -435,32 +411,32 @@ task offload_spi_test;
 
     //Configure DMA
 
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h410, DDR_BASE); // DEST_ADDRESS
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Configure the Offload module
 
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
 
     offload_status = 1;
 
     // Start the offload
     #100
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started.", $time);
 
     wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
     offload_status = 0;
 
     $display("[%t] Offload stopped.", $time);
@@ -469,7 +445,7 @@ task offload_spi_test;
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
+      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(DDR_BASE + 4*i);
     end
 
     if (irq_pending == 'h0) begin
@@ -505,21 +481,21 @@ begin
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
   // Enable SPI Engine
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
 
   // Configure the execution module
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CFG);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CFG);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
 
   // Set up the interrupts
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
   #100
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
     #100
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDOFIFO, (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SDOFIFO, (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
   end
 
   generate_transfer_cmd(1);
@@ -530,7 +506,7 @@ begin
 
   repeat (NUM_OF_WORDS) begin
   #100
-    axi_read (PULSAR_ADC_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+    axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
   end
 
   if (sdi_fifo_data != sdi_fifo_data_store)

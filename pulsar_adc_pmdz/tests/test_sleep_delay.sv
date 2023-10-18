@@ -32,41 +32,20 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
 
 `include "utils.svh"
+`include "spi_engine.svh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
-`define PULSAR_ADC_DMA                  32'h44A3_0000
-`define PULSAR_ADC_REGMAP               32'h44A0_0000
-`define PULSAR_ADC_CLKGEN               32'h44A7_0000
-`define PULSAR_ADC_CNV                  32'h44B0_0000
-`define DDR_BASE                        32'h8000_0000
-
-localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
-localparam SPI_ENG_ADDR_ID            = 32'h0000_0004;
-localparam SPI_ENG_ADDR_SCRATCH       = 32'h0000_0008;
-localparam SPI_ENG_ADDR_ENABLE        = 32'h0000_0040;
-localparam SPI_ENG_ADDR_IRQMASK       = 32'h0000_0080;
-localparam SPI_ENG_ADDR_IRQPEND       = 32'h0000_0084;
-localparam SPI_ENG_ADDR_IRQSRC        = 32'h0000_0088;
-localparam SPI_ENG_ADDR_SYNCID        = 32'h0000_00C0;
-localparam SPI_ENG_ADDR_CMDFIFO_ROOM  = 32'h0000_00D0;
-localparam SPI_ENG_ADDR_SDOFIFO_ROOM  = 32'h0000_00D4;
-localparam SPI_ENG_ADDR_SDIFIFO_LEVEL = 32'h0000_00D8;
-localparam SPI_ENG_ADDR_CMDFIFO       = 32'h0000_00E0;
-localparam SPI_ENG_ADDR_SDOFIFO       = 32'h0000_00E4;
-localparam SPI_ENG_ADDR_SDIFIFO       = 32'h0000_00E8;
-localparam SPI_ENG_ADDR_SDIFIFO_PEEK  = 32'h0000_00F0;
-localparam SPI_ENG_ADDR_OFFLOAD_EN    = 32'h0000_0100;
-localparam SPI_ENG_ADDR_OFFLOAD_RESET = 32'h0000_0108;
-localparam SPI_ENG_ADDR_OFFLOAD_CMD   = 32'h0000_0110;
-localparam SPI_ENG_ADDR_OFFLOAD_SDO   = 32'h0000_0114;
+localparam PULSAR_ADC_DMA             = 32'h44A3_0000;
+localparam PULSAR_ADC_BASE            = 32'h44A0_0000;
+localparam PULSAR_ADC_CLKGEN_BASE     = 32'h44A7_0000;
+localparam PULSAR_ADC_CNV_BASE        = 32'h44B0_0000;
+localparam DDR_BASE                   = 32'h8000_0000;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -112,11 +91,7 @@ localparam INST_SYNC                  = 32'h0000_3000;
 
 // Sleep instruction
 localparam INST_SLEEP                 = 32'h0000_3100;
-`define sleep(a)                      = INST_SLEEP | (a & 8'hFF);
-
-localparam PULSAR_ADC_BASE = `PULSAR_ADC_REGMAP;
-localparam PULSAR_ADC_CLKGEN_BASE = `PULSAR_ADC_CLKGEN;
-localparam PULSAR_ADC_CNV_BASE = `PULSAR_ADC_CNV;
+`define sleep(a)                      (INST_SLEEP | (a & 8'hFF))
 
 program test_sleep_delay (
   input pulsar_adc_irq,
@@ -199,12 +174,11 @@ end
 task sanity_test;
 begin
   #100 axi_read_v (PULSAR_ADC_BASE + 32'h0000000, 'h0001_0071);
-  #100 axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
-  #100 axi_read_v (PULSAR_ADC_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_read_v (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
-
 
 //---------------------------------------------------------------------------
 // IRQ callback
@@ -217,15 +191,15 @@ initial begin
   while (1) begin
     @(posedge pulsar_adc_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
-    axi_read (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
+    axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQPEND, irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
-      axi_read (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_SYNCID, sync_id);
+      axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SYNCID, sync_id);
       $display("[%t] NOTE: Offload SYNC %d IRQ. An offload transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
-      axi_read (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_SYNCID, sync_id);
+      axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SYNCID, sync_id);
       $display("[%t] NOTE: SYNC %d IRQ. FIFO transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SDI FIFO
@@ -241,7 +215,7 @@ initial begin
       $display("[%t] NOTE: CMD FIFO IRQ.", $time);
     end
     // Clear all pending IRQs
-    axi_write (`PULSAR_ADC_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQPEND, irq_pending);
   end
 end
 
@@ -270,7 +244,6 @@ initial begin
     #0.5   delay_clk = ~delay_clk;
   end
 end
-
 
 //---------------------------------------------------------------------------
 // SDI data generator
@@ -462,7 +435,6 @@ task sleep_delay_test;
   input [7:0] sleep_param;
 begin
 
-
   //start spi clk generator
   #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
 
@@ -472,22 +444,20 @@ begin
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
   // Enable SPI Engine
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);    
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);    
 
   // Set up the interrupts
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
   // Configure the Offload module
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
 
-  expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*2); //as per wiki (https://wiki.analog.com/resources/fpga/peripherals/spi_engine/instruction_format#sleep_instruction)
-  // behaviour as of 4d676ca: expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*4)
-
+  expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*2); 
   // Start the test
   #100
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_CMDFIFO, INST_SLEEP | (7 & 8'hFF));
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, (`sleep(sleep_param)));
 
   #2000
   sleep_time = sleep_instr_time.pop_back();
@@ -497,10 +467,9 @@ begin
       `INFO(("Sleep Test PASSED"));  
   end
   // Disable SPI Engine
-  axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 1);  
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 1);  
 end
 endtask
-
 
 //---------------------------------------------------------------------------
 // CS delay Test
@@ -517,7 +486,6 @@ task cs_delay_test;
   input [1:0] cs_deactivate_delay;
 begin
 
-
     //start spi clk generator
     #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
 
@@ -527,28 +495,28 @@ begin
     #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
     //Configure DMA
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer to DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h410, DDR_BASE); // DEST_ADDRESS
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer to DMA
 
     // Enable SPI Engine
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_ENABLE, 0);    
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);    
 
     // Set up the interrupts
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
     // Configure the Offload module
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 0);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 0);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 1);
     
     offload_transfer_cnt = 0;
     offload_status = 1;
@@ -557,13 +525,13 @@ begin
 
     // Start the offload
     #100
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started (no delay on CS change).", $time);
 
     wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
     offload_status = 0;
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
     
 
     $display("[%t] Offload stopped (no delay on CS change).", $time);
@@ -572,7 +540,7 @@ begin
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
+      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(DDR_BASE + 4*i);
     end
 
     if (irq_pending == 'h0) begin
@@ -583,48 +551,45 @@ begin
 
     if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("CS Delay Test FAILED: bad data"));
-    end else begin
-      cs_activate_time = cs_instr_time.pop_back();
-      cs_deactivate_time = cs_instr_time.pop_back();
-      if ((cs_activate_time != expected_cs_activate_time)) begin
-        `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));        
-      end else if (cs_deactivate_time != expected_cs_deactivate_time) begin
-        `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));    
-      end else begin
-        `INFO(("CS Delay Test PASSED"));  
-      end
+    end 
+    
+    cs_activate_time = cs_instr_time.pop_back();
+    cs_deactivate_time = cs_instr_time.pop_back();
+    if ((cs_activate_time != expected_cs_activate_time)) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));        
     end
+    if (cs_deactivate_time != expected_cs_deactivate_time) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));    
+    end
+    `INFO(("CS Delay Test PASSED"));  
 
     #2000    
-    env.mng.RegWrite32(`PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit DMA transfer
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit DMA transfer
 
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 1);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_RESET, 0);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | ((cs_activate_delay & 2'b11) << 8));
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF | ((cs_deactivate_delay & 2'b11) << 8));
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 0);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | ((cs_activate_delay & 2'b11) << 8));
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF | ((cs_deactivate_delay & 2'b11) << 8));
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
 
     offload_transfer_cnt = 0;
     sdi_store_cnt = 0;
     offload_status = 1;
     
-    // behaviour as per wiki should be 2*cs_activate_delay*(1+CLOCK_DIVIDER), half before and half after cs change
-    // behaviour as of 4d676ca: 2+cs_activate_delay*(1+CLOCK_DIVIDER)*2 before cs change, no delay after.
-    // behaviour after fix: 3+2*cs_activate_delay*(1+CLOCK_DIVIDER)*2
     // breakdown: cs_activate_delay*(1+CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
     expected_cs_activate_time = 3+2*cs_activate_delay*(1+CLOCK_DIVIDER)*2; 
     expected_cs_deactivate_time = 3+2*cs_deactivate_delay*(1+CLOCK_DIVIDER)*2; 
 
     // Start the offload
     #100
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 1);
     $display("[%t] Offload started (with delay on CS change).", $time);
 
     wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
     offload_status = 0;
-    axi_write (PULSAR_ADC_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
     
     $display("[%t] Offload stopped (with delay on CS change).", $time);
 
@@ -632,7 +597,7 @@ begin
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
+      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(DDR_BASE + 4*i);
     end
 
     if (irq_pending == 'h0) begin
@@ -643,18 +608,17 @@ begin
 
     if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("CS Delay Test FAILED: bad data"));
-    end else begin
-      cs_activate_time = cs_instr_time.pop_back();
-      cs_deactivate_time = cs_instr_time.pop_back();
-      if ((cs_activate_time != expected_cs_activate_time)) begin
-        `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));        
-      end else if (cs_deactivate_time != expected_cs_deactivate_time) begin
-        `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));    
-      end else begin
-        `INFO(("CS Delay Test PASSED"));  
-      end
     end
-
+    cs_activate_time = cs_instr_time.pop_back();
+    cs_deactivate_time = cs_instr_time.pop_back();
+    if ((cs_activate_time != expected_cs_activate_time)) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));        
+    end 
+    if (cs_deactivate_time != expected_cs_deactivate_time) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));    
+    end
+    `INFO(("CS Delay Test PASSED"));  
+    
   end
 endtask
 endprogram

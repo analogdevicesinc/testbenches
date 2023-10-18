@@ -33,6 +33,7 @@ adi_sim_project_files [list \
  "../common/sv/dma_trans.sv" \
  "../common/sv/axi_dmac_pkg.sv" \
  "../common/sv/test_harness_env.sv" \
+ "spi_engine.svh" \
  "tests/test_program.sv" \
  "tests/test_sleep_delay.sv"\
  "system_tb.sv" \

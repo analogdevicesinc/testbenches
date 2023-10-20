@@ -10,6 +10,7 @@ proc adi_sim_add_define {value} {
 proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   global design_name
   global ad_project_params
+  global use_smartconnect
 
   # Create project
   create_project ${project_name} ./runs/${project_name} -part $part -force

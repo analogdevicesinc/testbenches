@@ -1,5 +1,6 @@
 
 #global mng_axi_cfg
+global use_smartconnect
 # axi lite management port
 set mng_axi_cfg [ list \
    ADDR_WIDTH {32} \
@@ -157,9 +158,16 @@ set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells axi_cpu_interconnect]
 ad_connect axi_cpu_interconnect/M01_AXI /axi_mem_interconnect/S00_AXI
 
 global sys_mem_clk_index
-incr sys_mem_clk_index
-set_property CONFIG.NUM_CLKS [expr $sys_mem_clk_index +1] [get_bd_cells axi_mem_interconnect]
-ad_connect sys_cpu_clk axi_mem_interconnect/ACLK$sys_mem_clk_index
+if { $use_smartconnect == 1} {
+  incr sys_mem_clk_index
+  set_property CONFIG.NUM_CLKS [expr $sys_mem_clk_index +1] [get_bd_cells axi_mem_interconnect]
+  ad_connect sys_cpu_clk axi_mem_interconnect/ACLK$sys_mem_clk_index
+} else {
+  ad_connect sys_cpu_clk axi_cpu_interconnect/M01_ACLK
+  ad_connect sys_cpu_clk axi_mem_interconnect/S00_ACLK
+  ad_connect sys_cpu_resetn axi_cpu_interconnect/M01_ARESETN
+  ad_connect sys_cpu_resetn axi_mem_interconnect/S00_ARESETN
+}
 
 #fake an ad_cpu_interconnect
 global sys_cpu_interconnect_index

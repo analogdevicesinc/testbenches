@@ -62,7 +62,7 @@ localparam NUM_OF_CS                  = 1;
 localparam THREE_WIRE                 = 0;
 localparam CPOL                       = 0;
 localparam CPHA                       = 1;
-localparam CLOCK_DIVIDER              = 0;
+localparam CLOCK_DIVIDER              = 2;
 localparam NUM_OF_WORDS               = 1;
 localparam NUM_OF_TRANSFERS           = 1;
 
@@ -428,8 +428,6 @@ end
 bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 bit [31:0] sleep_time;
 bit [31:0] expected_sleep_time;
-bit [31:0] expected_sleep_time;
-bit [31:0] sleep_arg;
 
 task sleep_delay_test;
   input [7:0] sleep_param;
@@ -450,11 +448,11 @@ begin
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
   // Configure the Offload module
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CFG);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
 
-  expected_sleep_time = (sleep_param+1)*((CLOCK_DIVIDER+1)*2); 
+  expected_sleep_time = 2+(sleep_param)*((CLOCK_DIVIDER+1)*2); 
   // Start the test
   #100
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, (`sleep(sleep_param)));
@@ -578,8 +576,8 @@ begin
     offload_status = 1;
     
     // breakdown: cs_activate_delay*(1+CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
-    expected_cs_activate_time = 3+2*cs_activate_delay*(1+CLOCK_DIVIDER)*2; 
-    expected_cs_deactivate_time = 3+2*cs_deactivate_delay*(1+CLOCK_DIVIDER)*2; 
+    expected_cs_activate_time = 2+2*cs_activate_delay*(1+CLOCK_DIVIDER)*2; 
+    expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+CLOCK_DIVIDER)*2; 
 
     // Start the offload
     #100

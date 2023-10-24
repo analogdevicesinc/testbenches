@@ -447,7 +447,7 @@ begin
   // Set up the interrupts
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
-  // Configure the Offload module
+  // Write commnads stack
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CFG);
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);

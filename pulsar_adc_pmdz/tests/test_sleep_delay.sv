@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2023 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -442,7 +442,7 @@ begin
   #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
   // Enable SPI Engine
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);    
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
 
   // Set up the interrupts
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
@@ -452,7 +452,7 @@ begin
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
 
-  expected_sleep_time = 2+(sleep_param)*((CLOCK_DIVIDER+1)*2); 
+  expected_sleep_time = 2+(sleep_param)*((CLOCK_DIVIDER+1)*2);
   // Start the test
   #100
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, (`sleep(sleep_param)));
@@ -460,12 +460,12 @@ begin
   #2000
   sleep_time = sleep_instr_time.pop_back();
   if ((sleep_time != expected_sleep_time)) begin
-      `ERROR(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));        
+      `ERROR(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
   end else begin
-      `INFO(("Sleep Test PASSED"));  
+      `INFO(("Sleep Test PASSED"));
   end
   // Disable SPI Engine
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 1);  
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 1);
 end
 endtask
 
@@ -500,7 +500,7 @@ begin
     env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer to DMA
 
     // Enable SPI Engine
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);    
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
 
     // Set up the interrupts
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
@@ -515,7 +515,7 @@ begin
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 1);
-    
+
     offload_transfer_cnt = 0;
     offload_status = 1;
     expected_cs_activate_time = 2;
@@ -530,7 +530,7 @@ begin
 
     offload_status = 0;
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
-    
+
 
     $display("[%t] Offload stopped (no delay on CS change).", $time);
 
@@ -549,19 +549,19 @@ begin
 
     if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("CS Delay Test FAILED: bad data"));
-    end 
-    
+    end
+
     cs_activate_time = cs_instr_time.pop_back();
     cs_deactivate_time = cs_instr_time.pop_back();
     if ((cs_activate_time != expected_cs_activate_time)) begin
-      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));        
+      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
     end
     if (cs_deactivate_time != expected_cs_deactivate_time) begin
-      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));    
+      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
     end
-    `INFO(("CS Delay Test PASSED"));  
+    `INFO(("CS Delay Test PASSED"));
 
-    #2000    
+    #2000
     env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit DMA transfer
 
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 1);
@@ -574,10 +574,10 @@ begin
     offload_transfer_cnt = 0;
     sdi_store_cnt = 0;
     offload_status = 1;
-    
+
     // breakdown: cs_activate_delay*(1+CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
-    expected_cs_activate_time = 2+2*cs_activate_delay*(1+CLOCK_DIVIDER)*2; 
-    expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+CLOCK_DIVIDER)*2; 
+    expected_cs_activate_time = 2+2*cs_activate_delay*(1+CLOCK_DIVIDER)*2;
+    expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+CLOCK_DIVIDER)*2;
 
     // Start the offload
     #100
@@ -588,7 +588,7 @@ begin
 
     offload_status = 0;
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
-    
+
     $display("[%t] Offload stopped (with delay on CS change).", $time);
 
     #2000
@@ -610,13 +610,13 @@ begin
     cs_activate_time = cs_instr_time.pop_back();
     cs_deactivate_time = cs_instr_time.pop_back();
     if ((cs_activate_time != expected_cs_activate_time)) begin
-      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));        
-    end 
-    if (cs_deactivate_time != expected_cs_deactivate_time) begin
-      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));    
+      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
     end
-    `INFO(("CS Delay Test PASSED"));  
-    
+    if (cs_deactivate_time != expected_cs_deactivate_time) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
+    end
+    `INFO(("CS Delay Test PASSED"));
+
   end
 endtask
 endprogram

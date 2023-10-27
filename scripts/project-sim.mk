@@ -62,7 +62,7 @@ endif
 # This rule template will build the environment
 # $(1): configuration name
 define build
-$(addprefix runs/,$(1)/system_project.log) : library $(addprefix cfgs/,$(1).tcl) $(ENV_DEPS)
+$(addprefix runs/,$(1)/system_project.log) : $(addprefix cfgs/,$(1).tcl) $(ENV_DEPS) | library
 	-rm -rf $(addprefix runs/,$(1))
 	mkdir -p runs
 	mkdir -p $(addprefix runs/,$(1))
@@ -80,7 +80,7 @@ endef
 # $(2): test name
 define sim
 $(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
-$(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS)
+$(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS) remake_always
 	$(RUN_PRE_OPT)$$(call simulate, \
 		$(CMD_PRE) $(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST), \
 		$$@, \
@@ -133,6 +133,9 @@ library:
 	@for lib in $(LIB_DEPS); do \
 		$(MAKE) -C $(HDL_LIBRARY_PATH)$${lib} xilinx || exit $$?; \
 	done
+
+remake_always:
+	:
 
 # Create here the targets which build the test env
 $(foreach cfg, $(BUILD_CFGS), $(eval $(call build, $(cfg))))

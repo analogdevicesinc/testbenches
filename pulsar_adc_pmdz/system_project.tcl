@@ -15,6 +15,9 @@ source "cfgs/${cfg_file}"
 # Set the project name
 set project_name [file rootname $cfg_file]
 
+# Set to use SmartConnect or AXI Interconnect
+set use_smartconnect 1
+
 # Create the project
 adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 

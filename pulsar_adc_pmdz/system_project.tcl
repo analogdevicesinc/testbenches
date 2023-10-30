@@ -19,7 +19,7 @@ set project_name [file rootname $cfg_file]
 set use_smartconnect 1
 
 # Create the project
-adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
+adi_sim_project_xilinx $project_name "xc7z007sclg400-1"
 
 # Add test files to the project
 adi_sim_project_files [list \
@@ -36,7 +36,9 @@ adi_sim_project_files [list \
  "../common/sv/dma_trans.sv" \
  "../common/sv/axi_dmac_pkg.sv" \
  "../common/sv/test_harness_env.sv" \
+ "spi_engine.svh" \
  "tests/test_program.sv" \
+ "tests/test_sleep_delay.sv"\
  "system_tb.sv" \
  ]
 

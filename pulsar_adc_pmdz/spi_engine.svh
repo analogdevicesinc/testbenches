@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 - 2023 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2023 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,29 +35,28 @@
 
 `timescale 1ns/1ps
 
-`include "utils.svh"
+`ifndef _SPI_ENGINE_SVH_
+`define _SPI_ENGINE_SVH_
 
-module system_tb();
-  wire pulsar_adc_spi_cs;
-  wire pulsar_adc_spi_sclk;
-  wire pulsar_adc_spi_clk;
-  wire pulsar_adc_spi_sdi;
-  wire pulsar_adc_spi_sdo;
-  wire pulsar_adc_irq;
+`define SPI_ENG_ADDR_VERSION        32'h0000_0000
+`define SPI_ENG_ADDR_ID             32'h0000_0004
+`define SPI_ENG_ADDR_SCRATCH        32'h0000_0008
+`define SPI_ENG_ADDR_ENABLE         32'h0000_0040
+`define SPI_ENG_ADDR_IRQMASK        32'h0000_0080
+`define SPI_ENG_ADDR_IRQPEND        32'h0000_0084
+`define SPI_ENG_ADDR_IRQSRC         32'h0000_0088
+`define SPI_ENG_ADDR_SYNCID         32'h0000_00C0
+`define SPI_ENG_ADDR_CMDFIFO_ROOM   32'h0000_00D0
+`define SPI_ENG_ADDR_SDOFIFO_ROOM   32'h0000_00D4
+`define SPI_ENG_ADDR_SDIFIFO_LEVEL  32'h0000_00D8
+`define SPI_ENG_ADDR_CMDFIFO        32'h0000_00E0
+`define SPI_ENG_ADDR_SDOFIFO        32'h0000_00E4
+`define SPI_ENG_ADDR_SDIFIFO        32'h0000_00E8
+`define SPI_ENG_ADDR_SDIFIFO_PEEK   32'h0000_00F0
+`define SPI_ENG_ADDR_OFFLOAD_EN     32'h0000_0100
+`define SPI_ENG_ADDR_OFFLOAD_RESET  32'h0000_0108
+`define SPI_ENG_ADDR_OFFLOAD_CMD    32'h0000_0110
+`define SPI_ENG_ADDR_OFFLOAD_SDO    32'h0000_0114
 
-  `TEST_PROGRAM test(
-    .pulsar_adc_irq(pulsar_adc_irq),
-    .pulsar_adc_spi_sclk(pulsar_adc_spi_sclk),
-    .pulsar_adc_spi_cs(pulsar_adc_spi_cs),
-    .pulsar_adc_spi_clk(pulsar_adc_spi_clk),
-    .pulsar_adc_spi_sdi(pulsar_adc_spi_sdi));
 
-  test_harness `TH (
-    .pulsar_adc_irq(pulsar_adc_irq),
-    .pulsar_adc_spi_cs(pulsar_adc_spi_cs),
-    .pulsar_adc_spi_sclk(pulsar_adc_spi_sclk),
-    .pulsar_adc_spi_clk(pulsar_adc_spi_clk),
-    .pulsar_adc_spi_sdi(pulsar_adc_spi_sdi),
-    .pulsar_adc_spi_sdo(pulsar_adc_spi_sdo));
-
-endmodule
+`endif

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 - 2023 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2023 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -32,8 +32,6 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
 
 `include "utils.svh"
 `include "spi_engine.svh"
@@ -64,9 +62,9 @@ localparam NUM_OF_CS                  = 1;
 localparam THREE_WIRE                 = 0;
 localparam CPOL                       = 0;
 localparam CPHA                       = 1;
-localparam CLOCK_DIVIDER              = 0;
+localparam CLOCK_DIVIDER              = 2;
 localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 8;
+localparam NUM_OF_TRANSFERS           = 1;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -75,6 +73,8 @@ localparam NUM_OF_TRANSFERS           = 8;
 // Chip select instructions
 localparam INST_CS_OFF                = 32'h0000_10FF;
 localparam INST_CS_ON                 = 32'h0000_10FE;
+localparam INST_CS_OFF_DELAY          = 32'h0000_13FF;
+localparam INST_CS_ON_DELAY           = 32'h0000_13FE;
 
 // Transfer instructions
 localparam INST_WR                    = 32'h0000_0100 | (NUM_OF_WORDS-1);
@@ -91,9 +91,9 @@ localparam INST_SYNC                  = 32'h0000_3000;
 
 // Sleep instruction
 localparam INST_SLEEP                 = 32'h0000_3100;
-`define sleep(a)                      = INST_SLEEP | (a & 8'hFF);
+`define sleep(a)                      (INST_SLEEP | (a & 8'hFF))
 
-program test_program (
+program test_sleep_delay (
   input pulsar_adc_irq,
   input pulsar_adc_spi_sclk,
   input pulsar_adc_spi_cs,
@@ -157,11 +157,10 @@ initial begin
 
   #100
 
-  fifo_spi_test;
+  sleep_delay_test(7);
 
-  #100
+  cs_delay_test(3,3);
 
-  offload_spi_test;
   `INFO(("Test Done"));
 
   $finish;
@@ -179,25 +178,6 @@ begin
   #100 axi_read_v (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
-endtask
-
-//---------------------------------------------------------------------------
-// SPI Engine generate transfer
-//---------------------------------------------------------------------------
-
-task generate_transfer_cmd;
-  input [7:0] sync_id;
-  begin
-    // assert CSN
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
-    // transfer data
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_WRD);
-    // de-assert CSN
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
-    // SYNC command to generate interrupt
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | sync_id));
-    $display("[%t] NOTE: Transfer generation finished.", $time);
-  end
 endtask
 
 //---------------------------------------------------------------------------
@@ -401,45 +381,158 @@ initial begin
 end
 
 //---------------------------------------------------------------------------
-// Offload SPI Test
+// Sleep and Chip Select Instruction time counter
+//---------------------------------------------------------------------------
+
+bit [31:0] sleep_instr_time[$];
+bit [31:0] sleep_current_duration;
+bit [31:0] cs_instr_time[$];
+bit [31:0] cs_current_duration;
+wire [15:0] cmd, cmd_d1;
+wire cmd_valid, cmd_ready;
+wire idle;
+
+assign cmd          = test_harness.spi_pulsar_adc.spi_pulsar_adc_execution.inst.cmd;
+assign cmd_d1       = test_harness.spi_pulsar_adc.spi_pulsar_adc_execution.inst.cmd_d1;
+assign cmd_valid    = test_harness.spi_pulsar_adc.spi_pulsar_adc_execution.inst.cmd_valid;
+assign cmd_ready    = test_harness.spi_pulsar_adc.spi_pulsar_adc_execution.inst.cmd_ready;
+assign idle         = test_harness.spi_pulsar_adc.spi_pulsar_adc_execution.inst.idle;
+
+initial begin
+  sleep_current_duration = 0;
+  while(1) begin
+    @(posedge pulsar_adc_spi_clk);
+      if (idle && (cmd_d1[15:8] == 8'h31)) begin
+        sleep_instr_time.push_front(sleep_current_duration+1); // add one to account for this cycle
+      end
+      if (cmd_valid && cmd_ready && (cmd[15:8] == 8'h31)) begin
+        sleep_current_duration = 0;
+      end else begin
+        sleep_current_duration = sleep_current_duration+1;
+      end
+      if (idle && (cmd_d1[15:10] == 6'h4)) begin
+        cs_instr_time.push_front(cs_current_duration+1); // add one to account for this cycle
+      end
+      if (cmd_valid && cmd_ready && (cmd[15:10] == 6'h4)) begin
+        cs_current_duration = 0;
+      end else begin
+        cs_current_duration = cs_current_duration+1;
+      end
+  end
+end
+
+//---------------------------------------------------------------------------
+// Sleep delay Test
 //---------------------------------------------------------------------------
 
 bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] sleep_time;
+bit [31:0] expected_sleep_time;
 
-task offload_spi_test;
-  begin
+task sleep_delay_test;
+  input [7:0] sleep_param;
+begin
+
+  //start spi clk generator
+  #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+
+  //config cnv
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00001000);
+  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
+
+  // Enable SPI Engine
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
+
+  // Set up the interrupts
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
+
+  // Write commnads stack
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CFG);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
+
+  expected_sleep_time = 2+(sleep_param)*((CLOCK_DIVIDER+1)*2);
+  // Start the test
+  #100
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, (`sleep(sleep_param)));
+
+  #2000
+  sleep_time = sleep_instr_time.pop_back();
+  if ((sleep_time != expected_sleep_time)) begin
+      `ERROR(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
+  end else begin
+      `INFO(("Sleep Test PASSED"));
+  end
+  // Disable SPI Engine
+  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 1);
+end
+endtask
+
+//---------------------------------------------------------------------------
+// CS delay Test
+//---------------------------------------------------------------------------
+
+bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] cs_activate_time;
+bit [31:0] expected_cs_activate_time;
+bit [31:0] cs_deactivate_time;
+bit [31:0] expected_cs_deactivate_time;
+
+task cs_delay_test;
+  input [1:0] cs_activate_delay;
+  input [1:0] cs_deactivate_delay;
+begin
+
+    //start spi clk generator
+    #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+
+    //config cnv
+    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
+    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00001000);
+    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
 
     //Configure DMA
-
     env.mng.RegWrite32(PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
     env.mng.RegWrite32(PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
     env.mng.RegWrite32(PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
     env.mng.RegWrite32(PULSAR_ADC_DMA+32'h410, DDR_BASE); // DEST_ADDRESS
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer to DMA
+
+    // Enable SPI Engine
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
+
+    // Set up the interrupts
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
 
     // Configure the Offload module
-
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 0);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 1);
 
+    offload_transfer_cnt = 0;
     offload_status = 1;
+    expected_cs_activate_time = 2;
+    expected_cs_deactivate_time = 2;
 
     // Start the offload
     #100
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 1);
-    $display("[%t] Offload started.", $time);
+    $display("[%t] Offload started (no delay on CS change).", $time);
 
     wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
     offload_status = 0;
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
 
-    $display("[%t] Offload stopped.", $time);
+
+    $display("[%t] Offload stopped (no delay on CS change).", $time);
 
     #2000
 
@@ -455,66 +548,75 @@ task offload_spi_test;
     end
 
     if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
-      `ERROR(("Offload Test FAILED"));
-    end else begin
-      `INFO(("Offload Test PASSED"));
+      `ERROR(("CS Delay Test FAILED: bad data"));
     end
 
-  end
-endtask
+    cs_activate_time = cs_instr_time.pop_back();
+    cs_deactivate_time = cs_instr_time.pop_back();
+    if ((cs_activate_time != expected_cs_activate_time)) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
+    end
+    if (cs_deactivate_time != expected_cs_deactivate_time) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
+    end
+    `INFO(("CS Delay Test PASSED"));
 
-//---------------------------------------------------------------------------
-// FIFO SPI Test
-//---------------------------------------------------------------------------
+    #2000
+    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit DMA transfer
 
-bit   [31:0]  sdi_fifo_data = 0;
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 1);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 0);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON | ((cs_activate_delay & 2'b11) << 8));
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF | ((cs_deactivate_delay & 2'b11) << 8));
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
 
-task fifo_spi_test;
-begin
+    offload_transfer_cnt = 0;
+    sdi_store_cnt = 0;
+    offload_status = 1;
 
-  //start spi clk generator
-  #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+    // breakdown: cs_activate_delay*(1+CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
+    expected_cs_activate_time = 2+2*cs_activate_delay*(1+CLOCK_DIVIDER)*2;
+    expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+CLOCK_DIVIDER)*2;
 
-  //config cnv
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00000121);
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
-
-  // Enable SPI Engine
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
-
-  // Configure the execution module
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_CFG);
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
-
-  // Set up the interrupts
-  axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_IRQMASK, 32'h00018);
-
-  #100
-  // Generate a FIFO transaction, write SDO first
-  repeat (NUM_OF_WORDS) begin
+    // Start the offload
     #100
-    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SDOFIFO, (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    $display("[%t] Offload started (with delay on CS change).", $time);
+
+    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+
+    offload_status = 0;
+    axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_EN, 0);
+
+    $display("[%t] Offload stopped (with delay on CS change).", $time);
+
+    #2000
+
+    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
+      #1
+      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(DDR_BASE + 4*i);
+    end
+
+    if (irq_pending == 'h0) begin
+      `ERROR(("IRQ Test FAILED"));
+    end else begin
+      `INFO(("IRQ Test PASSED"));
+    end
+
+    if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
+      `ERROR(("CS Delay Test FAILED: bad data"));
+    end
+    cs_activate_time = cs_instr_time.pop_back();
+    cs_deactivate_time = cs_instr_time.pop_back();
+    if ((cs_activate_time != expected_cs_activate_time)) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
+    end
+    if (cs_deactivate_time != expected_cs_deactivate_time) begin
+      `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
+    end
+    `INFO(("CS Delay Test PASSED"));
+
   end
-
-  generate_transfer_cmd(1);
-
-  #100
-  wait(sync_id == 1);
-  #100
-
-  repeat (NUM_OF_WORDS) begin
-  #100
-    axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
-  end
-
-  if (sdi_fifo_data != sdi_fifo_data_store)
-    `ERROR(("Fifo Read Test FAILED"));
-
-  `INFO(("Fifo Read Test PASSED"));
-
-end
 endtask
-
 endprogram

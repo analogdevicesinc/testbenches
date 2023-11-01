@@ -63,6 +63,9 @@ endif
 # $(1): configuration name
 define build
 $(addprefix runs/,$(1)/system_project.log) : library $(addprefix cfgs/,$(1).tcl) $(ENV_DEPS)
+ifeq ($(RUN), sim)
+	touch $(addprefix runs/,$(1)/system_project.log)
+else
 	-rm -rf $(addprefix runs/,$(1))
 	mkdir -p runs
 	mkdir -p $(addprefix runs/,$(1))
@@ -73,6 +76,7 @@ $(addprefix runs/,$(1)/system_project.log) : library $(addprefix cfgs/,$(1).tcl)
 		Building $(HL)$(strip $(1))$(NC) env, \
 		$(1), \
 		BuildEnv)
+endif
 endef
 
 # This rule template will run the simulation

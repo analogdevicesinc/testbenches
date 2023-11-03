@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -64,7 +64,9 @@ program test_program;
 
   bit [31:0] lane_rate_khz = `LANE_RATE*1000000;
   longint lane_rate = lane_rate_khz*1000;
+  int tx_link_clk_ratio = (`RX_JESD_L == 1) ? 2 : 1;
 
+  real rx_device_clk, tx_device_clk, tx_link_clk, tx_os_device_clk;
   real rx_sysref_clk, tx_sysref_clk, tx_os_sysref_clk, common_sysref_clk;
 
   jesd_link tx_link;
@@ -169,15 +171,22 @@ program test_program;
     dut_tx_ll.probe();
 
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
-    `TH.`RX_DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(ex_rx_ll.calc_device_clk()));
-    `TH.`TX_DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(ex_tx_ll.calc_device_clk()));
-    `TH.`TX_OS_DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(ex_tx_os_ll.calc_device_clk()));
+
+    rx_device_clk = ex_rx_ll.calc_device_clk();
+    tx_device_clk = ex_tx_ll.calc_device_clk();
+    tx_link_clk = tx_device_clk * tx_link_clk_ratio;
+    tx_os_device_clk = ex_tx_os_ll.calc_device_clk();
+
+    `TH.`RX_DEVICE_CLK.inst.IF.set_clk_frq(rx_device_clk);
+    `TH.`TX_DEVICE_CLK.inst.IF.set_clk_frq(tx_device_clk);
+    `TH.`TX_LINK_CLK.inst.IF.set_clk_frq(tx_link_clk);
+    `TH.`TX_OS_DEVICE_CLK.inst.IF.set_clk_frq(tx_os_device_clk);
 
     rx_sysref_clk = ex_rx_ll.calc_sysref_clk();
     tx_sysref_clk = ex_tx_ll.calc_sysref_clk();
     tx_os_sysref_clk = ex_tx_os_ll.calc_sysref_clk();
-    
-    //comment
+
+    // Common SYSREF clock frequency computation
     if (tx_sysref_clk >= rx_sysref_clk && `fmod(tx_sysref_clk, rx_sysref_clk) == 0) begin
       if (rx_sysref_clk >= tx_os_sysref_clk && `fmod(rx_sysref_clk, tx_os_sysref_clk) == 0) begin
         common_sysref_clk = tx_os_sysref_clk;
@@ -203,6 +212,7 @@ program test_program;
     `TH.`REF_CLK.inst.IF.start_clock;
     `TH.`RX_DEVICE_CLK.inst.IF.start_clock;
     `TH.`TX_DEVICE_CLK.inst.IF.start_clock;
+    `TH.`TX_LINK_CLK.inst.IF.start_clock;
     `TH.`TX_OS_DEVICE_CLK.inst.IF.start_clock;
     `TH.`SYSREF_CLK.inst.IF.start_clock;
 
@@ -216,7 +226,7 @@ program test_program;
                             `REF_CLK_RATE*1000000);
     
     dut_tx_xcvr.setup_clocks(lane_rate,
-                           `REF_CLK_RATE*1000000, '{QPLL0, QPLL1});
+                            `REF_CLK_RATE*1000000, '{QPLL0, QPLL1});
 
     dut_rx_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000, '{CPLL});

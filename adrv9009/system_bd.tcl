@@ -228,6 +228,8 @@ ad_connect ref_clk_ex i_rx_jesd_exerciser/ref_clk
 
 set_property -dict [list CONFIG.NUM_MI {18}] [get_bd_cells axi_cpu_interconnect]
 ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M17_AXI
+ad_connect sys_cpu_clk axi_cpu_interconnect/M17_ACLK
+ad_connect sys_cpu_resetn axi_cpu_interconnect/M17_ARESETN
 
 create_bd_port -dir O ex_rx_sync
 ad_connect ex_rx_sync i_rx_jesd_exerciser/rx_sync_0
@@ -248,6 +250,8 @@ ad_connect ref_clk_ex i_tx_jesd_exerciser/ref_clk
 
 set_property -dict [list CONFIG.NUM_MI {19}] [get_bd_cells axi_cpu_interconnect]
 ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M18_AXI
+ad_connect sys_cpu_clk axi_cpu_interconnect/M18_ACLK
+ad_connect sys_cpu_resetn axi_cpu_interconnect/M18_ARESETN
 
 create_bd_port -dir I ex_tx_sync
 ad_connect ex_tx_sync i_tx_jesd_exerciser/tx_sync_0
@@ -277,6 +281,8 @@ ad_connect ref_clk_ex i_tx_os_jesd_exerciser/ref_clk
 
 set_property -dict [list CONFIG.NUM_MI {20}] [get_bd_cells axi_cpu_interconnect]
 ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M19_AXI
+ad_connect sys_cpu_clk axi_cpu_interconnect/M19_ACLK
+ad_connect sys_cpu_resetn axi_cpu_interconnect/M19_ARESETN
 
 create_bd_port -dir I ex_tx_os_sync
 ad_connect ex_tx_os_sync i_tx_os_jesd_exerciser/tx_sync_0

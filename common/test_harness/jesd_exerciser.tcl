@@ -65,6 +65,7 @@ proc create_jesd_exerciser { \
   create_bd_port -dir I sys_cpu_resetn
 
   create_bd_port -dir I device_clk
+  create_bd_port -dir I link_clk
   create_bd_port -dir I ref_clk
 
 
@@ -138,7 +139,7 @@ proc create_jesd_exerciser { \
   set xcvr_rx_index 0
   set xcvr_instance NONE
 
-  ad_xcvrcon  util_xcvr axi_xcvr axi_jesd {} {} device_clk
+  ad_xcvrcon  util_xcvr axi_xcvr axi_jesd {} link_clk device_clk
 
 
   # list of peripherals to connect to the control interface

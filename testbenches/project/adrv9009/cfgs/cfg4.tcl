@@ -5,7 +5,9 @@ set ad_project_params(LINK_MODE) 1
 set ad_project_params(REF_CLK_RATE) 500
 set ad_project_params(LANE_RATE) 10
 
-set ad_project_params(DAC_FIFO_ADDRESS_WIDTH) 16
+set ad_project_params(DAC_OFFLOAD_TYPE) 0
+set ad_project_params(DAC_OFFLOAD_SIZE) [expr 2*1024*1024]
+set ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH) 0
 
 set ad_project_params(TX_JESD_M) 4
 set ad_project_params(TX_JESD_L) 4

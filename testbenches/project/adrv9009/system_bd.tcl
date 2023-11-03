@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2018-2024 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2018-2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -37,9 +37,6 @@ global ad_project_params
 
 source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
 
-source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
-source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl
-
 set LINK_MODE  $ad_project_params(LINK_MODE)
 
 set JESD_8B10B 1
@@ -53,7 +50,9 @@ if {$LINK_MODE == $JESD_8B10B} {
   set NP12_DATAPATH_WIDTH 12
 }
 
-set dac_fifo_address_width $ad_project_params(DAC_FIFO_ADDRESS_WIDTH)
+set dac_offload_type $ad_project_params(DAC_OFFLOAD_TYPE)
+set dac_offload_size $ad_project_params(DAC_OFFLOAD_SIZE)
+set plddr_offload_axi_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 set ENCODER_SEL 1
 set LANE_RATE $ad_project_params(LANE_RATE)
 set MAX_NUM_OF_CONVERTERS 4
@@ -237,10 +236,10 @@ ad_connect rx_device_clk i_rx_jesd_exerciser/device_clk
 ad_connect rx_device_clk i_rx_jesd_exerciser/link_clk
 ad_connect ref_clk_ex i_rx_jesd_exerciser/ref_clk
 
-set_property -dict [list CONFIG.NUM_MI {18}] [get_bd_cells axi_axi_interconnect]
-ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M17_AXI
-ad_connect sys_cpu_clk axi_axi_interconnect/M17_ACLK
-ad_connect sys_cpu_resetn axi_axi_interconnect/M17_ARESETN
+set_property -dict [list CONFIG.NUM_MI {19}] [get_bd_cells axi_axi_interconnect]
+ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M18_AXI
+ad_connect sys_cpu_clk axi_axi_interconnect/M18_ACLK
+ad_connect sys_cpu_resetn axi_axi_interconnect/M18_ARESETN
 
 create_bd_port -dir O ex_rx_sync
 ad_connect ex_rx_sync i_rx_jesd_exerciser/rx_sync_0
@@ -259,10 +258,10 @@ ad_connect tx_device_clk i_tx_jesd_exerciser/device_clk
 ad_connect tx_link_clk i_tx_jesd_exerciser/link_clk
 ad_connect ref_clk_ex i_tx_jesd_exerciser/ref_clk
 
-set_property -dict [list CONFIG.NUM_MI {19}] [get_bd_cells axi_axi_interconnect]
-ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M18_AXI
-ad_connect sys_cpu_clk axi_axi_interconnect/M18_ACLK
-ad_connect sys_cpu_resetn axi_axi_interconnect/M18_ARESETN
+set_property -dict [list CONFIG.NUM_MI {20}] [get_bd_cells axi_axi_interconnect]
+ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M19_AXI
+ad_connect sys_cpu_clk axi_axi_interconnect/M19_ACLK
+ad_connect sys_cpu_resetn axi_axi_interconnect/M19_ARESETN
 
 create_bd_port -dir I ex_tx_sync
 ad_connect ex_tx_sync i_tx_jesd_exerciser/tx_sync_0
@@ -290,10 +289,10 @@ ad_connect tx_os_device_clk i_tx_os_jesd_exerciser/device_clk
 ad_connect tx_os_device_clk i_tx_os_jesd_exerciser/link_clk
 ad_connect ref_clk_ex i_tx_os_jesd_exerciser/ref_clk
 
-set_property -dict [list CONFIG.NUM_MI {20}] [get_bd_cells axi_axi_interconnect]
-ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M19_AXI
-ad_connect sys_cpu_clk axi_axi_interconnect/M19_ACLK
-ad_connect sys_cpu_resetn axi_axi_interconnect/M19_ARESETN
+set_property -dict [list CONFIG.NUM_MI {21}] [get_bd_cells axi_axi_interconnect]
+ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M20_AXI
+ad_connect sys_cpu_clk axi_axi_interconnect/M20_ACLK
+ad_connect sys_cpu_resetn axi_axi_interconnect/M20_ARESETN
 
 create_bd_port -dir I ex_tx_os_sync
 ad_connect ex_tx_os_sync i_tx_os_jesd_exerciser/tx_sync_0
@@ -320,6 +319,10 @@ adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
 set TX_DMA 0x7C420000
 set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_dma}]
 adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
+
+set TX_OFFLOAD 0x7C430000
+set_property offset $TX_OFFLOAD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_adrv9009_data_offload}]
+adi_sim_add_define "TX_OFFLOAD_BA=[format "%d" ${TX_OFFLOAD}]"
 
 set RX_DMA 0x7C400000
 set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_dma}]

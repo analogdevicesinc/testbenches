@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -139,8 +139,7 @@ module system_tb();
     .dac_os_data_3(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*3 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
     
     .dac_fir_filter_active (1'b0),
-    .adc_fir_filter_active (1'b0),
-    .dac_fifo_bypass (1'b0)
+    .adc_fir_filter_active (1'b0)
   );
 
   reg [RX_DMA_NP-1:0] sample = 'h0;

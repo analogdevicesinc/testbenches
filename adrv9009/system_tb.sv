@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -67,13 +67,15 @@ module system_tb();
     .ref_clk_out(ref_clk_ex),
     .rx_device_clk_out(rx_device_clk),
     .tx_device_clk_out(tx_device_clk),
+    .tx_link_clk_out(tx_link_clk),
     .tx_os_device_clk_out(tx_os_device_clk),
     .sysref_clk_out(sysref),
 
     .rx_device_clk(rx_device_clk),
     .tx_device_clk(tx_device_clk),
+    .tx_link_clk(tx_link_clk),
     .tx_os_device_clk(tx_os_device_clk),
-    .ref_clk(tx_device_clk),
+    .ref_clk(rx_device_clk),
     .ref_clk_ex(ref_clk_ex),
     .sysref(sysref),
     .tx_sysref_0(sysref),
@@ -143,40 +145,36 @@ module system_tb();
 
   reg [RX_DMA_NP-1:0] sample = 'h0;
   integer sample_counter = 0;
-  always @(posedge tx_device_clk) begin
+  always @(posedge `TH.i_tx_jesd_exerciser.device_clk) begin
     for (int i = 0; i < `RX_JESD_M; i++) begin
       for (int j = 0; j < RX_SAMPLES_PER_CHANNEL; j++) begin
-        // First 256 sample is channel count on each nibble
-        // Next 256 sample is channel count on MS nibble and incr pattern
-        if (sample_counter[9] | 1) begin
-          sample[RX_DMA_NP-1 -: 4] = i;
-          sample[7:0] = sample_counter+j;
+        // Test incrementing data on consecutive samples
+        if (`TH.i_tx_jesd_exerciser.tx_tpl_core.dac_enable_0) begin
+          sample = sample_counter+`RX_JESD_M*j+i;
         end else begin
-          sample = {4{i[3:0]}};
+          sample = 'h0;
         end
         tx_ex_dac_data[RX_DMA_NP*(RX_SAMPLES_PER_CHANNEL*i+j) +:RX_DMA_NP] = sample;
       end
     end
-    sample_counter = sample_counter + RX_SAMPLES_PER_CHANNEL;
+    sample_counter = sample_counter + `RX_JESD_M*RX_SAMPLES_PER_CHANNEL;
   end
 
   reg [RX_OS_DMA_NP-1:0] sample1 = 'h0;
   integer sample_counter1 = 0;
-  always @(posedge tx_os_device_clk) begin
+  always @(posedge `TH.i_tx_os_jesd_exerciser.device_clk) begin
     for (int i = 0; i < `RX_OS_JESD_M; i++) begin
       for (int j = 0; j < RX_OS_SAMPLES_PER_CHANNEL; j++) begin
-        // First 256 sample is channel count on each nibble
-        // Next 256 sample is channel count on MS nibble and incr pattern
-        if (sample_counter1[9] | 1) begin
-          sample1[RX_OS_DMA_NP-1 -: 4] = i;
-          sample1[7:0] = sample_counter1+j;
+        // Test incrementing data on consecutive samples
+        if (`TH.i_tx_os_jesd_exerciser.tx_tpl_core.dac_enable_0) begin
+          sample1 = sample_counter1+`RX_OS_JESD_M*j+i;
         end else begin
-          sample1 = {4{i[3:0]}};
+          sample1 = 'h0;
         end
         tx_os_ex_dac_data[RX_OS_DMA_NP*(RX_OS_SAMPLES_PER_CHANNEL*i+j) +:RX_OS_DMA_NP] = sample1;
       end
     end
-    sample_counter1 = sample_counter1 + RX_OS_SAMPLES_PER_CHANNEL;
+    sample_counter1 = sample_counter1 + `RX_OS_JESD_M*RX_OS_SAMPLES_PER_CHANNEL;
   end
 
 endmodule

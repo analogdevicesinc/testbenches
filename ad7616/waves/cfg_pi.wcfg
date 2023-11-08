@@ -5,7 +5,7 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
-            <top_module name="\$unit_logger_pkg_sv " />
+            <top_module name="\$unit_logger_pkg_sv_4101713013 " />
             <top_module name="axi4stream_vip_pkg" />
             <top_module name="axi_vip_pkg" />
             <top_module name="glbl" />
@@ -25,11 +25,53 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0 ps"></ZoomStartTime>
-      <ZoomEndTime time="-11 ps"></ZoomEndTime>
-      <Cursor1Time time="0 ps"></Cursor1Time>
+      <ZoomStartTime time="30,754,996 ps"></ZoomStartTime>
+      <ZoomEndTime time="30,755,001 ps"></ZoomEndTime>
+      <Cursor1Time time="30,755,000 ps"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
+      <NameColumnWidth column_width="236"></NameColumnWidth>
+      <ValueColumnWidth column_width="135"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="0" />
+   <WVObjectSize size="10" />
+   <wvobject type="array" fp_name="/system_tb/\genblk1.test /rx_db_i">
+      <obj_property name="ElementShortName">rx_db_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_db_i[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/\genblk1.test /rx_db_t">
+      <obj_property name="ElementShortName">rx_db_t</obj_property>
+      <obj_property name="ObjectShortName">rx_db_t</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/\genblk1.test /rx_rd_n">
+      <obj_property name="ElementShortName">rx_rd_n</obj_property>
+      <obj_property name="ObjectShortName">rx_rd_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/\genblk1.test /rx_wr_n">
+      <obj_property name="ElementShortName">rx_wr_n</obj_property>
+      <obj_property name="ObjectShortName">rx_wr_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/\genblk1.test /rx_cs_n">
+      <obj_property name="ElementShortName">rx_cs_n</obj_property>
+      <obj_property name="ObjectShortName">rx_cs_n</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/\genblk1.test /rx_db_o">
+      <obj_property name="ElementShortName">rx_db_o[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_db_o[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/\genblk1.test /sys_clk">
+      <obj_property name="ElementShortName">sys_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/\genblk1.test /rx_busy">
+      <obj_property name="ElementShortName">rx_busy</obj_property>
+      <obj_property name="ObjectShortName">rx_busy</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/\genblk1.test /dma_data_store_arr">
+      <obj_property name="ElementShortName">dma_data_store_arr[9:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">dma_data_store_arr[9:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/\genblk1.test /captured_word_arr">
+      <obj_property name="ElementShortName">captured_word_arr[9:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">captured_word_arr[9:0][31:0]</obj_property>
+   </wvobject>
 </wave_config>

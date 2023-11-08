@@ -15,6 +15,26 @@ source "cfgs/${cfg_file}"
 # Set the project name
 set project_name [file rootname $cfg_file]
 
+# Set project params
+global ad_project_params
+
+set SER_PAR_N $ad_project_params(SER_PAR_N)
+
+#set a default test program
+if {$SER_PAR_N == 1} {
+  adi_sim_add_define "TEST_PROGRAM=test_program_si"
+} elseif {$SER_PAR_N == 0} {
+  adi_sim_add_define "TEST_PROGRAM=test_program_pi"
+} else {
+  adi_sim_add_define "TEST_PROGRAM=test_program_si"
+}
+
+#global mng_axi_cfg
+global use_smartconnect
+if {[expr {![info exists use_smartconnect]}]} {
+  set use_smartconnect 1
+}
+
 # Create the project
 adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
@@ -36,8 +56,5 @@ adi_sim_project_files [list \
  "tests/test_program_si.sv" \
  "tests/test_program_pi.sv" \
  "system_tb.sv"]
-
-#set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_program_si"
 
 adi_sim_generate $project_name

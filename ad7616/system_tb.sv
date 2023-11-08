@@ -39,7 +39,7 @@
 
 module system_tb();
     generate
-    if (`SI_OR_PI == 0) begin
+    if (`SER_PAR_N == 1) begin //serial interface
       wire       ad7616_spi_sclk;
       wire       ad7616_spi_sdo;
       wire [1:0] ad7616_spi_sdi;
@@ -48,27 +48,27 @@ module system_tb();
       wire       adc_cnvst;
       wire       spi_clk;
       wire       irq;
-  
+
     `TEST_PROGRAM test(
       .spi_clk (spi_clk),
       .irq (irq),
       .ad7616_spi_sdi(ad7616_spi_sdi),
       .ad7616_spi_cs (ad7616_spi_cs),
-      .ad7616_spi_sclk (ad7616_spi_sclk));   
-  
+      .ad7616_spi_sclk (ad7616_spi_sclk));
+
     test_harness `TH (
       .spi_clk (spi_clk),
       .irq (irq),
       .rx_busy (adc_busy),
       .rx_cnvst (adc_cnvst),
-      .ad7616_spi_sdo (ad7616_spi_sdo),  
-      .ad7616_spi_sdi (ad7616_spi_sdi),  
+      .ad7616_spi_sdo (ad7616_spi_sdo),
+      .ad7616_spi_sdi (ad7616_spi_sdi),
       .ad7616_spi_cs (ad7616_spi_cs),
       .ad7616_spi_sclk (ad7616_spi_sclk));
-      
+
       assign adc_busy = adc_cnvst;
     end
-    else
+    else //parallel interface
     begin
       wire        rx_cnvst;
       wire        rx_busy;
@@ -79,18 +79,17 @@ module system_tb();
       wire        rx_wr_n;
       wire        rx_cs_n;
       wire        sys_clk;
-  
+
     `TEST_PROGRAM test(
-      .rx_cnvst (rx_cnvst),
-      .rx_busy (rx_busy),
       .rx_db_i (rx_db_i),
       .rx_db_o (rx_db_o),
       .rx_db_t (rx_db_t),
       .rx_rd_n (rx_rd_n),
       .rx_wr_n (rx_wr_n),
       .rx_cs_n (rx_cs_n),
-      .sys_clk (sys_clk));
-  
+      .sys_clk (sys_clk),
+      .rx_busy (rx_busy));
+
      test_harness `TH (
       .rx_cnvst (rx_cnvst),
       .rx_busy (rx_busy),
@@ -101,8 +100,8 @@ module system_tb();
       .rx_wr_n (rx_wr_n),
       .rx_cs_n (rx_cs_n),
       .sys_clk (sys_clk));
-  
+
       assign rx_busy = rx_cnvst;
-    end    
+    end
     endgenerate
 endmodule

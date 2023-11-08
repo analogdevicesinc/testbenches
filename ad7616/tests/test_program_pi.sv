@@ -42,15 +42,14 @@ import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
-`define AD7616_DMA                      32'h44A3_0000
-`define AXI_AD7616                      32'h44A8_0000
-`define AXI_PWMGEN                      32'h44B0_0000
-`define DDR_BASE                        32'h8000_0000
+localparam AD7616_DMA                 = 32'h44A3_0000;
+localparam AXI_AD7616                 = 32'h44A8_0000;
+localparam AXI_CLKGEN                 = 32'h44A7_0000;
+localparam AXI_PWMGEN                 = 32'h44B0_0000;
+localparam DDR_BASE                   = 32'h8000_0000;
 
 localparam AD7616_CNVST_EN            = 32'h0000_0440;
 localparam AD7616_CNVST_RATE          = 32'h0000_0444;
-
-localparam AD7616_BASE = `AXI_AD7616;
 
 localparam AD7616_PI_ADDR_PCORE_VERSION  = 32'h0000_0400;
 localparam AD7616_PI_ADDR_ID             = 32'h0000_0404;
@@ -66,7 +65,6 @@ localparam AD7616_CTRL_CNVST_EN          = 2;
 localparam NUM_OF_TRANSFERS              = 10;
 
 program test_program_pi (
-  input         rx_cnvst,
   output [15:0] rx_db_i,
   input         rx_db_t,
   input         rx_rd_n,
@@ -74,10 +72,7 @@ program test_program_pi (
   output        rx_cs_n,
   input  [15:0] rx_db_o,
   input         sys_clk,
-  output        rx_busy);
-
-assign rx_db_i = tx_data_buf;
-assign rx_busy = rx_cnvst;
+  input         rx_busy);
 
 test_harness_env env;
 
@@ -136,11 +131,6 @@ initial begin
 
   #100
 
-  //reg mode rd wr test
-
-  #100
-
-  //dma_parallel_test;
   data_acquisition_test;
 
   `INFO(("Test Done"));
@@ -152,13 +142,21 @@ end
 wire        rx_rd_n_negedge_s;
 wire        rx_rd_n_posedge_s;
 reg         rx_rd_n_d;
+reg         rx_rd_n_tmp;
 reg [15:0]  tx_data_buf = 16'ha1b2;
 bit [31:0]  dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
+bit [31:0] transfer_cnt;
+bit transfer_status = 0;
+
+assign rx_db_i = tx_data_buf;
 
 initial begin
   while(1) begin
     @(posedge sys_clk);
-      rx_rd_n_d <= rx_rd_n;
+    rx_rd_n_tmp <= rx_rd_n;
+    fork
+      rx_rd_n_d <= rx_rd_n_tmp;
+    join_none
   end
 end
 
@@ -167,18 +165,18 @@ assign rx_rd_n_posedge_s = rx_rd_n & ~rx_rd_n_d;
 
 initial begin
   while(1) begin
-    @(posedge sys_clk);
-    if (rx_rd_n_negedge_s) begin
+    @(negedge rx_rd_n);
       tx_data_buf <= tx_data_buf + 16'h0808;
-
-      if (transfer_cnt[0]) begin
-        dma_data_store_arr [(transfer_cnt - 1) >> 1] [15:0] = tx_data_buf;
-      end else begin
-        dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = tx_data_buf;
-      end
-    end
+      if (transfer_status)
+        if (transfer_cnt[0]) begin
+          dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = tx_data_buf;
+        end else begin
+          dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = tx_data_buf;
+        end
+      @(posedge rx_rd_n);
   end
 end
+
 
 //---------------------------------------------------------------------------
 // Sanity test reg interface
@@ -186,8 +184,8 @@ end
 
 task sanity_test;
 begin
-  #100 axi_write (AD7616_BASE + AD7616_PI_ADDR_SCRATCH, 32'hDEADBEEF);
-  #100 axi_read_v (AD7616_BASE + AD7616_PI_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_write (AXI_AD7616 + AD7616_PI_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_read_v (AXI_AD7616 + AD7616_PI_ADDR_SCRATCH, 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -196,70 +194,78 @@ endtask
 // Transfer Counter
 //---------------------------------------------------------------------------
 
-bit [31:0] transfer_cnt;
-
 initial begin
   while(1) begin
-    @(posedge rx_rd_n_negedge_s && transfer_status);
-      transfer_cnt <= transfer_cnt + 'h1;
-  end
+    @(posedge rx_rd_n);
+  if (transfer_status)
+        transfer_cnt <= transfer_cnt + 'h1;
+        @(negedge rx_rd_n);
+    end
 end
 
 //---------------------------------------------------------------------------
-// Data Acquisition Test ?? TBD
+// Data Acquisition Test
 //---------------------------------------------------------------------------
 
 reg [31:0] rdata_reg;
 bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
-bit transfer_status = 0;
+
 
 task data_acquisition_test;
   begin
-
-    //Configure DMA
-    env.mng.RegWrite32(`AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`AD7616_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
-    env.mng.RegWrite32(`AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
-
-    #100 axi_write (AD7616_BASE + AD7616_PI_ADDR_CTRL, 32'h0);
-    #100 axi_write (AD7616_BASE + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN);
-    #100 axi_write (AD7616_BASE + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN | AD7616_CTRL_CNVST_EN);
-
-    #10000
-
-    #100 axi_write (AD7616_BASE + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN);
+    // Start spi clk generator
+    axi_write (AXI_CLKGEN + 32'h00000040, 32'h0000003);
 
     // Configure pwm gen
-    #100 axi_write (`AXI_PWMGEN + 32'h00000010, 32'h00000000);
-    #100 axi_write (`AXI_PWMGEN + 32'h00000040, 'h64);
-    #100 axi_write (`AXI_PWMGEN + 32'h00000010, 32'h00000002);
+    axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000001);
+    axi_write (AXI_PWMGEN + 32'h00000040, 'h64);
+    axi_write (AXI_PWMGEN + 32'h00000080, 'h1);
+    axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000002);
+    $display("[%t] axi_pwm_gen started.", $time);
 
-    #100
+     //Configure DMA
+    axi_write (AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
+    axi_write (AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
+    axi_write (AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
+    axi_write (AD7616_DMA+32'h410, DDR_BASE); // DEST_ADDRESS
+
+    //Configure AXI_AD7616
+    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, 32'h0);
+    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN);
+    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN | AD7616_CTRL_CNVST_EN);
+    #10000
+    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN);
+
+    @(negedge rx_busy)
+    #200
+
     transfer_status = 1;
 
-    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS);
+    axi_write (AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+
+    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
     #100
+    @(negedge rx_rd_n_negedge_s);
+    @(posedge sys_clk);
     transfer_status = 0;
 
     // Stop pwm gen
-    #100 axi_write (`AXI_PWMGEN + 32'h00000010, 32'h00000001);
+    axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000001);
     $display("[%t] axi_pwm_gen stopped.", $time);
 
     #200
-    #100 axi_write (AD7616_BASE + AD7616_PI_ADDR_WDATA, 32'hdead);
-    #100 axi_read  (AD7616_BASE + AD7616_PI_ADDR_RDATA, rdata_reg);
+    axi_write (AXI_AD7616 + AD7616_PI_ADDR_WDATA, 32'hdead);
+    axi_read  (AXI_AD7616 + AD7616_PI_ADDR_RDATA, rdata_reg);
 
     #2000
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
+      captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(DDR_BASE + 4*i);
     end
 
-    if (captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
+    if (captured_word_arr  != dma_data_store_arr) begin
       `ERROR(("Data Acquisition Test FAILED"));
     end else begin
       `INFO(("Data Acquisition Test PASSED"));

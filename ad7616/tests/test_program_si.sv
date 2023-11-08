@@ -47,6 +47,8 @@ import test_harness_env_pkg::*;
 `define AXI_PWMGEN                      32'h44B0_0000
 `define DDR_BASE                        32'h8000_0000
 
+localparam AXI_CLKGEN                 = 32'h44A7_0000;
+
 localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
 localparam SPI_ENG_ADDR_ID            = 32'h0000_0004;
 localparam SPI_ENG_ADDR_SCRATCH       = 32'h0000_0008;
@@ -294,7 +296,6 @@ initial begin
   end
 end
 
-
 //---------------------------------------------------------------------------
 // SDI data generator
 //---------------------------------------------------------------------------
@@ -434,7 +435,6 @@ initial begin
   end
 end
 
-
 //---------------------------------------------------------------------------
 // Offload SPI Test
 //---------------------------------------------------------------------------
@@ -445,26 +445,26 @@ task offload_spi_test;
   begin
 
     //config cnv
-    #100 axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000000);
+    #100 axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000001);
     #100 axi_write (AXI_PWMGEN + 32'h00000040, 'h64);
     #100 axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000002);
 
     //Configure DMA
-    env.mng.RegWrite32(`AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`AD7616_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
-    env.mng.RegWrite32(`AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    #100 axi_write (`AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
+    #100 axi_write (`AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
+    #100 axi_write (`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
+    #100 axi_write (`AD7616_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
+    #100 axi_write (`AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Configure the Offload module
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
-    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
 
     offload_status = 1;
 
@@ -504,6 +504,9 @@ bit   [31:0]  sdi_fifo_data = 0;
 
 task fifo_spi_test;
 begin
+
+  // Start spi clk generator
+  axi_write (AXI_CLKGEN + 32'h00000040, 32'h0000003);
 
   axi_write (AD7616_BASE + AD7616_CNVST_EN, 32'h00000003);
   axi_write (AD7616_BASE + AD7616_CNVST_RATE, 32'h00000128);

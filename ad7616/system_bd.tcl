@@ -36,7 +36,7 @@
 source ../../scripts/adi_env.tcl
 
 # system level parameters
-set SI_OR_PI  $ad_project_params(SI_OR_PI)
+set SER_PAR_N  $ad_project_params(SER_PAR_N)
 
 global ad_project_params
 
@@ -50,7 +50,7 @@ adi_project_files [list \
 
 source ../../projects/ad7616_sdz/common/ad7616_bd.tcl
 
-if {$SI_OR_PI == 0} {
+if {$SER_PAR_N == 1} {
 
   create_bd_port -dir O spi_clk
   create_bd_port -dir O irq
@@ -58,12 +58,10 @@ if {$SI_OR_PI == 0} {
   ad_connect spi_clk sys_cpu_clk
   ad_connect irq spi_ad7616/irq
 
-} elseif {$SI_OR_PI == 1} {
+} else {
 
   create_bd_port -dir O sys_clk
-  create_bd_port -dir O irq
-
+  ad_disconnect  spi_clk ad7616_pwm_gen/ext_clk
+  ad_connect  sys_cpu_clk ad7616_pwm_gen/ext_clk
   ad_connect sys_clk sys_cpu_clk
-  ad_connect irq axi_ad7616/irq
-
 }

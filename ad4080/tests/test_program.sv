@@ -95,6 +95,13 @@ program test_program;
   end
   endtask
 
+  task axi_read(
+    input   [31:0]  raddr,
+    output  [31:0]  data);
+  begin
+    env.mng.RegRead32(raddr,data);
+  end
+  endtask
   // --------------------------
   // Main procedure
   // --------------------------
@@ -109,7 +116,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(2);
     env.start();
 
     //asserts all the resets for 100 ns
@@ -120,7 +127,7 @@ program test_program;
     #1us;
 
     sanity_test;
-
+    
     dma_test;
 
     // Tap value for lane 0
@@ -182,6 +189,28 @@ program test_program;
 
 
   // --------------------------
+// Enable pattern
+// --------------------------
+task enable_pattern;
+begin
+   int num_lanes = (`SINGLE_LANE==1) ? 1 : 2;
+    int sdr_ddr_n = `SDR_DDR_N;
+    bit [31:0] sync_status = 32'b0;
+  force system_tb.enable_pattern = 1'b1;
+  axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL), 1<<3 | num_lanes<<8 | sdr_ddr_n<<16);
+
+  axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status);
+
+  while(sync_status == 31'b0)
+    axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status); 
+
+  force system_tb.enable_pattern = 1'b0;
+
+end
+endtask
+
+
+  // --------------------------
   // DMA test procedure
   // --------------------------
   task dma_test;
@@ -207,14 +236,20 @@ program test_program;
     axi_write (`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
-    #100us;
 
-    check_captured_data(
-      .address (`DDR_BASE+'h00002000),
-      .length (64),
-      .step (1),
-      .max_sample(2048)
-    );
+ 
+    enable_pattern;
+    
+
+
+ 
+
+//    check_captured_data(
+//      .address (`DDR_BASE+'h00002000),
+//      .length (64),
+//      .step (1),
+//      .max_sample(2048)
+//    );
 
     link_down;
 

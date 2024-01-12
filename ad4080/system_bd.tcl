@@ -33,7 +33,7 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../library/scripts/adi_env.tcl
+source ../../scripts/adi_env.tcl
 
 global ad_project_params
 
@@ -41,6 +41,6 @@ global ad_project_params
 #  Block design under test
 #
 #
-source $ad_hdl_dir/../ghdl/projects/mach1/common/mach1_bd.tcl
+source $ad_hdl_dir/projects/ad408x_fmc_evb/common/ad408x_fmc_evb_bd.tcl
 
 

@@ -28,57 +28,49 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="30.600001 us"></ZoomEndTime>
-      <Cursor1Time time="2.283000 us"></Cursor1Time>
+      <ZoomStartTime time="7,067.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="8,359.001 ns"></ZoomEndTime>
+      <Cursor1Time time="8,215.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="220"></NameColumnWidth>
-      <ValueColumnWidth column_width="165"></ValueColumnWidth>
+      <ValueColumnWidth column_width="133"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="11" />
-   <wvobject type="logic" fp_name="/system_tb/cnv_clk">
-      <obj_property name="ElementShortName">cnv_clk</obj_property>
-      <obj_property name="ObjectShortName">cnv_clk</obj_property>
+   <WVObjectSize size="9" />
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/sync_n">
+      <obj_property name="ElementShortName">sync_n</obj_property>
+      <obj_property name="ObjectShortName">sync_n</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/ssi_clk">
-      <obj_property name="ElementShortName">ssi_clk</obj_property>
-      <obj_property name="ObjectShortName">ssi_clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/dco_p">
+      <obj_property name="ElementShortName">dco_p</obj_property>
+      <obj_property name="ObjectShortName">dco_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/dclk_in_p">
-      <obj_property name="ElementShortName">dclk_in_p</obj_property>
-      <obj_property name="ObjectShortName">dclk_in_p</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/da_p">
+      <obj_property name="ElementShortName">da_p</obj_property>
+      <obj_property name="ObjectShortName">da_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/data_a_in_p">
-      <obj_property name="ElementShortName">data_a_in_p</obj_property>
-      <obj_property name="ObjectShortName">data_a_in_p</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/db_p">
+      <obj_property name="ElementShortName">db_p</obj_property>
+      <obj_property name="ObjectShortName">db_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/data_b_in_p">
-      <obj_property name="ElementShortName">data_b_in_p</obj_property>
-      <obj_property name="ObjectShortName">data_b_in_p</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/cnv_in_p">
+      <obj_property name="ElementShortName">cnv_in_p</obj_property>
+      <obj_property name="ObjectShortName">cnv_in_p</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/adc_data">
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/serdes_reset_s">
+      <obj_property name="ElementShortName">serdes_reset_s</obj_property>
+      <obj_property name="ObjectShortName">serdes_reset_s</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/adc_data">
       <obj_property name="ElementShortName">adc_data[31:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data[31:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/adc_valid">
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/adc_valid">
       <obj_property name="ElementShortName">adc_valid</obj_property>
       <obj_property name="ObjectShortName">adc_valid</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/shift_cnt">
-      <obj_property name="ElementShortName">shift_cnt[4:0]</obj_property>
-      <obj_property name="ObjectShortName">shift_cnt[4:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/ad4080_phy/inst/packed_data">
-      <obj_property name="ElementShortName">packed_data[19:0]</obj_property>
-      <obj_property name="ObjectShortName">packed_data[19:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/packed_data_valid">
-      <obj_property name="ElementShortName">packed_data_valid</obj_property>
-      <obj_property name="ObjectShortName">packed_data_valid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/ad4080_phy/inst/serdes_reset_s">
-      <obj_property name="ElementShortName">serdes_reset_s</obj_property>
-      <obj_property name="ObjectShortName">serdes_reset_s</obj_property>
+   <wvobject type="array" fp_name="/system_tb/final_sample">
+      <obj_property name="ElementShortName">final_sample[19:0]</obj_property>
+      <obj_property name="ObjectShortName">final_sample[19:0]</obj_property>
    </wvobject>
 </wave_config>

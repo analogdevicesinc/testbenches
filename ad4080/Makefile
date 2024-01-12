@@ -28,11 +28,11 @@ ENV_DEPS += system_bd.tcl
 ENV_DEPS +=../scripts/adi_sim.tcl
 ENV_DEPS +=../scripts/run_sim.tcl
 
-#LIB_DEPS += ad4080_phy
+LIB_DEPS += axi_ad408x
 LIB_DEPS += axi_dmac
 LIB_DEPS += axi_sysid
 LIB_DEPS += sysid_rom
-LIB_DEPS += axi_generic_adc
+
 
 # default test program
 TP := test_program

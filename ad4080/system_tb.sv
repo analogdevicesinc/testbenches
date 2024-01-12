@@ -44,7 +44,7 @@
 module system_tb #(
 ) ();
 
-  localparam DCO_HALF_PERIOD = 10;
+  localparam DCO_HALF_PERIOD = 2.5;
   localparam BITS_PER_CYCLE = (`SINGLE_LANE ? 1 : 2) * (`SDR_DDR_N==1 ? 1 : 2);
   localparam CNV_HALF_PERIOD_COR = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
   localparam CNV_HALF_PERIOD = `EN_UNCOR ? 4 * CNV_HALF_PERIOD_COR : CNV_HALF_PERIOD_COR;
@@ -54,7 +54,7 @@ module system_tb #(
   reg sync_n = 1'b0;
   reg ssi_clk = 1'b0;
   reg cnv_clk = 1'b0;
-
+  reg enable_pattern = 1'b0;
   reg dco_p = 1'b0;
   reg dco_n = 1'b1;
 
@@ -69,7 +69,8 @@ module system_tb #(
     .db_p (db_p),
     .db_n (db_n),
     .sync_n (sync_n),
-    .uncorrected_mode (`EN_UNCOR)
+    .cnv_in_p(cnv_clk),
+    .cnv_in_n(~cnv_clk)
 
   );
 
@@ -116,7 +117,8 @@ module system_tb #(
   reg da_n = 1'b1;
   reg db_p = 1'b0;
   reg db_n = 1'b1;
-
+  wire [19:0] final_sample;
+  assign final_sample = (enable_pattern) ? 20'hac5d6 : sample;
   `ifdef M1
   always @(negedge cnv_clk) begin
   `else
@@ -131,11 +133,12 @@ module system_tb #(
           drive_sample(~sample);
           drive_sample({20{1'b0}});
         end
-        drive_sample(sample);
+         drive_sample(final_sample);
       end
     join_none
     #1;
     sample = sample + 1;
+  
    // sample = {sample[18:0],sample[19]};
   end
 
@@ -157,6 +160,8 @@ module system_tb #(
         if (`SINGLE_LANE == 1) begin
           da_p <= sample_t[i-1];
           da_n <= ~sample_t[i-1];
+          db_p <= 1'b0;
+          db_n <= 1'b0;
         end else begin
           da_p <= sample_t[i-2];
           da_n <= ~sample_t[i-2];

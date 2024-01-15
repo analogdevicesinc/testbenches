@@ -62,10 +62,7 @@ endif
 # This rule template will build the environment
 # $(1): configuration name
 define build
-$(addprefix runs/,$(1)/system_project.log) : library $(addprefix cfgs/,$(1).tcl) $(ENV_DEPS)
-ifeq ($(RUN), sim)
-	touch $(addprefix runs/,$(1)/system_project.log)
-else
+$(addprefix runs/,$(1)/system_project.log) : $(addprefix cfgs/,$(1).tcl) $(ENV_DEPS)
 	-rm -rf $(addprefix runs/,$(1))
 	mkdir -p runs
 	mkdir -p $(addprefix runs/,$(1))
@@ -76,7 +73,6 @@ else
 		Building $(HL)$(strip $(1))$(NC) env, \
 		$(1), \
 		BuildEnv)
-endif
 endef
 
 # This rule template will run the simulation
@@ -84,13 +80,14 @@ endef
 # $(2): test name
 define sim
 $(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
-$(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS)
+$(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS) FORCE
 	$(RUN_PRE_OPT)$$(call simulate, \
 		$(CMD_PRE) $(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST), \
 		$$@, \
 		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
 		$(1), \
 		$(2))
+FORCE:
 endef
 
 # Run an arbitrary test on an arbitrary configuration by taking
@@ -124,7 +121,7 @@ $(foreach cfg_test, $(TESTS),\
 # Make list unique
 BUILD_CFGS := $(sort $(BUILD_CFGS))
 
-.PHONY: all library clean $(BUILD_CFGS)
+.PHONY: all clean $(BUILD_CFGS)
 
 all: $(BUILD_CFGS) 
 
@@ -133,10 +130,14 @@ clean:
 	-rm -rf results
 	-rm -rf vivado*
 
-library:
-	@for lib in $(LIB_DEPS); do \
-		$(MAKE) -C $(HDL_LIBRARY_PATH)$${lib} xilinx || exit $$?; \
-	done
+# Create here the targets which build the libraries
+$(HDL_LIBRARY_PATH)%/component.xml: TARGET:=xilinx
+FORCE:
+$(HDL_LIBRARY_PATH)%/component.xml: FORCE
+	flock $(dir $@).lock -c " \
+	$(MAKE) -C $(dir $@) $(TARGET); \
+	"; exit $$?
+FORCE:
 
 # Create here the targets which build the test env
 $(foreach cfg, $(BUILD_CFGS), $(eval $(call build, $(cfg))))

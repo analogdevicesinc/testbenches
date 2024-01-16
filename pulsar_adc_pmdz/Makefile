@@ -37,17 +37,17 @@ LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
 LIB_DEPS += sysid_rom
 
-# default test program
-TP := test_program
+# default test programs
+# Format is: <test name>
+TP := $(notdir $(basename $(wildcard tests/*.sv)))
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl
 CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
-#$(warning $(CFG_FILES))
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
-TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
+TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(addprefix $(cfg):, $(TP)))
 
 include ../scripts/project-sim.mk
 

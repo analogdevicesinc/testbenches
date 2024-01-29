@@ -38,10 +38,16 @@ set ddr_axi_cfg [list \
 ad_ip_instance axi_vip mng_axi_vip $mng_axi_cfg
 adi_sim_add_define "MNG_AXI=mng_axi_vip"
 
-
 # Create data storage DDR controller (AXI slave)
 ad_ip_instance axi_vip ddr_axi_vip $ddr_axi_cfg
 adi_sim_add_define "DDR_AXI=ddr_axi_vip"
+
+# Create AXI Protocol Converter
+ad_ip_instance axi_protocol_converter axi_mem_converter
+set_property -dict [list \
+  CONFIG.MI_PROTOCOL {AXI4} \
+  CONFIG.SI_PROTOCOL {AXI4LITE} \
+] [get_bd_cells axi_mem_converter]
 
 # Interrupt controller
 ad_ip_instance axi_intc axi_intc
@@ -155,14 +161,18 @@ ad_mem_hp0_interconnect sys_mem_clk ddr_axi_vip/S_AXI
 
 # connect mng_vip to ddr_vip
 set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells axi_cpu_interconnect]
-ad_connect axi_cpu_interconnect/M01_AXI /axi_mem_interconnect/S00_AXI
 
 global sys_mem_clk_index
 if { $use_smartconnect == 1} {
   incr sys_mem_clk_index
   set_property CONFIG.NUM_CLKS [expr $sys_mem_clk_index +1] [get_bd_cells axi_mem_interconnect]
   ad_connect sys_cpu_clk axi_mem_interconnect/ACLK$sys_mem_clk_index
+  ad_connect sys_cpu_clk axi_mem_converter/aclk
+  ad_connect sys_cpu_resetn axi_mem_converter/aresetn
+  ad_connect axi_mem_converter/M_AXI /axi_mem_interconnect/S00_AXI
+  ad_connect axi_cpu_interconnect/M01_AXI /axi_mem_converter/S_AXI
 } else {
+  ad_connect axi_cpu_interconnect/M01_AXI /axi_mem_interconnect/S00_AXI
   ad_connect sys_cpu_clk axi_cpu_interconnect/M01_ACLK
   ad_connect sys_cpu_clk axi_mem_interconnect/S00_ACLK
   ad_connect sys_cpu_resetn axi_cpu_interconnect/M01_ARESETN

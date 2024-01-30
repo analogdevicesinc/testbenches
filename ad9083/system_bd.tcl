@@ -221,7 +221,7 @@ ad_xcvrpll dac_jesd204_xcvr/up_pll_rst util_jesd204_xcvr/up_qpll_rst_*
 ad_xcvrpll dac_jesd204_xcvr/up_pll_rst util_jesd204_xcvr/up_cpll_rst_*
 ad_connect  $sys_cpu_resetn util_jesd204_xcvr/up_rstn
 
-ad_disconnect $sys_cpu_resetn axi_mem_interconnect/aresetn
+ad_disconnect $sys_mem_resetn axi_mem_interconnect/aresetn
 ad_connect    $sys_dma_resetn axi_mem_interconnect/aresetn
 
 ad_connect  sys_dma_rstgen/peripheral_reset ad9083_dac_fifo/dma_rst

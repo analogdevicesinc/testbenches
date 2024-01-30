@@ -72,6 +72,36 @@ package adi_peripheral_pkg;
       `INFO(("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch));
     endtask
 
+    // -----------------
+    // 
+    // -----------------
+    task axi_read_f(
+      input  [31:0] addr,
+      output [31:0] data);
+
+      this.bus.RegRead32(this.base_address + addr, data);
+    endtask: axi_read_f
+
+    // -----------------
+    //
+    // -----------------
+    task axi_write_f(
+      input [31:0] addr,
+      input [31:0] data);
+
+      this.bus.RegWrite32(this.base_address + addr, data);
+    endtask: axi_write_f
+
+    // -----------------
+    //
+    // -----------------
+    task axi_verify_f(
+      input [31:0] addr,
+      input [31:0] data);
+
+      this.bus.RegReadVerify32(this.base_address + addr, data);
+    endtask: axi_verify_f
+
   endclass
 
 endpackage

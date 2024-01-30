@@ -21,7 +21,6 @@ SV_DEPS += ../common/sv/adi_regmap_adc_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_jesd_tx_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_jesd_rx_pkg.sv
 SV_DEPS += ../common/sv/dma_trans.sv
-SV_DEPS += ../common/sv/axi_dmac_pkg.sv
 SV_DEPS += ../common/sv/test_harness_env.sv
 SV_DEPS += system_tb.sv
 

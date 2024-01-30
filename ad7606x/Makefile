@@ -19,7 +19,6 @@ SV_DEPS += ../common/sv/adi_regmap_common_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_pwm_gen_pkg.sv
 SV_DEPS += ../common/sv/dma_trans.sv
-SV_DEPS += ../common/sv/axi_dmac_pkg.sv
 SV_DEPS += system_tb.sv
 
 ENV_DEPS +=../../library/util_cdc/sync_bits.v

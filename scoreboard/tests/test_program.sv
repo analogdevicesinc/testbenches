@@ -98,28 +98,15 @@ program test_program;
     // Setup generator/monitor stubs
     //=========================================================================
 
-    // ADC stub
-    env.adc_src_axis_seq_0.configure(1, 0);
-    env.adc_src_axis_seq_0.update(`ADC_TRANSFER_LENGTH, 0, 0);
-    env.adc_src_axis_seq_0.enable();
-
-    // DAC stub
-    env.dac_dst_axis_seq_0.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-
-    // ADC stub
-    env.adc_src_axis_seq_1.configure(1, 0);
-    env.adc_src_axis_seq_1.update(`ADC_TRANSFER_LENGTH, 0, 0);
-    env.adc_src_axis_seq_1.enable();
-
-    // DAC stub
-    env.dac_dst_axis_seq_1.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    // configure environment sequencers
+    env.configure(`ADC_TRANSFER_LENGTH);
 
     //=========================================================================
 
     setLoggerVerbosity(250);
     
-    env.sys_reset();
     env.start();
+    env.sys_reset();
 
     `INFO(("Bring up IP from reset."));
     systemBringUp();

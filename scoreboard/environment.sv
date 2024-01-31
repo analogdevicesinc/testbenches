@@ -140,6 +140,30 @@ package environment_pkg;
     endfunction
 
     //============================================================================
+    // Configure environment
+    //   - Configure the sequencer VIPs with an initial configuration before starting them
+    //============================================================================
+    task configure(int bytes_to_generate);
+
+      // ADC stub
+      adc_src_axis_seq_0.set_data_gen_mode(1);
+      adc_src_axis_seq_0.set_rand_valid(0);
+      adc_src_axis_seq_0.add_xfer_descriptor(bytes_to_generate, 0, 0);
+
+      // DAC stub
+      dac_dst_axis_seq_0.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+
+      // ADC stub
+      adc_src_axis_seq_1.set_data_gen_mode(1);
+      adc_src_axis_seq_1.set_rand_valid(0);
+      adc_src_axis_seq_1.add_xfer_descriptor(bytes_to_generate, 0, 0);
+
+      // DAC stub
+      dac_dst_axis_seq_1.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+
+    endtask
+
+    //============================================================================
     // Start environment
     //   - Connect all the agents to the scoreboard
     //   - Start the agents
@@ -157,6 +181,9 @@ package environment_pkg;
       dac_dst_axis_agent_1.start_slave();
       adc_dst_axi_pt_agent_1.start_monitor();
       dac_src_axi_pt_agent_1.start_monitor();
+
+      adc_src_axis_seq_0.start();
+      adc_src_axis_seq_1.start();
 
       scoreboard_tx0.set_source_stream(dac_src_axi_pt_0_mon, dac_src_axi_pt_0_mon.tx_mailbox);
       scoreboard_tx0.set_sink_stream(dac_dst_axis_0_mon, dac_dst_axis_0_mon.x_mailbox);

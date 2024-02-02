@@ -41,6 +41,8 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
+import adi_regmap_pwm_gen_pkg::*;
 
 `define AD469X_DMA                  32'h44A3_0000
 `define AD469X_REGMAP               32'h44A0_0000
@@ -538,14 +540,15 @@ bit   [31:0]  sdi_fifo_data = 0;
 task fifo_spi_test;
 begin
 
-  //start spi clk generator
-  #100 axi_write (AD469X_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+  // Start spi clk generator
+  axi_write (AD469X_CLKGEN_BASE + 32'h00000040, 32'h0000003);
 
-  //config cnv (with averaging)
-  #100 axi_write (AD469X_CNV_BASE + 32'h00000010, 32'h00000000);
-  #100 axi_write (AD469X_CNV_BASE + 32'h00000040, ('h64 * 'd16) - 'h0);
-  #100 axi_write (AD469X_CNV_BASE + 32'h0000004c, ('h64 * 'd4) - 'h0);
-  #100 axi_write (AD469X_CNV_BASE + 32'h00000010, 32'h00000002);
+  // Config cnv (with averaging)
+  axi_write (AD469X_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  axi_write (AD469X_CNV_BASE + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(('h64 * 'd16) - 'h0)); // set PWM 0 period
+  axi_write (AD469X_CNV_BASE + GetAddrs(REG_PULSE_1_PERIOD), `SET_REG_PULSE_1_PERIOD_PULSE_1_PERIOD(('h64 * 'd4) - 'h0)); // set PWM 1 period
+  axi_write (AD469X_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  $display("[%t] axi_pwm_gen started.", $time);
 
   // Enable SPI Engine
   axi_write (AD469X_BASE + SPI_ENG_ADDR_ENABLE, 0);

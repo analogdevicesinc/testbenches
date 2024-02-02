@@ -138,15 +138,15 @@ for {set i 0} {$i < 2} {incr i} {
   ad_connect adc_src_axis_${i}/m_axis RX_DUT_${i}/s_axis
   ad_connect RX_DUT_${i}/m_axis i_rx_dmac_${i}/s_axis
   
-  ad_connect dma_clk_vip/clk_out adc_src_axis_${i}/aclk
+  ad_connect sys_dma_clk adc_src_axis_${i}/aclk
   ad_connect sys_dma_resetn adc_src_axis_${i}/aresetn
   
-  ad_connect dma_clk_vip/clk_out RX_DUT_${i}/s_axis_aclk
+  ad_connect sys_dma_clk RX_DUT_${i}/s_axis_aclk
   ad_connect sys_dma_resetn RX_DUT_${i}/s_axis_aresetn
-  ad_connect sys_clk_vip/clk_out RX_DUT_${i}/m_axis_aclk
+  ad_connect sys_cpu_clk RX_DUT_${i}/m_axis_aclk
   ad_connect sys_cpu_resetn RX_DUT_${i}/m_axis_aresetn
   
-  ad_connect sys_clk_vip/clk_out i_rx_dmac_${i}/s_axis_aclk
+  ad_connect sys_cpu_clk i_rx_dmac_${i}/s_axis_aclk
   ad_connect sys_mem_clk i_rx_dmac_${i}/m_dest_axi_aclk
   ad_connect sys_mem_resetn i_rx_dmac_${i}/m_dest_axi_aresetn
   
@@ -168,15 +168,15 @@ for {set i 0} {$i < 2} {incr i} {
   ]
   adi_sim_add_define "DAC_DST_AXIS_${i}=dac_dst_axis_${i}"
   
-  ad_connect dma_clk_vip/clk_out dac_dst_axis_${i}/aclk
+  ad_connect sys_dma_clk dac_dst_axis_${i}/aclk
   ad_connect sys_dma_resetn dac_dst_axis_${i}/aresetn
   
-  ad_connect dma_clk_vip/clk_out TX_DUT_${i}/m_axis_aclk
+  ad_connect sys_dma_clk TX_DUT_${i}/m_axis_aclk
   ad_connect sys_dma_resetn TX_DUT_${i}/m_axis_aresetn
-  ad_connect sys_clk_vip/clk_out TX_DUT_${i}/s_axis_aclk
+  ad_connect sys_cpu_clk TX_DUT_${i}/s_axis_aclk
   ad_connect sys_cpu_resetn TX_DUT_${i}/s_axis_aresetn
   
-  ad_connect sys_clk_vip/clk_out i_tx_dmac_${i}/m_axis_aclk
+  ad_connect sys_cpu_clk i_tx_dmac_${i}/m_axis_aclk
   ad_connect sys_mem_clk i_tx_dmac_${i}/m_src_axi_aclk
   ad_connect sys_mem_resetn i_tx_dmac_${i}/m_src_axi_aresetn
   

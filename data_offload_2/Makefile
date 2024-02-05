@@ -25,6 +25,7 @@ ENV_DEPS += ../scripts/run_sim.tcl
 
 LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
+LIB_DEPS += util_do_ram
 LIB_DEPS += axi_dmac
 LIB_DEPS += data_offload
 LIB_DEPS += util_hbm

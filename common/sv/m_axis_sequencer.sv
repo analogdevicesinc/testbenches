@@ -40,99 +40,222 @@ package m_axis_sequencer_pkg;
   import axi4stream_vip_pkg::*;
   import logger_pkg::*;
 
+  typedef enum {
+      DATA_GEN_MODE_TEST_DATA,  // get data from test
+      DATA_GEN_MODE_AUTO_INCR,  // autogenerate incrementing data until aborted
+      DATA_GEN_MODE_AUTO_RAND   // autogenerate randomized data until aborted
+  } data_gen_mode_t;
+
+  typedef enum {
+    STOP_POLICY_DATA_BEAT,        // disable after the data beat has been transferred
+    STOP_POLICY_PACKET,           // disable after the packet has been transferred
+    STOP_POLICY_DESCRIPTOR_QUEUE  // disable after the packet queue has been transferred
+  } stop_policy_t;
+
   class m_axis_sequencer #( type T, `AXIS_VIP_PARAM_DECL);
 
-    bit enabled = 1'b0;
-    event en_ev;
+    protected bit enabled;
+    protected event en_ev;
 
-    bit mode = 1'b1;  // 0 - get data from test;
-                      // 1 - autogenerate data until aborted
-    bit rand_valid = 1'b1;  // 0 - get valid instantaneously
-                            // 1 - gen valid after a random delay
-    int byte_count = 0;
+    data_gen_mode_t data_gen_mode;
 
+    bit descriptor_gen_mode;  // 0 - get descriptor from test;
+                              // 1 - autogenerate descriptor based on the first descriptor from test until aborted
+    
+    int byte_count;
 
-    event data_av_ev;
-    event beat_done;
-    event queue_empty;
-    axi4stream_transaction trans;
+    int data_beat_delay; // delay in clock cycles
+    int descriptor_delay; // delay in clock cycles
+
+    protected stop_policy_t stop_policy;
+
+    protected event data_av_ev;
+    protected event beat_done;
+    protected event packet_done;
+    protected event queue_empty;
 
     T agent;
 
-    xil_axi4stream_data_byte byte_stream [$];
+    protected axi4stream_transaction trans;
+    protected xil_axi4stream_data_byte byte_stream [$];
+
     typedef struct{
       int num_bytes;
       bit gen_last;
       bit gen_sync;
-      } byte_count_t;
+    } descriptor_t;
 
-    byte_count_t byte_count_q [$];
+    protected descriptor_t descriptor_q [$];
+
 
     function new(T agent);
       this.agent = agent;
-    endfunction
+      this.enabled = 1'b0;
+      this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
+      this.descriptor_gen_mode = 1'b0;
+      this.byte_count = 0;
+      this.data_beat_delay = 0;
+      this.descriptor_delay = 0;
+      this.stop_policy = STOP_POLICY_DATA_BEAT;
+    endfunction: new
 
-    function void configure(int mode, int rand_valid = 1);
+
+    // set disable policy
+    function void set_stop_policy(input stop_policy_t stop_policy);
+      this.stop_policy = stop_policy;
+      `INFOV(("Disable policy configured"), 55);
+    endfunction: set_stop_policy
+
+
+    // set data generation mode
+    function void set_data_gen_mode(input data_gen_mode_t data_gen_mode);
       if (enabled)
-        `ERROR(("sequencer must be disabled before configuration"));
-      this.mode = mode;
-      this.rand_valid = rand_valid;
-      `INFOV(("configure start"), 55);
-    endfunction
+        `ERROR(("Sequencer must be disabled before configuring data generation mode"));
+      this.data_gen_mode = data_gen_mode;
+      `INFOV(("Data generation mode confgured"), 55);
+    endfunction: set_data_gen_mode
 
 
-    function void update(int bytes_to_generate,
-                         int gen_last = 1,
-                         int gen_sync = 1);
-      byte_count_t descriptor;
+    // set data generation mode
+    function void set_descriptor_gen_mode(input bit descriptor_gen_mode);
+      if (enabled)
+        `ERROR(("Sequencer must be disabled before configuring descriptor generation mode"));
+      this.descriptor_gen_mode = descriptor_gen_mode;
+      `INFOV(("Descriptor generation mode confgured"), 55);
+    endfunction: set_descriptor_gen_mode
+
+
+    // set data beat delay
+    function void set_data_beat_delay(input int data_beat_delay);
+      this.data_beat_delay = data_beat_delay;
+      `INFOV(("Data beat delay confgured"), 55);
+    endfunction: set_data_beat_delay
+
+
+    // set descriptor delay
+    function void set_descriptor_delay(input int descriptor_delay);
+      this.descriptor_delay = descriptor_delay;
+      `INFOV(("Descriptor delay confgured"), 55);
+    endfunction: set_descriptor_delay
+
+
+    // create transfer based on data beats per packet
+    function void add_xfer_descriptor_packet_size(
+      input int data_beats_per_packet,
+      input int gen_tlast = 1,
+      input int gen_sync = 1);
+      
+      add_xfer_descriptor(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
+    endfunction: add_xfer_descriptor_packet_size
+
+
+    // create transfer descriptor
+    function void add_xfer_descriptor(
+      input int bytes_to_generate,
+      input int gen_last = 1,
+      input int gen_sync = 1);
+
+      descriptor_t descriptor;
       descriptor.num_bytes = bytes_to_generate;
       descriptor.gen_last = gen_last;
       descriptor.gen_sync = gen_sync;
       `INFOV(("Updating generator with %0d bytes with last %0d, sync %0d",
                bytes_to_generate, gen_last, gen_sync), 5);
 
-      byte_count_q.push_back(descriptor);
-    endfunction
+      descriptor_q.push_back(descriptor);
+    endfunction: add_xfer_descriptor
 
-    task generator();
+
+    // check if ready is asserted
+    function bit check_ready_asserted();
+      return agent.vif_proxy.is_ready_asserted();
+    endfunction: check_ready_asserted
+
+    // wait for set amount of clock cycles
+    task wait_clk_count(int wait_clocks);
+      agent.vif_proxy.wait_aclks(wait_clocks);
+    endtask: wait_clk_count
+
+
+    // descriptor delay subroutine
+    // - can be overridden in inherited classes for more specific delay generation
+    protected task descriptor_delay_subroutine();
+      wait_clk_count(descriptor_delay);
+    endtask: descriptor_delay_subroutine
+
+
+    // wait until data beat is sent
+    task beat_sent();
+      @beat_done;
+    endtask: beat_sent
+
+
+    // wait until packet is sent
+    task packet_sent();
+      @packet_done;
+    endtask: packet_sent
+
+
+    // wait until queue is empty
+    task wait_empty_descriptor_queue();
+      @queue_empty;
+    endtask: wait_empty_descriptor_queue
+
+
+    // generate transfer with transfer descriptors
+    protected task generator();
       `INFOV(("generator start"), 55);
-      while (1) begin
+      forever begin
         if (enabled == 0) begin
           `INFOV(("Waiting for enable"), 55);
           @en_ev;
+          #1step;
           `INFOV(("Enable found"), 55);
         end else begin
-          // start to packetize a little later than starting the sender
-          #10;
-          if (byte_count_q.size() > 0)
+          if (descriptor_q.size() > 0) begin
             packetize();
-          else
+            descriptor_delay_subroutine();
+          end else begin
             -> queue_empty;
+            #1step;
+          end
         end
       end
-    endtask
+    endtask: generator
+
+
+    // descriptor delay subroutine
+    // - can be overridden in inherited classes for more specific delay generation
+    protected task data_beat_delay_subroutine();
+      trans.set_delay(data_beat_delay);
+    endtask: data_beat_delay_subroutine
+
 
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
-    task packetize();
+    protected task packetize();
       xil_axi4stream_data_byte data[];
       int packet_length;
       int byte_per_beat;
-      byte_count_t descriptor;
+      descriptor_t descriptor;
 
       `INFOV(("packetize start"), 55);
       byte_per_beat = AXIS_VIP_DATA_WIDTH/8;
       data = new[byte_per_beat];
-      descriptor = byte_count_q.pop_front();
+      descriptor = descriptor_q.pop_front();
+
+      // put a copy of the descriptor back into the queue and continue processing
+      if (this.descriptor_gen_mode == 1)
+        descriptor_q.push_back(descriptor);
 
       packet_length = descriptor.num_bytes / byte_per_beat;
 
       for (int tc=0; tc<packet_length; tc++) begin : packet_loop
 
         for (int i=0; i<byte_per_beat; i++) begin
-          case (mode)
-            0:
+          case (data_gen_mode)
+            DATA_GEN_MODE_TEST_DATA:
               // block transfer until we get data from byte stream queue
-              while (1) begin
+              forever begin
                 if (byte_stream.size() > 0) begin
                   data[i] = byte_stream.pop_front();
                   break;
@@ -142,9 +265,9 @@ package m_axis_sequencer_pkg;
                 if (enabled == 0)
                   disable packet_loop;
               end
-            1:
+            DATA_GEN_MODE_AUTO_INCR:
               data[i] = byte_count++;
-            default:
+            DATA_GEN_MODE_AUTO_RAND:
               data[i] = $random;
           endcase
         end
@@ -152,17 +275,9 @@ package m_axis_sequencer_pkg;
         `INFOV(("generating axis transaction"), 55);
         trans = agent.driver.create_transaction();
         trans.set_data(data);
-        if (rand_valid == 1) begin
-          // set transaction delay to be in most of the cases zero
-          // but occasionally insert small or a larger delay
-          case ($urandom_range(0,10))
-            0       : trans.set_delay(1);
-            1       : trans.set_delay(8);
-            default : trans.set_delay(0);
-          endcase
-        end else begin
-          trans.set_delay(0);
-        end
+        trans.set_id('h0);
+        trans.set_dest('h0);
+        data_beat_delay_subroutine();
 
         if (AXIS_VIP_HAS_TLAST)
           trans.set_last((tc == packet_length-1) & descriptor.gen_last);
@@ -173,51 +288,69 @@ package m_axis_sequencer_pkg;
         -> data_av_ev;
         `INFOV(("waiting transfer to complete"), 55);
         @(beat_done);
-        if (enabled == 0) begin
+        if (enabled == 0 && stop_policy == STOP_POLICY_DATA_BEAT) begin
           `INFOV(("block disabled, leaving packetize"), 55);
           break;
         end
       end
+      -> packet_done;
+    endtask: packetize
 
-    endtask
 
-    task enable();
+    protected task sender();
+      `INFOV(("sender start"), 55);
+      forever begin
+        if (enabled == 0)
+          @en_ev;
+        else begin
+          forever begin
+            if (enabled) begin
+              `INFOV(("waiting for data to be available"), 55);
+              @data_av_ev;
+            end
+            `INFOV(("sending axis transaction"), 55);
+            agent.driver.send(trans);
+            -> beat_done;
+            if (enabled == 0)
+              if (stop_policy == STOP_POLICY_DATA_BEAT)
+                break;
+              else begin
+                wait(packet_done.triggered || data_av_ev.triggered);
+                if (packet_done.triggered == 1)
+                  break;
+              end
+          end
+        end
+      end
+    endtask: sender
+
+    
+    task start();
       `INFOV(("enable sequencer"), 55);
       enabled = 1;
-      #1;
+      #1step;
       -> en_ev;
-    endtask
+    endtask: start
+
 
     task stop();
       `INFOV(("disable sequencer"), 55);
       enabled = 0;
       byte_count = 0;
-      #1;
-    endtask
+      #1step;
+    endtask: stop
 
-
-    task sender();
-      `INFOV(("sender start"), 55);
-      while (1) begin
-        if (enabled == 0)
-          @en_ev;
-        else begin
-          `INFOV(("waiting for data to be available"), 55);
-          @data_av_ev;
-          `INFOV(("sending axis transaction"), 55);
-          agent.driver.send(trans);
-          #1;
-          -> beat_done;
-        end
-      end
-    endtask
 
     task run();
       fork
-        generator();
+        begin
+          // start the generator at the next time slot
+          #1step;
+          generator();
+        end
         sender();
       join_none
-    endtask
+    endtask: run
 
   endclass
 

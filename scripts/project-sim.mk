@@ -16,12 +16,13 @@ SHELL:=/bin/bash
 # simulate - Run a sim command and look in logfile for errors; creates JUnit XML
 # $(1): Command to execute
 # $(2): Logfile name
-# $(3): Textual description of the task
-# $(4): configuration name
-# $(5): test  name
+# $(3): Textual description of the start of the task
+# $(4): Textual description of the end of the task
+# $(5): configuration name
+# $(6): test  name
 FOLDER=$(shell basename $(CURDIR))
 define simulate
-@echo -n "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."
+@echo "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."
 START=$$(date +%s); \
 $(strip $(1)) >> $(strip $(2)) 2>&1; \
 (ERR=$$?; \
@@ -29,9 +30,10 @@ END=$$(date +%s); \
 DIFF=$$(( $$END - $$START )); \
 ERRS=`grep -v ^# $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -e "\[ERROR\]" -e "while\\ executing" -C 10 |  sed 's/</\&lt;/g' | sed 's/>/\&gt;/g'`; \
 if [[ $$ERRS > 0 ]] ; then ERR=1; fi;\
-JUnitFile='results/$(strip $(4))_$(strip $(5)).xml'; \
+JUnitFile='results/$(strip $(5))_$(strip $(6)).xml'; \
 echo \<testsuite\> > $$JUnitFile; \
-echo \<testcase classname=\"$(FOLDER)_$(strip $(4))\" name=\"$(strip $(5))\" time=\"$$DIFF\" \> >> $$JUnitFile; \
+echo \<testcase classname=\"$(FOLDER)_$(strip $(5))\" name=\"$(strip $(6))\" time=\"$$DIFF\" \> >> $$JUnitFile; \
+echo -n "$(strip $(4)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)]"; \
 if [ $$ERR = 0 ]; then \
 	echo " $(GREEN)OK$(NC)"; \
 	echo \<passed\/\> >> $$JUnitFile; \
@@ -71,6 +73,7 @@ $(addprefix runs/,$(1)/system_project.log) : $(addprefix cfgs/,$(1).tcl) $(ENV_D
 		$(CMD_PRE) $(M_VIVADO_BATCH) system_project.tcl -tclargs $(1).tcl $(CMD_POST), \
 		$$@, \
 		Building $(HL)$(strip $(1))$(NC) env, \
+		Build $(HL)$(strip $(1))$(NC) env, \
 		$(1), \
 		BuildEnv)
 endef
@@ -85,6 +88,7 @@ $(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_pr
 		$(CMD_PRE) $(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST), \
 		$$@, \
 		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
+		Run $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
 		$(1), \
 		$(2))
 FORCE:

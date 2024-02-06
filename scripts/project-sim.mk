@@ -85,7 +85,7 @@ define sim
 $(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
 $(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS) FORCE
 	$(RUN_PRE_OPT)$$(call simulate, \
-		$(CMD_PRE) $(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST), \
+		$(CMD_PRE) flock runs/$(1)/.lock -c "$(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST)", \
 		$$@, \
 		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
 		Run $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
@@ -103,7 +103,7 @@ TESTS += $(CFG):$(TST)
 endif
 endif
 
-MODE ?= "batch"
+MODE ?= batch
 
 STOP_ON_ERROR ?= y
 
@@ -149,9 +149,9 @@ $(foreach cfg, $(BUILD_CFGS), $(eval $(call build, $(cfg))))
 # Create here the targets which run the actual simulations
 # TESTS format:  <configuration>:<test name>
 $(foreach cfg_test, $(TESTS),\
-	$(eval cfg = $(word 1,$(subst :, ,$(cfg_test)))) \
-	$(eval test = $(word 2,$(subst :, ,$(cfg_test)))) \
-	$(eval $(call sim, $(cfg), $(test))) \
+	$(eval cfg = $(strip $(word 1,$(subst :, ,$(cfg_test))))) \
+	$(eval test = $(strip $(word 2,$(subst :, ,$(cfg_test))))) \
+	$(eval $(call sim,$(cfg),$(test))) \
 )
 
 # Group sim targets based on env config so we can run easily all test 

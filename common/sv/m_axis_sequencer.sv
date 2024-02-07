@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -52,20 +52,21 @@ package m_axis_sequencer_pkg;
     STOP_POLICY_DESCRIPTOR_QUEUE  // disable after the packet queue has been transferred
   } stop_policy_t;
 
-  class m_axis_sequencer #( type T, `AXIS_VIP_PARAM_DECL);
+
+  class m_axis_sequencer_base;
 
     protected bit enabled;
     protected event en_ev;
 
-    data_gen_mode_t data_gen_mode;
+    protected data_gen_mode_t data_gen_mode;
 
-    bit descriptor_gen_mode;  // 0 - get descriptor from test;
+    protected bit descriptor_gen_mode;  // 0 - get descriptor from test;
                               // 1 - autogenerate descriptor based on the first descriptor from test until aborted
     
-    int byte_count;
+    protected int byte_count;
 
-    int data_beat_delay; // delay in clock cycles
-    int descriptor_delay; // delay in clock cycles
+    protected int data_beat_delay; // delay in clock cycles
+    protected int descriptor_delay; // delay in clock cycles
 
     protected stop_policy_t stop_policy;
 
@@ -73,8 +74,6 @@ package m_axis_sequencer_pkg;
     protected event beat_done;
     protected event packet_done;
     protected event queue_empty;
-
-    T agent;
 
     protected axi4stream_transaction trans;
     protected xil_axi4stream_data_byte byte_stream [$];
@@ -87,17 +86,36 @@ package m_axis_sequencer_pkg;
 
     protected descriptor_t descriptor_q [$];
 
-
-    function new(T agent);
-      this.agent = agent;
-      this.enabled = 1'b0;
-      this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
-      this.descriptor_gen_mode = 1'b0;
-      this.byte_count = 0;
-      this.data_beat_delay = 0;
-      this.descriptor_delay = 0;
-      this.stop_policy = STOP_POLICY_DATA_BEAT;
+    // new
+    function new();
     endfunction: new
+
+
+    // check if ready is asserted
+    virtual function bit check_ready_asserted();
+    endfunction: check_ready_asserted
+
+
+    // wait for set amount of clock cycles
+    virtual task wait_clk_count(int wait_clocks);
+    endtask: wait_clk_count
+
+
+    // pack the byte stream into transfers(beats) then in packets by setting the tlast
+    virtual protected task packetize();
+    endtask: packetize
+
+
+    virtual protected task sender();
+    endtask: sender
+
+
+    // create transfer based on data beats per packet
+    virtual function void add_xfer_descriptor_packet_size(
+      input int data_beats_per_packet,
+      input int gen_tlast = 1,
+      input int gen_sync = 1);
+    endfunction: add_xfer_descriptor_packet_size
 
 
     // set disable policy
@@ -139,16 +157,6 @@ package m_axis_sequencer_pkg;
     endfunction: set_descriptor_delay
 
 
-    // create transfer based on data beats per packet
-    function void add_xfer_descriptor_packet_size(
-      input int data_beats_per_packet,
-      input int gen_tlast = 1,
-      input int gen_sync = 1);
-      
-      add_xfer_descriptor(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
-    endfunction: add_xfer_descriptor_packet_size
-
-
     // create transfer descriptor
     function void add_xfer_descriptor(
       input int bytes_to_generate,
@@ -164,17 +172,6 @@ package m_axis_sequencer_pkg;
 
       descriptor_q.push_back(descriptor);
     endfunction: add_xfer_descriptor
-
-
-    // check if ready is asserted
-    function bit check_ready_asserted();
-      return agent.vif_proxy.is_ready_asserted();
-    endfunction: check_ready_asserted
-
-    // wait for set amount of clock cycles
-    task wait_clk_count(int wait_clocks);
-      agent.vif_proxy.wait_aclks(wait_clocks);
-    endtask: wait_clk_count
 
 
     // descriptor delay subroutine
@@ -231,8 +228,76 @@ package m_axis_sequencer_pkg;
     endtask: data_beat_delay_subroutine
 
 
+    task start();
+      `INFOV(("enable sequencer"), 55);
+      enabled = 1;
+      #1step;
+      -> en_ev;
+    endtask: start
+
+
+    task stop();
+      `INFOV(("disable sequencer"), 55);
+      enabled = 0;
+      byte_count = 0;
+      #1step;
+    endtask: stop
+
+
+    task run();
+      fork
+        begin
+          // start the generator at the next time slot
+          #1step;
+          generator();
+        end
+        sender();
+      join_none
+    endtask: run
+
+  endclass: m_axis_sequencer_base
+
+
+  class m_axis_sequencer #( type T, `AXIS_VIP_PARAM_DECL) extends m_axis_sequencer_base;
+
+    T agent;
+
+    function new(T agent);
+      this.agent = agent;
+      this.enabled = 1'b0;
+      this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
+      this.descriptor_gen_mode = 1'b0;
+      this.byte_count = 0;
+      this.data_beat_delay = 0;
+      this.descriptor_delay = 0;
+      this.stop_policy = STOP_POLICY_DATA_BEAT;
+    endfunction: new
+
+
+    // create transfer based on data beats per packet
+    virtual function void add_xfer_descriptor_packet_size(
+      input int data_beats_per_packet,
+      input int gen_tlast = 1,
+      input int gen_sync = 1);
+      
+      add_xfer_descriptor(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
+    endfunction: add_xfer_descriptor_packet_size
+
+
+    // check if ready is asserted
+    virtual function bit check_ready_asserted();
+      return agent.vif_proxy.is_ready_asserted();
+    endfunction: check_ready_asserted
+
+
+    // wait for set amount of clock cycles
+    virtual task wait_clk_count(int wait_clocks);
+      agent.vif_proxy.wait_aclks(wait_clocks);
+    endtask: wait_clk_count
+
+
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
-    protected task packetize();
+    virtual protected task packetize();
       xil_axi4stream_data_byte data[];
       int packet_length;
       int byte_per_beat;
@@ -297,7 +362,7 @@ package m_axis_sequencer_pkg;
     endtask: packetize
 
 
-    protected task sender();
+    virtual protected task sender();
       `INFOV(("sender start"), 55);
       forever begin
         if (enabled == 0)
@@ -323,34 +388,6 @@ package m_axis_sequencer_pkg;
         end
       end
     endtask: sender
-
-    
-    task start();
-      `INFOV(("enable sequencer"), 55);
-      enabled = 1;
-      #1step;
-      -> en_ev;
-    endtask: start
-
-
-    task stop();
-      `INFOV(("disable sequencer"), 55);
-      enabled = 0;
-      byte_count = 0;
-      #1step;
-    endtask: stop
-
-
-    task run();
-      fork
-        begin
-          // start the generator at the next time slot
-          #1step;
-          generator();
-        end
-        sender();
-      join_none
-    endtask: run
 
   endclass
 

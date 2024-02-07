@@ -44,8 +44,10 @@ ad_ip_instance axi_vip ddr_axi_vip $ddr_axi_cfg
 adi_sim_add_define "DDR_AXI=ddr_axi_vip"
 
 # Interrupt controller
-ad_ip_instance axi_intc axi_intc
-ad_ip_parameter axi_intc CONFIG.C_HAS_FAST 0
+ad_ip_instance axi_intc axi_intc [list \
+  C_IRQ_CONNECTION 1 \
+  C_HAS_FAST 0 \
+]
 
 ad_ip_instance xlconcat sys_concat_intc
 ad_ip_parameter sys_concat_intc CONFIG.NUM_PORTS 16
@@ -186,6 +188,11 @@ incr sys_cpu_interconnect_index
 #fake an ad_mem_hpx_interconnect
 global sys_mem_interconnect_index
 incr sys_mem_interconnect_index
+
+# create external port for IRQ
+create_bd_port -dir O -type intr irq
+
+ad_connect irq axi_intc/irq
 
 # Set DDR VIP to a range of 2G 
 set DDR_BASE 0x80000000

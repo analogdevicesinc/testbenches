@@ -38,6 +38,8 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
+import adi_regmap_pkg::*;
+import adi_regmap_pwm_gen_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
@@ -433,13 +435,14 @@ task sleep_delay_test;
   input [7:0] sleep_param;
 begin
 
-  //start spi clk generator
-  #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+  // Start spi clk generator
+  axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
 
-  //config cnv
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000000);
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00001000);
-  #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
+  // Config cnv
+  axi_write (PULSAR_ADC_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  axi_write (PULSAR_ADC_CNV_BASE + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('d1000)); // set PWM period
+  axi_write (PULSAR_ADC_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  $display("[%t] axi_pwm_gen started.", $time);
 
   // Enable SPI Engine
   axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
@@ -484,13 +487,14 @@ task cs_delay_test;
   input [1:0] cs_deactivate_delay;
 begin
 
-    //start spi clk generator
-    #100 axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+    // Start spi clk generator
+    axi_write (PULSAR_ADC_CLKGEN_BASE + 32'h00000040, 32'h0000003);
 
-    //config cnv
-    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000001);
-    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000040, 32'd00001000);
-    #100 axi_write (PULSAR_ADC_CNV_BASE + 32'h00000010, 32'h00000002);
+    // Config cnv
+    axi_write (PULSAR_ADC_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (PULSAR_ADC_CNV_BASE + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('d1000)); // set PWM period
+    axi_write (PULSAR_ADC_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    $display("[%t] axi_pwm_gen started.", $time);
 
     //Configure DMA
     env.mng.RegWrite32(PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA

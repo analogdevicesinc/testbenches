@@ -75,32 +75,32 @@ package adi_peripheral_pkg;
     // -----------------
     // 
     // -----------------
-    task axi_read_f(
+    task axi_read(
       input  [31:0] addr,
       output [31:0] data);
 
       this.bus.RegRead32(this.base_address + addr, data);
-    endtask: axi_read_f
+    endtask: axi_read
 
     // -----------------
     //
     // -----------------
-    task axi_write_f(
+    task axi_write(
       input [31:0] addr,
       input [31:0] data);
 
       this.bus.RegWrite32(this.base_address + addr, data);
-    endtask: axi_write_f
+    endtask: axi_write
 
     // -----------------
     //
     // -----------------
-    task axi_verify_f(
+    task axi_verify(
       input [31:0] addr,
       input [31:0] data);
 
       this.bus.RegReadVerify32(this.base_address + addr, data);
-    endtask: axi_verify_f
+    endtask: axi_verify
 
   endclass
 

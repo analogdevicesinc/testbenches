@@ -35,7 +35,9 @@ package scoreboard_pkg;
     bit enabled;
     xil_uint error_cnt;
     xil_uint comparison_cnt;
+
     event end_of_first_cycle;
+    event byte_streams_empty;
 
     // constructor
     function new(input string name);
@@ -51,7 +53,7 @@ package scoreboard_pkg;
       this.source_byte_stream_size = 0;
       this.sink_byte_stream_size = 0;
 
-    endfunction /* new */
+    endfunction: new
 
     // connect the analysis ports of the monitor to the scoreboard
     function void set_source_stream(
@@ -61,7 +63,7 @@ package scoreboard_pkg;
       this.source_tm = source_tm;
       this.source_mailbox = source_mailbox;
 
-    endfunction /* set_source_stream */
+    endfunction: set_source_stream
 
     function void set_sink_stream(
       x_monitor sink_tm,
@@ -70,7 +72,7 @@ package scoreboard_pkg;
       this.sink_tm = sink_tm;
       this.sink_mailbox = sink_mailbox;
 
-    endfunction /* set_sink_stream */
+    endfunction: set_sink_stream 
 
     // run task
     task run();
@@ -83,7 +85,7 @@ package scoreboard_pkg;
         // verify_tx_cyclic();
       join_none
 
-    endtask /* run */
+    endtask: run
 
     // set sink type
     function void set_sink_type(input bit sink_type);
@@ -94,12 +96,23 @@ package scoreboard_pkg;
         `ERROR(("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
       end
 
-    endfunction
+    endfunction: set_sink_type
+
+    // clear source and sink byte streams
+    function void clear_streams();
+      source_byte_stream.delete();
+      sink_byte_stream.delete();
+    endfunction: clear_streams
 
     // get sink type
     function bit get_sink_type();
       return this.sink_type;
     endfunction
+
+    // wait until source and sink byte streams are empty, full check
+    task wait_until_complete();
+      @byte_streams_empty;
+    endtask
 
     // get transaction data from source monitor
     task get_source_transaction();
@@ -164,8 +177,12 @@ package scoreboard_pkg;
           end else begin
             this.comparison_cnt++;
           end
-        end else
+        end else begin
+          if ((this.source_byte_stream_size == 0) &&
+              (this.sink_byte_stream_size == 0))
+            ->byte_streams_empty;
           #1step;
+        end
       end
 
     endtask /* compare_transaction */

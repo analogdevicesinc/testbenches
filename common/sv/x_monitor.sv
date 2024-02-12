@@ -10,6 +10,7 @@ package x_monitor_pkg;
 
   class x_monitor extends xil_component;
 
+    mailbox_c #(logic [7:0]) mailbox;
     semaphore semaphore_key;
     event transaction_event;
 
@@ -17,6 +18,7 @@ package x_monitor_pkg;
     function new(input string name);
       super.new(name);
 
+      this.mailbox = new;
       this.semaphore_key = new(1);
     endfunction
 
@@ -54,20 +56,14 @@ package x_monitor_pkg;
   endclass
 
   
-  class x_axi_monitor #( type T) extends x_monitor;
+  class x_axi_monitor #( type T, bit operation_type ) extends x_monitor;
 
     // analysis port from the monitor
     xil_analysis_port #(axi_monitor_transaction) axi_ap;
 
-    // transaction mailbox (because the source and sink interface can have
-    // different widths, byte streams are used)
-    mailbox_c #(logic [7:0]) tx_mailbox;
-    mailbox_c #(logic [7:0]) rx_mailbox;
-
     // int transfer_size;
     // int all_transfer_size;
-    int axi_tx_byte_stream_size;
-    int axi_rx_byte_stream_size;
+    int axi_byte_stream_size;
 
     // counters and synchronizers
     bit enabled;
@@ -82,13 +78,9 @@ package x_monitor_pkg;
       // this.transfer_size = 0;
       // this.all_transfer_size = 0;
 
-      this.tx_mailbox = new;
-      this.rx_mailbox = new;
-
       this.axi_ap = agent.monitor.item_collected_port;
 
-      this.axi_tx_byte_stream_size = 0;
-      this.axi_rx_byte_stream_size = 0;
+      this.axi_byte_stream_size = 0;
 
     endfunction /* new */
 
@@ -109,42 +101,41 @@ package x_monitor_pkg;
       axi_monitor_transaction transaction;
       xil_axi_data_beat data_beat;
       int num_bytes;
-      logic [7:0] axi_tx_byte;
+      logic [7:0] axi_byte;
 
       forever begin
+        this.get_key();
         if (this.axi_ap.get_item_cnt() > 0) begin
           this.axi_ap.get(transaction);
-          num_bytes = transaction.get_data_width()/8;
-          for (int i=0; i<(transaction.get_len()+1); i++) begin
-            data_beat = transaction.get_data_beat(i);
-            for (int j=0; j<num_bytes; j++) begin
-              axi_tx_byte = data_beat[j*8+:8];
-              // put each beat into byte queues
-              if (transaction.get_cmd_type() == 1'b1) begin  // WRITE
-                this.rx_mailbox.put(axi_tx_byte);
-                this.axi_rx_byte_stream_size++;
-              end else begin  // READ
-                this.tx_mailbox.put(axi_tx_byte);
-                this.axi_tx_byte_stream_size++;
-                // this.transfer_size++;
-                // if (this.transfer_size == this.tx_comparison_cnt) begin
-                //   -> end_of_first_cycle;
-                // end
+          if (transaction.get_cmd_type() == operation_type) begin  // WRITE
+            this.put_key();
+            num_bytes = transaction.get_data_width()/8;
+            for (int i=0; i<(transaction.get_len()+1); i++) begin
+              data_beat = transaction.get_data_beat(i);
+              for (int j=0; j<num_bytes; j++) begin
+                axi_byte = data_beat[j*8+:8];
+                // put each beat into byte queues
+                if (transaction.get_cmd_type() == 1'b1) begin  // WRITE
+                  this.mailbox.put(axi_byte);
+                  this.axi_byte_stream_size++;
+                end
               end
+              if (transaction.get_cmd_type() == 1'b1)
+                `INFOV(("Caught a transaction: %d", this.axi_byte_stream_size), 100);
+              this.transaction_captured();
+              #1step;
+              this.mailbox.flush();
+              this.axi_byte_stream_size = 0;
             end
+          end else begin
+            this.put_key();
+            #1step;
           end
-          if (transaction.get_cmd_type() == 1'b1)
-            `INFOV(("Caught a WRITE transaction: %d", this.axi_rx_byte_stream_size), 100);
-          else
-            `INFOV(("Caught a READ transaction: %d", this.axi_tx_byte_stream_size), 100);
-          this.transaction_captured();
+        end else begin
+          this.axi_ap.write(transaction);
+          this.put_key();
           #1step;
-          this.rx_mailbox.flush();
-          this.tx_mailbox.flush();
-          this.axi_rx_byte_stream_size = 0;
-          this.axi_tx_byte_stream_size = 0;
-        end else
-          #1step;
+        end
       end
 
     endtask /* get_transaction */
@@ -159,10 +150,6 @@ package x_monitor_pkg;
 
     // analysis port from the monitor
     xil_analysis_port #(axi4stream_monitor_transaction) axis_ap;
-
-    // transaction queues (because the source and sink interface can have
-    // different widths, byte streams are used)
-    mailbox_c #(logic [7:0]) x_mailbox;
 
     // int transfer_size;
     // int all_transfer_size;
@@ -180,8 +167,6 @@ package x_monitor_pkg;
       this.tx_sink_type = CYCLIC;
       // this.transfer_size = 0;
       // this.all_transfer_size = 0;
-
-      this.x_mailbox = new;
       
       this.axis_ap = agent.monitor.item_collected_port;
 
@@ -222,7 +207,7 @@ package x_monitor_pkg;
       axi4stream_transaction transaction;
       xil_axi4stream_data_beat data_beat;
       int num_bytes;
-      logic [7:0] axi_tx_byte;
+      logic [7:0] axi_byte;
 
       forever begin
         if (this.axis_ap.get_item_cnt() > 0) begin
@@ -232,10 +217,10 @@ package x_monitor_pkg;
           num_bytes = transaction.get_data_width()/8;
           data_beat = transaction.get_data_beat();
           for (int j=0; j<num_bytes; j++) begin
-            axi_tx_byte = data_beat[j*8+:8];
-            this.x_mailbox.put(axi_tx_byte);
+            axi_byte = data_beat[j*8+:8];
+            this.mailbox.put(axi_byte);
           end
-          `INFOV(("Caught a TX AXI4 stream transaction: %d", this.x_mailbox.num()), 100);
+          `INFOV(("Caught a TX AXI4 stream transaction: %d", this.mailbox.num()), 100);
 
           // this.all_transfer_size += this.transfer_size;
 
@@ -247,7 +232,7 @@ package x_monitor_pkg;
           // this.all_transfer_size += this.transfer_size;
           this.transaction_captured();
           #1step;
-          this.x_mailbox.flush();
+          this.mailbox.flush();
         end else
           #1step;
       end

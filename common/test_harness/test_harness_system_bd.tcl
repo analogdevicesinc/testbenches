@@ -1,6 +1,10 @@
 
 #global mng_axi_cfg
 global use_smartconnect
+if {[expr {![info exists use_smartconnect]}]} {
+  set use_smartconnect 1
+}
+
 # axi lite management port
 set mng_axi_cfg [ list \
    ADDR_WIDTH {32} \

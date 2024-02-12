@@ -15,13 +15,8 @@ package scoreboard_pkg;
     sink_type_t sink_type ;
 
     // List of analysis ports from the monitors
-    x_monitor source_tm;
-    x_monitor sink_tm;
-
-    // transaction queues (because the source and sink interface can have
-    // different widths, byte streams are used)
-    mailbox_c #(logic [7:0]) source_mailbox;
-    mailbox_c #(logic [7:0]) sink_mailbox;
+    x_monitor source_monitor;
+    x_monitor sink_monitor;
 
     logic [7:0] source_byte_stream [$];
     logic [7:0] sink_byte_stream [$];
@@ -57,20 +52,16 @@ package scoreboard_pkg;
 
     // connect the analysis ports of the monitor to the scoreboard
     function void set_source_stream(
-      x_monitor source_tm,
-      mailbox_c #(logic [7:0]) source_mailbox);
+      x_monitor source_monitor);
 
-      this.source_tm = source_tm;
-      this.source_mailbox = source_mailbox;
+      this.source_monitor = source_monitor;
 
     endfunction: set_source_stream
 
     function void set_sink_stream(
-      x_monitor sink_tm,
-      mailbox_c #(logic [7:0]) sink_mailbox);
+      x_monitor sink_monitor);
 
-      this.sink_tm = sink_tm;
-      this.sink_mailbox = sink_mailbox;
+      this.sink_monitor = sink_monitor;
 
     endfunction: set_sink_stream 
 
@@ -120,16 +111,16 @@ package scoreboard_pkg;
       logic [7:0] source_byte;
 
       forever begin
-        this.source_tm.wait_for_transaction_event();
-        this.source_tm.get_key();
-        for (int i=0; i<this.source_mailbox.num(); ++i) begin
-          this.source_mailbox.get(source_byte);
-          this.source_mailbox.put(source_byte);
+        this.source_monitor.wait_for_transaction_event();
+        this.source_monitor.get_key();
+        for (int i=0; i<this.source_monitor.mailbox.num(); ++i) begin
+          this.source_monitor.mailbox.get(source_byte);
+          this.source_monitor.mailbox.put(source_byte);
           this.source_byte_stream.push_front(source_byte);
         end
-        this.source_byte_stream_size += this.source_mailbox.num();
-        `INFO(("Source transaction received, size: %d - %d", this.source_mailbox.num(), this.source_byte_stream_size));
-        this.source_tm.put_key();
+        this.source_byte_stream_size += this.source_monitor.mailbox.num();
+        `INFO(("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size));
+        this.source_monitor.put_key();
       end
 
     endtask: get_source_transaction
@@ -140,16 +131,16 @@ package scoreboard_pkg;
       logic [7:0] sink_byte;
 
       forever begin
-        this.sink_tm.wait_for_transaction_event();
-        this.sink_tm.get_key();
-        for (int i=0; i<this.sink_mailbox.num(); ++i) begin
-          this.sink_mailbox.get(sink_byte);
-          this.sink_mailbox.put(sink_byte);
+        this.sink_monitor.wait_for_transaction_event();
+        this.sink_monitor.get_key();
+        for (int i=0; i<this.sink_monitor.mailbox.num(); ++i) begin
+          this.sink_monitor.mailbox.get(sink_byte);
+          this.sink_monitor.mailbox.put(sink_byte);
           this.sink_byte_stream.push_front(sink_byte);
         end
-        this.sink_byte_stream_size += this.sink_mailbox.num();
-        `INFO(("Sink transaction received, size: %d", this.sink_mailbox.num()));
-        this.sink_tm.put_key();
+        this.sink_byte_stream_size += this.sink_monitor.mailbox.num();
+        `INFO(("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size));
+        this.sink_monitor.put_key();
       end
 
     endtask: get_sink_transaction

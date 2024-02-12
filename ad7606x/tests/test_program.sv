@@ -73,8 +73,6 @@ program test_program (
   output        rx_busy,
   output bit [1:0] adc_config_mode);
 
-assign rx_db_i = tx_data_buf;
-
 test_harness_env env;
 
 // --------------------------
@@ -131,13 +129,13 @@ initial begin
   sanity_test;
 
   #100 adc_config_SIMPLE_test;
-  
+
   #200 adc_config_CRC_test;
-  
+
   #200 adc_config_STATUS_test;
-  
+
   #200 adc_config_STATUS_CRC_test;
-  
+
   #200 adc_config_SIMPLE_test;
 
   #100 db_transmission_test;
@@ -169,6 +167,7 @@ end
   reg [15:0]  tx_data_buf = 16'h0;
   bit [15:0]  tx_crc;
 
+  assign rx_db_i = tx_data_buf;
   assign tx_crc = (DEV_CONFIG == 0 || DEV_CONFIG == 1) ? ((adc_config_mode == 1) ? 16'hE0E2 : ((adc_config_mode == 3) ? 16'h6B33 : 16'h0)) : ((adc_config_mode == 1) ? 16'hD885 : ((adc_config_mode == 3) ? 16'hAF8B : 16'h0));
 
   wire [4:0] num_of_transfers;
@@ -213,7 +212,7 @@ initial begin
                         tx_data_buf = tx_ch2;
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -233,7 +232,7 @@ initial begin
                         tx_data_buf = tx_ch4;
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -253,7 +252,7 @@ initial begin
                         tx_data_buf = tx_ch6;
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -273,7 +272,7 @@ initial begin
                         tx_data_buf = tx_ch8;
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -292,7 +291,7 @@ initial begin
                         tx_data_buf = {8'b0,tx_status_5};
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -309,7 +308,7 @@ initial begin
                         tx_data_buf = {8'b0,tx_status_6};
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -326,7 +325,7 @@ initial begin
                         tx_data_buf = {8'b0,tx_status_7};
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -343,7 +342,7 @@ initial begin
                         tx_data_buf = {8'b0,tx_status_8};
                       end
                       if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin 
+                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
                           tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
@@ -518,20 +517,21 @@ endtask
 //---------------------------------------------------------------------------
 bit [31:0] capp_word;
 task db_transmission_test;
-  begin 
+  begin
     #100 transfer_status = 1;
 
     // Generate cnvst_n pulse using AXI_PWM_GEN
-    #100 axi_write (`AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(0)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    #100 axi_write (`AXI_PWMGEN + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('h64)); // set PWM period
-    #100 axi_write (`AXI_PWMGEN + GetAddrs(REG_PULSE_0_WIDTH), `SET_REG_PULSE_0_WIDTH_PULSE_0_WIDTH('h63)); // set PWM pulse width
-    #100 axi_write (`AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    axi_write (`AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (`AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(0)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (`AXI_PWMGEN + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('h64)); // set PWM period
+    axi_write (`AXI_PWMGEN + GetAddrs(REG_PULSE_0_WIDTH), `SET_REG_PULSE_0_WIDTH_PULSE_0_WIDTH('h63)); // set PWM pulse width
+    axi_write (`AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     $display("[%t] axi_pwm_gen started.", $time);
 
     wait(rx_ch_count == num_of_transfers);
 
     // Stop pwm gen
-    axi_write (`AXI_PWMGEN + 32'h00000010, 'h2); // stop PWM_GEN
+    axi_write (`AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1));
     $display("[%t] axi_pwm_gen stopped.", $time);
   end
 endtask

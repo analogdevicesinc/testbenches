@@ -50,6 +50,7 @@ adi_sim_project_files [list \
  "../common/sv/dmac_api.sv" \
  "../common/sv/adi_regmap_pkg.sv" \
  "../common/sv/adi_regmap_dmac_pkg.sv" \
+ "../common/sv/adi_regmap_pwm_gen_pkg.sv" \
  "../common/sv/dma_trans.sv" \
  "../common/sv/test_harness_env.sv" \
  "tests/test_program_si.sv" \

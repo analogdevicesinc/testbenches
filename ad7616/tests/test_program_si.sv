@@ -41,6 +41,8 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
+import adi_regmap_pwm_gen_pkg::*;
 
 `define AD7616_DMA                      32'h44A3_0000
 `define AD7616_REGMAP                   32'h44A0_0000
@@ -444,27 +446,28 @@ bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 task offload_spi_test;
   begin
 
-    //config cnv
-    #100 axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000001);
-    #100 axi_write (AXI_PWMGEN + 32'h00000040, 'h64);
-    #100 axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000002);
+    // Configure pwm
+    axi_write (AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (AXI_PWMGEN + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('h64)); // set PWM period
+    axi_write (AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    $display("[%t] axi_pwm_gen started.", $time);
 
-    //Configure DMA
-    #100 axi_write (`AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
-    #100 axi_write (`AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
-    #100 axi_write (`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    #100 axi_write (`AD7616_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
-    #100 axi_write (`AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    // Configure DMA
+    axi_write (`AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
+    axi_write (`AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
+    axi_write (`AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
+    axi_write (`AD7616_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
+    axi_write (`AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Configure the Offload module
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
-    #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    axi_write (AD7616_BASE + SPI_ENG_ADDR_OFFLOAD_SDO, 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
 
     offload_status = 1;
 

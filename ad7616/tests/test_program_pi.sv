@@ -41,6 +41,8 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
+import adi_regmap_pwm_gen_pkg::*;
 
 localparam AD7616_DMA                 = 32'h44A3_0000;
 localparam AXI_AD7616                 = 32'h44A8_0000;
@@ -217,10 +219,9 @@ task data_acquisition_test;
     axi_write (AXI_CLKGEN + 32'h00000040, 32'h0000003);
 
     // Configure pwm gen
-    axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000001);
-    axi_write (AXI_PWMGEN + 32'h00000040, 'h64);
-    axi_write (AXI_PWMGEN + 32'h00000080, 'h1);
-    axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000002);
+    axi_write (AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (AXI_PWMGEN + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('h64)); // set PWM period
+    axi_write (AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     $display("[%t] axi_pwm_gen started.", $time);
 
      //Configure DMA

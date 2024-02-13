@@ -102,15 +102,20 @@ package adi_regmap_pkg;
     return ret;
   endfunction;
 
-  function bit [31:0] UpdateRegister(bit [31:0] regvalue,
-                                     bit [31:0] fieldvalue,
-                                     bit [31:0] mask);
-    bit [31:0] ret = regvalue;
-    ret = ret & (~mask);
-    ret = ret | fieldvalue;
+  function bit [31:0] UpdateField(reg_t register,
+                                  string field,
+                                  bit [31:0] regvalue,
+                                  bit [31:0] curregvalue);
+    bit [31:0] ret = curregvalue;
+
+    if (!register.fields.exists(field))
+      `ERROR(("Field %s in reg %s does not exists", field, register.name));
+
+    ret = ret & (~SetField(register, field, 'hFFFF)); // mask
+    ret = ret | SetField(register, field, regvalue); // update register
 
     return ret;
-  endfunction;
+  endfunction
 
   function int GetAddrs(reg_t register);
     return register.addr;

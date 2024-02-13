@@ -43,7 +43,6 @@ package dmac_api_pkg;
   import adi_regmap_pkg::*;
   import reg_accessor_pkg::*;
   import dma_trans_pkg::*;
-  import axi_dmac_pkg::*;
 
   class dmac_api extends adi_peripheral;
 
@@ -64,9 +63,9 @@ package dmac_api_pkg;
     task discover_params();                                                                   
       bit [31:0] val;
       bit  [3:0] bpb_dest_log2, bpb_src_log2, bpb_width_log2;
-      this.bus.RegRead32(this.base_address + GetAddrs(DMAC_PERIPHERAL_ID), val);              
+      this.axi_read(GetAddrs(DMAC_PERIPHERAL_ID), val);              
       p.ID = `GET_DMAC_PERIPHERAL_ID_PERIPHERAL_ID(val);
-      this.bus.RegRead32(this.base_address + GetAddrs(DMAC_INTERFACE_DESCRIPTION), val);      
+      this.axi_read(GetAddrs(DMAC_INTERFACE_DESCRIPTION), val);      
       bpb_dest_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BEAT_DEST_LOG2(val);          
       p.DMA_DATA_WIDTH_DEST = (2**bpb_dest_log2)*8;
       p.DMA_TYPE_DEST = `GET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_DEST(val);
@@ -75,18 +74,18 @@ package dmac_api_pkg;
       p.DMA_TYPE_SRC = `GET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_SRC(val);
       bpb_width_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BURST_WIDTH(val);            
       p.MAX_BYTES_PER_BURST = 2**bpb_width_log2;
-      this.bus.RegWrite32(this.base_address + GetAddrs(DMAC_X_LENGTH),
-                                SetField(DMAC_X_LENGTH, "X_LENGTH", 32'h0));
-      this.bus.RegRead32(this.base_address + GetAddrs(DMAC_X_LENGTH), val);
+      this.axi_write(GetAddrs(DMAC_X_LENGTH),
+                        `SET_DMAC_X_LENGTH_X_LENGTH(32'h0));
+      this.axi_read(GetAddrs(DMAC_X_LENGTH), val);
       p.DMA_LENGTH_ALIGN = `GET_DMAC_X_LENGTH_X_LENGTH(val)+1;
-      this.bus.RegWrite32(this.base_address + GetAddrs(DMAC_Y_LENGTH),
-                                SetField(DMAC_Y_LENGTH, "Y_LENGTH", 32'hFFFFFFFF));
-      this.bus.RegRead32(this.base_address + GetAddrs(DMAC_Y_LENGTH), val);
+      this.axi_write(GetAddrs(DMAC_Y_LENGTH),
+                        `SET_DMAC_Y_LENGTH_Y_LENGTH(32'hFFFFFFFF));
+      this.axi_read(GetAddrs(DMAC_Y_LENGTH), val);
       if (val==0) begin
         p.DMA_2D_TRANSFER = 0;
       end else begin 
         p.DMA_2D_TRANSFER = 1;
-        this.bus.RegWrite32(this.base_address + GetAddrs(DMAC_Y_LENGTH), 32'h0);
+        this.axi_write(GetAddrs(DMAC_Y_LENGTH), 32'h0);
       end
     endtask : discover_params
 
@@ -117,26 +116,26 @@ package dmac_api_pkg;
     //
     // -----------------
     task enable_dma();
-      this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_CONTROL),
-                                SetField(DMAC_CONTROL, "ENABLE", 1));
+      this.axi_write(GetAddrs(DMAC_CONTROL),
+                        `SET_DMAC_CONTROL_ENABLE(1));
     endtask : enable_dma
 
     // -----------------
     //
     // -----------------
     task disable_dma();
-      this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_CONTROL),
-                                SetField(DMAC_CONTROL, "ENABLE", 0));
+      this.axi_write(GetAddrs(DMAC_CONTROL),
+                        `SET_DMAC_CONTROL_PAUSE(0));
     endtask : disable_dma
 
     // -----------------
     //
     // -----------------
     task set_flags(input bit[2:0] flags);
-      this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_FLAGS),
-                                SetField(DMAC_FLAGS, "CYCLIC", flags[0])|
-                                SetField(DMAC_FLAGS, "TLAST", flags[1])|
-                                SetField(DMAC_FLAGS, "PARTIAL_REPORTING_EN", flags[2]));
+      this.axi_write(GetAddrs(DMAC_FLAGS),
+                        `SET_DMAC_FLAGS_CYCLIC(flags[0])|
+                        `SET_DMAC_FLAGS_TLAST(flags[1])|
+                        `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
     endtask : set_flags
 
     // -----------------
@@ -151,10 +150,8 @@ package dmac_api_pkg;
       fork
         begin
           do
-            this.bus.RegRead32( this.base_address + GetAddrs(DMAC_TRANSFER_SUBMIT), regData);
-          while (GetField(DMAC_TRANSFER_SUBMIT,
-                          "TRANSFER_SUBMIT",
-                          regData) != 0);
+            this.axi_read(GetAddrs(DMAC_TRANSFER_SUBMIT), regData);
+          while (`GET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(regData) != 0);
           `INFO(("Ready for submission "));
         end
         begin
@@ -171,10 +168,38 @@ package dmac_api_pkg;
     //
     // -----------------
     task transfer_start;
-      this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_TRANSFER_SUBMIT),
-                                SetField(DMAC_TRANSFER_SUBMIT, "TRANSFER_SUBMIT", 1));
+      this.axi_write(GetAddrs(DMAC_TRANSFER_SUBMIT),
+                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       `INFO(("Transfer start"));
     endtask : transfer_start
+
+    // -----------------
+    //
+    // -----------------
+    task set_dest_addr(input int xfer_addr);
+      this.axi_write(GetAddrs(DMAC_DEST_ADDRESS),
+                        `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(xfer_addr));
+    endtask : set_dest_addr
+
+    // -----------------
+    //
+    // -----------------
+    task set_src_addr(input int xfer_addr);
+      this.axi_write(GetAddrs(DMAC_SRC_ADDRESS),
+                        `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(xfer_addr));
+    endtask : set_src_addr
+
+    // -----------------
+    //
+    // -----------------
+    task set_lengths(
+      input int xfer_length_x,
+      input int xfer_length_y);
+      this.axi_write(GetAddrs(DMAC_X_LENGTH),
+                        `SET_DMAC_X_LENGTH_X_LENGTH(xfer_length_x));
+      this.axi_write(GetAddrs(DMAC_Y_LENGTH),
+                        `SET_DMAC_Y_LENGTH_Y_LENGTH(xfer_length_y));
+    endtask : set_lengths
 
     // -----------------
     //
@@ -193,13 +218,11 @@ package dmac_api_pkg;
       fork
         begin
           while (~regData[transfer_id]) begin
-            this.bus.RegRead32( this.base_address + GetAddrs(DMAC_TRANSFER_DONE), regData);
+            this.axi_read(GetAddrs(DMAC_TRANSFER_DONE), regData);
           end
           `INFO(("Transfer id %0d DONE",transfer_id));
 
-          partial_info_available = GetField(DMAC_TRANSFER_DONE,
-                                            "PARTIAL_TRANSFER_DONE",
-                                            regData);
+          partial_info_available = `GET_DMAC_TRANSFER_DONE_PARTIAL_TRANSFER_DONE(regData);
 
           if (partial_segment == 1) begin
             if (partial_info_available != 1) begin
@@ -207,20 +230,16 @@ package dmac_api_pkg;
             end
 
             `INFO(("Found partial data info for ID  %0d",transfer_id));
-            this.bus.RegRead32( this.base_address + GetAddrs(DMAC_PARTIAL_TRANSFER_LENGTH), regData);
-            segment_length_found = GetField(DMAC_PARTIAL_TRANSFER_LENGTH,
-                                            "PARTIAL_LENGTH",
-                                             regData);
+            this.axi_read(GetAddrs(DMAC_PARTIAL_TRANSFER_LENGTH), regData);
+            segment_length_found = `GET_DMAC_PARTIAL_TRANSFER_LENGTH_PARTIAL_LENGTH(regData);
             if (segment_length_found != segment_length) begin
               `ERROR(("Partial transfer length does not match Expected %0d Found %0d",
                       segment_length, segment_length_found));
             end else begin
               `INFO(("Found partial data info length is %0d",segment_length));
             end
-            this.bus.RegRead32( this.base_address + GetAddrs(DMAC_PARTIAL_TRANSFER_ID), regData);
-            id_found = GetField(DMAC_PARTIAL_TRANSFER_ID,
-                                "PARTIAL_TRANSFER_ID",
-                                regData);
+            this.axi_read(GetAddrs(DMAC_PARTIAL_TRANSFER_ID), regData);
+            id_found = `GET_DMAC_PARTIAL_TRANSFER_ID_PARTIAL_TRANSFER_ID(regData);
 
             if (id_found != transfer_id) begin
               `ERROR(("Partial transfer ID does not match Expected %0d Found %0d",
@@ -245,7 +264,7 @@ package dmac_api_pkg;
     //
     // -----------------
     task transfer_id_get(output bit [3:0] transfer_id);
-      this.bus.RegRead32( this.base_address + GetAddrs(DMAC_TRANSFER_ID), transfer_id);
+      this.axi_read(GetAddrs(DMAC_TRANSFER_ID), transfer_id);
       `INFO(("Found transfer ID = %0d", transfer_id));
     endtask : transfer_id_get
 
@@ -266,15 +285,15 @@ package dmac_api_pkg;
         `ERROR(("Transfer length (%0d) must be multiple of largest interface (%0d)", t.length, p.DMA_LENGTH_ALIGN));
       end
       if (p.DMA_TYPE_SRC == 0) begin
-        this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_SRC_ADDRESS),
-                                  SetField(DMAC_SRC_ADDRESS, "SRC_ADDRESS", t.src_addr));
+        this.axi_write(GetAddrs(DMAC_SRC_ADDRESS),
+                          `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(t.src_addr));
       end
       if (p.DMA_TYPE_DEST == 0) begin
-        this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_DEST_ADDRESS),
-                                  SetField(DMAC_DEST_ADDRESS, "DEST_ADDRESS", t.dst_addr));
+        this.axi_write(GetAddrs(DMAC_DEST_ADDRESS),
+                          `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(t.dst_addr));
       end
-      this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_X_LENGTH),
-                                SetField(DMAC_X_LENGTH, "X_LENGTH", t.length-1));
+      this.axi_write(GetAddrs(DMAC_X_LENGTH),
+                        `SET_DMAC_X_LENGTH_X_LENGTH(t.length-1));
 
       if (p.DMA_2D_TRANSFER == 1) begin
         if (!$cast(t_2d,t)) begin
@@ -284,15 +303,15 @@ package dmac_api_pkg;
           t_2d.src_stride = 0;
           t_2d.dst_stride = 0;
         end
-        this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_Y_LENGTH),
-                                  SetField(DMAC_Y_LENGTH, "Y_LENGTH", t_2d.ylength-1));
+        this.axi_write(GetAddrs(DMAC_Y_LENGTH),
+                          `SET_DMAC_Y_LENGTH_Y_LENGTH(t_2d.ylength-1));
         if (p.DMA_TYPE_SRC == 0) begin
-          this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_SRC_STRIDE),
-                                    SetField(DMAC_SRC_STRIDE, "SRC_STRIDE", t_2d.src_stride));
+          this.axi_write(GetAddrs(DMAC_SRC_STRIDE),
+                            `SET_DMAC_SRC_STRIDE_SRC_STRIDE(t_2d.src_stride));
         end
         if (p.DMA_TYPE_DEST == 0) begin
-          this.bus.RegWrite32( this.base_address + GetAddrs(DMAC_DEST_STRIDE),
-                                    SetField(DMAC_DEST_STRIDE, "DEST_STRIDE", t_2d.dst_stride));
+          this.axi_write(GetAddrs(DMAC_DEST_STRIDE),
+                            `SET_DMAC_DEST_STRIDE_DEST_STRIDE(t_2d.dst_stride));
         end
       end
 

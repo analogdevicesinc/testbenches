@@ -31,7 +31,6 @@ adi_sim_project_files [list \
  "../common/sv/adi_regmap_pkg.sv" \
  "../common/sv/adi_regmap_dmac_pkg.sv" \
  "../common/sv/dma_trans.sv" \
- "../common/sv/axi_dmac_pkg.sv" \
  "../common/sv/test_harness_env.sv" \
  "tests/test_program.sv" \
  "system_tb.sv" \

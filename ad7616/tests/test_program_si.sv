@@ -121,7 +121,7 @@ localparam AXI_PWMGEN = `AXI_PWMGEN;
 
 program test_program_si (
   input       spi_clk,
-  input       irq,
+  input       ad7616_irq,
   input       ad7616_spi_sclk,
   input       ad7616_spi_sdo,
   input [1:0] ad7616_spi_sdi,
@@ -240,7 +240,7 @@ reg [7:0] sync_id = 0;
 
 initial begin
   while (1) begin
-    @(posedge irq);
+    @(posedge ad7616_irq);
     // read pending IRQs
     axi_read (`AD7616_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
     // IRQ launched by Offload SYNC command

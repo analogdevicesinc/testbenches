@@ -53,10 +53,10 @@ source ../../projects/ad7616_sdz/common/ad7616_bd.tcl
 if {$SER_PAR_N == 1} {
 
   create_bd_port -dir O spi_clk
-  create_bd_port -dir O irq
+  create_bd_port -dir O ad7616_irq
 
   ad_connect spi_clk sys_cpu_clk
-  ad_connect irq spi_ad7616/irq
+  ad_connect ad7616_irq spi_ad7616/irq
 
 } else {
 

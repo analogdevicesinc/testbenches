@@ -38,6 +38,7 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
+import adi_regmap_dmac_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import logger_pkg::*;
@@ -498,11 +499,14 @@ begin
     $display("[%t] axi_pwm_gen started.", $time);
 
     //Configure DMA
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h410, DDR_BASE); // DEST_ADDRESS
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer to DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_FLAGS),
+      `SET_DMAC_FLAGS_TLAST(1) |
+      `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
+      ); // Use TLAST
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(DDR_BASE));  // DEST_ADDRESS
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Enable SPI Engine
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_ENABLE, 0);
@@ -567,7 +571,7 @@ begin
     `INFO(("CS Delay Test PASSED"));
 
     #2000
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit DMA transfer
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 1);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_RESET, 0);

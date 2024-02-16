@@ -40,6 +40,7 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
+import adi_regmap_dmac_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import logger_pkg::*;
@@ -412,15 +413,16 @@ task offload_spi_test;
   begin
 
     //Configure DMA
-
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h410, DDR_BASE); // DEST_ADDRESS
-    env.mng.RegWrite32(PULSAR_ADC_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_FLAGS),
+      `SET_DMAC_FLAGS_TLAST(1) |
+      `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
+      ); // Use TLAST
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(DDR_BASE));  // DEST_ADDRESS
+    env.mng.RegWrite32(PULSAR_ADC_DMA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Configure the Offload module
-
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
     axi_write (PULSAR_ADC_BASE + `SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
@@ -512,10 +514,13 @@ begin
     axi_read (PULSAR_ADC_BASE + `SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
   end
 
-  if (sdi_fifo_data != sdi_fifo_data_store)
+  if (sdi_fifo_data != sdi_fifo_data_store) begin
+    $display("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store);
     `ERROR(("Fifo Read Test FAILED"));
-
-  `INFO(("Fifo Read Test PASSED"));
+  end else begin
+    $display("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store);
+    `INFO(("Fifo Read Test PASSED"));
+  end
 
 end
 endtask

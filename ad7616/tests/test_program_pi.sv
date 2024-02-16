@@ -39,6 +39,8 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
+import adi_regmap_pkg::*;
+import adi_regmap_dmac_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 import adi_regmap_pkg::*;
@@ -224,13 +226,16 @@ task data_acquisition_test;
     axi_write (AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     $display("[%t] axi_pwm_gen started.", $time);
 
-     //Configure DMA
-    axi_write (AD7616_DMA+32'h400, 32'h00000001); // Enable DMA
-    axi_write (AD7616_DMA+32'h40c, 32'h00000006); // use TLAST
-    axi_write (AD7616_DMA+32'h418, (NUM_OF_TRANSFERS*4)-1); // X_LENGHTH = 1024-1
-    axi_write (AD7616_DMA+32'h410, DDR_BASE); // DEST_ADDRESS
+     // Configure DMA
+    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_FLAGS),
+      `SET_DMAC_FLAGS_TLAST(1) |
+      `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
+      ); // Use TLAST
+    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(DDR_BASE));  // DEST_ADDRESS
 
-    //Configure AXI_AD7616
+    // Configure AXI_AD7616
     axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, 32'h0);
     axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN);
     axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN | AD7616_CTRL_CNVST_EN);
@@ -242,7 +247,7 @@ task data_acquisition_test;
 
     transfer_status = 1;
 
-    axi_write (AD7616_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 

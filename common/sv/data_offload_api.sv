@@ -56,7 +56,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task set_transfer_length(input int length);
-      this.axi_write_f(GetAddrs(DO_TRANSFER_LENGTH),
+      this.axi_write(GetAddrs(DO_TRANSFER_LENGTH),
                         `SET_DO_TRANSFER_LENGTH_PARTIAL_LENGTH(length-1));
     endtask
 
@@ -64,7 +64,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task enable_oneshot_mode();
-      this.axi_write_f(GetAddrs(DO_CONTROL),
+      this.axi_write(GetAddrs(DO_CONTROL),
                         `SET_DO_CONTROL_ONESHOT_EN(1));
     endtask
 
@@ -72,7 +72,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task disable_oneshot_mode();
-      this.axi_write_f(GetAddrs(DO_CONTROL),
+      this.axi_write(GetAddrs(DO_CONTROL),
                         `SET_DO_CONTROL_ONESHOT_EN(0));
     endtask
 
@@ -80,7 +80,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task enable_bypass_mode();
-      this.axi_write_f(GetAddrs(DO_CONTROL),
+      this.axi_write(GetAddrs(DO_CONTROL),
                         `SET_DO_CONTROL_OFFLOAD_BYPASS(1));
     endtask
 
@@ -88,7 +88,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task disable_bypass_mode();
-      this.axi_write_f(GetAddrs(DO_CONTROL),
+      this.axi_write(GetAddrs(DO_CONTROL),
                         `SET_DO_CONTROL_OFFLOAD_BYPASS(0));
     endtask
 
@@ -96,7 +96,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task assert_reset();
-      this.axi_write_f(GetAddrs(DO_CONTROL),
+      this.axi_write(GetAddrs(DO_CONTROL),
                         `SET_DO_RESETN_OFFLOAD_RESETN(0));
     endtask
 
@@ -104,7 +104,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task deassert_reset();
-      this.axi_write_f(GetAddrs(DO_RESETN_OFFLOAD),
+      this.axi_write(GetAddrs(DO_RESETN_OFFLOAD),
                         `SET_DO_RESETN_OFFLOAD_RESETN(1));
     endtask
 

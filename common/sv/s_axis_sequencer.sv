@@ -44,14 +44,34 @@ package s_axis_sequencer_pkg;
 
     protected xil_axi4stream_data_byte byte_stream [$];
     protected xil_axi4stream_ready_gen_policy_t mode;
+
+    protected bit variable_ranges;
+
     protected xil_axi4stream_uint high_time;
     protected xil_axi4stream_uint low_time;
 
+    protected xil_axi4stream_uint high_time_min;
+    protected xil_axi4stream_uint high_time_max;
+
+    protected xil_axi4stream_uint low_time_min;
+    protected xil_axi4stream_uint low_time_max;
+
+
+    // new
     function new();
-      
     endfunction: new
 
-    function void set_mode(xil_axi4stream_ready_gen_policy_t mode);
+    // function for variable ranges
+    function void set_use_variable_ranges();
+      this.variable_ranges = 1;
+    endfunction: set_use_variable_ranges
+
+    function void clr_use_variable_ranges();
+      this.variable_ranges = 0;
+    endfunction: clr_use_variable_ranges
+
+    // ready generation policy functions
+    function void set_mode(input xil_axi4stream_ready_gen_policy_t mode);
       this.mode = mode;
     endfunction
 
@@ -59,7 +79,8 @@ package s_axis_sequencer_pkg;
       return this.mode;
     endfunction
 
-    function void set_high_time(xil_axi4stream_uint high_time);
+    // high time functions
+    function void set_high_time(input xil_axi4stream_uint high_time);
       this.high_time = high_time;
     endfunction
 
@@ -67,7 +88,16 @@ package s_axis_sequencer_pkg;
       return this.high_time;
     endfunction
 
-    function void set_low_time(xil_axi4stream_uint low_time);
+    function void set_high_time_range(
+      input xil_axi4stream_uint high_time_min, 
+      input xil_axi4stream_uint high_time_max);
+
+      this.high_time_min = high_time_min;
+      this.high_time_max = high_time_max;
+    endfunction
+
+    // low time functions
+    function void set_low_time(input xil_axi4stream_uint low_time);
       this.low_time = low_time;
     endfunction
 
@@ -75,7 +105,16 @@ package s_axis_sequencer_pkg;
       return this.low_time;
     endfunction
 
-    task verify_byte(bit [7:0] refdata);
+    function void set_low_time_range(
+      input xil_axi4stream_uint low_time_min, 
+      input xil_axi4stream_uint low_time_max);
+
+      this.low_time_min = low_time_min;
+      this.low_time_max = low_time_max;
+    endfunction
+
+    // function for verifying bytes
+    task verify_byte(input bit [7:0] refdata);
       bit [7:0] data;
       if (byte_stream.size() == 0) begin
         `ERROR(("Byte steam empty !!!"));
@@ -87,10 +126,12 @@ package s_axis_sequencer_pkg;
       end
     endtask
 
+    // call ready generation function
     task run();
       user_gen_tready();
     endtask
 
+    // virtual tasks to be implemented
     virtual task user_gen_tready();
     endtask
 
@@ -107,19 +148,33 @@ package s_axis_sequencer_pkg;
     function new(T agent);
       this.agent = agent;
       this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
-      this.low_time = 1;
+      this.low_time = 0;
       this.high_time = 1;
+      this.high_time_min = 0;
+      this.high_time_max = 0;
+      this.low_time_min = 0;
+      this.low_time_max = 0;
+      this.variable_ranges = 0;
     endfunction
 
     // TODO: test different ready policies
 
     virtual task user_gen_tready();
       axi4stream_ready_gen tready_gen;
+      
       tready_gen = agent.driver.create_ready("TREADY");
+      
       tready_gen.set_ready_policy(this.mode);
+
+      if (variable_ranges)
+        tready_gen.set_use_variable_ranges();
+
       if (this.mode != XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE) begin
         tready_gen.set_low_time(this.low_time);
         tready_gen.set_high_time(this.high_time);
+
+        tready_gen.set_low_time_range(this.low_time_min, this.low_time_max);
+        tready_gen.set_high_time_range(this.high_time_min, this.high_time_max);
       end
       agent.driver.send_tready(tready_gen);
     endtask

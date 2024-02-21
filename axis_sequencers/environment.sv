@@ -101,8 +101,8 @@ package environment_pkg;
       src_axis_agent.start_master();
       dst_axis_agent.start_slave();
 
-      scoreboard.set_source_stream(src_axis_mon, src_axis_mon.x_mailbox);
-      scoreboard.set_sink_stream(dst_axis_mon, dst_axis_mon.x_mailbox);
+      scoreboard.set_source_stream(src_axis_mon);
+      scoreboard.set_sink_stream(dst_axis_mon);
 
     endtask
 

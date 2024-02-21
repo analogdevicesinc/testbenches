@@ -46,10 +46,11 @@ package m_axis_sequencer_pkg;
       DATA_GEN_MODE_AUTO_RAND   // autogenerate randomized data until aborted
   } data_gen_mode_t;
 
-  typedef enum {
-    STOP_POLICY_DATA_BEAT,        // disable after the data beat has been transferred
-    STOP_POLICY_PACKET,           // disable after the packet has been transferred
-    STOP_POLICY_DESCRIPTOR_QUEUE  // disable after the packet queue has been transferred
+  typedef enum bit [1:0] {
+    STOP_POLICY_IMMEDIATE = 2'h0,        // disable as soon as possible
+    STOP_POLICY_DATA_BEAT = 2'h1,        // disable after the data beat has been transferred
+    STOP_POLICY_PACKET = 2'h2,           // disable after the packet has been transferred
+    STOP_POLICY_DESCRIPTOR_QUEUE = 2'h3  // disable after the packet queue has been transferred
   } stop_policy_t;
 
 
@@ -91,13 +92,18 @@ package m_axis_sequencer_pkg;
     endfunction: new
 
 
+    // set vif proxy to drive outputs with 0 when inactive
+    virtual task set_inactive_drive_output_0();
+    endtask: set_inactive_drive_output_0
+
+
     // check if ready is asserted
     virtual function bit check_ready_asserted();
     endfunction: check_ready_asserted
 
 
     // wait for set amount of clock cycles
-    virtual task wait_clk_count(int wait_clocks);
+    virtual task wait_clk_count(input int wait_clocks);
     endtask: wait_clk_count
 
 
@@ -167,8 +173,8 @@ package m_axis_sequencer_pkg;
       descriptor.num_bytes = bytes_to_generate;
       descriptor.gen_last = gen_last;
       descriptor.gen_sync = gen_sync;
-      `INFOV(("Updating generator with %0d bytes with last %0d, sync %0d",
-               bytes_to_generate, gen_last, gen_sync), 5);
+      // `INFOV(("Updating generator with %0d bytes with last %0d, sync %0d",
+      //          bytes_to_generate, gen_last, gen_sync), 5);
 
       descriptor_q.push_back(descriptor);
     endfunction: add_xfer_descriptor
@@ -206,19 +212,24 @@ package m_axis_sequencer_pkg;
         if (enabled == 0) begin
           `INFOV(("Waiting for enable"), 55);
           @en_ev;
-          #1step;
           `INFOV(("Enable found"), 55);
         end else begin
           if (descriptor_q.size() > 0) begin
             packetize();
             descriptor_delay_subroutine();
           end else begin
-            -> queue_empty;
+            ->> queue_empty;
             #1step;
           end
         end
       end
     endtask: generator
+
+
+    // function 
+    function void push_byte_for_stream(xil_axi4stream_data_byte byte_stream);
+      this.byte_stream.push_back(byte_stream);
+    endfunction: push_byte_for_stream
 
 
     // descriptor delay subroutine
@@ -231,8 +242,7 @@ package m_axis_sequencer_pkg;
     task start();
       `INFOV(("enable sequencer"), 55);
       enabled = 1;
-      #1step;
-      -> en_ev;
+      ->> en_ev;
     endtask: start
 
 
@@ -240,17 +250,12 @@ package m_axis_sequencer_pkg;
       `INFOV(("disable sequencer"), 55);
       enabled = 0;
       byte_count = 0;
-      #1step;
     endtask: stop
 
 
     task run();
       fork
-        begin
-          // start the generator at the next time slot
-          #1step;
-          generator();
-        end
+        generator();
         sender();
       join_none
     endtask: run
@@ -284,6 +289,13 @@ package m_axis_sequencer_pkg;
     endfunction: add_xfer_descriptor_packet_size
 
 
+    // set vif proxy to drive outputs with 0 when inactive
+    virtual task set_inactive_drive_output_0();
+      agent.vif_proxy.set_dummy_drive_type(XIL_AXI4STREAM_VIF_DRIVE_NONE);
+
+      this.wait_clk_count(2);
+    endtask: set_inactive_drive_output_0
+
     // check if ready is asserted
     virtual function bit check_ready_asserted();
       return agent.vif_proxy.is_ready_asserted();
@@ -291,7 +303,7 @@ package m_axis_sequencer_pkg;
 
 
     // wait for set amount of clock cycles
-    virtual task wait_clk_count(int wait_clocks);
+    virtual task wait_clk_count(input int wait_clocks);
       agent.vif_proxy.wait_aclks(wait_clocks);
     endtask: wait_clk_count
 
@@ -299,6 +311,7 @@ package m_axis_sequencer_pkg;
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
     virtual protected task packetize();
       xil_axi4stream_data_byte data[];
+      xil_axi4stream_strb keep[];
       int packet_length;
       int byte_per_beat;
       descriptor_t descriptor;
@@ -306,6 +319,7 @@ package m_axis_sequencer_pkg;
       `INFOV(("packetize start"), 55);
       byte_per_beat = AXIS_VIP_DATA_WIDTH/8;
       data = new[byte_per_beat];
+      keep = new[byte_per_beat];
       descriptor = descriptor_q.pop_front();
 
       // put a copy of the descriptor back into the queue and continue processing
@@ -323,23 +337,28 @@ package m_axis_sequencer_pkg;
               forever begin
                 if (byte_stream.size() > 0) begin
                   data[i] = byte_stream.pop_front();
+                  keep[i] = 1'b1;
                   break;
                 end else
-                  `INFOV(("Waiting for data"), 55);
-                  #1;
+                  #1step;
                 if (enabled == 0)
                   disable packet_loop;
               end
-            DATA_GEN_MODE_AUTO_INCR:
+            DATA_GEN_MODE_AUTO_INCR: begin
               data[i] = byte_count++;
-            DATA_GEN_MODE_AUTO_RAND:
+              keep[i] = 1'b1;
+            end
+            DATA_GEN_MODE_AUTO_RAND: begin
               data[i] = $random;
+              keep[i] = 1'b1;
+            end
           endcase
         end
 
         `INFOV(("generating axis transaction"), 55);
         trans = agent.driver.create_transaction();
         trans.set_data(data);
+        trans.set_keep(keep);
         trans.set_id('h0);
         trans.set_dest('h0);
         data_beat_delay_subroutine();
@@ -350,15 +369,15 @@ package m_axis_sequencer_pkg;
         if (AXIS_VIP_USER_WIDTH > 0)
           trans.set_user_beat((tc == 0) & descriptor.gen_sync);
 
-        -> data_av_ev;
+        ->> data_av_ev;
         `INFOV(("waiting transfer to complete"), 55);
         @(beat_done);
-        if (enabled == 0 && stop_policy == STOP_POLICY_DATA_BEAT) begin
+        if (enabled == 0 && stop_policy <= STOP_POLICY_DATA_BEAT) begin
           `INFOV(("block disabled, leaving packetize"), 55);
           break;
         end
       end
-      -> packet_done;
+      ->> packet_done;
     endtask: packetize
 
 
@@ -373,11 +392,13 @@ package m_axis_sequencer_pkg;
               `INFOV(("waiting for data to be available"), 55);
               @data_av_ev;
             end
+            if (stop_policy == STOP_POLICY_IMMEDIATE)
+              break;
             `INFOV(("sending axis transaction"), 55);
             agent.driver.send(trans);
-            -> beat_done;
+            ->> beat_done;
             if (enabled == 0)
-              if (stop_policy == STOP_POLICY_DATA_BEAT)
+              if (stop_policy <= STOP_POLICY_DATA_BEAT)
                 break;
               else begin
                 wait(packet_done.triggered || data_av_ev.triggered);

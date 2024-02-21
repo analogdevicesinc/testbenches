@@ -14,6 +14,8 @@ package x_monitor_pkg;
     semaphore semaphore_key;
     event transaction_event;
 
+    bit enabled;
+
     // constructor
     function new(input string name);
       super.new(name);
@@ -33,12 +35,22 @@ package x_monitor_pkg;
 
     // event functions
     task transaction_captured();
-      ->this.transaction_event;
+      ->>this.transaction_event;
     endtask
 
     task wait_for_transaction_event();
       @this.transaction_event;
     endtask
+
+    // run task
+    task run();
+
+      fork
+        this.enabled = 1;
+        get_transaction();
+      join_none
+
+    endtask /* run */
 
     // virtual functions
     virtual function void set_sink_type(input bit sink_type);
@@ -47,16 +59,19 @@ package x_monitor_pkg;
     virtual function bit get_sink_type();
     endfunction
 
-    virtual task run();
-    endtask
-
     virtual task get_transaction();
     endtask
 
   endclass
 
+  typedef enum bit {
+    READ_OP = 1'b0,
+    WRITE_OP = 1'b1
+  } operation_type_t;
   
-  class x_axi_monitor #( type T, bit operation_type ) extends x_monitor;
+  class x_axi_monitor #( type T, operation_type_t operation_type ) extends x_monitor;
+    // operation type: 1 - write
+    //                 0 - read
 
     // analysis port from the monitor
     xil_analysis_port #(axi_monitor_transaction) axi_ap;
@@ -66,8 +81,7 @@ package x_monitor_pkg;
     int axi_byte_stream_size;
 
     // counters and synchronizers
-    bit enabled;
-    event end_of_first_cycle;
+    // event end_of_first_cycle;
 
     // constructor
     function new(input string name, T agent);
@@ -84,16 +98,6 @@ package x_monitor_pkg;
 
     endfunction /* new */
 
-    // run task
-    virtual task run();
-
-      fork
-        this.enabled = 1;
-        get_transaction();
-      join_none
-
-    endtask /* run */
-
     // collect data from the DDR interface, all WRITE transaction are coming
     // from the ADC and all READ transactions are going to the DAC
     virtual task get_transaction();
@@ -107,7 +111,7 @@ package x_monitor_pkg;
         this.get_key();
         if (this.axi_ap.get_item_cnt() > 0) begin
           this.axi_ap.get(transaction);
-          if (transaction.get_cmd_type() == operation_type) begin  // WRITE
+          if (bit'(transaction.get_cmd_type()) == bit'(operation_type)) begin
             this.put_key();
             num_bytes = transaction.get_data_width()/8;
             for (int i=0; i<(transaction.get_len()+1); i++) begin
@@ -115,14 +119,13 @@ package x_monitor_pkg;
               for (int j=0; j<num_bytes; j++) begin
                 axi_byte = data_beat[j*8+:8];
                 // put each beat into byte queues
-                if (transaction.get_cmd_type() == 1'b1) begin  // WRITE
-                  this.mailbox.put(axi_byte);
-                  this.axi_byte_stream_size++;
-                end
+                this.mailbox.put(axi_byte);
+                this.axi_byte_stream_size++;
               end
               if (transaction.get_cmd_type() == 1'b1)
                 `INFOV(("Caught a transaction: %d", this.axi_byte_stream_size), 100);
               this.transaction_captured();
+              #1step;
               #1step;
               this.mailbox.flush();
               this.axi_byte_stream_size = 0;
@@ -155,8 +158,7 @@ package x_monitor_pkg;
     // int all_transfer_size;
 
     // counters and synchronizers
-    bit enabled;
-    event end_of_first_cycle;
+    // event end_of_first_cycle;
 
     // constructor
     function new(input string name, T agent);
@@ -171,16 +173,6 @@ package x_monitor_pkg;
       this.axis_ap = agent.monitor.item_collected_port;
 
     endfunction /* new */
-
-    // run task
-    virtual task run();
-
-      fork
-        this.enabled = 1;
-        get_transaction();
-      join_none
-
-    endtask /* run */
 
     // set sink type
     virtual function void set_sink_type(input bit sink_type);
@@ -220,7 +212,7 @@ package x_monitor_pkg;
             axi_byte = data_beat[j*8+:8];
             this.mailbox.put(axi_byte);
           end
-          `INFOV(("Caught a TX AXI4 stream transaction: %d", this.mailbox.num()), 100);
+          `INFOV(("Caught an AXI4 stream transaction: %d", this.mailbox.num()), 100);
 
           // this.all_transfer_size += this.transfer_size;
 

@@ -33,6 +33,7 @@ package scoreboard_pkg;
 
     event end_of_first_cycle;
     event byte_streams_empty;
+    event stop_scoreboard;
 
     // constructor
     function new(input string name);
@@ -78,6 +79,13 @@ package scoreboard_pkg;
 
     endtask: run
 
+    // stop scoreboard
+    task stop();
+      this.enabled = 0;
+      ->>stop_scoreboard;
+      #1step;
+    endtask: stop
+
     // set sink type
     function void set_sink_type(input bit sink_type);
 
@@ -111,7 +119,16 @@ package scoreboard_pkg;
       logic [7:0] source_byte;
 
       forever begin
-        this.source_monitor.wait_for_transaction_event();
+        fork begin
+          fork
+            this.source_monitor.wait_for_transaction_event();
+            @stop_scoreboard;
+          join_any
+          disable fork;
+        end join
+        if (this.enabled == 0)
+          break;
+        
         this.source_monitor.get_key();
         for (int i=0; i<this.source_monitor.mailbox.num(); ++i) begin
           this.source_monitor.mailbox.get(source_byte);
@@ -119,7 +136,7 @@ package scoreboard_pkg;
           this.source_byte_stream.push_front(source_byte);
         end
         this.source_byte_stream_size += this.source_monitor.mailbox.num();
-        `INFO(("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size));
+        `INFOV(("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size), 200);
         this.source_monitor.put_key();
       end
 
@@ -131,7 +148,17 @@ package scoreboard_pkg;
       logic [7:0] sink_byte;
 
       forever begin
-        this.sink_monitor.wait_for_transaction_event();
+        fork begin
+          fork
+            this.sink_monitor.wait_for_transaction_event();
+            @stop_scoreboard;
+          join_any
+          disable fork;
+        end join
+
+        if (this.enabled == 0)
+          break;
+
         this.sink_monitor.get_key();
         for (int i=0; i<this.sink_monitor.mailbox.num(); ++i) begin
           this.sink_monitor.mailbox.get(sink_byte);
@@ -139,7 +166,7 @@ package scoreboard_pkg;
           this.sink_byte_stream.push_front(sink_byte);
         end
         this.sink_byte_stream_size += this.sink_monitor.mailbox.num();
-        `INFO(("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size));
+        `INFOV(("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size), 200);
         this.sink_monitor.put_key();
       end
 
@@ -154,6 +181,8 @@ package scoreboard_pkg;
       `INFOV(("Scoreboard started"), 100);
 
       forever begin : tx_path
+        if (this.enabled == 0)
+          break;
         if ((this.source_byte_stream_size > 0) &&
               (this.sink_byte_stream_size > 0)) begin
           source_byte = this.source_byte_stream.pop_back();

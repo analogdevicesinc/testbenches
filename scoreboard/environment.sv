@@ -56,13 +56,13 @@ package environment_pkg;
 
     x_axis_monitor #(`AGENT(test_harness, adc_src_axis_0, mst_t)) adc_src_axis_0_mon;
     x_axis_monitor #(`AGENT(test_harness, dac_dst_axis_0, slv_t)) dac_dst_axis_0_mon;
-    x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_0, passthrough_mem_t)) adc_dst_axi_pt_0_mon;
-    x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_0, passthrough_mem_t)) dac_src_axi_pt_0_mon;
+    x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_0, passthrough_mem_t), WRITE_OP) adc_dst_axi_pt_0_mon;
+    x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_0, passthrough_mem_t), READ_OP) dac_src_axi_pt_0_mon;
 
     x_axis_monitor #(`AGENT(test_harness, adc_src_axis_1, mst_t)) adc_src_axis_1_mon;
     x_axis_monitor #(`AGENT(test_harness, dac_dst_axis_1, slv_t)) dac_dst_axis_1_mon;
-    x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_1, passthrough_mem_t)) adc_dst_axi_pt_1_mon;
-    x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_1, passthrough_mem_t)) dac_src_axi_pt_1_mon;
+    x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_1, passthrough_mem_t), WRITE_OP) adc_dst_axi_pt_1_mon;
+    x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_1, passthrough_mem_t), READ_OP) dac_src_axi_pt_1_mon;
 
     scoreboard scoreboard_tx0;
     scoreboard scoreboard_rx0;
@@ -185,17 +185,17 @@ package environment_pkg;
       adc_src_axis_seq_0.start();
       adc_src_axis_seq_1.start();
 
-      scoreboard_tx0.set_source_stream(dac_src_axi_pt_0_mon, dac_src_axi_pt_0_mon.tx_mailbox);
-      scoreboard_tx0.set_sink_stream(dac_dst_axis_0_mon, dac_dst_axis_0_mon.x_mailbox);
+      scoreboard_tx0.set_source_stream(dac_src_axi_pt_0_mon);
+      scoreboard_tx0.set_sink_stream(dac_dst_axis_0_mon);
 
-      scoreboard_rx0.set_source_stream(adc_src_axis_0_mon, adc_src_axis_0_mon.x_mailbox);
-      scoreboard_rx0.set_sink_stream(adc_dst_axi_pt_0_mon, adc_dst_axi_pt_0_mon.rx_mailbox);
+      scoreboard_rx0.set_source_stream(adc_src_axis_0_mon);
+      scoreboard_rx0.set_sink_stream(adc_dst_axi_pt_0_mon);
 
-      scoreboard_tx1.set_source_stream(dac_src_axi_pt_1_mon, dac_src_axi_pt_1_mon.tx_mailbox);
-      scoreboard_tx1.set_sink_stream(dac_dst_axis_1_mon, dac_dst_axis_1_mon.x_mailbox);
+      scoreboard_tx1.set_source_stream(dac_src_axi_pt_1_mon);
+      scoreboard_tx1.set_sink_stream(dac_dst_axis_1_mon);
 
-      scoreboard_rx1.set_source_stream(adc_src_axis_1_mon, adc_src_axis_1_mon.x_mailbox);
-      scoreboard_rx1.set_sink_stream(adc_dst_axi_pt_1_mon, adc_dst_axi_pt_1_mon.rx_mailbox);
+      scoreboard_rx1.set_source_stream(adc_src_axis_1_mon);
+      scoreboard_rx1.set_sink_stream(adc_dst_axi_pt_1_mon);
 
     endtask
 

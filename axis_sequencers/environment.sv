@@ -11,8 +11,6 @@ package environment_pkg;
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import test_harness_env_pkg::*;
-  import scoreboard_pkg::*;
-  import x_monitor_pkg::*;
 
   import `PKGIFY(test_harness, mng_axi_vip)::*;
   import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -30,11 +28,6 @@ package environment_pkg;
                       `AXIS_VIP_PARAMS(test_harness, src_axis)
                       ) src_axis_seq;
     s_axis_sequencer #(`AGENT(test_harness, dst_axis, slv_t)) dst_axis_seq;
-
-    x_axis_monitor #(`AGENT(test_harness, src_axis, mst_t)) src_axis_mon;
-    x_axis_monitor #(`AGENT(test_harness, dst_axis, slv_t)) dst_axis_mon;
-
-    scoreboard scoreboard;
 
     //============================================================================
     // Constructor
@@ -67,11 +60,6 @@ package environment_pkg;
       src_axis_seq = new(src_axis_agent);
       dst_axis_seq = new(dst_axis_agent);
 
-      src_axis_mon = new("Source AXIS Transaction Monitor", src_axis_agent);
-      dst_axis_mon = new("Destination AXIS Transaction Monitor", dst_axis_agent);
-
-      scoreboard = new("Data Offload Verification Environment TX Scoreboard");
-
     endfunction
 
     //============================================================================
@@ -100,9 +88,6 @@ package environment_pkg;
 
       src_axis_agent.start_master();
       dst_axis_agent.start_slave();
-
-      scoreboard.set_source_stream(src_axis_mon);
-      scoreboard.set_sink_stream(dst_axis_mon);
 
     endtask
 

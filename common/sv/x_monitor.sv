@@ -111,6 +111,7 @@ package x_monitor_pkg;
         this.get_key();
         if (this.axi_ap.get_item_cnt() > 0) begin
           this.axi_ap.get(transaction);
+          `INFO(("Transaction pulled"));
           if (bit'(transaction.get_cmd_type()) == bit'(operation_type)) begin
             this.put_key();
             num_bytes = transaction.get_data_width()/8;
@@ -131,11 +132,11 @@ package x_monitor_pkg;
               this.axi_byte_stream_size = 0;
             end
           end else begin
+            this.axi_ap.write(transaction);
             this.put_key();
             #1step;
           end
         end else begin
-          this.axi_ap.write(transaction);
           this.put_key();
           #1step;
         end

@@ -358,10 +358,12 @@ package m_axis_sequencer_pkg;
         `INFOV(("generating axis transaction"), 55);
         trans = agent.driver.create_transaction();
         trans.set_data(data);
-        trans.set_keep(keep);
         trans.set_id('h0);
         trans.set_dest('h0);
         data_beat_delay_subroutine();
+
+        if (AXIS_VIP_HAS_TKEEP)
+          trans.set_keep(keep);
 
         if (AXIS_VIP_HAS_TLAST)
           trans.set_last((tc == packet_length-1) & descriptor.gen_last);

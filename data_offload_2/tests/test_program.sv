@@ -37,6 +37,7 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
+import m_axis_sequencer_pkg::*;
 import logger_pkg::*;
 
 import environment_pkg::*;

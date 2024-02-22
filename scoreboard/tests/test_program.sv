@@ -74,23 +74,23 @@ program test_program;
               `TH.`ADC_SRC_AXIS_0.inst.IF,
               `TH.`DAC_DST_AXIS_0.inst.IF,
               `TH.`ADC_DST_AXI_PT_0.inst.IF,
-              `TH.`DAC_SRC_AXI_PT_0.inst.IF,
+              `TH.`DAC_SRC_AXI_PT_0.inst.IF
 
-              `TH.`ADC_SRC_AXIS_1.inst.IF,
-              `TH.`DAC_DST_AXIS_1.inst.IF,
-              `TH.`ADC_DST_AXI_PT_1.inst.IF,
-              `TH.`DAC_SRC_AXI_PT_1.inst.IF
+              // `TH.`ADC_SRC_AXIS_1.inst.IF,
+              // `TH.`DAC_DST_AXIS_1.inst.IF,
+              // `TH.`ADC_DST_AXI_PT_1.inst.IF,
+              // `TH.`DAC_SRC_AXI_PT_1.inst.IF
              );
 
     dmac_tx_0 = new("DMAC TX 0", env.mng, `TX_DMA_BA_0);
     dmac_rx_0 = new("DMAC RX 0", env.mng, `RX_DMA_BA_0);
-    dmac_tx_1 = new("DMAC TX 1", env.mng, `TX_DMA_BA_1);
-    dmac_rx_1 = new("DMAC RX 1", env.mng, `RX_DMA_BA_1);
+    // dmac_tx_1 = new("DMAC TX 1", env.mng, `TX_DMA_BA_1);
+    // dmac_rx_1 = new("DMAC RX 1", env.mng, `RX_DMA_BA_1);
 
     do_tx_0 = new("Data Offload TX 0", env.mng, `TX_DOFF_BA_0);
     do_rx_0 = new("Data Offload RX 0", env.mng, `RX_DOFF_BA_0);
-    do_tx_1 = new("Data Offload TX 1", env.mng, `TX_DOFF_BA_1);
-    do_rx_1 = new("Data Offload RX 1", env.mng, `RX_DOFF_BA_1);
+    // do_tx_1 = new("Data Offload TX 1", env.mng, `TX_DOFF_BA_1);
+    // do_rx_1 = new("Data Offload RX 1", env.mng, `RX_DOFF_BA_1);
 
     #1step;
 
@@ -122,7 +122,7 @@ program test_program;
     #100
     `INFO(("Start RX DMA ..."));
     rx_dma_transfer(dmac_rx_0, 32'h80000000, `ADC_TRANSFER_LENGTH);
-    rx_dma_transfer(dmac_rx_1, 32'h80000000, `ADC_TRANSFER_LENGTH);
+    // rx_dma_transfer(dmac_rx_1, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
     #10000
     `INFO(("Initialize the memory ..."));
@@ -130,7 +130,7 @@ program test_program;
 
     `INFO(("Start TX DMA ..."));
     tx_dma_transfer(dmac_tx_0, 32'h80000000, 1024);
-    tx_dma_transfer(dmac_tx_1, 32'h80000000, 1024);
+    // tx_dma_transfer(dmac_tx_1, 32'h80000000, 1024);
 
     #10000;
         
@@ -150,15 +150,15 @@ program test_program;
     `INFO(("Bring up TX Data Offload 0"));
     do_tx_0.deassert_reset();
 
-    `INFO(("Bring up RX Data Offload 1"));
-    do_rx_1.deassert_reset();
-    `INFO(("Bring up TX Data Offload 1"));
-    do_tx_1.deassert_reset();
+    // `INFO(("Bring up RX Data Offload 1"));
+    // do_rx_1.deassert_reset();
+    // `INFO(("Bring up TX Data Offload 1"));
+    // do_tx_1.deassert_reset();
 
     // Enable tx oneshot mode
     do_tx_0.enable_oneshot_mode();
 
-    do_tx_1.enable_oneshot_mode();
+    // do_tx_1.enable_oneshot_mode();
 
     // bring up the DMAC instances from reset
 
@@ -167,17 +167,17 @@ program test_program;
     `INFO(("Bring up TX DMAC 0"));
     dmac_tx_0.enable_dma();
 
-    `INFO(("Bring up RX DMAC 1"));
-    dmac_rx_1.enable_dma();
-    `INFO(("Bring up TX DMAC 1"));
-    dmac_tx_1.enable_dma();
+    // `INFO(("Bring up RX DMAC 1"));
+    // dmac_rx_1.enable_dma();
+    // `INFO(("Bring up TX DMAC 1"));
+    // dmac_tx_1.enable_dma();
 
   endtask
 
   task do_set_transfer_length(input int length);
     do_rx_0.set_transfer_length(length);
 
-    do_rx_1.set_transfer_length(length);
+    // do_rx_1.set_transfer_length(length);
   endtask
 
   // RX DMA transfer generator

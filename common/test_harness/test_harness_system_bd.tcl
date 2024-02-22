@@ -44,8 +44,10 @@ ad_ip_instance axi_vip ddr_axi_vip $ddr_axi_cfg
 adi_sim_add_define "DDR_AXI=ddr_axi_vip"
 
 # Interrupt controller
-ad_ip_instance axi_intc axi_intc
-ad_ip_parameter axi_intc CONFIG.C_HAS_FAST 0
+ad_ip_instance axi_intc axi_intc [list \
+  C_IRQ_CONNECTION 1 \
+  C_HAS_FAST 0 \
+]
 
 ad_ip_instance xlconcat sys_concat_intc
 ad_ip_parameter sys_concat_intc CONFIG.NUM_PORTS 16
@@ -95,19 +97,26 @@ ad_ip_parameter sys_rstgen CONFIG.C_EXT_RST_WIDTH 1
 ad_ip_instance proc_sys_reset sys_dma_rstgen
 ad_ip_parameter sys_dma_rstgen CONFIG.C_EXT_RST_WIDTH 1
 
+ad_ip_instance proc_sys_reset sys_mem_rstgen
+ad_ip_parameter sys_mem_rstgen CONFIG.C_EXT_RST_WIDTH 1
+
 ad_connect sys_rst_vip/rst_out sys_rstgen/ext_reset_in
 ad_connect sys_rst_vip/rst_out sys_dma_rstgen/ext_reset_in
+ad_connect sys_rst_vip/rst_out sys_mem_rstgen/ext_reset_in
 
 ad_connect sys_cpu_clk sys_rstgen/slowest_sync_clk
 ad_connect sys_dma_clk sys_dma_rstgen/slowest_sync_clk
+ad_connect sys_mem_clk sys_mem_rstgen/slowest_sync_clk
 ad_connect sys_cpu_reset sys_rstgen/peripheral_reset
 ad_connect sys_cpu_resetn sys_rstgen/peripheral_aresetn
 ad_connect sys_dma_reset sys_dma_rstgen/peripheral_reset
 ad_connect sys_dma_resetn sys_dma_rstgen/peripheral_aresetn
+ad_connect sys_mem_reset sys_mem_rstgen/peripheral_reset
+ad_connect sys_mem_resetn sys_mem_rstgen/peripheral_aresetn
 
 ad_connect sys_cpu_clk /mng_axi_vip/aclk
 ad_connect sys_cpu_resetn /mng_axi_vip/aresetn
-ad_connect sys_cpu_resetn /ddr_axi_vip/aresetn
+ad_connect sys_mem_resetn /ddr_axi_vip/aresetn
 
 # Clock and reset interface to system_bd
 set sys_mem_clk sys_mem_clk
@@ -120,6 +129,10 @@ set sys_dma_clk sys_dma_clk
 set sys_dma_clk_source dma_clk_vip/clk_out
 set sys_dma_reset sys_dma_reset
 set sys_dma_resetn sys_dma_resetn
+
+set sys_mem_clk sys_mem_clk
+set sys_mem_reset sys_mem_reset
+set sys_mem_resetn sys_mem_resetn
 
 ad_connect axi_intc/intr sys_concat_intc/dout
 
@@ -176,6 +189,13 @@ incr sys_cpu_interconnect_index
 global sys_mem_interconnect_index
 incr sys_mem_interconnect_index
 
+# create external port for IRQ
+create_bd_port -dir O -type intr irq
+
+ad_connect irq axi_intc/irq
+
 # Set DDR VIP to a range of 2G 
-create_bd_addr_seg -range 0x80000000 -offset 0x80000000 [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
+set DDR_BASE 0x80000000
+create_bd_addr_seg -range ${DDR_BASE} -offset ${DDR_BASE} [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
   [get_bd_addr_segs ddr_axi_vip/S_AXI/Reg] SEG_mng_ddr_cntlr
+adi_sim_add_define "DDR_BA=[format "%d" ${DDR_BASE}]"

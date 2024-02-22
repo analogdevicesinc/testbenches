@@ -49,6 +49,7 @@ package test_harness_env_pkg;
     // Agents
     `AGENT(test_harness, mng_axi_vip, mst_t) mng_agent;
     `AGENT(test_harness, ddr_axi_vip, slv_mem_t) ddr_axi_agent;
+
     // Sequencers
     m_axi_sequencer #(`AGENT(test_harness, mng_axi_vip, mst_t)) mng;
     s_axi_sequencer #(`AGENT(test_harness, ddr_axi_vip, slv_mem_t)) ddr_axi_seq;
@@ -60,6 +61,8 @@ package test_harness_env_pkg;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if;
 
+    virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if;
+
     //============================================================================
     // Constructor
     //============================================================================
@@ -67,6 +70,9 @@ package test_harness_env_pkg;
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
+
+      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
+
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
     );
@@ -74,6 +80,7 @@ package test_harness_env_pkg;
       this.sys_clk_vip_if = sys_clk_vip_if;
       this.dma_clk_vip_if = dma_clk_vip_if;
       this.ddr_clk_vip_if = ddr_clk_vip_if;
+      this.sys_rst_vip_if = sys_rst_vip_if;
 
       // Creating the agents
       mng_agent = new("AXI Manager agent", mng_vip_if);
@@ -132,6 +139,10 @@ package test_harness_env_pkg;
     task stop;
       mng_agent.stop_master();
       ddr_axi_agent.stop_slave();
+
+      sys_clk_vip_if.stop_clock;
+      dma_clk_vip_if.stop_clock;
+      ddr_clk_vip_if.stop_clock;
     endtask
 
     //============================================================================
@@ -149,7 +160,16 @@ package test_harness_env_pkg;
       done = 1;
     endtask
 
-
+    //============================================================================
+    // System reset routine
+    //============================================================================
+    task sys_reset;
+      //asserts all the resets for 100 ns
+      sys_rst_vip_if.assert_reset;
+      #100;
+      sys_rst_vip_if.deassert_reset;
+      #100;
+    endtask
 
   endclass
 

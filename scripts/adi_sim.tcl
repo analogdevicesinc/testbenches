@@ -80,6 +80,8 @@ proc adi_sim_generate {project_name } {
   generate_target Simulation [get_files $project_system_dir/$design_name.bd]
 
   set_property include_dirs . [get_filesets sim_1]
+
+  set_msg_config -string mb_reset -suppress
 }
 
 proc adi_open_project {project_path} {

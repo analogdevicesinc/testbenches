@@ -90,6 +90,7 @@ program test_dma;
     env = new(`TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
+              `TH.`SYS_RST.inst.IF,
               `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF);
 

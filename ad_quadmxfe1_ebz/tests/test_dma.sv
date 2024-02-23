@@ -76,7 +76,7 @@ program test_dma;
   int data_path_width;
   int tpl_data_path_width;
 
-  bit [31:0] lane_rate_khz = `RX_RATE*1000000;
+  bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint lane_rate = lane_rate_khz*1000;
 
   reg timed_out;

@@ -2,8 +2,8 @@
 global ad_project_params
 
 set ad_project_params(JESD_MODE)  64B66B
-set ad_project_params(RX_RATE)  24.75
-set ad_project_params(TX_RATE)  24.75
+set ad_project_params(RX_LANE_RATE)  24.75
+set ad_project_params(TX_LANE_RATE)  24.75
 set ad_project_params(RX_PLL_SEL)  1
 set ad_project_params(TX_PLL_SEL)  1
 set ad_project_params(REF_CLK_RATE)  250

@@ -265,7 +265,7 @@ program test_program_64b66b;
     env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_CONTROL),
                        `SET_DMAC_CONTROL_ENABLE(1));
     env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_FLAGS),
-                       `SET_DMAC_CONTROL_TLAST(1));
+                       `SET_DMAC_FLAGS_TLAST(1));
     env.mng.RegWrite32(`TX_DMA+GetAddrs(DMAC_X_LENGTH),
                        `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003FF));
     env.mng.RegWrite32(`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),

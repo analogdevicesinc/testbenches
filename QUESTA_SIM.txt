@@ -1,0 +1,18 @@
+In order to use Questa Simulator, you need to have access to the Linux VDIs. 
+
+Open a new terminal and load in the CShell with "csh" command.
+Load the modules with the following commands:
+module load vivado/adi/2023.2
+module load questa/adi/2023.4
+Clone the HDL repository and inside of it the Testbenches repository. 
+In order to run Questa Simulator, open any project, and run the project in the following mode:
+make MODE=gui QUESTA=y
+Questa Simulator was only tested in GUI mode. You can add additional parameters such as CFG and TST according to the Readme. 
+
+Notes:
+Initially, Questa will need compiled libraries, this will take appox. 1h. After that the the compiled libraries will be ready to be used by all projects. 
+Not all libraries are going to pass, some of them will fail. This may result in an error at the build phase of the project. Rerun the build, it should go without an issue. 
+Everything is set up to use the Questa Simulator at the building phase, if you want to switch back to Vivado, you'll have to rebuild the configuration as well. TODO: change this to be set at testing phase. 
+Try and avoid deleting the compiled libraries after they are done. 
+Questa Simulator takes a while to open, and it takes a little bit of time until it starts going compared to Vivado. 
+On the VDI, don't use multiple cloned repositories, as the available disk space is limited to 40GB and there's not enough space for 2 repositories with Questa Simulator. 

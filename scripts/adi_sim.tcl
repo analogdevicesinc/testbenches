@@ -59,21 +59,38 @@ proc adi_sim_project_files {project_files} {
   set_property -name "top" -value "system_tb" -objects [get_filesets sim_1]
 }
 
-proc adi_sim_generate {project_name } {
+proc adi_sim_generate {project_name {questa_sim "n"}} {
   global design_name
   global adi_sim_defines
 
   # Set the defines for simulation
   set_property verilog_define $adi_sim_defines [get_filesets sim_1]
 
-  set_property -name {xsim.simulate.runtime} -value {} -objects [get_filesets sim_1]
+  if {$questa_sim != "y"} {
+    set_property -name {xsim.simulate.runtime} -value {all} -objects [get_filesets sim_1]
 
-  # Show all Xilinx primitives e.g GTYE4_COMMON
-  set_property -name {xsim.elaborate.debug_level} -value {all} -objects [get_filesets sim_1]
-  # Log all waves
-  set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
+    # Show all Xilinx primitives e.g GTYE4_COMMON
+    set_property -name {xsim.elaborate.debug_level} -value {all} -objects [get_filesets sim_1]
+    # Log all waves
+    set_property -name {xsim.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
+    # Set random seed at each run
+    set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed random} -objects [get_filesets sim_1]
+  } else {
+    set dirname "../compile_simlib/questa"
+    if {! [file exist $dirname]} {
+      file mkdir ${dirname}
 
-  set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed random} -objects [get_filesets sim_1]
+      compile_simlib -simulator questa -simulator_exec_path {/cad/adi/apps/mentor/questa/2023.4/questasim/linux_x86_64} -family all -language all -library all -dir $dirname
+    }
+
+    set_property compxlib.questa_compiled_library_dir $dirname [current_project]
+
+    set_property target_simulator Questa [current_project]
+
+    set_property -name {questa.simulate.runtime} -value {-all} -objects [get_filesets sim_1]
+    set_property -name {questa.simulate.vsim.more_options} -value {-sv_seed random} -objects [get_filesets sim_1]
+    set_property -name {questa.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
+  }
 
   set project_system_dir "./runs/$project_name/$project_name.srcs/sources_1/bd/$design_name"
 

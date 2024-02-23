@@ -7,6 +7,11 @@ if {$argc < 1} {
   exit 1
 } else {
   set cfg_file [lindex $argv 0]
+  if {$argc == 2} {
+    set questa_sim [lindex $argv 1]
+  } else {
+    set questa_sim n
+  }
 }
 
 # Read config file 
@@ -41,7 +46,7 @@ adi_sim_project_files [list \
 #set a default test program
 adi_sim_add_define "TEST_PROGRAM=test_program"
 
-adi_sim_generate $project_name
+adi_sim_generate $project_name $questa_sim
 
 # Use this only for debugging specific seeds that failed previously
 #set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed 1695199824} -objects [get_filesets sim_1]

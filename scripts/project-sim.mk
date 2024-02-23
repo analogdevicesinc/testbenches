@@ -70,7 +70,7 @@ $(addprefix runs/,$(1)/system_project.log) : $(addprefix cfgs/,$(1).tcl) $(ENV_D
 	mkdir -p $(addprefix runs/,$(1))
 	mkdir -p results
 	$(RUN_PRE_OPT)$$(call simulate, \
-		$(CMD_PRE) $(M_VIVADO_BATCH) system_project.tcl -tclargs $(1).tcl $(CMD_POST), \
+		$(CMD_PRE) $(M_VIVADO_BATCH) system_project.tcl -tclargs $(1).tcl ${QUESTA} $(CMD_POST), \
 		$$@, \
 		Building $(HL)$(strip $(1))$(NC) env, \
 		Build $(HL)$(strip $(1))$(NC) env, \
@@ -85,7 +85,7 @@ define sim
 $(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
 $(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS) FORCE
 	$(RUN_PRE_OPT)$$(call simulate, \
-		$(CMD_PRE) flock runs/$(1)/.lock -c "$(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST)", \
+		$(CMD_PRE) flock runs/$(1)/.lock -c "$(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(QUESTA) $(CMD_POST)", \
 		$$@, \
 		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
 		Run $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
@@ -106,6 +106,8 @@ endif
 MODE ?= batch
 
 STOP_ON_ERROR ?= y
+
+QUESTA ?= n
 
 ifeq ($(STOP_ON_ERROR), y)
 	RUN_PRE_OPT =

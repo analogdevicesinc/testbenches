@@ -7,7 +7,6 @@ package environment_pkg;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
   import logger_pkg::*;
-
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import test_harness_env_pkg::*;

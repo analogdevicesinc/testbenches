@@ -61,6 +61,7 @@ package s_axis_sequencer_pkg;
     function new();
     endfunction: new
 
+
     // function for variable ranges
     function void set_use_variable_ranges();
       this.variable_ranges = 1;
@@ -131,6 +132,7 @@ package s_axis_sequencer_pkg;
       user_gen_tready();
     endtask
 
+
     // virtual tasks to be implemented
     virtual task user_gen_tready();
     endtask
@@ -145,6 +147,7 @@ package s_axis_sequencer_pkg;
 
     protected T agent;
 
+
     function new(T agent);
       this.agent = agent;
       this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
@@ -157,7 +160,6 @@ package s_axis_sequencer_pkg;
       this.variable_ranges = 0;
     endfunction
 
-    // TODO: test different ready policies
 
     virtual task user_gen_tready();
       axi4stream_ready_gen tready_gen;

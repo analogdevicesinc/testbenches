@@ -62,7 +62,7 @@ package m_axis_sequencer_pkg;
     protected data_gen_mode_t data_gen_mode;
 
     protected bit descriptor_gen_mode;  // 0 - get descriptor from test;
-                              // 1 - autogenerate descriptor based on the first descriptor from test until aborted
+                                        // 1 - autogenerate descriptor based on the first descriptor from test until aborted
     
     protected int byte_count;
 
@@ -87,6 +87,7 @@ package m_axis_sequencer_pkg;
 
     protected descriptor_t descriptor_q [$];
 
+
     // new
     function new();
     endfunction: new
@@ -96,25 +97,20 @@ package m_axis_sequencer_pkg;
     virtual task set_inactive_drive_output_0();
     endtask: set_inactive_drive_output_0
 
-
     // check if ready is asserted
     virtual function bit check_ready_asserted();
     endfunction: check_ready_asserted
-
 
     // wait for set amount of clock cycles
     virtual task wait_clk_count(input int wait_clocks);
     endtask: wait_clk_count
 
-
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
     virtual protected task packetize();
     endtask: packetize
 
-
     virtual protected task sender();
     endtask: sender
-
 
     // create transfer based on data beats per packet
     virtual function void add_xfer_descriptor_packet_size(
@@ -130,7 +126,6 @@ package m_axis_sequencer_pkg;
       `INFOV(("Disable policy configured"), 55);
     endfunction: set_stop_policy
 
-
     // set data generation mode
     function void set_data_gen_mode(input data_gen_mode_t data_gen_mode);
       if (enabled)
@@ -138,7 +133,6 @@ package m_axis_sequencer_pkg;
       this.data_gen_mode = data_gen_mode;
       `INFOV(("Data generation mode confgured"), 55);
     endfunction: set_data_gen_mode
-
 
     // set data generation mode
     function void set_descriptor_gen_mode(input bit descriptor_gen_mode);
@@ -148,20 +142,17 @@ package m_axis_sequencer_pkg;
       `INFOV(("Descriptor generation mode confgured"), 55);
     endfunction: set_descriptor_gen_mode
 
-
     // set data beat delay
     function void set_data_beat_delay(input int data_beat_delay);
       this.data_beat_delay = data_beat_delay;
       `INFOV(("Data beat delay confgured"), 55);
     endfunction: set_data_beat_delay
 
-
     // set descriptor delay
     function void set_descriptor_delay(input int descriptor_delay);
       this.descriptor_delay = descriptor_delay;
       `INFOV(("Descriptor delay confgured"), 55);
     endfunction: set_descriptor_delay
-
 
     // create transfer descriptor
     function void add_xfer_descriptor(
@@ -179,31 +170,26 @@ package m_axis_sequencer_pkg;
       descriptor_q.push_back(descriptor);
     endfunction: add_xfer_descriptor
 
-
     // descriptor delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
     protected task descriptor_delay_subroutine();
       wait_clk_count(descriptor_delay);
     endtask: descriptor_delay_subroutine
 
-
     // wait until data beat is sent
     task beat_sent();
       @beat_done;
     endtask: beat_sent
-
 
     // wait until packet is sent
     task packet_sent();
       @packet_done;
     endtask: packet_sent
 
-
     // wait until queue is empty
     task wait_empty_descriptor_queue();
       @queue_empty;
     endtask: wait_empty_descriptor_queue
-
 
     // generate transfer with transfer descriptors
     protected task generator();
@@ -225,12 +211,10 @@ package m_axis_sequencer_pkg;
       end
     endtask: generator
 
-
     // function 
     function void push_byte_for_stream(xil_axi4stream_data_byte byte_stream);
       this.byte_stream.push_back(byte_stream);
     endfunction: push_byte_for_stream
-
 
     // descriptor delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
@@ -238,20 +222,17 @@ package m_axis_sequencer_pkg;
       trans.set_delay(data_beat_delay);
     endtask: data_beat_delay_subroutine
 
-
     task start();
       `INFOV(("enable sequencer"), 55);
       enabled = 1;
       ->> en_ev;
     endtask: start
 
-
     task stop();
       `INFOV(("disable sequencer"), 55);
       enabled = 0;
       byte_count = 0;
     endtask: stop
-
 
     task run();
       fork
@@ -266,6 +247,7 @@ package m_axis_sequencer_pkg;
   class m_axis_sequencer #( type T, `AXIS_VIP_PARAM_DECL) extends m_axis_sequencer_base;
 
     T agent;
+
 
     function new(T agent);
       this.agent = agent;
@@ -288,7 +270,6 @@ package m_axis_sequencer_pkg;
       add_xfer_descriptor(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
     endfunction: add_xfer_descriptor_packet_size
 
-
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
       agent.vif_proxy.set_dummy_drive_type(XIL_AXI4STREAM_VIF_DRIVE_NONE);
@@ -301,12 +282,10 @@ package m_axis_sequencer_pkg;
       return agent.vif_proxy.is_ready_asserted();
     endfunction: check_ready_asserted
 
-
     // wait for set amount of clock cycles
     virtual task wait_clk_count(input int wait_clocks);
       agent.vif_proxy.wait_aclks(wait_clocks);
     endtask: wait_clk_count
-
 
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
     virtual protected task packetize();
@@ -381,7 +360,6 @@ package m_axis_sequencer_pkg;
       end
       ->> packet_done;
     endtask: packetize
-
 
     virtual protected task sender();
       `INFOV(("sender start"), 55);

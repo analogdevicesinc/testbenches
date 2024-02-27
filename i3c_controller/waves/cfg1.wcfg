@@ -6,6 +6,7 @@
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="\$unit_logger_pkg_sv_646304553 " />
+            <top_module name="\$unit_xpm_cdc_sv_220102727 " />
             <top_module name="axi4stream_vip_pkg" />
             <top_module name="axi_vip_pkg" />
             <top_module name="glbl" />
@@ -25,15 +26,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2.466667 us"></ZoomStartTime>
-      <ZoomEndTime time="68.066668 us"></ZoomEndTime>
-      <Cursor1Time time="9.766667 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="788.000001 us"></ZoomEndTime>
+      <Cursor1Time time="93.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="204"></NameColumnWidth>
-      <ValueColumnWidth column_width="123"></ValueColumnWidth>
+      <ValueColumnWidth column_width="119"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="5" />
+   <WVObjectSize size="6" />
+   <wave_markers>
+      <marker label="" time="66415000" />
+   </wave_markers>
    <wvobject type="logic" fp_name="/system_tb/i3c_irq">
       <obj_property name="ElementShortName">i3c_irq</obj_property>
       <obj_property name="ObjectShortName">i3c_irq</obj_property>
@@ -62,51 +66,53 @@
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_framing/sm">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">sm[4:0]</obj_property>
-         <obj_property name="ObjectShortName">sm[4:0]</obj_property>
-         <obj_property name="label">framing sm[4:0]</obj_property>
-         <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_framing/smt">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">smt[2:0]</obj_property>
-         <obj_property name="ObjectShortName">smt[2:0]</obj_property>
-         <obj_property name="label">framing smt[2:0]</obj_property>
+         <obj_property name="ElementShortName">sm[2:0]</obj_property>
+         <obj_property name="ObjectShortName">sm[2:0]</obj_property>
          <obj_property name="CustomSignalColor">#FFFF00</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_word/sm">
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">sm[4:0]</obj_property>
-         <obj_property name="ObjectShortName">sm[4:0]</obj_property>
+         <obj_property name="ElementShortName">sm[1:0]</obj_property>
+         <obj_property name="ObjectShortName">sm[1:0]</obj_property>
          <obj_property name="label">word sm[4:0]</obj_property>
-         <obj_property name="CustomSignalColor">#FFD700</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_word/smt">
-         <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">smt[1:0]</obj_property>
-         <obj_property name="ObjectShortName">smt[1:0]</obj_property>
-         <obj_property name="label">word smt[1:0]</obj_property>
          <obj_property name="CustomSignalColor">#FFD700</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_bit_mod/sm">
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">sm[4:2]</obj_property>
-         <obj_property name="ObjectShortName">sm[4:2]</obj_property>
+         <obj_property name="ElementShortName">sm[1:0]</obj_property>
+         <obj_property name="ObjectShortName">sm[1:0]</obj_property>
          <obj_property name="label">bit_mod sm[4:2]</obj_property>
          <obj_property name="CustomSignalColor">#FFA500</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_bit_mod/smt">
+   </wvobject>
+   <wvobject type="group" fp_name="group26">
+      <obj_property name="label">command state</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_framing/st">
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="ElementShortName">smt[1:0]</obj_property>
-         <obj_property name="ObjectShortName">smt[1:0]</obj_property>
-         <obj_property name="label">bit_mod smt[1:0]</obj_property>
-         <obj_property name="CustomSignalColor">#FFA500</obj_property>
+         <obj_property name="ElementShortName">st[4:0]</obj_property>
+         <obj_property name="ObjectShortName">st[4:0]</obj_property>
+         <obj_property name="label">framing st[4:0]</obj_property>
+         <obj_property name="CustomSignalColor">#DCDCDC</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_word/st">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">st[4:0]</obj_property>
+         <obj_property name="ObjectShortName">st[4:0]</obj_property>
+         <obj_property name="label">word st[4:0]</obj_property>
+         <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/i3c_controller_0/core/inst/i_i3c_controller_bit_mod/st">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">st[4:2]</obj_property>
+         <obj_property name="ObjectShortName">st[4:2]</obj_property>
+         <obj_property name="label">bit_mod st[4:2]</obj_property>
+         <obj_property name="CustomSignalColor">#808080</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
    </wvobject>

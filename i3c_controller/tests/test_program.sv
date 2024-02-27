@@ -36,9 +36,8 @@
 //
 
 `include "utils.svh"
-`include "../../../library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap_defs.v"
-`include "../../../library/i3c_controller/i3c_controller_core/i3c_controller_word_cmd.v"
-`default_nettype wire
+`include "../../../library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh"
+`include "../../../library/i3c_controller/i3c_controller_core/i3c_controller_word.vh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -130,7 +129,7 @@ localparam I2C_CMD_3           = {3'b010, 12'd6, DEVICE_SA1[6:0], 1'b0};
 `define DUT_I3C_BIT_MOD `DUT_I3C_CORE.i_i3c_controller_bit_mod
 `define DUT_I3C_FRAMING `DUT_I3C_CORE.i_i3c_controller_framing
 `define DUT_I3C_REGMAP  `DUT_I3C_HOST.i_i3c_controller_regmap
-`define STOP `DUT_I3C_WORD.sm == `CMDW_STOP_OD | `DUT_I3C_WORD.sm == `CMDW_STOP_PP
+`define STOP `DUT_I3C_WORD.st == `CMDW_STOP_OD | `DUT_I3C_WORD.st == `CMDW_STOP_PP
 
 program test_program (
   input i3c_irq,
@@ -179,13 +178,13 @@ endtask
 task write_ibi_da(input int da);
  begin
   force `DUT_I3C_BIT_MOD.sdi = 1'b0;
-  wait (`DUT_I3C_WORD.sm == `CMDW_BCAST_7E_W0);
+  wait (`DUT_I3C_WORD.st == `CMDW_BCAST_7E_W0);
   for (int i = 0; i < 7; i++) begin
-    wait (`DUT_I3C_BIT_MOD.cmd_ready == 1'b1);
+    wait (`DUT_I3C_BIT_MOD.cmdb_ready == 1'b1);
     force `DUT_I3C_BIT_MOD.sdi = da[7-i] ? 1'bZ : 1'b0;
-    wait (`DUT_I3C_BIT_MOD.cmd_ready == 1'b0);
+    wait (`DUT_I3C_BIT_MOD.cmdb_ready == 1'b0);
   end
-  wait (`DUT_I3C_WORD.sm != `CMDW_BCAST_7E_W0);
+  wait (`DUT_I3C_WORD.st != `CMDW_BCAST_7E_W0);
   release `DUT_I3C_BIT_MOD.sdi;
 end
 endtask
@@ -223,7 +222,7 @@ initial begin
       end else if (`DUT_I3C_WORD.do_rx_t && ~do_rx_t) begin
         force `DUT_I3C_BIT_MOD.sdi = 1'b0;
       end else begin
-        if (`DUT_I3C_WORD.sm == `CMDW_DAA_DEV_CHAR) begin
+        if (`DUT_I3C_WORD.st == `CMDW_DAA_DEV_CHAR) begin
           force `DUT_I3C_BIT_MOD.sdi = dev_char_state;
         end else begin
           release `DUT_I3C_BIT_MOD.sdi;
@@ -372,7 +371,7 @@ begin
   `INFO(("CCC I3C Test #4"));
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETPID); // CCC, length rx 6
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETPID);
-  wait (`DUT_I3C_WORD.sm == `CMDW_MSG_RX);
+  wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b1;
   repeat (6) @(posedge `DUT_I3C_WORD.sdi_valid);
@@ -391,7 +390,7 @@ begin
   `INFO(("CCC I3C Test #5"));
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETDCR); // CCC, length rx 1
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETDCR);
-  wait (`DUT_I3C_WORD.sm == `CMDW_MSG_RX);
+  wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b1;
   wait (`STOP);
@@ -436,8 +435,8 @@ begin
 
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
-  `WAIT (`DUT_I3C_BIT_MOD.cmd_nop == 1, 10000);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
+  `WAIT (`DUT_I3C_BIT_MOD.nop == 1, 100000);
 
   // Test #2, controller does private read transfer that is ACK
   `INFO(("PRIV I3C Test #2"));
@@ -448,14 +447,14 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_3);
 
   // Dummy HIGH peripheral write + T_bit continue
-  wait (`DUT_I3C_WORD.sm == `CMDW_MSG_RX);
+  wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b1;
   wait (`STOP);
   release `DUT_I3C_BIT_MOD.sdi;
   auto_ack <= 1'b1;
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Test #3, controller does private read transfer that is cancelled
   // at the first T-Bit
@@ -465,14 +464,14 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_3);
 
   // Dummy LOW peripheral write + T_bit stop
-  wait (`DUT_I3C_WORD.sm == `CMDW_MSG_RX);
+  wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b0;
   wait (`STOP);
   release `DUT_I3C_BIT_MOD.sdi;
   auto_ack <= 1'b1;
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Test #4, controller does private write transfer to an unknown DA.
   // Expected result: return UDA_ERROR in receipt
@@ -483,7 +482,7 @@ begin
 
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_4);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Test #5, controller does private read transfer that is NACK
   `INFO(("PRIV I3C Test #5"));
@@ -493,10 +492,10 @@ begin
 
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b1;
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
   auto_ack <= 1'b1;
   release `DUT_I3C_BIT_MOD.sdi;
 
@@ -508,14 +507,14 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_5);
 
   // Dummy HIGH peripheral write + T_bit continue
-  wait (`DUT_I3C_WORD.sm == `CMDW_MSG_RX);
+  wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b1;
   wait (`STOP);
   release `DUT_I3C_BIT_MOD.sdi;
   auto_ack <= 1'b1;
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Read Results
 
@@ -591,11 +590,11 @@ begin
 
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I2C_CMD_1);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Assert is in I²C mode
   if (`DUT_I3C_BIT_MOD.i2c_mode !== 1)
    `ERROR(("Not in I2C mode!"));
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Test #2, controller does private read transfer and ACKs all receiving
   // bytes.
@@ -605,14 +604,14 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I2C_CMD_2);
 
   // Dummy LOW peripheral write + ACK continue
-  wait (`DUT_I3C_WORD.sm == `CMDW_I2C_RX);
+  wait (`DUT_I3C_WORD.st == `CMDW_I2C_RX);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b0;
   repeat (5) @(negedge i3c_controller_0_sda);
   release `DUT_I3C_BIT_MOD.sdi;
 
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
   auto_ack <= 1'b1;
 
   // Test #3, controller does private write transfer that stalls for a while
@@ -624,14 +623,14 @@ begin
 
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I2C_CMD_3);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Wait a while to write second payload, stalling the bus
-  wait (`DUT_I3C_BIT_MOD.smt == 1);
+  wait (`DUT_I3C_BIT_MOD.sm == 1);
   # 10000
   if (`DUT_I3C_BIT_MOD.scl !== 0)
     `ERROR(("Bus is not stalled (SCL != 0)"));
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_SDO_FIFO, 32'h0000_00DE);
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 1);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Read Results
 
@@ -710,12 +709,12 @@ begin
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
 
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Write DA during low during broadcast address
   write_ibi_da(DEVICE_DA1);
-  wait (`DUT_I3C_WORD.sm == `CMDW_IBI_MDB);
+  wait (`DUT_I3C_WORD.st == `CMDW_IBI_MDB);
   force `DUT_I3C_BIT_MOD.sdi = 1'bZ;
-  wait (`DUT_I3C_WORD.sm == `CMDW_SR);
+  wait (`DUT_I3C_WORD.st == `CMDW_SR);
   release `DUT_I3C_BIT_MOD.sdi;
   // Enable ACK during the cmd transfer
   auto_ack <= 1'b1;
@@ -760,7 +759,7 @@ begin
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
 
-  wait (`DUT_I3C_BIT_MOD.cmd_nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Write DA during low during broadcast address
   write_ibi_da(START_DA-1);
   // Enable ACK during the cmd transfer
@@ -831,9 +830,10 @@ begin
   // Write CMD instruction
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CCC_CMD_ENTDAA);
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CCC_ENTDAA);
-  `WAIT (`DUT_I3C_FRAMING.sm == `CMDW_START, 10000);
+  `WAIT (`DUT_I3C_FRAMING.st == `CMDW_START, 10000);
 
   @(posedge i3c_irq);
+  `INFO(("GOT DAA IRQ"));
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
     `ERROR(("Wrong SDI FIFO level"));
@@ -849,7 +849,7 @@ begin
 
   // Write DEV_CHAR_2 all Low for the second peripheral,
   // so BCR[2] is Low (used in the ibi_i3c_test).
-  wait (`DUT_I3C_WORD.sm == `CMDW_DAA_DEV_CHAR);
+  wait (`DUT_I3C_WORD.st == `CMDW_DAA_DEV_CHAR);
   dev_char_state <= 1'b0;
   @(posedge i3c_irq);
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
@@ -864,7 +864,7 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
 
   // Wait next start, do not ACK to exit DAA (no other dev on bus needs addr)
-  `WAIT (`DUT_I3C_WORD.sm == `CMDW_START, 10000);
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_START, 100000);
   #10 auto_ack <= 1'b0;
   @(posedge i3c_irq);
   axi_read (I3C_CONTROLLER, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);

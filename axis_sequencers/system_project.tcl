@@ -30,9 +30,6 @@ adi_sim_project_files [list \
  "../common/sv/adi_peripheral_pkg.sv" \
  "../common/sv/adi_regmap_pkg.sv" \
  "../common/sv/test_harness_env.sv" \
- "../common/sv/mailbox.sv" \
- "../common/sv/x_monitor.sv" \
- "../common/sv/scoreboard.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
  "system_tb.sv" \

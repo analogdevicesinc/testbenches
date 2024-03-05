@@ -90,6 +90,13 @@ package m_axis_sequencer_pkg;
 
     // new
     function new();
+      this.enabled = 1'b0;
+      this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
+      this.descriptor_gen_mode = 1'b0;
+      this.byte_count = 0;
+      this.data_beat_delay = 0;
+      this.descriptor_delay = 0;
+      this.stop_policy = STOP_POLICY_DATA_BEAT;
     endfunction: new
 
 
@@ -131,7 +138,7 @@ package m_axis_sequencer_pkg;
       if (enabled)
         `ERROR(("Sequencer must be disabled before configuring data generation mode"));
       this.data_gen_mode = data_gen_mode;
-      `INFOV(("Data generation mode confgured"), 55);
+      `INFOV(("Data generation mode configured"), 55);
     endfunction: set_data_gen_mode
 
     // set data generation mode
@@ -139,19 +146,19 @@ package m_axis_sequencer_pkg;
       if (enabled)
         `ERROR(("Sequencer must be disabled before configuring descriptor generation mode"));
       this.descriptor_gen_mode = descriptor_gen_mode;
-      `INFOV(("Descriptor generation mode confgured"), 55);
+      `INFOV(("Descriptor generation mode configured"), 55);
     endfunction: set_descriptor_gen_mode
 
     // set data beat delay
     function void set_data_beat_delay(input int data_beat_delay);
       this.data_beat_delay = data_beat_delay;
-      `INFOV(("Data beat delay confgured"), 55);
+      `INFOV(("Data beat delay configured"), 55);
     endfunction: set_data_beat_delay
 
     // set descriptor delay
     function void set_descriptor_delay(input int descriptor_delay);
       this.descriptor_delay = descriptor_delay;
-      `INFOV(("Descriptor delay confgured"), 55);
+      `INFOV(("Descriptor delay configured"), 55);
     endfunction: set_descriptor_delay
 
     // create transfer descriptor
@@ -246,18 +253,13 @@ package m_axis_sequencer_pkg;
 
   class m_axis_sequencer #( type T, `AXIS_VIP_PARAM_DECL) extends m_axis_sequencer_base;
 
-    T agent;
+    protected T agent;
 
 
     function new(T agent);
+      super.new();
+
       this.agent = agent;
-      this.enabled = 1'b0;
-      this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
-      this.descriptor_gen_mode = 1'b0;
-      this.byte_count = 0;
-      this.data_beat_delay = 0;
-      this.descriptor_delay = 0;
-      this.stop_policy = STOP_POLICY_DATA_BEAT;
     endfunction: new
 
 
@@ -361,6 +363,7 @@ package m_axis_sequencer_pkg;
       ->> packet_done;
     endtask: packetize
 
+    // packet sender function
     virtual protected task sender();
       `INFOV(("sender start"), 55);
       forever begin

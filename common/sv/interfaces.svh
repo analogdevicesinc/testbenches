@@ -39,11 +39,6 @@
 interface clk_if ();
   logic clk;
 
-  modport IF(
-    input clk,
-    import start_clock
-  );
-
   task start_clock(int clk_period);
     clk = 1'b1;
     fork

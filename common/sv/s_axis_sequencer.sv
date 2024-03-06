@@ -59,6 +59,14 @@ package s_axis_sequencer_pkg;
 
     // new
     function new();
+      this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
+      this.low_time = 0;
+      this.high_time = 1;
+      this.high_time_min = 1;
+      this.high_time_max = 1;
+      this.low_time_min = 0;
+      this.low_time_max = 0;
+      this.variable_ranges = 0;
     endfunction: new
 
 
@@ -149,15 +157,9 @@ package s_axis_sequencer_pkg;
 
 
     function new(T agent);
+      super.new();
+
       this.agent = agent;
-      this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
-      this.low_time = 0;
-      this.high_time = 1;
-      this.high_time_min = 1;
-      this.high_time_max = 1;
-      this.low_time_min = 0;
-      this.low_time_max = 0;
-      this.variable_ranges = 0;
     endfunction
 
 
@@ -168,8 +170,10 @@ package s_axis_sequencer_pkg;
       
       tready_gen.set_ready_policy(this.mode);
 
-      if (variable_ranges)
+      if (this.variable_ranges)
         tready_gen.set_use_variable_ranges();
+      else
+        tready_gen.clr_use_variable_ranges();
 
       if (this.mode != XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE) begin
         tready_gen.set_low_time(this.low_time);

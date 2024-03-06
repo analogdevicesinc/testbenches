@@ -155,6 +155,8 @@ package x_monitor_pkg;
     // analysis port from the monitor
     xil_analysis_port #(axi4stream_monitor_transaction) axis_ap;
 
+    T agent;
+
     // int transfer_size;
     // int all_transfer_size;
 
@@ -170,8 +172,10 @@ package x_monitor_pkg;
       this.tx_sink_type = CYCLIC;
       // this.transfer_size = 0;
       // this.all_transfer_size = 0;
+
+      this.agent = agent;
       
-      this.axis_ap = agent.monitor.item_collected_port;
+      this.axis_ap = this.agent.monitor.item_collected_port;
 
     endfunction /* new */
 
@@ -199,6 +203,7 @@ package x_monitor_pkg;
 
       axi4stream_transaction transaction;
       xil_axi4stream_data_beat data_beat;
+      xil_axi4stream_strb_beat keep_beat;
       int num_bytes;
       logic [7:0] axi_byte;
 
@@ -209,9 +214,11 @@ package x_monitor_pkg;
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
           data_beat = transaction.get_data_beat();
+          keep_beat = transaction.get_keep_beat();
           for (int j=0; j<num_bytes; j++) begin
             axi_byte = data_beat[j*8+:8];
-            this.mailbox.put(axi_byte);
+            if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
+              this.mailbox.put(axi_byte);
           end
           `INFOV(("Caught an AXI4 stream transaction: %d", this.mailbox.num()), 100);
 

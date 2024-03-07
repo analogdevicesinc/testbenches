@@ -50,7 +50,7 @@ import test_harness_env_pkg::*;
 `define WAIT(CONDITION, TIMEOUT) \
   fork \
   begin \
-    #TIMEOUT \
+    #``TIMEOUT``ns \
     `ERROR(("Wait statement expired.")); \
   end \
   begin \
@@ -207,6 +207,8 @@ endtask
 //---------------------------------------------------------------------------
 // Peripheral ACK & Stop RX
 //---------------------------------------------------------------------------
+// Mock acknowledge by the peripheral without having to make a method call for
+// every byte transferred.
 // Limitation: If on do_ack or CMDW_DAA_DEV_CHAR, do_ack <= 1'b0 will not
 // release the sdi
 logic do_ack = 1'b1;
@@ -607,6 +609,7 @@ begin
   wait (`DUT_I3C_WORD.st == `CMDW_I2C_RX);
   auto_ack <= 1'b0;
   force `DUT_I3C_BIT_MOD.sdi = 1'b0;
+  // Count 5 ACK-bit asserted low by the controller
   repeat (5) @(negedge i3c_controller_0_sda);
   release `DUT_I3C_BIT_MOD.sdi;
 
@@ -627,7 +630,7 @@ begin
   // Wait a while to write second payload, stalling the bus
   wait (`DUT_I3C_BIT_MOD.sm == 1);
   # 10000
-  if (`DUT_I3C_BIT_MOD.scl !== 0)
+  if (i3c_controller_0_scl !== 0)
     `ERROR(("Bus is not stalled (SCL != 0)"));
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_SDO_FIFO, 32'h0000_00DE);
   wait (`DUT_I3C_BIT_MOD.nop == 1);

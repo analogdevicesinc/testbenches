@@ -53,14 +53,15 @@ create_bd_port -dir I output_clk
 ad_ip_instance util_axis_fifo_asym util_axis_fifo_asym_DUT [list \
   ASYNC_CLK 1 \
   S_DATA_WIDTH $INPUT_WIDTH \
-  S_ADDRESS_WIDTH 5 \
+  ADDRESS_WIDTH 5 \
   M_DATA_WIDTH $OUTPUT_WIDTH \
   M_AXIS_REGISTERED 1 \
-  ALMOST_EMPTY_THRESHOLD 4 \
-  ALMOST_FULL_THRESHOLD 4 \
+  ALMOST_EMPTY_THRESHOLD 16 \
+  ALMOST_FULL_THRESHOLD 16 \
   TLAST_EN 1 \
   TKEEP_EN 1 \
-  S_FIFO_LIMITED 0 \
+  FIFO_LIMITED 1 \
+  ADDRESS_WIDTH_PERSPECTIVE 0 \
 ]
 
 ad_connect input_clk util_axis_fifo_asym_DUT/s_axis_aclk

@@ -121,7 +121,7 @@ module test_program(
     init_req <= 1'b1;
 
     if (!`OFFLOAD_ONESHOT) begin
-      @env.src_axis_seq.queue_empty;
+      @env.src_axis_seq.wait_empty_descriptor_queue();
       init_req <= 1'b0;
     end
 
@@ -135,7 +135,7 @@ module test_program(
       env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
 
     if (!`OFFLOAD_ONESHOT) begin
-      @env.src_axis_seq.queue_empty;
+      @env.src_axis_seq.wait_empty_descriptor_queue();
       init_req <= 1'b0;
     end
 

@@ -43,7 +43,7 @@ package adi_regmap_spi_engine_pkg;
 
   const reg_t axi_spi_engine_VERSION = '{ 'h0000, "VERSION" , '{
     "VERSION_MAJOR": '{ 31, 16, RO, 'h01 },
-    "VERSION_MINOR": '{ 15, 8, RO, 'h00 },
+    "VERSION_MINOR": '{ 15, 8, RO, 'h01 },
     "VERSION_PATCH": '{ 7, 0, RO, 'h71 }}};
   `define SET_axi_spi_engine_VERSION_VERSION_MAJOR(x) SetField(axi_spi_engine_VERSION,"VERSION_MAJOR",x)
   `define GET_axi_spi_engine_VERSION_VERSION_MAJOR(x) GetField(axi_spi_engine_VERSION,"VERSION_MAJOR",x)

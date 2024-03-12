@@ -49,15 +49,19 @@ import test_harness_env_pkg::*;
 //---------------------------------------------------------------------------
 `define WAIT(CONDITION, TIMEOUT) \
   fork \
-  begin \
-    #``TIMEOUT``ns \
-    `ERROR(("Wait statement expired.")); \
-  end \
-  begin \
-    wait (CONDITION); \
-  end \
-  join_any \
-  disable fork;
+    begin \
+      fork \
+      begin \
+        #``TIMEOUT``ns \
+        `ERROR(("Wait statement expired.")); \
+      end \
+      begin \
+        wait (CONDITION); \
+      end \
+      join_any \
+      disable fork; \
+    end \
+  join
 
 
 localparam I3C_CONTROLLER           = 32'h44A0_0000;

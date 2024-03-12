@@ -79,7 +79,7 @@ localparam AD7616_CNVST_RATE          = 32'h0000_0444;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0071;
+localparam PCORE_VERSION              = 32'h0001_0171;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 16;
@@ -210,7 +210,7 @@ end
 
 task sanity_test;
 begin
-  #100 axi_read_v (AD7616_BASE + 32'h0000000, 'h0001_0071);
+  #100 axi_read_v (AD7616_BASE + 32'h0000000, 'h0001_0171);
   #100 axi_write (AD7616_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
   #100 axi_read_v (AD7616_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));

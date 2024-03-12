@@ -45,6 +45,9 @@ module system_tb();
   wire i3c_sdi;
   wire i3c_sdo;
   wire i3c_t;
+  wire offload_sdi_valid;
+  wire offload_sdi_ready;
+  wire offload_trigger;
 
   ad_iobuf #(
     .DATA_WIDTH(1)
@@ -57,15 +60,21 @@ module system_tb();
   `TEST_PROGRAM test(
     .i3c_irq(i3c_irq),
     .i3c_clk(i3c_clk),
-    .i3c_controller_0_scl(i3c_scl),
-    .i3c_controller_0_sda(i3c_sda));
+    .i3c_scl(i3c_scl),
+    .i3c_sda(i3c_sda),
+    .offload_sdi_valid(offload_sdi_valid),
+    .offload_sdi_ready(offload_sdi_ready),
+    .offload_trigger(offload_trigger));
 
   test_harness `TH (
     .i3c_irq(i3c_irq),
     .i3c_clk(i3c_clk),
-    .i3c_controller_0_scl(i3c_scl),
-    .i3c_controller_0_sdi(i3c_sdi),
-    .i3c_controller_0_sdo(i3c_sdo),
-    .i3c_controller_0_t(i3c_t));
+    .i3c_scl(i3c_scl),
+    .i3c_sdi(i3c_sdi),
+    .i3c_sdo(i3c_sdo),
+    .i3c_t(i3c_t),
+    .offload_sdi_tvalid(offload_sdi_valid),
+    .offload_sdi_tready(offload_sdi_ready),
+    .offload_trigger(offload_trigger));
 
 endmodule

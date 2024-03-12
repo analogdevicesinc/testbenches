@@ -123,8 +123,8 @@ localparam I2C_CMD_3           = {3'b010, 12'd6, DEVICE_SA1[6:0], 1'b0};
 //---------------------------------------------------------------------------
 // Aliases
 //---------------------------------------------------------------------------
-`define DUT_I3C_CORE $root.system_tb.test_harness.i3c_controller_0.core.inst
-`define DUT_I3C_HOST $root.system_tb.test_harness.i3c_controller_0.host_interface.inst
+`define DUT_I3C_CORE $root.system_tb.test_harness.i3c.core.inst
+`define DUT_I3C_HOST $root.system_tb.test_harness.i3c.host_interface.inst
 `define DUT_I3C_WORD    `DUT_I3C_CORE.i_i3c_controller_word
 `define DUT_I3C_BIT_MOD `DUT_I3C_CORE.i_i3c_controller_bit_mod
 `define DUT_I3C_FRAMING `DUT_I3C_CORE.i_i3c_controller_framing
@@ -132,10 +132,13 @@ localparam I2C_CMD_3           = {3'b010, 12'd6, DEVICE_SA1[6:0], 1'b0};
 `define STOP `DUT_I3C_WORD.st == `CMDW_STOP_OD | `DUT_I3C_WORD.st == `CMDW_STOP_PP
 
 program test_program (
-  input i3c_irq,
-  input i3c_clk,
-  input i3c_controller_0_scl,
-  input i3c_controller_0_sda);
+  input  i3c_irq,
+  input  i3c_clk,
+  input  i3c_scl,
+  inout  i3c_sda,
+  input  offload_sdi_valid,
+  output offload_sdi_ready,
+  output offload_trigger);
 
 test_harness_env env;
 
@@ -173,19 +176,30 @@ end
 endtask
 
 //---------------------------------------------------------------------------
-// Write a DA to the sdi lane, for IBI request mock
+// Port drivers
+//---------------------------------------------------------------------------
+// Register to drive i3c_sda, mocks a device on the bus
+reg i3c_dev_sda = 1'bZ;
+assign i3c_sda = i3c_dev_sda;
+// Logic to drive the offload trigger
+logic offload_trigger_l = 1'b1;
+assign offload_trigger = offload_trigger_l;
+// Always ready to receive offload data
+assign offload_sdi_ready = 1'b1;
+
+//---------------------------------------------------------------------------
+// Write a DA to the SDA lane, for IBI request mock
 //---------------------------------------------------------------------------
 task write_ibi_da(input int da);
  begin
-  force `DUT_I3C_BIT_MOD.sdi = 1'b0;
+  i3c_dev_sda <= 1'b0;
   wait (`DUT_I3C_WORD.st == `CMDW_BCAST_7E_W0);
-  for (int i = 0; i < 7; i++) begin
-    wait (`DUT_I3C_BIT_MOD.cmdb_ready == 1'b1);
-    force `DUT_I3C_BIT_MOD.sdi = da[7-i] ? 1'bZ : 1'b0;
-    wait (`DUT_I3C_BIT_MOD.cmdb_ready == 1'b0);
+  for (int i = 6; i >= 0; i--) begin
+    @(negedge i3c_scl)
+    i3c_dev_sda <= da[i] ? 1'bZ : 1'b0;
   end
-  wait (`DUT_I3C_WORD.st != `CMDW_BCAST_7E_W0);
-  release `DUT_I3C_BIT_MOD.sdi;
+  @(negedge i3c_scl)
+  i3c_dev_sda <= 1'bZ;
 end
 endtask
 
@@ -194,13 +208,13 @@ endtask
 //---------------------------------------------------------------------------
 task print_cmdr (input int data);
 begin
-  $display("[%t] Got CMDR error %d, length %d, sync %d", $time, data[23:20], data[19:8], data[7:0]);
+  `INFO(("[%t] Got CMDR error %d, length %d, sync %d", $time, data[23:20], data[19:8], data[7:0]));
 end
 endtask
 
 task print_ibi(input int data);
 begin
-  $display("[%t] Got IBI DA %b, MDB %b, Sync %d.", $time, data[23:17], data[15:08], data[7:0]);
+  `INFO(("[%t] Got IBI DA %b, MDB %b, Sync %d.", $time, data[23:17], data[15:08], data[7:0]));
 end
 endtask
 
@@ -220,14 +234,16 @@ initial begin
     @(posedge i3c_clk);
     if (auto_ack) begin
       if (`DUT_I3C_WORD.do_ack && do_ack) begin
-        force `DUT_I3C_BIT_MOD.sdi = 1'b0;
+        i3c_dev_sda <= 1'b0;
       end else if (`DUT_I3C_WORD.do_rx_t && ~do_rx_t) begin
-        force `DUT_I3C_BIT_MOD.sdi = 1'b0;
+        i3c_dev_sda <= 1'b0;
+      end else if (`DUT_I3C_WORD.do_rx_t && ~do_rx_t) begin
+        i3c_dev_sda <= 1'b0;
       end else begin
         if (`DUT_I3C_WORD.st == `CMDW_DAA_DEV_CHAR) begin
-          force `DUT_I3C_BIT_MOD.sdi = dev_char_state;
+          i3c_dev_sda <= dev_char_state;
         end else begin
-          release `DUT_I3C_BIT_MOD.sdi;
+          i3c_dev_sda <= 1'bZ;
         end
       end
     end
@@ -239,41 +255,40 @@ end
 //---------------------------------------------------------------------------
 initial begin
 
-  //creating environment
+  // Creating environment
   env = new(`TH.`SYS_CLK.inst.IF,
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
+            `TH.`SYS_RST.inst.IF,
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF);
 
   setLoggerVerbosity(6);
+
   env.start();
+  env.sys_reset();
 
-  //asserts all the resets for 100 ns
-  `TH.`SYS_RST.inst.IF.assert_reset;
-  #100
-  `TH.`SYS_RST.inst.IF.deassert_reset;
-
-  #100 sanity_test;
+  sanity_test;
 
   // Enable I3C Controller
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_ENABLE, 0);
   // Set speed grade to 3.12 MHz
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_OPS, {2'b01, 4'd0, 1'b0});
 
-  #100 dev_char_i3c_test;
+  // Must occur before any other task, since the written data is later used
+  dev_char_i3c_test;
 
-  #100 daa_i3c_test;
+  daa_i3c_test;
 
-  #100 ccc_i3c_test;
+  ccc_i3c_test;
 
-  #100 priv_i3c_test;
+  priv_i3c_test;
 
-  #100 priv_i2c_test;
+  priv_i2c_test;
 
-  #100 offload_i3c_test;
+  offload_i3c_test;
 
-  #100 ibi_i3c_test;
+  ibi_i3c_test;
 
   `INFO(("Test Done"));
 
@@ -292,13 +307,13 @@ initial begin
     axi_read (I3C_CONTROLLER, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
     if (irq_pending & (1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING)) begin
-      $display("[%t] NOTE: Got CMDR IRQ", $time);
+      `INFO(("[%t] NOTE: Got CMDR IRQ", $time));
     end else if (irq_pending & (1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING)) begin
-      $display("[%t] NOTE: Got IBI IRQ", $time);
+      `INFO(("[%t] NOTE: Got IBI IRQ", $time));
     end else if (irq_pending & (1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING)) begin
-      $display("[%t] NOTE: Got DAA IRQ", $time);
+      `INFO(("[%t] NOTE: Got DAA IRQ", $time));
     end else begin
-      $display("[%t] NOTE: Got IRQ %h", $time, irq_pending);
+      `INFO(("[%t] NOTE: Got IRQ %h", $time, irq_pending));
     end
   end
 end
@@ -375,11 +390,11 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETPID);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
-  force `DUT_I3C_BIT_MOD.sdi = 1'b1;
+  i3c_dev_sda <= 1'bZ;
   repeat (6) @(posedge `DUT_I3C_WORD.sdi_valid);
-  force `DUT_I3C_BIT_MOD.sdi = 1'b0;
+  i3c_dev_sda <= 1'b0;
   wait (`STOP);
-  release `DUT_I3C_BIT_MOD.sdi;
+  i3c_dev_sda <= 1'bZ;
   auto_ack <= 1'b1;
   @(posedge i3c_irq);
   axi_read (I3C_CONTROLLER, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
@@ -394,9 +409,9 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETDCR);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
-  force `DUT_I3C_BIT_MOD.sdi = 1'b1;
+  i3c_dev_sda <= 1'b0;
   wait (`STOP);
-  release `DUT_I3C_BIT_MOD.sdi;
+  i3c_dev_sda <= 1'bZ;
   auto_ack <= 1'b1;
   @(posedge i3c_irq);
   axi_read (I3C_CONTROLLER, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
@@ -451,9 +466,8 @@ begin
   // Dummy HIGH peripheral write + T_bit continue
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
-  force `DUT_I3C_BIT_MOD.sdi = 1'b1;
+  i3c_dev_sda <= 1'bZ;
   wait (`STOP);
-  release `DUT_I3C_BIT_MOD.sdi;
   auto_ack <= 1'b1;
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
@@ -468,9 +482,9 @@ begin
   // Dummy LOW peripheral write + T_bit stop
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
-  force `DUT_I3C_BIT_MOD.sdi = 1'b0;
+  i3c_dev_sda <= 1'b0;
   wait (`STOP);
-  release `DUT_I3C_BIT_MOD.sdi;
+  i3c_dev_sda <= 1'bZ;
   auto_ack <= 1'b1;
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
@@ -496,10 +510,8 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   auto_ack <= 1'b0;
-  force `DUT_I3C_BIT_MOD.sdi = 1'b1;
   wait (`DUT_I3C_BIT_MOD.nop == 1);
   auto_ack <= 1'b1;
-  release `DUT_I3C_BIT_MOD.sdi;
 
   // Test #6, controller does private read transfer that is ACK,
   // no broadcast address.
@@ -511,9 +523,7 @@ begin
   // Dummy HIGH peripheral write + T_bit continue
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
-  force `DUT_I3C_BIT_MOD.sdi = 1'b1;
   wait (`STOP);
-  release `DUT_I3C_BIT_MOD.sdi;
   auto_ack <= 1'b1;
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
@@ -608,10 +618,11 @@ begin
   // Dummy LOW peripheral write + ACK continue
   wait (`DUT_I3C_WORD.st == `CMDW_I2C_RX);
   auto_ack <= 1'b0;
-  force `DUT_I3C_BIT_MOD.sdi = 1'b0;
-  // Count 5 ACK-bit asserted low by the controller
-  repeat (5) @(negedge i3c_controller_0_sda);
-  release `DUT_I3C_BIT_MOD.sdi;
+  i3c_dev_sda <= 1'b0;
+  // Count 5 ACK-bit asserted low by the controller (sampling before
+  // tri-state)
+  repeat (5) @(negedge `DUT_I3C_BIT_MOD.sdo);
+  i3c_dev_sda <= 1'bZ;
 
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
@@ -629,8 +640,8 @@ begin
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Wait a while to write second payload, stalling the bus
   wait (`DUT_I3C_BIT_MOD.sm == 1);
-  # 10000
-  if (i3c_controller_0_scl !== 0)
+  #10000ns
+  if (i3c_scl !== 0)
     `ERROR(("Bus is not stalled (SCL != 0)"));
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_SDO_FIFO, 32'h0000_00DE);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
@@ -716,9 +727,7 @@ begin
   // Write DA during low during broadcast address
   write_ibi_da(DEVICE_DA1);
   wait (`DUT_I3C_WORD.st == `CMDW_IBI_MDB);
-  force `DUT_I3C_BIT_MOD.sdi = 1'bZ;
   wait (`DUT_I3C_WORD.st == `CMDW_SR);
-  release `DUT_I3C_BIT_MOD.sdi;
   // Enable ACK during the cmd transfer
   auto_ack <= 1'b1;
   wait (i3c_irq);
@@ -744,7 +753,7 @@ begin
   auto_ack <= 1'b0;
   write_ibi_da(START_DA);
 
-  # 10000
+  #10000ns
   if (`DUT_I3C_REGMAP.ibi_fifo_valid)
     `ERROR(("IBI should not have thrown IBI"));
 
@@ -754,7 +763,7 @@ begin
   // request. No ibi is written to the FIFO. Then continue the request
   // after resolving the IBI request.
 
-  #12000
+  #12000ns
   `INFO(("IBI I3C Test #4"));
   // Write SDO payload
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
@@ -781,7 +790,7 @@ begin
   // Expected result: the controller accepts the IBI by driving SCL,
   // ACKs the IBI and follows with a Stop.
 
-  #12000
+  #12000ns
   `INFO(("IBI I3C Test #5"));
   auto_ack <= 1'b0;
   write_ibi_da(DEVICE_DA1+1);
@@ -811,7 +820,6 @@ endtask
 //---------------------------------------------------------------------------
 // DAA I3C Test
 //---------------------------------------------------------------------------
-bit   [31:0]  dev_char_data = 0;
 task daa_i3c_test;
 begin
   `INFO(("DAA I3C Started"));
@@ -868,7 +876,7 @@ begin
 
   // Wait next start, do not ACK to exit DAA (no other dev on bus needs addr)
   `WAIT (`DUT_I3C_WORD.st == `CMDW_START, 100000);
-  #10 auto_ack <= 1'b0;
+  #10ns auto_ack <= 1'b0;
   @(posedge i3c_irq);
   axi_read (I3C_CONTROLLER, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
@@ -886,7 +894,6 @@ endtask
 //---------------------------------------------------------------------------
 // Device Characteristics I3C Test
 //---------------------------------------------------------------------------
-bit [6:0]  dev_char_addr = START_DA+1;
 bit [3:0]  dev_char_0 = 4'b1110;
 bit [3:0]  dev_char_1 = 4'b0010;
 bit [3:0]  dev_char_2 = 4'b0011;
@@ -896,21 +903,21 @@ task dev_char_i3c_test;
 begin
   `INFO(("Device Characteristics I3C Test Started"));
   // Write DEV_CHAR of four devices
-  axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1 , 1'b1, 4'h0, dev_char_0});
+  axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1, 1'b1, 4'h0, dev_char_0});
   axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA2, 1'b1, 4'h0, dev_char_1});
-  axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_SA1 , 1'b1, 4'h0, dev_char_2});
+  axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_SA1, 1'b1, 4'h0, dev_char_2});
   axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_SA2, 1'b1, 4'h0, dev_char_3});
 
   // Read first and check value
   axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1 , 9'h0});
   axi_read (I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, dev_char_data);
-  $display("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data);
+  `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data));
   if (dev_char_data[3:0] != dev_char_0 || dev_char_data[15:9] != DEVICE_DA1)
     `ERROR(("DEV_CHAR_0 FAILED"));
   // Read second and check value
   axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA2, 9'h0});
   axi_read (I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, dev_char_data);
-  $display("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data);
+  `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data));
   if (dev_char_data[3:0] != dev_char_1 || dev_char_data[15:9] != DEVICE_DA2)
     `ERROR(("DEV_CHAR_0 FAILED"));
 
@@ -923,18 +930,18 @@ endtask
 //---------------------------------------------------------------------------
 task offload_i3c_test;
 begin
-  // TODO: improve the offload test.
   // Test #1, controller does offload transfer
 
-  #10000
+  #10000ns
 
   // Mask all interrupts
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_IRQ_MASK, 32'h00);
 
   `INFO(("Offload I3C Test Started"));
 
-  #10 force `DUT_I3C_HOST.offload_trigger = 1'b0;
-  #10 force `DUT_I3C_HOST.offload_sdi_ready = 1'b1;
+  offload_trigger_l = 1'b1;
+  #10ns offload_trigger_l = 1'b0;
+
   // Write SDO payload
   axi_write (I3C_CONTROLLER, {`I3C_REGMAP_OFFLOAD_SDO_, 4'h0}, 32'hDEAD_BEEF);
 
@@ -947,20 +954,24 @@ begin
   // Set offload length and enter offload mode
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_OPS, {2'b11, 4'd2, 1'b1});
 
-  #10 force `DUT_I3C_HOST.offload_trigger = 1'b1;
-  #10 force `DUT_I3C_HOST.offload_trigger = 1'b0;
+  offload_trigger_l = 1'b1;
+  #10ns offload_trigger_l = 1'b0;
 
-  #50000
+  // Wait 2 offload_sdi_valid, that means, the 5 bytes from I3C_CMD_3
+  repeat (2) @(posedge offload_sdi_valid);
 
-  #10 force `DUT_I3C_HOST.offload_trigger = 1'b1;
-  #10 force `DUT_I3C_HOST.offload_trigger = 1'b0;
+  #200ns
+  offload_trigger_l = 1'b1;
+  #10ns offload_trigger_l = 1'b0;
 
-  #50000
+  repeat (2) @(posedge offload_sdi_valid);
+
+  #200ns
 
   // Exit offload mode
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_OPS, {4'd0, 1'b0});
-  #10 release `DUT_I3C_HOST.offload_trigger;
-  #10 release `DUT_I3C_HOST.offload_sdi_ready;
+  offload_trigger_l = 1'b1;
+  #10ns offload_trigger_l = 1'b0;
 
   `INFO(("Offload I3C Test Done"));
 end

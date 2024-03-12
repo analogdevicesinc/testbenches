@@ -79,7 +79,7 @@ localparam AD7616_CNVST_RATE          = 32'h0000_0444;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0071;
+localparam PCORE_VERSION              = 32'h0001_0171;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 16;

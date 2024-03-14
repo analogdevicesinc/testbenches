@@ -111,8 +111,8 @@ program test_program;
     endcase
 
     env.src_axis_seq.start();
-    
-    #200ns;
+
+    #1step;
 
     case (`SRC_DESCRIPTORS)
       1: //env.src_axis_seq.beat_sent();

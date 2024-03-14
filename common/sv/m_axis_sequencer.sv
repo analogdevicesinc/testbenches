@@ -57,7 +57,8 @@ package m_axis_sequencer_pkg;
   class m_axis_sequencer_base;
 
     protected bit enabled;
-    protected event en_ev;
+    protected event enable_ev;
+    protected event disable_ev;
 
     protected data_gen_mode_t data_gen_mode;
 
@@ -129,6 +130,8 @@ package m_axis_sequencer_pkg;
 
     // set disable policy
     function void set_stop_policy(input stop_policy_t stop_policy);
+      if (enabled)
+        `ERROR(("Sequencer must be disabled before configuring stop policy"));
       this.stop_policy = stop_policy;
       `INFOV(("Disable policy configured"), 55);
     endfunction: set_stop_policy
@@ -202,19 +205,32 @@ package m_axis_sequencer_pkg;
     protected task generator();
       `INFOV(("generator start"), 55);
       forever begin
-        if (enabled == 0) begin
-          `INFOV(("Waiting for enable"), 55);
-          @en_ev;
-          `INFOV(("Enable found"), 55);
-        end else begin
-          if (descriptor_q.size() > 0) begin
-            packetize();
-            descriptor_delay_subroutine();
-          end else begin
-            ->> queue_empty;
-            #1step;
-          end
-        end
+        `INFOV(("Waiting for enable"), 55);
+        @enable_ev;
+        `INFOV(("Enable found"), 55);
+        fork begin
+          fork
+            begin
+              @disable_ev;
+              case (stop_policy)
+                STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
+                STOP_POLICY_PACKET: @packet_done;
+                STOP_POLICY_DATA_BEAT: @beat_done;
+                STOP_POLICY_IMMEDIATE: ;
+              endcase
+            end
+            forever begin
+              if (descriptor_q.size() > 0) begin
+                packetize();
+                descriptor_delay_subroutine();
+              end else begin
+                ->> queue_empty;
+                #1step;
+              end
+            end
+          join_any
+          disable fork;
+        end join
       end
     endtask: generator
 
@@ -232,13 +248,14 @@ package m_axis_sequencer_pkg;
     task start();
       `INFOV(("enable sequencer"), 55);
       enabled = 1;
-      ->> en_ev;
+      ->> enable_ev;
     endtask: start
 
     task stop();
       `INFOV(("disable sequencer"), 55);
       enabled = 0;
       byte_count = 0;
+      ->> disable_ev;
     endtask: stop
 
     task run();
@@ -304,7 +321,7 @@ package m_axis_sequencer_pkg;
       descriptor = descriptor_q.pop_front();
 
       // put a copy of the descriptor back into the queue and continue processing
-      if (this.descriptor_gen_mode == 1)
+      if (this.descriptor_gen_mode == 1 && enabled)
         descriptor_q.push_back(descriptor);
 
       packet_length = descriptor.num_bytes / byte_per_beat;
@@ -322,8 +339,6 @@ package m_axis_sequencer_pkg;
                   break;
                 end else
                   #1step;
-                if (enabled == 0)
-                  disable packet_loop;
               end
             DATA_GEN_MODE_AUTO_INCR: begin
               data[i] = byte_count++;
@@ -354,11 +369,7 @@ package m_axis_sequencer_pkg;
 
         ->> data_av_ev;
         `INFOV(("waiting transfer to complete"), 55);
-        @(beat_done);
-        if (enabled == 0 && stop_policy <= STOP_POLICY_DATA_BEAT) begin
-          `INFOV(("block disabled, leaving packetize"), 55);
-          break;
-        end
+        @beat_done;
       end
       ->> packet_done;
     endtask: packetize
@@ -367,29 +378,29 @@ package m_axis_sequencer_pkg;
     virtual protected task sender();
       `INFOV(("sender start"), 55);
       forever begin
-        if (enabled == 0)
-          @en_ev;
-        else begin
-          forever begin
-            if (enabled) begin
-              `INFOV(("waiting for data to be available"), 55);
-              @data_av_ev;
+        `INFOV(("Waiting for enable"), 55);
+        @enable_ev;
+        `INFOV(("Enable found"), 55);
+        fork begin
+          fork
+            begin
+              @disable_ev;
+              case (stop_policy)
+                STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
+                STOP_POLICY_PACKET: @packet_done;
+                STOP_POLICY_DATA_BEAT: @beat_done;
+                STOP_POLICY_IMMEDIATE: ;
+              endcase
             end
-            if (stop_policy == STOP_POLICY_IMMEDIATE)
-              break;
-            `INFOV(("sending axis transaction"), 55);
-            agent.driver.send(trans);
-            ->> beat_done;
-            if (enabled == 0)
-              if (stop_policy <= STOP_POLICY_DATA_BEAT)
-                break;
-              else begin
-                wait(packet_done.triggered || data_av_ev.triggered);
-                if (packet_done.triggered == 1)
-                  break;
-              end
-          end
-        end
+            forever begin
+              @data_av_ev;
+              `INFOV(("sending axis transaction"), 55);
+              agent.driver.send(trans);
+              ->> beat_done;
+            end
+          join_any
+          disable fork;
+        end join
       end
     endtask: sender
 

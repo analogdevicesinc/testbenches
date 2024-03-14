@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="environment_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="m_axis_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="s_axis_sequencer_pkg" />
+            <top_module name="scoreboard_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_adc_dst_axi_pt_0_0_pkg" />
+            <top_module name="test_harness_adc_dst_axi_pt_1_0_pkg" />
+            <top_module name="test_harness_adc_src_axis_0_0_pkg" />
+            <top_module name="test_harness_adc_src_axis_1_0_pkg" />
+            <top_module name="test_harness_dac_dst_axis_0_0_pkg" />
+            <top_module name="test_harness_dac_dst_axis_1_0_pkg" />
+            <top_module name="test_harness_dac_src_axi_pt_0_0_pkg" />
+            <top_module name="test_harness_dac_src_axi_pt_1_0_pkg" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="x_axi_monitor_pkg" />
+            <top_module name="x_axis_monitor_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="12.111881 us"></ZoomEndTime>
+      <Cursor1Time time="0.128000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="174"></NameColumnWidth>
+      <ValueColumnWidth column_width="67"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="0" />
+</wave_config>

@@ -37,6 +37,7 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
+import m_axis_sequencer_pkg::*;
 import logger_pkg::*;
 
 import environment_pkg::*;
@@ -79,11 +80,11 @@ module test_program(
     // Setup generator/monitor stubs
     //=========================================================================
 
-    env.src_axis_seq.configure(1, 0);
+    env.src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
     for (int i = 0; i < `SRC_TRANSFERS_INITIAL_COUNT; i++)
-      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
+      env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
 
-    env.src_axis_seq.enable();
+    env.src_axis_seq.start();
 
     env.dst_axis_seq.set_mode(`DST_READY_MODE);
     env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
@@ -120,7 +121,7 @@ module test_program(
     init_req <= 1'b1;
 
     if (!`OFFLOAD_ONESHOT) begin
-      @env.src_axis_seq.queue_empty;
+      @env.src_axis_seq.wait_empty_descriptor_queue();
       init_req <= 1'b0;
     end
 
@@ -131,10 +132,10 @@ module test_program(
     #100
 
     for (int i = 0; i < `SRC_TRANSFERS_DELAYED_COUNT; i++)
-      env.src_axis_seq.update(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
+      env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
 
     if (!`OFFLOAD_ONESHOT) begin
-      @env.src_axis_seq.queue_empty;
+      @env.src_axis_seq.wait_empty_descriptor_queue();
       init_req <= 1'b0;
     end
 

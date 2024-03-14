@@ -109,34 +109,28 @@ package x_monitor_pkg;
 
       forever begin
         this.get_key();
-        if (this.axi_ap.get_item_cnt() > 0) begin
-          this.axi_ap.get(transaction);
-          `INFO(("Transaction pulled"));
-          if (bit'(transaction.get_cmd_type()) == bit'(operation_type)) begin
-            this.put_key();
-            num_bytes = transaction.get_data_width()/8;
-            for (int i=0; i<(transaction.get_len()+1); i++) begin
-              data_beat = transaction.get_data_beat(i);
-              for (int j=0; j<num_bytes; j++) begin
-                axi_byte = data_beat[j*8+:8];
-                // put each beat into byte queues
-                this.mailbox.put(axi_byte);
-                this.axi_byte_stream_size++;
-              end
-              if (transaction.get_cmd_type() == 1'b1)
-                `INFOV(("Caught a transaction: %d", this.axi_byte_stream_size), 100);
-              this.transaction_captured();
-              #1step;
-              #1step;
-              this.mailbox.flush();
-              this.axi_byte_stream_size = 0;
+        this.axi_ap.get(transaction);
+        `INFO(("Transaction pulled"));
+        if (bit'(transaction.get_cmd_type()) == bit'(operation_type)) begin
+          this.put_key();
+          num_bytes = transaction.get_data_width()/8;
+          for (int i=0; i<(transaction.get_len()+1); i++) begin
+            data_beat = transaction.get_data_beat(i);
+            for (int j=0; j<num_bytes; j++) begin
+              axi_byte = data_beat[j*8+:8];
+              // put each beat into byte queues
+              this.mailbox.put(axi_byte);
+              this.axi_byte_stream_size++;
             end
-          end else begin
-            this.axi_ap.write(transaction);
-            this.put_key();
+            `INFOV(("Caught a transaction: %d", this.axi_byte_stream_size), 100);
+            this.transaction_captured();
             #1step;
+            #1step;
+            this.mailbox.flush();
+            this.axi_byte_stream_size = 0;
           end
         end else begin
+          this.axi_ap.write(transaction);
           this.put_key();
           #1step;
         end
@@ -208,33 +202,29 @@ package x_monitor_pkg;
       logic [7:0] axi_byte;
 
       forever begin
-        if (this.axis_ap.get_item_cnt() > 0) begin
-          // `INFOV(("Caught a TX AXI4 stream transaction: %d", this.axis_ap.get_item_cnt()), 100);
-          this.axis_ap.get(transaction);
-          // all bytes from a beat are valid
-          num_bytes = transaction.get_data_width()/8;
-          data_beat = transaction.get_data_beat();
-          keep_beat = transaction.get_keep_beat();
-          for (int j=0; j<num_bytes; j++) begin
-            axi_byte = data_beat[j*8+:8];
-            if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
-              this.mailbox.put(axi_byte);
-          end
-          `INFOV(("Caught an AXI4 stream transaction: %d", this.mailbox.num()), 100);
+        this.axis_ap.get(transaction);
+        // all bytes from a beat are valid
+        num_bytes = transaction.get_data_width()/8;
+        data_beat = transaction.get_data_beat();
+        keep_beat = transaction.get_keep_beat();
+        for (int j=0; j<num_bytes; j++) begin
+          axi_byte = data_beat[j*8+:8];
+          if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
+            this.mailbox.put(axi_byte);
+        end
+        `INFOV(("Caught an AXI4 stream transaction: %d", this.mailbox.num()), 100);
 
-          // this.all_transfer_size += this.transfer_size;
+        // this.all_transfer_size += this.transfer_size;
 
-          // // reset the TX source beat counter so we can initiate more than one
-          // // DMA transfers in the test program and still check the cyclic mode
-          // if (transaction.get_last())
-          //   this.transfer_size = 0;
+        // // reset the TX source beat counter so we can initiate more than one
+        // // DMA transfers in the test program and still check the cyclic mode
+        // if (transaction.get_last())
+        //   this.transfer_size = 0;
 
-          // this.all_transfer_size += this.transfer_size;
-          this.transaction_captured();
-          #1step;
-          this.mailbox.flush();
-        end else
-          #1step;
+        // this.all_transfer_size += this.transfer_size;
+        this.transaction_captured();
+        #1step;
+        this.mailbox.flush();
       end
 
     endtask /* get_transaction */

@@ -34,6 +34,8 @@ package scoreboard_pkg;
     event end_of_first_cycle;
     event byte_streams_empty;
     event stop_scoreboard;
+    event source_transaction_event;
+    event sink_transaction_event;
 
     // constructor
     function new(input string name);
@@ -137,6 +139,7 @@ package scoreboard_pkg;
         end
         this.source_byte_stream_size += this.source_monitor.mailbox.num();
         `INFOV(("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size), 200);
+        ->>source_transaction_event;
         this.source_monitor.put_key();
       end
 
@@ -167,6 +170,7 @@ package scoreboard_pkg;
         end
         this.sink_byte_stream_size += this.sink_monitor.mailbox.num();
         `INFOV(("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size), 200);
+        ->>sink_transaction_event;
         this.sink_monitor.put_key();
       end
 
@@ -201,7 +205,13 @@ package scoreboard_pkg;
           if ((this.source_byte_stream_size == 0) &&
               (this.sink_byte_stream_size == 0))
             ->byte_streams_empty;
-          #1step;
+          fork begin
+            fork
+              @source_transaction_event;
+              @sink_transaction_event;
+            join_any
+            disable fork;
+          end join
         end
       end
 

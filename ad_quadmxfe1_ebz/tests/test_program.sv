@@ -74,7 +74,7 @@ program test_program;
   xcvr tx_xcvr;
 
   int use_dds = 1;
-  bit [31:0] lane_rate_khz = `RX_RATE*1000000;
+  bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
   initial begin

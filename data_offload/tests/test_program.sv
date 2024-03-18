@@ -4,6 +4,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import m_axi_sequencer_pkg::*;
+import m_axis_sequencer_pkg::*;
 import environment_pkg::*;
 
 //=============================================================================
@@ -80,9 +81,9 @@ module test_program();
     //=========================================================================
 
     // ADC stub
-    env.adc_src_axis_seq.configure(1, 0);
-    env.adc_src_axis_seq.update(`ADC_TRANSFER_LENGTH, 0, 0);
-    env.adc_src_axis_seq.enable();
+    env.adc_src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+    env.adc_src_axis_seq.add_xfer_descriptor(`ADC_TRANSFER_LENGTH, 0, 0);
+    env.adc_src_axis_seq.start();
 
     // DAC stub
     dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
@@ -118,6 +119,7 @@ module test_program();
     rx_dma_transfer(`RX_DMA_BA, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
     #10000
+
     `INFO(("Initialize the memory ..."));
     init_mem_64(32'h80000000, 1024);
 

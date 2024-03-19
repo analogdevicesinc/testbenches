@@ -58,10 +58,31 @@ if {$SER_PAR_N == 1} {
   ad_connect spi_clk sys_cpu_clk
   ad_connect ad7616_irq spi_ad7616/irq
 
+  set BA_SPI_REGMAP 0x44A00000
+  set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ad7616_axi_regmap}]
+  adi_sim_add_define "SPI_AD7616_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
+
 } else {
 
   create_bd_port -dir O sys_clk
   ad_disconnect  spi_clk ad7616_pwm_gen/ext_clk
   ad_connect  sys_cpu_clk ad7616_pwm_gen/ext_clk
   ad_connect sys_clk sys_cpu_clk
+
+  set BA_AD7616 0x44A80000
+  set_property offset $BA_AD7616 [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad7616}]
+  adi_sim_add_define "AXI_AD7616_BA=[format "%d" ${BA_AD7616}]"
+
 }
+
+set BA_DMA 0x44A30000
+set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad7616_dma}]
+adi_sim_add_define "AD7616_DMA_BA=[format "%d" ${BA_DMA}]"
+
+set BA_PWM 0x44B00000
+set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad7616_pwm_gen}]
+adi_sim_add_define "AD7616_PWM_GEN_BA=[format "%d" ${BA_PWM}]"
+
+set BA_CLKGEN 0x44A70000
+set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
+adi_sim_add_define "AD7616_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"

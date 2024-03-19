@@ -40,33 +40,16 @@
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import adi_regmap_pkg::*;
+import adi_regmap_axi_ad7616_pkg::*;
+import adi_regmap_clkgen_pkg::*;
 import adi_regmap_dmac_pkg::*;
+import adi_regmap_pwm_gen_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
-import adi_regmap_pkg::*;
-import adi_regmap_pwm_gen_pkg::*;
 
-localparam AD7616_DMA                 = 32'h44A3_0000;
-localparam AXI_AD7616                 = 32'h44A8_0000;
-localparam AXI_CLKGEN                 = 32'h44A7_0000;
-localparam AXI_PWMGEN                 = 32'h44B0_0000;
-localparam DDR_BASE                   = 32'h8000_0000;
-
-localparam AD7616_CNVST_EN            = 32'h0000_0440;
-localparam AD7616_CNVST_RATE          = 32'h0000_0444;
-
-localparam AD7616_PI_ADDR_PCORE_VERSION  = 32'h0000_0400;
-localparam AD7616_PI_ADDR_ID             = 32'h0000_0404;
-localparam AD7616_PI_ADDR_SCRATCH        = 32'h0000_0408;
-localparam AD7616_PI_ADDR_CTRL           = 32'h0000_0440;
-localparam AD7616_PI_ADDR_CONV_RATE      = 32'h0000_0444;
-localparam AD7616_PI_ADDR_BURST_LENGTH   = 32'h0000_0448;
-localparam AD7616_PI_ADDR_RDATA          = 32'h0000_044C;
-localparam AD7616_PI_ADDR_WDATA          = 32'h0000_0450;
-
-localparam AD7616_CTRL_RESETN            = 1;
-localparam AD7616_CTRL_CNVST_EN          = 2;
-localparam NUM_OF_TRANSFERS              = 10;
+localparam AD7616_CTRL_RESETN         = 1;
+localparam AD7616_CTRL_CNVST_EN       = 2;
+localparam NUM_OF_TRANSFERS           = 10;
 
 program test_program_pi (
   output [15:0] rx_db_i,
@@ -189,8 +172,8 @@ end
 
 task sanity_test;
 begin
-  #100 axi_write (AXI_AD7616 + AD7616_PI_ADDR_SCRATCH, 32'hDEADBEEF);
-  #100 axi_read_v (AXI_AD7616 + AD7616_PI_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
+  #100 axi_read_v (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -219,36 +202,42 @@ bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 task data_acquisition_test;
   begin
     // Start spi clk generator
-    axi_write (AXI_CLKGEN + 32'h00000040, 32'h0000003);
+    axi_write (`AD7616_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+      `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+      `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
+      );
 
     // Configure pwm gen
-    axi_write (AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (AXI_PWMGEN + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('h64)); // set PWM period
-    axi_write (AXI_PWMGEN + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('h64)); // set PWM period
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     $display("[%t] axi_pwm_gen started.", $time);
 
      // Configure DMA
-    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_FLAGS),
+    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(DDR_BASE));  // DEST_ADDRESS
+    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
 
     // Configure AXI_AD7616
-    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, 32'h0);
-    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN);
-    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN | AD7616_CTRL_CNVST_EN);
+    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL),
+      `SET_AXI_AD7616_REG_UP_CNTRL_CNVST_EN(0) |
+      `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(0)
+      );
+    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL), `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(AD7616_CTRL_RESETN));
+    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL), `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(AD7616_CTRL_RESETN) | `SET_AXI_AD7616_REG_UP_CNTRL_CNVST_EN(AD7616_CTRL_CNVST_EN));
     #10000
-    axi_write (AXI_AD7616 + AD7616_PI_ADDR_CTRL, AD7616_CTRL_RESETN);
+    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL), `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(AD7616_CTRL_RESETN));
 
     @(negedge rx_busy)
     #200
 
     transfer_status = 1;
 
-    env.mng.RegWrite32(AD7616_DMA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
@@ -258,18 +247,18 @@ task data_acquisition_test;
     transfer_status = 0;
 
     // Stop pwm gen
-    axi_write (AXI_PWMGEN + 32'h00000010, 32'h00000001);
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1));
     $display("[%t] axi_pwm_gen stopped.", $time);
 
     #200
-    axi_write (AXI_AD7616 + AD7616_PI_ADDR_WDATA, 32'hdead);
-    axi_read  (AXI_AD7616 + AD7616_PI_ADDR_RDATA, rdata_reg);
+    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_WRITE_DATA ), `SET_AXI_AD7616_REG_UP_WRITE_DATA_UP_WRITE_DATA(32'hDEAD));
+    axi_read  (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_READ_DATA ), rdata_reg);
 
     #2000
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(DDR_BASE + 4*i);
+      captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
     end
 
     if (captured_word_arr  != dma_data_store_arr) begin

@@ -57,6 +57,7 @@ package m_axis_sequencer_pkg;
   class m_axis_sequencer_base;
 
     protected bit enabled;
+    protected bit queue_empty_sig;
     protected event enable_ev;
     protected event disable_ev;
 
@@ -76,6 +77,8 @@ package m_axis_sequencer_pkg;
     protected event beat_done;
     protected event packet_done;
     protected event queue_empty;
+    protected event byte_stream_ev;
+    protected event queue_ev;
 
     protected axi4stream_transaction trans;
     protected xil_axi4stream_data_byte byte_stream [$];
@@ -98,6 +101,7 @@ package m_axis_sequencer_pkg;
       this.data_beat_delay = 0;
       this.descriptor_delay = 0;
       this.stop_policy = STOP_POLICY_DATA_BEAT;
+      this.queue_empty_sig = 1;
     endfunction: new
 
 
@@ -178,6 +182,8 @@ package m_axis_sequencer_pkg;
       //          bytes_to_generate, gen_last, gen_sync), 5);
 
       descriptor_q.push_back(descriptor);
+      this.queue_empty_sig = 0;
+      ->>queue_ev;
     endfunction: add_xfer_descriptor
 
     // descriptor delay subroutine
@@ -198,6 +204,8 @@ package m_axis_sequencer_pkg;
 
     // wait until queue is empty
     task wait_empty_descriptor_queue();
+      if (this.queue_empty_sig)
+        return;
       @queue_empty;
     endtask: wait_empty_descriptor_queue
 
@@ -221,11 +229,15 @@ package m_axis_sequencer_pkg;
             end
             forever begin
               if (descriptor_q.size() > 0) begin
-                packetize();
-                descriptor_delay_subroutine();
+                if (enabled || (!enabled && stop_policy == STOP_POLICY_DESCRIPTOR_QUEUE)) begin
+                  packetize();
+                  descriptor_delay_subroutine();
+                end else
+                  @enable_ev;
               end else begin
+                this.queue_empty_sig = 1;
                 ->> queue_empty;
-                #1step;
+                @queue_ev;
               end
             end
           join_any
@@ -237,6 +249,7 @@ package m_axis_sequencer_pkg;
     // function 
     function void push_byte_for_stream(xil_axi4stream_data_byte byte_stream);
       this.byte_stream.push_back(byte_stream);
+      ->>byte_stream_ev;
     endfunction: push_byte_for_stream
 
     // descriptor delay subroutine
@@ -338,7 +351,7 @@ package m_axis_sequencer_pkg;
                   keep[i] = 1'b1;
                   break;
                 end else
-                  #1step;
+                  @byte_stream_ev;
               end
             DATA_GEN_MODE_AUTO_INCR: begin
               data[i] = byte_count++;

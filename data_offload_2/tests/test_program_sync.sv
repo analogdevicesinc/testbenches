@@ -75,8 +75,6 @@ module test_program_sync (
     env.src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
     env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, 1, 0);
 
-    env.src_axis_seq.start();
-
     env.dst_axis_seq.set_mode(`DST_READY_MODE);
     env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
     env.dst_axis_seq.set_low_time(`DST_READY_LOW);
@@ -96,6 +94,8 @@ module test_program_sync (
     #100
     `INFO(("Bring up IP from reset."));
     systemBringUp;
+
+    env.src_axis_seq.start();
 
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));

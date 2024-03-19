@@ -84,8 +84,6 @@ module test_program(
     for (int i = 0; i < `SRC_TRANSFERS_INITIAL_COUNT; i++)
       env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
 
-    env.src_axis_seq.start();
-
     env.dst_axis_seq.set_mode(`DST_READY_MODE);
     env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
     env.dst_axis_seq.set_low_time(`DST_READY_LOW);
@@ -114,6 +112,8 @@ module test_program(
     `INFO(("Bring up IP from reset."));
     systemBringUp;
 
+    env.src_axis_seq.start();
+
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));
     env.run();
@@ -121,7 +121,7 @@ module test_program(
     init_req <= 1'b1;
 
     if (!`OFFLOAD_ONESHOT) begin
-      @env.src_axis_seq.wait_empty_descriptor_queue();
+      env.src_axis_seq.wait_empty_descriptor_queue();
       init_req <= 1'b0;
     end
 
@@ -135,7 +135,7 @@ module test_program(
       env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
 
     if (!`OFFLOAD_ONESHOT) begin
-      @env.src_axis_seq.wait_empty_descriptor_queue();
+      env.src_axis_seq.wait_empty_descriptor_queue();
       init_req <= 1'b0;
     end
 

@@ -83,7 +83,6 @@ module test_program();
     // ADC stub
     env.adc_src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
     env.adc_src_axis_seq.add_xfer_descriptor(`ADC_TRANSFER_LENGTH, 0, 0);
-    env.adc_src_axis_seq.start();
 
     // DAC stub
     dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
@@ -112,6 +111,8 @@ module test_program();
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));
     env.run();
+
+    env.adc_src_axis_seq.start();
 
     // Generate DMA transfers
     #100

@@ -56,6 +56,14 @@ ad_ip_instance axi_dmac dut_rx_dma $ad_project_params(rx_dma_cfg)
 
 ad_ip_instance axi_dmac dut_tx_dma $ad_project_params(tx_dma_cfg)
 
+foreach {k v} $rx_dma_cfg {
+  adi_sim_add_define "rx_dma_cfg_${k}=${v}"
+}
+
+foreach {k v} $tx_dma_cfg {
+  adi_sim_add_define "tx_dma_cfg_${k}=${v}"
+}
+
 ad_connect  $device_clk dut_rx_dma/s_axis_aclk
 ad_connect  $device_clk dut_tx_dma/m_axis_aclk
 

@@ -143,3 +143,90 @@ package adi_regmap_data_offload_pkg;
   `define DEFAULT_DO_FSM_DBG_FSM_STATE_READ GetResetValue(DO_FSM_DBG,"FSM_STATE_WRITE")
 
 endpackage
+
+package do_regmap_pkg;
+  import regmap_pkg::*;
+
+  class DO_REGMAP #(
+    int MEMORY_TYPE,
+    int TX_OR_RXN_PATH,
+    int HAS_BYPASS,
+    int MEM_SIZE_LOG2);
+
+    class VERSION extends register_base;
+      field_base PATCH_F;
+      field_base MINOR_F;
+      field_base MAJOR_F;
+
+      function new(input string name);
+        super.new(name, 'h0000);
+        this.PATCH_F = new("PATCH", 7, 0, R, 'h61, this);
+        this.MINOR_F = new("MINOR", 15, 8, R, 'h0, this);
+        this.MAJOR_F = new("MAJOR", 31, 16, R, 'h1, this);
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION
+
+    class SYNTHESIS_CONFIG #(int MEMORY_TYPE, int TX_OR_RXN_PATH, int HAS_BYPASS, int MEM_SIZE_LOG2) extends register_base;
+      field_base MEMORY_TYPE_F;
+      field_base TX_OR_RXN_PATH_F;
+      field_base HAS_BYPASS_F;
+      field_base MEM_SIZE_LOG2_F;
+
+      function new(input string name);
+        super.new(name, 'h0010);
+        this.MEMORY_TYPE_F = new("MEMORY_TYPE", 7, 0, R, MEMORY_TYPE, this);
+        this.TX_OR_RXN_PATH_F = new("TX_OR_RXN_PATH", 15, 8, R, TX_OR_RXN_PATH, this);
+        this.HAS_BYPASS_F = new("HAS_BYPASS", 31, 16, R, HAS_BYPASS, this);
+        this.MEM_SIZE_LOG2_F = new("MEM_SIZE_LOG2", 31, 16, R, $clog2(MEM_SIZE_LOG2), this);
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYNTHESIS_CONFIG
+
+    class TRANSFER_LENGTH extends register_base;
+      field_base PARTIAL_LENGTH_F;
+
+      function new(input string name);
+        super.new(name, 'h001C);
+        this.PARTIAL_LENGTH_F = new("PARTIAL_LENGTH", 31, 0, RW, 'h0, this);
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TRANSFER_LENGTH
+
+    class RESETN_OFFLOAD extends register_base;
+      field_base RESETN_F;
+
+      function new(input string name);
+        super.new(name, 'h0084);
+        this.RESETN_F = new("RESETN", 0, 0, RW, 'h0, this);
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: RESETN_OFFLOAD
+
+    class CONTROL extends register_base;
+      field_base ONESHOT_EN_F;
+      field_base OFFLOAD_BYPASS_F;
+
+      function new(input string name);
+        super.new(name, 'h0088);
+        this.ONESHOT_EN_F = new("ONESHOT_EN", 1, 1, RW, 'h0 , this);
+        this.OFFLOAD_BYPASS_F = new("OFFLOAD_BYPASS", 0, 0, RW, 'h0, this);
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CONTROL
+
+    VERSION VERSION_R;
+    SYNTHESIS_CONFIG #(MEMORY_TYPE, TX_OR_RXN_PATH, HAS_BYPASS, MEM_SIZE_LOG2) SYNTHESIS_CONFIG_R;
+    TRANSFER_LENGTH TRANSFER_LENGTH_R;
+    RESETN_OFFLOAD RESETN_OFFLOAD_R;
+    CONTROL CONTROL_R;
+
+    function new();
+      this.VERSION_R = new("VERSION");
+      this.SYNTHESIS_CONFIG_R = new("SYNTHESIS_CONFIG");
+      this.TRANSFER_LENGTH_R = new("TRANSFER_LENGTH");
+      this.RESETN_OFFLOAD_R = new("RESETN_OFFLOAD");
+      this.CONTROL_R = new("CONTROL");
+    endfunction
+  endclass
+endpackage

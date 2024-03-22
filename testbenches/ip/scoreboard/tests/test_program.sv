@@ -63,6 +63,8 @@ program test_program;
 
   initial begin
 
+    setLoggerVerbosity(250);
+
     // create environment
     env = new(`TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
@@ -97,14 +99,14 @@ program test_program;
     //=========================================================================
 
     //=========================================================================
-
-    setLoggerVerbosity(250);
     
     env.start();
     env.sys_reset();
 
     // configure environment sequencers
     env.configure(`ADC_TRANSFER_LENGTH);
+    
+    sanity_test();
 
     `INFO(("Bring up IP from reset."));
     systemBringUp();
@@ -142,6 +144,11 @@ program test_program;
     $finish();
 
   end
+
+  task sanity_test();
+    do_tx_0.sanity_test();
+    do_rx_0.sanity_test();
+  endtask
 
   task systemBringUp();
 

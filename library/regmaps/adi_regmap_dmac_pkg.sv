@@ -359,3 +359,48 @@ package adi_regmap_dmac_pkg;
 
 
 endpackage
+
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
+package dmac_regmap_pkg;
+  import regmap_pkg::*;
+
+  class DMAC_REGMAP #(int DMA_DATA_WIDTH_DEST = 0, int DMA_TYPE_DEST = 0);
+    class INTERFACE_DESCRIPTION #(int DMA_DATA_WIDTH_DEST = 0, int DMA_TYPE_DEST = 0) extends register_base;
+      field_base BYTES_PER_BEAT_DEST_LOG2_F;
+      field_base DMA_TYPE_DEST_F;
+      
+      function new(input string name);
+        super.new(name, 'h0010);
+        this.BYTES_PER_BEAT_DEST_LOG2_F = new("BYTES_PER_BEAT_DEST_LOG2", 3, 0, R, $clog2(DMA_DATA_WIDTH_DEST[7:0]/8), this);
+        this.DMA_TYPE_DEST_F = new("DMA_TYPE_DEST", 5, 4, R, DMA_TYPE_DEST, this);
+      endfunction
+    endclass
+
+    INTERFACE_DESCRIPTION #(DMA_DATA_WIDTH_DEST, DMA_TYPE_DEST) INTERFACE_DESCRIPTION_R;
+
+    class IRQ_MASK extends register_base;
+      field_base TRANSFER_COMPLETED_F;
+      field_base TRANSFER_QUEUED_F;
+      
+      function new(input string name);
+        super.new(name, 'h0080);
+        this.TRANSFER_COMPLETED_F = new("TRANSFER_COMPLETED", 1, 1, RW, 'h1, this);
+        this.TRANSFER_QUEUED_F = new("TRANSFER_QUEUED", 0, 0, RW, 'h1, this);
+      endfunction
+    endclass
+
+    IRQ_MASK IRQ_MASK_R;
+
+    function new();
+      this.INTERFACE_DESCRIPTION_R = new("INTERFACE_DESCRIPTION");
+      this.IRQ_MASK_R = new("IRQ_MASK");
+    endfunction
+  endclass
+endpackage

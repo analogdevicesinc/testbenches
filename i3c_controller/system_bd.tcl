@@ -54,10 +54,11 @@ create_bd_port -dir I offload_trigger
 source $ad_hdl_dir/library/i3c_controller/scripts/i3c_controller_bd.tcl
 
 set async_clk 0
+set clk_mod 0
 set offload 1
 set max_devs 16
 
-i3c_controller_create i3c $async_clk $offload $max_devs
+i3c_controller_create i3c $async_clk $clk_mod $offload $max_devs
 
 ad_connect i3c/m_i3c i3c
 ad_connect i3c/offload_sdi offload_sdi

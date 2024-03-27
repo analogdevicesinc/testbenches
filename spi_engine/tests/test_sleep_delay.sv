@@ -44,7 +44,7 @@ import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
-import test_harness_env_pkg::*
+import test_harness_env_pkg::*;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters

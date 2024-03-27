@@ -55,3 +55,19 @@ create_bd_port -dir O pulsar_adc_irq
 ad_connect pulsar_adc_spi_clk spi_clkgen/clk_0
 ad_connect pulsar_adc_irq spi_pulsar_adc/irq
 
+set BA_SPI_REGMAP 0x44A00000
+set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_pulsar_adc_axi_regmap}]
+adi_sim_add_define "PULSAR_ADC_SPI_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
+
+set BA_DMA 0x44A30000
+set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_pulsar_adc_dma}]
+adi_sim_add_define "PULSAR_ADC_DMA_BA=[format "%d" ${BA_DMA}]"
+
+set BA_CLKGEN 0x44A70000
+set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
+adi_sim_add_define "PULSAR_ADC_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
+
+set BA_PWM 0x44B00000
+set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_pulsar_adc_trigger_gen}]
+adi_sim_add_define "PULSAR_ADC_PWM_GEN_BA=[format "%d" ${BA_PWM}]"
+

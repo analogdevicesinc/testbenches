@@ -54,3 +54,19 @@ create_bd_port -dir O ad463x_irq
 ad_connect ad463x_spi_clk spi_clkgen/clk_0
 ad_connect ad463x_irq spi_ad463x/irq
 
+set BA_SPI_REGMAP 0x44A00000
+set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ad463x_axi_regmap}]
+adi_sim_add_define "SPI_AD469X_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
+
+set BA_DMA 0x44A30000
+set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad463x_dma}]
+adi_sim_add_define "AD469X_DMA_BA=[format "%d" ${BA_DMA}]"
+
+set BA_CLKGEN 0x44A70000
+set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
+adi_sim_add_define "AD463X_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
+
+set BA_PWM 0x44B00000
+set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_cnv_generator}]
+adi_sim_add_define "AD469X_PWM_GEN_BA=[format "%d" ${BA_PWM}]"
+

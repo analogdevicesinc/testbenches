@@ -166,9 +166,9 @@ package test_harness_env_pkg;
     task sys_reset;
       //asserts all the resets for 100 ns
       sys_rst_vip_if.assert_reset;
-      #100;
+      #200;
       sys_rst_vip_if.deassert_reset;
-      #100;
+      #800;
     endtask
 
   endclass

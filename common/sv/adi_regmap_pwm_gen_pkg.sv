@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2023 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,93 +26,88 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Wed Sep 21 10:12:17 2022 */
+/* Thu Mar 28 13:22:23 2024 */
 
 package adi_regmap_pwm_gen_pkg;
   import adi_regmap_pkg::*;
 
 
-/* axi_pwm_gen */
+/* PWM Generator (axi_pwm_gen) */
 
-  const reg_t REG_RSTN = '{ 'h0010, "REG_RSTN" , '{
+  const reg_t axi_pwm_gen_REG_VERSION = '{ 'h0000, "REG_VERSION" , '{
+    "VERSION": '{ 31, 0, RO, 'h00010100 }}};
+  `define SET_axi_pwm_gen_REG_VERSION_VERSION(x) SetField(axi_pwm_gen_REG_VERSION,"VERSION",x)
+  `define GET_axi_pwm_gen_REG_VERSION_VERSION(x) GetField(axi_pwm_gen_REG_VERSION,"VERSION",x)
+  `define DEFAULT_axi_pwm_gen_REG_VERSION_VERSION GetResetValue(axi_pwm_gen_REG_VERSION,"VERSION")
+  `define UPDATE_axi_pwm_gen_REG_VERSION_VERSION(x,y) UpdateField(axi_pwm_gen_REG_VERSION,"VERSION",x,y)
+
+  const reg_t axi_pwm_gen_REG_ID = '{ 'h0004, "REG_ID" , '{
+    "ID": '{ 31, 0, RO, 'h00000000 }}};
+  `define SET_axi_pwm_gen_REG_ID_ID(x) SetField(axi_pwm_gen_REG_ID,"ID",x)
+  `define GET_axi_pwm_gen_REG_ID_ID(x) GetField(axi_pwm_gen_REG_ID,"ID",x)
+  `define DEFAULT_axi_pwm_gen_REG_ID_ID GetResetValue(axi_pwm_gen_REG_ID,"ID")
+  `define UPDATE_axi_pwm_gen_REG_ID_ID(x,y) UpdateField(axi_pwm_gen_REG_ID,"ID",x,y)
+
+  const reg_t axi_pwm_gen_REG_SCRATCH = '{ 'h0008, "REG_SCRATCH" , '{
+    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
+  `define SET_axi_pwm_gen_REG_SCRATCH_SCRATCH(x) SetField(axi_pwm_gen_REG_SCRATCH,"SCRATCH",x)
+  `define GET_axi_pwm_gen_REG_SCRATCH_SCRATCH(x) GetField(axi_pwm_gen_REG_SCRATCH,"SCRATCH",x)
+  `define DEFAULT_axi_pwm_gen_REG_SCRATCH_SCRATCH GetResetValue(axi_pwm_gen_REG_SCRATCH,"SCRATCH")
+  `define UPDATE_axi_pwm_gen_REG_SCRATCH_SCRATCH(x,y) UpdateField(axi_pwm_gen_REG_SCRATCH,"SCRATCH",x,y)
+
+  const reg_t axi_pwm_gen_REG_CORE_MAGIC = '{ 'h000c, "REG_CORE_MAGIC" , '{
+    "CORE_MAGIC": '{ 31, 0, RW, 'h504C5347 }}};
+  `define SET_axi_pwm_gen_REG_CORE_MAGIC_CORE_MAGIC(x) SetField(axi_pwm_gen_REG_CORE_MAGIC,"CORE_MAGIC",x)
+  `define GET_axi_pwm_gen_REG_CORE_MAGIC_CORE_MAGIC(x) GetField(axi_pwm_gen_REG_CORE_MAGIC,"CORE_MAGIC",x)
+  `define DEFAULT_axi_pwm_gen_REG_CORE_MAGIC_CORE_MAGIC GetResetValue(axi_pwm_gen_REG_CORE_MAGIC,"CORE_MAGIC")
+  `define UPDATE_axi_pwm_gen_REG_CORE_MAGIC_CORE_MAGIC(x,y) UpdateField(axi_pwm_gen_REG_CORE_MAGIC,"CORE_MAGIC",x,y)
+
+  const reg_t axi_pwm_gen_REG_RSTN = '{ 'h0010, "REG_RSTN" , '{
     "LOAD_CONFIG": '{ 1, 1, WO, 'h0 },
     "RESET": '{ 0, 0, RW, 'h0 }}};
-  `define SET_REG_RSTN_LOAD_CONFIG(x) SetField(REG_RSTN,"LOAD_CONFIG",x)
-  `define GET_REG_RSTN_LOAD_CONFIG(x) GetField(REG_RSTN,"LOAD_CONFIG",x)
-  `define SET_REG_RSTN_RESET(x) SetField(REG_RSTN,"RESET",x)
-  `define GET_REG_RSTN_RESET(x) GetField(REG_RSTN,"RESET",x)
+  `define SET_axi_pwm_gen_REG_RSTN_LOAD_CONFIG(x) SetField(axi_pwm_gen_REG_RSTN,"LOAD_CONFIG",x)
+  `define GET_axi_pwm_gen_REG_RSTN_LOAD_CONFIG(x) GetField(axi_pwm_gen_REG_RSTN,"LOAD_CONFIG",x)
+  `define DEFAULT_axi_pwm_gen_REG_RSTN_LOAD_CONFIG GetResetValue(axi_pwm_gen_REG_RSTN,"LOAD_CONFIG")
+  `define UPDATE_axi_pwm_gen_REG_RSTN_LOAD_CONFIG(x,y) UpdateField(axi_pwm_gen_REG_RSTN,"LOAD_CONFIG",x,y)
+  `define SET_axi_pwm_gen_REG_RSTN_RESET(x) SetField(axi_pwm_gen_REG_RSTN,"RESET",x)
+  `define GET_axi_pwm_gen_REG_RSTN_RESET(x) GetField(axi_pwm_gen_REG_RSTN,"RESET",x)
+  `define DEFAULT_axi_pwm_gen_REG_RSTN_RESET GetResetValue(axi_pwm_gen_REG_RSTN,"RESET")
+  `define UPDATE_axi_pwm_gen_REG_RSTN_RESET(x,y) UpdateField(axi_pwm_gen_REG_RSTN,"RESET",x,y)
 
-  const reg_t REG_N_PULSES = '{ 'h0014, "REG_N_PULSES" , '{
-    "": '{ 31, 0, RO, 'h0000 }}};
-  `define SET_REG_N_PULSES_(x) SetField(REG_N_PULSES,"",x)
-  `define GET_REG_N_PULSES_(x) GetField(REG_N_PULSES,"",x)
+  const reg_t axi_pwm_gen_REG_NB_PULSES = '{ 'h0014, "REG_NB_PULSES" , '{
+    "NB_PULSES": '{ 31, 0, RO, 'h0000 }}};
+  `define SET_axi_pwm_gen_REG_NB_PULSES_NB_PULSES(x) SetField(axi_pwm_gen_REG_NB_PULSES,"NB_PULSES",x)
+  `define GET_axi_pwm_gen_REG_NB_PULSES_NB_PULSES(x) GetField(axi_pwm_gen_REG_NB_PULSES,"NB_PULSES",x)
+  `define DEFAULT_axi_pwm_gen_REG_NB_PULSES_NB_PULSES GetResetValue(axi_pwm_gen_REG_NB_PULSES,"NB_PULSES")
+  `define UPDATE_axi_pwm_gen_REG_NB_PULSES_NB_PULSES(x,y) UpdateField(axi_pwm_gen_REG_NB_PULSES,"NB_PULSES",x,y)
 
-  const reg_t REG_PULSE_0_PERIOD = '{ 'h0040, "REG_PULSE_0_PERIOD" , '{
-    "PULSE_0_PERIOD": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(x) SetField(REG_PULSE_0_PERIOD,"PULSE_0_PERIOD",x)
-  `define GET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(x) GetField(REG_PULSE_0_PERIOD,"PULSE_0_PERIOD",x)
+  const reg_t axi_pwm_gen_REG_PULSE_X_PERIOD = '{ 'h0040, "REG_PULSE_X_PERIOD" , '{
+    "PULSE_X_PERIOD": '{ 31, 0, RW, 'h0000 }}};
+  `define SET_axi_pwm_gen_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(x) SetField(axi_pwm_gen_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD",x)
+  `define GET_axi_pwm_gen_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(x) GetField(axi_pwm_gen_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD",x)
+  `define DEFAULT_axi_pwm_gen_REG_PULSE_X_PERIOD_PULSE_X_PERIOD GetResetValue(axi_pwm_gen_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD")
+  `define UPDATE_axi_pwm_gen_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(x,y) UpdateField(axi_pwm_gen_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD",x,y)
 
-  const reg_t REG_PULSE_0_WIDTH = '{ 'h0044, "REG_PULSE_0_WIDTH" , '{
-    "PULSE_0_WIDTH": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_0_WIDTH_PULSE_0_WIDTH(x) SetField(REG_PULSE_0_WIDTH,"PULSE_0_WIDTH",x)
-  `define GET_REG_PULSE_0_WIDTH_PULSE_0_WIDTH(x) GetField(REG_PULSE_0_WIDTH,"PULSE_0_WIDTH",x)
+  const reg_t axi_pwm_gen_REG_PULSE_X_WIDTH = '{ 'h0080, "REG_PULSE_X_WIDTH" , '{
+    "PULSE_X_WIDTH": '{ 31, 0, RW, 'h0000 }}};
+  `define SET_axi_pwm_gen_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(x) SetField(axi_pwm_gen_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH",x)
+  `define GET_axi_pwm_gen_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(x) GetField(axi_pwm_gen_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH",x)
+  `define DEFAULT_axi_pwm_gen_REG_PULSE_X_WIDTH_PULSE_X_WIDTH GetResetValue(axi_pwm_gen_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH")
+  `define UPDATE_axi_pwm_gen_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(x,y) UpdateField(axi_pwm_gen_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH",x,y)
 
-  const reg_t REG_PULSE_0_OFFSET = '{ 'h0048, "REG_PULSE_0_OFFSET" , '{
-    "PULSE_0_OFFSET": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_0_OFFSET_PULSE_0_OFFSET(x) SetField(REG_PULSE_0_OFFSET,"PULSE_0_OFFSET",x)
-  `define GET_REG_PULSE_0_OFFSET_PULSE_0_OFFSET(x) GetField(REG_PULSE_0_OFFSET,"PULSE_0_OFFSET",x)
-
-  const reg_t REG_PULSE_1_PERIOD = '{ 'h004c, "REG_PULSE_1_PERIOD" , '{
-    "PULSE_1_PERIOD": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_1_PERIOD_PULSE_1_PERIOD(x) SetField(REG_PULSE_1_PERIOD,"PULSE_1_PERIOD",x)
-  `define GET_REG_PULSE_1_PERIOD_PULSE_1_PERIOD(x) GetField(REG_PULSE_1_PERIOD,"PULSE_1_PERIOD",x)
-
-  const reg_t REG_PULSE_1_WIDTH = '{ 'h0050, "REG_PULSE_1_WIDTH" , '{
-    "PULSE_1_WIDTH": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_1_WIDTH_PULSE_1_WIDTH(x) SetField(REG_PULSE_1_WIDTH,"PULSE_1_WIDTH",x)
-  `define GET_REG_PULSE_1_WIDTH_PULSE_1_WIDTH(x) GetField(REG_PULSE_1_WIDTH,"PULSE_1_WIDTH",x)
-
-  const reg_t REG_PULSE_1_OFFSET = '{ 'h0054, "REG_PULSE_1_OFFSET" , '{
-    "PULSE_1_OFFSET": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_1_OFFSET_PULSE_1_OFFSET(x) SetField(REG_PULSE_1_OFFSET,"PULSE_1_OFFSET",x)
-  `define GET_REG_PULSE_1_OFFSET_PULSE_1_OFFSET(x) GetField(REG_PULSE_1_OFFSET,"PULSE_1_OFFSET",x)
-
-  const reg_t REG_PULSE_2_PERIOD = '{ 'h0058, "REG_PULSE_2_PERIOD" , '{
-    "PULSE_2_PERIOD": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_2_PERIOD_PULSE_2_PERIOD(x) SetField(REG_PULSE_2_PERIOD,"PULSE_2_PERIOD",x)
-  `define GET_REG_PULSE_2_PERIOD_PULSE_2_PERIOD(x) GetField(REG_PULSE_2_PERIOD,"PULSE_2_PERIOD",x)
-
-  const reg_t REG_PULSE_2_WIDTH = '{ 'h005c, "REG_PULSE_2_WIDTH" , '{
-    "PULSE_2_WIDTH": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_2_WIDTH_PULSE_2_WIDTH(x) SetField(REG_PULSE_2_WIDTH,"PULSE_2_WIDTH",x)
-  `define GET_REG_PULSE_2_WIDTH_PULSE_2_WIDTH(x) GetField(REG_PULSE_2_WIDTH,"PULSE_2_WIDTH",x)
-
-  const reg_t REG_PULSE_2_OFFSET = '{ 'h0060, "REG_PULSE_2_OFFSET" , '{
-    "PULSE_2_OFFSET": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_2_OFFSET_PULSE_2_OFFSET(x) SetField(REG_PULSE_2_OFFSET,"PULSE_2_OFFSET",x)
-  `define GET_REG_PULSE_2_OFFSET_PULSE_2_OFFSET(x) GetField(REG_PULSE_2_OFFSET,"PULSE_2_OFFSET",x)
-
-  const reg_t REG_PULSE_3_PERIOD = '{ 'h0064, "REG_PULSE_3_PERIOD" , '{
-    "PULSE_3_PERIOD": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_3_PERIOD_PULSE_3_PERIOD(x) SetField(REG_PULSE_3_PERIOD,"PULSE_3_PERIOD",x)
-  `define GET_REG_PULSE_3_PERIOD_PULSE_3_PERIOD(x) GetField(REG_PULSE_3_PERIOD,"PULSE_3_PERIOD",x)
-
-  const reg_t REG_PULSE_3_WIDTH = '{ 'h0068, "REG_PULSE_3_WIDTH" , '{
-    "PULSE_3_WIDTH": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_3_WIDTH_PULSE_3_WIDTH(x) SetField(REG_PULSE_3_WIDTH,"PULSE_3_WIDTH",x)
-  `define GET_REG_PULSE_3_WIDTH_PULSE_3_WIDTH(x) GetField(REG_PULSE_3_WIDTH,"PULSE_3_WIDTH",x)
-
-  const reg_t REG_PULSE_3_OFFSET = '{ 'h006c, "REG_PULSE_3_OFFSET" , '{
-    "PULSE_3_OFFSET": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_REG_PULSE_3_OFFSET_PULSE_3_OFFSET(x) SetField(REG_PULSE_3_OFFSET,"PULSE_3_OFFSET",x)
-  `define GET_REG_PULSE_3_OFFSET_PULSE_3_OFFSET(x) GetField(REG_PULSE_3_OFFSET,"PULSE_3_OFFSET",x)
+  const reg_t axi_pwm_gen_REG_PULSE_X_OFFSET = '{ 'h00c0, "REG_PULSE_X_OFFSET" , '{
+    "PULSE_X_OFFSET": '{ 31, 0, RW, 'h0000 }}};
+  `define SET_axi_pwm_gen_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(x) SetField(axi_pwm_gen_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET",x)
+  `define GET_axi_pwm_gen_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(x) GetField(axi_pwm_gen_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET",x)
+  `define DEFAULT_axi_pwm_gen_REG_PULSE_X_OFFSET_PULSE_X_OFFSET GetResetValue(axi_pwm_gen_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET")
+  `define UPDATE_axi_pwm_gen_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(x,y) UpdateField(axi_pwm_gen_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET",x,y)
 
 
 endpackage

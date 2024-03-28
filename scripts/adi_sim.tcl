@@ -40,6 +40,14 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
     adi_sim_add_define $k=$v
   }
 
+  # write tcl parameters into a file
+  set outfile [open "./runs/${project_name}/parameters.log" w+]
+  puts $outfile "Configuration parameters\n"
+  foreach name [array names ad_project_params] {
+    puts $outfile "$name : $ad_project_params($name)"
+  }
+  close $outfile
+
   # Build the test harness based on the topology
   source system_bd.tcl
 

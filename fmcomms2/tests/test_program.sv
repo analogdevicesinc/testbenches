@@ -158,7 +158,7 @@ program test_program;
                `SET_REG_VERSION_VERSION('h000a0300));
     //check DAC VERSION
     axi_read_v (TX1_COMMON + GetAddrs(REG_VERSION),
-               `SET_REG_VERSION_VERSION('h00090162));
+               `SET_REG_VERSION_VERSION('h00090262));
   end
   endtask
 

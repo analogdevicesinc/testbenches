@@ -53,31 +53,6 @@ import spi_engine_instr_pkg::*;
 //---------------------------------------------------------------------------
 localparam PCORE_VERSION              = 32'h0001_0171;
 
-//---------------------------------------------------------------------------
-// SPI Engine instructions
-//---------------------------------------------------------------------------
-
-// Chip select instructions
-localparam INST_CS_OFF                = 32'h0000_10FF;
-localparam INST_CS_ON                 = 32'h0000_10FE;
-
-// Transfer instructions
-localparam INST_WR                    = 32'h0000_0100 | (`NUM_OF_WORDS-1);
-localparam INST_RD                    = 32'h0000_0200 | (`NUM_OF_WORDS-1);
-localparam INST_WRD                   = 32'h0000_0300 | (`NUM_OF_WORDS-1);
-
-// Configuration register instructions
-localparam INST_CFG                   = 32'h0000_2100 | (`THREE_WIRE << 2) | (`CPOL << 1) | `CPHA;
-localparam INST_PRESCALE              = 32'h0000_2000 | `CLOCK_DIVIDER;
-localparam INST_DLENGTH               = 32'h0000_2200 | `DATA_DLENGTH;
-
-// Synchronization
-localparam INST_SYNC                  = 32'h0000_3000;
-
-// Sleep instruction
-localparam INST_SLEEP                 = 32'h0000_3100;
-`define sleep(a)                      (INST_SLEEP | (a & 8'hFF))
-
 program test_program (
   input spi_engine_irq,
   input spi_engine_spi_sclk,

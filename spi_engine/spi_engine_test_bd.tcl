@@ -5,33 +5,19 @@
 
 source $ad_hdl_dir/library/spi_engine/scripts/spi_engine.tcl
 
-set DATA_WIDTH              $ad_project_params(DATA_WIDTH)
-set ASYNC_SPI_CLK           $ad_project_params(ASYNC_SPI_CLK)
-set NUM_OF_CS               $ad_project_params(NUM_OF_CS)
-set NUM_OF_SDI              $ad_project_params(NUM_OF_SDI)
-set NUM_OF_SDO              $ad_project_params(NUM_OF_SDO)
-set SDI_DELAY               $ad_project_params(SDI_DELAY)
-set ECHO_SCLK               $ad_project_params(ECHO_SCLK)
-set CMD_MEM_ADDR_WIDTH      $ad_project_params(CMD_MEM_ADDR_WIDTH)
-set DATA_MEM_ADDR_WIDTH     $ad_project_params(DATA_MEM_ADDR_WIDTH)
-set SDI_FIFO_ADDR_WIDTH     $ad_project_params(SDI_FIFO_ADDR_WIDTH)
-set SDO_FIFO_ADDR_WIDTH     $ad_project_params(SDO_FIFO_ADDR_WIDTH)
-set SYNC_FIFO_ADDR_WIDTH    $ad_project_params(SYNC_FIFO_ADDR_WIDTH)
-set CMD_FIFO_ADDR_WIDTH     $ad_project_params(CMD_FIFO_ADDR_WIDTH)
-
-set data_width              $DATA_WIDTH
-set async_spi_clk           $ASYNC_SPI_CLK
-set num_cs                  $NUM_OF_CS
-set num_sdi                 $NUM_OF_SDI
-set num_sdo                 $NUM_OF_SDO
-set sdi_delay               $SDI_DELAY
-set echo_sclk               $ECHO_SCLK
-set cmd_mem_addr_width      $CMD_MEM_ADDR_WIDTH
-set data_mem_addr_width     $DATA_MEM_ADDR_WIDTH
-set sdi_fifo_addr_width     $SDI_FIFO_ADDR_WIDTH
-set sdo_fifo_addr_width     $SDO_FIFO_ADDR_WIDTH
-set sync_fifo_addr_width    $SYNC_FIFO_ADDR_WIDTH
-set cmd_fifo_addr_width     $CMD_FIFO_ADDR_WIDTH
+set data_width              $ad_project_params(DATA_WIDTH)
+set async_spi_clk           $ad_project_params(ASYNC_SPI_CLK)
+set num_cs                  $ad_project_params(NUM_OF_CS)
+set num_sdi                 $ad_project_params(NUM_OF_SDI)
+set num_sdo                 $ad_project_params(NUM_OF_SDO)
+set sdi_delay               $ad_project_params(SDI_DELAY)
+set echo_sclk               $ad_project_params(ECHO_SCLK)
+set cmd_mem_addr_width      $ad_project_params(CMD_MEM_ADDR_WIDTH)
+set data_mem_addr_width     $ad_project_params(DATA_MEM_ADDR_WIDTH)
+set sdi_fifo_addr_width     $ad_project_params(SDI_FIFO_ADDR_WIDTH)
+set sdo_fifo_addr_width     $ad_project_params(SDO_FIFO_ADDR_WIDTH)
+set sync_fifo_addr_width    $ad_project_params(SYNC_FIFO_ADDR_WIDTH)
+set cmd_fifo_addr_width     $ad_project_params(CMD_FIFO_ADDR_WIDTH)
 
 create_bd_intf_port -mode Master -vlnv analog.com:interface:spi_engine_rtl:1.0 spi_engine_spi
 
@@ -91,3 +77,7 @@ ad_cpu_interrupt "ps-12" "mb-12" /$hier_spi_engine/irq
 
 ad_mem_hp1_interconnect $sys_cpu_clk sys_ps7/S_AXI_HP1
 ad_mem_hp1_interconnect $sys_cpu_clk axi_spi_engine_dma/m_dest_axi
+
+if {$ad_project_params(ECHO_SCLK)} {
+  adi_sim_add_define DEF_ECHO_SCLK
+}

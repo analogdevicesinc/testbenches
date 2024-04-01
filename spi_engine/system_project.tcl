@@ -38,7 +38,7 @@ adi_sim_project_files [list \
  "../common/sv/adi_regmap_spi_engine_pkg.sv" \
  "../common/sv/dma_trans.sv" \
  "../common/sv/test_harness_env.sv" \
- "spi_engine.svh" \
+ "../common/sv/spi_engine_instr_pkg.sv" \
  "tests/test_program.sv" \
  "tests/test_sleep_delay.sv" \
  "system_tb.sv" \
@@ -46,9 +46,5 @@ adi_sim_project_files [list \
 
 #set a default test program
 adi_sim_add_define "TEST_PROGRAM=test_program"
-
-if {$ad_project_params(ECHO_SCLK)} {
-  adi_sim_add_define DEF_ECHO_SCLK
-}
 
 adi_sim_generate $project_name

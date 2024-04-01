@@ -3,6 +3,8 @@ package spi_engine_instr_pkg;
 `define INST_CS         (32'h0000_1000)
 `define cs(mask)        (`INST_CS | (mask & 8'hFF))
 `define cs_delay(m,d)   (`INST_CS | ((d & 2'h3) << 8) | (m & 8'hFF))
+`define INST_CS_INV     (32'h0000_4000)
+`define cs_inv_mask(m)  (`INST_CS_INV | (m & 8'hFF))
 
 // Transfer instructions
 `define INST_WR         (32'h0000_0100 | (`NUM_OF_WORDS-1))

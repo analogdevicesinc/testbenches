@@ -49,7 +49,7 @@ import spi_engine_instr_pkg::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0171;
+localparam PCORE_VERSION              = 32'h0001_0200;
 
 program test_sleep_delay (
   input spi_engine_irq,
@@ -208,13 +208,15 @@ end
 wire          end_of_word;
 wire          spi_sclk_bfm = spi_engine_echo_sclk;
 wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = &spi_engine_spi_cs;
+wire          m_spi_csn_int_s;
 bit           m_spi_csn_int_d = 0;
 bit   [31:0]  sdi_shiftreg;
 bit   [7:0]   spi_sclk_pos_counter = 0;
 bit   [7:0]   spi_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
+
+assign m_spi_csn_int_s = (`CS_ACTIVE_HIGH) ? |spi_engine_spi_cs : &spi_engine_spi_cs;
 
 initial begin
   forever begin
@@ -224,6 +226,8 @@ initial begin
 end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
+assign m_spi_csn_posedge_s = m_spi_csn_int_s & !m_spi_csn_int_d;
+assign m_spi_csn_edge_s = (`CS_ACTIVE_HIGH) ? m_spi_csn_posedge_s : m_spi_csn_negedge_s;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
@@ -236,8 +240,8 @@ assign end_of_word = (`CPOL ^ `CPHA) ?
 
 initial begin
   forever begin
-    @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if (m_spi_csn_negedge_s) begin
+    @(posedge spi_sclk_bfm or posedge m_spi_csn_edge_s);
+    if (m_spi_csn_edge_s) begin
       spi_sclk_pos_counter <= 8'b0;
     end else begin
       spi_sclk_pos_counter <= (spi_sclk_pos_counter == `DATA_DLENGTH) ? 0 : spi_sclk_pos_counter+1;
@@ -247,8 +251,8 @@ end
 
 initial begin
   forever begin
-    @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if (m_spi_csn_negedge_s) begin
+    @(negedge spi_sclk_bfm or posedge m_spi_csn_edge_s);
+    if (m_spi_csn_edge_s) begin
       spi_sclk_neg_counter <= 8'b0;
     end else begin
       spi_sclk_neg_counter <= (spi_sclk_neg_counter == `DATA_DLENGTH) ? 0 : spi_sclk_neg_counter+1;
@@ -261,16 +265,16 @@ initial begin
   forever begin
     // synchronization
     if (`CPHA ^ `CPOL)
-      @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
+      @(posedge spi_sclk_bfm or posedge m_spi_csn_edge_s);
     else
-      @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if ((m_spi_csn_negedge_s) || (end_of_word)) begin
+      @(negedge spi_sclk_bfm or posedge m_spi_csn_edge_s);
+    if ((m_spi_csn_edge_s) || (end_of_word)) begin
       // delete the last word at end_of_word
       if (end_of_word) begin
         sdi_preg.pop_back();
         sdi_nreg.pop_back();
       end
-      if (m_spi_csn_negedge_s) begin
+      if (m_spi_csn_edge_s) begin
         // NOTE: assuming queue is empty
         repeat (`NUM_OF_WORDS) begin
           sdi_preg.push_front($urandom);
@@ -285,8 +289,8 @@ initial begin
                         sdi_preg[$] :
                         sdi_nreg[$];
       end
-      if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
-    end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
+      if (m_spi_csn_edge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
+    end else begin /* if ((m_spi_csn_edge_s) || (end_of_word)) */
       sdi_shiftreg <= {sdi_shiftreg[`DATA_DLENGTH-2:0], 1'b0};
     end
   end
@@ -409,10 +413,13 @@ task sleep_delay_test(
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );
 
-  // Write commnads stack
+  // Write commands
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
+  if (`CS_ACTIVE_HIGH) begin
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `cs_inv_mask(8'hFF));
+  end
 
   expected_sleep_time = 2+(sleep_param)*((`CLOCK_DIVIDER+1)*2);
   // Start the test
@@ -480,6 +487,9 @@ task cs_delay_test(
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+    if (`CS_ACTIVE_HIGH) begin
+      axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs_inv_mask(8'hFF));
+    end
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs(8'hFE));
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs(8'hFF));

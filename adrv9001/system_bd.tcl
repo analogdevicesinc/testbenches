@@ -55,3 +55,22 @@ source $ad_hdl_dir/projects/adrv9001/common/adrv9001_bd.tcl
 ad_ip_parameter axi_adrv9001 CONFIG.USE_RX_CLK_FOR_TX $ad_project_params(USE_RX_CLK_FOR_TX)
 ad_ip_parameter axi_adrv9001 CONFIG.DDS_DISABLE $ad_project_params(DDS_DISABLE)
 
+set RX1_DMA 0x44A30000
+set_property offset $RX1_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9001_rx1_dma}]
+adi_sim_add_define "RX1_DMA_BA=[format "%d" ${RX1_DMA}]"
+
+set RX2_DMA 0x44A40000
+set_property offset $RX2_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9001_rx2_dma}]
+adi_sim_add_define "RX2_DMA_BA=[format "%d" ${RX2_DMA}]"
+
+set TX1_DMA 0x44A50000
+set_property offset $TX1_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9001_tx1_dma}]
+adi_sim_add_define "TX1_DMA_BA=[format "%d" ${TX1_DMA}]"
+
+set TX2_DMA 0x44A60000
+set_property offset $TX2_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9001_tx2_dma}]
+adi_sim_add_define "TX2_DMA_BA=[format "%d" ${TX2_DMA}]"
+
+set AXI_ADRV9001 0x44A00000
+set_property offset $AXI_ADRV9001 [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9001}]
+adi_sim_add_define "AXI_ADRV9001_BA=[format "%d" ${AXI_ADRV9001}]"

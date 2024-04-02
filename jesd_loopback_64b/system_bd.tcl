@@ -242,3 +242,23 @@ for {set i $NUM_OF_CONVERTERS} {$i < $MAX_CONVERTERS} {incr i} {
 
 make_bd_pins_external  [get_bd_pins /dac_jesd204_transport/dac_dunf]
 make_bd_pins_external  [get_bd_pins /adc_jesd204_transport/adc_dovf]
+
+set JESD_PHY 0x44A60000
+set_property offset $JESD_PHY [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_jesd204_phy}]
+adi_sim_add_define "JESD_PHY_BA=[format "%d" ${JESD_PHY}]"
+
+set AXI_JESD_RX 0x44A90000
+set_property offset $AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_adc_jesd204_link}]
+adi_sim_add_define "AXI_JESD_RX_BA=[format "%d" ${AXI_JESD_RX}]"
+
+set AXI_JESD_TX 0x44B90000
+set_property offset $AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_link}]
+adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
+
+set ADC_TPL 0x44A10000
+set_property offset $ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_adc_jesd204_transport}]
+adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
+
+set DAC_TPL 0x44B10000
+set_property offset $DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_transport}]
+adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"

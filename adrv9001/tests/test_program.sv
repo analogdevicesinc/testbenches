@@ -49,13 +49,6 @@ import adi_regmap_common_pkg::*;
 import adi_regmap_jesd_tx_pkg::*;
 import adi_regmap_jesd_rx_pkg::*;
 
-`define RX1_DMA      32'h44A3_0000
-`define RX2_DMA      32'h44A4_0000
-`define TX1_DMA      32'h44A5_0000
-`define TX2_DMA      32'h44A6_0000
-`define AXI_ADRV9001 32'h44A0_0000
-`define DDR_BASE     32'h8000_0000
-
 `define PN7 0
 `define PN15 1
 `define NIBBLE_RAMP 2
@@ -72,31 +65,30 @@ program test_program;
   parameter IQCORRECTION_DISABLE = 1;
   parameter SYMB_OP = 0;
   parameter SYMB_8_16B = 0;
-  parameter BASE = `AXI_ADRV9001;
 
   parameter CH0 = 8'h00 * 4;
   parameter CH1 = 8'h10 * 4;
   parameter CH2 = 8'h20 * 4;
   parameter CH3 = 8'h30 * 4;
 
-  parameter RX1_COMMON  = BASE + 'h00_00 * 4;
-  parameter RX1_CHANNEL = BASE + 'h00_00 * 4;
+  parameter RX1_COMMON  = `AXI_ADRV9001_BA + 'h00_00 * 4;
+  parameter RX1_CHANNEL = `AXI_ADRV9001_BA + 'h00_00 * 4;
 
-  parameter RX1_DLY = BASE + 'h02_00 * 4;
+  parameter RX1_DLY = `AXI_ADRV9001_BA + 'h02_00 * 4;
 
-  parameter RX2_COMMON  = BASE + 'h04_00 * 4;
-  parameter RX2_CHANNEL = BASE + 'h04_00 * 4;
+  parameter RX2_COMMON  = `AXI_ADRV9001_BA + 'h04_00 * 4;
+  parameter RX2_CHANNEL = `AXI_ADRV9001_BA + 'h04_00 * 4;
 
-  parameter RX2_DLY = BASE + 'h06_00 * 4;
+  parameter RX2_DLY = `AXI_ADRV9001_BA + 'h06_00 * 4;
 
-  parameter TX1_COMMON  = BASE + 'h08_00 * 4;
-  parameter TX1_CHANNEL = BASE + 'h08_00 * 4;
+  parameter TX1_COMMON  = `AXI_ADRV9001_BA + 'h08_00 * 4;
+  parameter TX1_CHANNEL = `AXI_ADRV9001_BA + 'h08_00 * 4;
 
-  parameter TX2_COMMON  = BASE + 'h10_00 * 4;
-  parameter TX2_CHANNEL = BASE + 'h10_00 * 4;
+  parameter TX2_COMMON  = `AXI_ADRV9001_BA + 'h10_00 * 4;
+  parameter TX2_CHANNEL = `AXI_ADRV9001_BA + 'h10_00 * 4;
 
-  parameter TDD1 = BASE + 'h12_00 * 4;
-  parameter TDD2 = BASE + 'h13_00 * 4;
+  parameter TDD1 = `AXI_ADRV9001_BA + 'h12_00 * 4;
+  parameter TDD2 = `AXI_ADRV9001_BA + 'h13_00 * 4;
 
   test_harness_env env;
   bit [31:0] val;
@@ -495,20 +487,20 @@ program test_program;
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
       if (SYMB_OP[0] & SYMB_8_16B[0]) begin
-        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
+        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
       end else begin
-        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i,15);
+        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,((i+1) << 16) | i,15);
       end
       // Clear destination region
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+'h2000+i*2,'hBEEF,15);
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+'h2000+i*2,'hBEEF,15);
     end
 
     // Configure TX DMA
-    env.mng.RegWrite32(`TX1_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`TX1_DMA+32'h40c, 32'h00000001); // use CYCLIC
-    env.mng.RegWrite32(`TX1_DMA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
-    env.mng.RegWrite32(`TX1_DMA+32'h414, `DDR_BASE+32'h00000000); // SRC_ADDRESS
-    env.mng.RegWrite32(`TX1_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(`TX1_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`TX1_DMA_BA+32'h40c, 32'h00000001); // use CYCLIC
+    env.mng.RegWrite32(`TX1_DMA_BA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
+    env.mng.RegWrite32(`TX1_DMA_BA+32'h414, `DDR_BA+32'h00000000); // SRC_ADDRESS
+    env.mng.RegWrite32(`TX1_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Select DMA as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -563,19 +555,19 @@ program test_program;
     #20us;
 
     // Configure RX DMA
-    env.mng.RegWrite32(`RX1_DMA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
-    env.mng.RegWrite32(`RX1_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`RX1_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`RX1_DMA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`RX1_DMA+32'h410, `DDR_BASE+32'h00002000); // DEST_ADDRESS
-    env.mng.RegWrite32(`RX1_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(`RX1_DMA_BA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
+    env.mng.RegWrite32(`RX1_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`RX1_DMA_BA+32'h40c, 32'h00000006); // use TLAST
+    env.mng.RegWrite32(`RX1_DMA_BA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`RX1_DMA_BA+32'h410, `DDR_BA+32'h00002000); // DEST_ADDRESS
+    env.mng.RegWrite32(`RX1_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     @(posedge system_tb.test_harness.axi_adrv9001_rx1_dma.irq);
     //Clear interrupt
-    env.mng.RegWrite32(`RX1_DMA+32'h084, 32'h00000002);
+    env.mng.RegWrite32(`RX1_DMA_BA+32'h084, 32'h00000002);
 
     check_captured_data(
-      .address (`DDR_BASE+'h00002000),
+      .address (`DDR_BA+'h00002000),
       .length (1024),
       .step (1),
       .max_sample(2048)
@@ -597,20 +589,20 @@ program test_program;
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
       if (SYMB_OP[0] & SYMB_8_16B[0]) begin
-        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
+        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
       end else begin
-        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,((i+1) << 16) | i,15);
+        env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,((i+1) << 16) | i,15);
       end
       // Clear destination region
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+'h2000+i*2,'hBEEF,15);
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+'h2000+i*2,'hBEEF,15);
     end
 
     // Configure TX DMA
-    env.mng.RegWrite32(`TX2_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`TX2_DMA+32'h40c, 32'h00000001); // use CYCLIC
-    env.mng.RegWrite32(`TX2_DMA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
-    env.mng.RegWrite32(`TX2_DMA+32'h414, `DDR_BASE+32'h00000000); // SRC_ADDRESS
-    env.mng.RegWrite32(`TX2_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(`TX2_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`TX2_DMA_BA+32'h40c, 32'h00000001); // use CYCLIC
+    env.mng.RegWrite32(`TX2_DMA_BA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
+    env.mng.RegWrite32(`TX2_DMA_BA+32'h414, `DDR_BA+32'h00000000); // SRC_ADDRESS
+    env.mng.RegWrite32(`TX2_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Select DDS as source
     axi_write (TX2_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -641,19 +633,19 @@ program test_program;
     #20us;
 
     // Configure RX DMA
-    env.mng.RegWrite32(`RX2_DMA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
-    env.mng.RegWrite32(`RX2_DMA+32'h400, 32'h00000001); // Enable DMA
-    env.mng.RegWrite32(`RX2_DMA+32'h40c, 32'h00000006); // use TLAST
-    env.mng.RegWrite32(`RX2_DMA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`RX2_DMA+32'h410, `DDR_BASE+32'h00002000); // DEST_ADDRESS
-    env.mng.RegWrite32(`RX2_DMA+32'h408, 32'h00000001); // Submit transfer DMA
+    env.mng.RegWrite32(`RX2_DMA_BA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
+    env.mng.RegWrite32(`RX2_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    env.mng.RegWrite32(`RX2_DMA_BA+32'h40c, 32'h00000006); // use TLAST
+    env.mng.RegWrite32(`RX2_DMA_BA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`RX2_DMA_BA+32'h410, `DDR_BA+32'h00002000); // DEST_ADDRESS
+    env.mng.RegWrite32(`RX2_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     @(posedge system_tb.test_harness.axi_adrv9001_rx2_dma.irq);
     //Clear interrupt
-    env.mng.RegWrite32(`RX2_DMA+32'h084, 32'h00000002);
+    env.mng.RegWrite32(`RX2_DMA_BA+32'h084, 32'h00000002);
 
     check_captured_data(
-      .address (`DDR_BASE+'h00002000),
+      .address (`DDR_BA+'h00002000),
       .length (1024),
       .step (1),
       .max_sample(2048)

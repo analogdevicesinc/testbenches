@@ -286,3 +286,107 @@ for {set i 0} {$i < $RX_OS_NUM_OF_CONVERTERS} {incr i} {
 }
 
 assign_bd_address
+
+set AXI_JESD_RX_OS 0x44AB0000
+set_property offset $AXI_JESD_RX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_jesd}]
+adi_sim_add_define "AXI_JESD_RX_OS_BA=[format "%d" ${AXI_JESD_RX_OS}]"
+
+set AXI_JESD_RX 0x44AA0000
+set_property offset $AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_jesd}]
+adi_sim_add_define "AXI_JESD_RX_BA=[format "%d" ${AXI_JESD_RX}]"
+
+set AXI_JESD_TX 0x44A90000
+set_property offset $AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_jesd}]
+adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
+
+
+set TX_DMA 0x7C420000
+set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_dma}]
+adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
+
+set RX_DMA 0x7C400000
+set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_dma}]
+adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
+
+set RX_OS_DMA 0x7C440000
+set_property offset $RX_OS_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_dma}]
+adi_sim_add_define "RX_OS_DMA_BA=[format "%d" ${RX_OS_DMA}]"
+
+
+set ADC_TPL 0x44A00000
+set_property offset $ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_adrv9009_tpl_core}]
+adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
+
+set ADC_OS_TPL 0x44A08000
+set_property offset $ADC_OS_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_os_adrv9009_tpl_core}]
+adi_sim_add_define "ADC_OS_TPL_BA=[format "%d" ${ADC_OS_TPL}]"
+
+set DAC_TPL 0x44A04000
+set_property offset $DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_tx_adrv9009_tpl_core}]
+adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"
+
+
+set EX_ADC_TPL 0x44A30000
+set_property offset $EX_ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_adc_tpl_core_axi_lite}]
+adi_sim_add_define "EX_ADC_TPL_BA=[format "%d" ${EX_ADC_TPL}]"
+
+set EX_DAC_TPL 0x44AC0000
+set_property offset $EX_DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_dac_tpl_core_axi_lite}]
+adi_sim_add_define "EX_DAC_TPL_BA=[format "%d" ${EX_DAC_TPL}]"
+
+set EX_DAC_OS_TPL 0x44AF0000
+set_property offset $EX_DAC_OS_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_dac_tpl_core_axi_lite_1}]
+adi_sim_add_define "EX_DAC_OS_TPL_BA=[format "%d" ${EX_DAC_OS_TPL}]"
+
+
+set DUT_AXI_XCVR_RX_OS 0x44A50000
+set_property offset $DUT_AXI_XCVR_RX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_xcvr}]
+adi_sim_add_define "DUT_AXI_XCVR_RX_OS_BA=[format "%d" ${DUT_AXI_XCVR_RX_OS}]"
+
+set DUT_AXI_XCVR_RX 0x44A60000
+set_property offset $DUT_AXI_XCVR_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_xcvr}]
+adi_sim_add_define "DUT_AXI_XCVR_RX_BA=[format "%d" ${DUT_AXI_XCVR_RX}]"
+
+set DUT_AXI_XCVR_TX 0x44A80000
+set_property offset $DUT_AXI_XCVR_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_xcvr}]
+adi_sim_add_define "DUT_AXI_XCVR_TX_BA=[format "%d" ${DUT_AXI_XCVR_TX}]"
+
+
+set EX_AXI_XCVR_RX 0x44A20000
+set_property offset $EX_AXI_XCVR_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_axi_xcvr_axi_lite}]
+adi_sim_add_define "EX_AXI_XCVR_RX_BA=[format "%d" ${EX_AXI_XCVR_RX}]"
+
+set EX_AXI_JESD_RX 0x44A10000
+set_property offset $EX_AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_rx_axi_axi_lite}]
+adi_sim_add_define "EX_AXI_JESD_RX_BA=[format "%d" ${EX_AXI_JESD_RX}]"
+
+
+set EX_AXI_XCVR_TX 0x44A70000
+set_property offset $EX_AXI_XCVR_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_axi_xcvr_axi_lite_1}]
+adi_sim_add_define "EX_AXI_XCVR_TX_BA=[format "%d" ${EX_AXI_XCVR_TX}]"
+
+set EX_AXI_JESD_TX 0x44A40000
+set_property offset $EX_AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_tx_axi_axi_lite}]
+adi_sim_add_define "EX_AXI_JESD_TX_BA=[format "%d" ${EX_AXI_JESD_TX}]"
+
+
+set EX_AXI_XCVR_TX_OS 0x44AE0000
+set_property offset $EX_AXI_XCVR_TX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_axi_xcvr_axi_lite_2}]
+adi_sim_add_define "EX_AXI_XCVR_TX_OS_BA=[format "%d" ${EX_AXI_XCVR_TX_OS}]"
+
+set EX_AXI_JESD_TX_OS 0x44AD0000
+set_property offset $EX_AXI_JESD_TX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_tx_axi_axi_lite_1}]
+adi_sim_add_define "EX_AXI_JESD_TX_OS_BA=[format "%d" ${EX_AXI_JESD_TX_OS}]"
+
+
+set AXI_CLKGEN_TX 0x43C00000
+set_property offset $AXI_CLKGEN_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_clkgen}]
+adi_sim_add_define "AXI_CLKGEN_TX_BA=[format "%d" ${AXI_CLKGEN_TX}]"
+
+set AXI_CLKGEN_RX 0x43C10000
+set_property offset $AXI_CLKGEN_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_clkgen}]
+adi_sim_add_define "AXI_CLKGEN_RX_BA=[format "%d" ${AXI_CLKGEN_RX}]"
+
+set AXI_CLKGEN_RX_OS 0x43C20000
+set_property offset $AXI_CLKGEN_RX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_clkgen}]
+adi_sim_add_define "AXI_CLKGEN_RX_OS_BA=[format "%d" ${AXI_CLKGEN_RX_OS}]"

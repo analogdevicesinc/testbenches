@@ -67,3 +67,6 @@ ad_connect tdd_channel dut_tdd/tdd_channel
 
 ad_cpu_interconnect 0x7c420000 dut_tdd
 
+set TDD 0x7C420000
+set_property offset $TDD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dut_tdd}]
+adi_sim_add_define "TDD_BA=[format "%d" ${TDD}]"

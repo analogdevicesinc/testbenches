@@ -76,3 +76,10 @@ ad_mem_hp0_interconnect $sys_dma_clk dut_tx_dma/m_src_axi
 ad_cpu_interrupt ps-13 mb-12 dut_rx_dma/irq
 ad_cpu_interrupt ps-12 mb-13 dut_tx_dma/irq
 
+set RX_DMA 0x7C420000
+set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dut_rx_dma}]
+adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
+
+set TX_DMA 0x7C430000
+set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dut_tx_dma}]
+adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"

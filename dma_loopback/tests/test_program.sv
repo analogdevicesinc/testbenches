@@ -46,10 +46,6 @@ import adi_regmap_dmac_pkg::*;
 import dmac_api_pkg::*;
 import dma_trans_pkg::*;
 
-`define RX_DMA      32'h7c42_0000
-`define TX_DMA      32'h7c43_0000
-`define DDR_BASE    32'h8000_0000
-
 program test_program;
 
   test_harness_env env;
@@ -72,10 +68,10 @@ program test_program;
     setLoggerVerbosity(6);
     env.start();
 
-    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA);
+    m_dmac_api = new("TX_DMA_BA", env.mng, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA);
+    s_dmac_api = new("RX_DMA_BA", env.mng, `RX_DMA_BA);
     s_dmac_api.probe();
 
     start_clocks();
@@ -89,20 +85,20 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)) << 16) | i ,'hF);
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 16) | i ,'hF);
     end
 
     do_transfer(
-      .src_addr(`DDR_BASE+'h0000),
-      .dest_addr(`DDR_BASE+'h2000),
+      .src_addr(`DDR_BA+'h0000),
+      .dest_addr(`DDR_BA+'h2000),
       .length('h1000)
     );
 
     #20us;
 
     check_data(
-      .src_addr(`DDR_BASE+'h0000),
-      .dest_addr(`DDR_BASE+'h2000),
+      .src_addr(`DDR_BA+'h0000),
+      .dest_addr(`DDR_BA+'h2000),
       .length('h1000)
     );
 

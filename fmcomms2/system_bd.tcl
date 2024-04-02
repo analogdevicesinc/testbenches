@@ -54,3 +54,16 @@ source $ad_hdl_dir/projects/fmcomms2/common/fmcomms2_bd.tcl
 
 
 ad_ip_parameter axi_ad9361 CONFIG.DELAY_REFCLK_FREQUENCY 400
+
+
+set RX_DMA 0x7C400000
+set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad9361_adc_dma}]
+adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
+
+set TX_DMA 0x7C420000
+set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad9361_dac_dma}]
+adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
+
+set AXI_AD9361 0x79020000
+set_property offset $AXI_AD9361 [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad9361}]
+adi_sim_add_define "AXI_AD9361_BA=[format "%d" ${AXI_AD9361}]"

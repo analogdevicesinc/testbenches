@@ -46,13 +46,9 @@ import adi_regmap_dmac_pkg::*;
 import adi_regmap_dac_pkg::*;
 import adi_regmap_adc_pkg::*;
 import adi_regmap_common_pkg::*;
-`define RX_DMA       32'h7C40_0000
-`define TX_DMA       32'h7C42_0000
-`define AXI_AD9361   32'h7902_0000
-`define DDR_BASE     32'h8000_0000
+
 program test_program;
 
-  parameter BASE = `AXI_AD9361;
   parameter R1_MODE = 0;
 
   parameter CH0 = 8'h00 * 4;
@@ -60,15 +56,15 @@ program test_program;
   parameter CH2 = 8'h20 * 4;
   parameter CH3 = 8'h30 * 4;
 
-  parameter RX1_COMMON  = BASE + 'h00_00 * 4;
-  parameter RX1_CHANNEL = BASE;
+  parameter RX1_COMMON  = `AXI_AD9361_BA + 'h00_00 * 4;
+  parameter RX1_CHANNEL = `AXI_AD9361_BA;
 
-  parameter RX1_DLY = BASE + 'h02_00 * 4;
+  parameter RX1_DLY = `AXI_AD9361_BA + 'h02_00 * 4;
 
-  parameter TX1_COMMON  = BASE + 'h10_00 * 4;
-  parameter TX1_CHANNEL = BASE + 32'h0000_4000;
+  parameter TX1_COMMON  = `AXI_AD9361_BA + 'h10_00 * 4;
+  parameter TX1_CHANNEL = `AXI_AD9361_BA + 32'h0000_4000;
 
-  parameter TDD1 = BASE + 'h12_00 * 4;
+  parameter TDD1 = `AXI_AD9361_BA + 'h12_00 * 4;
   
 
   test_harness_env env;
@@ -378,19 +374,19 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+i*2,(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361_BA
     end
 
     // Configure TX DMA
-    axi_write (`TX_DMA+GetAddrs(DMAC_CONTROL), 
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL), 
                `SET_DMAC_CONTROL_ENABLE(1)); 
-    axi_write (`TX_DMA+GetAddrs(DMAC_X_LENGTH), 
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_X_LENGTH), 
                `SET_DMAC_X_LENGTH_X_LENGTH(32'h00000FFF));
-    axi_write (`TX_DMA+GetAddrs(DMAC_FLAGS),
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_FLAGS),
                `SET_DMAC_FLAGS_CYCLIC(1)); 
-    axi_write (`TX_DMA+GetAddrs(DMAC_SRC_ADDRESS),
-               `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BASE+32'h00000000)); 
-    axi_write (`TX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_SRC_ADDRESS),
+               `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000)); 
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
     // Select DDS as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -450,21 +446,21 @@ program test_program;
     #20us;
 
     // Configure RX DMA
-    axi_write (`RX_DMA+GetAddrs(DMAC_CONTROL),
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_CONTROL),
                `SET_DMAC_CONTROL_ENABLE(1));
-    axi_write (`RX_DMA+GetAddrs(DMAC_FLAGS),
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_FLAGS),
                `SET_DMAC_FLAGS_TLAST(1));
-    axi_write (`RX_DMA+GetAddrs(DMAC_X_LENGTH),
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_X_LENGTH),
                `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003FF));
-    axi_write (`RX_DMA+GetAddrs(DMAC_DEST_ADDRESS),
-               `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00002000));
-    axi_write (`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_DEST_ADDRESS),
+               `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00002000));
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
     #10us;
 
     check_captured_data(
-      .address (`DDR_BASE+'h00002000),
+      .address (`DDR_BA+'h00002000),
       .length (1024),
       .step (1),
       .max_sample(2048)

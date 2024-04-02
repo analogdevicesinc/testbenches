@@ -245,3 +245,26 @@ ad_connect dac_jesd204_transport/dac_tpl_core/dac_sync_manual_req_out manual_syn
 ad_connect manual_sync_or/Res dac_jesd204_transport/dac_tpl_core/dac_sync_manual_req_in
 ad_connect manual_sync_or/Res adc_jesd204_transport/adc_tpl_core/adc_sync_manual_req_in
 
+set ADC_XCVR 0x44A60000
+set_property offset $ADC_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_adc_jesd204_xcvr}]
+adi_sim_add_define "ADC_XCVR_BA=[format "%d" ${ADC_XCVR}]"
+
+set DAC_XCVR 0x44B60000
+set_property offset $DAC_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_xcvr}]
+adi_sim_add_define "DAC_XCVR_BA=[format "%d" ${DAC_XCVR}]"
+
+set AXI_JESD_RX 0x44A90000
+set_property offset $AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_adc_jesd204_link}]
+adi_sim_add_define "AXI_JESD_RX_BA=[format "%d" ${AXI_JESD_RX}]"
+
+set AXI_JESD_TX 0x44B90000
+set_property offset $AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_link}]
+adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
+
+set ADC_TPL 0x44A10000
+set_property offset $ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_adc_jesd204_transport}]
+adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
+
+set DAC_TPL 0x44B10000
+set_property offset $DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_transport}]
+adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"

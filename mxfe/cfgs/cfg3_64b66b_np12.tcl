@@ -22,3 +22,5 @@ set ad_project_params(TX_JESD_S) 2
 set ad_project_params(TX_JESD_NP) 12
 set ad_project_params(TX_JESD_F) 3
 set ad_project_params(TX_JESD_K) 256
+
+set ad_project_params(TDD_SUPPORT) 0

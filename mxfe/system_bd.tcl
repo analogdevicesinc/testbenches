@@ -41,10 +41,10 @@ source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
 source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl
 
 ## ADC FIFO depth in samples per converter
-#set adc_fifo_samples_per_converter [expr 4*1024]
+set adc_fifo_samples_per_converter [expr 4*1024]
 set adc_fifo_samples_per_converter [expr 512]
 ## DAC FIFO depth in samples per converter
-#set dac_fifo_samples_per_converter [expr 4*1024]
+set dac_fifo_samples_per_converter [expr 4*1024]
 set dac_fifo_samples_per_converter [expr 512]
 
 # DRP clk for 204C phy
@@ -95,3 +95,48 @@ source $ad_hdl_dir/projects/ad9081_fmca_ebz/common/ad9081_fmca_ebz_bd.tcl
 #}
 
 adi_sim_add_define "JESD_MODE=\"$JESD_MODE\""
+
+
+set RX_DMA 0x7C420000
+set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_dma}]
+adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
+
+set RX_XCVR 0x44A60000
+set_property offset $RX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_xcvr}]
+adi_sim_add_define "RX_XCVR_BA=[format "%d" ${RX_XCVR}]"
+
+set TX_DMA 0x7C430000
+set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_dma}]
+adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
+
+set TX_XCVR 0x44B60000
+set_property offset $TX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_xcvr}]
+adi_sim_add_define "TX_XCVR_BA=[format "%d" ${TX_XCVR}]"
+
+set AXI_JESD_RX 0x44A90000
+set_property offset $AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_jesd}]
+adi_sim_add_define "AXI_JESD_RX_BA=[format "%d" ${AXI_JESD_RX}]"
+
+set ADC_TPL 0x44A10000
+set_property offset $ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_mxfe_tpl_core}]
+adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
+
+set DAC_TPL 0x44B10000
+set_property offset $DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_tx_mxfe_tpl_core}]
+adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"
+
+set AXI_JESD_TX 0x44B90000
+set_property offset $AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_jesd}]
+adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
+
+set RX_OFFLOAD 0x7C450000
+set_property offset $RX_OFFLOAD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mxfe_rx_data_offload}]
+adi_sim_add_define "RX_OFFLOAD_BA=[format "%d" ${RX_OFFLOAD}]"
+
+set TX_OFFLOAD 0x7C440000
+set_property offset $TX_OFFLOAD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mxfe_tx_data_offload}]
+adi_sim_add_define "TX_OFFLOAD_BA=[format "%d" ${TX_OFFLOAD}]"
+
+set TDD 0x7C460000
+set_property offset $TDD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_tdd_0}]
+adi_sim_add_define "TDD_BA=[format "%d" ${TDD}]"

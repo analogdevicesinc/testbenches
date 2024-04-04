@@ -15,6 +15,7 @@ SV_DEPS += ../common/sv/s_axi_sequencer.sv
 SV_DEPS += ../common/sv/test_harness_env.sv
 SV_DEPS += ../common/sv/adi_peripheral_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_pkg.sv
+SV_DEPS += ../common/sv/watchdog.sv
 SV_DEPS += environment.sv
 SV_DEPS += system_tb.sv
 

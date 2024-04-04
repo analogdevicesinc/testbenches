@@ -5,7 +5,7 @@ global ad_project_params
 # 1) - 1 descriptor
 # 2) - Multiple descriptors
 # 3) - Infinite descriptors
-set ad_project_params(SRC_DESCRIPTORS) 1
+set ad_project_params(SRC_DESCRIPTORS) 3
 
 # #) - Inter-beat valid delays
 set ad_project_params(SRC_BEAT_DELAY) 0

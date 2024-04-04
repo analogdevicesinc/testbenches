@@ -40,37 +40,12 @@
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import adi_regmap_pkg::*;
+import adi_regmap_clkgen_pkg::*;
 import adi_regmap_dmac_pkg::*;
+import adi_regmap_pwm_gen_pkg::*;
+import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
-import adi_regmap_pkg::*;
-import adi_regmap_pwm_gen_pkg::*;
-
-`define AD469X_DMA                  32'h44A3_0000
-`define AD469X_REGMAP               32'h44A0_0000
-`define AD469X_CLKGEN               32'h44A7_0000
-`define AD469X_CNV                  32'h44B0_0000
-`define DDR_BASE                    32'h8000_0000
-
-localparam SPI_ENG_ADDR_VERSION       = 32'h0000_0000;
-localparam SPI_ENG_ADDR_ID            = 32'h0000_0004;
-localparam SPI_ENG_ADDR_SCRATCH       = 32'h0000_0008;
-localparam SPI_ENG_ADDR_ENABLE        = 32'h0000_0040;
-localparam SPI_ENG_ADDR_IRQMASK       = 32'h0000_0080;
-localparam SPI_ENG_ADDR_IRQPEND       = 32'h0000_0084;
-localparam SPI_ENG_ADDR_IRQSRC        = 32'h0000_0088;
-localparam SPI_ENG_ADDR_SYNCID        = 32'h0000_00C0;
-localparam SPI_ENG_ADDR_CMDFIFO_ROOM  = 32'h0000_00D0;
-localparam SPI_ENG_ADDR_SDOFIFO_ROOM  = 32'h0000_00D4;
-localparam SPI_ENG_ADDR_SDIFIFO_LEVEL = 32'h0000_00D8;
-localparam SPI_ENG_ADDR_CMDFIFO       = 32'h0000_00E0;
-localparam SPI_ENG_ADDR_SDOFIFO       = 32'h0000_00E4;
-localparam SPI_ENG_ADDR_SDIFIFO       = 32'h0000_00E8;
-localparam SPI_ENG_ADDR_SDIFIFO_PEEK  = 32'h0000_00F0;
-localparam SPI_ENG_ADDR_OFFLOAD_EN    = 32'h0000_0100;
-localparam SPI_ENG_ADDR_OFFLOAD_RESET = 32'h0000_0108;
-localparam SPI_ENG_ADDR_OFFLOAD_CMD   = 32'h0000_0110;
-localparam SPI_ENG_ADDR_OFFLOAD_SDO   = 32'h0000_0114;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -115,10 +90,6 @@ localparam INST_SYNC                  = 32'h0000_3000;
 // Sleep instruction
 localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
-
-localparam AD469X_BASE = `AD469X_REGMAP;
-localparam AD469X_CLKGEN_BASE = `AD469X_CLKGEN;
-localparam AD469X_CNV_BASE = `AD469X_CNV;
 
 program test_program (
   input ad463x_irq,
@@ -203,9 +174,9 @@ end
 
 task sanity_test;
 begin
-  #100 axi_read_v (AD469X_BASE + 32'h0000000, 'h0001_0171);
-  #100 axi_write (AD469X_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
-  #100 axi_read_v (AD469X_BASE + SPI_ENG_ADDR_SCRATCH, 32'hDEADBEEF);
+  #100 axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
+  #100 axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  #100 axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -218,13 +189,13 @@ task generate_transfer_cmd;
   input [7:0] sync_id;
   begin
     // assert CSN
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_ON);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_ON);
     // transfer data
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_CMDFIFO, INST_WRD);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_WRD);
     // de-assert CSN
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CS_OFF);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_OFF);
     // SYNC command to generate interrupt
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_CMDFIFO, (INST_SYNC | sync_id));
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
     $display("[%t] NOTE: Transfer generation finished.", $time);
   end
 endtask
@@ -240,15 +211,15 @@ initial begin
   while (1) begin
     @(posedge ad463x_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
-    axi_read (`AD469X_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
+    axi_read (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
-      axi_read (`AD469X_REGMAP + SPI_ENG_ADDR_SYNCID, sync_id);
+      axi_read (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       $display("[%t] NOTE: Offload SYNC %d IRQ. An offload transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
-      axi_read (`AD469X_REGMAP + SPI_ENG_ADDR_SYNCID, sync_id);
+      axi_read (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       $display("[%t] NOTE: SYNC %d IRQ. FIFO transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SDI FIFO
@@ -264,7 +235,7 @@ initial begin
       $display("[%t] NOTE: CMD FIFO IRQ.", $time);
     end
     // Clear all pending IRQs
-    axi_write (`AD469X_REGMAP + SPI_ENG_ADDR_IRQPEND, irq_pending);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
   end
 end
 
@@ -478,36 +449,30 @@ task offload_spi_test;
 
     //Configure DMA
 
-    //env.mng.RegWrite32(`AD469X_DMA+32'h400, 32'h00000001); // Enable DMA
-    //env.mng.RegWrite32(`AD469X_DMA+32'h40c, 32'h00000006); // use TLAST
-    //env.mng.RegWrite32(`AD469X_DMA+32'h418, (NUM_OF_TRANSFERS*4*2)-1); // X_LENGHTH = 1024-1
-    //env.mng.RegWrite32(`AD469X_DMA+32'h410, `DDR_BASE); // DEST_ADDRESS
-    //env.mng.RegWrite32(`AD469X_DMA+32'h408, 32'h00000001); // Submit transfer DMA
-
-    env.mng.RegWrite32(`AD469X_DMA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    env.mng.RegWrite32(`AD469X_DMA + GetAddrs(DMAC_FLAGS), 
+    env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_FLAGS), 
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    env.mng.RegWrite32(`AD469X_DMA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*2)-1)); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`AD469X_DMA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE));  // DEST_ADDRESS
-    env.mng.RegWrite32(`AD469X_DMA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*2)-1)); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
+    env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Configure the Offload module
 
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CFG);
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_PRESCALE);
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_DLENGTH);
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_ON);
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_RD);
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_CS_OFF);
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_CMD, INST_SYNC | 2);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_PRESCALE);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_DLENGTH);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_ON);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_RD);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_OFF);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_SYNC | 2);
 
     offload_status = 1;
 
     // Start the offload
     #100
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 1);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     $display("[%t] Offload started.", $time);
 
     if (`NUM_OF_SDI == 1) begin
@@ -516,7 +481,7 @@ task offload_spi_test;
       wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
     end
 
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_OFFLOAD_EN, 0);
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     offload_status = 0;
 
     $display("[%t] Offload stopped.", $time);
@@ -525,7 +490,7 @@ task offload_spi_test;
 
     for (int i=0; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BASE + 4*i);
+      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
     end
 
     if (irq_pending == 'h0) begin
@@ -553,31 +518,37 @@ task fifo_spi_test;
 begin
 
   // Start spi clk generator
-  axi_write (AD469X_CLKGEN_BASE + 32'h00000040, 32'h0000003);
+  axi_write (`AD463X_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
+    );
 
   // Config cnv (with averaging)
-  axi_write (AD469X_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (AD469X_CNV_BASE + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(('h64 * 'd16) - 'h0)); // set PWM 0 period
-  axi_write (AD469X_CNV_BASE + GetAddrs(REG_PULSE_1_PERIOD), `SET_REG_PULSE_1_PERIOD_PULSE_1_PERIOD(('h64 * 'd4) - 'h0)); // set PWM 1 period
-  axi_write (AD469X_CNV_BASE + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(('h64 * 'd16) - 'h0)); // set PWM 0 period
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_PULSE_1_PERIOD), `SET_REG_PULSE_1_PERIOD_PULSE_1_PERIOD(('h64 * 'd4) - 'h0)); // set PWM 1 period
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   $display("[%t] axi_pwm_gen started.", $time);
 
   // Enable SPI Engine
-  axi_write (AD469X_BASE + SPI_ENG_ADDR_ENABLE, 0);
+  axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
   // Configure the execution module
-  axi_write (AD469X_BASE + SPI_ENG_ADDR_CMDFIFO, INST_CFG);
-  axi_write (AD469X_BASE + SPI_ENG_ADDR_CMDFIFO, INST_PRESCALE);
-  axi_write (AD469X_BASE + SPI_ENG_ADDR_CMDFIFO, INST_DLENGTH);
+  axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
+  axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_PRESCALE);
+  axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
 
   // Set up the interrupts
-  axi_write (AD469X_BASE + SPI_ENG_ADDR_IRQMASK, 32'h00018);
+  axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+    `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
+    `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
+    );
 
   #100
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
     #100
-    axi_write (AD469X_BASE + SPI_ENG_ADDR_SDOFIFO, (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
+    axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
   end
 
   generate_transfer_cmd(1);
@@ -588,7 +559,7 @@ begin
 
   repeat (NUM_OF_WORDS) begin
   #100
-    axi_read (AD469X_BASE + SPI_ENG_ADDR_SDIFIFO, sdi_fifo_data);
+    axi_read (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), sdi_fifo_data);
   end
 
   if (sdi_fifo_data != sdi_fifo_data_store)

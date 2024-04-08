@@ -138,5 +138,8 @@ set_property offset $TX_OFFLOAD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_da
 adi_sim_add_define "TX_OFFLOAD_BA=[format "%d" ${TX_OFFLOAD}]"
 
 set TDD 0x7C460000
-set_property offset $TDD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_tdd_0}]
 adi_sim_add_define "TDD_BA=[format "%d" ${TDD}]"
+
+if {$TDD_SUPPORT == 1} {
+  set_property offset $TDD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_tdd_0}]
+}  

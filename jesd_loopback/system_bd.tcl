@@ -250,7 +250,7 @@ set_property offset $ADC_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data
 adi_sim_add_define "ADC_XCVR_BA=[format "%d" ${ADC_XCVR}]"
 
 set DAC_XCVR 0x44B60000
-set_property offset $DAC_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXISEG_data_dac_jesd204_xcvr}]
+set_property offset $DAC_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_xcvr}]
 adi_sim_add_define "DAC_XCVR_BA=[format "%d" ${DAC_XCVR}]"
 
 set AXI_JESD_RX 0x44A90000

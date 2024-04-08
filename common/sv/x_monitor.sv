@@ -11,10 +11,10 @@ package x_monitor_pkg;
   class x_monitor extends xil_component;
 
     mailbox_c #(logic [7:0]) mailbox;
-    semaphore semaphore_key;
-    event transaction_event;
+    protected semaphore semaphore_key;
+    protected event transaction_event;
 
-    bit enabled;
+    protected bit enabled;
 
     // constructor
     function new(input string name);
@@ -74,11 +74,11 @@ package x_monitor_pkg;
     //                 0 - read
 
     // analysis port from the monitor
-    xil_analysis_port #(axi_monitor_transaction) axi_ap;
+    protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
 
     // int transfer_size;
     // int all_transfer_size;
-    int axi_byte_stream_size;
+    protected int axi_byte_stream_size;
 
     // counters and synchronizers
     // event end_of_first_cycle;
@@ -144,12 +144,12 @@ package x_monitor_pkg;
   class x_axis_monitor #( type T) extends x_monitor;
 
     typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
-    sink_type_t tx_sink_type;
+    protected sink_type_t tx_sink_type;
 
     // analysis port from the monitor
-    xil_analysis_port #(axi4stream_monitor_transaction) axis_ap;
+    protected xil_analysis_port #(axi4stream_monitor_transaction) axis_ap;
 
-    T agent;
+    protected T agent;
 
     // int transfer_size;
     // int all_transfer_size;

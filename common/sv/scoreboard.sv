@@ -12,30 +12,29 @@ package scoreboard_pkg;
   class scoreboard extends xil_component;
 
     typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
-    sink_type_t sink_type ;
+    protected sink_type_t sink_type ;
 
     // List of analysis ports from the monitors
-    x_monitor source_monitor;
-    x_monitor sink_monitor;
+    protected x_monitor source_monitor;
+    protected x_monitor sink_monitor;
 
-    logic [7:0] source_byte_stream [$];
-    logic [7:0] sink_byte_stream [$];
+    protected logic [7:0] source_byte_stream [$];
+    protected logic [7:0] sink_byte_stream [$];
 
-    int transfer_size;
-    int all_transfer_size;
-    int source_byte_stream_size;
-    int sink_byte_stream_size;
+    // protected int transfer_size;
+    // protected int all_transfer_size;
+    protected int source_byte_stream_size;
+    protected int sink_byte_stream_size;
 
     // counters and synchronizers
-    bit enabled;
-    xil_uint error_cnt;
-    xil_uint comparison_cnt;
+    protected bit enabled;
+    protected bit byte_streams_empty_sig;
 
-    event end_of_first_cycle;
-    event byte_streams_empty;
-    event stop_scoreboard;
-    event source_transaction_event;
-    event sink_transaction_event;
+    // protected event end_of_first_cycle;
+    protected event byte_streams_empty;
+    protected event stop_scoreboard;
+    protected event source_transaction_event;
+    protected event sink_transaction_event;
 
     // constructor
     function new(input string name);
@@ -43,13 +42,12 @@ package scoreboard_pkg;
       super.new(name);
 
       this.enabled = 0;
-      this.error_cnt = 0;
-      this.comparison_cnt = 0;
       this.sink_type = CYCLIC;
-      this.transfer_size = 0;
-      this.all_transfer_size = 0;
+      // this.transfer_size = 0;
+      // this.all_transfer_size = 0;
       this.source_byte_stream_size = 0;
       this.sink_byte_stream_size = 0;
+      this.byte_streams_empty_sig = 1;
 
     endfunction: new
 
@@ -112,6 +110,8 @@ package scoreboard_pkg;
 
     // wait until source and sink byte streams are empty, full check
     task wait_until_complete();
+      if (this.byte_streams_empty_sig)
+        return;
       @byte_streams_empty;
     endtask
 
@@ -189,6 +189,7 @@ package scoreboard_pkg;
           break;
         if ((this.source_byte_stream_size > 0) &&
               (this.sink_byte_stream_size > 0)) begin
+          byte_streams_empty_sig = 0;
           source_byte = this.source_byte_stream.pop_back();
           this.source_byte_stream_size--;
           sink_byte = this.sink_byte_stream.pop_back();
@@ -196,20 +197,19 @@ package scoreboard_pkg;
           `INFOV(("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
           if (source_byte != sink_byte) begin
             `ERROR(("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
-            this.error_cnt++;
-            this.comparison_cnt++;
-          end else begin
-            this.comparison_cnt++;
           end
         end else begin
           if ((this.source_byte_stream_size == 0) &&
-              (this.sink_byte_stream_size == 0))
-            ->byte_streams_empty;
+              (this.sink_byte_stream_size == 0)) begin
+            byte_streams_empty_sig = 1;
+            ->>byte_streams_empty;
+          end
           fork begin
             fork
               @source_transaction_event;
               @sink_transaction_event;
             join_any
+            byte_streams_empty_sig = 0;
             disable fork;
           end join
         end

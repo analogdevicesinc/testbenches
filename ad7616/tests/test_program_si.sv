@@ -178,9 +178,9 @@ end
 
 task sanity_test;
 begin
-  #100 axi_read_v (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
-  #100 axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  #100 axi_read_v (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
+  axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask

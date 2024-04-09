@@ -208,9 +208,9 @@ task data_acquisition_test;
       );
 
     // Configure pwm gen
-    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('h64)); // set PWM period
-    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     $display("[%t] axi_pwm_gen started.", $time);
 
      // Configure DMA
@@ -247,7 +247,7 @@ task data_acquisition_test;
     transfer_status = 0;
 
     // Stop pwm gen
-    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1));
+    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
     $display("[%t] axi_pwm_gen stopped.", $time);
 
     #200

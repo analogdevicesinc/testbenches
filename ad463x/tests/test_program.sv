@@ -174,9 +174,9 @@ end
 
 task sanity_test;
 begin
-  #100 axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
-  #100 axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  #100 axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
+  axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -450,7 +450,7 @@ task offload_spi_test;
     //Configure DMA
 
     env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_FLAGS), 
+    env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
@@ -547,7 +547,6 @@ begin
   #100
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
-    #100
     axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
   end
 
@@ -558,7 +557,6 @@ begin
   #100
 
   repeat (NUM_OF_WORDS) begin
-  #100
     axi_read (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), sdi_fifo_data);
   end
 

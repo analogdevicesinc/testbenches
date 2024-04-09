@@ -173,9 +173,9 @@ end
 
 task sanity_test;
 begin
-  #100 axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
-  #100 axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  #100 axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -597,7 +597,6 @@ begin
     expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+CLOCK_DIVIDER)*2;
 
     // Start the offload
-    #100
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     $display("[%t] Offload started (with delay on CS change).", $time);
 

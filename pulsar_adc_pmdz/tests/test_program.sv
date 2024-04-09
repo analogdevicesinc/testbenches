@@ -174,9 +174,9 @@ end
 
 task sanity_test;
 begin
-  #100 axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
-  #100 axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  #100 axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 end
 endtask
@@ -478,7 +478,7 @@ begin
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
     `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
     );
-    
+
   // Config cnv
   axi_write (`PULSAR_ADC_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
   axi_write (`PULSAR_ADC_PWM_GEN_BA + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD('d121)); // set PWM period
@@ -502,7 +502,6 @@ begin
   #100
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
-    #100
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
   end
 
@@ -513,7 +512,6 @@ begin
   #100
 
   repeat (NUM_OF_WORDS) begin
-  #100
     axi_read (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), sdi_fifo_data);
   end
 

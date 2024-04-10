@@ -88,7 +88,7 @@ proc adi_sim_generate {project_name {questa_sim "n"}} {
     set_property target_simulator Questa [current_project]
 
     set_property -name {questa.simulate.runtime} -value {-all} -objects [get_filesets sim_1]
-    set_property -name {questa.simulate.vsim.more_options} -value {-sv_seed random} -objects [get_filesets sim_1]
+    set_property -name {questa.simulate.vsim.more_options} -value {-sv_seed random -permit_unmatched_virtual_intf} -objects [get_filesets sim_1]
     set_property -name {questa.simulate.log_all_signals} -value {true} -objects [get_filesets sim_1]
   }
 

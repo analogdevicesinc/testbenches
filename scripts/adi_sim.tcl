@@ -37,8 +37,29 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   # transfer tcl parameters as defines to verilog
   foreach {k v} [array get ad_project_params] {
-    adi_sim_add_define $k=$v
+    if { [llength $ad_project_params($k)] == 1} {
+      adi_sim_add_define $k=$v
+    } else {
+      foreach {h v} $ad_project_params($k) {
+        adi_sim_add_define ${k}_${h}=$v
+      }
+    }
   }
+
+  # write tcl parameters into a file
+  set outfile [open "./runs/${project_name}/parameters.log" w+]
+  puts $outfile "Configuration parameters\n"
+  foreach name [array names ad_project_params] {
+    if { [llength $ad_project_params($name)] == 1} {
+      puts $outfile "$name : $ad_project_params($name)"
+    } else {
+      puts $outfile "$name :"
+      foreach {k v} $ad_project_params($name) {
+        puts $outfile "  $k : $v"
+      }
+    }
+  }
+  close $outfile
 
   # Build the test harness based on the topology
   source system_bd.tcl

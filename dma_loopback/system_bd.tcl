@@ -50,12 +50,11 @@ set device_clk device_clk_vip/clk_out
 #
 #  ------------------
 
-global rx_dma_cfg
-global tx_dma_cfg
+global ad_project_params
 
-ad_ip_instance axi_dmac dut_rx_dma $rx_dma_cfg
+ad_ip_instance axi_dmac dut_rx_dma $ad_project_params(rx_dma_cfg)
 
-ad_ip_instance axi_dmac dut_tx_dma $tx_dma_cfg
+ad_ip_instance axi_dmac dut_tx_dma $ad_project_params(tx_dma_cfg)
 
 ad_connect  $device_clk dut_rx_dma/s_axis_aclk
 ad_connect  $device_clk dut_tx_dma/m_axis_aclk

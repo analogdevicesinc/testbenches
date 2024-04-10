@@ -50,8 +50,8 @@ set device_clk device_clk_vip/clk_out
 #
 #  ------------------
 
-global tdd_cfg
-ad_ip_instance axi_tdd dut_tdd $tdd_cfg
+global ad_project_params
+ad_ip_instance axi_tdd dut_tdd $ad_project_params(tdd_cfg)
 
 ad_connect  $device_clk dut_tdd/clk
 ad_connect  $sys_cpu_resetn dut_tdd/resetn
@@ -61,7 +61,7 @@ create_bd_port -dir O sync_out
 ad_connect  sync_in  dut_tdd/sync_in
 ad_connect  sync_out dut_tdd/sync_out
 
-set num_ch [lindex $tdd_cfg 3]
+set num_ch [lindex $ad_project_params(tdd_cfg) 3]
 create_bd_port -from 0 -to [expr $num_ch-1] -dir O tdd_channel
 ad_connect tdd_channel dut_tdd/tdd_channel
 

@@ -95,8 +95,8 @@ module test_program(
     env.scoreboard.set_oneshot(`OFFLOAD_ONESHOT);
     env.scoreboard.set_path_type(`OFFLOAD_PATH_TYPE);
 
-    start_clocks;
-    sys_reset;
+    start_clocks();
+    sys_reset();
 
     #1
     env.start();
@@ -110,7 +110,7 @@ module test_program(
 
     #100
     `INFO(("Bring up IP from reset."));
-    systemBringUp;
+    systemBringUp();
 
     env.src_axis_seq.start();
 
@@ -143,15 +143,14 @@ module test_program(
 
     env.stop();
 
-    stop_clocks;
+    stop_clocks();
 
     `INFO(("Test bench done!"));
     $finish();
 
   end
 
-  task start_clocks;
-
+  task start_clocks();
     #1
     `TH.`SRC_CLK.inst.IF.start_clock;
     #1
@@ -160,20 +159,16 @@ module test_program(
     `TH.`SYS_CLK.inst.IF.start_clock;
     #1
     `TH.`MEM_CLK.inst.IF.start_clock;
-
   endtask
 
-  task stop_clocks;
-
+  task stop_clocks();
     `TH.`SRC_CLK.inst.IF.stop_clock;
     `TH.`DST_CLK.inst.IF.stop_clock;
     `TH.`SYS_CLK.inst.IF.stop_clock;
     `TH.`MEM_CLK.inst.IF.stop_clock;
-
   endtask
 
-  task sys_reset;
-
+  task sys_reset();
     `TH.`SRC_RST.inst.IF.assert_reset;
     `TH.`DST_RST.inst.IF.assert_reset;
     `TH.`SYS_RST.inst.IF.assert_reset;
@@ -183,11 +178,9 @@ module test_program(
     `TH.`DST_RST.inst.IF.deassert_reset;
     `TH.`SYS_RST.inst.IF.deassert_reset;
     mem_rst_n = 1'b1;
-
   endtask
 
-  task systemBringUp;
-
+  task systemBringUp();
     // bring up the Data Offload instances from reset
     `INFO(("Bring up TX Data Offload"));
 
@@ -198,7 +191,6 @@ module test_program(
 `endif
 
     dut.set_resetn(1'b1);
-
   endtask
 
 endmodule

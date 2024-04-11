@@ -95,15 +95,15 @@ module test_program();
     `TH.`PLDDR_RST.inst.IF.assert_reset;
     #1;
     
-    start_clocks;
-    sys_reset;
+    start_clocks();
+    sys_reset();
           
     #1
     env.start();
 
     #100
     `INFO(("Bring up IP from reset."));
-    systemBringUp;
+    systemBringUp();
 
     //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
@@ -130,15 +130,14 @@ module test_program();
     #30000
     env.stop();
 
-    stop_clocks;
+    stop_clocks();
 
     `INFO(("Test bench done!"));
     $finish();
 
   end
 
-  task start_clocks;
-
+  task start_clocks();
     #1
     `TH.`SRC_CLK.inst.IF.start_clock;
     #1
@@ -147,20 +146,16 @@ module test_program();
     `TH.`SYS_CLK.inst.IF.start_clock;
     #1
     `TH.`PLDDR_CLK.inst.IF.start_clock;
-
   endtask
 
-  task stop_clocks;
-
+  task stop_clocks();
     `TH.`SRC_CLK.inst.IF.stop_clock;
     `TH.`DST_CLK.inst.IF.stop_clock;
     `TH.`SYS_CLK.inst.IF.stop_clock;
     `TH.`PLDDR_CLK.inst.IF.stop_clock;
-
   endtask
 
-  task sys_reset;
-
+  task sys_reset();
     `TH.`SRC_RST.inst.IF.assert_reset;
     `TH.`DST_RST.inst.IF.assert_reset;
     `TH.`SYS_RST.inst.IF.assert_reset;
@@ -171,11 +166,9 @@ module test_program();
     `TH.`DST_RST.inst.IF.deassert_reset;
     `TH.`SYS_RST.inst.IF.deassert_reset;
     `TH.`PLDDR_RST.inst.IF.deassert_reset;
-
   endtask
 
-  task systemBringUp;
-
+  task systemBringUp();
     // bring up the Data Offload instances from reset
 
     `INFO(("Bring up RX Data Offload"));
@@ -192,7 +185,6 @@ module test_program();
     env.mng.RegWrite32(`RX_DMA_BA + `DMAC_ADDR_CONTROL, 32'h1);
     `INFO(("Bring up TX DMAC"));
     env.mng.RegWrite32(`TX_DMA_BA + `DMAC_ADDR_CONTROL, 32'h1);
-
   endtask
 
   task do_set_transfer_length(int length);

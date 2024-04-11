@@ -97,23 +97,21 @@ program test_program;
   // --------------------------
   // Wrapper function for AXI read verify
   // --------------------------
-  task axi_read_v();
-    input   [31:0]  raddr;
-    input   [31:0]  vdata;
-  begin
+  task axi_read_v(
+    input   [31:0]  raddr,
+    input   [31:0]  vdata);
+
     env.mng.RegReadVerify32(raddr,vdata);
-  end
   endtask
 
   // --------------------------
   // Wrapper function for AXI write
   // --------------------------
-  task axi_write;
-    input [31:0]  waddr;
-    input [31:0]  wdata;
-  begin
+  task axi_write(
+    input [31:0]  waddr,
+    input [31:0]  wdata);
+
     env.mng.RegWrite32(waddr,wdata);
-  end
   endtask
 
   integer rate;
@@ -162,7 +160,7 @@ program test_program;
 
     #1us;
 
-    sanity_test;
+    sanity_test();
 
     // R2T2 tests
     R1_MODE = 0;
@@ -175,10 +173,10 @@ program test_program;
       pn_test(`PN15);
     end
     if (DDS_DISABLE == 0) begin
-      dds_test;
+      dds_test();
     end
 
-    dma_test;
+    dma_test();
 
     // independent R1T1 tests
     R1_MODE = 1;
@@ -189,7 +187,7 @@ program test_program;
       axi_write (RX2_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(0));
     end
-    dma_test_ch2;
+    dma_test_ch2();
 
     // Test internal loopback DAC2->ADC2
     // Enable internal loopback
@@ -198,7 +196,7 @@ program test_program;
         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
       axi_write (RX2_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
-      dma_test_ch2;
+      dma_test_ch2();
     end
 
     `INFO(("Test Done"));
@@ -208,9 +206,7 @@ program test_program;
   // --------------------------
   // Sanity test reg interface
   // --------------------------
-  task sanity_test;
-  begin
-
+  task sanity_test();
     //check ADC VERSION
     axi_read_v (RX1_COMMON + GetAddrs(COMMON_REG_VERSION),
                     `SET_COMMON_REG_VERSION_VERSION('h000a0300));
@@ -232,7 +228,6 @@ program test_program;
                                                (1 * 16) +
                                                (DDS_DISABLE * 64) +
                                                (IQCORRECTION_DISABLE * 1));
-  end
   endtask
 
   // --------------------------
@@ -242,7 +237,7 @@ program test_program;
                   bit rx2_en = 1,
                   bit tx1_en = 1,
                   bit tx2_en = 1);
-  begin
+
     // Configure Rx interface
     axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),
                (SDR_DDR_N << 16) |
@@ -278,20 +273,17 @@ program test_program;
     axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_RSTN), tx1_en << 1 | tx1_en << 0);
     axi_write (TX2_COMMON + GetAddrs(DAC_COMMON_REG_RSTN), tx2_en << 1 | tx2_en << 0);
 
-    gen_mssi_sync;
+    gen_mssi_sync();
 
     // pull out RX of reset
     axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN), rx1_en << 1 | rx1_en << 0);
     axi_write (RX2_COMMON + GetAddrs(ADC_COMMON_REG_RSTN), rx2_en << 1 | rx2_en << 0);
-
-  end
   endtask
 
   // --------------------------
   // Link teardown
   // --------------------------
-  task link_down;
-  begin
+  task link_down();
     // put RX in reset
     axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
               `SET_ADC_COMMON_REG_RSTN_RSTN(0));
@@ -303,15 +295,13 @@ program test_program;
     axi_write (TX2_COMMON + GetAddrs(DAC_COMMON_REG_RSTN),
               `SET_DAC_COMMON_REG_RSTN_RSTN(0));
     #1000;
-  end
   endtask
 
   // --------------------------
   // Test pattern test
   // --------------------------
-  task pn_test;
-    input [3:0] pattern;
-  begin
+  task pn_test(
+    input [3:0] pattern);
 
     reg [3:0] tx_pattern_map[0:3];
     reg [3:0] rx_pattern_map[0:3];
@@ -326,7 +316,7 @@ program test_program;
     rx_pattern_map[`NIBBLE_RAMP] = 10;
     rx_pattern_map[`FULL_RAMP] = 11;
 
-    link_setup;
+    link_setup();
     // enable test data for TX1
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(tx_pattern_map[pattern]));
@@ -380,22 +370,19 @@ program test_program;
     axi_read_v (RX1_COMMON + GetAddrs(ADC_COMMON_REG_STATUS),
                `SET_ADC_COMMON_REG_STATUS_STATUS('h1));
 
-    link_down;
-
-  end
+    link_down();
   endtask
 
   // --------------------------
   // DDS test procedure
   // --------------------------
-  task dds_test;
-  begin
+  task dds_test();
 
     //  -------------------------------------------------------
     //  Test DDS path
     //  -------------------------------------------------------
 
-    link_setup;
+    link_setup();
 
     // Select DDS as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -469,16 +456,13 @@ program test_program;
 
     #20000;
 
-    link_down;
-
-  end
+    link_down();
   endtask
 
    // --------------------------
   // DMA test procedure
   // --------------------------
-  task dma_test;
-  begin
+  task dma_test();
 
     //  -------------------------------------------------------
     //  Test DMA path
@@ -550,7 +534,7 @@ program test_program;
     axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_1),
       `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
 
-    link_setup;
+    link_setup();
 
     #20us;
 
@@ -572,15 +556,12 @@ program test_program;
       .step (1),
       .max_sample(2048)
     );
-
-  end
   endtask
 
   // --------------------------
   // DMA test procedure for Rx2/Tx2 independent pairs
   // --------------------------
-  task dma_test_ch2;
-  begin
+  task dma_test_ch2();
 
     //  -------------------------------------------------------
     //  Test DMA path
@@ -650,8 +631,6 @@ program test_program;
       .step (1),
       .max_sample(2048)
     );
-
-  end
   endtask
 
   // Check captured data against incremental pattern based on first sample
@@ -688,9 +667,7 @@ program test_program;
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end
       end
-
     end
   endtask
 
 endprogram
-

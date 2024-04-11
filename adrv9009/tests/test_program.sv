@@ -232,7 +232,6 @@ program test_program;
     `INFO(("  JESD LINK TEST DONE  "));
     `INFO(("======================="));
 
-
   end
 
   task tx_tpl_test(int use_dds);
@@ -380,7 +379,6 @@ program test_program;
 
     dut_rx_xcvr.down();
     ex_tx_xcvr.down();
-
   endtask
 
   task rx_os_tpl_test(int use_dds);
@@ -452,7 +450,6 @@ program test_program;
 
     ex_tx_os_xcvr.down();
     dut_rx_os_xcvr.down();
-
   endtask
 
   task check_captured_data(bit [31:0] address,

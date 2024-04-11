@@ -303,7 +303,6 @@ program test_dma;
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end
       end
-
     end
   endtask
 

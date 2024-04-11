@@ -69,28 +69,25 @@ test_harness_env env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-begin
+
   env.mng.RegReadVerify32(raddr,vdata);
-end
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-begin
+
   env.mng.RegRead32(raddr,data);
-end
 endtask
 
 // --------------------------
 // Wrapper function for AXI write
 // --------------------------
-task axi_write;
-  input [31:0]  waddr;
-  input [31:0]  wdata;
-begin
+task axi_write(
+  input [31:0]  waddr,
+  input [31:0]  wdata);
+
   env.mng.RegWrite32(waddr,wdata);
-end
 endtask
 
 // --------------------------
@@ -115,11 +112,11 @@ initial begin
   `TH.`SYS_RST.inst.IF.deassert_reset;
   #100
 
-  sanity_test;
+  sanity_test();
 
   #100
 
-  data_acquisition_test;
+  data_acquisition_test();
 
   `INFO(("Test Done"));
 
@@ -170,12 +167,10 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 
-task sanity_test;
-begin
+task sanity_test();
   axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   axi_read_v (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   `INFO(("Sanity Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -199,8 +194,7 @@ reg [31:0] rdata_reg;
 bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
 
-task data_acquisition_test;
-  begin
+task data_acquisition_test();
     // Start spi clk generator
     axi_write (`AD7616_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
       `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
@@ -266,8 +260,6 @@ task data_acquisition_test;
     end else begin
       `INFO(("Data Acquisition Test PASSED"));
     end
-
-  end
 endtask
 
 endprogram

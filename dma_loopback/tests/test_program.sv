@@ -130,7 +130,6 @@ program test_program;
 
     m_dmac_api.wait_transfer_done(m_tid);
     s_dmac_api.wait_transfer_done(s_tid);
-
   endtask
 
 
@@ -158,25 +157,18 @@ program test_program;
   endtask
 
   task start_clocks;
-
     `TH.`DEVICE_CLK.inst.IF.start_clock;
-
   endtask
 
   task stop_clocks;
-
     `TH.`DEVICE_CLK.inst.IF.stop_clock;
-
   endtask
 
   task sys_reset;
-
     //asserts all the resets for 100 ns
     `TH.`SYS_RST.inst.IF.assert_reset;
     #100
     `TH.`SYS_RST.inst.IF.deassert_reset;
-
   endtask
-
 
 endprogram

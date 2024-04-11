@@ -107,28 +107,25 @@ test_harness_env env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-begin
+
   env.mng.RegReadVerify32(raddr,vdata);
-end
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-begin
+
   env.mng.RegRead32(raddr,data);
-end
 endtask
 
 // --------------------------
 // Wrapper function for AXI write
 // --------------------------
-task axi_write;
-  input [31:0]  waddr;
-  input [31:0]  wdata;
-begin
+task axi_write(
+  input [31:0]  waddr,
+  input [31:0]  wdata);
+
   env.mng.RegWrite32(waddr,wdata);
-end
 endtask
 
 // --------------------------
@@ -153,15 +150,15 @@ initial begin
   `TH.`SYS_RST.inst.IF.deassert_reset;
   #100
 
-  sanity_test;
+  sanity_test();
 
   #100
 
-  fifo_spi_test;
+  fifo_spi_test();
 
   #100
 
-  offload_spi_test;
+  offload_spi_test();
   `INFO(("Test Done"));
 
   $finish;
@@ -172,22 +169,20 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 
-task sanity_test;
-begin
+task sanity_test();
   axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
   axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
 // SPI Engine generate transfer
 //---------------------------------------------------------------------------
 
-task generate_transfer_cmd;
-  input [7:0] sync_id;
-  begin
+task generate_transfer_cmd(
+  input [7:0] sync_id);
+
     // assert CSN
     axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_ON);
     // transfer data
@@ -197,7 +192,6 @@ task generate_transfer_cmd;
     // SYNC command to generate interrupt
     axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
     $display("[%t] NOTE: Transfer generation finished.", $time);
-  end
 endtask
 
 //---------------------------------------------------------------------------
@@ -444,9 +438,7 @@ end
 
 bit [31:0] offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) -1 :0];
 
-task offload_spi_test;
-  begin
-
+task offload_spi_test();
     //Configure DMA
 
     env.mng.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
@@ -471,7 +463,6 @@ task offload_spi_test;
     offload_status = 1;
 
     // Start the offload
-    #100
     axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     $display("[%t] Offload started.", $time);
 
@@ -504,8 +495,6 @@ task offload_spi_test;
     end else begin
       `INFO(("Offload Test PASSED"));
     end
-
-  end
 endtask
 
 //---------------------------------------------------------------------------
@@ -514,9 +503,7 @@ endtask
 
 bit   [31:0]  sdi_fifo_data = 0;
 
-task fifo_spi_test;
-begin
-
+task fifo_spi_test();
   // Start spi clk generator
   axi_write (`AD463X_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
@@ -564,8 +551,6 @@ begin
     `ERROR(("Fifo Read Test FAILED"));
 
   `INFO(("Fifo Read Test PASSED"));
-
-end
 endtask
 
 endprogram

@@ -150,11 +150,11 @@ program test_program;
   task sanity_test;
   begin
     //check ADC VERSION
-    axi_read_v (RX1_COMMON + GetAddrs(REG_VERSION),
-               `SET_REG_VERSION_VERSION('h000a0300));
+    axi_read_v (RX1_COMMON + GetAddrs(COMMON_REG_VERSION),
+               `SET_COMMON_REG_VERSION_VERSION('h000a0300));
     //check DAC VERSION
-    axi_read_v (TX1_COMMON + GetAddrs(REG_VERSION),
-               `SET_REG_VERSION_VERSION('h00090262));
+    axi_read_v (TX1_COMMON + GetAddrs(COMMON_REG_VERSION),
+               `SET_COMMON_REG_VERSION_VERSION('h00090262));
   end
   endtask
 

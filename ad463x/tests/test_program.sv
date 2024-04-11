@@ -524,10 +524,10 @@ begin
     );
 
   // Config cnv (with averaging)
-  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_PULSE_0_PERIOD), `SET_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(('h64 * 'd16) - 'h0)); // set PWM 0 period
-  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_PULSE_1_PERIOD), `SET_REG_PULSE_1_PERIOD_PULSE_1_PERIOD(('h64 * 'd4) - 'h0)); // set PWM 1 period
-  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(REG_RSTN), `SET_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(('h64 * 'd16) - 'h0)); // set PWM 0 period
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 4, `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(('h64 * 'd4) - 'h0)); // set PWM 1 period
+  axi_write (`AD469X_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   $display("[%t] axi_pwm_gen started.", $time);
 
   // Enable SPI Engine

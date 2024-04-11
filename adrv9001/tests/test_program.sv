@@ -212,22 +212,22 @@ program test_program;
   begin
 
     //check ADC VERSION
-    axi_read_v (RX1_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h000a0300));
-    axi_read_v (RX2_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h000a0300));
+    axi_read_v (RX1_COMMON + GetAddrs(COMMON_REG_VERSION),
+                    `SET_COMMON_REG_VERSION_VERSION('h000a0300));
+    axi_read_v (RX2_COMMON + GetAddrs(COMMON_REG_VERSION),
+                    `SET_COMMON_REG_VERSION_VERSION('h000a0300));
     //check DAC VERSION
-    axi_read_v (TX1_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h00090262));
-    axi_read_v (TX2_COMMON + GetAddrs(REG_VERSION),
-                    `SET_REG_VERSION_VERSION('h00090262));
+    axi_read_v (TX1_COMMON + GetAddrs(COMMON_REG_VERSION),
+                    `SET_COMMON_REG_VERSION_VERSION('h00090262));
+    axi_read_v (TX2_COMMON + GetAddrs(COMMON_REG_VERSION),
+                    `SET_COMMON_REG_VERSION_VERSION('h00090262));
     // check DAC CONFIG
-    axi_read_v (TX1_COMMON + GetAddrs(REG_CONFIG), (USE_RX_CLK_FOR_TX * 1024) +
+    axi_read_v (TX1_COMMON + GetAddrs(COMMON_REG_CONFIG), (USE_RX_CLK_FOR_TX * 1024) +
                                                (CMOS_LVDS_N * 128) +
                                                (SYNTH_R1_MODE * 16) +
                                                (DDS_DISABLE * 64) +
                                                (IQCORRECTION_DISABLE * 1));
-    axi_read_v (TX2_COMMON + GetAddrs(REG_CONFIG), (USE_RX_CLK_FOR_TX * 1024) +
+    axi_read_v (TX2_COMMON + GetAddrs(COMMON_REG_CONFIG), (USE_RX_CLK_FOR_TX * 1024) +
                                                (CMOS_LVDS_N * 128) +
                                                (1 * 16) +
                                                (DDS_DISABLE * 64) +

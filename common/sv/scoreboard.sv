@@ -83,6 +83,7 @@ package scoreboard_pkg;
     task stop();
       this.enabled = 0;
       ->>stop_scoreboard;
+      this.clear_streams();
       #1step;
     endtask: stop
 
@@ -101,6 +102,9 @@ package scoreboard_pkg;
     function void clear_streams();
       source_byte_stream.delete();
       sink_byte_stream.delete();
+      
+      this.source_byte_stream_size = 0;
+      this.sink_byte_stream_size = 0;
     endfunction: clear_streams
 
     // get sink type

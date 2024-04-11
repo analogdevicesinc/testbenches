@@ -44,8 +44,6 @@ import logger_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_tdd_gen_pkg::*;
 
-`define TDD      32'h7c42_0000
-
 program test_program;
 
   //instantiate the environment
@@ -274,7 +272,7 @@ program test_program;
     end
 
     // Check the pulse length using a loop on all available channels
-    check_pulse_length;
+    check_pulse_length();
 
 
     //*******//
@@ -315,7 +313,7 @@ program test_program;
     @(posedge running_state);
 
     // Check the pulse length using a loop on all available channels
-    check_pulse_length;
+    check_pulse_length();
 
 
     //*******//
@@ -393,7 +391,7 @@ program test_program;
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(1));
 
     // Trigger an external sync on the input pin
-    trigger_ext_event;
+    trigger_ext_event();
 
 
     //*********//
@@ -402,7 +400,7 @@ program test_program;
     @(posedge running_state);
 
     // Check the pulse length using a loop on all available channels
-    check_pulse_length;
+    check_pulse_length();
 
 
     //*******//
@@ -433,7 +431,7 @@ program test_program;
     @(posedge running_state);
 
     // Check the pulse length using a loop on all available channels
-    check_pulse_length;
+    check_pulse_length();
 
 
     //*******//
@@ -476,7 +474,7 @@ program test_program;
     // Since the initial software sync started the frame, the external sync will reset the tdd counter
     // Test this by issuing a parralel thread which counts and expects that the number of channel[0] sets per initial frame is 3
     fork
-      trigger_ext_event;
+      trigger_ext_event();
       repeat (3) @(posedge `TH.dut_tdd.inst.genblk1[0].i_channel.tdd_ch_set);
     join
 
@@ -494,7 +492,7 @@ program test_program;
     @(posedge `TH.dut_tdd.inst.tdd_endof_frame);
 
     // Check the pulse length using a loop on all available channels
-    check_pulse_length;
+    check_pulse_length();
 
     env.mng.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
                        `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(0));
@@ -521,7 +519,7 @@ program test_program;
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(1));
 
     // Trigger an external sync on the input pin
-    trigger_ext_event;
+    trigger_ext_event();
 
     // Test a continuous burst
     ch_en = 32'b1;
@@ -570,32 +568,25 @@ program test_program;
   end
 
 
-  task start_clocks;
-
+  task start_clocks();
     `TH.`DEVICE_CLK.inst.IF.start_clock;
-
   endtask
 
 
-  task stop_clocks;
-
+  task stop_clocks();
     `TH.`DEVICE_CLK.inst.IF.stop_clock;
-
   endtask
 
 
-  task sys_reset;
-
+  task sys_reset();
     //asserts all the resets for 100 ns
     `TH.`SYS_RST.inst.IF.assert_reset;
     #100
     `TH.`SYS_RST.inst.IF.deassert_reset;
-
   endtask
 
 
-  task trigger_ext_event;
-
+  task trigger_ext_event();
     #20ns;
     `TB.sync_in =1'b1;
     #10ns;
@@ -604,12 +595,10 @@ program test_program;
     `TB.sync_in =1'b1;
     #20ns;
     `TB.sync_in =1'b0;
-
   endtask
 
 
-  task check_pulse_length;
-
+  task check_pulse_length();
     for (int i=0; i<=channel_count; i++) begin
       time t1=0, t2=0, expected_pulse_lengh;
 
@@ -632,12 +621,10 @@ program test_program;
         success_count++;
       end
     end
-
   endtask
 
 
   task channel_probe (input int i, output time t1, t2);
-
     t1 = $time;
     t2 = $time;
 
@@ -648,7 +635,6 @@ program test_program;
     if (!ch_pol[i]) @(negedge `TB.tdd_channel[i]);
     else            @(posedge `TB.tdd_channel[i]);
     t2 = $time;
-
   endtask
 
 endprogram

@@ -74,28 +74,25 @@ test_harness_env env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-begin
+
   env.mng.RegReadVerify32(raddr,vdata);
-end
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-begin
+
   env.mng.RegRead32(raddr,data);
-end
 endtask
 
 // --------------------------
 // Wrapper function for AXI write
 // --------------------------
-task axi_write;
-  input [31:0]  waddr;
-  input [31:0]  wdata;
-begin
+task axi_write(
+  input [31:0]  waddr,
+  input [31:0]  wdata);
+
   env.mng.RegWrite32(waddr,wdata);
-end
 endtask
 
 // --------------------------
@@ -120,19 +117,19 @@ initial begin
   `TH.`SYS_RST.inst.IF.deassert_reset;
   #100
 
-  sanity_test;
+  sanity_test();
 
-  #100 adc_config_SIMPLE_test;
+  #100 adc_config_SIMPLE_test();
 
-  #200 adc_config_CRC_test;
+  #200 adc_config_CRC_test();
 
-  #200 adc_config_STATUS_test;
+  #200 adc_config_STATUS_test();
 
-  #200 adc_config_STATUS_CRC_test;
+  #200 adc_config_STATUS_CRC_test();
 
-  #200 adc_config_SIMPLE_test;
+  #200 adc_config_SIMPLE_test();
 
-  #100 db_transmission_test;
+  #100 db_transmission_test();
 
   `INFO(("Test Done"));
 
@@ -171,13 +168,11 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 
-task sanity_test;
-  begin
+task sanity_test();
     // check ADC VERSION
     axi_read_v (`AXI_AD7606X_BA + GetAddrs(COMMON_REG_VERSION),
                     `SET_COMMON_REG_VERSION_VERSION('h000a0300));
     $display("[%t] Sanity Test Done.", $time);
-  end
 endtask
 
 //---------------------------------------------------------------------------
@@ -372,8 +367,7 @@ bit        ctrl_status_SIMPLE = 'h0; // ctrl_status bit from ADC common core
 bit        ctrl_status_STATUS = 'h0; // ctrl_status bit from ADC common core
 bit        ctrl_status_STATUS_CRC = 'h0; // ctrl_status bit from ADC common core
 
-task adc_config_SIMPLE_test;
-  begin
+task adc_config_SIMPLE_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // set static data setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_SIMPLE); // read last config result
@@ -396,11 +390,9 @@ task adc_config_SIMPLE_test;
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h100); // set default
 
     adc_config_mode = 2'h0;
-  end
 endtask
 
-task adc_config_CRC_test;
-  begin
+task adc_config_CRC_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002185)); // set CRC and static data setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_CRC); // read last config result
@@ -423,11 +415,9 @@ task adc_config_CRC_test;
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h101); // set default
 
     adc_config_mode = 2'h1;
-  end
 endtask
 
-task adc_config_STATUS_test;
-  begin
+task adc_config_STATUS_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // static data setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
@@ -463,11 +453,9 @@ task adc_config_STATUS_test;
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h102); // set default
 
     adc_config_mode = 2'h2;
-  end
 endtask
 
-task adc_config_STATUS_CRC_test;
-  begin
+task adc_config_STATUS_CRC_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002185)); // static data and CRC setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
@@ -503,15 +491,13 @@ task adc_config_STATUS_CRC_test;
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h103); // set default
 
     adc_config_mode = 2'h3;
-  end
 endtask
 
 //---------------------------------------------------------------------------
 // DB transmission test
 //---------------------------------------------------------------------------
 bit [31:0] capp_word;
-task db_transmission_test;
-  begin
+task db_transmission_test();
     #100 transfer_status = 1;
 
     // Generate cnvst_n pulse using AXI_PWM_GEN
@@ -527,7 +513,6 @@ task db_transmission_test;
     // Stop pwm gen
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
     $display("[%t] axi_pwm_gen stopped.", $time);
-  end
 endtask
 
 endprogram

@@ -72,28 +72,25 @@ test_harness_env env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-begin
+
   env.mng.RegReadVerify32(raddr,vdata);
-end
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-begin
+
   env.mng.RegRead32(raddr,data);
-end
 endtask
 
 // --------------------------
 // Wrapper function for AXI write
 // --------------------------
-task axi_write;
-  input [31:0]  waddr;
-  input [31:0]  wdata;
-begin
+task axi_write(
+  input [31:0]  waddr,
+  input [31:0]  wdata);
+
   env.mng.RegWrite32(waddr,wdata);
-end
 endtask
 
 // --------------------------
@@ -114,7 +111,7 @@ initial begin
 
   env.sys_reset();
 
-  sanity_test;
+  sanity_test();
 
   #100ns
 
@@ -132,13 +129,11 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 
-task sanity_test;
-begin
+task sanity_test();
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), PCORE_VERSION);
   axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -390,9 +385,8 @@ bit [31:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS) -1 :0];
 bit [31:0] sleep_time;
 bit [31:0] expected_sleep_time;
 
-task sleep_delay_test;
-  input [7:0] sleep_param;
-begin
+task sleep_delay_test(
+  input [7:0] sleep_param);
 
   // Start spi clk generator
   axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
@@ -422,7 +416,6 @@ begin
 
   expected_sleep_time = 2+(sleep_param)*((`CLOCK_DIVIDER+1)*2);
   // Start the test
-  #100ns
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`sleep(sleep_param)));
 
   #2000ns
@@ -434,7 +427,6 @@ begin
   end
   // Disable SPI Engine
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), 1);
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -447,10 +439,9 @@ bit [31:0] expected_cs_activate_time;
 bit [31:0] cs_deactivate_time;
 bit [31:0] expected_cs_deactivate_time;
 
-task cs_delay_test;
-  input [1:0] cs_activate_delay;
-  input [1:0] cs_deactivate_delay;
-begin
+task cs_delay_test(
+  input [1:0] cs_activate_delay,
+  input [1:0] cs_deactivate_delay);
 
     // Start spi clk generator
     axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
@@ -500,7 +491,6 @@ begin
     expected_cs_deactivate_time = 2;
 
     // Start the offload
-    #100ns
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     `INFOV(("Offload started (no delay on CS change)."), 6);
 
@@ -508,7 +498,6 @@ begin
 
     offload_status = 0;
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-
 
     `INFOV(("Offload stopped (no delay on CS change)."), 6);
 
@@ -559,7 +548,6 @@ begin
     expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+`CLOCK_DIVIDER)*2;
 
     // Start the offload
-    #100ns
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     `INFOV(("Offload started (with delay on CS change)."), 6);
 
@@ -597,7 +585,6 @@ begin
       `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
     end
     `INFO(("CS Delay Test PASSED"));
-
-  end
 endtask
+
 endprogram

@@ -65,7 +65,7 @@ program test_program;
   parameter TX1_CHANNEL = `AXI_AD9361_BA + 32'h0000_4000;
 
   parameter TDD1 = `AXI_AD9361_BA + 'h12_00 * 4;
-  
+
 
   test_harness_env env;
   bit [31:0] val;
@@ -73,32 +73,28 @@ program test_program;
   // --------------------------
   // Wrapper function for AXI read verify
   // --------------------------
-  task axi_read_v();
+  task axi_read_v(
+      input   [31:0]  raddr,
+      input   [31:0]  vdata);
 
-      input   [31:0]  raddr;
-      input   [31:0]  vdata;
-
-  begin
     env.mng.RegReadVerify32(raddr,vdata);
-  end
   endtask
 
   // --------------------------
   // Wrapper function for AXI write
   // --------------------------
-  task axi_write;
-    input [31:0]  waddr;
-    input [31:0]  wdata;
-  begin
+  task axi_write(
+    input [31:0]  waddr,
+    input [31:0]  wdata);
+
     env.mng.RegWrite32(waddr,wdata);
-  end
   endtask
-  
+
   integer rate;
   initial begin
       rate = R1_MODE ? 2 : 4;
   end
-  
+
   // --------------------------
   // Main procedure
   // --------------------------
@@ -131,15 +127,14 @@ program test_program;
     // something first before transmitting. This is not possible in loopback mode.
     force system_tb.test_harness.axi_ad9361.inst.i_tx.dac_sync_enable = 1'b1;
 
-    sanity_test;
+    sanity_test();
 
     pn_test();
 
-    dds_test;
+    dds_test();
 
-    dma_test;
+    dma_test();
 
-    //dma_test;
     `INFO(("Test Done"));
 
   end
@@ -147,47 +142,41 @@ program test_program;
   // --------------------------
   // Sanity test reg interface
   // --------------------------
-  task sanity_test;
-  begin
+  task sanity_test();
     //check ADC VERSION
     axi_read_v (RX1_COMMON + GetAddrs(COMMON_REG_VERSION),
                `SET_COMMON_REG_VERSION_VERSION('h000a0300));
     //check DAC VERSION
     axi_read_v (TX1_COMMON + GetAddrs(COMMON_REG_VERSION),
                `SET_COMMON_REG_VERSION_VERSION('h00090262));
-  end
   endtask
 
   // --------------------------
   // Setup link
   // --------------------------
-  task link_setup;
-  begin
+  task link_setup();
     // Configure Rx interface
     axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL),
               `SET_ADC_COMMON_REG_CNTRL_R1_MODE(R1_MODE));
 
     // Configure Tx interface
-    axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_2), 
+    axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_CNTRL_2),
               `SET_DAC_COMMON_REG_CNTRL_2_R1_MODE(R1_MODE));
     axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_RATECNTRL),
               `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate-1));
-    
+
     // pull out RX of reset
     axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
               `SET_ADC_COMMON_REG_RSTN_RSTN(1));
     // pull out TX of reset
     axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_RSTN),
               `SET_DAC_COMMON_REG_RSTN_RSTN(1));
-
-  end
   endtask
 
   // --------------------------
   // Link teardown
   // --------------------------
-  task link_down;
-  begin
+  task link_down();
     // put RX in reset
    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
              `SET_ADC_COMMON_REG_RSTN_RSTN(0));
@@ -195,17 +184,13 @@ program test_program;
    axi_write (TX1_COMMON + GetAddrs(DAC_COMMON_REG_RSTN),
              `SET_DAC_COMMON_REG_RSTN_RSTN(0));
    #1000;
-  end
   endtask
 
   // --------------------------
   // Test pattern test
   // --------------------------
-  task pn_test;
-  begin
-
-
-    link_setup;
+  task pn_test();
+    link_setup();
 
     // enable test data for TX1
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -230,7 +215,7 @@ program test_program;
     axi_write (RX1_CHANNEL + CH3 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_PN_SEL(9));
     end
- 
+
     // SYNC DAC channels
     axi_write (TX1_COMMON+GetAddrs(DAC_COMMON_REG_CNTRL_1),
               `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
@@ -241,7 +226,7 @@ program test_program;
     // Allow initial OOS to propagate
     #15000;
 
-    // clear PN OOS and PN ER   
+    // clear PN OOS and PN ER
     axi_write (RX1_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS),
               `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_ERR(1) |
               `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(1) |
@@ -260,34 +245,31 @@ program test_program;
               `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(1) |
               `SET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(1));
     end
-    
+
     #10000;
 
     // check PN OOS and PN ERR flags
     axi_read_v (RX1_COMMON + GetAddrs(ADC_COMMON_REG_STATUS),
                `SET_ADC_COMMON_REG_STATUS_STATUS('h1));
-    link_down;
-
-  end
+    link_down();
   endtask
 
 
   // --------------------------
   // DDS test procedure
   // --------------------------
-  task dds_test;
-  begin
+  task dds_test();
 
     //  -------------------------------------------------------
     //  Test DDS path
     //  -------------------------------------------------------
 
-    link_setup;
+    link_setup();
 
     // Select DDS as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
-    axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7), 
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
     if (R1_MODE==0) begin
     axi_write (TX1_CHANNEL + CH2 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -311,62 +293,59 @@ program test_program;
     // Configure tone amplitude and frequency
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
-    axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1), 
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h07ff));
     if (R1_MODE==0) begin
-    axi_write (TX1_CHANNEL + CH2 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1), 
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h03ff));
-    axi_write (TX1_CHANNEL + CH3 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1), 
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h01ff));
     end
-    axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2), 
+    axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
-    axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2), 
+    axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0200));
     if (R1_MODE==0) begin
-    axi_write (TX1_CHANNEL + CH2 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2), 
+    axi_write (TX1_CHANNEL + CH2 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0400));
-    axi_write (TX1_CHANNEL + CH3 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2), 
+    axi_write (TX1_CHANNEL + CH3 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0800));
-    end    
+    end
 
     // Enable Rx channel, enable sign extension
     axi_write (RX1_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     axi_write (RX1_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     if (R1_MODE==0) begin
     axi_write (RX1_CHANNEL + CH2 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     axi_write (RX1_CHANNEL + CH3 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     end
     // SYNC DAC channels
     axi_write (TX1_COMMON+GetAddrs(DAC_COMMON_REG_CNTRL_1),
               `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-    // SYNC ADC channels 
+    // SYNC ADC channels
     axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL),
               `SET_ADC_COMMON_REG_CNTRL_SYNC(1));
     #20000;
 
-    link_down;
-
-  end
+    link_down();
   endtask
 
   // --------------------------
   // DMA test procedure
   // --------------------------
-  task dma_test;
-  begin
+  task dma_test();
 
     //  -------------------------------------------------------
     //  Test DMA path
@@ -378,14 +357,14 @@ program test_program;
     end
 
     // Configure TX DMA
-    axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL), 
-               `SET_DMAC_CONTROL_ENABLE(1)); 
-    axi_write (`TX_DMA_BA+GetAddrs(DMAC_X_LENGTH), 
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL),
+               `SET_DMAC_CONTROL_ENABLE(1));
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_X_LENGTH),
                `SET_DMAC_X_LENGTH_X_LENGTH(32'h00000FFF));
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_FLAGS),
-               `SET_DMAC_FLAGS_CYCLIC(1)); 
+               `SET_DMAC_FLAGS_CYCLIC(1));
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_SRC_ADDRESS),
-               `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000)); 
+               `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000));
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
     // Select DDS as source
@@ -417,21 +396,21 @@ program test_program;
     // Enable Rx channel, enable sign extension
 
     axi_write (RX1_CHANNEL + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     axi_write (RX1_CHANNEL + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     if (R1_MODE==0) begin
     axi_write (RX1_CHANNEL + CH2 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     axi_write (RX1_CHANNEL + CH3 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) | 
-              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) | 
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1) |
+              `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(1) |
               `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(1));
     end
     // SYNC DAC channels
@@ -441,7 +420,7 @@ program test_program;
     axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL),
               `SET_ADC_COMMON_REG_CNTRL_SYNC(1));
 
-    link_setup;
+    link_setup();
 
     #20us;
 
@@ -465,8 +444,6 @@ program test_program;
       .step (1),
       .max_sample(2048)
     );
-
-  end
   endtask
 
   // Check captured data against incremental pattern based on first sample
@@ -496,7 +473,6 @@ program test_program;
           `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end
       end
-
-    end
   endtask
+
 endprogram

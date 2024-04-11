@@ -212,6 +212,7 @@ package scoreboard_pkg;
             fork
               @source_transaction_event;
               @sink_transaction_event;
+              @stop_scoreboard;
             join_any
             byte_streams_empty_sig = 0;
             disable fork;

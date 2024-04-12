@@ -43,6 +43,7 @@ import m_axis_sequencer_pkg::*;
 import s_axis_sequencer_pkg::*;
 import logger_pkg::*;
 import environment_pkg::*;
+import watchdog_pkg::*;
 
 //=============================================================================
 // Register Maps
@@ -52,6 +53,8 @@ program test_program;
 
   // declare the class instances
   environment env;
+
+  watchdog send_data_wd;
 
   initial begin
 
@@ -95,20 +98,28 @@ program test_program;
         env.src_axis_seq.set_stop_policy(STOP_POLICY_DATA_BEAT);
         // env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
         env.src_axis_seq.add_xfer_descriptor_packet_size(32'd10, 1, 0);
+
+        send_data_wd = new(1000, "Send data");
       end
       2: begin
         env.src_axis_seq.set_descriptor_gen_mode(0);
         env.src_axis_seq.set_stop_policy(STOP_POLICY_DESCRIPTOR_QUEUE);
         repeat (10) env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
+
+        send_data_wd = new(30000, "Send data");
       end
       3: begin
         env.src_axis_seq.set_descriptor_gen_mode(1);
         env.src_axis_seq.set_stop_policy(STOP_POLICY_PACKET);
         env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
+
+        send_data_wd = new(20000, "Send data");
       end
       default:
         `ERROR(("Source descriptor parameter incorrect!"));
     endcase
+
+    send_data_wd.start();
 
     env.src_axis_seq.start();
 
@@ -127,6 +138,8 @@ program test_program;
       end
       default: ;
     endcase
+
+    send_data_wd.stop();
 
     env.stop();
     

@@ -12,7 +12,7 @@ package scoreboard_pkg;
   class scoreboard extends xil_component;
 
     typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
-    protected sink_type_t sink_type ;
+    protected sink_type_t sink_type;
 
     // List of analysis ports from the monitors
     protected x_monitor source_monitor;
@@ -21,8 +21,6 @@ package scoreboard_pkg;
     protected logic [7:0] source_byte_stream [$];
     protected logic [7:0] sink_byte_stream [$];
 
-    // protected int transfer_size;
-    // protected int all_transfer_size;
     protected int source_byte_stream_size;
     protected int sink_byte_stream_size;
 
@@ -42,9 +40,7 @@ package scoreboard_pkg;
       super.new(name);
 
       this.enabled = 0;
-      this.sink_type = CYCLIC;
-      // this.transfer_size = 0;
-      // this.all_transfer_size = 0;
+      this.sink_type = ONESHOT;
       this.source_byte_stream_size = 0;
       this.sink_byte_stream_size = 0;
       this.byte_streams_empty_sig = 1;
@@ -71,10 +67,9 @@ package scoreboard_pkg;
 
       fork
         this.enabled = 1;
-        get_source_transaction();
-        get_sink_transaction();
-        compare_transaction();
-        // verify_tx_cyclic();
+        this.get_source_transaction();
+        this.get_sink_transaction();
+        this.compare_transaction();
       join_none
 
     endtask: run
@@ -100,8 +95,8 @@ package scoreboard_pkg;
 
     // clear source and sink byte streams
     function void clear_streams();
-      source_byte_stream.delete();
-      sink_byte_stream.delete();
+      this.source_byte_stream.delete();
+      this.sink_byte_stream.delete();
       
       this.source_byte_stream_size = 0;
       this.sink_byte_stream_size = 0;
@@ -195,7 +190,10 @@ package scoreboard_pkg;
               (this.sink_byte_stream_size > 0)) begin
           byte_streams_empty_sig = 0;
           source_byte = this.source_byte_stream.pop_back();
-          this.source_byte_stream_size--;
+          if (this.sink_type == ONESHOT)
+            this.source_byte_stream.push_front(source_byte);
+          else
+            this.source_byte_stream_size--;
           sink_byte = this.sink_byte_stream.pop_back();
           this.sink_byte_stream_size--;
           `INFOV(("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
@@ -221,41 +219,6 @@ package scoreboard_pkg;
       end
 
     endtask /* compare_transaction */
-
-    // function void post_tx_test();
-
-    //   if (this.enabled == 0) begin
-    //     `INFO(("Scoreboard was inactive."));
-    //   end else begin
-    //       if (comparison_cnt == 0) begin
-    //         `ERROR(("TX scoreboard is empty! Check your interfaces or increase the runtime. Collected transactions are %d for source side and %d for sink side.", this.source_byte_stream_size, this.sink_byte_stream_size));
-    //       end else if (error_cnt > 0) begin
-    //         `ERROR(("ERROR: TX scoreboard has %d errors!", error_cnt));
-    //         `INFO(("TX scoreboard has passed. %d bytes were checked.", this.comparison_cnt));
-    //         `INFO(("TX transfer size are %d bytes.", this.all_transfer_size));
-    //       end else begin
-    //         `INFO(("TX scoreboard has passed. %d bytes were checked.", this.comparison_cnt));
-    //         `INFO(("TX transfer size are %d bytes.", this.all_transfer_size));
-    //       end
-    //   end
-
-    // endfunction /* post_tx_test */
-
-    // function void post_rx_test();
-
-    //   if (this.enabled == 0) begin
-    //     `INFO(("Scoreboard was inactive."));
-    //   end else begin
-    //     if (comparison_cnt == 0) begin
-    //       `ERROR(("RX scoreboard is empty! Check your interfaces or increase the runtime. Collected transactions are %d for source side and %d for sink side.", this.source_byte_stream_size, this.sink_byte_stream_size));
-    //     end else if (error_cnt > 0) begin
-    //       `ERROR(("ERROR: RX scoreboard has %d errors!", error_cnt));
-    //     end else begin
-    //       `INFO(("RX scoreboard has passed. %d bytes were checked.", this.comparison_cnt));
-    //     end
-    //   end
-
-    // endfunction /* post_rx_test */
 
   endclass
 

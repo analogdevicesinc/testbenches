@@ -190,7 +190,7 @@ package scoreboard_pkg;
               (this.sink_byte_stream_size > 0)) begin
           byte_streams_empty_sig = 0;
           source_byte = this.source_byte_stream.pop_back();
-          if (this.sink_type == ONESHOT)
+          if (this.sink_type == CYCLIC)
             this.source_byte_stream.push_front(source_byte);
           else
             this.source_byte_stream_size--;

@@ -92,14 +92,9 @@ program test_program;
     // do_tx_1 = new("Data Offload TX 1", env.mng, `TX_DOFF_BA_1);
     // do_rx_1 = new("Data Offload RX 1", env.mng, `RX_DOFF_BA_1);
 
-    #1step;
-
     //=========================================================================
     // Setup generator/monitor stubs
     //=========================================================================
-
-    // configure environment sequencers
-    env.configure(`ADC_TRANSFER_LENGTH);
 
     //=========================================================================
 
@@ -125,12 +120,12 @@ program test_program;
     // env.adc_src_axis_seq_1.start();
 
     // Generate DMA transfers
-    #100
     `INFO(("Start RX DMA ..."));
     rx_dma_transfer(dmac_rx_0, 32'h80000000, `ADC_TRANSFER_LENGTH);
     // rx_dma_transfer(dmac_rx_1, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
-    #10000
+    env.scoreboard_rx0.wait_until_complete();
+
     `INFO(("Initialize the memory ..."));
     init_mem_64(32'h80000000, 1024);
 
@@ -138,7 +133,8 @@ program test_program;
     tx_dma_transfer(dmac_tx_0, 32'h80000000, 1024);
     // tx_dma_transfer(dmac_tx_1, 32'h80000000, 1024);
 
-    #10000;
+    #1us;
+    env.scoreboard_tx0.wait_until_complete();
         
     env.stop();
     

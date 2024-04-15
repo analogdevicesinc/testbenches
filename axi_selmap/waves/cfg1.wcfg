@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_xpm_cdc_sv_220102727 " />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="12.225000 us"></ZoomStartTime>
+      <ZoomEndTime time="26.245001 us"></ZoomEndTime>
+      <Cursor1Time time="19.255000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="228"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="32" />
+   <wave_markers>
+      <marker label="" time="176815000" />
+   </wave_markers>
+   <wvobject type="logic" fp_name="/system_tb/cclk">
+      <obj_property name="ElementShortName">cclk</obj_property>
+      <obj_property name="ObjectShortName">cclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/program_b">
+      <obj_property name="ElementShortName">program_b</obj_property>
+      <obj_property name="ObjectShortName">program_b</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/rdwr_b">
+      <obj_property name="ElementShortName">rdwr_b</obj_property>
+      <obj_property name="ObjectShortName">rdwr_b</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/csi_b">
+      <obj_property name="ElementShortName">csi_b</obj_property>
+      <obj_property name="ObjectShortName">csi_b</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/init_b">
+      <obj_property name="ElementShortName">init_b</obj_property>
+      <obj_property name="ObjectShortName">init_b</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/done">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/data">
+      <obj_property name="ElementShortName">data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/up_data">
+      <obj_property name="ElementShortName">up_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">up_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/up_data_swapped">
+      <obj_property name="ElementShortName">up_data_swapped[7:0]</obj_property>
+      <obj_property name="ObjectShortName">up_data_swapped[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/sys_cpu_clk">
+      <obj_property name="ElementShortName">sys_cpu_clk</obj_property>
+      <obj_property name="ObjectShortName">sys_cpu_clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/sys_cpu_reset">
+      <obj_property name="ElementShortName">sys_cpu_reset[0:0]</obj_property>
+      <obj_property name="ObjectShortName">sys_cpu_reset[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/sys_cpu_resetn">
+      <obj_property name="ElementShortName">sys_cpu_resetn[0:0]</obj_property>
+      <obj_property name="ObjectShortName">sys_cpu_resetn[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/up_byte_counter">
+      <obj_property name="ElementShortName">up_byte_counter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">up_byte_counter[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/device_ready">
+      <obj_property name="ElementShortName">device_ready</obj_property>
+      <obj_property name="ObjectShortName">device_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/up_program_b">
+      <obj_property name="ElementShortName">up_program_b</obj_property>
+      <obj_property name="ObjectShortName">up_program_b</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/up_scratch">
+      <obj_property name="ElementShortName">up_scratch[31:0]</obj_property>
+      <obj_property name="ObjectShortName">up_scratch[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/up_data">
+      <obj_property name="ElementShortName">up_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">up_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/device_ready">
+      <obj_property name="ElementShortName">device_ready</obj_property>
+      <obj_property name="ObjectShortName">device_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/up_data_written">
+      <obj_property name="ElementShortName">up_data_written</obj_property>
+      <obj_property name="ObjectShortName">up_data_written</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/s_axi_aclk">
+      <obj_property name="ElementShortName">s_axi_aclk</obj_property>
+      <obj_property name="ObjectShortName">s_axi_aclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/up_clk">
+      <obj_property name="ElementShortName">up_clk</obj_property>
+      <obj_property name="ObjectShortName">up_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/up_cclk">
+      <obj_property name="ElementShortName">up_cclk</obj_property>
+      <obj_property name="ObjectShortName">up_cclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/up_cclk_div">
+      <obj_property name="ElementShortName">up_cclk_div</obj_property>
+      <obj_property name="ObjectShortName">up_cclk_div</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/i_regmap/data_written">
+      <obj_property name="ElementShortName">data_written</obj_property>
+      <obj_property name="ObjectShortName">data_written</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/\genblk4.i_cdc_fifo /fifo_full">
+      <obj_property name="ElementShortName">fifo_full</obj_property>
+      <obj_property name="ObjectShortName">fifo_full</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/CLK_DIV">
+      <obj_property name="ElementShortName">CLK_DIV[31:0]</obj_property>
+      <obj_property name="ObjectShortName">CLK_DIV[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/up_wreq_s">
+      <obj_property name="ElementShortName">up_wreq_s</obj_property>
+      <obj_property name="ObjectShortName">up_wreq_s</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/up_waddr_s">
+      <obj_property name="ElementShortName">up_waddr_s[13:0]</obj_property>
+      <obj_property name="ObjectShortName">up_waddr_s[13:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/cclk_pulse">
+      <obj_property name="ElementShortName">cclk_pulse</obj_property>
+      <obj_property name="ObjectShortName">cclk_pulse</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/\genblk4.i_cdc_fifo /fifo_empty">
+      <obj_property name="ElementShortName">fifo_empty</obj_property>
+      <obj_property name="ObjectShortName">fifo_empty</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/dut_selmap/inst/\genblk4.i_cdc_fifo /rd_en">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/dut_selmap/inst/\genblk4.i_cdc_fifo /rd_data">
+      <obj_property name="ElementShortName">rd_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_data[7:0]</obj_property>
+   </wvobject>
+</wave_config>

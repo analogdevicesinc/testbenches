@@ -108,6 +108,9 @@ program test_program;
     env.start();
     env.sys_reset();
 
+    // configure environment sequencers
+    env.configure(`ADC_TRANSFER_LENGTH);
+
     `INFO(("Bring up IP from reset."));
     systemBringUp();
 
@@ -117,6 +120,9 @@ program test_program;
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."));
     env.run();
+
+    env.adc_src_axis_seq_0.start();
+    // env.adc_src_axis_seq_1.start();
 
     // Generate DMA transfers
     #100

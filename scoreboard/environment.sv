@@ -180,9 +180,6 @@ package environment_pkg;
       // adc_dst_axi_pt_agent_1.start_monitor();
       // dac_src_axi_pt_agent_1.start_monitor();
 
-      adc_src_axis_seq_0.start();
-      // adc_src_axis_seq_1.start();
-
       scoreboard_tx0.set_source_stream(dac_src_axi_pt_0_mon);
       scoreboard_tx0.set_sink_stream(dac_dst_axis_0_mon);
 

@@ -165,6 +165,7 @@ for {set i 0} {$i < 1} {incr i} {
     INTERFACE_MODE {SLAVE} \
     TDATA_NUM_BYTES $dac_data_path_width \
     HAS_TLAST {1} \
+    HAS_TKEEP {0} \
   ]
   adi_sim_add_define "DAC_DST_AXIS_${i}=dac_dst_axis_${i}"
   

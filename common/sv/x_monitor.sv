@@ -76,12 +76,7 @@ package x_monitor_pkg;
     // analysis port from the monitor
     protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
 
-    // int transfer_size;
-    // int all_transfer_size;
     protected int axi_byte_stream_size;
-
-    // counters and synchronizers
-    // event end_of_first_cycle;
 
     // constructor
     function new(input string name, T agent);
@@ -89,8 +84,6 @@ package x_monitor_pkg;
       super.new(name);
 
       this.enabled = 0;
-      // this.transfer_size = 0;
-      // this.all_transfer_size = 0;
 
       this.axi_ap = agent.monitor.item_collected_port;
 
@@ -110,7 +103,6 @@ package x_monitor_pkg;
       forever begin
         this.get_key();
         this.axi_ap.get(transaction);
-        `INFO(("Transaction pulled"));
         if (bit'(transaction.get_cmd_type()) == bit'(operation_type)) begin
           this.put_key();
           num_bytes = transaction.get_data_width()/8;
@@ -122,7 +114,7 @@ package x_monitor_pkg;
               this.mailbox.put(axi_byte);
               this.axi_byte_stream_size++;
             end
-            `INFOV(("Caught a transaction: %d", this.axi_byte_stream_size), 100);
+            `INFOV(("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), 100);
             this.transaction_captured();
             #1step;
             #1step;
@@ -151,12 +143,6 @@ package x_monitor_pkg;
 
     protected T agent;
 
-    // int transfer_size;
-    // int all_transfer_size;
-
-    // counters and synchronizers
-    // event end_of_first_cycle;
-
     // constructor
     function new(input string name, T agent);
 
@@ -164,8 +150,6 @@ package x_monitor_pkg;
 
       this.enabled = 0;
       this.tx_sink_type = CYCLIC;
-      // this.transfer_size = 0;
-      // this.all_transfer_size = 0;
 
       this.agent = agent;
       
@@ -213,15 +197,6 @@ package x_monitor_pkg;
             this.mailbox.put(axi_byte);
         end
         `INFOV(("Caught an AXI4 stream transaction: %d", this.mailbox.num()), 100);
-
-        // this.all_transfer_size += this.transfer_size;
-
-        // // reset the TX source beat counter so we can initiate more than one
-        // // DMA transfers in the test program and still check the cyclic mode
-        // if (transaction.get_last())
-        //   this.transfer_size = 0;
-
-        // this.all_transfer_size += this.transfer_size;
         this.transaction_captured();
         #1step;
         this.mailbox.flush();

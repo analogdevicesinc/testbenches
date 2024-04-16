@@ -11,3 +11,4 @@ set tdd_cfg [list \
   SYNC_COUNT_WIDTH 64 \
   ]
 
+set ad_project_params(tdd_cfg) $tdd_cfg

@@ -78,3 +78,7 @@ create_bd_port -dir O i3c_clk
 
 ad_connect i3c_irq i3c/irq
 ad_connect i3c_clk sys_clk_vip/clk_out
+
+set I3C_CONTROLLER 0x44A00000
+set_property offset $I3C_CONTROLLER [get_bd_addr_segs {mng_axi_vip/Master_AXI/host_interface}]
+adi_sim_add_define "I3C_CONTROLLER_BA=[format "%d" ${I3C_CONTROLLER}]"

@@ -153,18 +153,15 @@ task axi_read_v(
     input   [31:0]  baddr,
     input   [13:0]  raddr,
     input   [31:0]  vdata);
-begin
+
   env.mng.RegReadVerify32(baddr+{raddr,2'b00},vdata);
-end
-endtask
 
 task axi_read(
     input   [31:0]  baddr,
     input   [13:0]  raddr,
     output  [31:0]  data);
-begin
+
   env.mng.RegRead32(baddr+{raddr,2'b00},data);
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -174,9 +171,8 @@ task axi_write(
   input [31:0]  baddr,
   input [13:0]  waddr,
   input [31:0]  wdata);
-begin
+
   env.mng.RegWrite32(baddr+{waddr,2'b00},wdata);
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -195,7 +191,6 @@ assign offload_sdi_ready = 1'b1;
 // Write a DA to the SDA lane, for IBI request mock
 //---------------------------------------------------------------------------
 task write_ibi_da(input int da);
- begin
   i3c_dev_sda <= 1'b0;
   wait (`DUT_I3C_WORD.st == `CMDW_BCAST_7E_W0);
   for (int i = 6; i >= 0; i--) begin
@@ -204,22 +199,17 @@ task write_ibi_da(input int da);
   end
   @(negedge i3c_scl)
   i3c_dev_sda <= 1'bZ;
-end
 endtask
 
 //---------------------------------------------------------------------------
 // Information
 //---------------------------------------------------------------------------
 task print_cmdr (input int data);
-begin
   `INFO(("[%t] Got CMDR error %d, length %d, sync %d", $time, data[23:20], data[19:8], data[7:0]));
-end
 endtask
 
 task print_ibi(input int data);
-begin
   `INFO(("[%t] Got IBI DA %b, MDB %b, Sync %d.", $time, data[23:17], data[15:08], data[7:0]));
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -272,7 +262,7 @@ initial begin
   env.start();
   env.sys_reset();
 
-  sanity_test;
+  sanity_test();
 
   // Enable I3C Controller
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_ENABLE, 0);
@@ -280,19 +270,19 @@ initial begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_OPS, {2'b01, 4'd0, 1'b0});
 
   // Must occur before any other task, since the written data is later used
-  dev_char_i3c_test;
+  dev_char_i3c_test();
 
-  daa_i3c_test;
+  daa_i3c_test();
 
-  ccc_i3c_test;
+  ccc_i3c_test();
 
-  priv_i3c_test;
+  priv_i3c_test();
 
-  priv_i2c_test;
+  priv_i2c_test();
 
-  offload_i3c_test;
+  offload_i3c_test();
 
-  ibi_i3c_test;
+  ibi_i3c_test();
 
   `INFO(("Test Done"));
 
@@ -325,15 +315,13 @@ end
 //---------------------------------------------------------------------------
 // Sanity test reg interface
 //---------------------------------------------------------------------------
-task sanity_test;
-begin
+task sanity_test();
   `INFO(("Sanity Started"));
   axi_read_v (I3C_CONTROLLER, `I3C_REGMAP_VERSION,       I3C_VERSION_CHECK);
   axi_read_v (I3C_CONTROLLER, `I3C_REGMAP_DEVICE_ID,     I3C_DEVICE_ID_CHECK);
   axi_write  (I3C_CONTROLLER, `I3C_REGMAP_SCRATCH,       I3C_SCRATCH_CHECK);
   axi_read_v (I3C_CONTROLLER, `I3C_REGMAP_SCRATCH,       I3C_SCRATCH_CHECK);
   `INFO(("Sanity Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -343,7 +331,6 @@ bit   [31:0]  cmdr_fifo_data = 0;
 bit   [31:0]  sdi_fifo_data = 0;
 
 task ccc_i3c_test;
-begin
   `INFO(("CCC I3C Started"));
 
   auto_ack <= 1'b1;
@@ -429,14 +416,12 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
   `INFO(("CCC I3C Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
 // Private transfer I3C Test
 //---------------------------------------------------------------------------
-task priv_i3c_test;
-begin
+task priv_i3c_test();
   `INFO(("Private Transfer I3C Started"));
 
   // Disable IBI
@@ -584,14 +569,12 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
   `INFO(("Private Transfer I3C Ended"));
-end
 endtask
 
 //---------------------------------------------------------------------------
 // Private transfer I²C Test
 //---------------------------------------------------------------------------
-task priv_i2c_test;
-begin
+task priv_i2c_test();
   `INFO(("Private Transfer I2C Started"));
 
   // Unmask CMDR interrupt
@@ -681,7 +664,6 @@ begin
   end
 
   `INFO(("Private Transfer I2C Ended"));
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -689,8 +671,7 @@ endtask
 //---------------------------------------------------------------------------
 bit   [31:0]  ibi_fifo_data = 0;
 
-task ibi_i3c_test;
-begin
+task ibi_i3c_test();
   auto_ack <= 1'b0;
 
   `INFO(("IBI I3C Test Started"));
@@ -818,14 +799,12 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
   `INFO(("IBI I3C Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
 // DAA I3C Test
 //---------------------------------------------------------------------------
-task daa_i3c_test;
-begin
+task daa_i3c_test();
   `INFO(("DAA I3C Started"));
 
   // Unmask the CMDR and DAA interrupt
@@ -892,7 +871,6 @@ begin
   axi_write (I3C_CONTROLLER, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
   `INFO(("DAA I3C Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
@@ -903,8 +881,8 @@ bit [3:0]  dev_char_1 = 4'b0010;
 bit [3:0]  dev_char_2 = 4'b0011;
 bit [3:0]  dev_char_3 = 4'b0011;
 bit [31:0] dev_char_data = 0;
-task dev_char_i3c_test;
-begin
+
+task dev_char_i3c_test();
   `INFO(("Device Characteristics I3C Test Started"));
   // Write DEV_CHAR of four devices
   axi_write(I3C_CONTROLLER, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1, 1'b1, 4'h0, dev_char_0});
@@ -926,14 +904,12 @@ begin
     `ERROR(("DEV_CHAR_0 FAILED"));
 
   `INFO(("Device Characteristics I3C Test Done"));
-end
 endtask
 
 //---------------------------------------------------------------------------
 // Offload I3C Test
 //---------------------------------------------------------------------------
-task offload_i3c_test;
-begin
+task offload_i3c_test();
   // Test #1, controller does offload transfer
 
   #10000ns
@@ -978,7 +954,6 @@ begin
   #10ns offload_trigger_l = 1'b0;
 
   `INFO(("Offload I3C Test Done"));
-end
 endtask
 
 endprogram

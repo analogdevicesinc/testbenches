@@ -32,8 +32,8 @@ ENV_DEPS +=../scripts/run_sim.tcl
 LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
 LIB_DEPS += axi_dmac
-LIB_DEPS := util_pack/util_cpack2
-LIB_DEPS := util_pack/util_upack2
+LIB_DEPS += util_pack/util_cpack2
+LIB_DEPS += util_pack/util_upack2
 
 # default test program
 TP := test_program

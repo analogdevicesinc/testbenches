@@ -44,10 +44,15 @@ package dma_trans_pkg;
     int DMA_DATA_WIDTH_SRC;
     int DMA_DATA_WIDTH_DEST;
     int DMA_2D_TRANSFER;
+    int DMA_2D_TLAST_MODE;
     int DMA_TYPE_SRC;
     int DMA_TYPE_DEST;
     int DMA_LENGTH_ALIGN;
     int MAX_BYTES_PER_BURST;
+    int FRAMELOCK;
+    int MAX_NUM_FRAMES;
+    int USE_EXT_SYNC;
+    int HAS_AUTORUN;
   } axi_dmac_params_t;
 
   //==========================================================================
@@ -284,7 +289,7 @@ package dma_trans_pkg;
         s.dst_addr = dst_addr + i*dst_stride;
         s.length = length;
         if (i != ylength-1)
-          s.last = 0;
+          s.last = (p.DMA_2D_TLAST_MODE == 1) & this.last;
         if (i > 0)
           s.first = 0;
         sa[i] = s;
@@ -391,7 +396,75 @@ package dma_trans_pkg;
      return sa;
     endfunction
 
-  endclass : dma_partial_2d_segment
+  endclass
+
+  //==========================================================================
+  /*
+    dma_flocked_2d_segment
+  */
+  //==========================================================================
+  class dma_flocked_2d_segment extends dma_2d_segment;
+
+    rand int unsigned flock_distance;
+    int flock_wait_writer = 1;
+    int flock_mode = 0;  // 0 - dynamic. 1 - simple
+    rand int unsigned flock_framenum;
+    int unsigned flock_stride;
+
+    // -----------------
+    //
+    // -----------------
+    function new(axi_dmac_params_t p);
+      super.new(p);
+    endfunction
+
+    // -----------------
+    //
+    // -----------------
+    function copy(dma_flocked_2d_segment ds);
+      super.copy(ds);
+      ds.flock_framenum = flock_framenum;
+      ds.flock_distance = flock_distance;
+      ds.flock_stride = flock_stride;
+      ds.flock_mode = flock_mode;
+      ds.flock_wait_writer = flock_wait_writer;
+    endfunction
+
+    constraint c_buf_num  {flock_framenum < p.MAX_NUM_FRAMES;};
+    constraint c_frm_dist {flock_distance < flock_framenum;};
+
+    virtual function void print();
+      super.print();
+      `INFO(("flock_framenum is %0d", flock_framenum));
+      `INFO(("flock_distance is %0d", flock_distance));
+      `INFO(("flock_stride is 0x%0h", flock_stride));
+    endfunction
+
+
+    // -----------------
+    //
+    // -----------------
+    function void post_randomize();
+      super.post_randomize();
+      flock_stride =  length *  ylength;
+      cyclic = 1;
+    endfunction
+
+
+    // -----------------
+    //
+    // -----------------
+    function dma_flocked_2d_segment toSlaveSeg;
+      dma_flocked_2d_segment seg;
+      seg = new(this.p);
+      this.copy(seg);
+      seg.src_addr = seg.dst_addr;
+      seg.src_stride = seg.dst_stride;
+
+      return seg;
+    endfunction
+
+  endclass : dma_flocked_2d_segment
 
   //==========================================================================
   /*

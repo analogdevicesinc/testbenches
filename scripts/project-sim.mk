@@ -54,7 +54,7 @@ endef
 ifeq ($(OS), Windows_NT)
 CMD_PRE = cmd /C "
 CMD_POST = "
-RUN_SIM_PATH = $(shell cygpath -w $(ADI_HDL_DIR)/testbenches/scripts/run_sim.tcl) 
+RUN_SIM_PATH = $(shell cygpath -m $(ADI_HDL_DIR)/testbenches/scripts/run_sim.tcl)
 else
 CMD_PRE =
 CMD_POST =
@@ -85,7 +85,7 @@ define sim
 $(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
 $(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS) FORCE
 	$(RUN_PRE_OPT)$$(call simulate, \
-		$(CMD_PRE) flock runs/$(1)/.lock -c "$(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST)", \
+		$(CMD_PRE) flock runs/$(1)/.lock sh -c "$(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST)", \
 		$$@, \
 		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
 		Run $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
@@ -138,7 +138,7 @@ clean:
 $(HDL_LIBRARY_PATH)%/component.xml: TARGET:=xilinx
 FORCE:
 $(HDL_LIBRARY_PATH)%/component.xml: FORCE
-	flock $(dir $@).lock -c " \
+	flock $(dir $@).lock sh -c " \
 	$(MAKE) -C $(dir $@) $(TARGET); \
 	"; exit $$?
 FORCE:

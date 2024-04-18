@@ -50,6 +50,9 @@ program test_program;
 
   dmac_api dmac_tx;
   dmac_api dmac_rx;
+  
+  int data_length = $urandom_range(5, 10) * `WIDTH * 2**int($clog2(`CHANNELS)) * `CHANNELS * `SAMPLES / 8;
+  // int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8;
 
   initial begin
 
@@ -76,7 +79,7 @@ program test_program;
     env.sys_reset();
 
     // configure environment sequencers
-    env.configure(128);
+    env.configure(data_length);
 
     `INFO(("Bring up IPs from reset."));
     systemBringUp();
@@ -87,10 +90,8 @@ program test_program;
 
     // Generate DMA transfers
     `INFO(("Start DMAs"));
-    rx_dma_transfer(128);
-    tx_dma_transfer(128);
-
-    // #5us;
+    rx_dma_transfer(data_length);
+    tx_dma_transfer(data_length);
 
     env.tx_src_axis_seq.start();
     env.rx_src_axis_seq.start();
@@ -98,7 +99,7 @@ program test_program;
     // env.scoreboard_rx.wait_until_complete();
     // env.scoreboard_tx.wait_until_complete();
     
-    #1us;
+    #5us;
 
     env.stop();
     

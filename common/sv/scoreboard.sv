@@ -176,7 +176,7 @@ package scoreboard_pkg;
     endtask: get_sink_transaction
 
     // compare the collected data
-    task compare_transaction();
+    virtual task compare_transaction();
 
       logic [7:0] source_byte;
       logic [7:0] sink_byte;

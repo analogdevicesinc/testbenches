@@ -18,6 +18,7 @@ SV_DEPS += ../common/sv/adi_regmap_pkg.sv
 SV_DEPS += ../common/sv/mailbox.sv
 SV_DEPS += ../common/sv/x_monitor.sv
 SV_DEPS += ../common/sv/scoreboard.sv
+SV_DEPS += ../common/sv/scoreboard_pack.sv
 SV_DEPS += ../common/sv/dmac_api.sv
 SV_DEPS += ../common/sv/dma_trans.sv
 SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv

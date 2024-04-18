@@ -11,7 +11,7 @@ package environment_pkg;
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import test_harness_env_pkg::*;
-  import scoreboard_pkg::*;
+  import scoreboard_pack_pkg::*;
   import x_monitor_pkg::*;
 
   import `PKGIFY(test_harness, mng_axi_vip)::*;
@@ -42,8 +42,8 @@ package environment_pkg;
     x_axis_monitor #(`AGENT(test_harness, rx_src_axis, mst_t)) rx_src_axis_mon;
     x_axis_monitor #(`AGENT(test_harness, rx_dst_axis, slv_t)) rx_dst_axis_mon;
 
-    scoreboard scoreboard_tx;
-    scoreboard scoreboard_rx;
+    scoreboard_pack scoreboard_tx;
+    scoreboard_pack scoreboard_rx;
 
     //============================================================================
     // Constructor
@@ -88,8 +88,8 @@ package environment_pkg;
       rx_src_axis_mon = new("RX Source AXIS Transaction Monitor", rx_src_axis_agent);
       rx_dst_axis_mon = new("RX Destination AXIS Transaction Monitor", rx_dst_axis_agent);
 
-      scoreboard_tx = new("Pack Verification Environment TX Scoreboard");
-      scoreboard_rx = new("Pack Verification Environment RX Scoreboard");
+      scoreboard_tx = new("Pack Verification Environment TX Scoreboard", `CHANNELS, `SAMPLES, CPACK);
+      scoreboard_rx = new("Pack Verification Environment RX Scoreboard", `CHANNELS, `SAMPLES, UPACK);
 
     endfunction
 
@@ -155,8 +155,8 @@ package environment_pkg;
         rx_src_axis_mon.run();
         rx_dst_axis_mon.run();
 
-        // scoreboard_tx.run();
-        // scoreboard_rx.run();
+        scoreboard_tx.run();
+        scoreboard_rx.run();
       join_none
 
     endtask

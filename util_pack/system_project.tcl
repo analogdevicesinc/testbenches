@@ -33,6 +33,7 @@ adi_sim_project_files [list \
  "../common/sv/mailbox.sv" \
  "../common/sv/x_monitor.sv" \
  "../common/sv/scoreboard.sv" \
+ "../common/sv/scoreboard_pack.sv" \
  "../common/sv/dmac_api.sv" \
  "../common/sv/dma_trans.sv" \
  "../common/sv/adi_regmap_dmac_pkg.sv" \

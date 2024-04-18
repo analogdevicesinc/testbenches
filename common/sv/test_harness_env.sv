@@ -41,6 +41,8 @@ package test_harness_env_pkg;
   import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
+  import s_spi_sequencer_pkg::*;
+  import adi_spi_bfm_pkg::*;
   import `PKGIFY(test_harness, mng_axi_vip)::*;
   import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
@@ -49,10 +51,12 @@ package test_harness_env_pkg;
     // Agents
     `AGENT(test_harness, mng_axi_vip, mst_t) mng_agent;
     `AGENT(test_harness, ddr_axi_vip, slv_mem_t) ddr_axi_agent;
+    adi_spi_agent `SPI_VIF_PARAMS spi_agent;
 
     // Sequencers
     m_axi_sequencer #(`AGENT(test_harness, mng_axi_vip, mst_t)) mng;
     s_axi_sequencer #(`AGENT(test_harness, ddr_axi_vip, slv_mem_t)) ddr_axi_seq;
+    s_spi_sequencer `SPI_VIF_PARAMS spi_seq;
 
     // Register accessors
     bit done = 0;
@@ -74,7 +78,8 @@ package test_harness_env_pkg;
       virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
 
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
+      virtual interface spi_bfm_if `SPI_VIF_PARAMS spi_if
     );
 
       this.sys_clk_vip_if = sys_clk_vip_if;
@@ -85,10 +90,13 @@ package test_harness_env_pkg;
       // Creating the agents
       mng_agent = new("AXI Manager agent", mng_vip_if);
       ddr_axi_agent = new("AXI DDR stub agent", ddr_vip_if);
+      spi_agent = new("SPI slave agent", spi_if);
+      
 
       // Creating the sequencers
       mng = new(mng_agent);
       ddr_axi_seq = new(ddr_axi_agent);
+      spi_seq = new(spi_agent);
 
     endfunction
 
@@ -100,6 +108,7 @@ package test_harness_env_pkg;
     task start();
       mng_agent.start_master();
       ddr_axi_agent.start_slave();
+      spi_agent.start();
 
       sys_clk_vip_if.start_clock;
       dma_clk_vip_if.start_clock;
@@ -139,6 +148,7 @@ package test_harness_env_pkg;
     task stop;
       mng_agent.stop_master();
       ddr_axi_agent.stop_slave();
+      spi_agent.stop();
 
       sys_clk_vip_if.stop_clock;
       dma_clk_vip_if.stop_clock;

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 - 2023 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,52 +33,67 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`timescale 1ns/1ps
-
 `include "utils.svh"
 
-module system_tb();
-  wire spi_engine_spi_cs;
-  wire spi_engine_spi_sclk;
-  wire spi_engine_spi_clk;
-  wire spi_engine_spi_sdi;
-  wire spi_engine_spi_sdo;
-  wire spi_engine_irq;
-`ifdef DEF_ECHO_SCLK
-  wire spi_engine_echo_sclk;
-`endif
 
-  `TEST_PROGRAM test(
-    .spi_engine_irq(spi_engine_irq),
-    .spi_engine_spi_sclk(spi_engine_spi_sclk),
-    .spi_engine_spi_cs(spi_engine_spi_cs),
-    .spi_engine_spi_clk(spi_engine_spi_clk),
-    `ifdef DEF_ECHO_SCLK
-    .spi_engine_echo_sclk(spi_engine_echo_sclk),
-    `endif
-    .spi_engine_spi_sdi(spi_engine_spi_sdi));
+module adi_spi_bfm #(
+  parameter MODE        = "SLAVE",
+  parameter CPOL        = 0,
+  parameter CPHA        = 0,
+  parameter INV_CS      = 0,
+  parameter realtime SLAVE_TSU   = 0ns,
+  parameter realtime SLAVE_TH    = 0ns,
+  parameter realtime MASTER_TSU  = 0ns,
+  parameter realtime MASTER_TH   = 0ns,
+  parameter realtime CS_TO_MISO  = 0ns,
+  parameter DATA_DLENGTH  = 16,
+  parameter DEFAULT_MISO_DATA = 'hDEADCAFE
+)  (
+  inout   logic sclk,
+  inout   wire  mosi,
+  inout   wire  miso,
+  inout   logic cs
+);
 
-  test_harness `TH (
-    .spi_engine_irq(spi_engine_irq),
-    .spi_engine_spi_cs(spi_engine_spi_cs),
-    .spi_engine_spi_sclk(spi_engine_spi_sclk),
-    .spi_engine_spi_clk(spi_engine_spi_clk),
-    .spi_engine_spi_sdi(spi_engine_spi_sdi),
-    `ifdef DEF_ECHO_SCLK
-    .spi_engine_echo_sclk(spi_engine_echo_sclk),
-    `endif
-    .spi_engine_spi_sdo(spi_engine_spi_sdo));
+  import adi_spi_bfm_pkg::*;
+  
+  spi_bfm_if `SPI_VIF_PARAM_ORDER IF ();
 
-  adi_spi_bfm #(
-    .MODE("SLAVE"),
-    .DATA_DLENGTH(`DATA_DLENGTH),
-    .CPOL(`CPOL),
-    .CPHA(`CPHA)
-  ) spi_bfm (
-    .sclk(spi_engine_spi_sclk),
-    .mosi(spi_engine_spi_sdo),
-    .miso(spi_engine_spi_sdi),
-    .cs(spi_engine_spi_cs)
-  );
+  initial begin : ASSERT_PARAMETERS
+    assert (MODE == "SLAVE") 
+    else   begin
+      `ERROR(("Unsupported mode %s",MODE));
+    end
+  end : ASSERT_PARAMETERS
+
+  generate
+    if (MODE=="SLAVE") begin
+      assign miso = IF.miso;
+      assign IF.mosi = mosi;
+      assign IF.sclk = sclk;
+      assign IF.cs = cs;
+      initial begin
+        IF.set_slave_mode();
+      end      
+    end else if (MODE=="MASTER") begin
+      assign IF.miso = miso;
+      assign mosi = IF.mosi;
+      assign IF.sclk = sclk;
+      assign IF.cs = cs;
+      initial begin
+        IF.set_master_mode();
+      end
+    end else if (MODE=="MONITOR") begin
+      assign IF.miso = miso;
+      assign IF.mosi = mosi;
+      assign IF.miso = miso;
+      assign IF.cs   = cs;
+      initial begin
+        IF.intf_monitor_mode();
+      end
+    end
+  endgenerate
+
+  
 
 endmodule

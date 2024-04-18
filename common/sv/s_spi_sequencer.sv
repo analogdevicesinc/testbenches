@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 - 2023 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,52 +33,39 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`timescale 1ns/1ps
-
 `include "utils.svh"
 
-module system_tb();
-  wire spi_engine_spi_cs;
-  wire spi_engine_spi_sclk;
-  wire spi_engine_spi_clk;
-  wire spi_engine_spi_sdi;
-  wire spi_engine_spi_sdo;
-  wire spi_engine_irq;
-`ifdef DEF_ECHO_SCLK
-  wire spi_engine_echo_sclk;
-`endif
+package s_spi_sequencer_pkg;
 
-  `TEST_PROGRAM test(
-    .spi_engine_irq(spi_engine_irq),
-    .spi_engine_spi_sclk(spi_engine_spi_sclk),
-    .spi_engine_spi_cs(spi_engine_spi_cs),
-    .spi_engine_spi_clk(spi_engine_spi_clk),
-    `ifdef DEF_ECHO_SCLK
-    .spi_engine_echo_sclk(spi_engine_echo_sclk),
-    `endif
-    .spi_engine_spi_sdi(spi_engine_spi_sdi));
+  import logger_pkg::*;
+  import adi_spi_bfm_pkg::*;
 
-  test_harness `TH (
-    .spi_engine_irq(spi_engine_irq),
-    .spi_engine_spi_cs(spi_engine_spi_cs),
-    .spi_engine_spi_sclk(spi_engine_spi_sclk),
-    .spi_engine_spi_clk(spi_engine_spi_clk),
-    .spi_engine_spi_sdi(spi_engine_spi_sdi),
-    `ifdef DEF_ECHO_SCLK
-    .spi_engine_echo_sclk(spi_engine_echo_sclk),
-    `endif
-    .spi_engine_spi_sdo(spi_engine_spi_sdo));
+  class s_spi_sequencer `SPI_VIF_PARAM_DECL;
 
-  adi_spi_bfm #(
-    .MODE("SLAVE"),
-    .DATA_DLENGTH(`DATA_DLENGTH),
-    .CPOL(`CPOL),
-    .CPHA(`CPHA)
-  ) spi_bfm (
-    .sclk(spi_engine_spi_sclk),
-    .mosi(spi_engine_spi_sdo),
-    .miso(spi_engine_spi_sdi),
-    .cs(spi_engine_spi_cs)
-  );
+    adi_spi_agent `SPI_VIF_PARAM_ORDER agent;
 
-endmodule
+    function new(adi_spi_agent `SPI_VIF_PARAM_ORDER agent);
+      this.agent = agent;    
+    endfunction: new
+
+    virtual task automatic send_data(input bit[DATA_DLENGTH-1:0] data);
+      this.agent.send_data(data);
+    endtask : send_data
+
+    virtual task automatic receive_data(output bit[DATA_DLENGTH-1:0] data);
+      this.agent.receive_data(data);
+    endtask : receive_data
+
+    virtual task automatic receive_data_verify(input bit[DATA_DLENGTH-1:0] expected);
+      bit [DATA_DLENGTH-1:0] received;
+      this.agent.receive_data(received);
+      if (received !== expected) begin
+        `ERROR(("Data mismatch. Received : %h; expected %h", received, expected));
+      end
+    endtask : receive_data_verify
+
+    virtual task flush_send();
+      this.agent.flush_send();
+    endtask : flush_send
+  endclass
+endpackage

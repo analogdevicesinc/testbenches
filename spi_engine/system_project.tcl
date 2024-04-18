@@ -30,6 +30,10 @@ adi_sim_project_files [list \
  "../common/sv/s_axis_sequencer.sv" \
  "../common/sv/m_axi_sequencer.sv" \
  "../common/sv/s_axi_sequencer.sv" \
+ "../common/sv/spi_vip/adi_spi_vip.sv" \
+ "../common/sv/spi_vip/adi_spi_vip_pkg.sv" \
+ "../common/sv/spi_vip/spi_vip_if.sv" \
+ "../common/sv/s_spi_sequencer.sv" \
  "../common/sv/dmac_api.sv" \
  "../common/sv/adi_regmap_pkg.sv" \
  "../common/sv/adi_regmap_clkgen_pkg.sv" \
@@ -39,12 +43,12 @@ adi_sim_project_files [list \
  "../common/sv/dma_trans.sv" \
  "../common/sv/test_harness_env.sv" \
  "../common/sv/spi_engine_instr_pkg.sv" \
- "tests/test_program.sv" \
- "tests/test_sleep_delay.sv" \
+ "spi_environment.sv" \
+ "tests/test_vip.sv" \
  "system_tb.sv" \
  ]
 
 #set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_program"
+adi_sim_add_define "TEST_PROGRAM=test_vip"
 
 adi_sim_generate $project_name

@@ -64,7 +64,7 @@ ad_ip_instance axi_dmac dmac_tx [list \
   DMA_TYPE_SRC 2 \
   DMA_TYPE_DEST 1 \
   ID 0 \
-  FIFO_SIZE 2 \
+  FIFO_SIZE 4 \
   AXI_SLICE_SRC 1 \
   AXI_SLICE_DEST 1 \
   SYNC_TRANSFER_START 0 \
@@ -137,7 +137,7 @@ ad_ip_instance axi_dmac dmac_rx [list \
   DMA_TYPE_SRC 1 \
   DMA_TYPE_DEST 1 \
   ID 0 \
-  FIFO_SIZE 2 \
+  FIFO_SIZE 4 \
   AXI_SLICE_SRC 1 \
   AXI_SLICE_DEST 1 \
   SYNC_TRANSFER_START 0 \

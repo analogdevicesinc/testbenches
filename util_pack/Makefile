@@ -22,6 +22,7 @@ SV_DEPS += ../common/sv/scoreboard_pack.sv
 SV_DEPS += ../common/sv/dmac_api.sv
 SV_DEPS += ../common/sv/dma_trans.sv
 SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
+SV_DEPS += ../common/sv/watchdog.sv
 SV_DEPS += environment.sv
 SV_DEPS += system_tb.sv
 

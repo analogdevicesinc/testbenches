@@ -42,11 +42,14 @@ import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import environment_pkg::*;
 import dmac_api_pkg::*;
+import watchdog_pkg::*;
 
 program test_program;
 
   // declare the class instances
   environment env;
+
+  watchdog packer_scoreboard_wd;
 
   dmac_api dmac_tx;
   dmac_api dmac_rx;
@@ -96,6 +99,10 @@ program test_program;
     env.tx_src_axis_seq.start();
     env.rx_src_axis_seq.start();
 
+    // prepare watchdog with 20 us of wait time
+    packer_scoreboard_wd = new(20000, "Packers Scoreboard");
+    packer_scoreboard_wd.start();
+
     #1us;
 
     // wait for scoreboards to finish
@@ -103,6 +110,8 @@ program test_program;
       env.scoreboard_rx.wait_until_complete();
       env.scoreboard_tx.wait_until_complete();
     join
+
+    packer_scoreboard_wd.stop();
 
     env.stop();
     

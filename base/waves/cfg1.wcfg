@@ -19,14 +19,6 @@
             <top_module name="scoreboard_pkg" />
             <top_module name="std" />
             <top_module name="system_tb" />
-            <top_module name="test_harness_adc_dst_axi_pt_0_0_pkg" />
-            <top_module name="test_harness_adc_dst_axi_pt_1_0_pkg" />
-            <top_module name="test_harness_adc_src_axis_0_0_pkg" />
-            <top_module name="test_harness_adc_src_axis_1_0_pkg" />
-            <top_module name="test_harness_dac_dst_axis_0_0_pkg" />
-            <top_module name="test_harness_dac_dst_axis_1_0_pkg" />
-            <top_module name="test_harness_dac_src_axi_pt_0_0_pkg" />
-            <top_module name="test_harness_dac_src_axi_pt_1_0_pkg" />
             <top_module name="test_harness_ddr_axi_vip_0_pkg" />
             <top_module name="test_harness_env_pkg" />
             <top_module name="test_harness_mng_axi_vip_0_pkg" />

@@ -51,7 +51,18 @@ program test_program;
   // declare the class instances
   environment env;
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+  
+
   initial begin
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state));
+
+    setLoggerVerbosity(250);
 
     // create environment
     env = new(`TH.`SYS_CLK.inst.IF,
@@ -62,14 +73,14 @@ program test_program;
               `TH.`DDR_AXI.inst.IF
              );
 
-    #1step;
-
-    setLoggerVerbosity(250);
-    
     env.start();
     env.sys_reset();
 
+    // other configurations if necessary, before calling run
+
     env.run();
+
+    // stimulus
         
     env.stop();
     

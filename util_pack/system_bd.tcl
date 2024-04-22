@@ -97,7 +97,7 @@ ad_connect sys_cpu_resetn tx_src_axis/aresetn
 
 ad_ip_instance axi4stream_vip tx_dst_axis [list \
   INTERFACE_MODE {SLAVE} \
-  TDATA_NUM_BYTES [expr {$CHANNELS * $SAMPLES * $WIDTH / 8}] \
+  TDATA_NUM_BYTES [expr $MAX_WIDTH / 8] \
 ]
 adi_sim_add_define "TX_DST_AXIS=tx_dst_axis"
 

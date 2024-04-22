@@ -88,8 +88,8 @@ package environment_pkg;
       rx_src_axis_mon = new("RX Source AXIS Transaction Monitor", rx_src_axis_agent);
       rx_dst_axis_mon = new("RX Destination AXIS Transaction Monitor", rx_dst_axis_agent);
 
-      scoreboard_tx = new("Pack Verification Environment TX Scoreboard", `CHANNELS, `SAMPLES, CPACK);
-      scoreboard_rx = new("Pack Verification Environment RX Scoreboard", `CHANNELS, `SAMPLES, UPACK);
+      scoreboard_tx = new("Pack Verification Environment TX Scoreboard", `CHANNELS, `SAMPLES, `WIDTH, CPACK);
+      scoreboard_rx = new("Pack Verification Environment RX Scoreboard", `CHANNELS, `SAMPLES, `WIDTH, UPACK);
 
     endfunction
 

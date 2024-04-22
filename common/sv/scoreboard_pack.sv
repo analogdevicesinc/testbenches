@@ -19,6 +19,7 @@ package scoreboard_pack_pkg;
 
     protected int channels;
     protected int samples;
+    protected int width;
 
     protected pack_type mode;
 
@@ -27,12 +28,14 @@ package scoreboard_pack_pkg;
       input string name,
       input int channels,
       input int samples,
+      input int width,
       input pack_type mode);
 
       super.new(name);
 
       this.channels = channels;
       this.samples = samples;
+      this.width = width;
       this.mode = mode;
 
     endfunction: new
@@ -48,30 +51,30 @@ package scoreboard_pack_pkg;
       int inner_loop = (this.mode == CPACK) ? this.samples : this.channels;
 
       `INFOV(("Scoreboard started"), 100);
-      `INFOV(("Outer loop: %d", outer_loop), 100);
-      `INFOV(("Inner loop: %d", inner_loop), 100);
 
       forever begin : tx_path
         if (this.enabled == 0)
           break;
         if ((this.source_byte_stream_size > 0) &&
-              (this.sink_byte_stream_size >= this.channels*this.samples)) begin
+              (this.sink_byte_stream_size >= this.channels*this.samples*this.width/8)) begin
           byte_streams_empty_sig = 0;
-          for (int i=0; i<this.channels*this.samples; i++) begin
+          for (int i=0; i<this.channels*this.samples*this.width/8; i++) begin
             sink_byte_stream_block[i] = this.sink_byte_stream.pop_back();
             this.sink_byte_stream_size--;
           end
           for (int i=0; i<outer_loop; i++) begin
             for (int j=0; j<inner_loop; j++) begin
-              source_byte = this.source_byte_stream.pop_back();
-              if (this.sink_type == CYCLIC)
-                this.source_byte_stream.push_front(source_byte);
-              else
-                this.source_byte_stream_size--;
-              sink_byte = sink_byte_stream_block[outer_loop*j+i];
-              `INFOV(("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
-              if (source_byte != sink_byte) begin
-                `ERROR(("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
+              for (int k=0; k<this.width/8; k++) begin
+                source_byte = this.source_byte_stream.pop_back();
+                if (this.sink_type == CYCLIC)
+                  this.source_byte_stream.push_front(source_byte);
+                else
+                  this.source_byte_stream_size--;
+                sink_byte = sink_byte_stream_block[(outer_loop*j+i)*this.width/8+k];
+                `INFOV(("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
+                if (source_byte != sink_byte) begin
+                  `ERROR(("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
+                end
               end
             end
           end

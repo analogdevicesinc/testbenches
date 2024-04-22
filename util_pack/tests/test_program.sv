@@ -52,7 +52,6 @@ program test_program;
   dmac_api dmac_rx;
   
   int data_length = $urandom_range(5, 10) * `WIDTH * 2**int($clog2(`CHANNELS)) * `CHANNELS * `SAMPLES / 8;
-  // int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8;
 
   initial begin
 
@@ -93,13 +92,17 @@ program test_program;
     rx_dma_transfer(data_length);
     tx_dma_transfer(data_length);
 
+    // start generating data
     env.tx_src_axis_seq.start();
     env.rx_src_axis_seq.start();
 
-    // env.scoreboard_rx.wait_until_complete();
-    // env.scoreboard_tx.wait_until_complete();
-    
-    #5us;
+    #1us;
+
+    // wait for scoreboards to finish
+    fork
+      env.scoreboard_rx.wait_until_complete();
+      env.scoreboard_tx.wait_until_complete();
+    join
 
     env.stop();
     

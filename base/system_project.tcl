@@ -33,6 +33,7 @@ adi_sim_project_files [list \
  "../common/sv/mailbox.sv" \
  "../common/sv/x_monitor.sv" \
  "../common/sv/scoreboard.sv" \
+ "../common/sv/watchdog.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
  "system_tb.sv" \

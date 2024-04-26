@@ -38,13 +38,13 @@
 package s_spi_sequencer_pkg;
 
   import logger_pkg::*;
-  import adi_spi_bfm_pkg::*;
+  import adi_spi_vip_pkg::*;
 
-  class s_spi_sequencer `SPI_VIF_PARAM_DECL;
+  class s_spi_sequencer `SPI_PARAM_DECL;
 
-    adi_spi_agent `SPI_VIF_PARAM_ORDER agent;
+    adi_spi_agent `SPI_PARAM_ORDER agent;
 
-    function new(adi_spi_agent `SPI_VIF_PARAM_ORDER agent);
+    function new(adi_spi_agent `SPI_PARAM_ORDER agent);
       this.agent = agent;    
     endfunction: new
 

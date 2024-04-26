@@ -45,16 +45,16 @@ import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
-import test_harness_env_pkg::*;
+import spi_environment_pkg::*;
 import spi_engine_instr_pkg::*;
-import adi_spi_bfm_pkg::*;
+import adi_spi_vip_pkg::*;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
 localparam PCORE_VERSION              = 32'h0001_0171;
 
-program test_bfm (
+program test_vip (
   input spi_engine_irq,
   input spi_engine_spi_sclk,
   input [(`NUM_OF_CS - 1):0] spi_engine_spi_cs,
@@ -67,7 +67,7 @@ program test_bfm (
 timeunit 1ns;
 timeprecision 100ps;
 
-test_harness_env env;
+spi_environment env;
 
 // --------------------------
 // Wrapper function for AXI read verify
@@ -143,7 +143,7 @@ initial begin
             `TH.`SYS_RST.inst.IF,
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
-            system_tb.spi_bfm.IF
+            `TH.`SPI_S.inst.IF
             );
 
   setLoggerVerbosity(6);

@@ -11,6 +11,7 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   global design_name
   global ad_project_params
   global use_smartconnect
+  global ad_hdl_dir
 
   # Create project
   create_project ${project_name} ./runs/${project_name} -part $part -force
@@ -19,7 +20,9 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   set_property -name "default_lib" -value "xil_defaultlib" -objects [current_project]
 
   # Set IP repository paths
-  set_property "ip_repo_paths" "[file normalize "./../../library"] " \
+  set lib_dirs $ad_hdl_dir/library
+  lappend lib_dirs [file normalize "./../common/sv"]
+  set_property ip_repo_paths $lib_dirs \
     [get_filesets sources_1]
 
   # Rebuild user ip_repo's index before adding any source files

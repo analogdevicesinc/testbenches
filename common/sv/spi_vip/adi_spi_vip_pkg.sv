@@ -35,17 +35,26 @@
 
 `include "utils.svh"
 
-package adi_spi_bfm_pkg;
+package adi_spi_vip_pkg;
 
   import logger_pkg::*;
 
   // This helps us in dealing with systemverilog's awful parameterized interfaces (since there's no polymorphism there)
-  `define SPI_VIF_PARAM_DECL #(int CPOL=0, CPHA=0, INV_CS=0, DATA_DLENGTH=16, SLAVE_TSU=0ns, SLAVE_TH=0ns, MASTER_TSU=0ns, MASTER_TH=0ns, CS_TO_MISO=0ns)
-  `define SPI_VIF_PARAM_ORDER #(CPOL, CPHA, INV_CS, DATA_DLENGTH, SLAVE_TSU, SLAVE_TH, MASTER_TSU, MASTER_TH, CS_TO_MISO)
-  `define SPI_VIF_PARAMS #(`CPOL, `CPHA, 0, `DATA_DLENGTH, `SLAVE_TSU, `SLAVE_TH, `MASTER_TSU, `MASTER_TH, `CS_TO_MISO)
+  `define SPI_PARAM_DECL #(int CPOL=0, CPHA=0, INV_CS=0, DATA_DLENGTH=16, SLAVE_TSU=0ns, SLAVE_TH=0ns, MASTER_TSU=0ns, MASTER_TH=0ns, CS_TO_MISO=0ns)
+  `define SPI_PARAM_ORDER #(CPOL, CPHA, INV_CS, DATA_DLENGTH, SLAVE_TSU, SLAVE_TH, MASTER_TSU, MASTER_TH, CS_TO_MISO)
+  `define SPI_PARAMS(th,vip)      th``_``vip``_0_CPOL, \
+                                  th``_``vip``_0_CPHA, \
+                                  th``_``vip``_0_INV_CS, \
+                                  th``_``vip``_0_DATA_DLENGTH, \
+                                  th``_``vip``_0_SLAVE_TSU, \
+                                  th``_``vip``_0_SLAVE_TH, \
+                                  th``_``vip``_0_MASTER_TSU, \
+                                  th``_``vip``_0_MASTER_TH, \
+                                  th``_``vip``_0_CS_TO_MISO
+  `define SPI_VIF_PARAMS(th,vip)  
   
-  class adi_spi_driver `SPI_VIF_PARAM_DECL;
-    virtual interface spi_bfm_if `SPI_VIF_PARAM_ORDER vif;
+  class adi_spi_driver `SPI_PARAM_DECL;
+    virtual interface spi_vip_if `SPI_PARAM_ORDER vif;
     protected string name = "adi_spi_driver";
 
     typedef mailbox #(logic [DATA_DLENGTH-1:0]) spi_mbx_t;
@@ -56,7 +65,7 @@ package adi_spi_bfm_pkg;
     protected bit [DATA_DLENGTH-1:0] miso_reg;
     protected bit [DATA_DLENGTH-1:0] default_miso_data;
 
-    function new(string name, virtual spi_bfm_if `SPI_VIF_PARAM_ORDER intf);
+    function new(string name, virtual spi_vip_if `SPI_PARAM_ORDER intf);
       this.name = {name,"_driver"};
       this.vif = intf;
       this.active = 0;
@@ -103,26 +112,24 @@ package adi_spi_bfm_pkg;
         wait (vif.cs_active);
         if (!miso_mbx.try_get(miso_reg)) begin
           miso_reg = default_miso_data;
-          vif.drive_cb.miso <= 0;
-        end else begin
-          while (vif.cs_active) begin
-            for (int i = 0; i<DATA_DLENGTH; i=i+1) begin
-              fork
-                begin
-                  wait (!vif.cs_active);
-                end
-                begin
-                  @(vif.drive_cb);
-                end
-              join_any
-              if (!vif.cs_active) begin
-                break;
-              end
-              vif.drive_cb.miso <= miso_reg[DATA_DLENGTH-1];
-              miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
-            end
-          end
         end
+        while (vif.cs_active) begin
+          for (int i = 0; i<DATA_DLENGTH; i=i+1) begin
+            fork
+              begin
+                wait (!vif.cs_active);
+              end
+              begin
+                @(vif.drive_cb);
+              end
+            join_any
+            if (!vif.cs_active) begin
+              break;
+            end
+            vif.drive_cb.miso <= miso_reg[DATA_DLENGTH-1];
+            miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
+          end
+        end        
       end
     endtask : tx_miso
 
@@ -210,15 +217,15 @@ package adi_spi_bfm_pkg;
   endclass
 
 
-  class adi_spi_agent `SPI_VIF_PARAM_DECL;
+  class adi_spi_agent `SPI_PARAM_DECL;
 
-    virtual interface spi_bfm_if `SPI_VIF_PARAM_ORDER vif;
+    virtual interface spi_vip_if `SPI_PARAM_ORDER vif;
 
-    adi_spi_driver `SPI_VIF_PARAM_ORDER driver;
+    adi_spi_driver `SPI_PARAM_ORDER driver;
     protected string  name ="adi_spi_agent";
 
 
-    function new(string name, virtual spi_bfm_if `SPI_VIF_PARAM_ORDER intf);
+    function new(string name, virtual spi_vip_if `SPI_PARAM_ORDER intf);
       this.driver = new(name, intf);
       this.vif = intf;
       this.name = name;
@@ -246,7 +253,7 @@ package adi_spi_bfm_pkg;
       this.driver.stop();
     endtask : stop
 
-    virtual function set_default_miso_data(input bit[DATA_DLENGTH-1:0] data);
+    virtual function void set_default_miso_data(input bit[DATA_DLENGTH-1:0] data);
       this.driver.set_default_miso_data(data);
     endfunction : set_default_miso_data
 

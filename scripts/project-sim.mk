@@ -143,6 +143,15 @@ $(HDL_LIBRARY_PATH)%/component.xml: FORCE
 	"; exit $$?
 FORCE:
 
+# Create here the targets which build the sim libraries
+../common/sv/%/component.xml: TARGET:=xilinx
+FORCE:
+../common/sv/%/component.xml: FORCE
+	flock $(dir $@).lock -c " \
+	$(MAKE) -C $(dir $@) xilinx; \
+	"; exit $$?
+FORCE:
+
 # Create here the targets which build the test env
 $(foreach cfg, $(BUILD_CFGS), $(eval $(call build, $(cfg))))
 

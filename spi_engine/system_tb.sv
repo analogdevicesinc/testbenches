@@ -69,16 +69,4 @@ module system_tb();
     `endif
     .spi_engine_spi_sdo(spi_engine_spi_sdo));
 
-  adi_spi_bfm #(
-    .MODE("SLAVE"),
-    .DATA_DLENGTH(`DATA_DLENGTH),
-    .CPOL(`CPOL),
-    .CPHA(`CPHA)
-  ) spi_bfm (
-    .sclk(spi_engine_spi_sclk),
-    .mosi(spi_engine_spi_sdo),
-    .miso(spi_engine_spi_sdi),
-    .cs(spi_engine_spi_cs)
-  );
-
 endmodule

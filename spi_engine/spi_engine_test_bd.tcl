@@ -19,7 +19,7 @@ set sdo_fifo_addr_width     $ad_project_params(SDO_FIFO_ADDR_WIDTH)
 set sync_fifo_addr_width    $ad_project_params(SYNC_FIFO_ADDR_WIDTH)
 set cmd_fifo_addr_width     $ad_project_params(CMD_FIFO_ADDR_WIDTH)
 
-create_bd_intf_port -mode Master -vlnv analog.com:interface:spi_engine_rtl:1.0 spi_engine_spi
+create_bd_intf_port -mode Monitor -vlnv analog.com:interface:spi_engine_rtl:1.0 spi_engine_spi
 
 set hier_spi_engine spi_engine
 

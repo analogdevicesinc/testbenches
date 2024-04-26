@@ -20,11 +20,11 @@ set ad_project_params(DATA_DLENGTH)         18
 set ad_project_params(THREE_WIRE)           0
 set ad_project_params(CPOL)                 0
 set ad_project_params(CPHA)                 1
-set ad_project_params(SLAVE_TSU)            0ns
-set ad_project_params(SLAVE_TH)             0ns
-set ad_project_params(MASTER_TSU)           0ns
-set ad_project_params(MASTER_TH)            0ns
-set ad_project_params(CS_TO_MISO)           0ns
+set ad_project_params(SLAVE_TSU)            0
+set ad_project_params(SLAVE_TH)             0
+set ad_project_params(MASTER_TSU)           0
+set ad_project_params(MASTER_TH)            0
+set ad_project_params(CS_TO_MISO)           0
 set ad_project_params(CLOCK_DIVIDER)        2
 set ad_project_params(NUM_OF_WORDS)         1
 set ad_project_params(NUM_OF_TRANSFERS)     4

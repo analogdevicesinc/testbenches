@@ -8,13 +8,12 @@ source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 
 adi_ip_create adi_spi_vip
 adi_ip_files adi_spi_vip [list \
-    "spi_vip_pkg.ttcl" \
+    "adi_spi_vip_pkg.sv" \
     "adi_spi_vip.sv" \
     "spi_vip_if.sv" \
 ]
 
 adi_ip_properties_lite adi_spi_vip
-adi_ip_sim_ttcl adi_spi_vip "spi_vip_pkg.ttcl"
 
 set_property company_url {https://wiki.analog.com/resources/fpga/peripherals/spi_engine} [ipx::current_core]
 

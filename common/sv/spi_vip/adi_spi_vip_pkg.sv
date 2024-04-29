@@ -37,205 +37,29 @@
 
 package adi_spi_vip_pkg;
 
-  import logger_pkg::*;
-
-  // This helps us in dealing with systemverilog's awful parameterized interfaces (since there's no polymorphism there)
-  `define SPI_PARAM_DECL #(int CPOL=0, CPHA=0, INV_CS=0, DATA_DLENGTH=16, SLAVE_TSU=0ns, SLAVE_TH=0ns, MASTER_TSU=0ns, MASTER_TH=0ns, CS_TO_MISO=0ns)
-  `define SPI_PARAM_ORDER #(CPOL, CPHA, INV_CS, DATA_DLENGTH, SLAVE_TSU, SLAVE_TH, MASTER_TSU, MASTER_TH, CS_TO_MISO)
-  `define SPI_PARAMS(th,vip)      th``_``vip``_0_CPOL, \
-                                  th``_``vip``_0_CPHA, \
-                                  th``_``vip``_0_INV_CS, \
-                                  th``_``vip``_0_DATA_DLENGTH, \
-                                  th``_``vip``_0_SLAVE_TSU, \
-                                  th``_``vip``_0_SLAVE_TH, \
-                                  th``_``vip``_0_MASTER_TSU, \
-                                  th``_``vip``_0_MASTER_TH, \
-                                  th``_``vip``_0_CS_TO_MISO
-  `define SPI_VIF_PARAMS(th,vip)  
-  
-  class adi_spi_driver `SPI_PARAM_DECL;
-    virtual interface spi_vip_if `SPI_PARAM_ORDER vif;
-    protected string name = "adi_spi_driver";
-
-    typedef mailbox #(logic [DATA_DLENGTH-1:0]) spi_mbx_t;
-    protected spi_mbx_t mosi_mbx;
-    spi_mbx_t miso_mbx;
-    protected bit active;
-    protected bit stop_flag;
-    protected bit [DATA_DLENGTH-1:0] miso_reg;
-    protected bit [DATA_DLENGTH-1:0] default_miso_data;
-
-    function new(string name, virtual spi_vip_if `SPI_PARAM_ORDER intf);
-      this.name = {name,"_driver"};
-      this.vif = intf;
-      this.active = 0;
-      this.stop_flag = 0;
-      this.default_miso_data = 0;
-      this.miso_mbx = new();
-      this.mosi_mbx = new();
-    endfunction
-
-
-    protected function get_active();
-      return(this.active);
-    endfunction : get_active
-
-    protected function void set_active();
-      this.active = 1;
-    endfunction : set_active
-
-    protected function void clear_active();
-      this.active = 0;
-    endfunction : clear_active
-
-    protected task rx_mosi();
-      static logic [DATA_DLENGTH-1:0] mosi_data;
-      begin
-        if (vif.intf_slave_mode) begin
-          wait (vif.cs_active); 
-          while (vif.cs_active) begin
-            for (int i = 0; i<DATA_DLENGTH; i++) begin
-              if (!vif.cs_active) begin
-                break;
-              end
-              @(vif.sample_cb)
-              mosi_data = {mosi_data[DATA_DLENGTH-2:1], vif.sample_cb.mosi};
-            end    
-            mosi_mbx.put(mosi_data);
-          end
-        end
-      end
-    endtask : rx_mosi
-
-    protected task tx_miso();
-      begin  
-        wait (vif.cs_active);
-        if (!miso_mbx.try_get(miso_reg)) begin
-          miso_reg = default_miso_data;
-        end
-        while (vif.cs_active) begin
-          for (int i = 0; i<DATA_DLENGTH; i=i+1) begin
-            fork
-              begin
-                wait (!vif.cs_active);
-              end
-              begin
-                @(vif.drive_cb);
-              end
-            join_any
-            if (!vif.cs_active) begin
-              break;
-            end
-            vif.drive_cb.miso <= miso_reg[DATA_DLENGTH-1];
-            miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
-          end
-        end        
-      end
-    endtask : tx_miso
-
-    protected task cs_tristate();
-      @(vif.cs_cb) begin
-        if (vif.intf_slave_mode) begin
-          if (!vif.cs_active) begin
-            vif.cs_cb.miso <= 'z;
-          end else begin
-            vif.cs_cb.miso <= miso_reg[DATA_DLENGTH-1];
-          end      
-        end
-      end
-    endtask : cs_tristate
-
-    protected task run();
-      fork
-          forever begin
-            rx_mosi();
-          end
-          forever begin
-            tx_miso();
-          end
-          //forever begin
-            //cs_tristate();
-          //end
-      join
-    endtask : run
-
-    function void set_default_miso_data(
-      input bit [DATA_DLENGTH-1:0] default_data
-    );
-      begin
-        this.default_miso_data = default_data;
-      end
-    endfunction : set_default_miso_data
-
-    task put_tx_data(
-      input logic [DATA_DLENGTH-1:0] data);
-      begin
-        miso_mbx.put(data);
-      end
-    endtask
-
-    task get_rx_data(
-      output logic [DATA_DLENGTH-1:0] data);
-      begin
-        mosi_mbx.get(data);
-      end
-    endtask
-
-    task flush_tx();
-      begin
-        wait (miso_mbx.num()==0);
-      end
-    endtask
-
-    task start();
-      begin
-        if (!this.get_active()) begin
-          this.set_active();
-          fork
-            begin
-              @(posedge this.stop_flag);
-              `INFOV(("Stop event triggered."),2);
-            end
-            begin
-              this.run();
-            end
-          join_any
-          disable fork;
-          this.clear_active();
-        end else begin
-          `ERROR(("Already running!"));
-        end
-      end
-    endtask
-
-    task stop();
-      begin
-        this.stop_flag = 1;
-      end
-    endtask
-
+  virtual class adi_abstract_spi_driver;
+    pure virtual task put_tx_data(int unsigned data);
+    pure virtual task get_rx_data(output int unsigned data);
+    pure virtual task flush_tx();
+    pure virtual task start();
+    pure virtual task stop();
+    pure virtual function void set_default_miso_data(int unsigned data);
   endclass
 
+  class adi_spi_agent;
 
-  class adi_spi_agent `SPI_PARAM_DECL;
-
-    virtual interface spi_vip_if `SPI_PARAM_ORDER vif;
-
-    adi_spi_driver `SPI_PARAM_ORDER driver;
-    protected string  name ="adi_spi_agent";
+    adi_abstract_spi_driver driver;
 
 
-    function new(string name, virtual spi_vip_if `SPI_PARAM_ORDER intf);
-      this.driver = new(name, intf);
-      this.vif = intf;
-      this.name = name;
+    function new(adi_abstract_spi_driver driver);
+      this.driver = driver;
     endfunction
 
-    virtual task send_data(input bit[DATA_DLENGTH-1:0] data);
+    virtual task send_data(input int unsigned data);
       this.driver.put_tx_data(data);
     endtask : send_data
 
-    virtual task receive_data(output bit[DATA_DLENGTH-1:0] data);
+    virtual task receive_data(output int unsigned data);
       this.driver.get_rx_data(data);
     endtask : receive_data
 
@@ -253,7 +77,7 @@ package adi_spi_vip_pkg;
       this.driver.stop();
     endtask : stop
 
-    virtual function void set_default_miso_data(input bit[DATA_DLENGTH-1:0] data);
+    virtual function void set_default_miso_data(input int unsigned data);
       this.driver.set_default_miso_data(data);
     endfunction : set_default_miso_data
 

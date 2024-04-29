@@ -16,7 +16,6 @@ GENERIC_DEPS += adi_spi_vip_pkg.sv
 GENERIC_DEPS += spi_vip_if.sv
 GENERIC_DEPS += adi_spi_vip.sv
 
-XILINX_DEPS += spi_vip_pkg.ttcl
 XILINX_DEPS += adi_spi_vip_ip.tcl
 
 INTEL_DEPS += adi_spi_vip_hw.tcl

@@ -116,7 +116,7 @@ task spi_send;
   input [`DATA_DLENGTH:0]  data;
 begin
   env.spi_seq.send_data(data);
-  `INFOV(("spi_send: miso_mbx.num() = %d",env.spi_agent.driver.miso_mbx.num()),6);
+  //`INFOV(("spi_send: miso_mbx.num() = %d",env.spi_agent.driver.miso_mbx.num()),6);
 end
 endtask
 
@@ -143,7 +143,7 @@ initial begin
             `TH.`SYS_RST.inst.IF,
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
-            `TH.`SPI_S.inst.IF
+            `TH.`SPI_S.inst.IF.driver
             );
 
   setLoggerVerbosity(6);
@@ -211,7 +211,7 @@ initial begin
   forever begin
     @(posedge spi_engine_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
-    `INFOV(("miso mbx: miso_mbx.num() = %d",env.spi_agent.driver.miso_mbx.num()),6);
+    //`INFOV(("miso mbx: miso_mbx.num() = %d",env.spi_agent.driver.miso_mbx.num()),6);
 
     axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
     // IRQ launched by Offload SYNC command

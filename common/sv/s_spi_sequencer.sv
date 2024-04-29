@@ -40,24 +40,24 @@ package s_spi_sequencer_pkg;
   import logger_pkg::*;
   import adi_spi_vip_pkg::*;
 
-  class s_spi_sequencer `SPI_PARAM_DECL;
+  class s_spi_sequencer;
 
-    adi_spi_agent `SPI_PARAM_ORDER agent;
+    adi_spi_agent agent;
 
-    function new(adi_spi_agent `SPI_PARAM_ORDER agent);
+    function new(adi_spi_agent agent);
       this.agent = agent;    
     endfunction: new
 
-    virtual task automatic send_data(input bit[DATA_DLENGTH-1:0] data);
+    virtual task automatic send_data(input int unsigned data);
       this.agent.send_data(data);
     endtask : send_data
 
-    virtual task automatic receive_data(output bit[DATA_DLENGTH-1:0] data);
+    virtual task automatic receive_data(output int unsigned data);
       this.agent.receive_data(data);
     endtask : receive_data
 
-    virtual task automatic receive_data_verify(input bit[DATA_DLENGTH-1:0] expected);
-      bit [DATA_DLENGTH-1:0] received;
+    virtual task automatic receive_data_verify(input int unsigned expected);
+      int unsigned received;
       this.agent.receive_data(received);
       if (received !== expected) begin
         `ERROR(("Data mismatch. Received : %h; expected %h", received, expected));

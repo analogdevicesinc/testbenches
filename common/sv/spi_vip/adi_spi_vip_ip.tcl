@@ -109,6 +109,51 @@ set_property -dict [list \
  ] \
  [ipx::get_hdl_parameters INV_CS -of_objects $cc]
 
+## SLAVE_TIN
+ set_property	-dict [list \
+  "value_validation_type" "range_long" \
+  "value_validation_range_minimum" "-10000" \
+  "value_validation_range_maximum" "10000" \
+  "enablement_tcl_expr" "\$MODE==0" \
+ ] \
+ [ipx::get_user_parameters SLAVE_TIN -of_objects $cc]
+
+## SLAVE_TOUT
+ set_property	-dict [list \
+  "value_validation_type" "range_long" \
+  "value_validation_range_minimum" "-10000" \
+  "value_validation_range_maximum" "10000" \
+  "enablement_tcl_expr" "\$MODE==0" \
+ ] \
+ [ipx::get_user_parameters SLAVE_TOUT -of_objects $cc]
+
+## MASTER_TIN
+ set_property	-dict [list \
+  "value_validation_type" "range_long" \
+  "value_validation_range_minimum" "-10000" \
+  "value_validation_range_maximum" "10000" \
+  "enablement_tcl_expr" "\$MODE==1" \
+ ] \
+ [ipx::get_user_parameters MASTER_TIN -of_objects $cc]
+
+## MASTER_TOUT
+ set_property	-dict [list \
+  "value_validation_type" "range_long" \
+  "value_validation_range_minimum" "-10000" \
+  "value_validation_range_maximum" "10000" \
+  "enablement_tcl_expr" "\$MODE==1" \
+ ] \
+ [ipx::get_user_parameters MASTER_TOUT -of_objects $cc]
+
+## CS_TO_MISO
+ set_property	-dict [list \
+  "value_validation_type" "range_long" \
+  "value_validation_range_minimum" "-10000" \
+  "value_validation_range_maximum" "10000" \
+  "enablement_tcl_expr" "\$MODE==0" \
+ ] \
+ [ipx::get_user_parameters CS_TO_MISO -of_objects $cc]
+
 ## DATA_DLENGTH
 set_property -dict [list \
   "value_validation_type" "range_long" \
@@ -131,6 +176,9 @@ set page0 [ipgui::get_pagespec -name "ADI SPI VIP" -component $cc]
 
 set general_group [ipgui::add_group -name "General Configuration" -component $cc \
     -parent $page0 -display_name "General Configuration" ]
+
+set model_timing  [ipgui::add_group -name "Model Timing Configuration" -component $cc \
+    -parent $page0 -display_name "Model Timing Configuration" ]
 
 ipgui::add_param -name "MODE" -component $cc -parent $general_group
 set_property -dict [list \
@@ -165,6 +213,36 @@ set_property -dict [list \
   "display_name" "DATA_DLENGTH" \
   "tooltip" "\[DATA_DLENGTH\] Define the SPI word length" \
 ] [ipgui::get_guiparamspec -name "DATA_DLENGTH" -component $cc]
+
+ipgui::add_param -name "SLAVE_TIN" -component $cc -parent $model_timing
+set_property -dict [list \
+  "display_name" "Slave T_in" \
+  "tooltip" "\[SLAVE_TIN\] Input delay for slave interface mode."
+] [ipgui::get_guiparamspec -name "SLAVE_TIN" -component $cc]
+
+ipgui::add_param -name "SLAVE_TOUT" -component $cc -parent $model_timing
+set_property -dict [list \
+  "display_name" "Slave T_out" \
+  "tooltip" "\[SLAVE_TOUT\] Output delay for slave interface mode."
+] [ipgui::get_guiparamspec -name "SLAVE_TOUT" -component $cc]
+
+ipgui::add_param -name "MASTER_TIN" -component $cc -parent $model_timing
+set_property -dict [list \
+  "display_name" "Master T_in" \
+  "tooltip" "\[MASTER_TIN\] Input delay for master interface mode."
+] [ipgui::get_guiparamspec -name "MASTER_TIN" -component $cc]
+
+ipgui::add_param -name "MASTER_TOUT" -component $cc -parent $model_timing
+set_property -dict [list \
+  "display_name" "Master T_out" \
+  "tooltip" "\[MASTER_TOUT\] Output delay for master interface mode."
+] [ipgui::get_guiparamspec -name "MASTER_TOUT" -component $cc]
+
+ipgui::add_param -name "CS_TO_MISO" -component $cc -parent $model_timing
+set_property -dict [list \
+  "display_name" "CS to MISO delay" \
+  "tooltip" "\[CS_TO_MISO\] Chip-Select to MISO delay for slave interface mode."
+] [ipgui::get_guiparamspec -name "CS_TO_MISO" -component $cc]
 
 ## Create and save the XGUI file
 ipx::create_xgui_files [ipx::current_core]

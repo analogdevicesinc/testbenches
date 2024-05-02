@@ -34,30 +34,30 @@
 // ***************************************************************************
 
 module adi_spi_vip #(
-  parameter MODE        = 0, // SLAVE=0
-  parameter CPOL        = 0,
-  parameter CPHA        = 0,
-  parameter INV_CS      = 0,
-  parameter SLAVE_TSU   = 0,
-  parameter SLAVE_TH    = 0,
-  parameter MASTER_TSU  = 0,
-  parameter MASTER_TH   = 0,
-  parameter CS_TO_MISO  = 0,
+  parameter MODE          = 0, // SLAVE=0
+  parameter CPOL          = 0,
+  parameter CPHA          = 0,
+  parameter INV_CS        = 0,
+  parameter SLAVE_TIN     = 0,
+  parameter SLAVE_TOUT    = 0,
+  parameter MASTER_TIN    = 0,
+  parameter MASTER_TOUT   = 0,
+  parameter CS_TO_MISO    = 0,
   parameter DATA_DLENGTH  = 16,
   parameter DEFAULT_MISO_DATA = 'hCAFE
 )  (
-  inout   logic s_spi_sclk,
-  inout   wire  s_spi_mosi,
-  inout   wire  s_spi_miso,
-  inout   logic s_spi_cs,
-  inout   logic m_spi_sclk,
-  inout   wire  m_spi_mosi,
-  inout   wire  m_spi_miso,
-  inout   logic m_spi_cs,
-  inout   logic mon_spi_sclk,
-  inout   wire  mon_spi_mosi,
-  inout   wire  mon_spi_miso,
-  inout   logic mon_spi_cs
+  input   logic s_spi_sclk,
+  input   wire  s_spi_mosi,
+  output  wire  s_spi_miso,
+  input   logic s_spi_cs,
+  output  logic m_spi_sclk,
+  output  wire  m_spi_mosi,
+  input   wire  m_spi_miso,
+  output  logic m_spi_cs,
+  input   logic mon_spi_sclk,
+  input   wire  mon_spi_mosi,
+  input   wire  mon_spi_miso,
+  input   logic mon_spi_cs
 );
 
   localparam MODE_SLAVE   = 0;
@@ -69,10 +69,10 @@ module adi_spi_vip #(
     .CPHA         (CPHA),
     .INV_CS       (INV_CS),
     .DATA_DLENGTH (DATA_DLENGTH),
-    .SLAVE_TSU    (SLAVE_TSU),
-    .SLAVE_TH     (SLAVE_TH),
-    .MASTER_TSU   (MASTER_TSU),
-    .MASTER_TH    (MASTER_TH),
+    .SLAVE_TIN    (SLAVE_TIN),
+    .SLAVE_TOUT   (SLAVE_TOUT),
+    .MASTER_TIN   (MASTER_TIN),
+    .MASTER_TOUT  (MASTER_TOUT),
     .CS_TO_MISO   (CS_TO_MISO)
   ) IF ();
 

@@ -3,10 +3,10 @@ interface spi_vip_if #(
   CPHA=0,
   INV_CS=0,
   DATA_DLENGTH=16,
-  SLAVE_TSU=0,
-  SLAVE_TH=0,
-  MASTER_TSU=0,
-  MASTER_TH=0,
+  SLAVE_TIN=0,
+  SLAVE_TOUT=0,
+  MASTER_TIN=0,
+  MASTER_TOUT=0,
   CS_TO_MISO=0
 ) ();
   logic sclk;
@@ -20,28 +20,25 @@ interface spi_vip_if #(
   logic intf_slave_mode;
   logic intf_master_mode;
   logic intf_monitor_mode;
+  logic miso_oen;
+  logic miso_drive;
   logic cs_active;
-  localparam cs_active_level = (INV_CS) ? 1'b1 : 1'b0;
+  logic mosi_delayed;
+  localparam CS_ACTIVE_LEVEL = (INV_CS) ? 1'b1 : 1'b0;
 
   // hack for parameterized edge. TODO: improve this
   logic sample_edge, drive_edge;
   assign sample_edge  = (CPOL^CPHA) ? !sclk : sclk;
   assign drive_edge   = (CPOL^CPHA) ? sclk : !sclk;
-  assign cs_active = (cs == cs_active_level);
+  assign cs_active = (cs == CS_ACTIVE_LEVEL);
 
-  clocking sample_cb @( posedge sample_edge);
-    input #(SLAVE_TSU*1ns) mosi;
-    input #(MASTER_TSU*1ns) miso;
-  endclocking : sample_cb
+  // miso tri-state handling
+  assign miso = (!intf_slave_mode)  ? 'z          
+              : (miso_oen)          ? miso_drive  
+                /*default*/         : 'z;
 
-  clocking drive_cb @( posedge drive_edge);
-    output #(MASTER_TH*1ns) mosi;
-    output #(SLAVE_TH*1ns) miso;
-  endclocking : drive_cb
-
-  clocking cs_cb @(cs);
-    output #(CS_TO_MISO*1ns) miso;
-  endclocking : cs_cb
+  // mosi delay
+  assign #(SLAVE_TIN*1ns) mosi_delayed =  mosi;
 
   function void set_slave_mode();
     intf_slave_mode   = 1;
@@ -69,10 +66,10 @@ interface spi_vip_if #(
     CPHA=0,
     INV_CS=0,
     DATA_DLENGTH=16,
-    SLAVE_TSU=0,
-    SLAVE_TH=0,
-    MASTER_TSU=0,
-    MASTER_TH=0,
+    SLAVE_TIN=0,
+    SLAVE_TOUT=0,
+    MASTER_TIN=0,
+    MASTER_TOUT=0,
     CS_TO_MISO=0
   ) extends adi_abstract_spi_driver;
 
@@ -115,8 +112,8 @@ interface spi_vip_if #(
               if (!cs_active) begin
                 break;
               end
-              @(sample_cb)
-              mosi_data = {mosi_data[DATA_DLENGTH-2:1], sample_cb.mosi};
+              @(posedge sample_edge)
+              mosi_data <= {mosi_data[DATA_DLENGTH-2:1], mosi_delayed};
             end    
             mosi_mbx.put(mosi_data);
           end
@@ -125,39 +122,51 @@ interface spi_vip_if #(
     endtask : rx_mosi
 
     protected task tx_miso();
-      begin  
+      begin
         wait (cs_active);
-        if (!miso_mbx.try_get(miso_reg)) begin
-          miso_reg = default_miso_data;
-        end
         while (cs_active) begin
-          for (int i = 0; i<DATA_DLENGTH; i=i+1) begin
+          if (!miso_mbx.try_peek(miso_reg)) begin // try to get an item from the mbx, without popping it
+            miso_reg = default_miso_data;
+          end
+          if (CPHA==0) begin // early drive and shift if CPHA=0
+            miso_drive <= miso_reg[DATA_DLENGTH-1];
+            miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
+          end
+          for (int i = 0; i<DATA_DLENGTH; i++) begin
             fork
               begin
                 wait (!cs_active);
               end
               begin
-                @(drive_cb);
+                @(posedge drive_edge);
               end
             join_any
+            disable fork;
             if (!cs_active) begin
+              if (i != 0) begin // if i!=0, we got !cs_active in the middle of a transaction
+                $display("[SPI VIP] tx_miso: early exit due to unexpected CS inactive!");
+              end
               break;
             end
-            $display("miso_reg = %h",miso_reg);
-            drive_cb.miso <= miso_reg[DATA_DLENGTH-1];
-            miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
+            if (!(CPHA==0 && i==DATA_DLENGTH-1)) begin // don't shift at last edge if CPHA=0
+              miso_drive <= #(SLAVE_TOUT) miso_reg[DATA_DLENGTH-1];
+              miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
+            end
+            if (i==DATA_DLENGTH-1) begin
+              miso_mbx.get(miso_reg); // finally pop an item from the mbx after a complete transfer
+            end
           end
-        end        
+        end
       end
     endtask : tx_miso
 
     protected task cs_tristate();
-      @(cs_cb) begin
+      @(cs) begin
         if (intf_slave_mode) begin
           if (!cs_active) begin
-            cs_cb.miso <= 'z;
+            miso_oen <= #(CS_TO_MISO*1ns) 1'b0;
           end else begin
-            cs_cb.miso <= miso_reg[DATA_DLENGTH-1];
+            miso_oen <= #(CS_TO_MISO*1ns) 1'b1;
           end      
         end
       end
@@ -171,9 +180,9 @@ interface spi_vip_if #(
           forever begin
             tx_miso();
           end
-          //forever begin
-            //cs_tristate();
-          //end
+          forever begin
+            cs_tristate();
+          end
       join
     endtask : run
 
@@ -189,9 +198,7 @@ interface spi_vip_if #(
       input int unsigned data);
       bit [DATA_DLENGTH-1:0] txdata;
       begin
-        $display("put_tx_data: %h",data);
         txdata = data;
-        $display("txdata: %h",txdata);
         miso_mbx.put(txdata);
       end
     endtask
@@ -218,7 +225,7 @@ interface spi_vip_if #(
           fork
             begin
               @(posedge this.stop_flag);
-              $display("Stop event triggered.");
+              $display("[SPI VIP] Stop event triggered.");
             end
             begin
               this.run();
@@ -227,7 +234,7 @@ interface spi_vip_if #(
           disable fork;
           this.clear_active();
         end else begin
-          $error("Already running!");
+          $error("[SPI VIP] Already running!");
         end
       end
     endtask
@@ -246,10 +253,10 @@ interface spi_vip_if #(
     .CPHA         (CPHA),
     .INV_CS       (INV_CS),
     .DATA_DLENGTH (DATA_DLENGTH),
-    .SLAVE_TSU    (SLAVE_TSU),
-    .SLAVE_TH     (SLAVE_TH),
-    .MASTER_TSU   (MASTER_TSU),
-    .MASTER_TH    (MASTER_TH),
+    .SLAVE_TIN    (SLAVE_TIN),
+    .SLAVE_TOUT   (SLAVE_TOUT),
+    .MASTER_TIN   (MASTER_TIN),
+    .MASTER_TOUT  (MASTER_TOUT),
     .CS_TO_MISO   (CS_TO_MISO)
   ) driver = new();
 

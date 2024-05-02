@@ -44,11 +44,12 @@ adi_sim_project_files [list \
  "../common/sv/test_harness_env.sv" \
  "../common/sv/spi_engine_instr_pkg.sv" \
  "spi_environment.sv" \
- "tests/test_vip.sv" \
+ "tests/test_program.sv" \
+ "tests/test_sleep_delay.sv" \
  "system_tb.sv" \
  ]
 
 #set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_vip"
+adi_sim_add_define "TEST_PROGRAM=test_program"
 
 adi_sim_generate $project_name

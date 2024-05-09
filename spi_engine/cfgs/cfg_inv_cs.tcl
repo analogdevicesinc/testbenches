@@ -24,4 +24,4 @@ set ad_project_params(SDI_PHY_DELAY)        18
 set ad_project_params(CLOCK_DIVIDER)        2
 set ad_project_params(NUM_OF_WORDS)         1
 set ad_project_params(NUM_OF_TRANSFERS)     4
-set ad_project_params(CS_ACTIVE_HIGH)       0
+set ad_project_params(CS_ACTIVE_HIGH)       1

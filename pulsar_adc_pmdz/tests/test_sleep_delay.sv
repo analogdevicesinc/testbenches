@@ -49,7 +49,7 @@ import test_harness_env_pkg::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0171;
+localparam PCORE_VERSION              = 32'h0001_0200;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 32;

@@ -84,7 +84,6 @@ set_property -dict [list \
  ] \
  [ipx::get_hdl_parameters CPOL -of_objects $cc]
 
-
  ## CPHA
 set_property -dict [list \
   "value_format" "bool" \
@@ -161,8 +160,6 @@ set_property -dict [list \
   "value_validation_range_maximum" "32" \
  ] \
  [ipx::get_user_parameters DATA_DLENGTH -of_objects $cc]
-
-
 
 ## Customize IP Layout
 

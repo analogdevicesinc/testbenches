@@ -53,16 +53,16 @@ source ./spi_engine_test_bd.tcl
 
 # Add test-specific VIPs
 set spi_s_vip_cfg [ list \
-    MODE            0 \
-    CPOL            $ad_project_params(CPOL) \
-    CPHA            $ad_project_params(CPHA) \
-    INV_CS          0 \
-    SLAVE_TIN       $ad_project_params(SLAVE_TIN) \
-    SLAVE_TOUT      $ad_project_params(SLAVE_TOUT)  \
-    MASTER_TIN      $ad_project_params(MASTER_TIN)    \
-    MASTER_TOUT     $ad_project_params(MASTER_TOUT) \
-    CS_TO_MISO      $ad_project_params(CS_TO_MISO)    \
-    DATA_DLENGTH    $ad_project_params(DATA_DLENGTH) \
+    MODE            0                                   \
+    CPOL            $ad_project_params(CPOL)            \
+    CPHA            $ad_project_params(CPHA)            \
+    INV_CS          0                                   \
+    SLAVE_TIN       $ad_project_params(SLAVE_TIN)       \
+    SLAVE_TOUT      $ad_project_params(SLAVE_TOUT)      \
+    MASTER_TIN      $ad_project_params(MASTER_TIN)      \
+    MASTER_TOUT     $ad_project_params(MASTER_TOUT)     \
+    CS_TO_MISO      $ad_project_params(CS_TO_MISO)      \
+    DATA_DLENGTH    $ad_project_params(DATA_DLENGTH)    \
 ]
 puts "CPOL: "
 puts [$ad_project_params(CPOL)]

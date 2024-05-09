@@ -95,8 +95,8 @@ module adi_spi_vip #(
     end else if (MODE == MODE_MASTER) begin
       assign IF.miso = m_spi_miso;
       assign m_spi_mosi = IF.mosi;
-      assign IF.sclk = m_spi_sclk;
-      assign IF.cs = m_spi_cs;
+      assign m_spi_sclk = IF.sclk;
+      assign m_spi_cs = IF.cs;
       initial begin
         IF.set_master_mode();
       end

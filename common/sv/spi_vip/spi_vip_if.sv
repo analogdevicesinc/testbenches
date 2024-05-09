@@ -50,14 +50,14 @@ interface spi_vip_if #(
     intf_slave_mode   = 0;
     intf_master_mode  = 1;
     intf_monitor_mode = 0;
-    $fatal("Unsupported mode master"); //FIXME
+    $fatal("Unsupported mode master"); //TODO
   endfunction : set_master_mode
 
   function void set_monitor_mode();
     intf_slave_mode   = 0;
     intf_master_mode  = 0;
     intf_monitor_mode = 1;
-    $fatal("Unsupported mode monitor"); //FIXME
+    $fatal("Unsupported mode monitor"); //TODO
   endfunction : set_monitor_mode
 
 

@@ -54,7 +54,7 @@ create_bd_port -dir I offload_trigger
 source $ad_hdl_dir/library/i3c_controller/scripts/i3c_controller_bd.tcl
 
 set async_clk 0
-set clk_mod 0
+set clk_mod $ad_project_params(CLK_MOD)
 set offload 1
 set max_devs 16
 

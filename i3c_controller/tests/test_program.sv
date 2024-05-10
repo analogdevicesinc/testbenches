@@ -64,6 +64,17 @@ import test_harness_env_pkg::*;
   join
 
 //---------------------------------------------------------------------------
+// Aliases
+//---------------------------------------------------------------------------
+`define DUT_I3C_CORE $root.system_tb.test_harness.i3c.core.inst
+`define DUT_I3C_HOST $root.system_tb.test_harness.i3c.host_interface.inst
+`define DUT_I3C_WORD    `DUT_I3C_CORE.i_i3c_controller_word
+`define DUT_I3C_BIT_MOD `DUT_I3C_CORE.i_i3c_controller_bit_mod
+`define DUT_I3C_FRAMING `DUT_I3C_CORE.i_i3c_controller_framing
+`define DUT_I3C_REGMAP  `DUT_I3C_HOST.i_i3c_controller_regmap
+`define STOP `DUT_I3C_WORD.st == `CMDW_STOP_OD | `DUT_I3C_WORD.st == `CMDW_STOP_PP
+
+//---------------------------------------------------------------------------
 // I3C sanity definitions
 //---------------------------------------------------------------------------
 localparam I3C_VERSION_CHECK   = 32'h0000_0100;
@@ -120,17 +131,6 @@ localparam I2C_CMD_1           = {3'b010, 12'd2, DEVICE_SA1[6:0], 1'b0};
 localparam I2C_CMD_2           = {3'b010, 12'd5, DEVICE_SA2[6:0], 1'b1};
 // Write 6 bytes
 localparam I2C_CMD_3           = {3'b010, 12'd6, DEVICE_SA1[6:0], 1'b0};
-
-//---------------------------------------------------------------------------
-// Aliases
-//---------------------------------------------------------------------------
-`define DUT_I3C_CORE $root.system_tb.test_harness.i3c.core.inst
-`define DUT_I3C_HOST $root.system_tb.test_harness.i3c.host_interface.inst
-`define DUT_I3C_WORD    `DUT_I3C_CORE.i_i3c_controller_word
-`define DUT_I3C_BIT_MOD `DUT_I3C_CORE.i_i3c_controller_bit_mod
-`define DUT_I3C_FRAMING `DUT_I3C_CORE.i_i3c_controller_framing
-`define DUT_I3C_REGMAP  `DUT_I3C_HOST.i_i3c_controller_regmap
-`define STOP `DUT_I3C_WORD.st == `CMDW_STOP_OD | `DUT_I3C_WORD.st == `CMDW_STOP_PP
 
 program test_program (
   input  i3c_irq,
@@ -677,7 +677,7 @@ task ibi_i3c_test();
   // Unask IBI, CMDR interrupt
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h60);
 
-  // Enable IBI
+  // Listen & Enable IBI
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b11);
 
   // Test #1, peripheral does IBI request by pulling SDA low
@@ -785,6 +785,23 @@ task ibi_i3c_test();
     `ERROR(("Wrong IBI DA"));
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
 
+  // Test #6, peripheral does IBI request by pulling SDA low, but
+  // IBI is disabled while listening to them.
+  // Expected result: the controller rejects the IBI by NACKIng the,
+  // request. No ibi is written to the FIFO.
+
+  // Listen & Disable IBI
+  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b10);
+
+  #12000ns
+  `INFO(("IBI I3C Test #6"));
+  auto_ack <= 1'b0;
+  write_ibi_da(DEVICE_DA1+1);
+
+  #10000ns
+  if (`DUT_I3C_REGMAP.ibi_fifo_valid)
+    `ERROR(("IBI should not have thrown IBI"));
+
   auto_ack <= 1'b1;
 
   // Clear any sdi data from the cmd
@@ -874,6 +891,8 @@ endtask
 //---------------------------------------------------------------------------
 // Device Characteristics I3C Test
 //---------------------------------------------------------------------------
+// NOTE: in a software implementation, DEV_CHAR is written after the DAA, with
+// information from the acquired BCR.
 bit [3:0]  dev_char_0 = 4'b1110;
 bit [3:0]  dev_char_1 = 4'b0010;
 bit [3:0]  dev_char_2 = 4'b0011;

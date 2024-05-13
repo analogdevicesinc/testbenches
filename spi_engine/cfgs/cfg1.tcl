@@ -30,3 +30,17 @@ set ad_project_params(NUM_OF_WORDS)         3
 set ad_project_params(NUM_OF_TRANSFERS)     5
 set ad_project_params(CS_ACTIVE_HIGH)       0
 set ad_project_params(ECHO_SCLK_DELAY)      0.1
+
+set spi_s_vip_cfg [ list \
+    MODE            0                                   \
+    CPOL            $ad_project_params(CPOL)            \
+    CPHA            $ad_project_params(CPHA)            \
+    INV_CS          0                                   \
+    SLAVE_TIN       $ad_project_params(SLAVE_TIN)       \
+    SLAVE_TOUT      $ad_project_params(SLAVE_TOUT)      \
+    MASTER_TIN      $ad_project_params(MASTER_TIN)      \
+    MASTER_TOUT     $ad_project_params(MASTER_TOUT)     \
+    CS_TO_MISO      $ad_project_params(CS_TO_MISO)      \
+    DATA_DLENGTH    $ad_project_params(DATA_DLENGTH)    \
+]
+set ad_project_params(spi_s_vip_cfg) $spi_s_vip_cfg

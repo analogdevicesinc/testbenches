@@ -130,14 +130,6 @@ package spi_environment_pkg;
       super.stop();      
     endtask
 
-
-    //============================================================================
-    // System reset routine
-    //============================================================================
-    task sys_reset;
-      super.sys_reset();
-    endtask
-
   endclass
 
 endpackage

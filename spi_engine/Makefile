@@ -29,8 +29,6 @@ SV_DEPS += system_tb.sv
 ENV_DEPS +=../../library/util_cdc/sync_bits.v
 ENV_DEPS +=../../library/common/ad_edge_detect.v
 
-ENV_DEPS +=../common/sv/spi_vip/component.xml
-
 ENV_DEPS += system_project.tcl
 ENV_DEPS += system_bd.tcl
 ENV_DEPS +=../scripts/adi_sim.tcl
@@ -45,6 +43,8 @@ LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
 LIB_DEPS += sysid_rom
+
+SIM_LIB_DEPS +=spi_vip
 
 # default test programs
 # Format is: <test name>

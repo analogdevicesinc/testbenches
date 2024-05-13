@@ -52,34 +52,12 @@ adi_project_files [list \
 source ./spi_engine_test_bd.tcl
 
 # Add test-specific VIPs
-set spi_s_vip_cfg [ list \
-    MODE            0                                   \
-    CPOL            $ad_project_params(CPOL)            \
-    CPHA            $ad_project_params(CPHA)            \
-    INV_CS          0                                   \
-    SLAVE_TIN       $ad_project_params(SLAVE_TIN)       \
-    SLAVE_TOUT      $ad_project_params(SLAVE_TOUT)      \
-    MASTER_TIN      $ad_project_params(MASTER_TIN)      \
-    MASTER_TOUT     $ad_project_params(MASTER_TOUT)     \
-    CS_TO_MISO      $ad_project_params(CS_TO_MISO)      \
-    DATA_DLENGTH    $ad_project_params(DATA_DLENGTH)    \
-]
 puts "CPOL: "
 puts [$ad_project_params(CPOL)]
 puts "CPHA: "
 puts [$ad_project_params(CPHA)]
 
-ad_ip_instance adi_spi_vip spi_s_vip
-ad_ip_parameter spi_s_vip CONFIG.MODE           0
-ad_ip_parameter spi_s_vip CONFIG.CPOL           $ad_project_params(CPOL)
-ad_ip_parameter spi_s_vip CONFIG.CPHA           $ad_project_params(CPHA)
-ad_ip_parameter spi_s_vip CONFIG.INV_CS         0
-ad_ip_parameter spi_s_vip CONFIG.SLAVE_TIN      $ad_project_params(SLAVE_TIN)
-ad_ip_parameter spi_s_vip CONFIG.SLAVE_TOUT     $ad_project_params(SLAVE_TOUT)
-ad_ip_parameter spi_s_vip CONFIG.MASTER_TIN     $ad_project_params(MASTER_TIN)
-ad_ip_parameter spi_s_vip CONFIG.MASTER_TOUT    $ad_project_params(MASTER_TOUT)
-ad_ip_parameter spi_s_vip CONFIG.CS_TO_MISO     $ad_project_params(CS_TO_MISO)
-ad_ip_parameter spi_s_vip CONFIG.DATA_DLENGTH   $ad_project_params(DATA_DLENGTH)
+ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
 
 adi_sim_add_define "SPI_S=spi_s_vip"
 ad_connect spi_engine/m_spi spi_s_vip/s_spi

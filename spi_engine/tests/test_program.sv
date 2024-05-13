@@ -141,7 +141,7 @@ initial begin
   setLoggerVerbosity(6);
   env.start();
 
-  env.spi_agent.set_default_miso_data('h2AA55);
+  env.spi_seq.set_default_miso_data('h2AA55);
 
   env.sys_reset();
 

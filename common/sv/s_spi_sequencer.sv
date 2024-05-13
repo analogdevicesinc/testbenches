@@ -42,7 +42,7 @@ package s_spi_sequencer_pkg;
 
   class s_spi_sequencer;
 
-    adi_spi_agent agent;
+    protected adi_spi_agent agent;
 
     function new(adi_spi_agent agent);
       this.agent = agent;    
@@ -67,5 +67,11 @@ package s_spi_sequencer_pkg;
     virtual task flush_send();
       this.agent.flush_send();
     endtask : flush_send
+
+    virtual function void set_default_miso_data(input int unsigned data);
+      this.agent.set_default_miso_data(data);
+    endfunction : set_default_miso_data
+
+
   endclass
 endpackage

@@ -85,7 +85,6 @@ package test_harness_env_pkg;
       // Creating the agents
       mng_agent = new("AXI Manager agent", mng_vip_if);
       ddr_axi_agent = new("AXI DDR stub agent", ddr_vip_if);
-      
 
       // Creating the sequencers
       mng = new(mng_agent);

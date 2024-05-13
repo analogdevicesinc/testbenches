@@ -53,11 +53,7 @@ module adi_spi_vip #(
   output  logic m_spi_sclk,
   output  wire  m_spi_mosi,
   input   wire  m_spi_miso,
-  output  logic m_spi_cs,
-  input   logic mon_spi_sclk,
-  input   wire  mon_spi_mosi,
-  input   wire  mon_spi_miso,
-  input   logic mon_spi_cs
+  output  logic m_spi_cs
 );
 
   localparam MODE_SLAVE   = 0;
@@ -101,10 +97,14 @@ module adi_spi_vip #(
         IF.set_master_mode();
       end
     end else if (MODE == MODE_MONITOR) begin
-      assign IF.miso = mon_spi_miso;
-      assign IF.mosi = mon_spi_mosi;
-      assign IF.miso = mon_spi_miso;
-      assign IF.cs   = mon_spi_cs;
+      assign IF.miso = m_spi_miso;
+      assign IF.mosi = s_spi_mosi;
+      assign IF.miso = s_spi_miso;
+      assign IF.cs   = s_spi_cs;
+      assign s_spi_miso = m_spi_miso;
+      assign m_spi_mosi = s_spi_mosi;
+      assign m_spi_sclk = s_spi_sclk;
+      assign m_spi_cs   = s_spi_cs;
       initial begin
         IF.intf_monitor_mode();
       end

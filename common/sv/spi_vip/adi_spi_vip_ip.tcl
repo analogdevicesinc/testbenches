@@ -40,22 +40,11 @@ adi_add_bus "m_spi" "master" \
     {"m_spi_mosi" "sdo"} \
     {"m_spi_cs" "cs"} \
   }
-adi_add_bus "mon_spi" "monitor" \
-  "analog.com:interface:spi_engine_rtl:1.0" \
-  "analog.com:interface:spi_engine:1.0" \
-  {
-    {"mon_spi_sclk" "sclk"} \
-    {"mon_spi_miso" "sdi"} \
-    {"mon_spi_mosi" "sdo"} \
-    {"mon_spi_cs" "cs"} \
-  }
 
   adi_set_bus_dependency "s_spi" "s_spi" \
-  "(spirit:decode(id('MODELPARAM_VALUE.MODE')) == 0)"
+  "(spirit:decode(id('MODELPARAM_VALUE.MODE')) == 0) || (spirit:decode(id('MODELPARAM_VALUE.MODE')) == 2)"
     adi_set_bus_dependency "m_spi" "m_spi" \
-  "(spirit:decode(id('MODELPARAM_VALUE.MODE')) == 1)"
-    adi_set_bus_dependency "mon_spi" "mon_spi" \
-  "(spirit:decode(id('MODELPARAM_VALUE.MODE')) == 2)"
+  "(spirit:decode(id('MODELPARAM_VALUE.MODE')) == 1) || (spirit:decode(id('MODELPARAM_VALUE.MODE')) == 2)"
 
 ## Parameter validations
 

@@ -75,14 +75,12 @@ spi_environment env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-
   env.mng.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-
   env.mng.RegRead32(raddr,data);
 endtask
 
@@ -92,32 +90,29 @@ endtask
 task axi_write(
     input [31:0]  waddr,
     input [31:0]  wdata);
-
   env.mng.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
 // Wrapper function for SPI receive (from DUT)
 // --------------------------
-task spi_receive;
-    output [`DATA_DLENGTH:0]  data;
-
+task spi_receive(
+    output [`DATA_DLENGTH:0]  data);
   env.spi_seq.receive_data(data);
 endtask
 
 // --------------------------
 // Wrapper function for SPI send (to DUT)
 // --------------------------
-task spi_send;
-    input [`DATA_DLENGTH:0]  data;
-
+task spi_send(
+    input [`DATA_DLENGTH:0]  data);
   env.spi_seq.send_data(data);
 endtask
 
 // --------------------------
 // Wrapper function for waiting for all SPI
 // --------------------------
-task spi_wait_send;
+task spi_wait_send();
   env.spi_seq.flush_send();
 endtask
 
@@ -177,7 +172,6 @@ endtask
 
 task generate_transfer_cmd(
     input [7:0] sync_id);
-
   // assert CSN
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `cs(8'hFE));
   // transfer data
@@ -246,62 +240,63 @@ bit [`DATA_DLENGTH-1:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF
 bit [`DATA_DLENGTH-1:0] temp_data;
 
 task offload_spi_test();
-    //Configure DMA
-    env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-    env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
-      `SET_DMAC_FLAGS_TLAST(1) |
-      `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
-      ); // Use TLAST
-    env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
-    env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
-    env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  //Configure DMA
+  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
+    `SET_DMAC_FLAGS_TLAST(1) |
+    `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
+    ); // Use TLAST
+  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
+  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
+  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
-    // Configure the Offload module
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-    if (`CS_ACTIVE_HIGH) begin
-      axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs_inv_mask(8'hFF));
-    end
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs(8'hFE));
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs(8'hFF));
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+  // Configure the Offload module
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+  if (`CS_ACTIVE_HIGH) begin
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs_inv_mask(8'hFF));
+  end
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs(8'hFE));
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs(8'hFF));
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
-    // Enqueue transfers to DUT
-    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-      temp_data = $urandom;
-      spi_send(temp_data);
-      offload_sdi_data_store_arr[i] = temp_data;
-    end
+  // Enqueue transfers to DUT
+  for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
+    temp_data = $urandom;
+    spi_send(temp_data);
+    offload_sdi_data_store_arr[i] = temp_data;
+  end
 
-    // Start the offload
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-    `INFOV(("Offload started."),6);
+  // Start the offload
+  #100ns
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+  `INFOV(("Offload started."),6);
 
-    spi_wait_send();
+  spi_wait_send();
 
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
-    `INFOV(("Offload stopped."),6);
+  `INFOV(("Offload stopped."),6);
 
-    #2000ns
+  #2000ns
 
-    for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
-    end
+  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
+    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+  end
 
-    if (irq_pending == 'h0) begin
-      `ERROR(("IRQ Test FAILED"));
-    end else begin
-      `INFO(("IRQ Test PASSED"));
-    end
+  if (irq_pending == 'h0) begin
+    `ERROR(("IRQ Test FAILED"));
+  end else begin
+    `INFO(("IRQ Test PASSED"));
+  end
 
-    if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-      `ERROR(("Offload Test FAILED"));
-    end else begin
-      `INFO(("Offload Test PASSED"));
-    end
+  if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
+    `ERROR(("Offload Test FAILED"));
+  end else begin
+    `INFO(("Offload Test PASSED"));
+  end
 endtask
 
 //---------------------------------------------------------------------------

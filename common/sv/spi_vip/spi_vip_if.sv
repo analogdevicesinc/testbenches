@@ -104,7 +104,7 @@ interface spi_vip_if #(
 
     protected task rx_mosi();
       static logic [DATA_DLENGTH-1:0] mosi_data;
-      begin
+      forever begin
         if (intf_slave_mode) begin
           wait (cs_active); 
           while (cs_active) begin
@@ -122,7 +122,7 @@ interface spi_vip_if #(
     endtask : rx_mosi
 
     protected task tx_miso();
-      begin
+      forever begin
         wait (cs_active);
         while (cs_active) begin
           if (!miso_mbx.try_peek(miso_reg)) begin // try to get an item from the mbx, without popping it
@@ -135,13 +135,17 @@ interface spi_vip_if #(
           for (int i = 0; i<DATA_DLENGTH; i++) begin
             fork
               begin
-                wait (!cs_active);
+                fork
+                  begin
+                    wait (!cs_active);
+                  end
+                  begin
+                    @(posedge drive_edge);
+                  end
+                join_any
+                disable fork;
               end
-              begin
-                @(posedge drive_edge);
-              end
-            join_any
-            disable fork;
+            join
             if (!cs_active) begin
               if (i != 0) begin // if i!=0, we got !cs_active in the middle of a transaction
                 $display("[SPI VIP] tx_miso: early exit due to unexpected CS inactive!");
@@ -161,7 +165,8 @@ interface spi_vip_if #(
     endtask : tx_miso
 
     protected task cs_tristate();
-      @(cs) begin
+      forever begin
+        @(cs) 
         if (intf_slave_mode) begin
           if (!cs_active) begin
             miso_oen <= #(CS_TO_MISO*1ns) 1'b0;
@@ -174,13 +179,13 @@ interface spi_vip_if #(
 
     protected task run();
       fork
-          forever begin
+          begin
             rx_mosi();
           end
-          forever begin
+          begin
             tx_miso();
           end
-          forever begin
+          begin
             cs_tristate();
           end
       join
@@ -189,59 +194,56 @@ interface spi_vip_if #(
     function void set_default_miso_data(
       input bit [DATA_DLENGTH-1:0] default_data
     );
-      begin
-        this.default_miso_data = default_data;
-      end
+      this.default_miso_data = default_data;
     endfunction : set_default_miso_data
 
     task put_tx_data(
       input int unsigned data);
       bit [DATA_DLENGTH-1:0] txdata;
-      begin
-        txdata = data;
-        miso_mbx.put(txdata);
-      end
+      txdata = data;
+      miso_mbx.put(txdata);
     endtask
 
     task get_rx_data(
       output int unsigned data);
       bit [DATA_DLENGTH-1:0] rxdata;
-      begin
-        mosi_mbx.get(rxdata);
-        data = rxdata;
-      end
+      mosi_mbx.get(rxdata);
+      data = rxdata;
     endtask
 
     task flush_tx();
-      begin
-        wait (miso_mbx.num()==0);
-      end
+      wait (miso_mbx.num()==0);
     endtask
 
     task start();
-      begin
-        if (!this.get_active()) begin
-          this.set_active();
-          fork
-            begin
-              @(posedge this.stop_flag);
-              $display("[SPI VIP] Stop event triggered.");
-            end
-            begin
-              this.run();
-            end
-          join_any
-          disable fork;
-          this.clear_active();
-        end else begin
-          $error("[SPI VIP] Already running!");
-        end
+      if (!this.get_active()) begin
+        this.set_active();
+        fork
+          begin
+            fork
+              begin
+                @(posedge this.stop_flag);
+                $display("[SPI VIP] Stop event triggered.");
+                this.stop_flag = 0;
+              end
+              begin
+                this.run();
+              end
+            join_any
+            disable fork;
+          end
+        join
+        this.clear_active();
+      end else begin
+        $error("[SPI VIP] Already running!");
       end
     endtask
 
     task stop();
-      begin
+      if (this.get_active()) begin
         this.stop_flag = 1;
+      end else begin
+        $error("[SPI VIP] Already inactive!");
       end
     endtask
 

@@ -91,8 +91,8 @@ package spi_environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      spi_agent.start();
       super.start();
+      spi_agent.start();      
     endtask
 
     //============================================================================

@@ -11,6 +11,7 @@ HDL_LIBRARY_PATH := $(ADI_HDL_DIR)/library/
 LIBRARY_NAME := adi_spi_vip
 
 GENERIC_DEPS += ../utils.svh
+GENERIC_DEPS += ../logger_pkg.sv
 GENERIC_DEPS += adi_spi_vip_pkg.sv
 GENERIC_DEPS += spi_vip_if.sv
 GENERIC_DEPS += adi_spi_vip.sv

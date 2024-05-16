@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv " />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="133.600001 us"></ZoomEndTime>
+      <Cursor1Time time="29.885000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="204"></NameColumnWidth>
+      <ValueColumnWidth column_width="127"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="8" />
+   <wvobject type="logic" fp_name="/system_tb/spi_execution_spi_cs">
+      <obj_property name="ElementShortName">spi_execution_spi_cs</obj_property>
+      <obj_property name="ObjectShortName">spi_execution_spi_cs</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/spi_execution_spi_sclk">
+      <obj_property name="ElementShortName">spi_execution_spi_sclk</obj_property>
+      <obj_property name="ObjectShortName">spi_execution_spi_sclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/spi_execution_spi_clk">
+      <obj_property name="ElementShortName">spi_execution_spi_clk</obj_property>
+      <obj_property name="ObjectShortName">spi_execution_spi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/spi_execution_spi_sdi">
+      <obj_property name="ElementShortName">spi_execution_spi_sdi</obj_property>
+      <obj_property name="ObjectShortName">spi_execution_spi_sdi</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/spi_execution_spi_sdo">
+      <obj_property name="ElementShortName">spi_execution_spi_sdo</obj_property>
+      <obj_property name="ObjectShortName">spi_execution_spi_sdo</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/spi_execution_trigger">
+      <obj_property name="ElementShortName">spi_execution_trigger</obj_property>
+      <obj_property name="ObjectShortName">spi_execution_trigger</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/offload_captured_word_arr">
+      <obj_property name="ElementShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/offload_sdi_data_store_arr">
+      <obj_property name="ElementShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_read_data">
+      <obj_property name="ElementShortName">sdi_read_data[19:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_read_data[19:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_read_data_store">
+      <obj_property name="ElementShortName">sdi_read_data_store[19:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_read_data_store[19:0][31:0]</obj_property>
+   </wvobject>
+</wave_config>

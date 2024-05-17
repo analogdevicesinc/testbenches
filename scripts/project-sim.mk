@@ -142,7 +142,6 @@ $(HDL_LIBRARY_PATH)%/component.xml: FORCE
 	flock $(dir $@).lock sh -c " \
 	$(MAKE) -C $(dir $@) $(TARGET); \
 	"; exit $$?
-FORCE:
 
 # Create here the targets which build the sim libraries
 $(ADI_HDL_DIR)/testbenches/common/sv/%/component.xml: TARGET:=xilinx
@@ -151,7 +150,6 @@ $(ADI_HDL_DIR)/testbenches/common/sv/%/component.xml: FORCE
 	flock $(dir $@).lock -c " \
 	$(MAKE) -C $(dir $@) xilinx; \
 	"; exit $$?
-FORCE:
 
 # Create here the targets which build the test env
 $(foreach cfg, $(BUILD_CFGS), $(eval $(call build, $(cfg))))

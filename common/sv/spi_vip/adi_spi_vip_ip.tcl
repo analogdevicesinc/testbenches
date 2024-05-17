@@ -11,6 +11,8 @@ adi_ip_files adi_spi_vip [list \
     "adi_spi_vip_pkg.sv" \
     "adi_spi_vip.sv" \
     "spi_vip_if.sv" \
+    "$ad_hdl_dir/testbenches/common/sv/utils.svh" \
+    "$ad_hdl_dir/testbenches/common/sv/logger_pkg.sv" \
 ]
 
 adi_ip_properties_lite adi_spi_vip

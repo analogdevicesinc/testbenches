@@ -1,3 +1,5 @@
+`include "utils.svh"
+
 interface spi_vip_if #(
   int CPOL=0,
   CPHA=0,
@@ -15,6 +17,7 @@ interface spi_vip_if #(
   logic cs;
 
   import adi_spi_vip_pkg::*;
+  import logger_pkg::*;
 
   // internal 
   logic intf_slave_mode;
@@ -50,14 +53,14 @@ interface spi_vip_if #(
     intf_slave_mode   = 0;
     intf_master_mode  = 1;
     intf_monitor_mode = 0;
-    $fatal("Unsupported mode master"); //TODO
+    `ERROR(("Unsupported mode master")); //TODO
   endfunction : set_master_mode
 
   function void set_monitor_mode();
     intf_slave_mode   = 0;
     intf_master_mode  = 0;
     intf_monitor_mode = 1;
-    $fatal("Unsupported mode monitor"); //TODO
+    `ERROR(("Unsupported mode monitor")); //TODO
   endfunction : set_monitor_mode
 
 
@@ -113,7 +116,7 @@ interface spi_vip_if #(
                 break;
               end
               @(posedge sample_edge)
-              mosi_data <= {mosi_data[DATA_DLENGTH-2:1], mosi_delayed};
+              mosi_data <= {mosi_data[DATA_DLENGTH-2:0], mosi_delayed};
             end    
             mosi_mbx.put(mosi_data);
           end
@@ -125,10 +128,12 @@ interface spi_vip_if #(
       forever begin
         wait (cs_active);
         while (cs_active) begin
-          if (!miso_mbx.try_peek(miso_reg)) begin // try to get an item from the mbx, without popping it
+           // try to get an item from the mailbox, without popping it
+          if (!miso_mbx.try_peek(miso_reg)) begin
             miso_reg = default_miso_data;
           end
-          if (CPHA==0) begin // early drive and shift if CPHA=0
+          // early drive and shift if CPHA=0
+          if (CPHA == 0) begin 
             miso_drive <= miso_reg[DATA_DLENGTH-1];
             miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
           end
@@ -147,17 +152,20 @@ interface spi_vip_if #(
               end
             join
             if (!cs_active) begin
-              if (i != 0) begin // if i!=0, we got !cs_active in the middle of a transaction
-                $display("[SPI VIP] tx_miso: early exit due to unexpected CS inactive!");
+              // if i!=0, we got !cs_active in the middle of a transaction
+              if (i != 0) begin
+                `ERROR(("tx_miso: early exit due to unexpected CS inactive!"));
               end
               break;
             end
-            if (!(CPHA==0 && i==DATA_DLENGTH-1)) begin // don't shift at last edge if CPHA=0
+            // don't shift at last edge if CPHA=0
+            if (!(CPHA == 0 && i == DATA_DLENGTH-1)) begin
               miso_drive <= #(SLAVE_TOUT) miso_reg[DATA_DLENGTH-1];
               miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
             end
-            if (i==DATA_DLENGTH-1) begin
-              miso_mbx.get(miso_reg); // finally pop an item from the mbx after a complete transfer
+            if (i == DATA_DLENGTH-1) begin
+              // finally pop an item from the mailbox after a complete transfer
+              miso_mbx.get(miso_reg);
             end
           end
         end
@@ -223,7 +231,7 @@ interface spi_vip_if #(
             fork
               begin
                 @(posedge this.stop_flag);
-                $display("[SPI VIP] Stop event triggered.");
+                `INFO(("[SPI VIP] Stop event triggered."));
                 this.stop_flag = 0;
               end
               begin
@@ -235,7 +243,7 @@ interface spi_vip_if #(
         join
         this.clear_active();
       end else begin
-        $error("[SPI VIP] Already running!");
+        `ERROR(("Already running!"));
       end
     endtask
 
@@ -243,7 +251,7 @@ interface spi_vip_if #(
       if (this.get_active()) begin
         this.stop_flag = 1;
       end else begin
-        $error("[SPI VIP] Already inactive!");
+        `ERROR(("Already inactive!"));
       end
     endtask
 

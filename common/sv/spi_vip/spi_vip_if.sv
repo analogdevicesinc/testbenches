@@ -83,6 +83,7 @@ interface spi_vip_if #(
     protected bit stop_flag;
     protected bit [DATA_DLENGTH-1:0] miso_reg;
     protected bit [DATA_DLENGTH-1:0] default_miso_data;
+    protected event tx_mbx_updated;
 
     function new();
       this.active = 0;
@@ -125,19 +126,26 @@ interface spi_vip_if #(
     endtask : rx_mosi
 
     protected task tx_miso();
+        bit using_default;
+        bit pending_mbx;
       forever begin
         wait (cs_active);
         while (cs_active) begin
            // try to get an item from the mailbox, without popping it
           if (!miso_mbx.try_peek(miso_reg)) begin
             miso_reg = default_miso_data;
+            using_default = 1'b1;
+          end else begin
+            using_default = 1'b0;
           end
+          pending_mbx = 1'b0;
           // early drive and shift if CPHA=0
           if (CPHA == 0) begin 
             miso_drive <= miso_reg[DATA_DLENGTH-1];
             miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
           end
           for (int i = 0; i<DATA_DLENGTH; i++) begin
+            $display("i=%0d",i);
             fork
               begin
                 fork
@@ -146,6 +154,10 @@ interface spi_vip_if #(
                   end
                   begin
                     @(posedge drive_edge);
+                  end
+                  begin
+                    @(tx_mbx_updated.triggered);
+                    pending_mbx = 1'b1;
                   end
                 join_any
                 disable fork;
@@ -157,15 +169,25 @@ interface spi_vip_if #(
                 `ERROR(("tx_miso: early exit due to unexpected CS inactive!"));
               end
               break;
-            end
-            // don't shift at last edge if CPHA=0
-            if (!(CPHA == 0 && i == DATA_DLENGTH-1)) begin
-              miso_drive <= #(SLAVE_TOUT) miso_reg[DATA_DLENGTH-1];
-              miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
-            end
-            if (i == DATA_DLENGTH-1) begin
-              // finally pop an item from the mailbox after a complete transfer
-              miso_mbx.get(miso_reg);
+            end else if (pending_mbx && using_default && i == 0) begin
+              // we were going to transmit default data, but new data arrived between the cs edge and drive_edge
+              using_default = 1'b0;
+              pending_mbx = 1'b0;
+              break;
+            end else begin
+              // drive_edge has arrived
+              // don't shift at last edge if CPHA=0
+              if (!(CPHA == 0 && i == DATA_DLENGTH-1)) begin
+                miso_drive <= #(SLAVE_TOUT) miso_reg[DATA_DLENGTH-1];
+                miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
+              end
+              if (i == DATA_DLENGTH-1) begin
+                `INFO(("[SPI VIP] MISO Tx end of transfer."));
+                if (!using_default) begin
+                  // finally pop an item from the mailbox after a complete transfer
+                  miso_mbx.get(miso_reg);
+                end
+              end
             end
           end
         end
@@ -210,6 +232,7 @@ interface spi_vip_if #(
       bit [DATA_DLENGTH-1:0] txdata;
       txdata = data;
       miso_mbx.put(txdata);
+      ->tx_mbx_updated;
     endtask
 
     task get_rx_data(

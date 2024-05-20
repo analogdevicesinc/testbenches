@@ -111,7 +111,6 @@ endtask
 // Wrapper function for waiting for all SPI
 // --------------------------
 task spi_wait_send();
-task spi_wait_send();
   env.spi_seq.flush_send();
 endtask
 

@@ -35,7 +35,7 @@ set spi_s_vip_cfg [ list \
     MODE            0                                   \
     CPOL            $ad_project_params(CPOL)            \
     CPHA            $ad_project_params(CPHA)            \
-    INV_CS          0                                   \
+    INV_CS          $ad_project_params(CS_ACTIVE_HIGH)  \
     SLAVE_TIN       $ad_project_params(SLAVE_TIN)       \
     SLAVE_TOUT      $ad_project_params(SLAVE_TOUT)      \
     MASTER_TIN      $ad_project_params(MASTER_TIN)      \

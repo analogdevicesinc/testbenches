@@ -19,7 +19,7 @@ package environment_pkg;
 
   class environment extends test_harness_env;
 
-    // agents and sequencers
+    /* Add agents and sequencers */
 
     //============================================================================
     // Constructor
@@ -35,7 +35,7 @@ package environment_pkg;
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
     );
 
-      // creating the agents
+      // Creating the agents
       super.new(sys_clk_vip_if, 
                 dma_clk_vip_if, 
                 ddr_clk_vip_if, 

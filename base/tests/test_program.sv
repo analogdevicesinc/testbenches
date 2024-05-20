@@ -32,9 +32,7 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import axi_vip_pkg::*;
@@ -42,16 +40,12 @@ import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import environment_pkg::*;
 
-//=============================================================================
-// Register Maps
-//=============================================================================
-
 program test_program;
 
-  // declare the class instances
+  // Declare the class instances
   environment env;
 
-  // process variables
+  // Process variables
   process current_process;
   string current_process_random_state;
   
@@ -64,7 +58,7 @@ program test_program;
 
     setLoggerVerbosity(250);
 
-    // create environment
+    // Create environment
     env = new(`TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
@@ -76,11 +70,11 @@ program test_program;
     env.start();
     env.sys_reset();
 
-    // other configurations if necessary, before calling run
+    /* Add other configurations if necessary before calling run */
 
     env.run();
 
-    // stimulus
+    /* Add stimulus tasks */
         
     env.stop();
     

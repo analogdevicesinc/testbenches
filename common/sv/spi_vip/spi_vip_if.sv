@@ -145,7 +145,6 @@ interface spi_vip_if #(
             miso_reg = {miso_reg[DATA_DLENGTH-2:0], 1'b0};
           end
           for (int i = 0; i<DATA_DLENGTH; i++) begin
-            $display("i=%0d",i);
             fork
               begin
                 fork

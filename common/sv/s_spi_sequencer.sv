@@ -40,11 +40,11 @@ package s_spi_sequencer_pkg;
   import logger_pkg::*;
   import adi_spi_vip_pkg::*;
 
-  class s_spi_sequencer;
+  class s_spi_sequencer #(`SPI_VIP_IF_PARAM_DECL);
 
-    protected adi_spi_agent agent;
+    protected adi_spi_agent #(`SPI_VIP_IF_PARAM_ORDER) agent;
 
-    function new(adi_spi_agent agent);
+    function new(adi_spi_agent #(`SPI_VIP_IF_PARAM_ORDER) agent);
       this.agent = agent;    
     endfunction: new
 

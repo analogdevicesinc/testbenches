@@ -11,11 +11,13 @@ adi_ip_files adi_spi_vip [list \
     "adi_spi_vip_pkg.sv" \
     "adi_spi_vip.sv" \
     "spi_vip_if.sv" \
+    "adi_spi_vip_pkg.ttcl" \
     "$ad_hdl_dir/testbenches/common/sv/utils.svh" \
     "$ad_hdl_dir/testbenches/common/sv/logger_pkg.sv" \
 ]
 
 adi_ip_properties_lite adi_spi_vip
+adi_ip_sim_ttcl adi_spi_vip "adi_spi_vip_pkg.ttcl"
 
 set_property company_url {https://wiki.analog.com/resources/fpga/peripherals/spi_engine} [ipx::current_core]
 
@@ -152,6 +154,14 @@ set_property -dict [list \
  ] \
  [ipx::get_user_parameters DATA_DLENGTH -of_objects $cc]
 
+## DEFAULT_MISO_DATA
+set_property	-dict [list \
+  "value_bit_string_length" "32" \
+  "value_format" "bit_string" \
+  "enablement_tcl_expr" "\$MODE==0" \
+] \
+[ipx::get_user_parameters DEFAULT_MISO_DATA -of_objects $cc]
+
 ## Customize IP Layout
 
 ## Remove the automatically generated GUI page
@@ -201,6 +211,13 @@ set_property -dict [list \
   "display_name" "DATA_DLENGTH" \
   "tooltip" "\[DATA_DLENGTH\] Define the SPI word length" \
 ] [ipgui::get_guiparamspec -name "DATA_DLENGTH" -component $cc]
+
+ipgui::add_param -name "DEFAULT_MISO_DATA" -component $cc -parent $general_group 
+set_property -dict [list \
+  "display_name" "Default MISO data" \
+  "tooltip" "\[DEFAULT_MISO_DATA\] Default data sent by slave-mode VIP when it has nothing enqueued" \
+  "widget" "hexEdit" \
+] [ipgui::get_guiparamspec -name DEFAULT_MISO_DATA -component $cc]
 
 ipgui::add_param -name "SLAVE_TIN" -component $cc -parent $model_timing
 set_property -dict [list \

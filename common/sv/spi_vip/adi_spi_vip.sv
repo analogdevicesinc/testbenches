@@ -40,12 +40,12 @@ module adi_spi_vip #(
   parameter CPOL          = 0,
   parameter CPHA          = 0,
   parameter INV_CS        = 0,
+  parameter DATA_DLENGTH  = 16,
   parameter SLAVE_TIN     = 0,
   parameter SLAVE_TOUT    = 0,
   parameter MASTER_TIN    = 0,
   parameter MASTER_TOUT   = 0,
   parameter CS_TO_MISO    = 0,
-  parameter DATA_DLENGTH  = 16,
   parameter DEFAULT_MISO_DATA = 'hCAFE
 )  (
   input   logic s_spi_sclk,
@@ -64,15 +64,16 @@ module adi_spi_vip #(
   import logger_pkg::*;
   
   spi_vip_if #(
-    .CPOL         (CPOL),
-    .CPHA         (CPHA),
-    .INV_CS       (INV_CS),
-    .DATA_DLENGTH (DATA_DLENGTH),
-    .SLAVE_TIN    (SLAVE_TIN),
-    .SLAVE_TOUT   (SLAVE_TOUT),
-    .MASTER_TIN   (MASTER_TIN),
-    .MASTER_TOUT  (MASTER_TOUT),
-    .CS_TO_MISO   (CS_TO_MISO)
+    .CPOL               (CPOL),
+    .CPHA               (CPHA),
+    .INV_CS             (INV_CS),
+    .DATA_DLENGTH       (DATA_DLENGTH),
+    .SLAVE_TIN          (SLAVE_TIN),
+    .SLAVE_TOUT         (SLAVE_TOUT),
+    .MASTER_TIN         (MASTER_TIN),
+    .MASTER_TOUT        (MASTER_TOUT),
+    .CS_TO_MISO         (CS_TO_MISO),
+    .DEFAULT_MISO_DATA  (DEFAULT_MISO_DATA)
   ) IF ();
 
   initial begin : ASSERT_PARAMETERS
@@ -113,7 +114,5 @@ module adi_spi_vip #(
       end
     end
   endgenerate
-
-  
 
 endmodule

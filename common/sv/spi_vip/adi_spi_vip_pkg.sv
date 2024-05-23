@@ -37,22 +37,294 @@
 
 package adi_spi_vip_pkg;
 
-  virtual class adi_abstract_spi_driver;
-    pure virtual task put_tx_data(int unsigned data);
-    pure virtual task get_rx_data(output int unsigned data);
-    pure virtual task flush_tx();
-    pure virtual task start();
-    pure virtual task stop();
-    pure virtual function void set_default_miso_data(int unsigned data);
+  import logger_pkg::*;
+
+  `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
+                                    SPI_VIP_CPOL              ,\
+                                    SPI_VIP_CPHA              ,\
+                                    SPI_VIP_INV_CS            ,\
+                                    SPI_VIP_DATA_DLENGTH      ,\
+                                    SPI_VIP_SLAVE_TIN         ,\
+                                    SPI_VIP_SLAVE_TOUT        ,\
+                                    SPI_VIP_MASTER_TIN        ,\
+                                    SPI_VIP_MASTER_TOUT       ,\
+                                    SPI_VIP_CS_TO_MISO        ,\
+                                    SPI_VIP_DEFAULT_MISO_DATA 
+
+  `define SPI_VIP_PARAM_DECL  int   SPI_VIP_MODE              =0,\
+                                    SPI_VIP_CPOL              =0,\
+                                    SPI_VIP_CPHA              =0,\
+                                    SPI_VIP_INV_CS            =0,\
+                                    SPI_VIP_DATA_DLENGTH      =16,\
+                                    SPI_VIP_SLAVE_TIN         =0,\
+                                    SPI_VIP_SLAVE_TOUT        =0,\
+                                    SPI_VIP_MASTER_TIN        =0,\
+                                    SPI_VIP_MASTER_TOUT       =0,\
+                                    SPI_VIP_CS_TO_MISO        =0,\
+                                    SPI_VIP_DEFAULT_MISO_DATA ='hCAFE
+
+  `define SPI_VIP_PARAMS(th,vip)    th``_``vip``_0_VIP_MODE,\
+                                    th``_``vip``_0_VIP_CPOL,\
+                                    th``_``vip``_0_VIP_CPHA,\
+                                    th``_``vip``_0_VIP_INV_CS,\
+                                    th``_``vip``_0_VIP_DATA_DLENGTH,\
+                                    th``_``vip``_0_VIP_SLAVE_TIN,\
+                                    th``_``vip``_0_VIP_SLAVE_TOUT,\
+                                    th``_``vip``_0_VIP_MASTER_TIN,\
+                                    th``_``vip``_0_VIP_MASTER_TOUT,\
+                                    th``_``vip``_0_VIP_CS_TO_MISO,\
+                                    th``_``vip``_0_VIP_DEFAULT_MISO_DATA
+
+  `define SPI_VIP_IF_PARAM_ORDER  SPI_VIP_CPOL              ,\
+                                  SPI_VIP_CPHA              ,\
+                                  SPI_VIP_INV_CS            ,\
+                                  SPI_VIP_DATA_DLENGTH      ,\
+                                  SPI_VIP_SLAVE_TIN         ,\
+                                  SPI_VIP_SLAVE_TOUT        ,\
+                                  SPI_VIP_MASTER_TIN        ,\
+                                  SPI_VIP_MASTER_TOUT       ,\
+                                  SPI_VIP_CS_TO_MISO        ,\
+                                  SPI_VIP_DEFAULT_MISO_DATA 
+
+  `define SPI_VIP_IF_PARAM_DECL int SPI_VIP_CPOL              =0,\
+                                    SPI_VIP_CPHA              =0,\
+                                    SPI_VIP_INV_CS            =0,\
+                                    SPI_VIP_DATA_DLENGTH      =16,\
+                                    SPI_VIP_SLAVE_TIN         =0,\
+                                    SPI_VIP_SLAVE_TOUT        =0,\
+                                    SPI_VIP_MASTER_TIN        =0,\
+                                    SPI_VIP_MASTER_TOUT       =0,\
+                                    SPI_VIP_CS_TO_MISO        =0,\
+                                    SPI_VIP_DEFAULT_MISO_DATA ='hCAFE  
+
+  `define SPI_VIP_IF_PARAMS(th,vip) th``_``vip``_0_VIP_CPOL,\
+                                    th``_``vip``_0_VIP_CPHA,\
+                                    th``_``vip``_0_VIP_INV_CS,\
+                                    th``_``vip``_0_VIP_DATA_DLENGTH,\
+                                    th``_``vip``_0_VIP_SLAVE_TIN,\
+                                    th``_``vip``_0_VIP_SLAVE_TOUT,\
+                                    th``_``vip``_0_VIP_MASTER_TIN,\
+                                    th``_``vip``_0_VIP_MASTER_TOUT,\
+                                    th``_``vip``_0_VIP_CS_TO_MISO,\
+                                    th``_``vip``_0_VIP_DEFAULT_MISO_DATA
+
+
+
+  class adi_spi_driver #(`SPI_VIP_IF_PARAM_DECL);
+
+    typedef mailbox #(logic [SPI_VIP_DATA_DLENGTH-1:0]) spi_mbx_t;
+    protected spi_mbx_t mosi_mbx;
+    spi_mbx_t miso_mbx;
+    protected bit active;
+    protected bit stop_flag;
+    protected bit [SPI_VIP_DATA_DLENGTH-1:0] miso_reg;
+    protected bit [SPI_VIP_DATA_DLENGTH-1:0] default_miso_data;
+    protected event tx_mbx_updated;
+    virtual spi_vip_if #(`SPI_VIP_IF_PARAM_ORDER) vif;
+
+    function new(virtual spi_vip_if #(`SPI_VIP_IF_PARAM_ORDER) intf);
+      this.vif = intf;
+      this.active = 0;
+      this.stop_flag = 0;
+      this.default_miso_data = SPI_VIP_DEFAULT_MISO_DATA;
+      this.miso_mbx = new();
+      this.mosi_mbx = new();
+    endfunction
+
+
+    protected function get_active();
+      return(this.active);
+    endfunction : get_active
+
+    protected function void set_active();
+      this.active = 1;
+    endfunction : set_active
+
+    protected function void clear_active();
+      this.active = 0;
+    endfunction : clear_active
+
+    protected task rx_mosi();
+      static logic [SPI_VIP_DATA_DLENGTH-1:0] mosi_data;
+      forever begin
+        if (vif.intf_slave_mode) begin
+          wait (vif.cs_active); 
+          while (vif.cs_active) begin
+            for (int i = 0; i<SPI_VIP_DATA_DLENGTH; i++) begin
+              if (!vif.cs_active) begin
+                break;
+              end
+              @(posedge vif.sample_edge)
+              mosi_data <= {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
+            end    
+            mosi_mbx.put(mosi_data);
+          end
+        end
+      end
+    endtask : rx_mosi
+
+    protected task tx_miso();
+        bit using_default;
+        bit pending_mbx;
+      forever begin
+        if (vif.intf_slave_mode) begin
+          wait (vif.cs_active);
+          while (vif.cs_active) begin
+            // try to get an item from the mailbox, without popping it
+            if (!miso_mbx.try_peek(miso_reg)) begin
+              miso_reg = default_miso_data;
+              using_default = 1'b1;
+            end else begin
+              using_default = 1'b0;
+            end
+            pending_mbx = 1'b0;
+            // early drive and shift if CPHA=0
+            if (SPI_VIP_CPHA == 0) begin 
+              vif.miso_drive <= miso_reg[SPI_VIP_DATA_DLENGTH-1];
+              miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+            end
+            for (int i = 0; i<SPI_VIP_DATA_DLENGTH; i++) begin
+              fork
+                begin
+                  fork
+                    begin
+                      wait (!vif.cs_active);
+                    end
+                    begin
+                      @(posedge vif.drive_edge);
+                    end
+                    begin
+                      @(tx_mbx_updated.triggered);
+                      pending_mbx = 1'b1;
+                    end
+                  join_any
+                  disable fork;
+                end
+              join
+              if (!vif.cs_active) begin
+                // if i!=0, we got !cs_active in the middle of a transaction
+                if (i != 0) begin
+                  `ERROR(("tx_miso: early exit due to unexpected CS inactive!"));
+                end
+                break;
+              end else if (pending_mbx && using_default && i == 0) begin
+                // we were going to transmit default data, but new data arrived between the cs edge and vif.drive_edge
+                using_default = 1'b0;
+                pending_mbx = 1'b0;
+                break;
+              end else begin
+                // vif.drive_edge has arrived
+                // don't shift at last edge if CPHA=0
+                if (!(SPI_VIP_CPHA == 0 && i == SPI_VIP_DATA_DLENGTH-1)) begin
+                  vif.miso_drive <= #(SPI_VIP_SLAVE_TOUT) miso_reg[SPI_VIP_DATA_DLENGTH-1];
+                  miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+                end
+                if (i == SPI_VIP_DATA_DLENGTH-1) begin
+                  `INFO(("[SPI VIP] MISO Tx end of transfer."));
+                  if (!using_default) begin
+                    // finally pop an item from the mailbox after a complete transfer
+                    miso_mbx.get(miso_reg);
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    endtask : tx_miso
+
+    protected task cs_tristate();
+      forever begin
+        @(vif.cs) 
+        if (vif.intf_slave_mode) begin
+          if (!vif.cs_active) begin
+            vif.miso_oen <= #(SPI_VIP_CS_TO_MISO*1ns) 1'b0;
+          end else begin
+            vif.miso_oen <= #(SPI_VIP_CS_TO_MISO*1ns) 1'b1;
+          end      
+        end
+      end
+    endtask : cs_tristate
+
+    protected task run();
+      fork
+          begin
+            rx_mosi();
+          end
+          begin
+            tx_miso();
+          end
+          begin
+            cs_tristate();
+          end
+      join
+    endtask : run
+
+    function void set_default_miso_data(
+      input bit [SPI_VIP_DATA_DLENGTH-1:0] default_data
+    );
+      this.default_miso_data = default_data;
+    endfunction : set_default_miso_data
+
+    task put_tx_data(
+      input int unsigned data);
+      bit [SPI_VIP_DATA_DLENGTH-1:0] txdata;
+      txdata = data;
+      miso_mbx.put(txdata);
+      ->tx_mbx_updated;
+    endtask
+
+    task get_rx_data(
+      output int unsigned data);
+      bit [SPI_VIP_DATA_DLENGTH-1:0] rxdata;
+      mosi_mbx.get(rxdata);
+      data = rxdata;
+    endtask
+
+    task flush_tx();
+      wait (miso_mbx.num()==0);
+    endtask
+
+    task start();
+      if (!this.get_active()) begin
+        this.set_active();
+        fork
+          begin
+            fork
+              begin
+                @(posedge this.stop_flag);
+                `INFO(("[SPI VIP] Stop event triggered."));
+                this.stop_flag = 0;
+              end
+              begin
+                this.run();
+              end
+            join_any
+            disable fork;
+          end
+        join
+        this.clear_active();
+      end else begin
+        `ERROR(("Already running!"));
+      end
+    endtask
+
+    task stop();
+      if (this.get_active()) begin
+        this.stop_flag = 1;
+      end else begin
+        `ERROR(("Already inactive!"));
+      end
+    endtask
+
   endclass
 
-  class adi_spi_agent;
+  class adi_spi_agent #(`SPI_VIP_IF_PARAM_DECL);
 
-    adi_abstract_spi_driver driver;
+    protected adi_spi_driver #(`SPI_VIP_IF_PARAM_ORDER) driver;
 
-
-    function new(adi_abstract_spi_driver driver);
-      this.driver = driver;
+    function new(virtual spi_vip_if #(`SPI_VIP_IF_PARAM_ORDER) intf);
+      this.driver = new(intf);
     endfunction
 
     virtual task send_data(input int unsigned data);

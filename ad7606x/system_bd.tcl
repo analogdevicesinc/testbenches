@@ -56,7 +56,7 @@ create_bd_port -dir O sys_clk
 ad_connect sys_clk sys_cpu_clk
 
 ad_ip_parameter axi_ad7606x CONFIG.DEV_CONFIG $DEV_CONFIG
-ad_ip_parameter axi_ad7606x CONFIG.EXT_CLK $EXT_CLK
+ad_ip_parameter axi_ad7606x CONFIG.EXTERNAL_CLK $EXT_CLK
 
 set BA_AD7606X 0x44A00000
 set_property offset $BA_AD7606X [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad7606x}]
@@ -67,5 +67,5 @@ set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_a
 adi_sim_add_define "AD7606X_DMA_BA=[format "%d" ${BA_DMA}]"
 
 set BA_PWM 0x44A60000
-set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_pwm_gen}]
+set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad7606_pwm_gen}]
 adi_sim_add_define "AXI_PWMGEN_BA=[format "%d" ${BA_PWM}]"

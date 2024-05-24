@@ -39,6 +39,8 @@ LIB_DEPS += axi_sysid
 LIB_DEPS += sysid_rom
 LIB_DEPS += util_i2c_mixer
 LIB_DEPS += util_pack/util_cpack2 
+LIB_DEPS += util_cdc
+LIB_DEPS += util_axis_fifo
 
 # default test program
 TP := test_program

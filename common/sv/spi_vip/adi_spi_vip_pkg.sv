@@ -63,7 +63,7 @@ package adi_spi_vip_pkg;
                                     th``_``vip``_0_VIP_CS_TO_MISO,\
                                     th``_``vip``_0_VIP_DEFAULT_MISO_DATA
 
-  class adi_spi_driver #(`SPI_VIP_PARAM_ORDER);
+  class adi_spi_driver #(int `SPI_VIP_PARAM_ORDER);
 
     typedef mailbox #(logic [SPI_VIP_DATA_DLENGTH-1:0]) spi_mbx_t;
     protected spi_mbx_t mosi_mbx;
@@ -194,7 +194,7 @@ package adi_spi_vip_pkg;
             vif.miso_oen <= #(SPI_VIP_CS_TO_MISO*1ns) 1'b0;
           end else begin
             vif.miso_oen <= #(SPI_VIP_CS_TO_MISO*1ns) 1'b1;
-          end      
+          end
         end
       end
     endtask : cs_tristate
@@ -272,7 +272,7 @@ package adi_spi_vip_pkg;
 
   endclass
 
-  class adi_spi_agent #(`SPI_VIP_PARAM_ORDER);
+  class adi_spi_agent #(int `SPI_VIP_PARAM_ORDER);
 
     protected adi_spi_driver #(`SPI_VIP_PARAM_ORDER) driver;
 

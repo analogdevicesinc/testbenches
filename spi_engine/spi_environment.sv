@@ -51,10 +51,10 @@ package spi_environment_pkg;
   class spi_environment extends test_harness_env;
 
     // Agents
-    adi_spi_agent #(`SPI_VIP_IF_PARAMS(test_harness, spi_s_vip)) spi_agent;
+    adi_spi_agent #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_agent;
 
     // Sequencers
-    s_spi_sequencer #(`SPI_VIP_IF_PARAMS(test_harness, spi_s_vip)) spi_seq;
+    s_spi_sequencer #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_seq;
 
     //============================================================================
     // Constructor
@@ -68,7 +68,7 @@ package spi_environment_pkg;
 
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-      virtual interface spi_vip_if #(`SPI_VIP_IF_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
+      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
     );
 
       super.new(sys_clk_vip_if,

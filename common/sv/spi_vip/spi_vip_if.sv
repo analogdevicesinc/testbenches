@@ -1,7 +1,8 @@
 `include "utils.svh"
 
 interface spi_vip_if #(
-  int CPOL              =0,
+  int MODE              =0,
+      CPOL              =0,
       CPHA              =0,
       INV_CS            =0,
       DATA_DLENGTH      =16,

@@ -51,18 +51,6 @@ package adi_spi_vip_pkg;
                                     SPI_VIP_CS_TO_MISO        ,\
                                     SPI_VIP_DEFAULT_MISO_DATA 
 
-  `define SPI_VIP_PARAM_DECL  int   SPI_VIP_MODE              =0,\
-                                    SPI_VIP_CPOL              =0,\
-                                    SPI_VIP_CPHA              =0,\
-                                    SPI_VIP_INV_CS            =0,\
-                                    SPI_VIP_DATA_DLENGTH      =16,\
-                                    SPI_VIP_SLAVE_TIN         =0,\
-                                    SPI_VIP_SLAVE_TOUT        =0,\
-                                    SPI_VIP_MASTER_TIN        =0,\
-                                    SPI_VIP_MASTER_TOUT       =0,\
-                                    SPI_VIP_CS_TO_MISO        =0,\
-                                    SPI_VIP_DEFAULT_MISO_DATA ='hCAFE
-
   `define SPI_VIP_PARAMS(th,vip)    th``_``vip``_0_VIP_MODE,\
                                     th``_``vip``_0_VIP_CPOL,\
                                     th``_``vip``_0_VIP_CPHA,\
@@ -75,42 +63,7 @@ package adi_spi_vip_pkg;
                                     th``_``vip``_0_VIP_CS_TO_MISO,\
                                     th``_``vip``_0_VIP_DEFAULT_MISO_DATA
 
-  `define SPI_VIP_IF_PARAM_ORDER  SPI_VIP_CPOL              ,\
-                                  SPI_VIP_CPHA              ,\
-                                  SPI_VIP_INV_CS            ,\
-                                  SPI_VIP_DATA_DLENGTH      ,\
-                                  SPI_VIP_SLAVE_TIN         ,\
-                                  SPI_VIP_SLAVE_TOUT        ,\
-                                  SPI_VIP_MASTER_TIN        ,\
-                                  SPI_VIP_MASTER_TOUT       ,\
-                                  SPI_VIP_CS_TO_MISO        ,\
-                                  SPI_VIP_DEFAULT_MISO_DATA 
-
-  `define SPI_VIP_IF_PARAM_DECL int SPI_VIP_CPOL              =0,\
-                                    SPI_VIP_CPHA              =0,\
-                                    SPI_VIP_INV_CS            =0,\
-                                    SPI_VIP_DATA_DLENGTH      =16,\
-                                    SPI_VIP_SLAVE_TIN         =0,\
-                                    SPI_VIP_SLAVE_TOUT        =0,\
-                                    SPI_VIP_MASTER_TIN        =0,\
-                                    SPI_VIP_MASTER_TOUT       =0,\
-                                    SPI_VIP_CS_TO_MISO        =0,\
-                                    SPI_VIP_DEFAULT_MISO_DATA ='hCAFE  
-
-  `define SPI_VIP_IF_PARAMS(th,vip) th``_``vip``_0_VIP_CPOL,\
-                                    th``_``vip``_0_VIP_CPHA,\
-                                    th``_``vip``_0_VIP_INV_CS,\
-                                    th``_``vip``_0_VIP_DATA_DLENGTH,\
-                                    th``_``vip``_0_VIP_SLAVE_TIN,\
-                                    th``_``vip``_0_VIP_SLAVE_TOUT,\
-                                    th``_``vip``_0_VIP_MASTER_TIN,\
-                                    th``_``vip``_0_VIP_MASTER_TOUT,\
-                                    th``_``vip``_0_VIP_CS_TO_MISO,\
-                                    th``_``vip``_0_VIP_DEFAULT_MISO_DATA
-
-
-
-  class adi_spi_driver #(`SPI_VIP_IF_PARAM_DECL);
+  class adi_spi_driver #(`SPI_VIP_PARAM_ORDER);
 
     typedef mailbox #(logic [SPI_VIP_DATA_DLENGTH-1:0]) spi_mbx_t;
     protected spi_mbx_t mosi_mbx;
@@ -120,9 +73,9 @@ package adi_spi_vip_pkg;
     protected bit [SPI_VIP_DATA_DLENGTH-1:0] miso_reg;
     protected bit [SPI_VIP_DATA_DLENGTH-1:0] default_miso_data;
     protected event tx_mbx_updated;
-    virtual spi_vip_if #(`SPI_VIP_IF_PARAM_ORDER) vif;
+    virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) vif;
 
-    function new(virtual spi_vip_if #(`SPI_VIP_IF_PARAM_ORDER) intf);
+    function new(virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf);
       this.vif = intf;
       this.active = 0;
       this.stop_flag = 0;
@@ -319,11 +272,11 @@ package adi_spi_vip_pkg;
 
   endclass
 
-  class adi_spi_agent #(`SPI_VIP_IF_PARAM_DECL);
+  class adi_spi_agent #(`SPI_VIP_PARAM_ORDER);
 
-    protected adi_spi_driver #(`SPI_VIP_IF_PARAM_ORDER) driver;
+    protected adi_spi_driver #(`SPI_VIP_PARAM_ORDER) driver;
 
-    function new(virtual spi_vip_if #(`SPI_VIP_IF_PARAM_ORDER) intf);
+    function new(virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf);
       this.driver = new(intf);
     endfunction
 

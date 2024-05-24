@@ -64,6 +64,7 @@ module adi_spi_vip #(
   import logger_pkg::*;
   
   spi_vip_if #(
+    .MODE               (MODE),
     .CPOL               (CPOL),
     .CPHA               (CPHA),
     .INV_CS             (INV_CS),

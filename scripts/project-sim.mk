@@ -10,6 +10,7 @@ HDL_LIBRARY_PATH := $(ADI_HDL_DIR)/library/
 include $(ADI_HDL_DIR)/quiet.mk
 
 ENV_DEPS += $(foreach dep,$(LIB_DEPS),$(HDL_LIBRARY_PATH)$(dep)/component.xml)
+ENV_DEPS += $(foreach dep,$(SIM_LIB_DEPS),$(ADI_HDL_DIR)/testbenches/common/sv/$(dep)/component.xml)
 
 SHELL:=/bin/bash
 
@@ -141,7 +142,14 @@ $(HDL_LIBRARY_PATH)%/component.xml: FORCE
 	flock $(dir $@).lock sh -c " \
 	$(MAKE) -C $(dir $@) $(TARGET); \
 	"; exit $$?
+
+# Create here the targets which build the sim libraries
+$(ADI_HDL_DIR)/testbenches/common/sv/%/component.xml: TARGET:=xilinx
 FORCE:
+$(ADI_HDL_DIR)/testbenches/common/sv/%/component.xml: FORCE
+	flock $(dir $@).lock -c " \
+	$(MAKE) -C $(dir $@) xilinx; \
+	"; exit $$?
 
 # Create here the targets which build the test env
 $(foreach cfg, $(BUILD_CFGS), $(eval $(call build, $(cfg))))

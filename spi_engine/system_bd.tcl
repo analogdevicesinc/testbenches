@@ -51,6 +51,18 @@ adi_project_files [list \
 
 source ./spi_engine_test_bd.tcl
 
+# Add test-specific VIPs
+puts "CPOL: "
+puts [$ad_project_params(CPOL)]
+puts "CPHA: "
+puts [$ad_project_params(CPHA)]
+
+ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
+
+adi_sim_add_define "SPI_S=spi_s_vip"
+ad_connect spi_engine/m_spi spi_s_vip/s_spi
+
+# Last tasks
 create_bd_port -dir O spi_engine_spi_clk
 create_bd_port -dir O spi_engine_irq
 if {$ad_project_params(ECHO_SCLK)} {

@@ -61,11 +61,17 @@
    <wvobject type="array" fp_name="/system_tb/test/offload_captured_word_arr">
       <obj_property name="ElementShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">offload_captured_word_arr[19:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test/offload_sdi_data_store_arr">
       <obj_property name="ElementShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">offload_sdi_data_store_arr[19:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_fifo_data">
+      <obj_property name="ElementShortName">sdi_fifo_data[19:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_fifo_data[19:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdi_fifo_data_store">
+      <obj_property name="ElementShortName">sdi_fifo_data_store[19:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdi_fifo_data_store[19:0][31:0]</obj_property>
    </wvobject>
 </wave_config>

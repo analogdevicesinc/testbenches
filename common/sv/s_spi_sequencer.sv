@@ -45,7 +45,7 @@ package s_spi_sequencer_pkg;
     protected adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent;
 
     function new(adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent);
-      this.agent = agent;    
+      this.agent = agent;
     endfunction: new
 
     virtual task automatic send_data(input int unsigned data);

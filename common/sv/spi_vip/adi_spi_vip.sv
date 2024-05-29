@@ -62,7 +62,7 @@ module adi_spi_vip #(
   localparam MODE_MASTER  = 1;
   localparam MODE_MONITOR = 2;
   import logger_pkg::*;
-  
+
   spi_vip_if #(
     .MODE               (MODE),
     .CPOL               (CPOL),
@@ -78,7 +78,7 @@ module adi_spi_vip #(
   ) IF ();
 
   initial begin : ASSERT_PARAMETERS
-    assert (MODE == MODE_SLAVE) 
+    assert (MODE == MODE_SLAVE)
     else   begin
       `ERROR(("Unsupported mode %s. Valid values are 0=SLAVE, 1=MASTER, 2=MONITOR. Only 0(SLAVE) is currently supported.",MODE));
     end
@@ -92,7 +92,7 @@ module adi_spi_vip #(
       assign IF.cs = s_spi_cs;
       initial begin
         IF.set_slave_mode();
-      end      
+      end
     end else if (MODE == MODE_MASTER) begin
       assign IF.miso = m_spi_miso;
       assign m_spi_mosi = IF.mosi;

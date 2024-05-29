@@ -49,7 +49,7 @@ package adi_spi_vip_pkg;
                                     SPI_VIP_MASTER_TIN        ,\
                                     SPI_VIP_MASTER_TOUT       ,\
                                     SPI_VIP_CS_TO_MISO        ,\
-                                    SPI_VIP_DEFAULT_MISO_DATA 
+                                    SPI_VIP_DEFAULT_MISO_DATA
 
   `define SPI_VIP_PARAMS(th,vip)    th``_``vip``_0_VIP_MODE,\
                                     th``_``vip``_0_VIP_CPOL,\
@@ -101,7 +101,7 @@ package adi_spi_vip_pkg;
       static logic [SPI_VIP_DATA_DLENGTH-1:0] mosi_data;
       forever begin
         if (vif.intf_slave_mode) begin
-          wait (vif.cs_active); 
+          wait (vif.cs_active);
           while (vif.cs_active) begin
             for (int i = 0; i<SPI_VIP_DATA_DLENGTH; i++) begin
               if (!vif.cs_active) begin
@@ -109,7 +109,7 @@ package adi_spi_vip_pkg;
               end
               @(posedge vif.sample_edge)
               mosi_data <= {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
-            end    
+            end
             mosi_mbx.put(mosi_data);
           end
         end
@@ -132,7 +132,7 @@ package adi_spi_vip_pkg;
             end
             pending_mbx = 1'b0;
             // early drive and shift if CPHA=0
-            if (SPI_VIP_CPHA == 0) begin 
+            if (SPI_VIP_CPHA == 0) begin
               vif.miso_drive <= miso_reg[SPI_VIP_DATA_DLENGTH-1];
               miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
             end
@@ -188,7 +188,7 @@ package adi_spi_vip_pkg;
 
     protected task cs_tristate();
       forever begin
-        @(vif.cs) 
+        @(vif.cs)
         if (vif.intf_slave_mode) begin
           if (!vif.cs_active) begin
             vif.miso_oen <= #(SPI_VIP_CS_TO_MISO*1ns) 1'b0;

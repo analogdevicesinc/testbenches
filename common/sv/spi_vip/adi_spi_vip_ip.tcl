@@ -212,7 +212,7 @@ set_property -dict [list \
   "tooltip" "\[DATA_DLENGTH\] Define the SPI word length" \
 ] [ipgui::get_guiparamspec -name "DATA_DLENGTH" -component $cc]
 
-ipgui::add_param -name "DEFAULT_MISO_DATA" -component $cc -parent $general_group 
+ipgui::add_param -name "DEFAULT_MISO_DATA" -component $cc -parent $general_group
 set_property -dict [list \
   "display_name" "Default MISO data" \
   "tooltip" "\[DEFAULT_MISO_DATA\] Default data sent by slave-mode VIP when it has nothing enqueued" \

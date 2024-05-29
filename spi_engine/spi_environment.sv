@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -80,7 +80,7 @@ package spi_environment_pkg;
 
       // Creating the agents
       spi_agent = new(spi_s_vip_if);
-      
+
       // Creating the sequencers
       spi_seq = new(spi_agent);
 
@@ -93,7 +93,7 @@ package spi_environment_pkg;
     //============================================================================
     task start();
       super.start();
-      spi_agent.start();      
+      spi_agent.start();
     endtask
 
     //============================================================================
@@ -128,7 +128,7 @@ package spi_environment_pkg;
     //============================================================================
     task stop;
       spi_agent.stop();
-      super.stop();      
+      super.stop();
     endtask
 
   endclass

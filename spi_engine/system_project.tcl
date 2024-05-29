@@ -30,9 +30,7 @@ adi_sim_project_files [list \
  "../common/sv/s_axis_sequencer.sv" \
  "../common/sv/m_axi_sequencer.sv" \
  "../common/sv/s_axi_sequencer.sv" \
- "../common/sv/spi_vip/adi_spi_vip.sv" \
  "../common/sv/spi_vip/adi_spi_vip_pkg.sv" \
- "../common/sv/spi_vip/spi_vip_if.sv" \
  "../common/sv/s_spi_sequencer.sv" \
  "../common/sv/dmac_api.sv" \
  "../common/sv/adi_regmap_pkg.sv" \

@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2021(c) Analog Devices, Inc.
+## Copyright 2024(c) Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -13,6 +13,7 @@ SV_DEPS += ../common/sv/s_axis_sequencer.sv
 SV_DEPS += ../common/sv/m_axi_sequencer.sv
 SV_DEPS += ../common/sv/s_axi_sequencer.sv
 SV_DEPS += ../common/sv/s_spi_sequencer.sv
+SV_DEPS += ../common/sv/spi_vip/adi_spi_vip_pkg.sv
 SV_DEPS += ../common/sv/dmac_api.sv
 SV_DEPS += ../common/sv/adi_regmap_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_clkgen_pkg.sv

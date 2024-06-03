@@ -23,32 +23,35 @@ SHELL:=/bin/bash
 # $(6): test  name
 FOLDER=$(shell basename $(CURDIR))
 define simulate
-@echo "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."
-START=$$(date +%s); \
-$(strip $(1)) >> $(strip $(2)) 2>&1; \
-(ERR=$$?; \
-END=$$(date +%s); \
-DIFF=$$(( $$END - $$START )); \
-ERRS=`grep -v ^# $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -e "\[ERROR\]" -e "while\\ executing" -C 10 |  sed 's/</\&lt;/g' | sed 's/>/\&gt;/g'`; \
-if [[ $$ERRS > 0 ]] ; then ERR=1; fi;\
-JUnitFile='results/$(strip $(5))_$(strip $(6)).xml'; \
-echo \<testsuite\> > $$JUnitFile; \
-echo \<testcase classname=\"$(FOLDER)_$(strip $(5))\" name=\"$(strip $(6))\" time=\"$$DIFF\" \> >> $$JUnitFile; \
-echo -n "$(strip $(4)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)]"; \
-if [ $$ERR = 0 ]; then \
-	echo " $(GREEN)OK$(NC)"; \
-	echo \<passed\/\> >> $$JUnitFile; \
-else \
-	echo " $(RED)FAILED$(NC)"; \
-	echo "For details see $(HL)$(CURDIR)/$(strip $(2))$(NC)"; \
-	echo ""; \
-	echo \<failure\> >> $$JUnitFile; \
-	echo "$$ERRS" >>  $$JUnitFile; \
-	echo \<\/failure\> >> $$JUnitFile; \
-fi; \
-echo \<\/testcase\> >> $$JUnitFile; \
-echo \<\/testsuite\> >> $$JUnitFile; \
-exit $$ERR)
+if [ -f $(CURDIR)/runs/$(strip $(5))/system_good.tmp ] || [ $(6) = BuildEnv ]; then \
+	echo "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."; \
+	START=$$(date +%s); \
+	$(strip $(1)) >> $(strip $(2)) 2>&1; \
+	(ERR=$$?; \
+	END=$$(date +%s); \
+	DIFF=$$(( $$END - $$START )); \
+	ERRS=`grep -v ^# $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -e "\[ERROR\]" -e "while\\ executing" -C 10 |  sed 's/</\&lt;/g' | sed 's/>/\&gt;/g'`; \
+	if [[ $$ERRS > 0 ]] ; then ERR=1; fi;\
+	JUnitFile='results/$(strip $(5))_$(strip $(6)).xml'; \
+	echo \<testsuite\> > $$JUnitFile; \
+	echo \<testcase classname=\"$(FOLDER)_$(strip $(5))\" name=\"$(strip $(6))\" time=\"$$DIFF\" \> >> $$JUnitFile; \
+	echo -n "$(strip $(4)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)]"; \
+	if [ $$ERR = 0 ]; then \
+		echo " $(GREEN)OK$(NC)"; \
+		echo \<passed\/\> >> $$JUnitFile; \
+		echo '' > $(CURDIR)/runs/$(strip $(5))/system_good.tmp; \
+	else \
+		echo " $(RED)FAILED$(NC)"; \
+		echo "For details see $(HL)$(CURDIR)/$(strip $(2))$(NC)"; \
+		echo ""; \
+		echo \<failure\> >> $$JUnitFile; \
+		echo "$$ERRS" >>  $$JUnitFile; \
+		echo \<\/failure\> >> $$JUnitFile; \
+	fi; \
+	echo \<\/testcase\> >> $$JUnitFile; \
+	echo \<\/testsuite\> >> $$JUnitFile; \
+	exit $$ERR); \
+fi;
 endef
 
 # For Cygwin, Vivado must be called from the Windows environment

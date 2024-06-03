@@ -23,8 +23,8 @@ SHELL:=/bin/bash
 # $(6): test  name
 FOLDER=$(shell basename $(CURDIR))
 define simulate
+@echo "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."
 if [ -f $(CURDIR)/runs/$(strip $(5))/system_good.tmp ] || [ $(6) = BuildEnv ]; then \
-	echo "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."; \
 	START=$$(date +%s); \
 	$(strip $(1)) >> $(strip $(2)) 2>&1; \
 	(ERR=$$?; \
@@ -51,6 +51,9 @@ if [ -f $(CURDIR)/runs/$(strip $(5))/system_good.tmp ] || [ $(6) = BuildEnv ]; t
 	echo \<\/testcase\> >> $$JUnitFile; \
 	echo \<\/testsuite\> >> $$JUnitFile; \
 	exit $$ERR); \
+else \
+	echo -n "$(strip $(4)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)]"; \
+	echo " $(HL)SKIPPED$(NC)"; \
 fi;
 endef
 

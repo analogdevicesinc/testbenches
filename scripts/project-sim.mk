@@ -47,7 +47,7 @@ echo \<testcase classname=\"$(FOLDER)_$(strip $(5))\" name=\"$(strip $(6))\" tim
 echo -n "$(strip $(4)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)]"; \
 if [[ $$RUN_SCRIPT == false ]]; then \
 	echo " $(RED)SKIPPED$(NC)"; \
-	echo \<skipped\/\> >> $$JUnitFile; \
+	echo \<skipped\> >> $$JUnitFile; \
 	echo "Test skipped because the system project didn't build successfully!" >> $$JUnitFile; \
 	echo \<\/skipped\> >> $$JUnitFile; \
 elif [ $$ERR = 0 ]; then \

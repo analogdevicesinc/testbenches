@@ -53,8 +53,8 @@ import test_harness_env_pkg::*;
 localparam PCORE_VERSION              = 32'h0001_0200;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
-localparam DATA_WIDTH                 = 16;
-localparam DATA_DLENGTH               = 16;
+localparam DATA_WIDTH                 = 32;
+localparam DATA_DLENGTH               = 32;
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
 localparam SDI_DELAY                  = 0;
@@ -92,7 +92,7 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
 
 program test_program (
-  input       spi_clk,
+  input       ad738x_spi_clk,
   input       ad738x_irq,
   input       ad738x_spi_sclk,
   input [1:0] ad738x_spi_sdi,
@@ -265,51 +265,52 @@ end
 //---------------------------------------------------------------------------
 
 wire          end_of_word;
-wire          rx_sclk_bfm = ad738x_echo_sclk;
+wire          spi_sclk_bfm = ad738x_echo_sclk;
 wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = ad738x_spi_cs;
+wire          m_spi_csn_int_s = &ad738x_spi_cs;
 bit           m_spi_csn_int_d = 0;
-bit   [15:0]  sdi_shiftreg;
-wire  [15:0]  sdi_shiftreg2;
-bit   [7:0]   rx_sclk_pos_counter = 0;
-bit   [7:0]   rx_sclk_neg_counter = 0;
+bit   [31:0]  sdi_shiftreg;
+bit   [7:0]   spi_sclk_pos_counter = 0;
+bit   [7:0]   spi_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
 
 initial begin
   while(1) begin
-    @(posedge spi_clk);
+    @(posedge ad738x_spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
 end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-assign ad738x_spi_sdi[0] = sdi_shiftreg2[15];
-assign ad738x_spi_sdi[1] = sdi_shiftreg[15];
+genvar i;
+for (i = 0; i < 2; i++) begin
+  assign ad738x_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+end
 
 assign end_of_word = (CPOL ^ CPHA) ?
-                     (rx_sclk_pos_counter == 16) :
-                     (rx_sclk_neg_counter == 16);
+                     (spi_sclk_pos_counter == DATA_DLENGTH) :
+                     (spi_sclk_neg_counter == DATA_DLENGTH);
 
 initial begin
   while(1) begin
-    @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
+    @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
-      rx_sclk_pos_counter <= 8'b0;
+      spi_sclk_pos_counter <= 8'b0;
     end else begin
-      rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH*2) ? 0 : rx_sclk_pos_counter+1;
+      spi_sclk_pos_counter <= (spi_sclk_pos_counter == DATA_DLENGTH) ? 0 : spi_sclk_pos_counter+1;
     end
   end
 end
 
 initial begin
   while(1) begin
-    @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
+    @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
-      rx_sclk_neg_counter <= 8'b0;
+      spi_sclk_neg_counter <= 8'b0;
     end else begin
-      rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH*2) ? 0 : rx_sclk_neg_counter+1;
+      spi_sclk_neg_counter <= (spi_sclk_neg_counter == DATA_DLENGTH) ? 0 : spi_sclk_neg_counter+1;
     end
   end
 end
@@ -319,9 +320,9 @@ initial begin
   while(1) begin
     // synchronization
     if (CPHA ^ CPOL)
-      @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
+      @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
     else
-      @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
+      @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
     if ((m_spi_csn_negedge_s) || (end_of_word)) begin
       // delete the last word at end_of_word
       if (end_of_word) begin
@@ -343,15 +344,12 @@ initial begin
                         sdi_preg[$] :
                         sdi_nreg[$];
       end
-      if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
+      if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdi_shiftreg <= {sdi_shiftreg[15:0], 1'b0};  //????????????? vezi pulsar
-      //sdi_shiftreg2 <= {sdi_shiftreg2[15:0], 1'b0};
+      sdi_shiftreg <= {sdi_shiftreg[30:0], 1'b0};
     end
   end
 end
-
-assign sdi_shiftreg2 = {sdi_shiftreg[14:0], 1'b0}; //????????? vezi pulsar
 
 //---------------------------------------------------------------------------
 // Storing SDI Data for later comparison
@@ -360,26 +358,31 @@ assign sdi_shiftreg2 = {sdi_shiftreg[14:0], 1'b0}; //????????? vezi pulsar
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
-bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
+bit [31:0]  offload_sdi_data_store_arr [(2* NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
+bit [31:0]  sdi_shiftreg2;
+bit [31:0]  sdi_shiftreg_aux;
+bit [31:0]  sdi_shiftreg_aux_old;
+bit [31:0]  sdi_shiftreg_old;
+
+assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
 
 initial begin
   while(1) begin
-    @(posedge rx_sclk_bfm);
-    sdi_data_store <= {sdi_shiftreg[13:0], 2'b00};
+    @(posedge ad738x_echo_sclk);
+    sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
-        sdi_store_cnt <= sdi_store_cnt + 1;
+          sdi_store_cnt <= sdi_store_cnt + 2;
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg2;
-          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg;
+            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
+            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
       end else begin
-        sdi_fifo_data_store[31:16] = sdi_shiftreg;
-        sdi_fifo_data_store[15:0] = sdi_shiftreg2;
+        sdi_fifo_data_store = sdi_shiftreg;
       end
       shiftreg_sampled <= 'h1;
     end
@@ -403,7 +406,7 @@ end
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] offload_captured_word_arr [(2* NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test();
     // Configure pwm
@@ -418,7 +421,7 @@ task offload_spi_test();
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    env.mng.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*2)-1)); // X_LENGHTH = 1024-1
     env.mng.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
     env.mng.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
@@ -430,7 +433,7 @@ task offload_spi_test();
     axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_RD);
     axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_OFF);
     axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_SYNC | 2);
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
+    //axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
 
     offload_status = 1;
 
@@ -447,12 +450,12 @@ task offload_spi_test();
 
     #2000
 
-    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
+    for (int i=0; i<=((2* NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
       offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
     end
 
-    if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
+    if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("Offload Test FAILED"));
     end else begin
       `INFO(("Offload Test PASSED"));

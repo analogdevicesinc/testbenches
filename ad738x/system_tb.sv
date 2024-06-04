@@ -43,18 +43,18 @@ module system_tb();
       wire       ad738x_spi_sdo;
       wire [1:0] ad738x_spi_sdi;
       wire       ad738x_spi_cs;
-      wire       spi_clk;
+      wire       ad738x_spi_clk;
       wire       ad738x_irq;
 
     `TEST_PROGRAM test(
-      .spi_clk (spi_clk),
+      .ad738x_spi_clk (ad738x_spi_clk),
       .ad738x_irq (ad738x_irq),
       .ad738x_spi_sdi(ad738x_spi_sdi),
       .ad738x_spi_cs (ad738x_spi_cs),
       .ad738x_spi_sclk (ad738x_spi_sclk));
 
     test_harness `TH (
-      .spi_clk (spi_clk),
+      .ad738x_spi_clk (ad738x_spi_clk),
       .irq (),
       .ad738x_irq(ad738x_irq),
       .ad738x_spi_sdo (ad738x_spi_sdo),

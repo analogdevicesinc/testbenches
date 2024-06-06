@@ -9,7 +9,7 @@ if {$argc < 1} {
   set cfg_file [lindex $argv 0]
 }
 
-# Read config file 
+# Read config file
 source "cfgs/${cfg_file}"
 
 # Set the project name

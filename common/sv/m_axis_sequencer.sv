@@ -221,7 +221,10 @@ package m_axis_sequencer_pkg;
             begin
               @disable_ev;
               case (stop_policy)
-                STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
+                STOP_POLICY_DESCRIPTOR_QUEUE: begin
+                  if (!this.queue_empty_sig)
+                    @queue_empty;
+                end
                 STOP_POLICY_PACKET: @packet_done;
                 STOP_POLICY_DATA_BEAT: @beat_done;
                 STOP_POLICY_IMMEDIATE: ;
@@ -399,7 +402,10 @@ package m_axis_sequencer_pkg;
             begin
               @disable_ev;
               case (stop_policy)
-                STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
+                STOP_POLICY_DESCRIPTOR_QUEUE: begin
+                if (!this.queue_empty_sig)
+                  @queue_empty;
+                end
                 STOP_POLICY_PACKET: @packet_done;
                 STOP_POLICY_DATA_BEAT: @beat_done;
                 STOP_POLICY_IMMEDIATE: ;

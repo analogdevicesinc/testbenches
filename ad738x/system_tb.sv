@@ -39,12 +39,12 @@
 
 module system_tb();
 
-      wire       ad738x_spi_sclk;
-      wire       ad738x_spi_sdo;
-      wire [1:0] ad738x_spi_sdi;
-      wire       ad738x_spi_cs;
-      wire       ad738x_spi_clk;
-      wire       ad738x_irq;
+      wire ad738x_spi_sclk;
+      wire ad738x_spi_sdo;
+      wire [`NUM_OF_SDI-1:0] ad738x_spi_sdi;
+      wire ad738x_spi_cs;
+      wire ad738x_spi_clk;
+      wire ad738x_irq;
 
     `TEST_PROGRAM test(
       .ad738x_spi_clk (ad738x_spi_clk),

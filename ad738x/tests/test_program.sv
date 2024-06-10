@@ -92,11 +92,11 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
 
 program test_program (
-  input       ad738x_spi_clk,
-  input       ad738x_irq,
-  input       ad738x_spi_sclk,
-  input [1:0] ad738x_spi_sdi,
-  input       ad738x_spi_cs);
+  input ad738x_spi_clk,
+  input ad738x_irq,
+  input ad738x_spi_sclk,
+  input [(`NUM_OF_SDI - 1):0] ad738x_spi_sdi,
+  input ad738x_spi_cs);
 
 
 test_harness_env env;
@@ -285,7 +285,7 @@ end
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
-for (i = 0; i < 2; i++) begin
+for (i = 0; i < `NUM_OF_SDI; i++) begin
   assign ad738x_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
 end
 
@@ -433,7 +433,6 @@ task offload_spi_test();
     axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_RD);
     axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_OFF);
     axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_SYNC | 2);
-    //axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
 
     offload_status = 1;
 

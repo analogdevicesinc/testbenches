@@ -477,9 +477,28 @@ task fifo_spi_test();
   axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
   // Configure the execution module
-  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
+  /*axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
   axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_PRESCALE);
   axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
+*/
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h2103);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h10FE);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h2007);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h2208);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h0100);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h10FF);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h3104);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h10FE);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h2210);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h0100);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h10FF);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h3104);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h10FE);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h0200);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h10FF);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h2000);
+  axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), 'h3001);
+
 
   // Set up the interrupts
   axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
@@ -490,6 +509,7 @@ task fifo_spi_test();
   #100
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
+    axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
   end
 

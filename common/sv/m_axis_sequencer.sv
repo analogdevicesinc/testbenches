@@ -209,6 +209,11 @@ package m_axis_sequencer_pkg;
       @queue_empty;
     endtask: wait_empty_descriptor_queue
 
+    // clear queue
+    task clear_descriptor_queue();
+      descriptor_q.delete();
+    endtask: clear_descriptor_queue
+
     // generate transfer with transfer descriptors
     protected task generator();
       `INFOV(("generator start"), 55);
@@ -220,12 +225,13 @@ package m_axis_sequencer_pkg;
           fork
             begin
               @disable_ev;
-              case (stop_policy)
-                STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
-                STOP_POLICY_PACKET: @packet_done;
-                STOP_POLICY_DATA_BEAT: @beat_done;
-                STOP_POLICY_IMMEDIATE: ;
-              endcase
+              if (this.queue_empty_sig == 0)
+                case (stop_policy)
+                  STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
+                  STOP_POLICY_PACKET: @packet_done;
+                  STOP_POLICY_DATA_BEAT: @beat_done;
+                  STOP_POLICY_IMMEDIATE: ;
+                endcase
             end
             forever begin
               if (descriptor_q.size() > 0) begin
@@ -269,6 +275,7 @@ package m_axis_sequencer_pkg;
       enabled = 0;
       byte_count = 0;
       ->> disable_ev;
+      #1step;
     endtask: stop
 
     task run();
@@ -351,7 +358,22 @@ package m_axis_sequencer_pkg;
                   keep[i] = 1'b1;
                   break;
                 end else
-                  @byte_stream_ev;
+                  fork begin
+                    fork
+                      @byte_stream_ev;
+                      begin
+                        @disable_ev;
+                        if (tc==0 && i==0) begin
+                          case (stop_policy)
+                            STOP_POLICY_PACKET: ->> packet_done;
+                            STOP_POLICY_DATA_BEAT: ->> beat_done;
+                            default: ;
+                          endcase
+                        end
+                      end
+                    join_any
+                    disable fork;
+                  end join
               end
             DATA_GEN_MODE_AUTO_INCR: begin
               data[i] = byte_count++;
@@ -398,12 +420,13 @@ package m_axis_sequencer_pkg;
           fork
             begin
               @disable_ev;
-              case (stop_policy)
-                STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
-                STOP_POLICY_PACKET: @packet_done;
-                STOP_POLICY_DATA_BEAT: @beat_done;
-                STOP_POLICY_IMMEDIATE: ;
-              endcase
+              if (this.queue_empty_sig == 0)
+                case (stop_policy)
+                  STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
+                  STOP_POLICY_PACKET: @packet_done;
+                  STOP_POLICY_DATA_BEAT: @beat_done;
+                  STOP_POLICY_IMMEDIATE: ;
+                endcase
             end
             forever begin
               @data_av_ev;

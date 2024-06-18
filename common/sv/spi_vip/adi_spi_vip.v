@@ -33,8 +33,6 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`include "utils.svh"
-
 module adi_spi_vip #(
   parameter MODE          = 0, // SLAVE=0
   parameter CPOL          = 0,
@@ -48,22 +46,17 @@ module adi_spi_vip #(
   parameter CS_TO_MISO    = 0,
   parameter DEFAULT_MISO_DATA = 'hCAFE
 )  (
-  input   logic s_spi_sclk,
+  input   wire  s_spi_sclk,
   input   wire  s_spi_mosi,
   output  wire  s_spi_miso,
-  input   logic s_spi_cs,
-  output  logic m_spi_sclk,
+  input   wire  s_spi_cs,
+  output  wire  m_spi_sclk,
   output  wire  m_spi_mosi,
   input   wire  m_spi_miso,
-  output  logic m_spi_cs
+  output  wire  m_spi_cs
 );
 
-  localparam MODE_SLAVE   = 0;
-  localparam MODE_MASTER  = 1;
-  localparam MODE_MONITOR = 2;
-  import logger_pkg::*;
-
-  spi_vip_if #(
+  adi_spi_vip_top #(
     .MODE               (MODE),
     .CPOL               (CPOL),
     .CPHA               (CPHA),
@@ -75,45 +68,15 @@ module adi_spi_vip #(
     .MASTER_TOUT        (MASTER_TOUT),
     .CS_TO_MISO         (CS_TO_MISO),
     .DEFAULT_MISO_DATA  (DEFAULT_MISO_DATA)
-  ) IF ();
-
-  initial begin : ASSERT_PARAMETERS
-    assert (MODE == MODE_SLAVE)
-    else   begin
-      `ERROR(("Unsupported mode %s. Valid values are 0=SLAVE, 1=MASTER, 2=MONITOR. Only 0(SLAVE) is currently supported.",MODE));
-    end
-  end : ASSERT_PARAMETERS
-
-  generate
-    if (MODE == MODE_SLAVE) begin
-      assign s_spi_miso = IF.miso;
-      assign IF.mosi = s_spi_mosi;
-      assign IF.sclk = s_spi_sclk;
-      assign IF.cs = s_spi_cs;
-      initial begin
-        IF.set_slave_mode();
-      end
-    end else if (MODE == MODE_MASTER) begin
-      assign IF.miso = m_spi_miso;
-      assign m_spi_mosi = IF.mosi;
-      assign m_spi_sclk = IF.sclk;
-      assign m_spi_cs = IF.cs;
-      initial begin
-        IF.set_master_mode();
-      end
-    end else if (MODE == MODE_MONITOR) begin
-      assign IF.miso = m_spi_miso;
-      assign IF.mosi = s_spi_mosi;
-      assign IF.miso = s_spi_miso;
-      assign IF.cs   = s_spi_cs;
-      assign s_spi_miso = m_spi_miso;
-      assign m_spi_mosi = s_spi_mosi;
-      assign m_spi_sclk = s_spi_sclk;
-      assign m_spi_cs   = s_spi_cs;
-      initial begin
-        IF.intf_monitor_mode();
-      end
-    end
-  endgenerate
+  ) spi_vip (
+    .s_spi_sclk (s_spi_sclk),
+    .s_spi_mosi (s_spi_mosi),
+    .s_spi_miso (s_spi_miso),
+    .s_spi_cs   (s_spi_cs),
+    .m_spi_sclk (m_spi_sclk),
+    .m_spi_mosi (m_spi_mosi),
+    .m_spi_miso (m_spi_miso),
+    .m_spi_cs   (m_spi_cs)
+  );
 
 endmodule

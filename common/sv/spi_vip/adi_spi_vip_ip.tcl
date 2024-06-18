@@ -9,7 +9,8 @@ source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 adi_ip_create adi_spi_vip
 adi_ip_files adi_spi_vip [list \
     "adi_spi_vip_pkg.sv" \
-    "adi_spi_vip.sv" \
+    "adi_spi_vip_top.sv" \
+    "adi_spi_vip.v" \
     "spi_vip_if.sv" \
     "adi_spi_vip_pkg.ttcl" \
     "$ad_hdl_dir/testbenches/common/sv/utils.svh" \

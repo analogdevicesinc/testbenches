@@ -13,7 +13,8 @@ LIBRARY_NAME := adi_spi_vip
 GENERIC_DEPS += ../utils.svh
 GENERIC_DEPS += adi_spi_vip_pkg.sv
 GENERIC_DEPS += spi_vip_if.sv
-GENERIC_DEPS += adi_spi_vip.sv
+GENERIC_DEPS += adi_spi_vip_top.sv
+GENERIC_DEPS += adi_spi_vip.v
 
 XILINX_DEPS += adi_spi_vip_ip.tcl
 XILINX_DEPS += adi_spi_vip_pkg.ttcl

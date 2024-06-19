@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv_3047853939 " />
+            <top_module name="adi_regmap_clkgen_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_regmap_pwm_gen_pkg" />
+            <top_module name="adi_regmap_spi_engine_pkg" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="8.789166 us"></ZoomStartTime>
+      <ZoomEndTime time="16.119167 us"></ZoomEndTime>
+      <Cursor1Time time="13.689166 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="204"></NameColumnWidth>
+      <ValueColumnWidth column_width="123"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="27" />
+   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_cs">
+      <obj_property name="ElementShortName">pulsar_adc_spi_cs</obj_property>
+      <obj_property name="ObjectShortName">pulsar_adc_spi_cs</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_sclk">
+      <obj_property name="ElementShortName">pulsar_adc_spi_sclk</obj_property>
+      <obj_property name="ObjectShortName">pulsar_adc_spi_sclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_clk">
+      <obj_property name="ElementShortName">pulsar_adc_spi_clk</obj_property>
+      <obj_property name="ObjectShortName">pulsar_adc_spi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_sdi">
+      <obj_property name="ElementShortName">pulsar_adc_spi_sdi</obj_property>
+      <obj_property name="ObjectShortName">pulsar_adc_spi_sdi</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_spi_sdo">
+      <obj_property name="ElementShortName">pulsar_adc_spi_sdo</obj_property>
+      <obj_property name="ObjectShortName">pulsar_adc_spi_sdo</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/pulsar_adc_irq">
+      <obj_property name="ElementShortName">pulsar_adc_irq</obj_property>
+      <obj_property name="ObjectShortName">pulsar_adc_irq</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/cmd">
+      <obj_property name="ElementShortName">cmd[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cmd[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/cs_sleep_counter">
+      <obj_property name="ElementShortName">cs_sleep_counter[1:0]</obj_property>
+      <obj_property name="ObjectShortName">cs_sleep_counter[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/sleep_counter">
+      <obj_property name="ElementShortName">sleep_counter[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sleep_counter[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/counter">
+      <obj_property name="ElementShortName">counter[13:0]</obj_property>
+      <obj_property name="ObjectShortName">counter[13:0]</obj_property>
+      <obj_property name="CustomSignalColor">#D2691E</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/clk_div_last">
+      <obj_property name="ElementShortName">clk_div_last</obj_property>
+      <obj_property name="ObjectShortName">clk_div_last</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/wait_for_io">
+      <obj_property name="ElementShortName">wait_for_io</obj_property>
+      <obj_property name="ObjectShortName">wait_for_io</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/idle">
+      <obj_property name="ElementShortName">idle</obj_property>
+      <obj_property name="ObjectShortName">idle</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/bit_counter">
+      <obj_property name="ElementShortName">bit_counter[4:0]</obj_property>
+      <obj_property name="ObjectShortName">bit_counter[4:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FF00FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/word_length">
+      <obj_property name="ElementShortName">word_length[7:0]</obj_property>
+      <obj_property name="ObjectShortName">word_length[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/transfer_active">
+      <obj_property name="ElementShortName">transfer_active</obj_property>
+      <obj_property name="ObjectShortName">transfer_active</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/BIT_COUNTER_WIDTH">
+      <obj_property name="ElementShortName">BIT_COUNTER_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BIT_COUNTER_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/BIT_COUNTER_CLEAR">
+      <obj_property name="ElementShortName">BIT_COUNTER_CLEAR[13:0]</obj_property>
+      <obj_property name="ObjectShortName">BIT_COUNTER_CLEAR[13:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/BIT_COUNTER_CARRY">
+      <obj_property name="ElementShortName">BIT_COUNTER_CARRY[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BIT_COUNTER_CARRY[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/idle">
+      <obj_property name="ElementShortName">idle</obj_property>
+      <obj_property name="ObjectShortName">idle</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/cs_sleep_counter_compare">
+      <obj_property name="ElementShortName">cs_sleep_counter_compare</obj_property>
+      <obj_property name="ObjectShortName">cs_sleep_counter_compare</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/cs_sleep_repeat">
+      <obj_property name="ElementShortName">cs_sleep_repeat</obj_property>
+      <obj_property name="ObjectShortName">cs_sleep_repeat</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/CMD_CHIPSELECT">
+      <obj_property name="ElementShortName">CMD_CHIPSELECT[2:0]</obj_property>
+      <obj_property name="ObjectShortName">CMD_CHIPSELECT[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/cmd_d1">
+      <obj_property name="ElementShortName">cmd_d1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cmd_d1[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/sleep_counter_compare">
+      <obj_property name="ElementShortName">sleep_counter_compare</obj_property>
+      <obj_property name="ObjectShortName">sleep_counter_compare</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/BIT_COUNTER_CARRY">
+      <obj_property name="ElementShortName">BIT_COUNTER_CARRY[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BIT_COUNTER_CARRY[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_pulsar_adc/spi_pulsar_adc_execution/inst/BIT_COUNTER_WIDTH">
+      <obj_property name="ElementShortName">BIT_COUNTER_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BIT_COUNTER_WIDTH[31:0]</obj_property>
+   </wvobject>
+</wave_config>

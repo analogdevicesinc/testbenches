@@ -49,7 +49,7 @@ module system_tb #(
   localparam CNV_HALF_PERIOD_COR = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
   localparam CNV_HALF_PERIOD = `EN_UNCOR ? 4 * CNV_HALF_PERIOD_COR : CNV_HALF_PERIOD_COR;
   localparam LATENCY = `SDR_DDR_N ? `SINGLE_LANE ? 6 : 5
-                                  : `SINGLE_LANE ? 4 : 3;
+                                  : `SINGLE_LANE ? 8 : 3;
 
   reg sync_n = 1'b0;
   reg ssi_clk = 1'b0;
@@ -138,7 +138,7 @@ module system_tb #(
     join_none
     #1;
     sample = sample + 1;
-  
+
    // sample = {sample[18:0],sample[19]};
   end
 

@@ -5,6 +5,7 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
+            <top_module name="\$unit_xpm_cdc_sv_220102727 " />
             <top_module name="adi_regmap_adc_pkg" />
             <top_module name="adi_regmap_common_pkg" />
             <top_module name="adi_regmap_dmac_pkg" />
@@ -28,20 +29,30 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2,060.200 ns"></ZoomStartTime>
-      <ZoomEndTime time="2,409.201 ns"></ZoomEndTime>
-      <Cursor1Time time="2,126.200 ns"></Cursor1Time>
+      <ZoomStartTime time="6,796.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="6,944.401 ns"></ZoomEndTime>
+      <Cursor1Time time="6,888.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="216"></NameColumnWidth>
-      <ValueColumnWidth column_width="85"></ValueColumnWidth>
+      <NameColumnWidth column_width="158"></NameColumnWidth>
+      <ValueColumnWidth column_width="99"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="3" />
+   <WVObjectSize size="6" />
    <wave_markers>
-      <marker label="" time="2410000" />
-      <marker label="" time="2610000" />
-      <marker label="" time="2210000" />
+      <marker label="" time="6483000" />
    </wave_markers>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/adc_clk_data">
+      <obj_property name="ElementShortName">adc_clk_data</obj_property>
+      <obj_property name="ObjectShortName">adc_clk_data</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/adc_data_p_d">
+      <obj_property name="ElementShortName">adc_data_p_d[19:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_p_d[19:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/adc_data_p">
+      <obj_property name="ElementShortName">adc_data_p[19:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_p[19:0]</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/adc_data">
       <obj_property name="ElementShortName">adc_data[31:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data[31:0]</obj_property>
@@ -50,8 +61,9 @@
       <obj_property name="ElementShortName">adc_valid</obj_property>
       <obj_property name="ObjectShortName">adc_valid</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/serdes_reset_s">
-      <obj_property name="ElementShortName">serdes_reset_s</obj_property>
-      <obj_property name="ObjectShortName">serdes_reset_s</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/adc_valid_d">
+      <obj_property name="ElementShortName">adc_valid_d[1:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_valid_d[1:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
 </wave_config>

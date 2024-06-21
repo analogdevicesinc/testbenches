@@ -127,7 +127,7 @@ program test_program;
     #1us;
 
     sanity_test;
-    
+
     dma_test;
 
     // Tap value for lane 0
@@ -197,12 +197,13 @@ begin
     int sdr_ddr_n = `SDR_DDR_N;
     bit [31:0] sync_status = 32'b0;
   force system_tb.enable_pattern = 1'b1;
+  axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL_3), 31'h2);
   axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL), 1<<3 | num_lanes<<8 | sdr_ddr_n<<16);
 
   axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status);
 
   while(sync_status == 31'b0)
-    axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status); 
+    axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status);
 
   force system_tb.enable_pattern = 1'b0;
 
@@ -237,12 +238,12 @@ endtask
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
 
- 
+
     enable_pattern;
-    
 
 
- 
+
+
 
 //    check_captured_data(
 //      .address (`DDR_BASE+'h00002000),
@@ -251,7 +252,7 @@ endtask
 //      .max_sample(2048)
 //    );
 
-    link_down;
+    // link_down;
 
   end
   endtask

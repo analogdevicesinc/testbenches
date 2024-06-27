@@ -38,6 +38,8 @@ source ../../scripts/adi_env.tcl
 # system level parameters
 set DEV_CONFIG  $ad_project_params(DEV_CONFIG)
 set EXT_CLK $ad_project_params(EXT_CLK)
+set ADC_N_BITS $ad_project_params(ADC_N_BITS)
+set NUM_OF_CH $ad_project_params(NUM_OF_CH)
 
 global ad_project_params
 

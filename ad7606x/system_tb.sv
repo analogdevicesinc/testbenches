@@ -58,7 +58,7 @@ module system_tb();
 
   wire [4:0] num_chs;
 
-  parameter DEV_CONFIG = 0;
+  parameter DEV_CONFIG = 3;
   localparam NEG_EDGE = 1;
 
   `TEST_PROGRAM test(

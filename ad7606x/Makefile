@@ -44,17 +44,29 @@ LIB_DEPS += util_axis_fifo
 
 # default test program
 TP := test_program
+#TP := test_program_4ch
+#TP := test_program_6ch
+#TP := test_program_8ch
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl
-CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
+#CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 #$(warning $(CFG_FILES))
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
-TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
+#TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 
-#TESTS += cfg1:test_program_pi
+#TESTS += cfg0:test_program_8ch
+#TESTS += cfg1:test_program_8ch
+#TESTS += cfg2:test_program_8ch
+#TESTS += cfg3:test_program_4ch
+#TESTS += cfg4:test_program_8ch
+#TESTS += cfg5:test_program_6ch
+#TESTS += cfg6:test_program_4ch
+#TESTS += cfg7:test_program_8ch
+#TESTS += cfg8:test_program_8ch
+#TESTS += cfg9:test_program_8ch
 
 include ../scripts/project-sim.mk
 

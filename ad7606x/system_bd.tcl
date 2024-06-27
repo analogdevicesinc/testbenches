@@ -38,6 +38,8 @@ source ../../scripts/adi_env.tcl
 # system level parameters
 set DEV_CONFIG  $ad_project_params(DEV_CONFIG)
 set EXT_CLK $ad_project_params(EXT_CLK)
+set RESOLUTION $ad_project_params(RESOLUTION)
+set TYPE $ad_project_params(TYPE)
 
 global ad_project_params
 

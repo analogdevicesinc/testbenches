@@ -50,6 +50,8 @@ import adi_regmap_pwm_gen_pkg::*;
 parameter DEV_CONFIG = 0;
 parameter SIMPLE_STATUS_CRC = 0;
 parameter EXT_CLK = 0;
+parameter TYPE = 0; // available options 0/1/2/3
+parameter ADC_N_BITS = 18; // available options 16/18
 
 program test_program (
   input         rx_cnvst_n,
@@ -142,18 +144,11 @@ end
   bit [(DEV_CONFIG == 2 ? 17 : 15):0]  tx_ch2 = (DEV_CONFIG == 2) ? 18'h57311 : 16'h5CC5;
   bit [(DEV_CONFIG == 2 ? 17 : 15):0]  tx_ch3 = (DEV_CONFIG == 2) ? 18'hA8CE2 : 16'hA33A;
   bit [(DEV_CONFIG == 2 ? 17 : 15):0]  tx_ch4 = (DEV_CONFIG == 2) ? 18'h54CD1 : 16'h5335;
-  bit [(DEV_CONFIG == 2 ? 17 : 15):0]  tx_ch5 = (DEV_CONFIG == 2) ? 18'h32AB0 : 16'hCAAC;
-  bit [(DEV_CONFIG == 2 ? 17 : 15):0]  tx_ch6 = (DEV_CONFIG == 2) ? 18'h31570 : 16'hC55C;
-  bit [(DEV_CONFIG == 2 ? 17 : 15):0]  tx_ch7 = (DEV_CONFIG == 2) ? 18'hCEA83 : 16'h3AA3;
-  bit [(DEV_CONFIG == 2 ? 17 : 15):0]  tx_ch8 = (DEV_CONFIG == 2) ? 18'hCD543 : 16'h3553;
+
   bit [ 7:0]            tx_status_1 = 8'h0;
   bit [ 7:0]            tx_status_2 = 8'h1;
   bit [ 7:0]            tx_status_3 = 8'h2;
   bit [ 7:0]            tx_status_4 = 8'h3;
-  bit [ 7:0]            tx_status_5 = 8'h4;
-  bit [ 7:0]            tx_status_6 = 8'h5;
-  bit [ 7:0]            tx_status_7 = 8'h6;
-  bit [ 7:0]            tx_status_8 = 8'h7;
 
   reg [15:0]  tx_data_buf = 16'h0;
   bit [15:0]  tx_crc;
@@ -228,121 +223,9 @@ initial begin
                         end
                       end
                     end
-      32'h00000005: begin
-                      tx_data_buf = tx_ch5;
-                      if (DEV_CONFIG == 2) begin
-                        tx_data_buf = tx_ch3[17:2];
-                      end
-                    end
       32'h00000006: begin
                       if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_3};
-                      end else if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
-                        tx_data_buf = tx_ch6;
-                      end
-                      if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
-                        end
-                      end
-                    end
-      32'h00000007: begin
-                      tx_data_buf = tx_ch7;
-                      if (DEV_CONFIG == 2) begin
-                        tx_data_buf = tx_ch4[17:2];
-                      end
-                    end
-      32'h00000008: begin
-                      if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_4};
-                      end else if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
-                        tx_data_buf = tx_ch8;
-                      end
-                      if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
-                        end
-                      end
-                    end
-      32'h00000009: begin
-                      if (DEV_CONFIG == 2) begin
-                        tx_data_buf = tx_ch5[17:2];
-                      end else begin
-                        tx_data_buf = tx_crc;
-                      end
-                    end
-      32'h0000000A: begin
-                      if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_5};
-                      end
-                      if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
-                        end
-                      end
-                    end
-      32'h0000000B: begin
-                      if (DEV_CONFIG == 2) begin
-                        tx_data_buf = tx_ch6[17:2];
-                      end
-                    end
-      32'h0000000C: begin
-                      if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_6};
-                      end
-                      if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
-                        end
-                      end
-                    end
-      32'h0000000D: begin
-                      if (DEV_CONFIG == 2) begin
-                        tx_data_buf = tx_ch7[17:2];
-                      end
-                    end
-      32'h0000000E: begin
-                      if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_7};
-                      end
-                      if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
-                        end
-                      end
-                    end
-      32'h0000000F: begin
-                      if (DEV_CONFIG == 2) begin
-                        tx_data_buf = tx_ch8[17:2];
-                      end
-                    end
-      32'h00000010: begin
-                      if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_8};
-                      end
-                      if (DEV_CONFIG == 2) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
-                        end
-                      end
-                    end
-      32'h00000011: begin
-                      if ((DEV_CONFIG == 0 || DEV_CONFIG == 1) &&  adc_config_mode == 3) begin
-                        tx_data_buf = {8'b0,tx_status_8};
-                      end else if (DEV_CONFIG == 2 && (adc_config_mode == 1 || adc_config_mode == 3)) begin
-                        tx_data_buf = tx_crc;
                       end
                     end
     endcase

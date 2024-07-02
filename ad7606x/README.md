@@ -26,6 +26,13 @@ Where:
  * <name of test> is a file from the tests directory without the tcl extension
 
 ** NOTE
- * cfg1 - AD7606B device selected;
- * cfg2 - AD7606C-16 device selected;
- * cfg3 - AD7606C-18 device selected;
+ * cfg0 - AD7606B device selected;
+ * cfg1 - AD7606C-16 device selected;
+ * cfg2 - AD7606C-18 device selected;
+ * cfg3 - AD7605-4 device selected;
+ * cfg4 - AD7606-8 device selected;
+ * cfg5 - AD7606-6 device selected;
+ * cfg6 - AD7606-4 device selected;
+ * cfg7 - AD7607 device selected;
+ * cfg8 - AD7608 device selected;
+ * cfg9 - AD7609 device selected;

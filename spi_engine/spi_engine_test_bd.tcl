@@ -18,6 +18,7 @@ set sdi_fifo_addr_width     $ad_project_params(SDI_FIFO_ADDR_WIDTH)
 set sdo_fifo_addr_width     $ad_project_params(SDO_FIFO_ADDR_WIDTH)
 set sync_fifo_addr_width    $ad_project_params(SYNC_FIFO_ADDR_WIDTH)
 set cmd_fifo_addr_width     $ad_project_params(CMD_FIFO_ADDR_WIDTH)
+set sdo_streaming           $ad_project_params(SDO_STREAMING)
 
 create_bd_intf_port -mode Monitor -vlnv analog.com:interface:spi_engine_rtl:1.0 spi_engine_spi
 
@@ -27,7 +28,8 @@ spi_engine_create $hier_spi_engine  $data_width $async_spi_clk $num_cs $num_sdi 
                                     $num_sdo $sdi_delay $echo_sclk \
                                     $cmd_mem_addr_width $data_mem_addr_width \
                                     $sdi_fifo_addr_width $sdo_fifo_addr_width \
-                                    $sync_fifo_addr_width $cmd_fifo_addr_width
+                                    $sync_fifo_addr_width $cmd_fifo_addr_width \
+                                    $sdo_streaming
 
 ad_ip_instance axi_clkgen spi_clkgen
 ad_ip_parameter spi_clkgen CONFIG.CLK0_DIV 5

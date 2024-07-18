@@ -62,6 +62,14 @@ ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
 adi_sim_add_define "SPI_S=spi_s_vip"
 ad_connect spi_engine/m_spi spi_s_vip/s_spi
 
+if ($ad_project_params(SDO_STREAMING)) {
+    ad_ip_instance axi4stream_vip sdo_src $ad_project_params(axis_sdo_src_vip_cfg)
+    adi_sim_add_define "SDO_SRC=sdo_src"
+    ad_connect spi_clk sdo_src/aclk
+    ad_connect sys_cpu_resetn sdo_src/aresetn
+    ad_connect sdo_src/m_axis $hier_spi_engine/s_axis_sample
+}
+
 # Last tasks
 create_bd_port -dir O spi_engine_spi_clk
 create_bd_port -dir O spi_engine_irq

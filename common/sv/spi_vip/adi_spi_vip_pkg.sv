@@ -108,7 +108,7 @@ package adi_spi_vip_pkg;
                 break;
               end
               @(posedge vif.sample_edge)
-              mosi_data <= {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
+              mosi_data = {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
             end
             mosi_mbx.put(mosi_data);
           end

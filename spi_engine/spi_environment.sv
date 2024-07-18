@@ -39,7 +39,8 @@ package spi_environment_pkg;
 
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
-  import m_axi_sequencer_pkg::*;
+  import m_axi_sequencer_pkg::*;  
+  import m_axis_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
   import s_spi_sequencer_pkg::*;
   import adi_spi_vip_pkg::*;
@@ -47,14 +48,26 @@ package spi_environment_pkg;
   import `PKGIFY(test_harness, mng_axi_vip)::*;
   import `PKGIFY(test_harness, ddr_axi_vip)::*;
   import `PKGIFY(test_harness, spi_s_vip)::*;
+  `ifdef DEF_SDO_STREAMING
+    import `PKGIFY(test_harness, sdo_src)::*;
+  `endif
 
   class spi_environment extends test_harness_env;
 
     // Agents
     adi_spi_agent #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_agent;
+    `ifdef DEF_SDO_STREAMING
+    `AGENT(test_harness, sdo_src, mst_t)    sdo_src_agent;
+    `endif
+
 
     // Sequencers
     s_spi_sequencer #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_seq;
+    `ifdef DEF_SDO_STREAMING
+    m_axis_sequencer #(`AGENT(test_harness, sdo_src, mst_t),
+              `AXIS_VIP_PARAMS(test_harness, sdo_src)
+              ) sdo_src_seq;
+    `endif
 
     //============================================================================
     // Constructor
@@ -66,6 +79,9 @@ package spi_environment_pkg;
 
       virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
 
+      `ifdef DEF_SDO_STREAMING
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, sdo_src)) sdo_src_axis_vip_if,
+      `endif
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
       virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
@@ -80,11 +96,34 @@ package spi_environment_pkg;
 
       // Creating the agents
       spi_agent = new(spi_s_vip_if);
+      `ifdef DEF_SDO_STREAMING
+      sdo_src_agent = new("SDO Source AXI Stream Agent", sdo_src_axis_vip_if);
+      `endif
 
       // Creating the sequencers
       spi_seq = new(spi_agent);
+      `ifdef DEF_SDO_STREAMING
+      sdo_src_seq = new(sdo_src_agent);
+      `endif
 
+      // downgrade reset check: we are currently using a clock generator for the SPI clock,
+      // so it will come a bit after the reset and trigger the default error. 
+      // This is harmless for this test (we don't want to test any reset scheme)
+      `ifdef DEF_SDO_STREAMING
+      sdo_src_axis_vip_if.set_xilinx_reset_check_to_warn();
+      `endif
     endfunction
+
+    //============================================================================
+    // Configure environment
+    //   - Configure the sequencers with an initial configuration before starting 
+    //============================================================================
+    task configure();
+      `ifdef DEF_SDO_STREAMING
+      sdo_src_seq.set_stop_policy(STOP_POLICY_PACKET);
+      sdo_src_seq.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
+      `endif
+    endtask
 
     //============================================================================
     // Start environment
@@ -94,6 +133,9 @@ package spi_environment_pkg;
     task start();
       super.start();
       spi_agent.start();
+      `ifdef DEF_SDO_STREAMING
+      sdo_src_agent.start_master();
+      `endif
     endtask
 
     //============================================================================
@@ -104,7 +146,9 @@ package spi_environment_pkg;
     task test();
       super.test();
       fork
-
+        `ifdef DEF_SDO_STREAMING
+        sdo_src_seq.run();
+        `endif
       join_none
     endtask
 
@@ -120,7 +164,6 @@ package spi_environment_pkg;
     //============================================================================
     task run;
       test();
-      post_test();
     endtask
 
     //============================================================================
@@ -129,6 +172,10 @@ package spi_environment_pkg;
     task stop;
       spi_agent.stop();
       super.stop();
+      `ifdef DEF_SDO_STREAMING
+      sdo_src_seq.stop();
+      sdo_src_agent.stop_master();
+      `endif
     endtask
 
   endclass

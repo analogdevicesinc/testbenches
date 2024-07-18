@@ -127,6 +127,9 @@ initial begin
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
+            `ifdef DEF_SDO_STREAMING
+            `TH.`SDO_SRC.inst.IF,
+            `endif
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
             `TH.`SPI_S.inst.IF
@@ -134,10 +137,18 @@ initial begin
 
   setLoggerVerbosity(6);
   env.start();
+  env.configure();
+
+  env.sys_reset();
+
+  env.run();
 
   env.spi_seq.set_default_miso_data('h2AA55);
 
-  env.sys_reset();
+  // start sdo source (will wait for data enqueued)
+  `ifdef DEF_SDO_STREAMING
+  env.sdo_src_seq.start();
+  `endif
 
   sanity_test();
 
@@ -183,6 +194,22 @@ task generate_transfer_cmd(
   // SYNC command to generate interrupt
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
   `INFOV(("Transfer generation finished."), 6);
+endtask
+
+//---------------------------------------------------------------------------
+// SPI Engine SDO data
+//---------------------------------------------------------------------------
+
+task sdo_stream_gen(
+    input [`DATA_DLENGTH:0]  tx_data);
+  xil_axi4stream_data_byte data[(`DATA_WIDTH/8)-1:0];
+  `ifdef DEF_SDO_STREAMING
+  for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
+    data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
+    env.sdo_src_seq.push_byte_for_stream(data[i]);
+  end
+  env.sdo_src_seq.add_xfer_descriptor((`DATA_WIDTH/8),0,0);
+  `endif
 endtask
 
 //---------------------------------------------------------------------------
@@ -237,9 +264,14 @@ end
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [`DATA_DLENGTH-1:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
-bit [`DATA_DLENGTH-1:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
-bit [`DATA_DLENGTH-1:0] temp_data;
+bit [`DATA_DLENGTH-1:0] sdi_read_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
+bit [`DATA_DLENGTH-1:0] sdo_write_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
+bit [`DATA_DLENGTH-1:0] sdi_read_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
+bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
+bit [`DATA_DLENGTH-1:0] rx_data;
+bit [`DATA_DLENGTH-1:0] tx_data;
+localparam sdo_mem_num = (`SDO_STREAMING) ? (`MIN((`NUM_OF_WORDS),(`SDO_MEM_WORDS))) : (`NUM_OF_WORDS);
+bit [`DATA_DLENGTH-1:0] one_shot_sdo_data [sdo_mem_num-1 :0] = '{default:'0};
 
 task offload_spi_test();
   //Configure DMA
@@ -260,15 +292,26 @@ task offload_spi_test();
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
   end
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WRD);
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
-  // Enqueue transfers to DUT
+  // Enqueue transfers transfers to DUT
+  for (int i = 0; i<sdo_mem_num; i=i+1) begin
+    one_shot_sdo_data[i] = $urandom;
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), one_shot_sdo_data[i]);
+  end
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    temp_data = $urandom;
-    spi_send(temp_data);
-    offload_sdi_data_store_arr[i] = temp_data;
+    rx_data = $urandom;
+    spi_send(rx_data);
+    sdi_read_data_store[i]  = rx_data;
+    if (i%(`NUM_OF_WORDS)<sdo_mem_num) begin
+      tx_data = one_shot_sdo_data[i%(`NUM_OF_WORDS)];
+    end else begin
+      tx_data = $urandom;
+      sdo_stream_gen(tx_data);
+    end
+    sdo_write_data_store[i] = tx_data;
   end
 
   // Start the offload
@@ -284,21 +327,29 @@ task offload_spi_test();
 
   #2000ns
 
-  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
-  end
-
   if (irq_pending == 'h0) begin
     `ERROR(("IRQ Test FAILED"));
   end else begin
     `INFO(("IRQ Test PASSED"));
   end
 
-  if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-    `ERROR(("Offload Test FAILED"));
-  end else begin
-    `INFO(("Offload Test PASSED"));
+  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
+    sdi_read_data[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+    if (sdi_read_data[i] != sdi_read_data_store[i]) begin
+      `INFOV(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]),6);
+      `ERROR(("Offload Read Test FAILED"));
+    end
   end
+  `INFO(("Offload Read Test PASSED"));
+
+  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
+    spi_receive(sdo_write_data[i]);
+    if (sdo_write_data[i] != sdo_write_data_store[i]) begin
+      `INFOV(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]),6);
+      `ERROR(("Offload Write Test FAILED"));
+    end
+  end
+  `INFO(("Offload Write Test PASSED"));
 endtask
 
 //---------------------------------------------------------------------------
@@ -306,7 +357,9 @@ endtask
 //---------------------------------------------------------------------------
 
 bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
+bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
 bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data_store [`NUM_OF_WORDS-1:0];
+bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data_store [`NUM_OF_WORDS-1:0];
 
 task fifo_spi_test();
   // Start spi clk generator
@@ -340,32 +393,37 @@ task fifo_spi_test();
 
   #100ns
   // Generate a FIFO transaction, write SDO first
-  repeat (`NUM_OF_WORDS) begin
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAC ));
-  end
-
-  // Enqueue transfer to DUT
   for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-    temp_data = $urandom;
-    spi_send(temp_data);
-    sdi_fifo_data_store[i] = temp_data;
+    rx_data = $urandom;
+    tx_data = $urandom;
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (tx_data));// << (`DATA_WIDTH - `DATA_DLENGTH)));
+    spi_send(rx_data);
+    sdi_fifo_data_store[i] = rx_data;
+    sdo_fifo_data_store[i] = tx_data;
   end
 
   generate_transfer_cmd(1);
 
+  `INFO(("Waiting for SPI VIP send..."));
   spi_wait_send();
+  `INFO(("SPI sent"));
 
   for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-  #100ns
-    axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), sdi_fifo_data[i][`DATA_DLENGTH-1:0]);
+    axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), sdi_fifo_data[i]);
+    spi_receive(sdo_fifo_data[i]);
   end
 
   if (sdi_fifo_data !== sdi_fifo_data_store) begin
     `INFOV(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store),6);
     `ERROR(("Fifo Read Test FAILED"));
-  end else begin
-    `INFO(("Fifo Read Test PASSED"));
   end
+  `INFO(("Fifo Read Test PASSED"));
+
+  if (sdo_fifo_data !== sdo_fifo_data_store) begin
+    `INFOV(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data, sdo_fifo_data_store),6);
+    `ERROR(("Fifo Write Test FAILED"));
+  end
+  `INFO(("Fifo Write Test PASSED"));
 endtask
 
 endprogram

@@ -50,7 +50,7 @@ import adi_spi_vip_pkg::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0200;
+localparam PCORE_VERSION              = 32'h0001_0201;
 
 program test_sleep_delay (
   inout spi_engine_irq,
@@ -212,9 +212,13 @@ end
 //---------------------------------------------------------------------------
 
 int sleep_instr_time[$];
+int sleep_duration;
 int sleep_current_duration;
+bit sleeping;
 int cs_instr_time[$];
 int cs_current_duration;
+int cs_duration;
+bit cs_sleeping;
 wire [15:0] cmd, cmd_d1;
 wire cmd_valid, cmd_ready;
 wire idle;
@@ -227,23 +231,34 @@ assign idle         = `TH.spi_engine.spi_engine_execution.inst.idle;
 
 initial begin
   sleep_current_duration = 0;
+  sleep_duration = 0;
+  sleeping = 1'b0;
+  cs_current_duration = 0;
+  cs_duration = 0;
+  cs_sleeping = 1'b0;
   forever begin
     @(posedge spi_engine_spi_clk);
-      if (idle && (cmd_d1[15:8] == 8'h31)) begin
+      if (idle && (cmd_d1[15:8] == 8'h31) && sleeping) begin
+        sleeping <= 1'b0;
+        sleep_duration = sleep_current_duration+1;
         sleep_instr_time.push_front(sleep_current_duration+1); // add one to account for this cycle
       end
       if (cmd_valid && cmd_ready && (cmd[15:8] == 8'h31)) begin
-        sleep_current_duration = 0;
+        sleep_current_duration <= 0;
+        sleeping <= 1'b1;
       end else begin
-        sleep_current_duration = sleep_current_duration+1;
+        sleep_current_duration <= sleep_current_duration+1;
       end
-      if (idle && (cmd_d1[15:10] == 6'h4)) begin
+      if (idle && (cmd_d1[15:10] == 6'h4) && cs_sleeping) begin
+        cs_sleeping = 1'b0;
+        cs_duration = cs_current_duration+1;
         cs_instr_time.push_front(cs_current_duration+1); // add one to account for this cycle
       end
       if (cmd_valid && cmd_ready && (cmd[15:10] == 6'h4)) begin
-        cs_current_duration = 0;
+        cs_current_duration <= 0;
+        cs_sleeping <= 1'b1;
       end else begin
-        cs_current_duration = cs_current_duration+1;
+        cs_current_duration <= cs_current_duration+1;
       end
   end
 end
@@ -281,7 +296,7 @@ task sleep_delay_test(
   // Write commands
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), ((`INST_DLENGTH) & 32'hFFFF_FF00) | 16);
   if (`CS_ACTIVE_HIGH) begin
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `cs_inv_mask(8'hFF));
   end
@@ -297,6 +312,19 @@ task sleep_delay_test(
   end else begin
       `INFO(("Sleep Test PASSED"));
   end
+
+  // change the SPI word size (this should not affect sleep delay)
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`sleep(sleep_param)));
+  #2000ns
+  sleep_time = sleep_instr_time.pop_back();
+  #100ns
+  if ((sleep_time != expected_sleep_time)) begin
+      `ERROR(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
+  end else begin
+      `INFO(("Sleep Test PASSED"));
+  end
+
   // Disable SPI Engine
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), 1);
 endtask

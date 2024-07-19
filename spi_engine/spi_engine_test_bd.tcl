@@ -83,3 +83,6 @@ ad_mem_hp1_interconnect $sys_cpu_clk axi_spi_engine_dma/m_dest_axi
 if {$ad_project_params(ECHO_SCLK)} {
   adi_sim_add_define DEF_ECHO_SCLK
 }
+if {$ad_project_params(SDO_STREAMING)} {
+  adi_sim_add_define DEF_SDO_STREAMING
+}

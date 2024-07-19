@@ -128,10 +128,12 @@ initial begin
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
+            `ifdef DEF_SDO_STREAMING
+            `TH.`SDO_SRC.inst.IF,
+            `endif
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
-            `TH.`SPI_S.inst.IF,
-            `TH.`SDO_SRC.inst.IF
+            `TH.`SPI_S.inst.IF
             );
 
   setLoggerVerbosity(6);
@@ -145,7 +147,9 @@ initial begin
   env.spi_seq.set_default_miso_data('h2AA55);
 
   // start sdo source (will wait for data enqueued)
+  `ifdef DEF_SDO_STREAMING
   env.sdo_src_seq.start();
+  `endif
 
   sanity_test();
 
@@ -197,11 +201,13 @@ endtask
 task sdo_stream_gen(
     input [`DATA_DLENGTH:0]  tx_data);
   xil_axi4stream_data_byte data[(`DATA_WIDTH/8)-1:0];
+  `ifdef DEF_SDO_STREAMING
   for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
     data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
     env.sdo_src_seq.push_byte_for_stream(data[i]);
   end
   env.sdo_src_seq.add_xfer_descriptor((`DATA_WIDTH/8),0,0);
+  `endif
 endtask
 
 //---------------------------------------------------------------------------
@@ -262,6 +268,8 @@ bit [`DATA_DLENGTH-1:0] sdi_read_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)
 bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
 bit [`DATA_DLENGTH-1:0] rx_data;
 bit [`DATA_DLENGTH-1:0] tx_data;
+localparam one_shot_num = (`SDO_STREAMING) ? (`MIN((`NUM_OF_WORDS),(`ONE_SHOT_WORDS))) : (`NUM_OF_WORDS);
+bit [`DATA_DLENGTH-1:0] one_shot_sdo_data [one_shot_num-1 :0] = '{default:'0};
 
 task offload_spi_test();
   //Configure DMA
@@ -286,17 +294,21 @@ task offload_spi_test();
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `cs(8'hFF));
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
-  // Enqueue transfers to DUT
+  // Enqueue transfers transfers to DUT
+  for (int i = 0; i<one_shot_num; i=i+1) begin
+    one_shot_sdo_data[i] = $urandom;
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), one_shot_sdo_data[i]);
+  end
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
     rx_data = $urandom;
-    tx_data = $urandom;
     spi_send(rx_data);
-    if (`SDO_STREAMING) begin
-      sdo_stream_gen(tx_data);
-    end else begin
-      axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), (tx_data));// << (`DATA_WIDTH - `DATA_DLENGTH)));
-    end
     sdi_read_data_store[i]  = rx_data;
+    if (i%(`NUM_OF_WORDS)<one_shot_num) begin
+      tx_data = one_shot_sdo_data[i%(`NUM_OF_WORDS)];
+    end else begin
+      tx_data = $urandom;
+      sdo_stream_gen(tx_data);
+    end
     sdo_write_data_store[i] = tx_data;
   end
 

@@ -175,11 +175,11 @@ program test_program;
     env.ref_src_axis_seq.start();
     `endif
 
-    m_dmac_api.enable_dma();
-    m_dmac_api.set_flags('b1111);
+    m_dmac_api.set_control('b1001);
+    m_dmac_api.set_flags('b111);
 
-    s_dmac_api.enable_dma();
-    s_dmac_api.set_flags('b1111);
+    s_dmac_api.set_control('b1001);
+    s_dmac_api.set_flags('b111);
 
     `ifdef HAS_XIL_VDMA
     // Config S2MM

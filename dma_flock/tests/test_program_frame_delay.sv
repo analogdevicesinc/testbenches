@@ -136,6 +136,7 @@ program test_program_frame_delay;
       // Get parameters
       autorun_flock_framenum =  `TH.`DUT_RX_DMA.inst.AUTORUN_FRAMELOCK_CONFIG & 'hFF;
       autorun_flock_distance = (((`TH.`DUT_RX_DMA.inst.AUTORUN_FRAMELOCK_CONFIG) >> 16) & 'hFF) + 1;
+
       singleTest(
         .frame_num(10),
         .flock_framenum(autorun_flock_framenum),
@@ -217,11 +218,11 @@ program test_program_frame_delay;
     `endif
 
     if (has_autorun == 0) begin
-      m_dmac_api.enable_dma();
-      m_dmac_api.set_flags('b1111);
+      m_dmac_api.set_control('b1001);
+      m_dmac_api.set_flags('b111);
 
-      s_dmac_api.enable_dma();
-      s_dmac_api.set_flags('b1111);
+      s_dmac_api.set_control('b1001);
+      s_dmac_api.set_flags('b111);
     end
 
     `ifdef HAS_XIL_VDMA

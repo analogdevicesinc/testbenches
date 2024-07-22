@@ -92,7 +92,7 @@ package dmac_api_pkg;
         this.axi_write(GetAddrs(DMAC_Y_LENGTH), 32'h0);
       end
       this.axi_read(GetAddrs(DMAC_FLAGS), val);
-      p.FRAMELOCK = `GET_DMAC_FLAGS_FRAMELOCK(val);
+      p.FRAMELOCK = `GET_DMAC_CONTROL_FRAMELOCK(val);
     endtask : discover_params
 
     // -----------------
@@ -137,12 +137,22 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
+    task set_control(input bit[3:0] control);
+      this.axi_write(GetAddrs(DMAC_CONTROL),
+                        `SET_DMAC_CONTROL_ENABLE(control[0]) |
+                        `SET_DMAC_CONTROL_PAUSE(control[1]) |
+                        `SET_DMAC_CONTROL_HWDESC(control[2]) |
+                        `SET_DMAC_CONTROL_FRAMELOCK(control[3]));
+    endtask : set_control
+
+    // -----------------
+    //
+    // -----------------
     task set_flags(input bit[3:0] flags);
       this.axi_write(GetAddrs(DMAC_FLAGS),
                         `SET_DMAC_FLAGS_CYCLIC(flags[0]) |
                         `SET_DMAC_FLAGS_TLAST(flags[1]) |
-                        `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]) |
-                        `SET_DMAC_FLAGS_FRAMELOCK(flags[3]));
+                        `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
     endtask : set_flags
 
     // -----------------

@@ -26,7 +26,7 @@ set m_dma_cfg [list \
    DMA_2D_TLAST_MODE {1} \
    \
    AUTORUN                  $AUTORUN \
-   AUTORUN_FLAGS            {0xB} \
+   AUTORUN_FLAGS            {0x13} \
    AUTORUN_SRC_ADDR         {0x00000000} \
    AUTORUN_DEST_ADDR        {0x00001000} \
    AUTORUN_X_LENGTH         {0x3FF} \
@@ -50,7 +50,7 @@ set s_dma_cfg [list \
    DMA_2D_TLAST_MODE {1} \
    \
    AUTORUN                  $AUTORUN \
-   AUTORUN_FLAGS            {0xB} \
+   AUTORUN_FLAGS            {0x13} \
    AUTORUN_SRC_ADDR         {0x00001000} \
    AUTORUN_DEST_ADDR        {0x00000000} \
    AUTORUN_X_LENGTH         {0x3FF} \

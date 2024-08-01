@@ -147,7 +147,7 @@ package adi_spi_vip_pkg;
                       @(posedge vif.drive_edge);
                     end
                     begin
-                      @(tx_mbx_updated.triggered);
+                      wait (tx_mbx_updated.triggered && i==0 && using_default);
                       pending_mbx = 1'b1;
                     end
                   join_any
@@ -160,7 +160,7 @@ package adi_spi_vip_pkg;
                   `ERROR(("tx_miso: early exit due to unexpected CS inactive!"));
                 end
                 break;
-              end else if (pending_mbx && using_default && i == 0) begin
+              end else if (pending_mbx) begin
                 // we were going to transmit default data, but new data arrived between the cs edge and vif.drive_edge
                 using_default = 1'b0;
                 pending_mbx = 1'b0;

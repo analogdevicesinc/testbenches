@@ -50,7 +50,7 @@ import adi_spi_vip_pkg::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0201;
+localparam PCORE_VERSION              = 32'h0001_0300;
 
 program test_sleep_delay (
   inout spi_engine_irq,
@@ -124,6 +124,9 @@ initial begin
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
+            `ifdef DEF_SDO_STREAMING
+            `TH.`SDO_SRC.inst.IF,
+            `endif
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
             `TH.`SPI_S.inst.IF
@@ -131,10 +134,18 @@ initial begin
 
   setLoggerVerbosity(6);
   env.start();
+  env.configure();
+
+  env.sys_reset();
+
+  env.run();
 
   env.spi_seq.set_default_miso_data('h2AA55);
 
-  env.sys_reset();
+  // start sdo source (will wait for data enqueued)
+  `ifdef DEF_SDO_STREAMING
+  env.sdo_src_seq.start();
+  `endif
 
   sanity_test();
 

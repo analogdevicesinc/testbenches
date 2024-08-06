@@ -62,7 +62,6 @@ package environment_pkg;
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, tx_dst_axis)) tx_dst_axis_vip_if,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, rx_src_axis)) rx_src_axis_vip_if,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, rx_dst_axis)) rx_dst_axis_vip_if
-
     );
 
       // creating the agents

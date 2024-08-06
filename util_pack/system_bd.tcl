@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright 2022 (c) Analog Devices, Inc. All rights reserved.
+# Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -48,18 +48,12 @@ set SAMPLES $ad_project_params(SAMPLES)
 set WIDTH $ad_project_params(WIDTH)
 set MAX_WIDTH [expr {2 ** ceil([log2 $CHANNELS]) * $SAMPLES * $WIDTH}]
 
-ad_ip_instance xlconstant GND [list \
-  CONST_VAL 0 \
-]
-ad_connect gnd GND/dout
-
 ad_ip_instance xlconstant VCC [list \
   CONST_VAL 1 \
 ]
 ad_connect vcc VCC/dout
 
 # Create CPack configuration
-
 ad_ip_instance axi_dmac dmac_tx [list \
   DMA_TYPE_SRC 2 \
   DMA_TYPE_DEST 1 \
@@ -132,7 +126,6 @@ for {set i 0} {$i < $CHANNELS} {incr i} {
 ad_connect tx_src_axis/m_axis_tvalid util_cpack2_DUT/fifo_wr_en
 
 # Create UPack configuration
-
 ad_ip_instance axi_dmac dmac_rx [list \
   DMA_TYPE_SRC 1 \
   DMA_TYPE_DEST 1 \

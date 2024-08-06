@@ -43,6 +43,7 @@ import logger_pkg::*;
 import environment_pkg::*;
 import m_axis_sequencer_pkg::*;
 import s_axis_sequencer_pkg::*;
+import watchdog_pkg::*;
 
 program test_program (
   clk_if input_clk_if,
@@ -51,6 +52,7 @@ program test_program (
   // declare the class instances
   environment env;
 
+  watchdog send_data_wd;
 
   initial begin
 
@@ -78,20 +80,31 @@ program test_program (
 
     env.run();
 
+    send_data_wd = new(500000, "Send data");
+
+    send_data_wd.start();
+
+    env.input_axis_seq.start();
+
     // stimulus
-    repeat($urandom_range(10,20)) begin
-      env.input_axis_seq.add_xfer_descriptor_packet_size($urandom_range(1,100), 1, 0);
-
-      env.input_axis_seq.start();
+    repeat($urandom_range(5,13)) begin
+      send_data_wd.reset();
       
-      #($urandom_range(1,20)*1us);
+      repeat($urandom_range(1,5))
+        env.input_axis_seq.add_xfer_descriptor_packet_size($urandom_range(1,100), 1, 0);
+      
+      #($urandom_range(1,10)*1us);
 
-      env.input_axis_seq.stop();
+      env.input_axis_seq.clear_queue();
 
-      env.input_axis_seq.packet_sent();
+      #1us;
 
       env.scoreboard_inst.wait_until_complete();
+
+      `INFOV(("Packet finished."), 5);
     end
+
+    send_data_wd.stop();
         
     env.stop();
     

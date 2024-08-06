@@ -42,6 +42,8 @@ global ad_project_params
 
 set INPUT_WIDTH $ad_project_params(INPUT_WIDTH)
 set OUTPUT_WIDTH $ad_project_params(OUTPUT_WIDTH)
+set FIFO_LIMITED $ad_project_params(FIFO_LIMITED)
+set ADDRESS_WIDTH $ad_project_params(ADDRESS_WIDTH)
 
 # input clock and reset
 create_bd_port -dir I input_clk
@@ -53,14 +55,14 @@ create_bd_port -dir I output_clk
 ad_ip_instance util_axis_fifo_asym util_axis_fifo_asym_DUT [list \
   ASYNC_CLK 1 \
   S_DATA_WIDTH $INPUT_WIDTH \
-  ADDRESS_WIDTH 5 \
+  ADDRESS_WIDTH $ADDRESS_WIDTH \
   M_DATA_WIDTH $OUTPUT_WIDTH \
   M_AXIS_REGISTERED 1 \
   ALMOST_EMPTY_THRESHOLD 16 \
   ALMOST_FULL_THRESHOLD 16 \
   TLAST_EN 1 \
   TKEEP_EN 1 \
-  FIFO_LIMITED 1 \
+  FIFO_LIMITED $FIFO_LIMITED \
   ADDRESS_WIDTH_PERSPECTIVE 0 \
 ]
 

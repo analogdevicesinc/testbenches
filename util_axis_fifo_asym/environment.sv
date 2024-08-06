@@ -118,8 +118,8 @@ package environment_pkg;
 
       super.start();
 
-      input_clk_if.start_clock($urandom_range(1000,10000));
-      output_clk_if.start_clock($urandom_range(1000,10000));
+      input_clk_if.start_clock(`INPUT_CLK);
+      output_clk_if.start_clock(`OUTPUT_CLK);
 
       input_axis_agent.start_master();
       output_axis_agent.start_slave();

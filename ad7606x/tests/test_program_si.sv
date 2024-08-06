@@ -46,9 +46,6 @@ import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
-parameter DEV_CONFIG = 0;
-parameter NUM_OF_SDI = 2;
-
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
@@ -97,7 +94,7 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 program test_program_si (
   output        ad7606_spi_cs,
   output        ad7606_spi_sclk,
-  input  [NUM_OF_SDI-1:0] ad7606_spi_sdi,
+  input  [`NUM_OF_SDI-1:0] ad7606_spi_sdi,
   output        ad7606_spi_sdo,
   input         adc_busy,
   output        adc_cnvst_n);

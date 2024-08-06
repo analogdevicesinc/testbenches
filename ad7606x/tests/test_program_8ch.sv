@@ -47,11 +47,7 @@ import adi_regmap_common_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 
-parameter DEV_CONFIG = 0;
 parameter SIMPLE_STATUS_CRC = 0;
-parameter EXT_CLK = 0;
-parameter ADC_N_BITS = (DEV_CONFIG == 2 || DEV_CONFIG == 8 || DEV_CONFIG == 9) ? 18 : 16;
-parameter NUM_OF_CH = 8;
 
 parameter CH0 = 8'h00 * 4;
 parameter CH1 = 8'h10 * 4;
@@ -151,14 +147,14 @@ initial begin
 end
 
   // fixed data for channels
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch1 = (ADC_N_BITS == 18) ? 18'hAB322 : 16'hACCA;
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch2 = (ADC_N_BITS == 18) ? 18'h57311 : 16'h5CC5;
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch3 = (ADC_N_BITS == 18) ? 18'hA8CE2 : 16'hA33A;
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch4 = (ADC_N_BITS == 18) ? 18'h54CD1 : 16'h5335;
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch5 = (ADC_N_BITS == 18) ? 18'h32AB0 : 16'hCAAC;
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch6 = (ADC_N_BITS == 18) ? 18'h31570 : 16'hC55C;
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch7 = (ADC_N_BITS == 18) ? 18'hCEA83 : 16'h3AA3;
-  bit [(ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch8 = (ADC_N_BITS == 18) ? 18'hCD543 : 16'h3553;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch1 = (`ADC_N_BITS == 18) ? 18'hAB322 : 16'hACCA;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch2 = (`ADC_N_BITS == 18) ? 18'h57311 : 16'h5CC5;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch3 = (`ADC_N_BITS == 18) ? 18'hA8CE2 : 16'hA33A;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch4 = (`ADC_N_BITS == 18) ? 18'h54CD1 : 16'h5335;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch5 = (`ADC_N_BITS == 18) ? 18'h32AB0 : 16'hCAAC;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch6 = (`ADC_N_BITS == 18) ? 18'h31570 : 16'hC55C;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch7 = (`ADC_N_BITS == 18) ? 18'hCEA83 : 16'h3AA3;
+  bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch8 = (`ADC_N_BITS == 18) ? 18'hCD543 : 16'h3553;
   bit [ 7:0]            tx_status_1 = 8'h0;
   bit [ 7:0]            tx_status_2 = 8'h1;
   bit [ 7:0]            tx_status_3 = 8'h2;
@@ -172,10 +168,10 @@ end
   bit [15:0]  tx_crc;
 
   assign rx_db_i = tx_data_buf;
-  assign tx_crc = (ADC_N_BITS == 16) ? ((adc_config_mode == 1) ? 16'hE0E2 : ((adc_config_mode == 3) ? 16'h6B33 : 16'h0)) : ((adc_config_mode == 1) ? 16'hD885 : ((adc_config_mode == 3) ? 16'hAF8B : 16'h0));
+  assign tx_crc = (`ADC_N_BITS == 16) ? ((adc_config_mode == 1) ? 16'hE0E2 : ((adc_config_mode == 3) ? 16'h6B33 : 16'h0)) : ((adc_config_mode == 1) ? 16'hD885 : ((adc_config_mode == 3) ? 16'hAF8B : 16'h0));
 
   wire [4:0] num_of_transfers;
-  assign num_of_transfers = (ADC_N_BITS == 16) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
+  assign num_of_transfers = (`ADC_N_BITS == 16) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
 
 //---------------------------------------------------------------------------
 // Sanity test reg interface
@@ -201,19 +197,19 @@ initial begin
     case (transfer_cnt)
       32'h00000000: tx_data_buf = 16'h0;
       32'h00000001: begin
-                      if (ADC_N_BITS == 16) begin
+                      if (`ADC_N_BITS == 16) begin
                         tx_data_buf = tx_ch1;
-                      end else if (ADC_N_BITS == 18) begin
+                      end else if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch1[17:2];
                       end
                     end
       32'h00000002: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_1};
-                      end else if ((ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
+                      end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
                         tx_data_buf = tx_ch2;
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -223,17 +219,17 @@ initial begin
                     end
       32'h00000003: begin
                       tx_data_buf = tx_ch3;
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch2[17:2];
                       end
                     end
       32'h00000004: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_2};
-                      end else if ((ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
+                      end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
                         tx_data_buf = tx_ch4;
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -243,17 +239,17 @@ initial begin
                     end
       32'h00000005: begin
                       tx_data_buf = tx_ch5;
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch3[17:2];
                       end
                     end
       32'h00000006: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_3};
-                      end else if ((ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
+                      end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
                         tx_data_buf = tx_ch6;
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -263,17 +259,17 @@ initial begin
                     end
       32'h00000007: begin
                       tx_data_buf = tx_ch7;
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch4[17:2];
                       end
                     end
       32'h00000008: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_4};
-                      end else if ((ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
+                      end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
                         tx_data_buf = tx_ch8;
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -282,17 +278,17 @@ initial begin
                       end
                     end
       32'h00000009: begin
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch5[17:2];
                       end else begin
                         tx_data_buf = tx_crc;
                       end
                     end
       32'h0000000A: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_5};
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -301,15 +297,15 @@ initial begin
                       end
                     end
       32'h0000000B: begin
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch6[17:2];
                       end
                     end
       32'h0000000C: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_6};
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -318,15 +314,15 @@ initial begin
                       end
                     end
       32'h0000000D: begin
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch7[17:2];
                       end
                     end
       32'h0000000E: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_7};
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -335,15 +331,15 @@ initial begin
                       end
                     end
       32'h0000000F: begin
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         tx_data_buf = tx_ch8[17:2];
                       end
                     end
       32'h00000010: begin
-                      if ((ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
                         tx_data_buf = {8'b0,tx_status_8};
                       end
-                      if (ADC_N_BITS == 18) begin
+                      if (`ADC_N_BITS == 18) begin
                         if (adc_config_mode == 0 || adc_config_mode == 1) begin
                           tx_data_buf = {tx_ch1[1:0],14'b0};
                         end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
@@ -352,9 +348,9 @@ initial begin
                       end
                     end
       32'h00000011: begin
-                      if ((ADC_N_BITS == 16) &&  adc_config_mode == 3) begin
+                      if ((`ADC_N_BITS == 16) &&  adc_config_mode == 3) begin
                         tx_data_buf = {8'b0,tx_status_8};
-                      end else if (ADC_N_BITS == 18 && (adc_config_mode == 1 || adc_config_mode == 3)) begin
+                      end else if (`ADC_N_BITS == 18 && (adc_config_mode == 1 || adc_config_mode == 3)) begin
                         tx_data_buf = tx_crc;
                       end
                     end

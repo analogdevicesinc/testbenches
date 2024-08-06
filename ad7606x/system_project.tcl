@@ -19,21 +19,23 @@ set project_name [file rootname $cfg_file]
 global ad_project_params
 
 set INTF $ad_project_params(INTF)
-if {$INTF == 0} {
-  set NUM_OF_CH $ad_project_params(NUM_OF_CH)
-} else {
-  set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
-}
+set ADC_N_BITS $ad_project_params(ADC_N_BITS)
+set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
+set NUM_OF_CH $ad_project_params(NUM_OF_CH)
 
 #set a default test program
 if {$INTF == 0} {
-  if {$NUM_OF_CH == 8} {
+  if {$ADC_N_BITS == 18} {
     adi_sim_add_define "TEST_PROGRAM=test_program_8ch"
-  } elseif {$NUM_OF_CH == 4} {
-    adi_sim_add_define "TEST_PROGRAM=test_program_4ch"
-  } elseif {$NUM_OF_CH == 6} {
-    adi_sim_add_define "TEST_PROGRAM=test_program_6ch"
-  }
+  } elseif {$ADC_N_BITS == 18} {
+    if{$NUM_OF_CH == 4} {
+      adi_sim_add_define "TEST_PROGRAM=test_program_4ch"
+    } elseif {$NUM_OF_CH == 6} {
+      adi_sim_add_define "TEST_PROGRAM=test_program_6ch"
+    } elseif {$NUM_OF_CH == 8} {
+      adi_sim_add_define "TEST_PROGRAM=test_program_8ch"
+    }
+  }  
 } else {
   adi_sim_add_define "TEST_PROGRAM=test_program_si"
 }

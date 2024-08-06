@@ -62,35 +62,23 @@ TP := test_program_si
 #TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 
 # Parallel interface configurations
-#TESTS += cfg0:test_program_8ch
-#TESTS += cfg1:test_program_8ch
-#TESTS += cfg2:test_program_8ch
-#TESTS += cfg3:test_program_4ch
-#TESTS += cfg4:test_program_8ch
-#TESTS += cfg5:test_program_6ch
-#TESTS += cfg6:test_program_4ch
-#TESTS += cfg7:test_program_8ch
-#TESTS += cfg8:test_program_8ch
-#TESTS += cfg9:test_program_8ch
+#TESTS += cfg_p_16b:test_program_4ch
+#TESTS += cfg_p_16b:test_program_6ch
+#TESTS += cfg_p_16b:test_program_8ch
+#TESTS += cfg_p_18b:test_program_8ch
 
 # Serial interface configurations
-#TESTS += cfg0:test_program_si
-#TESTS += cfg1:test_program_si
-#TESTS += cfg2:test_program_si
-#TESTS += cfg3:test_program_si
-#TESTS += cfg4:test_program_si
-#TESTS += cfg5:test_program_si
-#TESTS += cfg6:test_program_si
-#TESTS += cfg7:test_program_si
-#TESTS += cfg8:test_program_si
-#TESTS += cfg9:test_program_si
+#TESTS += cfg_s_sdi1:test_program_si
+#TESTS += cfg_s_sdi2:test_program_si
+#TESTS += cfg_s_sdi4:test_program_si
+#TESTS += cfg_s_sdi8:test_program_si
 
 include ../scripts/project-sim.mk
 
 # usage :
 #
 # run specific test on a specific configuration in gui mode
-# 	make CFG=cfg_PI_7606B_CRC TST=test_program_pi MODE=gui
+# 	make CFG=cfg_p_18b TST=test_program_8ch MODE=gui
 #
 
 ####################################################################################

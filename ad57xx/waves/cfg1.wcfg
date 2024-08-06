@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv_2280717572 " />
+            <top_module name="\$unit_xpm_cdc_sv_220102727 " />
+            <top_module name="ad57xx_environment_pkg" />
+            <top_module name="adi_regmap_clkgen_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_regmap_pwm_gen_pkg" />
+            <top_module name="adi_regmap_spi_engine_pkg" />
+            <top_module name="adi_spi_vip_pkg" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="reg_accessor_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="s_spi_sequencer_pkg" />
+            <top_module name="spi_engine_instr_pkg" />
+            <top_module name="std" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="test_harness_spi_s_vip_0_pkg" />
+            <top_module name="vpkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="16,426.714 ns"></ZoomStartTime>
+      <ZoomEndTime time="17,754.715 ns"></ZoomEndTime>
+      <Cursor1Time time="16,760.714 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="204"></NameColumnWidth>
+      <ValueColumnWidth column_width="119"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="9" />
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_s_vip/s_spi_sclk">
+      <obj_property name="ElementShortName">s_spi_sclk</obj_property>
+      <obj_property name="ObjectShortName">s_spi_sclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_s_vip/s_spi_mosi">
+      <obj_property name="ElementShortName">s_spi_mosi</obj_property>
+      <obj_property name="ObjectShortName">s_spi_mosi</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_s_vip/s_spi_miso">
+      <obj_property name="ElementShortName">s_spi_miso</obj_property>
+      <obj_property name="ObjectShortName">s_spi_miso</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_s_vip/s_spi_cs">
+      <obj_property name="ElementShortName">s_spi_cs</obj_property>
+      <obj_property name="ObjectShortName">s_spi_cs</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdo_write_data">
+      <obj_property name="ElementShortName">sdo_write_data[2:0][23:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_write_data[2:0][23:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sdo_write_data_store">
+      <obj_property name="ElementShortName">sdo_write_data_store[2:0][23:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_write_data_store[2:0][23:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/ad57xx_spi_irq">
+      <obj_property name="ElementShortName">ad57xx_spi_irq</obj_property>
+      <obj_property name="ObjectShortName">ad57xx_spi_irq</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/ad57xx_spi_clk">
+      <obj_property name="ElementShortName">ad57xx_spi_clk</obj_property>
+      <obj_property name="ObjectShortName">ad57xx_spi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/trig_gen/pwm_0">
+      <obj_property name="ElementShortName">pwm_0</obj_property>
+      <obj_property name="ObjectShortName">pwm_0</obj_property>
+   </wvobject>
+</wave_config>

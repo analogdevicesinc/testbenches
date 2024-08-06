@@ -37,8 +37,6 @@
 
 package adi_spi_vip_pkg;
 
-  import logger_pkg::*;
-
   `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
                                     SPI_VIP_CPOL              ,\
                                     SPI_VIP_CPHA              ,\
@@ -157,7 +155,7 @@ package adi_spi_vip_pkg;
               if (!vif.cs_active) begin
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
-                  `ERROR(("tx_miso: early exit due to unexpected CS inactive!"));
+                  $error("tx_miso: early exit due to unexpected CS inactive!");
                 end
                 break;
               end else if (pending_mbx) begin
@@ -173,7 +171,7 @@ package adi_spi_vip_pkg;
                   miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
                 end
                 if (i == SPI_VIP_DATA_DLENGTH-1) begin
-                  `INFO(("[SPI VIP] MISO Tx end of transfer."));
+                  $display("[SPI VIP] MISO Tx end of transfer.");
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
                     miso_mbx.get(miso_reg);
@@ -246,7 +244,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                `INFO(("[SPI VIP] Stop event triggered."));
+                $display("[SPI VIP] Stop event triggered.");
                 this.stop_flag = 0;
               end
               begin
@@ -258,7 +256,7 @@ package adi_spi_vip_pkg;
         join
         this.clear_active();
       end else begin
-        `ERROR(("Already running!"));
+        $error("Already running!");
       end
     endtask
 
@@ -266,7 +264,7 @@ package adi_spi_vip_pkg;
       if (this.get_active()) begin
         this.stop_flag = 1;
       end else begin
-        `ERROR(("Already inactive!"));
+        $error("Already inactive!");
       end
     endtask
 

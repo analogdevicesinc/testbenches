@@ -19,7 +19,11 @@ set project_name [file rootname $cfg_file]
 global ad_project_params
 
 set INTF $ad_project_params(INTF)
-set NUM_OF_CH $ad_project_params(NUM_OF_CH)
+if {$INTF == 0} {
+  set NUM_OF_CH $ad_project_params(NUM_OF_CH)
+} else {
+  set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
+}
 
 #set a default test program
 if {$INTF == 0} {
@@ -31,7 +35,7 @@ if {$INTF == 0} {
     adi_sim_add_define "TEST_PROGRAM=test_program_6ch"
   }
 } else {
-  adi_sim_add_define "TEST_PROGRAM=test_program"
+  adi_sim_add_define "TEST_PROGRAM=test_program_si"
 }
 
 # Create the project
@@ -52,12 +56,13 @@ adi_sim_project_files [list \
  "../common/sv/adi_regmap_common_pkg.sv" \
  "../common/sv/adi_regmap_dmac_pkg.sv" \
  "../common/sv/adi_regmap_pwm_gen_pkg.sv" \
+ "../common/sv/adi_regmap_spi_engine_pkg.sv" \
  "../common/sv/dma_trans.sv" \
  "../common/sv/test_harness_env.sv" \
  "tests/test_program_8ch.sv" \
  "tests/test_program_4ch.sv" \
  "tests/test_program_6ch.sv" \
- "tests/test_program.sv" \
+ "tests/test_program_si.sv" \
  "system_tb.sv"]
 
 adi_sim_generate $project_name

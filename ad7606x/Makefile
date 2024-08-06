@@ -41,9 +41,13 @@ LIB_DEPS += util_i2c_mixer
 LIB_DEPS += util_pack/util_cpack2 
 LIB_DEPS += util_cdc
 LIB_DEPS += util_axis_fifo
+LIB_DEPS += spi_engine/axi_spi_engine
+LIB_DEPS += spi_engine/spi_engine_execution
+LIB_DEPS += spi_engine/spi_engine_interconnect
+LIB_DEPS += spi_engine/spi_engine_offload
 
 # default test program
-TP := test_program
+TP := test_program_si
 #TP := test_program_4ch
 #TP := test_program_6ch
 #TP := test_program_8ch
@@ -57,6 +61,7 @@ TP := test_program
 # Format is:  <configuration>:<test name>
 #TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 
+# Parallel interface configurations
 #TESTS += cfg0:test_program_8ch
 #TESTS += cfg1:test_program_8ch
 #TESTS += cfg2:test_program_8ch
@@ -67,6 +72,18 @@ TP := test_program
 #TESTS += cfg7:test_program_8ch
 #TESTS += cfg8:test_program_8ch
 #TESTS += cfg9:test_program_8ch
+
+# Serial interface configurations
+#TESTS += cfg0:test_program_si
+#TESTS += cfg1:test_program_si
+#TESTS += cfg2:test_program_si
+#TESTS += cfg3:test_program_si
+#TESTS += cfg4:test_program_si
+#TESTS += cfg5:test_program_si
+#TESTS += cfg6:test_program_si
+#TESTS += cfg7:test_program_si
+#TESTS += cfg8:test_program_si
+#TESTS += cfg9:test_program_si
 
 include ../scripts/project-sim.mk
 

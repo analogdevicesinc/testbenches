@@ -52,7 +52,7 @@ import adi_spi_vip_pkg::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0201;
+localparam PCORE_VERSION              = 32'h0001_0300;
 
 program test_program (
   inout spi_engine_irq,
@@ -339,7 +339,7 @@ task fifo_spi_test();
   #100ns
   // Generate a FIFO transaction, write SDO first
   repeat (`NUM_OF_WORDS) begin
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (`DATA_WIDTH - `DATA_DLENGTH)));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAC ));
   end
 
   // Enqueue transfer to DUT

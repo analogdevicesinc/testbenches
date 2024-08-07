@@ -50,7 +50,7 @@ import adi_spi_vip_pkg::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam PCORE_VERSION              = 32'h0001_0201;
+localparam PCORE_VERSION              = 32'h0001_0300;
 
 program test_sleep_delay (
   inout spi_engine_irq,

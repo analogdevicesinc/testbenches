@@ -27,15 +27,15 @@ set NUM_OF_CH $ad_project_params(NUM_OF_CH)
 if {$INTF == 0} {
   if {$ADC_N_BITS == 18} {
     adi_sim_add_define "TEST_PROGRAM=test_program_8ch"
-  } elseif {$ADC_N_BITS == 18} {
-    if{$NUM_OF_CH == 4} {
+  } elseif {$ADC_N_BITS == 16} {
+    if {$NUM_OF_CH == 4} {
       adi_sim_add_define "TEST_PROGRAM=test_program_4ch"
     } elseif {$NUM_OF_CH == 6} {
       adi_sim_add_define "TEST_PROGRAM=test_program_6ch"
     } elseif {$NUM_OF_CH == 8} {
       adi_sim_add_define "TEST_PROGRAM=test_program_8ch"
     }
-  }  
+  }
 } else {
   adi_sim_add_define "TEST_PROGRAM=test_program_si"
 }

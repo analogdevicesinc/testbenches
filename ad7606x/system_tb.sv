@@ -60,7 +60,7 @@ if (`INTF == 0) begin //parallel interface
 
     wire [4:0] num_chs;
 
-    parameter DEV_CONFIG = 3;
+    parameter ADC_N_BITS = 16;
     localparam NEG_EDGE = 1;
 
     `TEST_PROGRAM test(
@@ -104,7 +104,7 @@ if (`INTF == 0) begin //parallel interface
       end
     end
 
-    assign num_chs = (DEV_CONFIG == 0 || DEV_CONFIG == 1) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
+    assign num_chs = (ADC_N_BITS == 16) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
     assign rx_busy = (~rx_cnvst_n & rx_cnvst_n_d) ? 1'b1 : 1'b0;
     assign rx_ch_count = rx_ch_count_d;
     assign rx_data_ready = (~rx_rd_n & rx_rd_n_d) ? 1'b1 : 1'b0;

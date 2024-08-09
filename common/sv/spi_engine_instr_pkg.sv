@@ -15,7 +15,7 @@ package spi_engine_instr_pkg;
 `define INST_CFG        (32'h0000_2100 | (`SDO_IDLE_STATE << 3) | (`THREE_WIRE << 2) | (`CPOL << 1) | `CPHA)
 `define INST_PRESCALE   (32'h0000_2000 | `CLOCK_DIVIDER)
 `define INST_DLENGTH    (32'h0000_2200 | `DATA_DLENGTH)
-`define SET_DLENGTH(d)  (`INST_DLENGTH | (d & 8'hFF))
+`define SET_DLENGTH(d)  ((`INST_DLENGTH & ~32'hFF) | (d & 8'hFF))
 
 // Synchronization
 `define INST_SYNC       (32'h0000_3000)

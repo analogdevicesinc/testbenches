@@ -44,6 +44,7 @@ adi_sim_project_files [list \
  "spi_environment.sv" \
  "tests/test_program.sv" \
  "tests/test_sleep_delay.sv" \
+ "tests/test_delay.sv" \
  "system_tb.sv" \
  ]
 

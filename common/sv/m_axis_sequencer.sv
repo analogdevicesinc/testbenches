@@ -104,7 +104,7 @@ package m_axis_sequencer_pkg;
       this.descriptor_delay = 0;
       this.stop_policy = STOP_POLICY_DATA_BEAT;
       this.queue_empty_sig = 1;
-      this.keep_all = 0;
+      this.keep_all = 1;
     endfunction: new
 
 

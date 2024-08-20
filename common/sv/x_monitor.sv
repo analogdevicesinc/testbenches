@@ -76,6 +76,8 @@ package x_monitor_pkg;
     // analysis port from the monitor
     protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
 
+    protected T agent;
+
     protected int axi_byte_stream_size;
 
     // constructor
@@ -85,7 +87,8 @@ package x_monitor_pkg;
 
       this.enabled = 0;
 
-      this.axi_ap = agent.monitor.item_collected_port;
+      this.agent = agent;
+      this.axi_ap = this.agent.monitor.item_collected_port;
 
       this.axi_byte_stream_size = 0;
 
@@ -97,22 +100,29 @@ package x_monitor_pkg;
 
       axi_monitor_transaction transaction;
       xil_axi_data_beat data_beat;
+      xil_axi_strb_beat strb_beat;
       int num_bytes;
       logic [7:0] axi_byte;
 
       forever begin
         this.get_key();
         this.axi_ap.get(transaction);
-        if (bit'(transaction.get_cmd_type()) == bit'(operation_type)) begin
+        if (bit'(transaction.get_cmd_type()) == operation_type) begin
           this.put_key();
           num_bytes = transaction.get_data_width()/8;
           for (int i=0; i<(transaction.get_len()+1); i++) begin
             data_beat = transaction.get_data_beat(i);
+            strb_beat = transaction.get_strb_beat(i);
             for (int j=0; j<num_bytes; j++) begin
               axi_byte = data_beat[j*8+:8];
               // put each beat into byte queues
-              this.mailbox.put(axi_byte);
-              this.axi_byte_stream_size++;
+              if (operation_type == READ_OP) begin
+                this.mailbox.put(axi_byte);
+                this.axi_byte_stream_size++;
+              end else if (strb_beat[j] || !this.agent.vif_proxy.C_AXI_HAS_WSTRB) begin
+                this.mailbox.put(axi_byte);
+                this.axi_byte_stream_size++;
+              end
             end
             `INFOV(("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), 100);
             this.transaction_captured();
@@ -152,7 +162,6 @@ package x_monitor_pkg;
       this.tx_sink_type = CYCLIC;
 
       this.agent = agent;
-      
       this.axis_ap = this.agent.monitor.item_collected_port;
 
     endfunction /* new */

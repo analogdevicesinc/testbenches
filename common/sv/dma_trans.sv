@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2018, 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -396,7 +396,7 @@ package dma_trans_pkg;
      return sa;
     endfunction
 
-  endclass
+  endclass : dma_partial_2d_segment
 
   //==========================================================================
   /*

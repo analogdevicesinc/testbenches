@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -92,7 +92,7 @@ program test_program;
     sanity_test;
 
     start_clocks();
-    sys_reset();
+    env.sys_reset();
 
     // Test synchronous (reader and writer at the same speed)
     singleTest(
@@ -122,8 +122,9 @@ program test_program;
     );
 
     stop_clocks();
+    env.stop();
 
-    $display("Testbench done!");
+    `INFO(("Testbench done!"));
     $finish();
 
   end
@@ -333,13 +334,6 @@ program test_program;
     `TH.`DST_CLK.inst.IF.stop_clock;
   endtask
 
-  // Asserts all the resets for 100 ns
-  task sys_reset;
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    #100
-    `TH.`SYS_RST.inst.IF.deassert_reset;
-  endtask
-
   // Assert external sync for one clock cycle
   task assert_writer_ext_sync;
   `ifdef SRC_SYNC_IO
@@ -377,7 +371,7 @@ program test_program;
     // Calculate and wait one output frame duration plus a margin
     incycles = bytes_to_transfer / `DST_AXIS_VIP_CFG_TDATA_NUM_BYTES * 1.5;
     fperiod = (incycles*1000000000)/ clk_period;
-    #fperiod;
+    #(fperiod*1ns);
   endtask
 
 endprogram

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -99,7 +99,7 @@ program test_program_frame_delay;
     end
 
     start_clocks();
-    sys_reset();
+    env.sys_reset();
 
     // Test non-autorun mode
     if (has_sautorun + has_dautorun == 0) begin
@@ -151,6 +151,7 @@ program test_program_frame_delay;
     end
 
     stop_clocks();
+    env.stop();
 
     $display("Testbench done!");
     $finish();
@@ -380,13 +381,6 @@ program test_program_frame_delay;
   task stop_clocks;
     `TH.`SRC_CLK.inst.IF.stop_clock;
     `TH.`DST_CLK.inst.IF.stop_clock;
-  endtask
-
-  // Asserts all the resets for 100 ns
-  task sys_reset;
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    #100
-    `TH.`SYS_RST.inst.IF.deassert_reset;
   endtask
 
   // Assert external sync for one clock cycle

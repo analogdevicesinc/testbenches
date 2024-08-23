@@ -128,8 +128,12 @@ ad_connect dut_tx_dma/m_framelock dut_rx_dma/s_framelock
 
 ## connect cpu
 
-ad_cpu_interconnect 0x7C420000 dut_rx_dma
-ad_cpu_interconnect 0x7C430000 dut_tx_dma
+set DUT_RX_DMA 0x7C420000
+set DUT_TX_DMA 0x7C430000
+ad_cpu_interconnect $DUT_RX_DMA dut_rx_dma
+ad_cpu_interconnect $DUT_TX_DMA dut_tx_dma
+adi_sim_add_define "DUT_RX_DMA_BA=[format "%d" ${DUT_RX_DMA}]"
+adi_sim_add_define "DUT_TX_DMA_BA=[format "%d" ${DUT_TX_DMA}]"
 
 ad_mem_hp0_interconnect $sys_dma_clk dut_rx_dma/m_src_axi
 ad_mem_hp0_interconnect $sys_dma_clk dut_tx_dma/m_dest_axi

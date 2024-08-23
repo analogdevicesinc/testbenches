@@ -22,8 +22,6 @@ ipx::remove_all_bus_interface [ipx::current_core]
 
 adi_set_ports_dependency "in" \
       "(spirit:decode(id('MODELPARAM_VALUE.MODE')) = 0)"
-adi_set_ports_dependency "out" \
-      "(spirit:decode(id('MODELPARAM_VALUE.MODE')) = 1)"
 
 set cc [ipx::current_core]
 

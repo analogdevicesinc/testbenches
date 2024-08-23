@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -34,12 +34,12 @@
 // ***************************************************************************
 
 module io_vip #(
-  parameter MODE = 1, // 1 - driver, 0 - monitor
+  parameter MODE = 1, // 1 - master, 0 - slave
   parameter WIDTH = 1
 )(
   input  clk,
-  input  in,
-  output out
+  input  [WIDTH-1:0] in,
+  output [WIDTH-1:0] out
 );
 
   io_vip_if #(
@@ -49,9 +49,8 @@ module io_vip #(
     .clk(clk)
   );
 
-  generate if (MODE) begin
-    assign out = IF.io;
-  end else begin
+  assign out = IF.io;
+  generate if (~MODE) begin
     assign IF.io = in;
   end
   endgenerate

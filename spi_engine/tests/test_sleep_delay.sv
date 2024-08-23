@@ -303,7 +303,7 @@ task sleep_delay_test(
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
   end
 
-  expected_sleep_time = 2+(sleep_param)*((`CLOCK_DIVIDER+1)*2);
+  expected_sleep_time = 2+(sleep_param+1)*((`CLOCK_DIVIDER+1)*2);
   // Start the test
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`SLEEP(sleep_param)));
 

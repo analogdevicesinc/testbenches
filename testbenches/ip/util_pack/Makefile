@@ -19,6 +19,7 @@ SV_DEPS += ../../../library/drivers/common/mailbox.sv
 SV_DEPS += ../../../library/drivers/common/x_monitor.sv
 SV_DEPS += ../../../library/drivers/common/scoreboard.sv
 SV_DEPS += ../../../library/drivers/common/scoreboard_pack.sv
+SV_DEPS += ../../../library/drivers/common/filter.sv
 SV_DEPS += ../../../library/drivers/dmac/dmac_api.sv
 SV_DEPS += ../../../library/drivers/dmac/dma_trans.sv
 SV_DEPS += ../../../library/regmaps/adi_regmap_dmac_pkg.sv

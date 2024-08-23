@@ -100,13 +100,13 @@ package environment_pkg;
 
       // TX stubs
       tx_src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      tx_src_axis_seq.add_xfer_descriptor(bytes_to_generate, 0, 0);
+      tx_src_axis_seq.add_xfer_descriptor(bytes_to_generate, 1, 0);
 
       tx_dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
 
       // RX stub
       rx_src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      rx_src_axis_seq.add_xfer_descriptor(bytes_to_generate, 0, 0);
+      rx_src_axis_seq.add_xfer_descriptor(bytes_to_generate, 1, 0);
 
       rx_dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
 

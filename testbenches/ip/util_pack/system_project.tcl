@@ -34,6 +34,7 @@ adi_sim_project_files [list \
  "../../../library/drivers/common/x_monitor.sv" \
  "../../../library/drivers/common/scoreboard.sv" \
  "../../../library/drivers/common/scoreboard_pack.sv" \
+ "../../../library/drivers/common/filter.sv" \
  "../../../library/drivers/dmac/dmac_api.sv" \
  "../../../library/drivers/dmac/dma_trans.sv" \
  "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \

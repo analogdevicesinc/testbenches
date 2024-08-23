@@ -292,7 +292,6 @@ package m_axis_sequencer_pkg;
       enabled = 0;
       byte_count = 0;
       ->> disable_ev;
-      #1step;
     endtask: stop
 
     task run();

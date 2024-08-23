@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -34,7 +34,7 @@
 // ***************************************************************************
 
 interface io_vip_if #(
-  int MODE = 0, // 1 - driver, 0 - monitor
+  int MODE = 0, // 1 - master, 0 - slave
       WIDTH = 1
 ) (
   input bit clk
@@ -42,10 +42,10 @@ interface io_vip_if #(
 
   logic [WIDTH-1:0] io = 0;
 
-  // Driver functions
+  // Master functions
   function void set_io(int o);
     if (MODE === 0) begin
-      $display("[ERROR] %0t Unsupported in monitor mode", $time);
+      $display("[ERROR] %0t Unsupported in slave mode", $time);
       $finish;
     end else begin
       io <= o[WIDTH-1:0];
@@ -58,7 +58,7 @@ interface io_vip_if #(
     set_io(o);
   endtask
 
-  // Monitor functions
+  // Slave functions
   function int get_io();
     return io;
   endfunction

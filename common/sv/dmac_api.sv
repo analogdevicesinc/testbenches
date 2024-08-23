@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2018, 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -79,11 +79,11 @@ package dmac_api_pkg;
       p.USE_EXT_SYNC = `GET_DMAC_INTERFACE_DESCRIPTION_1_USE_EXT_SYNC(val);
       p.HAS_AUTORUN = `GET_DMAC_INTERFACE_DESCRIPTION_1_HAS_AUTORUN(val);
       this.axi_write(GetAddrs(DMAC_X_LENGTH),
-                        `SET_DMAC_X_LENGTH_X_LENGTH(32'h0));
+                     `SET_DMAC_X_LENGTH_X_LENGTH(32'h0));
       this.axi_read(GetAddrs(DMAC_X_LENGTH), val);
       p.DMA_LENGTH_ALIGN = `GET_DMAC_X_LENGTH_X_LENGTH(val)+1;
       this.axi_write(GetAddrs(DMAC_Y_LENGTH),
-                        `SET_DMAC_Y_LENGTH_Y_LENGTH(32'hFFFFFFFF));
+                     `SET_DMAC_Y_LENGTH_Y_LENGTH(32'hFFFFFFFF));
       this.axi_read(GetAddrs(DMAC_Y_LENGTH), val);
       if (val==0) begin
         p.DMA_2D_TRANSFER = 0;
@@ -123,7 +123,7 @@ package dmac_api_pkg;
     // -----------------
     task enable_dma();
       this.axi_write(GetAddrs(DMAC_CONTROL),
-                        `SET_DMAC_CONTROL_ENABLE(1));
+                     `SET_DMAC_CONTROL_ENABLE(1));
     endtask : enable_dma
 
     // -----------------
@@ -131,7 +131,7 @@ package dmac_api_pkg;
     // -----------------
     task disable_dma();
       this.axi_write(GetAddrs(DMAC_CONTROL),
-                        `SET_DMAC_CONTROL_PAUSE(0));
+                     `SET_DMAC_CONTROL_PAUSE(0));
     endtask : disable_dma
 
     // -----------------
@@ -139,10 +139,10 @@ package dmac_api_pkg;
     // -----------------
     task set_control(input bit[3:0] control);
       this.axi_write(GetAddrs(DMAC_CONTROL),
-                        `SET_DMAC_CONTROL_ENABLE(control[0]) |
-                        `SET_DMAC_CONTROL_PAUSE(control[1]) |
-                        `SET_DMAC_CONTROL_HWDESC(control[2]) |
-                        `SET_DMAC_CONTROL_FRAMELOCK(control[3]));
+                     `SET_DMAC_CONTROL_ENABLE(control[0]) |
+                     `SET_DMAC_CONTROL_PAUSE(control[1]) |
+                     `SET_DMAC_CONTROL_HWDESC(control[2]) |
+                     `SET_DMAC_CONTROL_FRAMELOCK(control[3]));
     endtask : set_control
 
     // -----------------
@@ -150,9 +150,9 @@ package dmac_api_pkg;
     // -----------------
     task set_flags(input bit[3:0] flags);
       this.axi_write(GetAddrs(DMAC_FLAGS),
-                        `SET_DMAC_FLAGS_CYCLIC(flags[0]) |
-                        `SET_DMAC_FLAGS_TLAST(flags[1]) |
-                        `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
+                     `SET_DMAC_FLAGS_CYCLIC(flags[0]) |
+                     `SET_DMAC_FLAGS_TLAST(flags[1]) |
+                     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
     endtask : set_flags
 
     // -----------------
@@ -186,7 +186,7 @@ package dmac_api_pkg;
     // -----------------
     task transfer_start;
       this.axi_write(GetAddrs(DMAC_TRANSFER_SUBMIT),
-                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+                     `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       `INFO(("Transfer start"));
     endtask : transfer_start
 
@@ -195,7 +195,7 @@ package dmac_api_pkg;
     // -----------------
     task set_dest_addr(input int xfer_addr);
       this.axi_write(GetAddrs(DMAC_DEST_ADDRESS),
-                        `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(xfer_addr));
+                     `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(xfer_addr));
     endtask : set_dest_addr
 
     // -----------------
@@ -203,7 +203,7 @@ package dmac_api_pkg;
     // -----------------
     task set_src_addr(input int xfer_addr);
       this.axi_write(GetAddrs(DMAC_SRC_ADDRESS),
-                        `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(xfer_addr));
+                     `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(xfer_addr));
     endtask : set_src_addr
 
     // -----------------
@@ -213,9 +213,9 @@ package dmac_api_pkg;
       input int xfer_length_x,
       input int xfer_length_y);
       this.axi_write(GetAddrs(DMAC_X_LENGTH),
-                        `SET_DMAC_X_LENGTH_X_LENGTH(xfer_length_x));
+                     `SET_DMAC_X_LENGTH_X_LENGTH(xfer_length_x));
       this.axi_write(GetAddrs(DMAC_Y_LENGTH),
-                        `SET_DMAC_Y_LENGTH_Y_LENGTH(xfer_length_y));
+                     `SET_DMAC_Y_LENGTH_Y_LENGTH(xfer_length_y));
     endtask : set_lengths
 
     // -----------------

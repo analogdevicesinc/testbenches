@@ -79,7 +79,6 @@ package environment_pkg;
     // Register accessors
 
     dma_transfer_group trans_q[$];
-    bit done = 0;
 
     scoreboard scrb;
 
@@ -95,10 +94,10 @@ package environment_pkg;
 
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-    `ifdef HAS_XIL_VDMA
+      `ifdef HAS_XIL_VDMA
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, ref_src_axis_vip)) ref_src_axis_vip_if,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, ref_dst_axis_vip)) ref_dst_axis_vip_if,
-    `endif
+      `endif
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, src_axis_vip)) src_axis_vip_if,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dst_axis_vip)) dst_axis_vip_if
     );
@@ -112,18 +111,18 @@ package environment_pkg;
       // Creating the agents
       src_axis_agent = new("Src AXI stream agent", src_axis_vip_if);
       dst_axis_agent = new("Dest AXI stream agent", dst_axis_vip_if);
-    `ifdef HAS_XIL_VDMA
+      `ifdef HAS_XIL_VDMA
       ref_src_axis_agent = new("Ref Src AXI stream agent", ref_src_axis_vip_if);
       ref_dst_axis_agent = new("Ref Dest AXI stream agent", ref_dst_axis_vip_if);
-    `endif
+      `endif
 
       // Creating the sequencers
       src_axis_seq = new(src_axis_agent);
       dst_axis_seq = new(dst_axis_agent);
-    `ifdef HAS_XIL_VDMA
+      `ifdef HAS_XIL_VDMA
       ref_src_axis_seq = new(ref_src_axis_agent);
       ref_dst_axis_seq = new(ref_dst_axis_agent);
-    `endif
+      `endif
 
     scrb = new;
 
@@ -143,10 +142,10 @@ package environment_pkg;
 
       src_axis_agent.start_master();
       dst_axis_agent.start_slave();
-    `ifdef HAS_XIL_VDMA
+      `ifdef HAS_XIL_VDMA
       ref_src_axis_agent.start_master();
       ref_dst_axis_agent.start_slave();
-    `endif
+      `endif
 
     endtask
 
@@ -157,16 +156,14 @@ package environment_pkg;
     //============================================================================
     task test();
       super.test();
-      fork
-        src_axis_seq.run();
-        `ifdef HAS_XIL_VDMA
-        ref_src_axis_seq.run();
-        `endif
-        // DEST AXIS does not have to run, scoreboard connects and
-        // gathers packets from the agent
-        scrb.run();
-        test_c_run();
-      join_none
+      src_axis_seq.run();
+      `ifdef HAS_XIL_VDMA
+      ref_src_axis_seq.run();
+      `endif
+      // DEST AXIS does not have to run, scoreboard connects and
+      // gathers packets from the agent
+      scrb.run();
+      test_c_run();
     endtask
 
     //============================================================================

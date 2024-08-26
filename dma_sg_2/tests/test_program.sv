@@ -47,8 +47,6 @@ import adi_regmap_dmac_pkg::*;
 
 `define ADC_TRANSFER_LENGTH 32'h600
 
-localparam DDR_BASE = 'h8000_0000;
-
 program test_program;
 
   // declare the class instances
@@ -100,96 +98,96 @@ program test_program;
     // Init test data
     `INFO(("Initialize the memory ..."));
     for (int i=0;i<'h4000;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(DDR_BASE+i*2,(((i+1)) << 16) | i ,'hF);
+      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 16) | i ,'hF);
     end
 
     //=========================================================================
     // TX Block descriptors
     // DMA 1st Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_0000),
+      .bd_addr(`DDR_BA+'h1_0000),
       .flags('h0003),
       .id('h0001),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h0000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h0000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0057));
 
     // DMA 2nd Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_0030),
+      .bd_addr(`DDR_BA+'h1_0030),
       .flags('h0003),
       .id('h0002),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h1000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h1000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0024));
 
     // DMA 3rd Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_0060),
+      .bd_addr(`DDR_BA+'h1_0060),
       .flags('h0003),
       .id('h0003),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h2000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h2000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0199));
 
     // DMA 4th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_0090),
+      .bd_addr(`DDR_BA+'h1_0090),
       .flags('h0003),
       .id('hCDEF),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h3000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h3000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0FFF));
 
     // DMA 5th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_00C0),
+      .bd_addr(`DDR_BA+'h1_00C0),
       .flags('h0003),
       .id('hAABB),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h4000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h4000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0FFF));
 
     // DMA 6th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_00F0),
+      .bd_addr(`DDR_BA+'h1_00F0),
       .flags('h0003),
       .id('hCCDD),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h5000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h5000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0FFF));
 
     // DMA 7th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_0120),
+      .bd_addr(`DDR_BA+'h1_0120),
       .flags('h0003),
       .id('hEEFF),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h6000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h6000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0FFF));
 
     // DMA 8th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_0150),
+      .bd_addr(`DDR_BA+'h1_0150),
       .flags('h0003),
       .id('h1234),
-      .dest_addr(DDR_BASE+'h0000),
-      .src_addr(DDR_BASE+'h7000),
-      .next_sg_addr(DDR_BASE+'h1_FFFF),
+      .dest_addr(`DDR_BA+'h0000),
+      .src_addr(`DDR_BA+'h7000),
+      .next_sg_addr(`DDR_BA+'h1_FFFF),
       .y_len('h0000),
       .x_len('h0FFF));
 
@@ -197,67 +195,67 @@ program test_program;
     // RX Block descriptors
     // DMA 1st Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_1000),
+      .bd_addr(`DDR_BA+'h1_1000),
       .flags('h0002),
       .id('h3210),
-      .dest_addr(DDR_BASE+'h8000),
-      .src_addr(DDR_BASE+'h0000),
-      .next_sg_addr(DDR_BASE+'h1_1030),
+      .dest_addr(`DDR_BA+'h8000),
+      .src_addr(`DDR_BA+'h0000),
+      .next_sg_addr(`DDR_BA+'h1_1030),
       .y_len('h0000),
       .x_len('hFFFF));
 
     // DMA 2nd Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_1030),
+      .bd_addr(`DDR_BA+'h1_1030),
       .flags('h0002),
       .id('h7654),
-      .dest_addr(DDR_BASE+'h9000),
-      .src_addr(DDR_BASE+'h0000),
-      .next_sg_addr(DDR_BASE+'h1_1060),
+      .dest_addr(`DDR_BA+'h9000),
+      .src_addr(`DDR_BA+'h0000),
+      .next_sg_addr(`DDR_BA+'h1_1060),
       .y_len('h0000),
       .x_len('hFFFF));
 
     // DMA 3rd Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_1060),
+      .bd_addr(`DDR_BA+'h1_1060),
       .flags('h0002),
       .id('hBA98),
-      .dest_addr(DDR_BASE+'hA000),
-      .src_addr(DDR_BASE+'h0000),
-      .next_sg_addr(DDR_BASE+'h1_1090),
+      .dest_addr(`DDR_BA+'hA000),
+      .src_addr(`DDR_BA+'h0000),
+      .next_sg_addr(`DDR_BA+'h1_1090),
       .y_len('h0000),
       .x_len('hFFFF));
 
     // DMA 4th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_1090),
+      .bd_addr(`DDR_BA+'h1_1090),
       .flags('h0002),
       .id('hFEDC),
-      .dest_addr(DDR_BASE+'hB000),
-      .src_addr(DDR_BASE+'h0000),
-      .next_sg_addr(DDR_BASE+'h1_10C0),
+      .dest_addr(`DDR_BA+'hB000),
+      .src_addr(`DDR_BA+'h0000),
+      .next_sg_addr(`DDR_BA+'h1_10C0),
       .y_len('h0000),
       .x_len('hFFFF));
 
     // DMA 5th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_10C0),
+      .bd_addr(`DDR_BA+'h1_10C0),
       .flags('h0002),
       .id('hDCDC),
-      .dest_addr(DDR_BASE+'hC000),
-      .src_addr(DDR_BASE+'h0000),
-      .next_sg_addr(DDR_BASE+'h1_10F0),
+      .dest_addr(`DDR_BA+'hC000),
+      .src_addr(`DDR_BA+'h0000),
+      .next_sg_addr(`DDR_BA+'h1_10F0),
       .y_len('h0000),
       .x_len('hFFFF));
 
     // DMA 6th Descriptor test data
     init_mem_bd(
-      .bd_addr(DDR_BASE+'h1_10F0),
+      .bd_addr(`DDR_BA+'h1_10F0),
       .flags('h0002),
       .id('hFEFE),
-      .dest_addr(DDR_BASE+'hD000),
-      .src_addr(DDR_BASE+'h0000),
-      .next_sg_addr(DDR_BASE+'h1_1000),
+      .dest_addr(`DDR_BA+'hD000),
+      .src_addr(`DDR_BA+'h0000),
+      .next_sg_addr(`DDR_BA+'h1_1000),
       .y_len('h0000),
       .x_len('hFFFF));
 
@@ -274,7 +272,7 @@ program test_program;
       .control(3'b101),
       .flags(3'b110),
       .irq_mask(3'b001),
-      .bd_addr(DDR_BASE+'h1_1000));
+      .bd_addr(`DDR_BA+'h1_1000));
 
     fork
       forever
@@ -309,7 +307,7 @@ program test_program;
         .control(3'b101),
         .flags(3'b010),
         .irq_mask(3'b001),
-        .bd_addr(DDR_BASE+'h1_0000+i*'h30));
+        .bd_addr(`DDR_BA+'h1_0000+i*'h30));
 
     #1us;
     env.scoreboard_tx.wait_until_complete();

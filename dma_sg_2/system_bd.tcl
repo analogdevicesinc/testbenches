@@ -76,7 +76,7 @@ ad_ip_instance axi_dmac i_rx_dmac [list \
     CYCLIC 0 \
     DMA_DATA_WIDTH_SRC 512 \
     DMA_DATA_WIDTH_DEST 512 \
-    SG_SLOW_TRANSFER 1 \
+    SG_DELAYED_INPUT 1 \
 ]
 
 ad_ip_instance axi_dmac i_tx_dmac [list \

@@ -190,10 +190,10 @@ package environment_pkg;
       super.stop();
       src_axis_agent.stop_master();
       dst_axis_agent.stop_slave();
-    `ifdef HAS_XIL_VDMA
+      `ifdef HAS_XIL_VDMA
       ref_src_axis_agent.stop_master();
       ref_dst_axis_agent.stop_slave();
-    `endif
+      `endif
     endtask
 
   endclass

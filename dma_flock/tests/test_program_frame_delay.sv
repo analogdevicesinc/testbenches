@@ -85,6 +85,8 @@ program test_program_frame_delay;
 
     setLoggerVerbosity(6);
     env.start();
+    start_clocks();
+    env.sys_reset();
     env.run();
 
     m_dmac_api = new("TX_DMA_BA", env.mng, `TX_DMA_BA);
@@ -97,9 +99,6 @@ program test_program_frame_delay;
     if (has_sautorun + has_dautorun == 0) begin
       sanity_test;
     end
-
-    start_clocks();
-    env.sys_reset();
 
     // Test non-autorun mode
     if (has_sautorun + has_dautorun == 0) begin
@@ -153,7 +152,7 @@ program test_program_frame_delay;
     stop_clocks();
     env.stop();
 
-    $display("Testbench done!");
+    `INFO(("Testbench done!"));
     $finish();
 
   end
@@ -314,7 +313,7 @@ program test_program_frame_delay;
                           .bytes_to_transfer(m_seg.get_bytes_in_transfer));
           end
         end
-        #10;
+        #10ns;
       end
     join
     sync_gen_en = 0;
@@ -374,7 +373,7 @@ program test_program_frame_delay;
 
     `TH.`SRC_CLK.inst.IF.start_clock;
     `TH.`DST_CLK.inst.IF.start_clock;
-    #100;
+    #100ns;
   endtask
 
   // Stop all clocks
@@ -408,7 +407,7 @@ program test_program_frame_delay;
     // Calculate and wait one input frame duration plus a margin
     incycles = bytes_to_transfer / `SRC_AXIS_VIP_CFG_TDATA_NUM_BYTES * 1.8;
     fperiod = (incycles*1000000000)/ clk_period;
-    #fperiod;
+    #(fperiod*1ns);
   endtask
 
   // Generate external sync pulse for output frames
@@ -420,7 +419,7 @@ program test_program_frame_delay;
     // Calculate and wait one output frame duration plus a margin
     incycles = bytes_to_transfer / `DST_AXIS_VIP_CFG_TDATA_NUM_BYTES * 1.8;
     fperiod = (incycles*1000000000)/ clk_period;
-    #fperiod;
+    #(fperiod*1ns);
   endtask
 
 endprogram

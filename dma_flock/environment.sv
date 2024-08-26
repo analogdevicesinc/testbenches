@@ -102,11 +102,11 @@ package environment_pkg;
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dst_axis_vip)) dst_axis_vip_if
     );
       super.new(sys_clk_vip_if,
-	        dma_clk_vip_if,
-		ddr_clk_vip_if,
-		sys_rst_vip_if,
-		mng_vip_if,
-		ddr_vip_if);
+                dma_clk_vip_if,
+                ddr_clk_vip_if,
+                sys_rst_vip_if,
+                mng_vip_if,
+                ddr_vip_if);
 
       // Creating the agents
       src_axis_agent = new("Src AXI stream agent", src_axis_vip_if);

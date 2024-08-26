@@ -158,12 +158,12 @@ program test_program_frame_delay;
   end
 
   task singleTest(
-    int frame_num = 10,
-    int flock_framenum = 3,
-    int flock_distance = 1,
-    int src_clk = 250000000,
-    int dst_clk = 250000000,
-    int has_autorun = 0
+    input int frame_num = 10,
+    input int flock_framenum = 3,
+    input int flock_distance = 1,
+    input int src_clk = 250000000,
+    input int dst_clk = 250000000,
+    input int has_autorun = 0
   );
     dma_flocked_2d_segment m_seg, s_seg;
     int m_tid, s_tid;
@@ -331,7 +331,7 @@ program test_program_frame_delay;
   endtask
 
   // This is a simple reg test to check the register access API
-  task sanity_test;
+  task sanity_test();
     xil_axi_ulong mtestWADDR; // Write ADDR
 
     bit [63:0]    mtestWData; // Write Data
@@ -351,22 +351,22 @@ program test_program_frame_delay;
   endtask
 
   // Set the writer AXIS side clock frequency
-  task set_src_clock(int freq);
+  task set_src_clock(input int freq);
     `TH.`SRC_CLK.inst.IF.set_clk_frq(.user_frequency(freq));
   endtask
 
   // Set the reader AXIS side clock frequency
-  task set_dst_clock(int freq);
+  task set_dst_clock(input int freq);
     `TH.`DST_CLK.inst.IF.set_clk_frq(.user_frequency(freq));
   endtask
 
   // Set the MM AXI side DDR clock frequency
-  task set_ddr_clock(int freq);
+  task set_ddr_clock(input int freq);
     `TH.`DDR_CLK.inst.IF.set_clk_frq(.user_frequency(freq));
   endtask
 
   // Start all clocks
-  task start_clocks;
+  task start_clocks();
      set_src_clock(100000000);
      set_dst_clock(100000000);
      set_ddr_clock(500000000);
@@ -377,13 +377,13 @@ program test_program_frame_delay;
   endtask
 
   // Stop all clocks
-  task stop_clocks;
+  task stop_clocks();
     `TH.`SRC_CLK.inst.IF.stop_clock;
     `TH.`DST_CLK.inst.IF.stop_clock;
   endtask
 
   // Assert external sync for one clock cycle
-  task assert_writer_ext_sync;
+  task assert_writer_ext_sync();
   `ifdef SRC_SYNC_IO
     `TH.`SRC_SYNC_IO.inst.IF.setw_io(1);
     `TH.`SRC_SYNC_IO.inst.IF.setw_io(0);
@@ -391,7 +391,7 @@ program test_program_frame_delay;
   endtask
 
   // Assert external sync for one clock cycle
-  task assert_reader_ext_sync;
+  task assert_reader_ext_sync();
   `ifdef DST_SYNC_IO
     `TH.`DST_SYNC_IO.inst.IF.setw_io(1);
     `TH.`DST_SYNC_IO.inst.IF.setw_io(0);
@@ -399,7 +399,7 @@ program test_program_frame_delay;
   endtask
 
   // Generate external sync pulse for input frames
-  task gen_src_fsync(int clk_period, int bytes_to_transfer);
+  task gen_src_fsync(input int clk_period, input int bytes_to_transfer);
     real incycles,fperiod;
     if (has_sfsync) begin
       assert_writer_ext_sync();
@@ -411,7 +411,7 @@ program test_program_frame_delay;
   endtask
 
   // Generate external sync pulse for output frames
-  task gen_dst_fsync(int clk_period, int bytes_to_transfer);
+  task gen_dst_fsync(input int clk_period, input int bytes_to_transfer);
     real incycles,fperiod;
     if (has_dfsync) begin
       assert_reader_ext_sync();

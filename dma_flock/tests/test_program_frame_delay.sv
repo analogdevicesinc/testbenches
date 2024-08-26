@@ -174,9 +174,11 @@ program test_program_frame_delay;
     axi_ready_gen  wready_gen;
 
     // Set no backpressure from AXIS destination
+    env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     env.dst_axis_seq.user_gen_tready();
     `ifdef HAS_XIL_VDMA
-    env.ref_dst_axis_seq.agent.driver.send_tready(tready_gen);
+    env.ref_dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    env.ref_dst_axis_seq.user_gen_tready();
     `endif
 
     // Set no backpressure from DDR

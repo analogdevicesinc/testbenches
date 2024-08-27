@@ -88,10 +88,7 @@ package filter_pkg;
     task apply_filter(input logic [7:0] packet[]);
       if (this.filter != null) begin
         for (int i=0; i<this.filter.size(); i++) begin
-          fork
-            automatic int j=i;
-            this.filter[j].apply_filter(packet);
-          join
+          this.filter[i].apply_filter(packet);
         end
         for (int i=0; i<this.filter.size(); i++) begin
           if (filter_type)
@@ -103,10 +100,7 @@ package filter_pkg;
 
       if (this.ft != null) begin
         for (int i=0; i<this.ft.size(); i++) begin
-          fork
-            automatic int j=i;
-            this.ft[j].apply_filter(packet);
-          join
+          this.ft[i].apply_filter(packet);
         end
         for (int i=0; i<this.ft.size(); i++) begin
           if (filter_type)

@@ -85,17 +85,10 @@ package x_monitor_pkg;
     virtual task get_transaction();
     endtask
 
-  endclass
+  endclass: x_monitor
 
   
-  typedef enum bit {
-    READ_OP = 1'b0,
-    WRITE_OP = 1'b1
-  } operation_type_t;
-  
-  class x_axi_monitor #( type T, operation_type_t operation_type ) extends x_monitor;
-    // operation type: 1 - write
-    //                 0 - read
+  class x_axi_monitor #( type T, xil_axi_cmd_t operation_type ) extends x_monitor;
 
     // analysis port from the monitor
     protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
@@ -124,30 +117,37 @@ package x_monitor_pkg;
       xil_axi_strb_beat strb_beat;
       int transaction_length;
       int num_bytes;
-      logic [7:0] axi_byte;
+      int valid_bytes;
       logic [7:0] axi_packet [];
 
       forever begin
         this.get_key();
         this.axi_ap.get(transaction);
-        if (bit'(transaction.get_cmd_type()) == operation_type) begin
+        if (transaction.get_cmd_type() == operation_type) begin
           this.put_key();
           num_bytes = transaction.get_data_width()/8;
           transaction_length = transaction.get_len()+1;
-          axi_packet = new [transaction_length*num_bytes];
+          
           for (int i=0; i<transaction_length; i++) begin
             data_beat = transaction.get_data_beat(i);
             strb_beat = transaction.get_strb_beat(i);
-            for (int j=0; j<num_bytes; j++) begin
-              axi_byte = data_beat[j*8+:8];
-              if (operation_type == READ_OP)
-                axi_packet[i*num_bytes+j] = axi_byte;
-              else if (strb_beat[j] || !this.agent.vif_proxy.C_AXI_HAS_WSTRB)
-                axi_packet[i*num_bytes+j] = axi_byte;
-            end
+
+            valid_bytes = 0;
+            if (this.agent.vif_proxy.C_AXI_HAS_WSTRB && transaction.get_cmd_type() == XIL_AXI_WRITE) begin
+              for (int j=0; j<num_bytes; j++)
+                if (strb_beat[j])
+                  valid_bytes++;
+            end else
+              valid_bytes = num_bytes;
+            axi_packet = new [axi_packet.size()+valid_bytes] (axi_packet);
+
+            for (int j=0; j<valid_bytes; j++)
+              axi_packet[axi_packet.size()-valid_bytes+j] = data_beat[j*8+:8];
           end
+
           if (this.filter_enabled)
             this.filter_tree.apply_filter(axi_packet);
+          
           if (!this.filter_enabled || this.filter_tree.result) begin
             for (int i=0; i<transaction_length*num_bytes; i++)
               this.mailbox.put(axi_packet[i]);
@@ -155,7 +155,7 @@ package x_monitor_pkg;
             #1step;
             this.mailbox.flush();
           end else
-            `INFOV(("Packet filtered"), 100);
+            `INFOV(("Packet filtered out"), 100);
         end else begin
           this.axi_ap.write(transaction);
           this.put_key();
@@ -194,7 +194,7 @@ package x_monitor_pkg;
       xil_axi4stream_data_beat data_beat;
       xil_axi4stream_strb_beat keep_beat;
       int num_bytes;
-      logic [7:0] axi_byte;
+      int valid_bytes;
       logic [7:0] axi_packet [];
 
       if (this.filter_enabled && !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_LAST])
@@ -206,23 +206,32 @@ package x_monitor_pkg;
         num_bytes = transaction.get_data_width()/8;
         data_beat = transaction.get_data_beat();
         keep_beat = transaction.get_keep_beat();
-        axi_packet = new [axi_packet.size()+num_bytes] (axi_packet);
-        for (int i=0; i<num_bytes; i++) begin
-          axi_byte = data_beat[i*8+:8];
-          if (keep_beat[i+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
-            axi_packet[axi_packet.size()-num_bytes+i] = axi_byte;
-        end
+
+        valid_bytes = 0;
+        if (this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP]) begin
+          for (int i=0; i<num_bytes; i++)
+            if (keep_beat[i])
+              valid_bytes++;
+        end else
+          valid_bytes = num_bytes;
+        axi_packet = new [axi_packet.size()+valid_bytes] (axi_packet);
+        
+        for (int i=0; i<valid_bytes; i++)
+          axi_packet[axi_packet.size()-valid_bytes+i] = data_beat[i*8+:8];
+
         if (this.filter_enabled && transaction.get_last())
           this.filter_tree.apply_filter(axi_packet);
-        if (transaction.get_last() && (!this.filter_enabled || this.filter_tree.result)) begin
-          for (int i=0; i<axi_packet.size(); i++)
-            this.mailbox.put(axi_packet[i]);
-          axi_packet = new [0];
-          this.transaction_captured();
-          #1step;
-          this.mailbox.flush();
-        end else
-          `INFOV(("Packet filtered"), 100);
+        
+        if (transaction.get_last())
+          if ((!this.filter_enabled || this.filter_tree.result)) begin
+            for (int i=0; i<axi_packet.size(); i++)
+              this.mailbox.put(axi_packet[i]);
+            axi_packet = new [0];
+            this.transaction_captured();
+            #1step;
+            this.mailbox.flush();
+          end else
+            `INFOV(("Packet filtered out"), 100);
       end
 
     endtask: get_transaction

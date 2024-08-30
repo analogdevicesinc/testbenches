@@ -139,6 +139,8 @@ package spi_execution_environment_pkg;
       sdo_src_seq.set_stop_policy(STOP_POLICY_PACKET);
       cmd_src_seq.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
       sdo_src_seq.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
+      cmd_src_seq.set_data_beat_delay(`CMD_STREAM_BEAT_DELAY);
+      sdo_src_seq.set_data_beat_delay(`SDO_STREAM_BEAT_DELAY);
 
       // destination stub
       sdi_sink_mode = XIL_AXI4STREAM_READY_GEN_RANDOM;

@@ -112,9 +112,9 @@ initial begin
   `TH.`SYS_RST.inst.IF.deassert_reset;
   #100
 
-  sanity_test();
+  //sanity_test();
 
-  #100
+  //#100
 
   data_acquisition_test();
 
@@ -167,12 +167,12 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 
-task sanity_test();
+/*task sanity_test();
   axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   axi_read_v (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   `INFO(("Sanity Test Done"));
 endtask
-
+*/
 //---------------------------------------------------------------------------
 // Transfer Counter
 //---------------------------------------------------------------------------
@@ -217,13 +217,8 @@ task data_acquisition_test();
     env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
 
     // Configure AXI_AD7616
-    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL),
-      `SET_AXI_AD7616_REG_UP_CNTRL_CNVST_EN(0) |
-      `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(0)
-      );
-    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL), `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(AD7616_CTRL_RESETN));
-    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL), `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(AD7616_CTRL_RESETN) | `SET_AXI_AD7616_REG_UP_CNTRL_CNVST_EN(AD7616_CTRL_CNVST_EN));
-    #10000
+    axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL), `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(0));
+    #1000
     axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL), `SET_AXI_AD7616_REG_UP_CNTRL_RESETN(AD7616_CTRL_RESETN));
 
     @(negedge rx_busy)

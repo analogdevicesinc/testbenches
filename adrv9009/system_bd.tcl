@@ -226,8 +226,8 @@ ad_connect rx_device_clk i_rx_jesd_exerciser/device_clk
 
 ad_connect ref_clk_ex i_rx_jesd_exerciser/ref_clk
 
-set_property -dict [list CONFIG.NUM_MI {18}] [get_bd_cells axi_cpu_interconnect]
-ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M17_AXI
+set_property -dict [list CONFIG.NUM_MI {18}] [get_bd_cells axi_axi_interconnect]
+ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M17_AXI
 
 create_bd_port -dir O ex_rx_sync
 ad_connect ex_rx_sync i_rx_jesd_exerciser/rx_sync_0
@@ -246,8 +246,8 @@ ad_connect tx_device_clk i_tx_jesd_exerciser/device_clk
 
 ad_connect ref_clk_ex i_tx_jesd_exerciser/ref_clk
 
-set_property -dict [list CONFIG.NUM_MI {19}] [get_bd_cells axi_cpu_interconnect]
-ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M18_AXI
+set_property -dict [list CONFIG.NUM_MI {19}] [get_bd_cells axi_axi_interconnect]
+ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M18_AXI
 
 create_bd_port -dir I ex_tx_sync
 ad_connect ex_tx_sync i_tx_jesd_exerciser/tx_sync_0
@@ -275,8 +275,8 @@ ad_connect tx_os_device_clk i_tx_os_jesd_exerciser/device_clk
 
 ad_connect ref_clk_ex i_tx_os_jesd_exerciser/ref_clk
 
-set_property -dict [list CONFIG.NUM_MI {20}] [get_bd_cells axi_cpu_interconnect]
-ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_cpu_interconnect/M19_AXI
+set_property -dict [list CONFIG.NUM_MI {20}] [get_bd_cells axi_axi_interconnect]
+ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M19_AXI
 
 create_bd_port -dir I ex_tx_os_sync
 ad_connect ex_tx_os_sync i_tx_os_jesd_exerciser/tx_sync_0

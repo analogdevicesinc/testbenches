@@ -270,8 +270,6 @@ bit [`DATA_DLENGTH-1:0] sdi_read_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)
 bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
 bit [`DATA_DLENGTH-1:0] rx_data;
 bit [`DATA_DLENGTH-1:0] tx_data;
-localparam sdo_mem_num = (`SDO_STREAMING) ? (`MIN((`NUM_OF_WORDS),(`SDO_MEM_WORDS))) : (`NUM_OF_WORDS);
-bit [`DATA_DLENGTH-1:0] one_shot_sdo_data [sdo_mem_num-1 :0] = '{default:'0};
 
 task offload_spi_test();
   //Configure DMA
@@ -283,6 +281,11 @@ task offload_spi_test();
   env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
   env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
   env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+
+  `ifdef DEF_SDO_STREAMING
+    // Enable SDO Offload
+    axi_write(`SPI_ENGINE_SPI_REGMAP_BA + 'h10C,  1); // TODO: use regmap
+  `endif
 
   // Configure the Offload module
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
@@ -297,21 +300,22 @@ task offload_spi_test();
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
   // Enqueue transfers transfers to DUT
-  for (int i = 0; i<sdo_mem_num; i=i+1) begin
-    one_shot_sdo_data[i] = $urandom;
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), one_shot_sdo_data[i]);
-  end
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
     rx_data = $urandom;
     spi_send(rx_data);
     sdi_read_data_store[i]  = rx_data;
-    if (i%(`NUM_OF_WORDS)<sdo_mem_num) begin
-      tx_data = one_shot_sdo_data[i%(`NUM_OF_WORDS)];
-    end else begin
-      tx_data = $urandom;
+    tx_data = $urandom;
+  `ifdef DEF_SDO_STREAMING
       sdo_stream_gen(tx_data);
-    end
-    sdo_write_data_store[i] = tx_data;
+      sdo_write_data_store[i] = tx_data;
+  `else
+      if (i<(`NUM_OF_WORDS)) begin
+        sdo_write_data_store[i] = tx_data;
+        axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), sdo_write_data_store[i]);
+      end else begin
+        sdo_write_data_store[i] = sdo_write_data_store[i%(`NUM_OF_WORDS)];
+      end
+  `endif
   end
 
   // Start the offload

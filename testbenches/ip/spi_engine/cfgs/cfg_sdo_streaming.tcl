@@ -32,7 +32,6 @@ set ad_project_params(NUM_OF_WORDS)         5
 set ad_project_params(NUM_OF_TRANSFERS)     3
 set ad_project_params(CS_ACTIVE_HIGH)       0
 set ad_project_params(ECHO_SCLK_DELAY)      0.1
-set ad_project_params(SDO_MEM_WORDS)        2
 
 set spi_s_vip_cfg [ list \
     MODE            0                                   \

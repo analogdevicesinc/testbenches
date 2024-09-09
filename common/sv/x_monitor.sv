@@ -45,14 +45,6 @@ package x_monitor_pkg;
       @this.transaction_event;
     endtask
 
-    task scoreboard_notified();
-      ->>this.scoreboard_event;
-    endtask
-
-    task wait_for_scoreboard_event();
-      @this.scoreboard_event;
-    endtask
-
     // run task
     task run();
       fork
@@ -137,7 +129,7 @@ package x_monitor_pkg;
           this.put_key();
           `INFOV(("Packet mail length: %d", this.mailbox.num()), 200);
           this.transaction_captured();
-          this.wait_for_scoreboard_event();
+          #1;
           this.get_key();
           this.mailbox.flush();
           this.put_key();
@@ -215,7 +207,7 @@ package x_monitor_pkg;
           `INFOV(("Packet mail length: %d", this.mailbox.num()), 200);
           axi_packet = new [0];
           this.transaction_captured();
-          this.wait_for_scoreboard_event();
+          #1;
           this.get_key();
           this.mailbox.flush();
           this.put_key();

@@ -195,7 +195,6 @@ package scoreboard_pkg;
           packet[i] = source_byte;
         end
         this.source_monitor.put_key();
-        this.source_monitor.scoreboard_notified();
 
         if (this.filter_enabled)
           this.filter_tree_source.apply_filter(packet);
@@ -239,7 +238,6 @@ package scoreboard_pkg;
           packet[i] = sink_byte;
         end
         this.sink_monitor.put_key();
-        this.sink_monitor.scoreboard_notified();
 
         if (this.filter_enabled)
           this.filter_tree_sink.apply_filter(packet);

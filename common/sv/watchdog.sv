@@ -63,12 +63,11 @@ package watchdog_pkg;
 
     task reset();
       this.stop();
-      #1step;
       this.start();
     endtask: reset
 
     task stop();
-      ->>this.stop_event;
+      ->this.stop_event;
     endtask: stop
 
     task start();

@@ -14,6 +14,7 @@ package x_monitor_pkg;
     mailbox_c #(logic [7:0]) mailbox;
     protected semaphore semaphore_key;
     protected event transaction_event;
+    protected event scoreboard_event;
 
     protected bit enabled;
 
@@ -42,6 +43,14 @@ package x_monitor_pkg;
 
     task wait_for_transaction_event();
       @this.transaction_event;
+    endtask
+
+    task scoreboard_notified();
+      ->>this.scoreboard_event;
+    endtask
+
+    task wait_for_scoreboard_event();
+      @this.scoreboard_event;
     endtask
 
     // run task
@@ -128,13 +137,13 @@ package x_monitor_pkg;
           this.put_key();
           `INFOV(("Packet mail length: %d", this.mailbox.num()), 200);
           this.transaction_captured();
-          #1step;
+          this.wait_for_scoreboard_event();
           this.get_key();
           this.mailbox.flush();
           this.put_key();
         end else begin
           this.axi_ap.write(transaction);
-          #1step;
+          #1;
         end
       end
 
@@ -206,7 +215,7 @@ package x_monitor_pkg;
           `INFOV(("Packet mail length: %d", this.mailbox.num()), 200);
           axi_packet = new [0];
           this.transaction_captured();
-          #1step;
+          this.wait_for_scoreboard_event();
           this.get_key();
           this.mailbox.flush();
           this.put_key();

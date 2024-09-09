@@ -79,10 +79,16 @@ package scoreboard_pack_pkg;
             end
           end
         end else begin
-          if ((this.source_byte_stream_size == 0) &&
-              (this.sink_byte_stream_size == 0)) begin
-            byte_streams_empty_sig = 1;
-            ->>byte_streams_empty;
+          if (this.sink_byte_stream_size < this.channels*this.samples*this.width/8) begin
+            if (this.transfer_type == CYCLIC) begin
+              byte_streams_empty_sig = 1;
+              ->>byte_streams_empty;
+            end else begin
+              if ((this.source_byte_stream_size == 0)) begin
+                byte_streams_empty_sig = 1;
+                ->>byte_streams_empty;
+              end
+            end
           end
           fork begin
             fork

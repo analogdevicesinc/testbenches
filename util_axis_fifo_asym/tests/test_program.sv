@@ -95,7 +95,7 @@ program test_program (
       
       #($urandom_range(1,10)*1us);
 
-      env.input_axis_seq.clear_queue();
+      env.input_axis_seq.clear_descriptor_queue();
 
       #1us;
 

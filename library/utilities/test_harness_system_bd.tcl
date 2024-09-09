@@ -167,8 +167,8 @@ ad_cpu_interconnect 0x41200000 axi_intc
 ad_mem_hp0_interconnect sys_mem_clk ddr_axi_vip/S_AXI
 
 # connect mng_vip to ddr_vip
-set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells axi_axi_interconnect]
-ad_connect axi_axi_interconnect/M01_AXI /axi_mem_interconnect/S00_AXI
+set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells axi_axi_interconnect_0]
+ad_connect axi_axi_interconnect_0/M01_AXI /axi_mem_interconnect/S00_AXI
 
 global sys_mem_clk_index
 if { $use_smartconnect == 1} {
@@ -176,9 +176,9 @@ if { $use_smartconnect == 1} {
   set_property CONFIG.NUM_CLKS [expr $sys_mem_clk_index +1] [get_bd_cells axi_mem_interconnect]
   ad_connect sys_cpu_clk axi_mem_interconnect/ACLK$sys_mem_clk_index
 } else {
-  ad_connect sys_cpu_clk axi_axi_interconnect/M01_ACLK
+  ad_connect sys_cpu_clk axi_axi_interconnect_0/M01_ACLK
   ad_connect sys_cpu_clk axi_mem_interconnect/S00_ACLK
-  ad_connect sys_cpu_resetn axi_axi_interconnect/M01_ARESETN
+  ad_connect sys_cpu_resetn axi_axi_interconnect_0/M01_ARESETN
   ad_connect sys_cpu_resetn axi_mem_interconnect/S00_ARESETN
 }
 

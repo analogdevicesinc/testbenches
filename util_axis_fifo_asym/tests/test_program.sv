@@ -91,7 +91,7 @@ program test_program (
       send_data_wd.reset();
       
       repeat($urandom_range(1,5))
-        env.input_axis_seq.add_xfer_descriptor_packet_size($urandom_range(1,100), 1, 0);
+        env.input_axis_seq.add_xfer_descriptor($urandom_range(1,1000), 1, 0);
       
       #($urandom_range(1,10)*1us);
 

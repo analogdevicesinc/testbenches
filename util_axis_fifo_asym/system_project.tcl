@@ -34,6 +34,7 @@ adi_sim_project_files [list \
  "../common/sv/test_harness_env.sv" \
  "../common/sv/mailbox.sv" \
  "../common/sv/x_monitor.sv" \
+ "../common/sv/filter.sv" \
  "../common/sv/scoreboard.sv" \
  "../common/sv/interfaces.svh" \
  "../common/sv/watchdog.sv" \

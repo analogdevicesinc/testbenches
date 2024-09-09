@@ -45,12 +45,11 @@ import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import dmac_api_pkg::*;
 import dma_trans_pkg::*;
+import dmac_regmap_pkg::*;
 
 `define RX_DMA      32'h7c42_0000
 `define TX_DMA      32'h7c43_0000
 `define DDR_BASE    32'h8000_0000
-
-import dmac_regmap::*;
 
 program test_program;
 
@@ -59,8 +58,8 @@ program test_program;
   dmac_api m_dmac_api;
   dmac_api s_dmac_api;
 
-  axi_dmac_params_cfg_t m_params;
-  axi_dmac_params_cfg_t s_params;
+  // axi_dmac_params_cfg_t m_params;
+  // axi_dmac_params_cfg_t s_params;
 
   DMAC_REGMAP #(5, 7) regmap;
 
@@ -83,41 +82,41 @@ program test_program;
     setLoggerVerbosity(6);
     env.start();
 
-    m_params = '{`tx_dma_cfg_DMA_TYPE_SRC,
-      `tx_dma_cfg_DMA_TYPE_DEST,
-      `tx_dma_cfg_ID,
-      `tx_dma_cfg_AXI_SLICE_SRC,
-      `tx_dma_cfg_AXI_SLICE_DEST,
-      `tx_dma_cfg_SYNC_TRANSFER_START,
-      `tx_dma_cfg_DMA_LENGTH_WIDTH,
-      `tx_dma_cfg_DMA_2D_TRANSFER,
-      `tx_dma_cfg_MAX_BYTES_PER_BURST,
-      `tx_dma_cfg_CYCLIC,
-      `tx_dma_cfg_DMA_DATA_WIDTH_SRC,
-      `tx_dma_cfg_DMA_DATA_WIDTH_DEST};
+    // m_params = '{`tx_dma_cfg_DMA_TYPE_SRC,
+    //   `tx_dma_cfg_DMA_TYPE_DEST,
+    //   `tx_dma_cfg_ID,
+    //   `tx_dma_cfg_AXI_SLICE_SRC,
+    //   `tx_dma_cfg_AXI_SLICE_DEST,
+    //   `tx_dma_cfg_SYNC_TRANSFER_START,
+    //   `tx_dma_cfg_DMA_LENGTH_WIDTH,
+    //   `tx_dma_cfg_DMA_2D_TRANSFER,
+    //   `tx_dma_cfg_MAX_BYTES_PER_BURST,
+    //   `tx_dma_cfg_CYCLIC,
+    //   `tx_dma_cfg_DMA_DATA_WIDTH_SRC,
+    //   `tx_dma_cfg_DMA_DATA_WIDTH_DEST};
 
-    s_params = '{`rx_dma_cfg_DMA_TYPE_SRC,
-      `rx_dma_cfg_DMA_TYPE_DEST,
-      `rx_dma_cfg_ID,
-      `rx_dma_cfg_AXI_SLICE_SRC,
-      `rx_dma_cfg_AXI_SLICE_DEST,
-      `rx_dma_cfg_SYNC_TRANSFER_START,
-      `rx_dma_cfg_DMA_LENGTH_WIDTH,
-      `rx_dma_cfg_DMA_2D_TRANSFER,
-      `rx_dma_cfg_MAX_BYTES_PER_BURST,
-      `rx_dma_cfg_CYCLIC,
-      `rx_dma_cfg_DMA_DATA_WIDTH_SRC,
-      `rx_dma_cfg_DMA_DATA_WIDTH_DEST};
+    // s_params = '{`rx_dma_cfg_DMA_TYPE_SRC,
+    //   `rx_dma_cfg_DMA_TYPE_DEST,
+    //   `rx_dma_cfg_ID,
+    //   `rx_dma_cfg_AXI_SLICE_SRC,
+    //   `rx_dma_cfg_AXI_SLICE_DEST,
+    //   `rx_dma_cfg_SYNC_TRANSFER_START,
+    //   `rx_dma_cfg_DMA_LENGTH_WIDTH,
+    //   `rx_dma_cfg_DMA_2D_TRANSFER,
+    //   `rx_dma_cfg_MAX_BYTES_PER_BURST,
+    //   `rx_dma_cfg_CYCLIC,
+    //   `rx_dma_cfg_DMA_DATA_WIDTH_SRC,
+    //   `rx_dma_cfg_DMA_DATA_WIDTH_DEST};
 
-    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA, m_params);
+    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA);
     m_dmac_api.probe();
 
-    `INFO(("Parameter test example: %d", m_dmac_api.params.DMA_DATA_WIDTH_SRC));
+    // `INFO(("Parameter test example: %d", m_dmac_api.params.DMA_DATA_WIDTH_SRC));
 
-    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA, s_params);
+    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA);
     s_dmac_api.probe();
 
-    `INFO(("Parameter test example: %d", s_dmac_api.params.DMA_DATA_WIDTH_SRC));
+    // `INFO(("Parameter test example: %d", s_dmac_api.params.DMA_DATA_WIDTH_SRC));
 
     start_clocks();
     sys_reset();

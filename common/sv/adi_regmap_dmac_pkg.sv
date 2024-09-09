@@ -254,7 +254,7 @@ package dmac_regmap_pkg;
       
       function new(input string name);
         super.new(name, 'h0010);
-        this.BYTES_PER_BEAT_DEST_LOG2_F = new("BYTES_PER_BEAT_DEST_LOG2", 3, 0, R, $clog2(DMA_DATA_WIDTH_DEST/8), this);
+        this.BYTES_PER_BEAT_DEST_LOG2_F = new("BYTES_PER_BEAT_DEST_LOG2", 3, 0, R, $clog2(DMA_DATA_WIDTH_DEST[7:0]/8), this);
         this.DMA_TYPE_DEST_F = new("DMA_TYPE_DEST", 5, 4, R, DMA_TYPE_DEST, this);
       endfunction
     endclass

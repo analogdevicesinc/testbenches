@@ -65,6 +65,8 @@ package m_axis_sequencer_pkg;
 
     protected bit descriptor_gen_mode;  // 0 - get descriptor from test;
                                         // 1 - autogenerate descriptor based on the first descriptor from test until aborted
+    protected bit keep_all; // 0 - bytes can be set to be invalid
+                            // 1 - all bytes are always valid, data is generated only for the set part
     
     protected int byte_count;
 
@@ -102,6 +104,7 @@ package m_axis_sequencer_pkg;
       this.descriptor_delay = 0;
       this.stop_policy = STOP_POLICY_DATA_BEAT;
       this.queue_empty_sig = 1;
+      this.keep_all = 1;
     endfunction: new
 
 
@@ -167,6 +170,20 @@ package m_axis_sequencer_pkg;
       this.descriptor_delay = descriptor_delay;
       `INFOV(("Descriptor delay configured"), 55);
     endfunction: set_descriptor_delay
+
+    // set all bytes valid in a sample, sets keep to 1
+    function void set_keep_all();
+      if (enabled)
+        `ERROR(("Sequencer must be disabled before configuring keep all parameter"));
+      this.keep_all = 1;
+    endfunction: set_keep_all
+
+    // bytes in a sample may not be valid, sets some bits of keep to 0
+    function void set_keep_some();
+      if (enabled)
+        `ERROR(("Sequencer must be disabled before configuring keep all parameter"));
+      this.keep_all = 0;
+    endfunction: set_keep_some
 
     // create transfer descriptor
     function void add_xfer_descriptor(
@@ -297,6 +314,7 @@ package m_axis_sequencer_pkg;
       super.new();
 
       this.agent = agent;
+      this.agent.vif_proxy.set_no_insert_x_when_keep_low(1);
     endfunction: new
 
 
@@ -336,8 +354,6 @@ package m_axis_sequencer_pkg;
 
       `INFOV(("packetize start"), 55);
       byte_per_beat = AXIS_VIP_DATA_WIDTH/8;
-      data = new[byte_per_beat];
-      keep = new[byte_per_beat];
       descriptor = descriptor_q.pop_front();
 
       // put a copy of the descriptor back into the queue and continue processing
@@ -345,10 +361,19 @@ package m_axis_sequencer_pkg;
         descriptor_q.push_back(descriptor);
 
       packet_length = descriptor.num_bytes / byte_per_beat;
+      if (packet_length*byte_per_beat < descriptor.num_bytes)
+        packet_length++;
+
+      if (keep_all)
+        descriptor.num_bytes = packet_length*byte_per_beat;
 
       for (int tc=0; tc<packet_length; tc++) begin : packet_loop
+        data = new[byte_per_beat];
+        for (int i=0; i<byte_per_beat; i++)
+          data[i] = 'd0;
+        keep = new[byte_per_beat];
 
-        for (int i=0; i<byte_per_beat; i++) begin
+        for (int i=0; i<byte_per_beat && (keep_all || tc*byte_per_beat+i<descriptor.num_bytes); i++) begin
           case (data_gen_mode)
             DATA_GEN_MODE_TEST_DATA:
               // block transfer until we get data from byte stream queue

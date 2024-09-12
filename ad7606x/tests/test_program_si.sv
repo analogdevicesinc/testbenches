@@ -289,7 +289,7 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign ad7606_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+  assign ad7606_spi_sdi[i] = sdi_shiftreg[15]; // all SDI lanes got the same data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
@@ -363,27 +363,68 @@ assign sdi_shiftreg2 = {sdi_shiftreg[14:0], 1'b0};
 
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
-bit [15:0]  sdi_store_cnt = 'h0;
-bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
+bit [15:0]  sdi_store_cnt = (`NUM_OF_SDI == 1) ? 'h1 : 'h0;
+bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
+bit [31:0]  sdi_shiftreg2;
+bit [31:0]  sdi_shiftreg_aux;
+bit [31:0]  sdi_shiftreg_aux_old;
+bit [31:0]  sdi_shiftreg_old;
+
+assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
 
 initial begin
   while(1) begin
-    @(posedge rx_sclk_bfm);
-    sdi_data_store <= {sdi_shiftreg[13:0], 2'b00};
+    @(posedge ad7606_echo_sclk);
+    sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
+    
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
-        sdi_store_cnt <= sdi_store_cnt + 1;
+        if (`NUM_OF_SDI == 1) begin
+          sdi_store_cnt <= sdi_store_cnt + 1;
+        end else begin
+          sdi_store_cnt <= sdi_store_cnt + 2;
+        end
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg2;
-          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg;
+        if (`NUM_OF_SDI == 1) begin
+          sdi_shiftreg_old <= sdi_shiftreg;
+          if (sdi_store_cnt [0] == 'h1 ) begin
+            for (int i=0; i<16; i=i+1) begin
+              offload_sdi_data_store_arr[sdi_store_cnt-1][16 + i] = sdi_shiftreg[2*i+1];
+              offload_sdi_data_store_arr[sdi_store_cnt-1][i] = sdi_shiftreg_old[2*i+1];
+              offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
+              offload_sdi_data_store_arr[sdi_store_cnt][16 + i] = sdi_shiftreg[2*i];
+            end
+          end
+        end else if (`NUM_OF_SDI == 2) begin
+          offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
+          offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
+        end else if (`NUM_OF_SDI == 4) begin
+          for (int i=0; i<16; i=i+1) begin
+            offload_sdi_data_store_arr[sdi_store_cnt][2*i  ] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt][2*i+1] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i  ] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i+1] = sdi_shiftreg[i];
+          end
+        end else if (`NUM_OF_SDI == 8) begin
+            for (int i=0; i<8; i=i+1) begin
+              offload_sdi_data_store_arr[sdi_store_cnt][4*i  ] = sdi_shiftreg[i];
+              offload_sdi_data_store_arr[sdi_store_cnt][4*i+1] = sdi_shiftreg[i];
+              offload_sdi_data_store_arr[sdi_store_cnt][4*i+2] = sdi_shiftreg[i];
+              offload_sdi_data_store_arr[sdi_store_cnt][4*i+3] = sdi_shiftreg[i];
+
+              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i  ] = sdi_shiftreg[i];
+              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+1] = sdi_shiftreg[i];
+              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+2] = sdi_shiftreg[i];
+              offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+3] = sdi_shiftreg[i];
+            end
+          end
       end else begin
-        sdi_fifo_data_store[31:16] = sdi_shiftreg;
-        sdi_fifo_data_store[15:0] = sdi_shiftreg2;
+        sdi_fifo_data_store = sdi_shiftreg;
       end
       shiftreg_sampled <= 'h1;
     end
@@ -441,9 +482,14 @@ task offload_spi_test();
     // Start the offload
     axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     $display("[%t] Offload started.", $time);
+    
+    if (`NUM_OF_SDI == 1) begin
+      wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
+    end else begin
+      wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+    end
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
-
+    
     axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     offload_status = 0;
 

@@ -113,12 +113,12 @@ if (`INTF == 0) begin //parallel interface
   end
   else //serial interface
   begin
-      wire       ad7606_spi_sclk;
-      wire       ad7606_spi_sdo;
-      wire [1:0] ad7606_spi_sdi;
-      wire       ad7606_spi_cs;
-      wire       adc_busy;
-      wire       adc_cnvst_n;
+      wire                   ad7606_spi_sclk;
+      wire                   ad7606_spi_sdo;
+      wire [`NUM_OF_SDI-1:0] ad7606_spi_sdi;
+      wire                   ad7606_spi_cs;
+      wire                   adc_busy;
+      wire                   adc_cnvst_n;
 
     `TEST_PROGRAM test(
       .ad7606_spi_sdi(ad7606_spi_sdi),
@@ -132,7 +132,7 @@ if (`INTF == 0) begin //parallel interface
       .ad7606_spi_sdi (ad7606_spi_sdi),
       .ad7606_spi_cs (ad7606_spi_cs),
       .ad7606_spi_sclk (ad7606_spi_sclk));
-      
+
       assign adc_busy = adc_cnvst_n;
     end
     endgenerate

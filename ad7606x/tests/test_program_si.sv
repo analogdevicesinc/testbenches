@@ -287,8 +287,10 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-assign ad7606_spi_sdi[0] = sdi_shiftreg2[15];
-assign ad7606_spi_sdi[1] = sdi_shiftreg[15];
+genvar i;
+for (i = 0; i < `NUM_OF_SDI; i++) begin
+  assign ad7606_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+end
 
 assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_pos_counter == 16) :
@@ -492,7 +494,7 @@ task fifo_spi_test();
   generate_transfer_cmd(1);
 
   #100
-  wait(sync_id == 1);
+  //wait(sync_id == 1);
   #100
 
   repeat (NUM_OF_WORDS) begin

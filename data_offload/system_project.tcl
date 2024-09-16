@@ -32,17 +32,11 @@ adi_sim_project_xilinx $project_name $part
 
 # Add test files to the project
 adi_sim_project_files [list \
- "../common/sv/utils.svh" \
- "../common/sv/logger_pkg.sv" \
- "../common/sv/reg_accessor.sv" \
  "../common/sv/m_axis_sequencer.sv" \
  "../common/sv/s_axis_sequencer.sv" \
- "../common/sv/m_axi_sequencer.sv" \
- "../common/sv/s_axi_sequencer.sv" \
  "do_scoreboard.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
- "system_tb.sv" \
 ]
 
 #set a default test program

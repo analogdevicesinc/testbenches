@@ -31,18 +31,12 @@ adi_sim_project_xilinx $project_name $part
 
 # Add test files to the project
 adi_sim_project_files [list \
- "../common/sv/utils.svh" \
- "../common/sv/logger_pkg.sv" \
- "../common/sv/reg_accessor.sv" \
  "../common/sv/m_axis_sequencer.sv" \
  "../common/sv/s_axis_sequencer.sv" \
- "../common/sv/m_axi_sequencer.sv" \
- "../common/sv/s_axi_sequencer.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
  "tests/test_program_sync.sv" \
  "do_scoreboard.sv" \
- "system_tb.sv" \
  "data_offload_pkg.sv" \
 ]
 

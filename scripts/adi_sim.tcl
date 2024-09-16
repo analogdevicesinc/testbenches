@@ -75,6 +75,8 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   # Use a define for the top module
   adi_sim_add_define "TB=system_tb"
+
+  source ../common/system_project_files.tcl
 }
 
 proc adi_sim_project_files {project_files} {

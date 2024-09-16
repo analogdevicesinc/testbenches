@@ -32,7 +32,9 @@ package environment_pkg;
       virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
 
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
+
+      virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if
     );
 
       // Creating the agents
@@ -41,7 +43,8 @@ package environment_pkg;
                 ddr_clk_vip_if, 
                 sys_rst_vip_if, 
                 mng_vip_if, 
-                ddr_vip_if);
+                ddr_vip_if,
+                irq_vip_if);
 
     endfunction
 
@@ -49,43 +52,22 @@ package environment_pkg;
     // Start environment
     //============================================================================
     task start();
-
       super.start();
-
     endtask
 
-    //============================================================================
-    // Start the test
-    //============================================================================
-    task test();
-    endtask
-
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-    endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
     task run;
-
-      //pre_test();
-      test();
-
+      super.run();
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
     task stop;
-
       super.stop();
-
-      post_test();
-
     endtask
 
   endclass

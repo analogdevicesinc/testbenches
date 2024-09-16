@@ -44,7 +44,7 @@ package adi_peripheral_pkg;
   //============================================================================
   class adi_peripheral;
     reg_accessor bus;
-    bit [31:0] base_address;
+    longint      base_address;
 
     // Semantic versioning
     bit [7:0] ver_major;
@@ -56,7 +56,11 @@ package adi_peripheral_pkg;
     // -----------------
     //
     // -----------------
-    function new (string name, reg_accessor bus, bit [31:0] base_address);
+    function new (
+      input string name,
+      reg_accessor bus,
+      input longint base_address);
+      
       this.name = name;
       this.bus = bus;
       this.base_address = base_address;
@@ -76,30 +80,33 @@ package adi_peripheral_pkg;
     // 
     // -----------------
     task axi_read(
-      input  [31:0] addr,
-      output [31:0] data);
+      input  longint      addr,
+      output logic [31:0] data,
+      input  bit          tx_priority = 0);
 
-      this.bus.RegRead32(this.base_address + addr, data);
+      this.bus.RegRead32(this.base_address + addr, data, tx_priority);
     endtask: axi_read
 
     // -----------------
     //
     // -----------------
     task axi_write(
-      input [31:0] addr,
-      input [31:0] data);
+      input longint    addr,
+      input bit [31:0] data,
+      input bit        tx_priority = 0);
 
-      this.bus.RegWrite32(this.base_address + addr, data);
+      this.bus.RegWrite32(this.base_address + addr, data, tx_priority);
     endtask: axi_write
 
     // -----------------
     //
     // -----------------
     task axi_verify(
-      input [31:0] addr,
-      input [31:0] data);
+      input longint      addr,
+      input logic [31:0] data,
+      input bit          tx_priority = 0);
 
-      this.bus.RegReadVerify32(this.base_address + addr, data);
+      this.bus.RegReadVerify32(this.base_address + addr, data, tx_priority);
     endtask: axi_verify
 
   endclass

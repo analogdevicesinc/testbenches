@@ -94,6 +94,9 @@ package environment_pkg;
 
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
+
+      virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if,
+
       `ifdef HAS_XIL_VDMA
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, ref_src_axis_vip)) ref_src_axis_vip_if,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, ref_dst_axis_vip)) ref_dst_axis_vip_if,
@@ -106,7 +109,8 @@ package environment_pkg;
                 ddr_clk_vip_if,
                 sys_rst_vip_if,
                 mng_vip_if,
-                ddr_vip_if);
+                ddr_vip_if,
+                irq_vip_if);
 
       // Creating the agents
       src_axis_agent = new("Src AXI stream agent", src_axis_vip_if);
@@ -124,7 +128,7 @@ package environment_pkg;
       ref_dst_axis_seq = new(ref_dst_axis_agent);
       `endif
 
-    scrb = new;
+      scrb = new;
 
     endfunction
 
@@ -135,6 +139,7 @@ package environment_pkg;
     //============================================================================
     task start();
       super.start();
+
       scrb.connect(
         src_axis_agent.monitor.item_collected_port,
         dst_axis_agent.monitor.item_collected_port
@@ -146,16 +151,14 @@ package environment_pkg;
       ref_src_axis_agent.start_master();
       ref_dst_axis_agent.start_slave();
       `endif
-
     endtask
 
     //============================================================================
-    // Start the test
-    //   - start the scoreboard
-    //   - start the sequencers
+    // Run subroutine
     //============================================================================
-    task test();
+    task run;
       super.test();
+
       src_axis_seq.run();
       `ifdef HAS_XIL_VDMA
       ref_src_axis_seq.run();
@@ -163,24 +166,6 @@ package environment_pkg;
       // DEST AXIS does not have to run, scoreboard connects and
       // gathers packets from the agent
       scrb.run();
-      test_c_run();
-    endtask
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      super.post_test();
-      // wait until done
-      scrb.shutdown();
-    endtask
-
-    //============================================================================
-    // Run subroutine
-    //============================================================================
-    task run;
-      test();
-      post_test();
     endtask
 
     //============================================================================
@@ -188,8 +173,10 @@ package environment_pkg;
     //============================================================================
     task stop;
       super.stop();
+
       src_axis_agent.stop_master();
       dst_axis_agent.stop_slave();
+      scrb.shutdown();
       `ifdef HAS_XIL_VDMA
       ref_src_axis_agent.stop_master();
       ref_dst_axis_agent.stop_slave();

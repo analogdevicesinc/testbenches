@@ -82,6 +82,8 @@ package environment_pkg;
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
 
+      virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if,
+
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, adc_src_axis_0)) adc_src_axis_vip_if_0,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dac_dst_axis_0)) dac_dst_axis_vip_if_0,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, adc_dst_axi_pt_0)) adc_dst_axi_pt_vip_if_0,
@@ -100,7 +102,8 @@ package environment_pkg;
                 ddr_clk_vip_if, 
                 sys_rst_vip_if, 
                 mng_vip_if, 
-                ddr_vip_if);
+                ddr_vip_if,
+                irq_vip_if);
 
       adc_src_axis_agent_0 = new("ADC Source AXI Stream Agent 0", adc_src_axis_vip_if_0);
       dac_dst_axis_agent_0 = new("DAC Destination AXI Stream Agent 0", dac_dst_axis_vip_if_0);
@@ -195,55 +198,33 @@ package environment_pkg;
     endtask
 
     //============================================================================
-    // Start the test
-    //   - start the RX scoreboard and sequencer
-    //   - start the TX scoreboard and sequencer
-    //   - setup the RX DMA
-    //   - setup the TX DMA
-    //============================================================================
-    task test();
-
-      fork
-        adc_src_axis_seq_0.run();
-        dac_dst_axis_seq_0.run();
-
-        // adc_src_axis_seq_1.run();
-        // dac_dst_axis_seq_1.run();
-
-        adc_src_axis_0_mon.run();
-        dac_dst_axis_0_mon.run();
-        adc_dst_axi_pt_0_mon.run();
-        dac_src_axi_pt_0_mon.run();
-
-        // adc_src_axis_1_mon.run();
-        // dac_dst_axis_1_mon.run();
-        // adc_dst_axi_pt_1_mon.run();
-        // dac_src_axi_pt_1_mon.run();
-
-        scoreboard_tx0.run();
-        scoreboard_rx0.run();
-
-        // scoreboard_tx1.run();
-        // scoreboard_rx1.run();
-      join_none
-
-    endtask
-
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // Evaluate the scoreboard's results
-    endtask
-
-    //============================================================================
     // Run subroutine
     //============================================================================
     task run;
 
-      //pre_test();
-      test();
+      super.run();
+
+      adc_src_axis_seq_0.run();
+      dac_dst_axis_seq_0.run();
+
+      // adc_src_axis_seq_1.run();
+      // dac_dst_axis_seq_1.run();
+
+      adc_src_axis_0_mon.run();
+      dac_dst_axis_0_mon.run();
+      adc_dst_axi_pt_0_mon.run();
+      dac_src_axi_pt_0_mon.run();
+
+      // adc_src_axis_1_mon.run();
+      // dac_dst_axis_1_mon.run();
+      // adc_dst_axi_pt_1_mon.run();
+      // dac_src_axi_pt_1_mon.run();
+
+      scoreboard_tx0.run();
+      scoreboard_rx0.run();
+
+      // scoreboard_tx1.run();
+      // scoreboard_rx1.run();
 
     endtask
 
@@ -261,8 +242,6 @@ package environment_pkg;
       // adc_src_axis_seq_1.stop();
       // adc_src_axis_agent_1.stop_master();
       // dac_dst_axis_agent_1.stop_slave();
-
-      post_test();
 
     endtask
 

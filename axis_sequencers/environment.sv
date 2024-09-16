@@ -41,6 +41,8 @@ package environment_pkg;
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
 
+      virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if,
+
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, src_axis)) src_axis_vip_if,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dst_axis)) dst_axis_vip_if
     );
@@ -51,7 +53,8 @@ package environment_pkg;
                 ddr_clk_vip_if, 
                 sys_rst_vip_if, 
                 mng_vip_if, 
-                ddr_vip_if);
+                ddr_vip_if,
+                irq_vip_if);
 
       src_axis_agent = new("Source AXI Stream Agent", src_axis_vip_if);
       dst_axis_agent = new("Destination AXI Stream Agent", dst_axis_vip_if);
@@ -91,29 +94,14 @@ package environment_pkg;
     endtask
 
     //============================================================================
-    // Start the test
-    //============================================================================
-    task test();
-      fork
-        src_axis_seq.run();
-        dst_axis_seq.run();
-      join_none
-    endtask
-
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-    endtask
-
-    //============================================================================
     // Run subroutine
     //============================================================================
     task run;
 
-      //pre_test();
-      test();
+      super.run();
+
+      src_axis_seq.run();
+      dst_axis_seq.run();
 
     endtask
 
@@ -123,10 +111,10 @@ package environment_pkg;
     task stop;
 
       super.stop();
-        src_axis_seq.stop();
-        src_axis_agent.stop_master();
-        dst_axis_agent.stop_slave();
-      post_test();
+
+      src_axis_seq.stop();
+      src_axis_agent.stop_master();
+      dst_axis_agent.stop_slave();
 
     endtask
 

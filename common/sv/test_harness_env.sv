@@ -41,6 +41,7 @@ package test_harness_env_pkg;
   import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
+  import irq_handler_pkg::*;
   import `PKGIFY(test_harness, mng_axi_vip)::*;
   import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
@@ -54,14 +55,15 @@ package test_harness_env_pkg;
     m_axi_sequencer #(`AGENT(test_harness, mng_axi_vip, mst_t)) mng;
     s_axi_sequencer #(`AGENT(test_harness, ddr_axi_vip, slv_mem_t)) ddr_axi_seq;
 
-    // Register accessors
-    bit done = 0;
+    irq_handler_class irq_handler;
 
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if;
 
     virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if;
+
+    virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if;
 
     //============================================================================
     // Constructor
@@ -74,12 +76,15 @@ package test_harness_env_pkg;
       virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
 
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
+
+      virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if
     );
 
       this.sys_clk_vip_if = sys_clk_vip_if;
       this.dma_clk_vip_if = dma_clk_vip_if;
       this.ddr_clk_vip_if = ddr_clk_vip_if;
+
       this.sys_rst_vip_if = sys_rst_vip_if;
 
       // Creating the agents
@@ -89,6 +94,8 @@ package test_harness_env_pkg;
       // Creating the sequencers
       mng = new(mng_agent);
       ddr_axi_seq = new(ddr_axi_agent);
+
+      irq_handler = new("IRQ handler", mng, `IRQ_C_BA, irq_vip_if);
 
     endfunction
 
@@ -101,74 +108,39 @@ package test_harness_env_pkg;
       mng_agent.start_master();
       ddr_axi_agent.start_slave();
 
-      sys_clk_vip_if.start_clock;
-      dma_clk_vip_if.start_clock;
-      ddr_clk_vip_if.start_clock;
-    endtask
-
-    //============================================================================
-    // Start the test
-    //   - start the scoreboard
-    //   - start the sequencers
-    //============================================================================
-    task test();
-      fork
-
-      join_none
-    endtask
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // wait until done
-      wait_done();
+      sys_clk_vip_if.start_clock();
+      dma_clk_vip_if.start_clock();
+      ddr_clk_vip_if.start_clock();
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
-    task run;
-      test();
-      post_test();
+    task run();
+      irq_handler.run();
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
+    task stop();
       mng_agent.stop_master();
       ddr_axi_agent.stop_slave();
 
-      sys_clk_vip_if.stop_clock;
-      dma_clk_vip_if.stop_clock;
-      ddr_clk_vip_if.stop_clock;
-    endtask
-
-    //============================================================================
-    // Wait until all component are done
-    //============================================================================
-    task wait_done;
-      wait (done == 1);
-      //`INFO(("Shutting down"));
-    endtask
-
-    //============================================================================
-    // Test controller routine
-    //============================================================================
-    task test_c_run();
-      done = 1;
+      sys_clk_vip_if.stop_clock();
+      dma_clk_vip_if.stop_clock();
+      ddr_clk_vip_if.stop_clock();
     endtask
 
     //============================================================================
     // System reset routine
     //============================================================================
-    task sys_reset;
+    task sys_reset();
       //asserts all the resets for 100 ns
-      sys_rst_vip_if.assert_reset;
-      #200;
-      sys_rst_vip_if.deassert_reset;
-      #800;
+      sys_rst_vip_if.assert_reset();
+      #200ns;
+      sys_rst_vip_if.deassert_reset();
+      #800ns;
     endtask
 
   endclass

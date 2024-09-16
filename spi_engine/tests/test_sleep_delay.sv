@@ -125,6 +125,7 @@ initial begin
             `TH.`SYS_RST.inst.IF,
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
+            `TH.`IRQ.inst.IF,
             `TH.`SPI_S.inst.IF
             );
 

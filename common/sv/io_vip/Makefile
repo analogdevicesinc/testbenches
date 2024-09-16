@@ -5,7 +5,7 @@
 
 LIBRARY_NAME := io_vip
 
-GENERIC_DEPS += io_vip.sv
+GENERIC_DEPS += io_vip_top.sv
 GENERIC_DEPS += io_vip_if.sv
 
 XILINX_DEPS += io_vip_ip.tcl

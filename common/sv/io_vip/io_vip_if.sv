@@ -34,8 +34,9 @@
 // ***************************************************************************
 
 interface io_vip_if #(
-  int MODE = 0, // 1 - master, 0 - slave
-      WIDTH = 1
+  int MODE = 1, // 1 - master, 0 - slave, 2 - passthrough
+      WIDTH = 1, // bitwidth
+      ASYNC = 0 // clock synchronous
 ) (
   input bit clk
 );
@@ -43,27 +44,32 @@ interface io_vip_if #(
   logic [WIDTH-1:0] io = 0;
 
   // Master functions
-  function void set_io(int o);
-    if (MODE === 0) begin
-      $display("[ERROR] %0t Unsupported in slave mode", $time);
-      $finish;
+  function void set_io(logic [WIDTH-1:0] o);
+    if (MODE != 1) begin
+      $fatal(0, "[ERROR] %0t Supported only in master mode", $time);
     end else begin
       io <= o[WIDTH-1:0];
     end
   endfunction
 
   // Wait and set
-  task setw_io(int o, int w=1);
+  task setw_io(
+    input int o,
+    input logic [WIDTH-1:0] w=1);
+
     repeat(w) wait_posedge_clk();
     set_io(o);
   endtask
 
   // Slave functions
-  function int get_io();
+  function logic [WIDTH-1:0] get_io();
     return io;
   endfunction
 
   task wait_posedge_clk();
+    if (ASYNC == 1) begin
+      $fatal(0, "[ERROR] %0t Unsupported in async mode", $time);
+    end
     @(cb);
   endtask
 

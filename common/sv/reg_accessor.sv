@@ -39,14 +39,17 @@ package reg_accessor_pkg;
 
   virtual class reg_accessor;
 
-    pure virtual task automatic RegWrite32(input xil_axi_ulong addr =0,
-                                           input bit [31:0]    data);
+    pure virtual task automatic RegWrite32(input xil_axi_ulong  addr,
+                                           input bit [31:0]     data,
+                                           input bit            tx_priority = 0);
 
-    pure virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
-                                          output bit [31:0]    data);
+    pure virtual task automatic RegRead32(input xil_axi_ulong  addr,
+                                          output logic [31:0]  data,
+                                          input bit            tx_priority = 0);
 
-    pure virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
-                                                input bit [31:0]     data);
+    pure virtual task automatic RegReadVerify32(input xil_axi_ulong  addr,
+                                                input logic [31:0]   data,
+                                                input bit            tx_priority = 0);
 
   endclass
 

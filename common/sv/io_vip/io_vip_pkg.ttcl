@@ -9,6 +9,7 @@
 <: setFileName ${ComponentName}_pkg :>
 <: setFileExtension ".sv" :>
 <: set mode                 [get_property MODELPARAM_VALUE.MODE] :>
+<: set async                 [get_property MODELPARAM_VALUE.ASYNC] :>
 <: set width                [get_property MODELPARAM_VALUE.WIDTH] :>
 
 <: proc b2i {b} { if {$b==true} {return 1} else {return 0}} :>
@@ -24,6 +25,7 @@ package <=: ComponentName :>_pkg;
 // environment.
 ///////////////////////////////////////////////////////////////////////////
   parameter <=: ComponentName :>_VIP_MODE               = <=: b2i $mode :>;
+  parameter <=: ComponentName :>_VIP_ASYNC              = <=: b2i $async :>;
   parameter <=: ComponentName :>_VIP_WIDTH              = <=: $width :>;
 //////////////////////////////////////////////////////////////////////////
 

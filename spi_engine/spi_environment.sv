@@ -68,6 +68,9 @@ package spi_environment_pkg;
 
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
+      
+      virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if,
+
       virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
     );
 
@@ -76,7 +79,8 @@ package spi_environment_pkg;
                 ddr_clk_vip_if,
                 sys_rst_vip_if,
                 mng_vip_if,
-                ddr_vip_if);
+                ddr_vip_if,
+                irq_vip_if);
 
       // Creating the agents
       spi_agent = new(spi_s_vip_if);
@@ -97,36 +101,15 @@ package spi_environment_pkg;
     endtask
 
     //============================================================================
-    // Start the test
-    //   - start the scoreboard
-    //   - start the sequencers
-    //============================================================================
-    task test();
-      super.test();
-      fork
-
-      join_none
-    endtask
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      super.post_test();
-    endtask
-
-    //============================================================================
     // Run subroutine
     //============================================================================
-    task run;
-      test();
-      post_test();
+    task run();
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
+    task stop();
       spi_agent.stop();
       super.stop();
     endtask

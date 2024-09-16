@@ -20,18 +20,10 @@ adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
 # Add test files to the project
 adi_sim_project_files [list \
- "../common/sv/utils.svh" \
- "../common/sv/logger_pkg.sv" \
- "../common/sv/reg_accessor.sv" \
  "../common/sv/m_axis_sequencer.sv" \
  "../common/sv/s_axis_sequencer.sv" \
- "../common/sv/m_axi_sequencer.sv" \
- "../common/sv/s_axi_sequencer.sv" \
- "../common/sv/adi_regmap_pkg.sv" \
  "../common/sv/adi_regmap_tdd_gen_pkg.sv" \
- "../common/sv/test_harness_env.sv" \
  "tests/test_program.sv" \
- "system_tb.sv" \
  ]
 
 #set a default test program

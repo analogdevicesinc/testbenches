@@ -65,6 +65,7 @@ program test_program;
               `TH.`SYS_RST.inst.IF,
               `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF,
+              `TH.`IRQ.inst.IF,
               `ifdef HAS_XIL_VDMA
               `TH.`REF_SRC_AXIS.inst.IF,
               `TH.`REF_DST_AXIS.inst.IF,

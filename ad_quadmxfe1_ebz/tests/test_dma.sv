@@ -82,7 +82,8 @@ program test_dma;
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
               `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
+              `TH.`DDR_AXI.inst.IF,
+              `TH.`IRQ.inst.IF);
 
     #2ps;
 

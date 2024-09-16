@@ -67,6 +67,7 @@ program test_program;
               `TH.`SYS_RST.inst.IF,
               `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF,
+              `TH.`IRQ.inst.IF,
 
               `TH.`TX_SRC_AXIS.inst.IF,
               `TH.`TX_DST_AXIS.inst.IF,

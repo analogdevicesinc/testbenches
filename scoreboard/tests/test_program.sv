@@ -70,6 +70,7 @@ program test_program;
               `TH.`SYS_RST.inst.IF,
               `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF,
+              `TH.`IRQ.inst.IF,
 
               `TH.`ADC_SRC_AXIS_0.inst.IF,
               `TH.`DAC_DST_AXIS_0.inst.IF,

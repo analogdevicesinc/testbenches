@@ -48,21 +48,37 @@ package m_axi_sequencer_pkg;
     semaphore reader_s;
     semaphore writer_s;
 
+    logic [31:0] read_op_count;
+    logic [31:0] write_op_count;
+
+    event reader_ev;
+    event writer_ev;
+
     function new(T agent);
       this.agent = agent;
       reader_s = new(1);
       writer_s = new(1);
+      read_op_count = 0;
+      write_op_count = 0;
     endfunction
 
     // ---------------------------------------------------------------------------
     // Generic tasks
     // ---------------------------------------------------------------------------
-    virtual task automatic RegWrite32(input xil_axi_ulong  addr =0,
-                                      input bit [31:0]    data);
+    virtual task automatic RegWrite32(input xil_axi_ulong  addr,
+                                      input bit [31:0]     data,
+                                      input bit            tx_priority = 0);
 
       static xil_axi_uint       id =0;
 
+      if (!tx_priority) begin
+        while (write_op_count) begin
+          @writer_ev;
+        end
+      end
+      write_op_count++;
       writer_s.get(1);
+
       `INFOV(("writing to address %h value %h", addr , data), 10);
 
       single_write_transaction_readback_api(.id(id),
@@ -73,16 +89,25 @@ package m_axi_sequencer_pkg;
                                             .data(data));
       id++;
       writer_s.put(1);
+      write_op_count--;
+      ->writer_ev;
 
     endtask : RegWrite32
 
-    virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
-                                     output bit [31:0]    data);
+    virtual task automatic RegRead32(input xil_axi_ulong  addr,
+                                     output logic [31:0]  data,
+                                     input bit            tx_priority = 0);
 
       xil_axi_data_beat DataBeat_for_read[];
       static xil_axi_uint       id =0;
 
+      if (!tx_priority) begin
+        while (read_op_count) begin
+          @reader_ev;
+        end
+      end
       reader_s.get(1);
+      read_op_count++;
 
       single_read_transaction_readback_api (.id(id),
                                             .addr(addr),
@@ -95,14 +120,18 @@ package m_axi_sequencer_pkg;
       `INFOV((" Reading data : %h @ 0x%h", data, addr), 10);
 
       reader_s.put(1);
+      read_op_count--;
+      ->reader_ev;
 
     endtask : RegRead32
 
-    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
-                                           input bit [31:0]     data);
+    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr,
+                                           input logic [31:0]   data,
+                                           input bit            tx_priority = 0);
      bit [31:0]    data_out;
      RegRead32(.addr(addr),
-               .data(data_out));
+               .data(data_out),
+               .tx_priority(tx_priority));
      if (data !== data_out) begin
        `ERROR((" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
      end
@@ -114,18 +143,18 @@ package m_axi_sequencer_pkg;
     // BFM specific tasks
     // ---------------------------------------------------------------------------
     task automatic single_write_transaction_api (
-                                  input string            name ="single_write",
-                                  input xil_axi_uint      id =0,
-                                  input xil_axi_ulong     addr =0,
-                                  input xil_axi_len_t     len =0,
-                                  input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
-                                  input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
-                                  input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
-                                  input xil_axi_cache_t   cache =3,
-                                  input xil_axi_prot_t    prot =0,
-                                  input xil_axi_region_t  region =0,
-                                  input xil_axi_qos_t     qos =0,
-                                  input bit [63:0]        data =0);
+      input string            name ="single_write",
+      input xil_axi_uint      id =0,
+      input xil_axi_ulong     addr =0,
+      input xil_axi_len_t     len =0,
+      input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
+      input xil_axi_cache_t   cache =3,
+      input xil_axi_prot_t    prot =0,
+      input xil_axi_region_t  region =0,
+      input xil_axi_qos_t     qos =0,
+      input bit [63:0]        data =0);
 
       axi_transaction  wr_trans;
       wr_trans = agent.wr_driver.create_transaction(name);

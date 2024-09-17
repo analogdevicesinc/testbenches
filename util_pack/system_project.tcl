@@ -29,6 +29,7 @@ adi_sim_project_files [list \
  "../common/sv/dmac_api.sv" \
  "../common/sv/dma_trans.sv" \
  "../common/sv/adi_regmap_dmac_pkg.sv" \
+ "environment.sv" \
  "tests/test_program.sv" \
  ]
 

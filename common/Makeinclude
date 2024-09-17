@@ -15,7 +15,6 @@ SV_DEPS += ../common/sv/test_harness_env.sv
 SV_DEPS += ../common/sv/adi_peripheral_pkg.sv
 SV_DEPS += ../common/sv/watchdog.sv
 SV_DEPS += ../common/sv/irq_handler.sv
-SV_DEPS += environment.sv
 SV_DEPS += system_tb.sv
 
 ENV_DEPS += system_project.tcl

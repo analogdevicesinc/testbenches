@@ -12,6 +12,10 @@ SV_DEPS += ../common/sv/s_axis_sequencer.sv
 SV_DEPS += ../common/sv/mailbox.sv
 SV_DEPS += ../common/sv/x_monitor.sv
 SV_DEPS += ../common/sv/scoreboard.sv
+SV_DEPS += ../common/sv/scoreboard.sv
+SV_DEPS += ../common/sv/scoreboard.sv
+SV_DEPS += ../common/sv/scoreboard.sv
+SV_DEPS += environment.sv
 
 # default test program
 TP := test_program

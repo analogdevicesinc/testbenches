@@ -17,6 +17,7 @@ SV_DEPS += ../common/sv/dma_trans.sv
 SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
 SV_DEPS += ../common/sv/data_offload_api.sv
 SV_DEPS += ../common/sv/adi_regmap_data_offload_pkg.sv
+SV_DEPS += environment.sv
 
 LIB_DEPS += util_cdc
 LIB_DEPS += util_axis_fifo

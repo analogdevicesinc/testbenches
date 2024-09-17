@@ -9,6 +9,7 @@
 # All test-bench dependencies except test programs
 SV_DEPS += ../common/sv/m_axis_sequencer.sv
 SV_DEPS += ../common/sv/s_axis_sequencer.sv
+SV_DEPS += environment.sv
 
 # default test program
 TP := test_program

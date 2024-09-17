@@ -14,8 +14,7 @@ SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
 SV_DEPS += ../common/sv/dma_trans.sv
 SV_DEPS += scoreboard.sv
 
-LIB_DEPS := axi_dmac
-SIM_LIB_DEPS := io_vip
+LIB_DEPS += axi_dmac
 
 # default test program
 TP := test_program

@@ -17,13 +17,11 @@ SV_DEPS += ../common/sv/dmac_api.sv
 SV_DEPS += ../common/sv/dma_trans.sv
 SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
 
-LIB_DEPS := util_cdc
+LIB_DEPS += util_cdc
 LIB_DEPS += util_axis_fifo
 LIB_DEPS += axi_dmac
 LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += util_pack/util_upack2
-
-SIM_LIB_DEPS := io_vip
 
 # default test program
 TP := test_program

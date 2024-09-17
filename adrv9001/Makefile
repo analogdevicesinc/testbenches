@@ -25,8 +25,6 @@ LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += axi_sysid
 LIB_DEPS += sysid_rom
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

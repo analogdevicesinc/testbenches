@@ -10,8 +10,6 @@
 SV_DEPS += ../common/sv/m_axis_sequencer.sv
 SV_DEPS += ../common/sv/s_axis_sequencer.sv
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

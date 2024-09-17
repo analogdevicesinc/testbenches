@@ -34,8 +34,6 @@ LIB_DEPS += util_pack/util_upack2
 LIB_DEPS += xilinx/axi_adxcvr
 LIB_DEPS += xilinx/util_adxcvr
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

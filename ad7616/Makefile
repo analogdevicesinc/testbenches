@@ -31,8 +31,6 @@ LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
 LIB_DEPS += sysid_rom
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program_si
 

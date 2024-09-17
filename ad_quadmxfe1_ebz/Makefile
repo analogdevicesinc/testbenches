@@ -37,8 +37,6 @@ LIB_DEPS += xilinx/util_adxcvr
 LIB_DEPS += axi_sysid
 LIB_DEPS += sysid_rom
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

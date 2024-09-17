@@ -27,8 +27,6 @@ LIB_DEPS += util_tdd_sync
 LIB_DEPS += util_wfifo
 LIB_DEPS += xilinx/util_clkdiv
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

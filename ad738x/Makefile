@@ -29,8 +29,6 @@ LIB_DEPS += sysid_rom
 LIB_DEPS += util_axis_upscale
 LIB_DEPS += util_pulse_gen
 
-SIM_LIB_DEPS := io_vip
-
 # default test programs
 # Format is: <test name>
 TP := $(notdir $(basename $(wildcard tests/*.sv)))

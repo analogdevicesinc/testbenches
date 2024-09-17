@@ -22,3 +22,5 @@ ENV_DEPS += system_project.tcl
 ENV_DEPS += system_bd.tcl
 ENV_DEPS +=../scripts/adi_sim.tcl
 ENV_DEPS +=../scripts/run_sim.tcl
+
+SIM_LIB_DEPS += io_vip

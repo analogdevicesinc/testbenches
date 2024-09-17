@@ -15,8 +15,6 @@ SV_DEPS += ../common/sv/dma_trans.sv
 
 LIB_DEPS += axi_dmac
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

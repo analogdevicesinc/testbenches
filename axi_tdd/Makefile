@@ -13,8 +13,6 @@ SV_DEPS += ../common/sv/adi_regmap_tdd_gen_pkg.sv
 
 LIB_DEPS += axi_tdd
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

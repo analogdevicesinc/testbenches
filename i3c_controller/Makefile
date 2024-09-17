@@ -18,8 +18,6 @@ LIB_DEPS += i3c_controller/i3c_controller_host_interface
 LIB_DEPS += i3c_controller/i3c_controller_core
 LIB_DEPS += sysid_rom
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

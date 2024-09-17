@@ -18,13 +18,11 @@ SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
 SV_DEPS += ../common/sv/data_offload_api.sv
 SV_DEPS += ../common/sv/adi_regmap_data_offload_pkg.sv
 
-LIB_DEPS := util_cdc
+LIB_DEPS += util_cdc
 LIB_DEPS += util_axis_fifo
 LIB_DEPS += axi_dmac
 LIB_DEPS += data_offload
 LIB_DEPS += util_do_ram
-
-SIM_LIB_DEPS := io_vip
 
 # default test program
 TP := test_program

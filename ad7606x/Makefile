@@ -33,8 +33,6 @@ LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += util_cdc
 LIB_DEPS += util_axis_fifo
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

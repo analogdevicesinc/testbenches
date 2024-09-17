@@ -27,8 +27,6 @@ LIB_DEPS += jesd204/jesd204_rx
 LIB_DEPS += xilinx/axi_adxcvr
 LIB_DEPS += xilinx/util_adxcvr
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

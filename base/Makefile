@@ -13,8 +13,6 @@ SV_DEPS += ../common/sv/mailbox.sv
 SV_DEPS += ../common/sv/x_monitor.sv
 SV_DEPS += ../common/sv/scoreboard.sv
 
-SIM_LIB_DEPS := io_vip
-
 # default test program
 TP := test_program
 

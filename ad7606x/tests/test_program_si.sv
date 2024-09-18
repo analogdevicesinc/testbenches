@@ -547,7 +547,7 @@ task fifo_spi_test();
   generate_transfer_cmd(1);
 
   #100
-  //wait(sync_id == 1);
+  wait(sync_id == 1);
   #100
 
   repeat (NUM_OF_WORDS) begin

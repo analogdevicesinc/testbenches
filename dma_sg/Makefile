@@ -2,7 +2,7 @@
 ## Copyright (C) 2024 Analog Devices, Inc.
 ####################################################################################
 
-.INCLUDE : ../common/Makeinclude
+include ../common/Makeinclude
 
 # All test-bench dependencies except test programs
 SV_DEPS += ../common/sv/m_axis_sequencer.sv

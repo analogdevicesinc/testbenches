@@ -55,6 +55,7 @@ adi_sim_project_files [list \
  "../common/sv/dmac_api.sv" \
  "../common/sv/adi_regmap_pkg.sv" \
  "../common/sv/adi_regmap_adc_pkg.sv" \
+ "../common/sv/adi_regmap_clkgen_pkg.sv" \
  "../common/sv/adi_regmap_common_pkg.sv" \
  "../common/sv/adi_regmap_dmac_pkg.sv" \
  "../common/sv/adi_regmap_pwm_gen_pkg.sv" \

@@ -40,6 +40,7 @@
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import adi_regmap_pkg::*;
+import adi_regmap_clkgen_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import adi_regmap_spi_engine_pkg::*;
@@ -516,6 +517,12 @@ endtask
 bit   [31:0]  sdi_fifo_data = 0;
 
 task fifo_spi_test();
+
+  // Start spi clk generator
+  axi_write (`AD7606X_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
+    );
 
   // Enable SPI Engine
   axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));

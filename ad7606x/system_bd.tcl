@@ -67,7 +67,7 @@ if {$INTF == 0} {
   set_property offset $BA_AD7606X [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad7606x}]
 } else {
   create_bd_port -dir O spi_clk
-  ad_connect spi_clk sys_cpu_clk
+  ad_connect spi_clk spi_clkgen/clk_0
   create_bd_port -dir O ad7606_irq
 
   set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ad7606_axi_regmap}]
@@ -80,3 +80,8 @@ adi_sim_add_define "AD7606X_DMA_BA=[format "%d" ${BA_DMA}]"
 set BA_PWM 0x44A60000
 set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad7606_pwm_gen}]
 adi_sim_add_define "AXI_PWMGEN_BA=[format "%d" ${BA_PWM}]"
+
+set BA_CLKGEN 0x44A70000
+#set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
+adi_sim_add_define "AD7606X_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
+

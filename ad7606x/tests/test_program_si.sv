@@ -91,12 +91,14 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 
 
 program test_program_si (
+  input         spi_clk,
+  input         ad7606_irq,
   output        ad7606_spi_cs,
   output        ad7606_spi_sclk,
   input  [`NUM_OF_SDI-1:0] ad7606_spi_sdi,
   output        ad7606_spi_sdo,
-  input         adc_busy,
-  output        adc_cnvst_n);
+  input         rx_busy,
+  output        rx_cnvst);
 
 test_harness_env env;
 
@@ -204,37 +206,37 @@ endtask
 reg [4:0] irq_pending = 0;
 reg [7:0] sync_id = 0;
 
-//initial begin
-//  while (1) begin
-//    @(posedge ad7606_irq);
-//    // read pending IRQs
-//    axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
-//    // IRQ launched by Offload SYNC command
-//    if (irq_pending & 5'b10000) begin
-//      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-//      $display("[%t] NOTE: Offload SYNC %d IRQ. An offload transfer just finished.", $time, sync_id);
-//    end
-//    // IRQ launched by SYNC command
-//    if (irq_pending & 5'b01000) begin
-//      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-//      $display("[%t] NOTE: SYNC %d IRQ. FIFO transfer just finished.", $time, sync_id);
-//    end
-//    // IRQ launched by SDI FIFO
-//    if (irq_pending & 5'b00100) begin
-//      $display("[%t] NOTE: SDI FIFO IRQ.", $time);
-//    end
-//    // IRQ launched by SDO FIFO
-//    if (irq_pending & 5'b00010) begin
-//      $display("[%t] NOTE: SDO FIFO IRQ.", $time);
-//    end
-//    // IRQ launched by SDO FIFO
-//    if (irq_pending & 5'b00001) begin
-//      $display("[%t] NOTE: CMD FIFO IRQ.", $time);
-//    end
-//    // Clear all pending IRQs
-//    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
-//  end
-//end
+initial begin
+  while (1) begin
+    @(posedge ad7606_irq);
+    // read pending IRQs
+    axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    // IRQ launched by Offload SYNC command
+    if (irq_pending & 5'b10000) begin
+      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      $display("[%t] NOTE: Offload SYNC %d IRQ. An offload transfer just finished.", $time, sync_id);
+    end
+    // IRQ launched by SYNC command
+    if (irq_pending & 5'b01000) begin
+      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      $display("[%t] NOTE: SYNC %d IRQ. FIFO transfer just finished.", $time, sync_id);
+    end
+    // IRQ launched by SDI FIFO
+    if (irq_pending & 5'b00100) begin
+      $display("[%t] NOTE: SDI FIFO IRQ.", $time);
+    end
+    // IRQ launched by SDO FIFO
+    if (irq_pending & 5'b00010) begin
+      $display("[%t] NOTE: SDO FIFO IRQ.", $time);
+    end
+    // IRQ launched by SDO FIFO
+    if (irq_pending & 5'b00001) begin
+      $display("[%t] NOTE: CMD FIFO IRQ.", $time);
+    end
+    // Clear all pending IRQs
+    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+  end
+end
 
 //---------------------------------------------------------------------------
 // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
@@ -378,7 +380,6 @@ initial begin
   while(1) begin
     @(posedge ad7606_echo_sclk);
     sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
-    
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
@@ -482,14 +483,13 @@ task offload_spi_test();
     // Start the offload
     axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     $display("[%t] Offload started.", $time);
-    
+
     if (`NUM_OF_SDI == 1) begin
       wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
     end else begin
       wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
     end
 
-    
     axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     offload_status = 0;
 
@@ -497,12 +497,12 @@ task offload_spi_test();
 
     #2000
 
-    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
+    for (int i=0; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
       offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
     end
 
-    if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
+    if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("Offload Test FAILED"));
     end else begin
       `INFO(("Offload Test PASSED"));

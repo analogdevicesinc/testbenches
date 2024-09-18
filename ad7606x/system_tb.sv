@@ -39,7 +39,7 @@
 
 module system_tb();
  generate
-if (`INTF == 0) begin //parallel interface
+  if (`INTF == 0) begin //parallel interface
     wire [1:0]  adc_config_mode;
     wire        rx_cnvst_n;
     wire        rx_busy;
@@ -119,13 +119,18 @@ if (`INTF == 0) begin //parallel interface
       wire                   ad7606_spi_cs;
       wire                   adc_busy;
       wire                   adc_cnvst_n;
+      wire                   ad7606_irq;
 
     `TEST_PROGRAM test(
+      .spi_clk (spi_clk),
+      .ad7606_irq (ad7606_irq),
       .ad7606_spi_sdi(ad7606_spi_sdi),
       .ad7606_spi_cs (ad7606_spi_cs),
       .ad7606_spi_sclk (ad7606_spi_sclk));
 
     test_harness `TH (
+      .spi_clk (spi_clk),
+      .ad7606_irq (ad7606_irq),
       .rx_busy (adc_busy),
       .rx_cnvst_n (adc_cnvst_n),
       .ad7606_spi_sdo (ad7606_spi_sdo),

@@ -68,7 +68,9 @@ if {$INTF == 0} {
 } else {
   create_bd_port -dir O spi_clk
   ad_connect spi_clk spi_clkgen/clk_0
+
   create_bd_port -dir O ad7606_irq
+  ad_connect ad7606_irq spi_ad7606/irq
 
   set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ad7606_axi_regmap}]
 }

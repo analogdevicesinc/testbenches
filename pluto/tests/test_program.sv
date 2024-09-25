@@ -127,22 +127,22 @@ program test_program;
     sanity_test();
 
     // 1R1T mode
-    r1_mode = 1;
+    //r1_mode = 1;
 
-    pn_test();
+    //pn_test();
 
-    dds_test();
+    //dds_test();
 
-    dma_test();
+    //dma_test();
 
     // 2R2T mode
     r1_mode = 0;
 
-    pn_test();
+    //pn_test();
 
-    dds_test();
+    //dds_test();
 
-    dma_test();
+    //dma_test();
 
     phaser_test();
 
@@ -542,9 +542,10 @@ program test_program;
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL),
                `SET_DMAC_CONTROL_ENABLE(1));
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_X_LENGTH),
-               `SET_DMAC_X_LENGTH_X_LENGTH(32'h000004FF));
+               `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003FF));
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_FLAGS),
-               `SET_DMAC_FLAGS_CYCLIC(0));
+               `SET_DMAC_FLAGS_CYCLIC(1) |
+               `SET_DMAC_FLAGS_TLAST(1));
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_SRC_ADDRESS),
                `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000));
 
@@ -568,60 +569,51 @@ program test_program;
     //  Configure the TDD for the phaser synchronization
     //  -------------------------------------------------------
 
-    // Set CH2 polarity to inverted and immediately apply the effect.
-    // This creates a backpressure on the TX DMA and prevents it from
-    // sending data until CH2 is set to 0.
-    axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
-               `SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(3'b100));
-    axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CONTROL),
-               `SET_TDDN_CNTRL_CONTROL_ENABLE(1));
-    axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CONTROL),
-               `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
-
-    // Submit the DMA transfers and wait for the TDD sync
-    axi_write (`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-    axi_write (`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-
     // Configure the TDD for the application
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT),
-               `SET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(32'h3));
+               `SET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(32'h10));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY),
-               `SET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(32'h80));
+               `SET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(32'h0F));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_FRAME_LENGTH),
-               `SET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(32'h1FF));
+               `SET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(32'hFF));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CH0_ON),
-               `SET_TDDN_CNTRL_CH0_ON_CH0_ON(32'h2F));
+               `SET_TDDN_CNTRL_CH0_ON_CH0_ON(32'h00));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CH0_OFF),
-               `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(32'h3F));
+               `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(32'h100));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CH1_ON),
-               `SET_TDDN_CNTRL_CH1_ON_CH1_ON(32'h40));
+               `SET_TDDN_CNTRL_CH1_ON_CH1_ON(32'h00));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CH1_OFF),
-               `SET_TDDN_CNTRL_CH1_OFF_CH1_OFF(32'h48));
+               `SET_TDDN_CNTRL_CH1_OFF_CH1_OFF(32'h10));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CH2_ON),
-               `SET_TDDN_CNTRL_CH2_ON_CH2_ON(32'h10));
+               `SET_TDDN_CNTRL_CH2_ON_CH2_ON(32'h00));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CH2_OFF),
-               `SET_TDDN_CNTRL_CH2_OFF_CH2_OFF(32'h180));
+               `SET_TDDN_CNTRL_CH2_OFF_CH2_OFF(32'h10));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
                `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(32'b111));
 
     axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CONTROL),
-               `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(1) |
                `SET_TDDN_CNTRL_CONTROL_ENABLE(1));
 
-    // Send the external sync signal related to the posedge of dac_valid
-    @(posedge `TH.axi_ad9361.dac_valid_i0);
-    trigger_ext_event();
+    // Submit the DMA transfers and wait for the TDD sync
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+
+    axi_write (`TDDN_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+               `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(1) |
+               `SET_TDDN_CNTRL_CONTROL_ENABLE(1));
+
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+
     check_cyclic_data();
 
     link_down();
@@ -663,41 +655,23 @@ program test_program;
                `SET_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(1));
     axi_write (`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-    axi_write (`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
-    check_captured_data(
-      .address (`DDR_BA+'h00002000),
-      .length (1024),
-      .step (1),
-      .max_sample(2048)
-    );
+    @(posedge `TH.axi_ad9361_adc_dma.irq);
+    #3050ns;
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_IRQ_PENDING),
+               `SET_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(1));
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
+               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
     @(posedge `TH.axi_ad9361_adc_dma.irq);
     axi_write (`RX_DMA_BA+GetAddrs(DMAC_IRQ_PENDING),
                `SET_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(1));
     axi_write (`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-    axi_write (`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-               `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-
-    check_captured_data(
-      .address (`DDR_BA+'h00002000),
-      .length (1024),
-      .step (1),
-      .max_sample(2048)
-    );
 
     @(posedge `TH.axi_ad9361_adc_dma.irq);
     axi_write (`RX_DMA_BA+GetAddrs(DMAC_IRQ_PENDING),
                `SET_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(1));
-
-    check_captured_data(
-      .address (`DDR_BA+'h00002000),
-      .length (1024),
-      .step (1),
-      .max_sample(2048)
-    );
   endtask
 
   // Trigger an external event

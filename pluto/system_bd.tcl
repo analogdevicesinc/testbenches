@@ -83,7 +83,7 @@ delete_bd_objs \
 ad_connect sys_cpu_clk sys_clk_vip/clk_out
 ad_connect sys_cpu_clk mng_axi_vip/aclk
 ad_connect sys_cpu_clk axi_intc/s_axi_aclk
-ad_connect sys_cpu_clk axi_cpu_interconnect/aclk
+ad_connect sys_cpu_clk axi_axi_interconnect/aclk
 ad_connect sys_cpu_clk axi_mem_interconnect/aclk1
 ad_connect sys_rst_vip/rst_out sys_rstgen/ext_reset_in
 ad_connect axi_intc/intr sys_concat_intc/dout

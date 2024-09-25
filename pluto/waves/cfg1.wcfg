@@ -5,6 +5,7 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
+            <top_module name="\$unit_xpm_cdc_sv_220102727 " />
             <top_module name="adi_regmap_adc_pkg" />
             <top_module name="adi_regmap_common_pkg" />
             <top_module name="adi_regmap_dac_pkg" />
@@ -35,105 +36,37 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="38.755209 us"></ZoomEndTime>
-      <Cursor1Time time="37.205000 us"></Cursor1Time>
+      <ZoomEndTime time="69.500001 us"></ZoomEndTime>
+      <Cursor1Time time="47.375000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="138"></NameColumnWidth>
-      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+      <NameColumnWidth column_width="229"></NameColumnWidth>
+      <ValueColumnWidth column_width="70"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="31" />
+   <WVObjectSize size="78" />
    <wave_markers>
       <marker label="" time="37450000000" />
       <marker label="" time="35626000000" />
    </wave_markers>
-   <wvobject fp_name="divider288" type="divider">
-      <obj_property name="label">AXI_AD9361 interface</obj_property>
+   <wvobject fp_name="divider31" type="divider">
+      <obj_property name="label">TDD CH</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_enable_i0">
-      <obj_property name="ElementShortName">adc_enable_i0</obj_property>
-      <obj_property name="ObjectShortName">adc_enable_i0</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_1[0]">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
+      <obj_property name="label">CH1</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_valid_i0">
-      <obj_property name="ElementShortName">adc_valid_i0</obj_property>
-      <obj_property name="ObjectShortName">adc_valid_i0</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361/adc_data_i0">
-      <obj_property name="ElementShortName">adc_data_i0[15:0]</obj_property>
-      <obj_property name="ObjectShortName">adc_data_i0[15:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
-      <obj_property name="AnalogYRangeMin">-512.000000</obj_property>
-      <obj_property name="AnalogYRRangeMax">512.000000</obj_property>
-      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_LINEAR</obj_property>
-      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
-      <obj_property name="AnalogHorizLine">0.000000</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_enable_q0">
-      <obj_property name="ElementShortName">adc_enable_q0</obj_property>
-      <obj_property name="ObjectShortName">adc_enable_q0</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_valid_q0">
-      <obj_property name="ElementShortName">adc_valid_q0</obj_property>
-      <obj_property name="ObjectShortName">adc_valid_q0</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361/adc_data_q0">
-      <obj_property name="ElementShortName">adc_data_q0[15:0]</obj_property>
-      <obj_property name="ObjectShortName">adc_data_q0[15:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
-      <obj_property name="AnalogYRangeMin">-512.000000</obj_property>
-      <obj_property name="AnalogYRRangeMax">512.000000</obj_property>
-      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_LINEAR</obj_property>
-      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
-      <obj_property name="AnalogHorizLine">0.000000</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_enable_i1">
-      <obj_property name="ElementShortName">adc_enable_i1</obj_property>
-      <obj_property name="ObjectShortName">adc_enable_i1</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_valid_i1">
-      <obj_property name="ElementShortName">adc_valid_i1</obj_property>
-      <obj_property name="ObjectShortName">adc_valid_i1</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361/adc_data_i1">
-      <obj_property name="ElementShortName">adc_data_i1[15:0]</obj_property>
-      <obj_property name="ObjectShortName">adc_data_i1[15:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
-      <obj_property name="AnalogYRangeMin">-512.000000</obj_property>
-      <obj_property name="AnalogYRRangeMax">512.000000</obj_property>
-      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_LINEAR</obj_property>
-      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
-      <obj_property name="AnalogHorizLine">0.000000</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_enable_q1">
-      <obj_property name="ElementShortName">adc_enable_q1</obj_property>
-      <obj_property name="ObjectShortName">adc_enable_q1</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361/adc_valid_q1">
-      <obj_property name="ElementShortName">adc_valid_q1</obj_property>
-      <obj_property name="ObjectShortName">adc_valid_q1</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361/adc_data_q1">
-      <obj_property name="ElementShortName">adc_data_q1[15:0]</obj_property>
-      <obj_property name="ObjectShortName">adc_data_q1[15:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
-      <obj_property name="AnalogYRangeMin">-512.000000</obj_property>
-      <obj_property name="AnalogYRRangeMax">512.000000</obj_property>
-      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_LINEAR</obj_property>
-      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
-      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_2[0]">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
+      <obj_property name="label">CH2</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
    <wvobject fp_name="divider288" type="divider">
       <obj_property name="label">DAC DMA</obj_property>
@@ -147,13 +80,17 @@
       <obj_property name="ElementShortName">m_axis_valid</obj_property>
       <obj_property name="ObjectShortName">m_axis_valid</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_dac_dma/m_axis_last">
+      <obj_property name="ElementShortName">m_axis_last</obj_property>
+      <obj_property name="ObjectShortName">m_axis_last</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361_dac_dma/m_axis_data">
       <obj_property name="ElementShortName">m_axis_data[63:0]</obj_property>
       <obj_property name="ObjectShortName">m_axis_data[63:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_dac_dma/m_axis_last">
-      <obj_property name="ElementShortName">m_axis_last</obj_property>
-      <obj_property name="ObjectShortName">m_axis_last</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_dac_dma/m_axis_xfer_req">
+      <obj_property name="ElementShortName">m_axis_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">m_axis_xfer_req</obj_property>
    </wvobject>
    <wvobject fp_name="divider288" type="divider">
       <obj_property name="label">ADC DMA</obj_property>
@@ -163,60 +100,270 @@
       <obj_property name="ElementShortName">fifo_wr_en</obj_property>
       <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/fifo_wr_din">
-      <obj_property name="ElementShortName">fifo_wr_din[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_din[63:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/fifo_wr_sync">
-      <obj_property name="ElementShortName">fifo_wr_sync</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_sync</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/fifo_wr_overflow">
+      <obj_property name="ElementShortName">fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/fifo_wr_xfer_req">
       <obj_property name="ElementShortName">fifo_wr_xfer_req</obj_property>
       <obj_property name="ObjectShortName">fifo_wr_xfer_req</obj_property>
    </wvobject>
-   <wvobject fp_name="divider31" type="divider">
-      <obj_property name="label">TDD CH</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/fifo_wr_din">
+      <obj_property name="ElementShortName">fifo_wr_din[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_din[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/fifo_wr_xfer_req">
+      <obj_property name="ElementShortName">fifo_wr_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_xfer_req</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider96" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/m_dest_axi_wready">
+      <obj_property name="ElementShortName">m_dest_axi_wready</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/m_dest_axi_wvalid">
+      <obj_property name="ElementShortName">m_dest_axi_wvalid</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/m_dest_axi_wdata">
+      <obj_property name="ElementShortName">m_dest_axi_wdata[63:0]</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wdata[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/m_dest_axi_wlast">
+      <obj_property name="ElementShortName">m_dest_axi_wlast</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider90" type="divider">
+      <obj_property name="label">DEBUG</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_0[0]">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-      <obj_property name="label">CH0</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/active">
+      <obj_property name="ElementShortName">active</obj_property>
+      <obj_property name="ObjectShortName">active</obj_property>
+      <obj_property name="CustomSignalColor">#F0E68C</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_1[0]">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-      <obj_property name="label">CH1</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/req_valid">
+      <obj_property name="ElementShortName">req_valid</obj_property>
+      <obj_property name="ObjectShortName">req_valid</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_2[0]">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-      <obj_property name="label">CH2</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/req_ready">
+      <obj_property name="ElementShortName">req_ready</obj_property>
+      <obj_property name="ObjectShortName">req_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/last_load">
+      <obj_property name="ElementShortName">last_load</obj_property>
+      <obj_property name="ObjectShortName">last_load</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider154" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/early_tlast">
+      <obj_property name="ElementShortName">early_tlast</obj_property>
+      <obj_property name="ObjectShortName">early_tlast</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/transfer_abort_s">
+      <obj_property name="ElementShortName">transfer_abort_s</obj_property>
+      <obj_property name="ObjectShortName">transfer_abort_s</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/pending_burst">
+      <obj_property name="ElementShortName">pending_burst</obj_property>
+      <obj_property name="ObjectShortName">pending_burst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/rewind_req_ready">
+      <obj_property name="ElementShortName">rewind_req_ready</obj_property>
+      <obj_property name="ObjectShortName">rewind_req_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider160" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/id_next">
+      <obj_property name="ElementShortName">id_next[3:0]</obj_property>
+      <obj_property name="ObjectShortName">id_next[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/\genblk6.i_src_dma_fifo /i_data_mover/request_id">
+      <obj_property name="ElementShortName">request_id[3:0]</obj_property>
+      <obj_property name="ObjectShortName">request_id[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_transfer/i_request_arb/req_valid">
+      <obj_property name="ElementShortName">req_valid</obj_property>
+      <obj_property name="ObjectShortName">req_valid</obj_property>
+      <obj_property name="CustomSignalColor">#FF0000</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_regmap/i_regmap_request/request_valid">
+      <obj_property name="ElementShortName">request_valid</obj_property>
+      <obj_property name="ObjectShortName">request_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9361_adc_dma/inst/i_regmap/i_regmap_request/request_ready">
+      <obj_property name="ElementShortName">request_ready</obj_property>
+      <obj_property name="ObjectShortName">request_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider46" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_frame_length">
+      <obj_property name="ElementShortName">tdd_frame_length[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_frame_length[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_counter">
+      <obj_property name="ElementShortName">tdd_counter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_counter[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_endof_frame">
+      <obj_property name="ElementShortName">tdd_endof_frame</obj_property>
+      <obj_property name="ObjectShortName">tdd_endof_frame</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_cstate">
+      <obj_property name="ElementShortName">tdd_cstate[1:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_cstate[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider48" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /t_high">
+      <obj_property name="ElementShortName">t_high[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_high[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /t_low">
+      <obj_property name="ElementShortName">t_low[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_low[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider54" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /t_high">
+      <obj_property name="ElementShortName">t_high[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_high[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /t_low">
+      <obj_property name="ElementShortName">t_low[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_low[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider59" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /t_high">
+      <obj_property name="ElementShortName">t_high[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_high[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /t_low">
+      <obj_property name="ElementShortName">t_low[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_low[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
    </wvobject>
    <wvobject fp_name="divider64" type="divider">
-      <obj_property name="label">CH Polarity</obj_property>
+      <obj_property name="label">DEBUG CH0</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /resetn">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /tdd_ch_en">
+      <obj_property name="ElementShortName">tdd_ch_en</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /tdd_ch_rst">
+      <obj_property name="ElementShortName">tdd_ch_rst</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /tdd_ch_set">
+      <obj_property name="ElementShortName">tdd_ch_set</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_set</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /ch_pol">
-      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">ch_pol</obj_property>
       <obj_property name="ObjectShortName">ch_pol</obj_property>
-      <obj_property name="label">CH0 POL</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider72" type="divider">
+      <obj_property name="label">DEBUG CH1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /resetn">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /tdd_ch_en">
+      <obj_property name="ElementShortName">tdd_ch_en</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /tdd_ch_rst">
+      <obj_property name="ElementShortName">tdd_ch_rst</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /tdd_ch_set">
+      <obj_property name="ElementShortName">tdd_ch_set</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_set</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /ch_pol">
-      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">ch_pol</obj_property>
       <obj_property name="ObjectShortName">ch_pol</obj_property>
-      <obj_property name="label">CH1 POL</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider75" type="divider">
+      <obj_property name="label">DEBUG CH2</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /resetn">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /tdd_ch_en">
+      <obj_property name="ElementShortName">tdd_ch_en</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /tdd_ch_rst">
+      <obj_property name="ElementShortName">tdd_ch_rst</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /tdd_ch_set">
+      <obj_property name="ElementShortName">tdd_ch_set</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_set</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /ch_pol">
-      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">ch_pol</obj_property>
       <obj_property name="ObjectShortName">ch_pol</obj_property>
-      <obj_property name="label">CH2 POL</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
 </wave_config>

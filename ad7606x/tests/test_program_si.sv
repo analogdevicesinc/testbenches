@@ -283,7 +283,7 @@ bit   [31:0]  sdi_nreg[$];
 
 initial begin
   while(1) begin
-    @(posedge ad7606_spi_sclk);
+    @(posedge spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
 end

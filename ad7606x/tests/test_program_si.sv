@@ -99,7 +99,7 @@ program test_program_si (
   input  [`NUM_OF_SDI-1:0] ad7606_spi_sdi,
   output        ad7606_spi_sdo,
   input         rx_busy,
-  output        rx_cnvst);
+  output        rx_cnvst_n);
 
 test_harness_env env;
 
@@ -345,10 +345,12 @@ initial begin
         sdi_shiftreg <= (CPOL ^ CPHA) ?
                         sdi_preg[$] :
                         sdi_nreg[$];
+        `INFO(("SR 1"));
       end else begin
         sdi_shiftreg <= (CPOL ^ CPHA) ?
                         sdi_preg[$] :
                         sdi_nreg[$];
+        `INFO(("SR 2"));
       end
       if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
@@ -523,7 +525,7 @@ task fifo_spi_test();
   axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
   axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
   axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-  $display("[%t] axi_pwm_gen started.", $time);    
+  $display("[%t] axi_pwm_gen started.", $time);
 
   // Enable SPI Engine
   axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));

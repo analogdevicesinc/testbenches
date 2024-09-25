@@ -32,8 +32,6 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
 
 `include "utils.svh"
 
@@ -96,7 +94,7 @@ endtask
 // Wrapper function for SPI receive (from DUT)
 // --------------------------
 task spi_receive(
-    output [`DATA_DLENGTH:0]  data);
+    output data_array_type data);
   env.spi_seq.receive_data(data);
 endtask
 
@@ -104,7 +102,7 @@ endtask
 // Wrapper function for SPI send (to DUT)
 // --------------------------
 task spi_send(
-    input [`DATA_DLENGTH:0]  data);
+    input data_array_type data);
   env.spi_seq.send_data(data);
 endtask
 
@@ -115,12 +113,45 @@ task spi_wait_send();
   env.spi_seq.flush_send();
 endtask
 
-
-
 // --------------------------
 // Main procedure
 // --------------------------
+
+data_array_type temp_data;
+data_array_type offload_captured_word_arr;
+data_array_type offload_sdi_data_store_arr;
+data_array_type sdi_fifo_data;
+data_array_type sdi_fifo_data_store;
+
 initial begin
+  /** Initialize dynamic array for the SDIO data
+    * if SYNCHRONOUS, it must generate one word per SDI lane
+    * if not, generates a single word for the SDI lanes
+    * NUM_OF_WORDS is related to the multibyte transfer
+    * NUM_OF_WORDS default value is 1 for now
+    * NUM_OF_TRANSFERS is related to the single instruction mode for RW nonadjancent addresses
+    * Streaming is for adjacent addresses
+  */
+  temp_data                    = new[(`NUM_OF_SDI)];
+  if (`SYNCHRONOUS_MODE) begin
+    offload_captured_word_arr  = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_SDI)];
+    offload_sdi_data_store_arr = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_SDI)];
+    sdi_fifo_data              = new[(`NUM_OF_WORDS)*(`NUM_OF_SDI)];
+    sdi_fifo_data_store        = new[(`NUM_OF_WORDS)*(`NUM_OF_SDI)];
+  end else begin
+    offload_captured_word_arr  = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS)];
+    offload_sdi_data_store_arr = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS)];
+    sdi_fifo_data              = new[(`NUM_OF_WORDS)];
+    sdi_fifo_data_store        = new[(`NUM_OF_WORDS)];
+  end
+
+  foreach (offload_captured_word_arr[i]) begin
+    offload_captured_word_arr[i] = 0;
+  end
+
+  foreach (sdi_fifo_data[i]) begin
+    sdi_fifo_data[i] = 0;
+  end
 
   //creating environment
   env = new(`TH.`SYS_CLK.inst.IF,
@@ -237,10 +268,6 @@ end
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [`DATA_DLENGTH-1:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
-bit [`DATA_DLENGTH-1:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
-bit [`DATA_DLENGTH-1:0] temp_data;
-
 task offload_spi_test();
   //Configure DMA
   env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
@@ -266,9 +293,12 @@ task offload_spi_test();
 
   // Enqueue transfers to DUT
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    temp_data = $urandom;
+    for (int j = 0; j < (`NUM_OF_SDI); j=j+1) begin
+      temp_data[j] = $urandom;
+      offload_sdi_data_store_arr[i * (`NUM_OF_SDI) + j] = temp_data[j];
+    end
+
     spi_send(temp_data);
-    offload_sdi_data_store_arr[i] = temp_data;
   end
 
   // Start the offload
@@ -284,8 +314,10 @@ task offload_spi_test();
 
   #2000ns
 
-  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+  for (int i=0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i=i+1) begin
+    for (int j = 0; j < (`NUM_OF_SDI); j=j+1) begin
+      offload_captured_word_arr[i * (`NUM_OF_SDI) + j] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*(i * (`NUM_OF_SDI) + j));
+    end
   end
 
   if (irq_pending == 'h0) begin
@@ -294,20 +326,22 @@ task offload_spi_test();
     `INFO(("IRQ Test PASSED"));
   end
 
-  if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-    `ERROR(("Offload Test FAILED"));
-  end else begin
-    `INFO(("Offload Test PASSED"));
-  end
+  // for (int i=0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i=i+1) begin
+    foreach (offload_captured_word_arr[j]) begin
+      if (offload_captured_word_arr[j] !== offload_sdi_data_store_arr[j]) begin
+        `INFOV(("offload_captured_word_arr: %x; offload_sdi_data_store_arr %x", offload_captured_word_arr[j], offload_sdi_data_store_arr[j]),6);
+        `ERROR(("Offload Test FAILED"));
+      end else begin
+        `INFO(("Offload Test PASSED"));
+      end
+    end
+  // end
+
 endtask
 
 //---------------------------------------------------------------------------
 // FIFO SPI Test
 //---------------------------------------------------------------------------
-
-bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
-bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data_store [`NUM_OF_WORDS-1:0];
-
 task fifo_spi_test();
   // Start spi clk generator
   axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
@@ -345,10 +379,13 @@ task fifo_spi_test();
   end
 
   // Enqueue transfer to DUT
-  for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-    temp_data = $urandom;
+  for (int i = 0; i < (`NUM_OF_WORDS); i = i+1) begin
+    for (int j = 0; j < (`NUM_OF_SDI); j=j+1) begin
+      temp_data[j] = $urandom;
+      sdi_fifo_data_store[i * (`NUM_OF_SDI) + j] = temp_data[j];
+    end
+
     spi_send(temp_data);
-    sdi_fifo_data_store[i] = temp_data;
   end
 
   generate_transfer_cmd(1);
@@ -356,15 +393,21 @@ task fifo_spi_test();
   spi_wait_send();
 
   for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-  #100ns
-    axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), sdi_fifo_data[i][`DATA_DLENGTH-1:0]);
+    for (int j = 0; j<(`NUM_OF_SDI) ; j=j+1) begin
+      #100ns
+      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), sdi_fifo_data[i * `NUM_OF_SDI + j][`DATA_DLENGTH-1:0]);
+    end
   end
 
-  if (sdi_fifo_data !== sdi_fifo_data_store) begin
-    `INFOV(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store),6);
-    `ERROR(("Fifo Read Test FAILED"));
-  end else begin
-    `INFO(("Fifo Read Test PASSED"));
+  for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
+    for (int j = 0; j<(`NUM_OF_SDI) ; j=j+1) begin
+      if (sdi_fifo_data[i * `NUM_OF_SDI + j] !== sdi_fifo_data_store[i * `NUM_OF_SDI + j]) begin
+        `INFOV(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data[i * `NUM_OF_SDI + j], sdi_fifo_data_store[i * `NUM_OF_SDI + j]),6);
+        `ERROR(("Fifo Read Test FAILED"));
+      end else begin
+        `INFO(("Fifo Read Test PASSED"));
+      end
+    end
   end
 endtask
 

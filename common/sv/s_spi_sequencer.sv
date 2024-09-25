@@ -48,20 +48,24 @@ package s_spi_sequencer_pkg;
       this.agent = agent;
     endfunction: new
 
-    virtual task automatic send_data(input int unsigned data);
+    virtual task automatic send_data(input data_array_type data);
       this.agent.send_data(data);
     endtask : send_data
 
-    virtual task automatic receive_data(output int unsigned data);
+    virtual task automatic receive_data(output data_array_type data);
       this.agent.receive_data(data);
     endtask : receive_data
 
-    virtual task automatic receive_data_verify(input int unsigned expected);
-      int unsigned received;
+    virtual task automatic receive_data_verify(input data_array_type expected);
+      // int unsigned received;
+      data_array_type received;
       this.agent.receive_data(received);
-      if (received !== expected) begin
-        `ERROR(("Data mismatch. Received : %h; expected %h", received, expected));
+      foreach (received[i]) begin
+        if (received[i] !== expected[i]) begin
+          `ERROR(("Data mismatch. Received : %h; expected %h on Channel %h", received, expected, i));
+        end
       end
+      
     endtask : receive_data_verify
 
     virtual task flush_send();

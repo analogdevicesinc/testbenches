@@ -36,26 +36,28 @@
 `include "utils.svh"
 
 module adi_spi_vip #(
-  parameter MODE          = 0, // SLAVE=0
-  parameter CPOL          = 0,
-  parameter CPHA          = 0,
-  parameter INV_CS        = 0,
-  parameter DATA_DLENGTH  = 16,
-  parameter SLAVE_TIN     = 0,
-  parameter SLAVE_TOUT    = 0,
-  parameter MASTER_TIN    = 0,
-  parameter MASTER_TOUT   = 0,
-  parameter CS_TO_MISO    = 0,
-  parameter DEFAULT_MISO_DATA = 'hCAFE
+  parameter SPIO_SIZE            = 1,
+  parameter SYNCHRONOUS_MODE     = 0,
+  parameter MODE                 = 0, // SLAVE=0
+  parameter CPOL                 = 0,
+  parameter CPHA                 = 0,
+  parameter INV_CS               = 0,
+  parameter DATA_DLENGTH         = 16,
+  parameter SLAVE_TIN            = 0,
+  parameter SLAVE_TOUT           = 0,
+  parameter MASTER_TIN           = 0,
+  parameter MASTER_TOUT          = 0,
+  parameter CS_TO_MISO           = 0,
+  parameter DEFAULT_MISO_DATA    = 'hCAFE
 )  (
-  input   logic s_spi_sclk,
-  input   wire  s_spi_mosi,
-  output  wire  s_spi_miso,
-  input   logic s_spi_cs,
-  output  logic m_spi_sclk,
-  output  wire  m_spi_mosi,
-  input   wire  m_spi_miso,
-  output  logic m_spi_cs
+  input   logic                  s_spi_sclk,
+  input   wire  [SPIO_SIZE-1:0]  s_spi_mosi,
+  output  wire  [SPIO_SIZE-1:0]  s_spi_miso,
+  input   logic                  s_spi_cs,
+  output  logic                  m_spi_sclk,
+  output  wire  [SPIO_SIZE-1:0]  m_spi_mosi,
+  input   wire  [SPIO_SIZE-1:0]  m_spi_miso,
+  output  logic                  m_spi_cs
 );
 
   localparam MODE_SLAVE   = 0;
@@ -64,17 +66,19 @@ module adi_spi_vip #(
   import logger_pkg::*;
 
   spi_vip_if #(
-    .MODE               (MODE),
-    .CPOL               (CPOL),
-    .CPHA               (CPHA),
-    .INV_CS             (INV_CS),
-    .DATA_DLENGTH       (DATA_DLENGTH),
-    .SLAVE_TIN          (SLAVE_TIN),
-    .SLAVE_TOUT         (SLAVE_TOUT),
-    .MASTER_TIN         (MASTER_TIN),
-    .MASTER_TOUT        (MASTER_TOUT),
-    .CS_TO_MISO         (CS_TO_MISO),
-    .DEFAULT_MISO_DATA  (DEFAULT_MISO_DATA)
+    .SPIO_SIZE              (SPIO_SIZE),
+    .SYNCHRONOUS_MODE       (SYNCHRONOUS_MODE),
+    .MODE                   (MODE),
+    .CPOL                   (CPOL),
+    .CPHA                   (CPHA),
+    .INV_CS                 (INV_CS),
+    .DATA_DLENGTH           (DATA_DLENGTH),
+    .SLAVE_TIN              (SLAVE_TIN),
+    .SLAVE_TOUT             (SLAVE_TOUT),
+    .MASTER_TIN             (MASTER_TIN),
+    .MASTER_TOUT            (MASTER_TOUT),
+    .CS_TO_MISO             (CS_TO_MISO),
+    .DEFAULT_MISO_DATA      (DEFAULT_MISO_DATA)
   ) IF ();
 
   initial begin : ASSERT_PARAMETERS

@@ -39,7 +39,9 @@ package adi_spi_vip_pkg;
 
   import logger_pkg::*;
 
-  `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
+  `define SPI_VIP_PARAM_ORDER       SPI_SPIO_SIZE             ,\
+                                    SPI_VIP_MODE              ,\
+                                    SPI_SYNCHRONOUS_MODE      ,\
                                     SPI_VIP_CPOL              ,\
                                     SPI_VIP_CPHA              ,\
                                     SPI_VIP_INV_CS            ,\
@@ -51,37 +53,57 @@ package adi_spi_vip_pkg;
                                     SPI_VIP_CS_TO_MISO        ,\
                                     SPI_VIP_DEFAULT_MISO_DATA
 
-  `define SPI_VIP_PARAMS(th,vip)    th``_``vip``_0_VIP_MODE,\
-                                    th``_``vip``_0_VIP_CPOL,\
-                                    th``_``vip``_0_VIP_CPHA,\
-                                    th``_``vip``_0_VIP_INV_CS,\
-                                    th``_``vip``_0_VIP_DATA_DLENGTH,\
-                                    th``_``vip``_0_VIP_SLAVE_TIN,\
-                                    th``_``vip``_0_VIP_SLAVE_TOUT,\
-                                    th``_``vip``_0_VIP_MASTER_TIN,\
-                                    th``_``vip``_0_VIP_MASTER_TOUT,\
-                                    th``_``vip``_0_VIP_CS_TO_MISO,\
+  `define SPI_VIP_PARAMS(th,vip)    th``_``vip``_0_VIP_SPIO_SIZE         ,\
+                                    th``_``vip``_0_VIP_MODE              ,\
+                                    th``_``vip``_0_VIP_SYNCHRONOUS_MODE  ,\
+                                    th``_``vip``_0_VIP_CPOL              ,\
+                                    th``_``vip``_0_VIP_CPHA              ,\
+                                    th``_``vip``_0_VIP_INV_CS            ,\
+                                    th``_``vip``_0_VIP_DATA_DLENGTH      ,\
+                                    th``_``vip``_0_VIP_SLAVE_TIN         ,\
+                                    th``_``vip``_0_VIP_SLAVE_TOUT        ,\
+                                    th``_``vip``_0_VIP_MASTER_TIN        ,\
+                                    th``_``vip``_0_VIP_MASTER_TOUT       ,\
+                                    th``_``vip``_0_VIP_CS_TO_MISO        ,\
                                     th``_``vip``_0_VIP_DEFAULT_MISO_DATA
+
+  typedef bit [`DATA_DLENGTH-1:0] data_type;
+  typedef data_type data_array_type[];
+  /** Define a wrapper for the array so it can be added to the mailbox
+    * solution: //https://verificationacademy.com/forums/t/how-to-put-unpacked-array-to-systemverilog-mailbox/39645
+    * It always define one data for each SDI lane
+    * if SPI_SPIO_SIZE is 4 (quad SPI), data contains (SPI_VIP_DATA_DLENGTH/SPI_SPIO_SIZE) valid bits
+    * if SPI_SPIO_SIZE is 2 (dual SPI):
+      * Instruction phase contains 8 valid bits for data[0], and data[1] does not have any content
+      * Data phase contains (SPI_VIP_DATA_DLENGTH/SPI_SPIO_SIZE) valid bits for each data
+    * if SPI_SPIO_SIZE is 1, each data contains SPI_VIP_DATA_DLENGTH valid bits
+  */
+  class array_wrapper;
+    data_array_type data = new [`SPIO_SIZE];
+  endclass
 
   class adi_spi_driver #(int `SPI_VIP_PARAM_ORDER);
 
-    typedef mailbox #(logic [SPI_VIP_DATA_DLENGTH-1:0]) spi_mbx_t;
-    protected spi_mbx_t mosi_mbx;
-    spi_mbx_t miso_mbx;
-    protected bit active;
-    protected bit stop_flag;
-    protected bit [SPI_VIP_DATA_DLENGTH-1:0] miso_reg;
-    protected bit [SPI_VIP_DATA_DLENGTH-1:0] default_miso_data;
-    protected event tx_mbx_updated;
-    virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) vif;
+    typedef mailbox #(array_wrapper) spi_mbx_t;
+    protected spi_mbx_t                                mosi_mbx;
+    spi_mbx_t                                          miso_mbx;
+    protected bit                                      active;
+    protected bit                                      stop_flag;
+    protected array_wrapper                            miso_reg = new();
+    protected array_wrapper                            miso_rearranged_reg = new();
+    protected bit [SPI_VIP_DATA_DLENGTH-1:0]           default_miso_data;
+    protected event                                    tx_mbx_updated;
+    virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER)         vif;
 
     function new(virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf);
-      this.vif = intf;
-      this.active = 0;
-      this.stop_flag = 0;
-      this.default_miso_data = SPI_VIP_DEFAULT_MISO_DATA;
-      this.miso_mbx = new();
-      this.mosi_mbx = new();
+      this.vif                 = intf;
+      this.active              = 0;
+      this.stop_flag           = 0;
+      this.default_miso_data   = SPI_VIP_DEFAULT_MISO_DATA;
+      this.miso_mbx            = new();
+      this.mosi_mbx            = new();
+      // this.miso_reg            = new();
+      // this.miso_rearranged_reg = new();
     endfunction
 
 
@@ -98,17 +120,21 @@ package adi_spi_vip_pkg;
     endfunction : clear_active
 
     protected task rx_mosi();
-      static logic [SPI_VIP_DATA_DLENGTH-1:0] mosi_data;
+      int VIP_DATA_SIZE = (SPI_SPIO_SIZE == 2) ? (8 + (SPI_VIP_DATA_DLENGTH-8)/SPI_SPIO_SIZE) : (SPI_VIP_DATA_DLENGTH/SPI_SPIO_SIZE);
+      static array_wrapper mosi_data = new();
+      // static logic [SPI_VIP_DATA_DLENGTH-1:0] mosi_data;
       forever begin
         if (vif.intf_slave_mode) begin
           wait (vif.cs_active);
           while (vif.cs_active) begin
-            for (int i = 0; i<SPI_VIP_DATA_DLENGTH; i++) begin
+            for (int i = 0; i < VIP_DATA_SIZE; i++) begin
               if (!vif.cs_active) begin
                 break;
               end
               @(posedge vif.sample_edge)
-              mosi_data <= {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
+              foreach (mosi_data.data[j]) begin
+                mosi_data.data[j] = {mosi_data.data[j][SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed[j]};
+              end
             end
             mosi_mbx.put(mosi_data);
           end
@@ -116,27 +142,68 @@ package adi_spi_vip_pkg;
       end
     endtask : rx_mosi
 
+    protected task rearrange_data(output using_default);
+      bit empty = !miso_mbx.try_peek(miso_reg); //if it is not empty, miso_reg is already populated
+      bit QUAD_SPI = (SPI_SPIO_SIZE == 4);
+      int word_index = 0;
+      int bit_index = SPI_VIP_DATA_DLENGTH-1;
+      int cont = 0;
+
+      for (int i = 0; i < SPI_SPIO_SIZE; i = i+1) begin
+        if (SPI_SYNCHRONOUS_MODE) begin //one word copy for each lane
+          if (empty) begin
+            miso_rearranged_reg.data[i] = default_miso_data;
+            using_default = 1'b1;
+          end else begin
+            miso_rearranged_reg.data[i] = miso_reg.data[i];
+            using_default = 1'b0;
+          end
+        end else begin //a single word shared among the SDI lanes
+          for (int j = SPI_VIP_DATA_DLENGTH-1; j >= 0; j = j - 1) begin
+            if (empty) begin
+              miso_rearranged_reg.data[word_index][bit_index] = default_miso_data[j];
+              using_default = 1'b1;
+            end else begin
+              miso_rearranged_reg.data[word_index][bit_index] = miso_reg.data[i][j];
+              using_default = 1'b0;
+            end
+
+            if (QUAD_SPI || cont >= 8) begin
+              word_index = j % SPI_SPIO_SIZE;
+              if ((word_index == 0) && (j != 0)) begin
+                bit_index = bit_index - 1;
+              end
+            end else begin //Dual SPI or Classic SPI always send the first byte (intruction phase) into SDI0 lane
+              word_index = 0;
+              bit_index = bit_index - 1;
+            end
+            cont = cont + 1;
+          end
+        end
+      end
+    endtask : rearrange_data
+
     protected task tx_miso();
-        bit using_default;
-        bit pending_mbx;
+      bit using_default;
+      bit pending_mbx;
+      //make it generic for 8 bit and 16 bit addressing
+      //Dual SPI or Classic SPI always send the first byte (intruction phase) into SDI0 lane
+      int VIP_DATA_SIZE = (SPI_SPIO_SIZE == 2) ? (8 + (SPI_VIP_DATA_DLENGTH-8)/SPI_SPIO_SIZE) : (SPI_VIP_DATA_DLENGTH/SPI_SPIO_SIZE);
+
       forever begin
         if (vif.intf_slave_mode) begin
           wait (vif.cs_active);
           while (vif.cs_active) begin
-            // try to get an item from the mailbox, without popping it
-            if (!miso_mbx.try_peek(miso_reg)) begin
-              miso_reg = default_miso_data;
-              using_default = 1'b1;
-            end else begin
-              using_default = 1'b0;
-            end
+            rearrange_data(using_default);
             pending_mbx = 1'b0;
             // early drive and shift if CPHA=0
             if (SPI_VIP_CPHA == 0) begin
-              vif.miso_drive <= miso_reg[SPI_VIP_DATA_DLENGTH-1];
-              miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+              foreach (vif.miso_drive[i]) begin
+                vif.miso_drive[i] <= miso_rearranged_reg.data[i][SPI_VIP_DATA_DLENGTH-1];
+                miso_rearranged_reg.data[i] = {miso_rearranged_reg.data[i][SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+              end
             end
-            for (int i = 0; i<SPI_VIP_DATA_DLENGTH; i++) begin
+            for (int i = 0; i < VIP_DATA_SIZE; i++) begin
               fork
                 begin
                   fork
@@ -168,11 +235,13 @@ package adi_spi_vip_pkg;
               end else begin
                 // vif.drive_edge has arrived
                 // don't shift at last edge if CPHA=0
-                if (!(SPI_VIP_CPHA == 0 && i == SPI_VIP_DATA_DLENGTH-1)) begin
-                  vif.miso_drive <= #(SPI_VIP_SLAVE_TOUT) miso_reg[SPI_VIP_DATA_DLENGTH-1];
-                  miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+                if (!(SPI_VIP_CPHA == 0 && i == VIP_DATA_SIZE-1)) begin
+                  foreach (vif.miso_drive[i]) begin
+                    vif.miso_drive[i] <= miso_rearranged_reg.data[i][SPI_VIP_DATA_DLENGTH-1];
+                    miso_rearranged_reg.data[i] = {miso_rearranged_reg.data[i][SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+                  end
                 end
-                if (i == SPI_VIP_DATA_DLENGTH-1) begin
+                if (i == VIP_DATA_SIZE-1) begin
                   `INFO(("[SPI VIP] MISO Tx end of transfer."));
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
@@ -220,18 +289,27 @@ package adi_spi_vip_pkg;
     endfunction : set_default_miso_data
 
     task put_tx_data(
-      input int unsigned data);
-      bit [SPI_VIP_DATA_DLENGTH-1:0] txdata;
-      txdata = data;
+      input data_array_type data);
+      array_wrapper txdata;
+      txdata = new();
+
+      foreach (data[i]) begin
+        txdata.data[i] = data[i];
+      end
+
       miso_mbx.put(txdata);
       ->tx_mbx_updated;
     endtask
 
     task get_rx_data(
-      output int unsigned data);
-      bit [SPI_VIP_DATA_DLENGTH-1:0] rxdata;
+      output data_array_type data);
+      array_wrapper rxdata;
+      rxdata = new();
       mosi_mbx.get(rxdata);
-      data = rxdata;
+
+      foreach (data[i]) begin
+        data[i] = rxdata.data[i];
+      end
     endtask
 
     task flush_tx();
@@ -280,11 +358,11 @@ package adi_spi_vip_pkg;
       this.driver = new(intf);
     endfunction
 
-    virtual task send_data(input int unsigned data);
+    virtual task send_data(input data_array_type data);
       this.driver.put_tx_data(data);
     endtask : send_data
 
-    virtual task receive_data(output int unsigned data);
+    virtual task receive_data(output data_array_type data);
       this.driver.get_rx_data(data);
     endtask : receive_data
 

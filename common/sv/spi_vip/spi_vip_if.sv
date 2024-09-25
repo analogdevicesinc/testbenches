@@ -35,34 +35,36 @@
 `include "utils.svh"
 
 interface spi_vip_if #(
-  int MODE              = 0,
-      CPOL              = 0,
-      CPHA              = 0,
-      INV_CS            = 0,
-      DATA_DLENGTH      = 16,
-      SLAVE_TIN         = 0,
-      SLAVE_TOUT        = 0,
-      MASTER_TIN        = 0,
-      MASTER_TOUT       = 0,
-      CS_TO_MISO        = 0,
-      DEFAULT_MISO_DATA = 'hCAFE
+  int SPIO_SIZE              = 1,
+      MODE                   = 0,
+      SYNCHRONOUS_MODE       = 0,
+      CPOL                   = 0,
+      CPHA                   = 0,
+      INV_CS                 = 0,
+      DATA_DLENGTH           = 16,
+      SLAVE_TIN              = 0,
+      SLAVE_TOUT             = 0,
+      MASTER_TIN             = 0,
+      MASTER_TOUT            = 0,
+      CS_TO_MISO             = 0,
+      DEFAULT_MISO_DATA      = 'hCAFE
 ) ();
-  logic sclk;
-  wire  miso; // need net types here in case tb wants to tristate this
-  wire  mosi; // need net types here in case tb wants to tristate this
-  logic cs;
+  logic                  sclk;
+  wire  [SPIO_SIZE-1:0]  miso; // need net types here in case tb wants to tristate this
+  wire  [SPIO_SIZE-1:0]  mosi; // need net types here in case tb wants to tristate this
+  logic                  cs;
 
   import logger_pkg::*;
 
   // internal
-  logic intf_slave_mode;
-  logic intf_master_mode;
-  logic intf_monitor_mode;
-  logic miso_oen;
-  logic miso_drive;
-  logic cs_active;
-  logic mosi_delayed;
-  localparam CS_ACTIVE_LEVEL = (INV_CS) ? 1'b1 : 1'b0;
+  logic      intf_slave_mode;
+  logic      intf_master_mode;
+  logic      intf_monitor_mode;
+  logic      miso_oen;
+  logic      [SPIO_SIZE-1:0]  miso_drive;
+  logic      cs_active;
+  logic      [SPIO_SIZE-1:0]  mosi_delayed;
+  localparam  CS_ACTIVE_LEVEL = (INV_CS) ? 1'b1 : 1'b0;
 
   // hack for parameterized edge. TODO: improve this
   logic sample_edge, drive_edge;

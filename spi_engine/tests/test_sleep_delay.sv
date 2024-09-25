@@ -94,7 +94,7 @@ endtask
 // Wrapper function for SPI receive (from DUT)
 // --------------------------
 task spi_receive(
-    output [`DATA_DLENGTH:0]  data);
+    output data_array_type data);
   env.spi_seq.receive_data(data);
 endtask
 
@@ -102,7 +102,7 @@ endtask
 // Wrapper function for SPI send (to DUT)
 // --------------------------
 task spi_send(
-    input [`DATA_DLENGTH:0]  data);
+    input data_array_type data);
   env.spi_seq.send_data(data);
 endtask
 
@@ -116,7 +116,27 @@ endtask
 // --------------------------
 // Main procedure
 // --------------------------
+
+data_array_type temp_data;
+data_array_type offload_captured_word_arr;
+data_array_type offload_sdi_data_store_arr;
 initial begin
+  /** Initialize dynamic array for the SDIO data
+    * if SYNCHRONOUS, it must generate one word per SDI lane
+    * if not, generates a single word for the SDI lanes
+    * NUM_OF_WORDS is related to the multibyte transfer
+    * NUM_OF_WORDS default value is 1 for now
+    * NUM_OF_TRANSFERS is related to the single instruction mode for RW nonadjancent addresses
+    * Streaming is for adjacent addresses
+  */
+  temp_data                    = new[(`NUM_OF_SDI)];
+  if (`SYNCHRONOUS_MODE) begin
+    offload_captured_word_arr  = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_SDI)];
+    offload_sdi_data_store_arr = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_SDI)];
+  end else begin
+    offload_captured_word_arr  = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS)];
+    offload_sdi_data_store_arr = new[(`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS)];
+  end
 
   //creating environment
   env = new(`TH.`SYS_CLK.inst.IF,
@@ -174,6 +194,7 @@ initial begin
   forever begin
     @(posedge spi_engine_irq);
     // read pending IRQs
+
     axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
@@ -238,6 +259,7 @@ initial begin
   cs_current_duration = 0;
   cs_duration = 0;
   cs_sleeping = 1'b0;
+
   forever begin
     @(posedge spi_engine_spi_clk);
       if (idle && (cmd_d1[15:8] == 8'h31) && sleeping) begin
@@ -335,13 +357,11 @@ endtask
 // CS delay Test
 //---------------------------------------------------------------------------
 
-bit [`DATA_DLENGTH:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
-bit [`DATA_DLENGTH:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
 int cs_activate_time;
 int expected_cs_activate_time;
 int cs_deactivate_time;
 int expected_cs_deactivate_time;
-bit [`DATA_DLENGTH-1:0] temp_data;
+
 
 task cs_delay_test(
     input [1:0] cs_activate_delay,
@@ -396,9 +416,12 @@ task cs_delay_test(
 
   // Enqueue transfers to DUT
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    temp_data = $urandom;
+    for (int j = 0; j < (`NUM_OF_SDI); j=j+1) begin
+      temp_data[j] = $urandom;
+      offload_sdi_data_store_arr[i * (`NUM_OF_SDI) + j] = temp_data[j];
+    end
+
     spi_send(temp_data);
-    offload_sdi_data_store_arr[i] = temp_data;
   end
 
   // Start the offload
@@ -414,8 +437,10 @@ task cs_delay_test(
 
   #2000ns
 
-  for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+  for (int i=0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i=i+1) begin
+    for (int j = 0; j < (`NUM_OF_SDI); j=j+1) begin
+      offload_captured_word_arr[i * (`NUM_OF_SDI) + j] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*(i * (`NUM_OF_SDI) + j));
+    end
   end
 
   if (irq_pending == 'h0) begin
@@ -424,9 +449,14 @@ task cs_delay_test(
     `INFO(("IRQ Test PASSED"));
   end
 
-  if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-    `ERROR(("CS Delay Test FAILED: bad data"));
-  end
+  // for (int i=0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i=i+1) begin
+    foreach (offload_captured_word_arr[j]) begin
+      if (offload_captured_word_arr[j] !== offload_sdi_data_store_arr[j]) begin
+        `INFOV(("offload_captured_word_arr: %x; offload_sdi_data_store_arr %x", offload_captured_word_arr[j], offload_sdi_data_store_arr[j]),6);
+        `ERROR(("CS Delay Test FAILED: bad data"));
+      end
+    end
+  // end
 
   repeat (`NUM_OF_TRANSFERS) begin
     cs_activate_time = cs_instr_time.pop_back();
@@ -456,9 +486,12 @@ task cs_delay_test(
 
   // Enqueue transfers to DUT
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    temp_data = $urandom;
+    for (int j = 0; j < (`NUM_OF_SDI); j=j+1) begin
+      temp_data[j] = $urandom;
+      offload_sdi_data_store_arr[i * (`NUM_OF_SDI) + j] = temp_data[j];
+    end
+
     spi_send(temp_data);
-    offload_sdi_data_store_arr[i] = temp_data;
   end
 
   // Start the offload
@@ -474,8 +507,10 @@ task cs_delay_test(
 
   #2000ns
 
-  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+  for (int i=0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i=i+1) begin
+    for (int j = 0; j < (`NUM_OF_SDI); j=j+1) begin
+      offload_captured_word_arr[i * (`NUM_OF_SDI) + j] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*(i * (`NUM_OF_SDI) + j));
+    end
   end
 
   if (irq_pending == 'h0) begin
@@ -484,9 +519,14 @@ task cs_delay_test(
     `INFO(("IRQ Test PASSED"));
   end
 
-  if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-    `ERROR(("CS Delay Test FAILED: bad data"));
-  end
+  // for (int i=0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i=i+1) begin
+    foreach (offload_captured_word_arr[j]) begin
+      if (offload_captured_word_arr [j] !== offload_sdi_data_store_arr [j]) begin
+        `ERROR(("CS Delay Test FAILED: bad data"));
+      end
+    end
+  // end
+
   repeat (`NUM_OF_TRANSFERS) begin
     cs_activate_time = cs_instr_time.pop_back();
     cs_deactivate_time = cs_instr_time.pop_back();

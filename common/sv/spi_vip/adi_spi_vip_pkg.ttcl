@@ -8,6 +8,8 @@
 <: setOutputDirectory "./sim/" :>
 <: setFileName ${ComponentName}_pkg :>
 <: setFileExtension ".sv" :>
+<: set spio_size            [get_property MODELPARAM_VALUE.SPIO_SIZE] :>
+<: set synchronous_mode     [get_property MODELPARAM_VALUE.SYNCHRONOUS_MODE] :>
 <: set mode                 [get_property MODELPARAM_VALUE.MODE] :>
 <: set cpol                 [get_property MODELPARAM_VALUE.CPOL] :>
 <: set cpha                 [get_property MODELPARAM_VALUE.CPHA] :>
@@ -33,6 +35,8 @@ package <=: ComponentName :>_pkg;
 // These parameters are named after the component for use in your verification
 // environment.
 ///////////////////////////////////////////////////////////////////////////
+  parameter <=: ComponentName :>_VIP_SPIO_SIZE          = <=: $spio_size :>;
+  parameter <=: ComponentName :>_VIP_SYNCHRONOUS_MODE   = <=: $synchronous_mode :>;
   parameter <=: ComponentName :>_VIP_MODE               = <=: $mode :>;
   parameter <=: ComponentName :>_VIP_CPOL               = <=: b2i $cpol :>;
   parameter <=: ComponentName :>_VIP_CPHA               = <=: b2i $cpha :>;

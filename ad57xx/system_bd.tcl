@@ -26,7 +26,7 @@
 #
 #   2. An ADI specific BSD license, which can be found in the top level directory
 #      of this repository (LICENSE_ADIBSD), and also on-line at:
-#      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+#      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 #      This will allow to generate bit files and not release the source code,
 #      as long as it attaches to an ADI device.
 #
@@ -57,7 +57,7 @@ ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
 
 adi_sim_add_define "SPI_S=spi_s_vip"
 
-ad_disconnect ad57xx_spi spi_ad57xx/m_spi  
+ad_disconnect ad57xx_spi spi_ad57xx/m_spi
 
 ad_connect spi_s_vip/s_spi spi_ad57xx/m_spi
 

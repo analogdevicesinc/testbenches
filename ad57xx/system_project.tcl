@@ -23,28 +23,28 @@ adi_sim_project_xilinx $project_name "xc7z007sclg400-1"
 
 # Add test files to the project
 adi_sim_project_files [list \
- "../common/sv/utils.svh" \
- "../common/sv/logger_pkg.sv" \
- "../common/sv/reg_accessor.sv" \
- "../common/sv/m_axis_sequencer.sv" \
- "../common/sv/s_axis_sequencer.sv" \
- "../common/sv/m_axi_sequencer.sv" \
- "../common/sv/s_axi_sequencer.sv" \
- "../common/sv/spi_vip/adi_spi_vip_pkg.sv" \
- "../common/sv/s_spi_sequencer.sv" \
- "../common/sv/dmac_api.sv" \
- "../common/sv/adi_regmap_pkg.sv" \
- "../common/sv/adi_regmap_clkgen_pkg.sv" \
- "../common/sv/adi_regmap_dmac_pkg.sv" \
- "../common/sv/adi_regmap_pwm_gen_pkg.sv" \
- "../common/sv/adi_regmap_spi_engine_pkg.sv" \
- "../common/sv/dma_trans.sv" \
- "../common/sv/test_harness_env.sv" \
- "../common/sv/spi_engine_instr_pkg.sv" \
- "ad57xx_environment.sv" \
- "tests/test_program.sv" \
- "system_tb.sv" \
- ]
+  "../common/sv/utils.svh" \
+  "../common/sv/logger_pkg.sv" \
+  "../common/sv/reg_accessor.sv" \
+  "../common/sv/m_axis_sequencer.sv" \
+  "../common/sv/s_axis_sequencer.sv" \
+  "../common/sv/m_axi_sequencer.sv" \
+  "../common/sv/s_axi_sequencer.sv" \
+  "../common/sv/spi_vip/adi_spi_vip_pkg.sv" \
+  "../common/sv/s_spi_sequencer.sv" \
+  "../common/sv/dmac_api.sv" \
+  "../common/sv/adi_regmap_pkg.sv" \
+  "../common/sv/adi_regmap_clkgen_pkg.sv" \
+  "../common/sv/adi_regmap_dmac_pkg.sv" \
+  "../common/sv/adi_regmap_pwm_gen_pkg.sv" \
+  "../common/sv/adi_regmap_spi_engine_pkg.sv" \
+  "../common/sv/dma_trans.sv" \
+  "../common/sv/test_harness_env.sv" \
+  "../common/sv/spi_engine_instr_pkg.sv" \
+  "ad57xx_environment.sv" \
+  "tests/test_program.sv" \
+  "system_tb.sv" \
+]
 
 #set a default test program
 adi_sim_add_define "TEST_PROGRAM=test_program"

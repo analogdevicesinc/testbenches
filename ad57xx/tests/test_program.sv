@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,14 +26,12 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
 
 `include "utils.svh"
 
@@ -125,8 +123,7 @@ initial begin
             `TH.`SYS_RST.inst.IF,
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
-            `TH.`SPI_S.inst.IF
-            );
+            `TH.`SPI_S.inst.IF);
 
   setLoggerVerbosity(6);
   env.start();
@@ -175,19 +172,19 @@ task generate_transfer_cmd(
   logic [32:0] transfer_instr;
   case (w_r)
     2'b11: begin
-      transfer_instr =  `INST_WRD;
+      transfer_instr = `INST_WRD;
     end
     2'b10: begin
-      transfer_instr =  `INST_WR;
+      transfer_instr = `INST_WR;
     end
     default: begin
-      transfer_instr =  `INST_RD;
+      transfer_instr = `INST_RD;
     end
   endcase
   // assert CSN
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFE));
   // transfer data
-  
+
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), transfer_instr);
   // de-assert CSN
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));

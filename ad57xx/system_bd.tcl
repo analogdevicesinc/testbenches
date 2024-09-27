@@ -73,7 +73,7 @@ set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi
 adi_sim_add_define "SPI_ENGINE_SPI_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
 
 set BA_TX_DMA 0x44A40000
-set_property offset $BA_TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad57xx_tx_dma}]
+set_property offset $BA_TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad57xx_dma}]
 adi_sim_add_define "SPI_ENGINE_TX_DMA_BA=[format "%d" ${BA_TX_DMA}]"
 
 set BA_CLKGEN 0x44A70000

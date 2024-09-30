@@ -12,6 +12,7 @@ set num_sdi                 $ad_project_params(NUM_OF_SDI)
 set num_sdo                 $ad_project_params(NUM_OF_SDO)
 set sdi_delay               $ad_project_params(SDI_DELAY)
 set echo_sclk               $ad_project_params(ECHO_SCLK)
+set sdo_streaming           $ad_project_params(SDO_STREAMING)
 set cmd_mem_addr_width      $ad_project_params(CMD_MEM_ADDR_WIDTH)
 set data_mem_addr_width     $ad_project_params(DATA_MEM_ADDR_WIDTH)
 set sdi_fifo_addr_width     $ad_project_params(SDI_FIFO_ADDR_WIDTH)
@@ -24,7 +25,7 @@ create_bd_intf_port -mode Monitor -vlnv analog.com:interface:spi_engine_rtl:1.0 
 set hier_spi_engine spi_engine
 
 spi_engine_create $hier_spi_engine  $data_width $async_spi_clk $num_cs $num_sdi  \
-                                    $num_sdo $sdi_delay $echo_sclk \
+                                    $num_sdo $sdi_delay $echo_sclk $sdo_streaming \
                                     $cmd_mem_addr_width $data_mem_addr_width \
                                     $sdi_fifo_addr_width $sdo_fifo_addr_width \
                                     $sync_fifo_addr_width $cmd_fifo_addr_width
@@ -80,4 +81,7 @@ ad_mem_hp1_interconnect $sys_cpu_clk axi_spi_engine_dma/m_dest_axi
 
 if {$ad_project_params(ECHO_SCLK)} {
   adi_sim_add_define DEF_ECHO_SCLK
+}
+if {$ad_project_params(SDO_STREAMING)} {
+  adi_sim_add_define DEF_SDO_STREAMING
 }

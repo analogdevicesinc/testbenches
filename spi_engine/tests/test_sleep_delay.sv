@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -123,6 +123,9 @@ initial begin
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
+            `ifdef DEF_SDO_STREAMING
+            `TH.`SDO_SRC.inst.IF,
+            `endif
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
             `TH.`SPI_S.inst.IF
@@ -130,10 +133,18 @@ initial begin
 
   setLoggerVerbosity(6);
   env.start();
+  env.configure();
+
+  env.sys_reset();
+
+  env.run();
 
   env.spi_seq.set_default_miso_data('h2AA55);
 
-  env.sys_reset();
+  // start sdo source (will wait for data enqueued)
+  `ifdef DEF_SDO_STREAMING
+  env.sdo_src_seq.start();
+  `endif
 
   sanity_test();
 

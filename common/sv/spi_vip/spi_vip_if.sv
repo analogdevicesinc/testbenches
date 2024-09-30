@@ -1,5 +1,5 @@
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -25,7 +25,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -51,8 +51,6 @@ interface spi_vip_if #(
   wire  miso; // need net types here in case tb wants to tristate this
   wire  mosi; // need net types here in case tb wants to tristate this
   logic cs;
-
-  import logger_pkg::*;
 
   // internal
   logic intf_slave_mode;
@@ -88,14 +86,14 @@ interface spi_vip_if #(
     intf_slave_mode   = 0;
     intf_master_mode  = 1;
     intf_monitor_mode = 0;
-    `ERROR(("Unsupported mode master")); //TODO
+    $error("Unsupported mode master"); //TODO
   endfunction : set_master_mode
 
   function void set_monitor_mode();
     intf_slave_mode   = 0;
     intf_master_mode  = 0;
     intf_monitor_mode = 1;
-    `ERROR(("Unsupported mode monitor")); //TODO
+    $error("Unsupported mode monitor"); //TODO
   endfunction : set_monitor_mode
 
 endinterface

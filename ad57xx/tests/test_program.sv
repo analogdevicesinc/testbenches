@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2023-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -32,8 +32,6 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
 
 `include "utils.svh"
 
@@ -45,7 +43,7 @@ import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
-import spi_environment_pkg::*;
+import ad57xx_environment_pkg::*;
 import spi_engine_instr_pkg::*;
 import adi_spi_vip_pkg::*;
 
@@ -54,19 +52,15 @@ import adi_spi_vip_pkg::*;
 //---------------------------------------------------------------------------
 
 program test_program (
-  inout spi_engine_irq,
-  inout spi_engine_spi_sclk,
-  inout [(`NUM_OF_CS - 1):0] spi_engine_spi_cs,
-  inout spi_engine_spi_clk,
-  `ifdef DEF_ECHO_SCLK
-  inout spi_engine_echo_sclk,
-  `endif
-  inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
+  inout ad57xx_spi_irq,
+  inout ad57xx_spi_clk);
 
 timeunit 1ns;
 timeprecision 100ps;
 
-spi_environment env;
+typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
+
+ad57xx_environment env;
 
 // --------------------------
 // Wrapper function for AXI read verify
@@ -127,38 +121,26 @@ initial begin
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
-            `ifdef DEF_SDO_STREAMING
-            `TH.`SDO_SRC.inst.IF,
-            `endif
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
-            `TH.`SPI_S.inst.IF
-            );
+            `TH.`SPI_S.inst.IF);
 
   setLoggerVerbosity(6);
   env.start();
-  env.configure();
+
+  env.spi_seq.set_default_miso_data('h0);
 
   env.sys_reset();
-
-  env.run();
-
-  env.spi_seq.set_default_miso_data('h2AA55);
-
-  // start sdo source (will wait for data enqueued)
-  `ifdef DEF_SDO_STREAMING
-  env.sdo_src_seq.start();
-  `endif
 
   sanity_test();
 
   #100ns
 
-  fifo_spi_test();
+  config_spi();
 
   #100ns
 
-  offload_spi_test();
+  offload_spi_test(`TEST_DATA_MODE);
   `INFO(("Test Done"));
 
   $finish;
@@ -184,32 +166,31 @@ endtask
 //---------------------------------------------------------------------------
 
 task generate_transfer_cmd(
-    input [7:0] sync_id);
+    input [7:0] sync_id,
+    input [1:0] w_r
+  );
+  logic [32:0] transfer_instr;
+  case (w_r)
+    2'b11: begin
+      transfer_instr = `INST_WRD;
+    end
+    2'b10: begin
+      transfer_instr = `INST_WR;
+    end
+    default: begin
+      transfer_instr = `INST_RD;
+    end
+  endcase
   // assert CSN
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFE));
   // transfer data
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_WRD);
+
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), transfer_instr);
   // de-assert CSN
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));
   // SYNC command to generate interrupt
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
   `INFOV(("Transfer generation finished."), 6);
-endtask
-
-//---------------------------------------------------------------------------
-// SPI Engine SDO data
-//---------------------------------------------------------------------------
-
-task sdo_stream_gen(
-    input [`DATA_DLENGTH:0]  tx_data);
-  xil_axi4stream_data_byte data[(`DATA_WIDTH/8)-1:0];
-  `ifdef DEF_SDO_STREAMING
-  for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
-    data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
-    env.sdo_src_seq.push_byte_for_stream(data[i]);
-  end
-  env.sdo_src_seq.add_xfer_descriptor((`DATA_WIDTH/8),0,0);
-  `endif
 endtask
 
 //---------------------------------------------------------------------------
@@ -221,7 +202,7 @@ reg [7:0] sync_id = 0;
 
 initial begin
   forever begin
-    @(posedge spi_engine_irq);
+    @(posedge ad57xx_spi_irq);
     // read pending IRQs
 
     axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
@@ -253,36 +234,52 @@ initial begin
 end
 
 //---------------------------------------------------------------------------
-// Echo SCLK generation - we need this only if ECHO_SCLK is enabled
-//---------------------------------------------------------------------------
-`ifdef DEF_ECHO_SCLK
-  assign #(`ECHO_SCLK_DELAY * 1ns) spi_engine_echo_sclk = spi_engine_spi_sclk;
-`endif
-
-
-//---------------------------------------------------------------------------
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [`DATA_DLENGTH-1:0] sdi_read_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
 bit [`DATA_DLENGTH-1:0] sdo_write_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
-bit [`DATA_DLENGTH-1:0] sdi_read_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
 bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
-bit [`DATA_DLENGTH-1:0] rx_data;
-bit [`DATA_DLENGTH-1:0] tx_data;
-localparam sdo_mem_num = (`SDO_STREAMING) ? (`MIN((`NUM_OF_WORDS),(`SDO_MEM_WORDS))) : (`NUM_OF_WORDS);
-bit [`DATA_DLENGTH-1:0] one_shot_sdo_data [sdo_mem_num-1 :0] = '{default:'0};
+bit [17:0] dac_word;
+bit [`DATA_DLENGTH-1:0] temp_data;
 
-task offload_spi_test();
-  //Configure DMA
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
+task offload_spi_test(
+  input offload_test_t data_mode
+);
+
+  // Enqueue transfers to DUT
+  for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
+    case (data_mode)
+      DATA_MODE_RANDOM: begin
+        dac_word = $urandom;
+      end
+      DATA_MODE_RAMP: begin
+        dac_word = i;
+      end
+      DATA_MODE_PATTERN: begin
+        dac_word = 'h1A50F;
+      end
+      default: begin
+        dac_word = 'h3FFFF;
+      end
+    endcase
+    temp_data = {4'b0001,dac_word,2'b00};
+    sdo_write_data_store [i] = temp_data;
+
+    env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(.addr(`DDR_BA + 4*i),
+                                                  .payload(temp_data),
+                                                  .strb('1));
+    spi_send('0);
+  end
+
+  //Configure TX DMA
+  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
     `SET_DMAC_FLAGS_TLAST(1) |
     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
     ); // Use TLAST
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
+  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
+  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   // Configure the Offload module
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
@@ -292,27 +289,9 @@ task offload_spi_test();
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
   end
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WRD);
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
-
-  // Enqueue transfers transfers to DUT
-  for (int i = 0; i<sdo_mem_num; i=i+1) begin
-    one_shot_sdo_data[i] = $urandom;
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), one_shot_sdo_data[i]);
-  end
-  for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    rx_data = $urandom;
-    spi_send(rx_data);
-    sdi_read_data_store[i]  = rx_data;
-    if (i%(`NUM_OF_WORDS)<sdo_mem_num) begin
-      tx_data = one_shot_sdo_data[i%(`NUM_OF_WORDS)];
-    end else begin
-      tx_data = $urandom;
-      sdo_stream_gen(tx_data);
-    end
-    sdo_write_data_store[i] = tx_data;
-  end
 
   // Start the offload
   #100ns
@@ -334,34 +313,24 @@ task offload_spi_test();
   end
 
   for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-    sdi_read_data[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
-    if (sdi_read_data[i] != sdi_read_data_store[i]) begin
-      `INFOV(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]),6);
-      `ERROR(("Offload Read Test FAILED"));
-    end
-  end
-  `INFO(("Offload Read Test PASSED"));
-
-  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
     spi_receive(sdo_write_data[i]);
     if (sdo_write_data[i] != sdo_write_data_store[i]) begin
       `INFOV(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]),6);
       `ERROR(("Offload Write Test FAILED"));
     end
   end
-  `INFO(("Offload Write Test PASSED"));
+  `INFO(("Offload Test PASSED"));
+
 endtask
 
 //---------------------------------------------------------------------------
-// FIFO SPI Test
+// Config SPI
 //---------------------------------------------------------------------------
 
-bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
-bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
-bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data_store [`NUM_OF_WORDS-1:0];
-bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data_store [`NUM_OF_WORDS-1:0];
+task config_spi();
 
-task fifo_spi_test();
+  bit [23:0] cfg_readback;
+
   // Start spi clk generator
   axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
@@ -370,7 +339,7 @@ task fifo_spi_test();
 
   // Config pwm
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d121)); // set PWM period
+  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   `INFOV(("axi_pwm_gen started."),6);
 
@@ -392,38 +361,30 @@ task fifo_spi_test();
     );
 
   #100ns
-  // Generate a FIFO transaction, write SDO first
-  for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-    rx_data = $urandom;
-    tx_data = $urandom;
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (tx_data));// << (`DATA_WIDTH - `DATA_DLENGTH)));
-    spi_send(rx_data);
-    sdi_fifo_data_store[i] = rx_data;
-    sdo_fifo_data_store[i] = tx_data;
-  end
 
-  generate_transfer_cmd(1);
+  //  Write ad57xx control register
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (24'h200002));
+  generate_transfer_cmd(1,2'b10); // write-only
 
-  `INFO(("Waiting for SPI VIP send..."));
+  // Read ad57xx control register
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (24'hA00000));
+  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (24'h000000));
+  generate_transfer_cmd(1,2'b10); // one write-only, then one write-read (writing 0 for nop)
+  spi_send(24'hA00002);
+  generate_transfer_cmd(1,2'b11);
+
   spi_wait_send();
-  `INFO(("SPI sent"));
 
-  for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-    axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), sdi_fifo_data[i]);
-    spi_receive(sdo_fifo_data[i]);
-  end
+  repeat (3) spi_receive(temp_data);
 
-  if (sdi_fifo_data !== sdi_fifo_data_store) begin
-    `INFOV(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store),6);
-    `ERROR(("Fifo Read Test FAILED"));
-  end
-  `INFO(("Fifo Read Test PASSED"));
+  axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), cfg_readback);
 
-  if (sdo_fifo_data !== sdo_fifo_data_store) begin
-    `INFOV(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data, sdo_fifo_data_store),6);
-    `ERROR(("Fifo Write Test FAILED"));
+  if (cfg_readback !== 24'hA00002) begin
+    `INFOV(("cfg_readback: %x; expected 'hA00002", cfg_readback),6);
+    `ERROR(("Cfg Test FAILED"));
+  end else begin
+    `INFO(("Cfg Test PASSED"));
   end
-  `INFO(("Fifo Write Test PASSED"));
 endtask
 
 endprogram

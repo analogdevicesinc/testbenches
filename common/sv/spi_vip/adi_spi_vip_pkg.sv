@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on_line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -36,8 +36,6 @@
 `include "utils.svh"
 
 package adi_spi_vip_pkg;
-
-  import logger_pkg::*;
 
   `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
                                     SPI_VIP_CPOL              ,\
@@ -108,7 +106,7 @@ package adi_spi_vip_pkg;
                 break;
               end
               @(posedge vif.sample_edge)
-              mosi_data <= {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
+              mosi_data = {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
             end
             mosi_mbx.put(mosi_data);
           end
@@ -147,7 +145,7 @@ package adi_spi_vip_pkg;
                       @(posedge vif.drive_edge);
                     end
                     begin
-                      @(tx_mbx_updated.triggered);
+                      wait (tx_mbx_updated.triggered && i==0 && using_default);
                       pending_mbx = 1'b1;
                     end
                   join_any
@@ -157,10 +155,10 @@ package adi_spi_vip_pkg;
               if (!vif.cs_active) begin
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
-                  `ERROR(("tx_miso: early exit due to unexpected CS inactive!"));
+                  $error("tx_miso: early exit due to unexpected CS inactive!");
                 end
                 break;
-              end else if (pending_mbx && using_default && i == 0) begin
+              end else if (pending_mbx) begin
                 // we were going to transmit default data, but new data arrived between the cs edge and vif.drive_edge
                 using_default = 1'b0;
                 pending_mbx = 1'b0;
@@ -173,7 +171,7 @@ package adi_spi_vip_pkg;
                   miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
                 end
                 if (i == SPI_VIP_DATA_DLENGTH-1) begin
-                  `INFO(("[SPI VIP] MISO Tx end of transfer."));
+                  $display("[SPI VIP] MISO Tx end of transfer.");
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
                     miso_mbx.get(miso_reg);
@@ -246,7 +244,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                `INFO(("[SPI VIP] Stop event triggered."));
+                $display("[SPI VIP] Stop event triggered.");
                 this.stop_flag = 0;
               end
               begin
@@ -258,7 +256,7 @@ package adi_spi_vip_pkg;
         join
         this.clear_active();
       end else begin
-        `ERROR(("Already running!"));
+        $error("Already running!");
       end
     endtask
 
@@ -266,7 +264,7 @@ package adi_spi_vip_pkg;
       if (this.get_active()) begin
         this.stop_flag = 1;
       end else begin
-        `ERROR(("Already inactive!"));
+        $error("Already inactive!");
       end
     endtask
 

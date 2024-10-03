@@ -194,7 +194,7 @@ create_bd_port -dir O -type intr irq
 
 ad_connect irq axi_intc/irq
 
-# Set DDR VIP to a range of 2G 
+# Set DDR VIP to a range of 2G
 set DDR_BASE 0x80000000
 create_bd_addr_seg -range ${DDR_BASE} -offset ${DDR_BASE} [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
   [get_bd_addr_segs ddr_axi_vip/S_AXI/Reg] SEG_mng_ddr_cntlr

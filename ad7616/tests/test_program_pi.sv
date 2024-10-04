@@ -49,7 +49,7 @@ import test_harness_env_pkg::*;
 
 localparam AD7616_CTRL_RESETN         = 1;
 localparam AD7616_CTRL_CNVST_EN       = 2;
-localparam NUM_OF_TRANSFERS           = 10;
+localparam NUM_OF_TRANSFERS           = 30;
 
 program test_program_pi (
   output [15:0] rx_db_i,
@@ -112,7 +112,7 @@ initial begin
   `TH.`SYS_RST.inst.IF.deassert_reset;
   #100
 
-  //sanity_test();
+  sanity_test();
 
   //#100
 
@@ -151,13 +151,16 @@ assign rx_rd_n_posedge_s = rx_rd_n & ~rx_rd_n_d;
 initial begin
   while(1) begin
     @(negedge rx_rd_n);
-      tx_data_buf <= tx_data_buf + 16'h0808;
-      if (transfer_status)
+      $display("[0x%0h] Inital.", tx_data_buf);
+      //if (transfer_status)
         if (transfer_cnt[0]) begin
-          dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = tx_data_buf;
+          dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = tx_data_buf - 16'h0808;
+          $display("[0x%0h] dma_data_store_arr[15:0].", tx_data_buf);
         end else begin
-          dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = tx_data_buf;
+          dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = tx_data_buf - 16'h0808;
+          $display("[0x%0h] dma_data_store_arr[31:16].", tx_data_buf);
         end
+        tx_data_buf <= tx_data_buf + 16'h0808;
       @(posedge rx_rd_n);
   end
 end
@@ -167,12 +170,12 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 
-/*task sanity_test();
+task sanity_test();
   axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   axi_read_v (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   `INFO(("Sanity Test Done"));
 endtask
-*/
+
 //---------------------------------------------------------------------------
 // Transfer Counter
 //---------------------------------------------------------------------------
@@ -180,7 +183,7 @@ endtask
 initial begin
   while(1) begin
     @(posedge rx_rd_n);
-  if (transfer_status)
+    //if (transfer_status)
         transfer_cnt <= transfer_cnt + 'h1;
         @(negedge rx_rd_n);
     end
@@ -193,13 +196,17 @@ end
 reg [31:0] rdata_reg;
 bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
-
 task data_acquisition_test();
     // Start spi clk generator
     axi_write (`AD7616_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
       `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
       `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
       );
+
+    // Configure REG_CHAN_CONTROL ENABLE
+    for (int i = 0; i < 16; i=i+1) begin
+    axi_write (`AXI_AD7616_BA + i*'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(32'h00000001));
+    end
 
     // Configure pwm gen
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
@@ -228,7 +235,7 @@ task data_acquisition_test();
 
     env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
-    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
+    wait(transfer_cnt == 3 * NUM_OF_TRANSFERS );
 
     #100
     @(negedge rx_rd_n_negedge_s);
@@ -248,6 +255,7 @@ task data_acquisition_test();
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
       captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+      $display("[0x%0h] captured_word_arr.", captured_word_arr[i]);
     end
 
     if (captured_word_arr  != dma_data_store_arr) begin

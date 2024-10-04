@@ -32,13 +32,9 @@ adi_sim_project_files [list \
  "../common/sv/test_harness_env.sv" \
  "../common/sv/mailbox.sv" \
  "../common/sv/x_monitor.sv" \
- "../common/sv/filter.sv" \
  "../common/sv/scoreboard.sv" \
- "../common/sv/scoreboard_pack.sv" \
- "../common/sv/dmac_api.sv" \
- "../common/sv/dma_trans.sv" \
- "../common/sv/adi_regmap_dmac_pkg.sv" \
  "../common/sv/watchdog.sv" \
+ "../common/sv/filter.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
  "system_tb.sv" \
@@ -48,3 +44,7 @@ adi_sim_project_files [list \
 adi_sim_add_define "TEST_PROGRAM=test_program"
 
 adi_sim_generate $project_name
+
+# Use this only for debugging specific seeds that failed previously
+#set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed 1695199824} -objects [get_filesets sim_1]
+

@@ -42,14 +42,14 @@ global ad_project_params
 adi_project_files [list \
     "../../../../library/common/ad_edge_detect.v" \
     "../../../../library/util_cdc/sync_bits.v" \
-        "../../../../library/common/ad_iobuf.v" \
+    "../../../../library/common/ad_iobuf.v" \
 ]
 
 #
 #  Block design under test
 #
 
-source ../../projects/ad57xx_ardz/common/ad57xx_ardz_bd.tcl
+source $ad_hdl_dir//projects/ad57xx_ardz/common/ad57xx_ardz_bd.tcl
 
 # Add test-specific VIPs
 

@@ -43,7 +43,7 @@ global ad_project_params
 #  Block design under test
 #
 
-source ../../projects/ad738x_fmc/common/ad738x_bd.tcl
+source $ad_hdl_dir/projects/ad738x_fmc/common/ad738x_bd.tcl
 
   create_bd_port -dir O ad738x_spi_clk
   create_bd_port -dir O ad738x_irq

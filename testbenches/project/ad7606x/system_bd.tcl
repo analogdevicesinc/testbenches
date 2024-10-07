@@ -49,7 +49,7 @@ adi_project_files [list \
 #  Block design under test
 #
 
-source ../../projects/ad7606x_fmc/common/ad7606x_bd.tcl
+source $ad_hdl_dir/projects/ad7606x_fmc/common/ad7606x_bd.tcl
 
 create_bd_port -dir O sys_clk
 

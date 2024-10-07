@@ -48,7 +48,7 @@ adi_project_files [list \
 #  Block design under test
 #
 
-source ../../projects/ad7616_sdz/common/ad7616_bd.tcl
+source $ad_hdl_dir/projects/ad7616_sdz/common/ad7616_bd.tcl
 
 if {$SER_PAR_N == 1} {
 

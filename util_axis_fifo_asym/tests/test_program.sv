@@ -39,17 +39,15 @@
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
-import m_axis_sequencer_pkg::*;
-import s_axis_sequencer_pkg::*;
 import logger_pkg::*;
 import environment_pkg::*;
+import m_axis_sequencer_pkg::*;
+import s_axis_sequencer_pkg::*;
 import watchdog_pkg::*;
 
-//=============================================================================
-// Register Maps
-//=============================================================================
-
-program test_program;
+program test_program (
+  clk_if input_clk_if,
+  clk_if output_clk_if);
 
   // declare the class instances
   environment env;
@@ -65,11 +63,15 @@ program test_program;
               `TH.`SYS_RST.inst.IF,
               `TH.`MNG_AXI.inst.IF,
               `TH.`DDR_AXI.inst.IF,
-              `TH.`SRC_AXIS.inst.IF,
-              `TH.`DST_AXIS.inst.IF
+
+              input_clk_if,
+              output_clk_if,
+
+              `TH.`INPUT_AXIS.inst.IF,
+              `TH.`OUTPUT_AXIS.inst.IF
              );
 
-    setLoggerVerbosity(250);
+    setLoggerVerbosity(5);
     
     env.start();
     env.sys_reset();
@@ -78,65 +80,32 @@ program test_program;
 
     env.run();
 
-    env.src_axis_seq.set_data_beat_delay(`SRC_BEAT_DELAY);
-    env.src_axis_seq.set_descriptor_delay(`SRC_DESCRIPTOR_DELAY);
-
-    env.dst_axis_seq.set_high_time(`DEST_BEAT_DELAY_HIGH);
-    env.dst_axis_seq.set_low_time(`DEST_BEAT_DELAY_LOW);
-
-    case (`DEST_BACKPRESSURE)
-      1: env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
-      2: env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-      default: `ERROR(("Destination backpressure mode parameter incorrect!"));
-    endcase
-
-    case (`SRC_DESCRIPTORS)
-      1: begin
-        env.src_axis_seq.set_descriptor_gen_mode(0);
-        env.src_axis_seq.set_stop_policy(STOP_POLICY_DATA_BEAT);
-        // env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
-        env.src_axis_seq.add_xfer_descriptor_packet_size(32'd10, 1, 0);
-
-        send_data_wd = new(1000, "Send data");
-      end
-      2: begin
-        env.src_axis_seq.set_descriptor_gen_mode(0);
-        env.src_axis_seq.set_stop_policy(STOP_POLICY_DESCRIPTOR_QUEUE);
-        repeat (10) env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
-
-        send_data_wd = new(30000, "Send data");
-      end
-      3: begin
-        env.src_axis_seq.set_descriptor_gen_mode(1);
-        env.src_axis_seq.set_stop_policy(STOP_POLICY_PACKET);
-        env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
-
-        send_data_wd = new(20000, "Send data");
-      end
-      default:
-        `ERROR(("Source descriptor parameter incorrect!"));
-    endcase
+    send_data_wd = new(500000, "Send data");
 
     send_data_wd.start();
 
-    env.src_axis_seq.start();
+    env.input_axis_seq.start();
 
-    case (`SRC_DESCRIPTORS)
-      1: //env.src_axis_seq.beat_sent();
-        env.src_axis_seq.packet_sent();
-      2: env.src_axis_seq.wait_empty_descriptor_queue();
-      3: begin
-        #10us;
+    // stimulus
+    repeat($urandom_range(5,13)) begin
+      send_data_wd.reset();
+      
+      repeat($urandom_range(1,5))
+        env.input_axis_seq.add_xfer_descriptor($urandom_range(1,1000), 1, 0);
+      
+      #($urandom_range(1,10)*1us);
 
-        env.src_axis_seq.stop();
+      env.input_axis_seq.clear_descriptor_queue();
 
-        env.src_axis_seq.packet_sent();
-      end
-      default: ;
-    endcase
+      #1us;
+
+      env.scoreboard_inst.wait_until_complete();
+
+      `INFOV(("Packet finished."), 5);
+    end
 
     send_data_wd.stop();
-
+        
     env.stop();
     
     `INFO(("Test bench done!"));

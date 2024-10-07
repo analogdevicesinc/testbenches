@@ -12,6 +12,8 @@ if {$argc < 1} {
 # Read config file 
 source "cfgs/${cfg_file}"
 
+global ad_project_params
+
 # Set the project name
 set project_name [file rootname $cfg_file]
 
@@ -34,10 +36,7 @@ adi_sim_project_files [list \
  "../common/sv/x_monitor.sv" \
  "../common/sv/filter.sv" \
  "../common/sv/scoreboard.sv" \
- "../common/sv/scoreboard_pack.sv" \
- "../common/sv/dmac_api.sv" \
- "../common/sv/dma_trans.sv" \
- "../common/sv/adi_regmap_dmac_pkg.sv" \
+ "../common/sv/interfaces.svh" \
  "../common/sv/watchdog.sv" \
  "environment.sv" \
  "tests/test_program.sv" \

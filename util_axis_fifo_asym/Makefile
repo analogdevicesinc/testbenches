@@ -19,11 +19,8 @@ SV_DEPS += ../common/sv/mailbox.sv
 SV_DEPS += ../common/sv/x_monitor.sv
 SV_DEPS += ../common/sv/filter.sv
 SV_DEPS += ../common/sv/scoreboard.sv
-SV_DEPS += ../common/sv/dmac_api.sv
-SV_DEPS += ../common/sv/dma_trans.sv
-SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
-SV_DEPS += ../common/sv/data_offload_api.sv
-SV_DEPS += ../common/sv/adi_regmap_data_offload_pkg.sv
+SV_DEPS += ../common/sv/interfaces.svh
+SV_DEPS += ../common/sv/watchdog.sv
 SV_DEPS += environment.sv
 SV_DEPS += system_tb.sv
 
@@ -34,9 +31,7 @@ ENV_DEPS +=../scripts/run_sim.tcl
 
 LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
-LIB_DEPS += axi_dmac
-LIB_DEPS += data_offload
-LIB_DEPS += util_do_ram
+LIB_DEPS += util_axis_fifo_asym
 
 # default test program
 TP := test_program
@@ -49,10 +44,6 @@ CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
-#TESTS += cfg1_mm2mm_default:directed_test
-#TESTS += cfg1:test_program
-#TESTS += cfg2_fsync:test_program
-#TESTS += cfg2_fsync:test_frame_delay
 
 include ../scripts/project-sim.mk
 

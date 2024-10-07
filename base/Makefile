@@ -17,6 +17,7 @@ SV_DEPS += ../common/sv/adi_peripheral_pkg.sv
 SV_DEPS += ../common/sv/adi_regmap_pkg.sv
 SV_DEPS += ../common/sv/mailbox.sv
 SV_DEPS += ../common/sv/x_monitor.sv
+SV_DEPS += ../common/sv/filter.sv
 SV_DEPS += ../common/sv/scoreboard.sv
 SV_DEPS += ../common/sv/watchdog.sv
 SV_DEPS += environment.sv

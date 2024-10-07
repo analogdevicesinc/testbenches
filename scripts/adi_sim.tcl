@@ -21,7 +21,7 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   # Set IP repository paths
   set lib_dirs $ad_hdl_dir/library
-  lappend lib_dirs [file normalize "./../common/sv"]
+  lappend lib_dirs [file normalize "./../../../library"]
   set_property ip_repo_paths $lib_dirs \
     [get_filesets sources_1]
 
@@ -35,7 +35,7 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   global sys_zynq
   set sys_zynq -1
   if { ![info exists ad_project_params(CUSTOM_HARNESS)] || !$ad_project_params(CUSTOM_HARNESS) } {
-    source ../common/test_harness/test_harness_system_bd.tcl
+    source ../../../library/utilities/test_harness_system_bd.tcl
   }
 
   # transfer tcl parameters as defines to verilog

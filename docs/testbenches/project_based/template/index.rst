@@ -120,10 +120,11 @@ Interrupts
 Building the test bench
 -------------------------------------------------------------------------------
 
-The design is built upon ADI's generic HDL reference design framework.
-ADI does not distribute the bit/elf files of these projects so they
-must be built from the sources available :git-hdl:`here </>`. To get
-the source you must
+The testbench is built upon ADI's generic HDL reference design framework.
+ADI does not distribute compiled files of these projects so they must be built
+from the sources available :git-hdl:`here </>` and :git-testbenches:`here </>`,
+with the specified hierarchy described :ref:`build_tb set_up_tb_repo`.
+To get the source you must
 `clone <https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository>`__
 the HDL repository, and then build the project as follows:.
 
@@ -164,14 +165,16 @@ waveforms.
    user@analog:~$ cd testbenches/ad7616
    user@analog:~/hdl/projects/ad7616$ make MODE=gui CFG=cfg_pi TST=test_program_pi
 
-The result of the build, if parameters were used, will be in the ``runs`` folder
-named by the configuration used:
+The built projects can be found in the ``runs`` folder, where each configuration specific
+build has it's own folder named after the configuration file's name. 
+Example: if the following command was run for a single configuration in the clean folder
+(no runs folder available):
 
 if the following command was run
 
 ``make CFG=cfg_pi``
 
-then the folder name will be:
+then the subfolder under ``runs`` name will be:
 
 ``cfg_pi``
 

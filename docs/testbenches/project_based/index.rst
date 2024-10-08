@@ -1,6 +1,6 @@
 .. _project_based:
 
-Project Based Testbenches
+Project Based
 ================================================================================
 
 Contents

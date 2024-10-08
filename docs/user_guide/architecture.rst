@@ -13,7 +13,16 @@ File structure of a project
 Project files for test benches
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  ``projects``
+-  ``library`` --- common files that are used in many projects
+
+    -   ``adi_vip`` --- ADI VIPs
+    -   ``ips`` --- IPs
+    -   ``utilities`` --- ADI Utilities
+    -   ``xilinx_vip`` --- Xilinx VIPs
+
+-  ``scripts`` --- used for creating and running the testbenches        
+
+-  ``testbenches``
 
    -  ``cfgs`` --- projects might have various parameters that can only be set
       during project creation, these parameters are set in one of these
@@ -39,17 +48,6 @@ Project files for test benches
 
    -  ``system_tb.sv`` --- connects the block design with the test program
 
--  ``common`` --- common files that are used in many projects
-
-    -   ``sv`` --- basic functions, abstract/base classes, register maps to access
-        IP’s registers, classes for controlling the IPs
-
-    -   ``test_harness`` --- base designs
-
-        -   ``jesd_exerciser.tcl`` --- used to instantiate the ADI JESD204 Framework 
-        -   ``test_harness_system_bd.tcl`` --- used in all projects as a base design
-
--  ``scripts`` --- used for creating and running the testbenches
 
 Creating a new testbench
 -------------------------------------------------------------------------------
@@ -58,7 +56,9 @@ Creating a new testbench
 -  Create the ``system_project.tcl`` script and add the currently known
    simulation dependencies there as well
 -  Create at least one ``configuration file`` (it can be left empty)
--  Create the ``system_bd.tcl`` script, which creates the block design
+-  Create the ``system_bd.tcl`` script, which creates the block design (consider
+   using Verification IPs as these are created to make testing easier and facilitates
+   faster testbench bring-up as well as less bugs in general)
 -  Create the ``system_tb.sv`` file that connects the testbench with the block design
 -  Consider creating ``classes`` that encapsulate the variables and functions, so it
    can be used in other testbenches
@@ -78,9 +78,14 @@ Requirements:
 -  New ``configuration`` doesn't change the connections between the block design and
    the ``test program``.
 -  ``Test program`` can be used with the new ``configuration`` without modifications.
+
+Process:
+
 -  Create a ``new configuration`` in ``cfg`` folder.
 -  Check if the ``Makefile`` automatically includes the newly created ``configuration``, 
    otherwise add it to the list manually.
+-  If a ``new parameter`` needs to be added, make sure all of the other ``configuration``
+   files are updated with the new parameter name and a new value as well
 -  Test the configuration with the existing test program.
 
 Adding a new test program to a test bench
@@ -95,7 +100,10 @@ Requirements:
 -  Connections between the block design and the test program don't change.
 -  All of the existing ``configurations`` must be compatible with the new
    ``test program``.
--  Create a ``new test`` program in tests folder.
+
+Process:
+
+-  Create a ``new test program`` in tests folder.
 -  Check if the ``Makefile`` automatically includes the newly created 
    ``configuration``, otherwise add it to the list manually.
 -  Test the program with the existing configurations.
@@ -109,13 +117,16 @@ Creating a modified block design in the same project folder
 
 Requirements:
 
+-  New ``configuration file(s)`` must be created for the new block design.
+
+Process:
+
 -  Create a new parameter that tells the ``system_bd.tcl`` what to build.
         -   this parameter must be included in all of the existing and new
             configuration files; 
         -   if the design already has multiple variations of the block design,
             update the existing parameter with the new value which corresponds
             to the new block design
--  New ``configuration file(s)`` must be created for the new block design.
 -  Modify the ``system_bd.tcl`` script to use the created parameter to create the
    old or new block design.
 -  In ``system_tb.sv`` use the parameter to connect the new block design with a

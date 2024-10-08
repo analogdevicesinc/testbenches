@@ -50,11 +50,10 @@ The root of the Testbenches repository has the following structure:
 
    .
    +-- .github
-   +-- common
    +-- docs
    +-- library
-   +-- projects
    +-- scripts
+   +-- testbenches
    +-- Makefile
    +-- README.md
    +-- LICENSE
@@ -62,12 +61,12 @@ The root of the Testbenches repository has the following structure:
 The repository is divided into 5 separate sections:
 
 -  **.github** with all our automations regarding coding checks, GitHub actions
--  **common** with common system verilog files used across test benches
 -  **docs** with our GitHubIO documentation and regmap source files
 -  **library** with all the Analog Devices Inc. proprietary IP cores and
    hdl modules, which are required to build the projects
--  **projects** with all the currently supported projects
--  **scripts** with our environment scripts that set tools versions, etc.
+-  **scripts** with scripts and makefiles to build and run the testbench
+-  **testbenches** with all the currently supported testbenches
+
 
 The file **.gitattributes** is used to properly `handle
 different <https://help.github.com/articles/dealing-with-line-endings/>`__

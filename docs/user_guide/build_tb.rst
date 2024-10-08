@@ -16,6 +16,8 @@ The build process depends on certain software and tools, which you could use in
 many ways. We use **command line** and mostly **Linux systems**. On Windows, we
 use **Cygwin**.
 
+.. _build_tb set_up_tb_repo:
+
 Set up the Testbenches repository
 -------------------------------------------------------------------------------
 
@@ -50,7 +52,7 @@ want to switch to any other branch you need to checkout that branch:
 .. code-block:: bash
 
    [~] cd testbenches/
-   [~] git status
+   [~] git branch
    [~] git checkout 2022_r2      
 
 Building a test bench
@@ -75,18 +77,22 @@ you don't get to the last line, the make failed to build one or more
 targets: it could be a library component or the project itself. There is
 nothing you can gather from the ``make`` output (other than which one
 failed). The actual information about the failure is in a log file inside
-the project directory.
+the project directory. By default, ``make`` builds all of the available
+configurations and runs all of the ``test programs`` that are predefined
+in the ``Makefile``.
 
 Also, there's an option to use ``make`` using GUI, so that at the end of the
-build it will launch Vivado and start the simulation.
+build it will launch Vivado and start the simulation with the waveform viewer
+started as well.
 
 .. code-block:: bash
 
    make MODE=gui
 
-On projects which support this, some ``make`` parameters can be added, to
-configure the project (you can check the **system_project.tcl** file
-to see if your project supports this).
+Some projects support adding additional ``make`` parameters to configure
+the project. This option gives you the ability to build only the configuration
+that you're interested in, without building the rest of the available
+configurations, as well as running the chosen test program, if it is the case.
 
 If parameters were used, the result of the build will be in a folder under runs/,
 named by the configuration used.

@@ -212,7 +212,7 @@ ad_connect  $sys_cpu_resetn tx_os_device_clk_rstgen/ext_reset_in
 
 source $ad_hdl_dir/projects/adrv9009/common/adrv9009_bd.tcl
 
-source ../../../library/test_harness/jesd_exerciser.tcl
+source $ad_hdl_dir/testbenches/library/ips/jesd/jesd_exerciser.tcl
 
 create_jesd_exerciser rx_jesd_exerciser 0 $ENCODER_SEL $LANE_RATE $TX_NUM_OF_CONVERTERS $TX_NUM_OF_LANES $TX_SAMPLES_PER_FRAME $TX_SAMPLE_WIDTH
 create_bd_cell -type container -reference rx_jesd_exerciser i_rx_jesd_exerciser

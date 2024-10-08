@@ -31,6 +31,7 @@ ENV_DEPS += ../../../scripts/adi_sim.tcl
 ENV_DEPS += ../../../scripts/run_sim.tcl
 
 LIB_DEPS += axi_dmac
+LIB_DEPS += axi_tdd
 LIB_DEPS += data_offload
 LIB_DEPS += jesd204/ad_ip_jesd204_tpl_dac
 LIB_DEPS += jesd204/axi_jesd204_tx

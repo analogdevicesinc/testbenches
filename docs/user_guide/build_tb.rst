@@ -94,11 +94,6 @@ the project. This option gives you the ability to build only the configuration
 that you're interested in, without building the rest of the available
 configurations, as well as running the chosen test program, if it is the case.
 
-.. note::
-
-   PR note: **system_project.tcl** doesn't necessarily tell which are the
-   configurations/parameters that can be used to build the project.
-
 If parameters were used, the result of the build will be in a folder under runs/,
 named by the configuration used.
 

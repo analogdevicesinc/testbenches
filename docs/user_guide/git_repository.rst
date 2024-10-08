@@ -64,7 +64,7 @@ The repository is divided into 5 separate sections:
 -  **docs** with our GitHubIO documentation and regmap source files
 -  **library** with all the Analog Devices Inc. proprietary IP cores and
    hdl modules, which are required to build the projects
--  **scripts** with our environment scripts that set tools versions, etc.
+-  **scripts** with scripts and makefiles to build and run the testbench
 -  **testbenches** with all the currently supported testbenches
 
 

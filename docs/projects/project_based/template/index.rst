@@ -123,7 +123,7 @@ Building the test bench
 The testbench is built upon ADI's generic HDL reference design framework.
 ADI does not distribute compiled files of these projects so they must be built
 from the sources available :git-hdl:`here </>` and :git-testbenches:`here </>`,
-with the specified hierarchy described :ref:`build_tb/set_up_tb_repo </>``.
+with the specified hierarchy described :ref:`build_tb set_up_tb_repo`.
 To get the source you must
 `clone <https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository>`__
 the HDL repository, and then build the project as follows:.

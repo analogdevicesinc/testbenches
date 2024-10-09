@@ -1,5 +1,5 @@
-source ../scripts/adi_sim.tcl
-source ../../scripts/adi_env.tcl
+source ../../../scripts/adi_sim.tcl
+source ../../../../scripts/adi_env.tcl
 source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
 if {$argc < 1} {
@@ -20,22 +20,22 @@ adi_sim_project_xilinx $project_name "xc7z010clg400-1"
 
 # Add test files to the project
 adi_sim_project_files [list \
- "../common/sv/utils.svh" \
- "../common/sv/logger_pkg.sv" \
- "../common/sv/reg_accessor.sv" \
- "../common/sv/m_axis_sequencer.sv" \
- "../common/sv/s_axis_sequencer.sv" \
- "../common/sv/m_axi_sequencer.sv" \
- "../common/sv/s_axi_sequencer.sv" \
- "../common/sv/adi_regmap_pkg.sv" \
- "../common/sv/adi_regmap_dmac_pkg.sv" \
- "../common/sv/adi_regmap_dac_pkg.sv" \
- "../common/sv/adi_regmap_adc_pkg.sv" \
- "../common/sv/adi_regmap_common_pkg.sv" \
- "../common/sv/adi_regmap_tdd_gen_pkg.sv" \
- "../common/sv/dmac_api.sv" \
- "../common/sv/dma_trans.sv" \
- "../common/sv/test_harness_env.sv" \
+ "../../../library/utilities/utils.svh" \
+ "../../../library/utilities/logger_pkg.sv" \
+ "../../../library/utilities/reg_accessor.sv" \
+ "../../../library/xilinx_vip/m_axis_sequencer.sv" \
+ "../../../library/xilinx_vip/s_axis_sequencer.sv" \
+ "../../../library/xilinx_vip/m_axi_sequencer.sv" \
+ "../../../library/xilinx_vip/s_axi_sequencer.sv" \
+ "../../../library/utilities/adi_regmap_pkg.sv" \
+ "../../../library/ips/dmac/adi_regmap_dmac_pkg.sv" \
+ "../../../library/ips/adi_regmap_dac_pkg.sv" \
+ "../../../library/ips/adi_regmap_adc_pkg.sv" \
+ "../../../library/ips/adi_regmap_common_pkg.sv" \
+ "../../../library/ips/tdd/adi_regmap_tdd_gen_pkg.sv" \
+ "../../../library/ips/dmac/dmac_api.sv" \
+ "../../../library/ips/dmac/dma_trans.sv" \
+ "../../../library/utilities/test_harness_env.sv" \
  "tests/test_program.sv" \
  "system_tb.sv" \
  ]

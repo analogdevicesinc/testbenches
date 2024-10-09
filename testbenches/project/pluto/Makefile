@@ -3,28 +3,28 @@
 ####################################################################################
 
 # All test-bench dependencies except test programs
-SV_DEPS += ../common/sv/utils.svh
-SV_DEPS += ../common/sv/logger_pkg.sv
-SV_DEPS += ../common/sv/reg_accessor.sv
-SV_DEPS += ../common/sv/m_axis_sequencer.sv
-SV_DEPS += ../common/sv/s_axis_sequencer.sv
-SV_DEPS += ../common/sv/m_axi_sequencer.sv
-SV_DEPS += ../common/sv/s_axi_sequencer.sv
-SV_DEPS += ../common/sv/adi_regmap_pkg.sv
-SV_DEPS += ../common/sv/adi_regmap_dmac_pkg.sv
-SV_DEPS += ../common/sv/adi_regmap_dac_pkg.sv
-SV_DEPS += ../common/sv/adi_regmap_adc_pkg.sv
-SV_DEPS += ../common/sv/adi_regmap_common_pkg.sv
-SV_DEPS += ../common/sv/adi_regmap_tdd_gen_pkg.sv
-SV_DEPS += ../common/sv/dmac_api.sv
-SV_DEPS += ../common/sv/dma_trans.sv
-SV_DEPS += ../common/sv/test_harness_env.sv
+SV_DEPS += ../../../library/utilities/utils.svh
+SV_DEPS += ../../../library/utilities/logger_pkg.sv
+SV_DEPS += ../../../library/utilities/reg_accessor.sv
+SV_DEPS += ../../../library/xilinx_vip/m_axis_sequencer.sv
+SV_DEPS += ../../../library/xilinx_vip/s_axis_sequencer.sv
+SV_DEPS += ../../../library/xilinx_vip/m_axi_sequencer.sv
+SV_DEPS += ../../../library/xilinx_vip/s_axi_sequencer.sv
+SV_DEPS += ../../../library/utilities/adi_regmap_pkg.sv
+SV_DEPS += ../../../library/ips/dmac/adi_regmap_dmac_pkg.sv
+SV_DEPS += ../../../library/ips/adi_regmap_dac_pkg.sv
+SV_DEPS += ../../../library/ips/adi_regmap_adc_pkg.sv
+SV_DEPS += ../../../library/ips/adi_regmap_common_pkg.sv
+SV_DEPS += ../../../library/ips/tdd/adi_regmap_tdd_gen_pkg.sv
+SV_DEPS += ../../../library/ips/dmac/dmac_api.sv
+SV_DEPS += ../../../library/ips/dmac/dma_trans.sv
+SV_DEPS += ../../../library/utilities/test_harness_env.sv
 SV_DEPS += system_tb.sv
 
 ENV_DEPS += system_project.tcl
 ENV_DEPS += system_bd.tcl
-ENV_DEPS += ../scripts/adi_sim.tcl
-ENV_DEPS += ../scripts/run_sim.tcl
+ENV_DEPS += ../../../scripts/adi_sim.tcl
+ENV_DEPS += ../../../scripts/run_sim.tcl
 
 LIB_DEPS += axi_ad9361
 LIB_DEPS += axi_dmac
@@ -48,4 +48,4 @@ TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 #TESTS += cfg2_fsync:test_program
 #TESTS += cfg2_fsync:test_frame_delay
 
-include ../scripts/project-sim.mk
+include ../../../scripts/project-sim.mk

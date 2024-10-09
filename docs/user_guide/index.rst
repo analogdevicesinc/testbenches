@@ -11,12 +11,12 @@ User Guide
    Releases <releases>
    Build a test bench <build_tb>
    Testbenches architecture <architecture>
-   Testbenches coding guidelines <testbenches_coding_guidelines>
+   Testbenches coding guidelines <coding_guidelines>
    Documentation guidelines <docs_guidelines>
 
 `Analog Devices, Inc.`_ provides testbenches to evaluate our FPGA reference
 designs and IP Cores. For information on our FPGA reference designs and IP Cores
-see :ref-hdl:doc:`index`.
+see :external+hdl:doc:`index`.
 
 This wiki documentation explains the testbench structures and resources of these
 reference designs.
@@ -29,7 +29,7 @@ Contents
 #. :ref:`releases`: Releases and supported tool versions
 #. :ref:`build_tb`: Building and generating the programming files
 #. :ref:`architecture`: HDL testbench architecture explained
-#. :ref:`testbenches_coding_guidelines`: The System Verilog coding guidelines
+#. :ref:`coding_guidelines`: The System Verilog coding guidelines
    that the HDL team follows
 #. :ref:`docs_guidelines`: Documentation guidelines
 #. :dokuwiki:`Reference designs using AMD Xilinx hardware <resources/alliances/xilinx>`

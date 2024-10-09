@@ -8,7 +8,7 @@ The main purpose of this user guide is to help the user understand and use
 and to provide advice and instructions for using these resources.
 These resources are found on the GitHub, the :git-hdl:`/`.
 
-After reading this guide, the user should be able to build a specific project 
+After reading this guide, the user should be able to build a specific project
 test bench from the :git-testbenches:`/` and be able to modify it (if so
 desired). Furthermore, all ADI developed and supported IPs are presented in detail.
 

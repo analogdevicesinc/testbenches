@@ -1,4 +1,4 @@
-.. _testbenches_coding_guidelines:
+.. _coding_guidelines:
 
 ADI Testbenches coding guidelines
 ===============================================================================
@@ -12,8 +12,9 @@ followed by all HDL testbenches.
 The coding rules are intended to be applied to testbenches written using
 System Verilog.
 
-The HDL coding guidelines :ref-hdl:`hdl_coding_guidelines` are also applicable
-here. In addition, there are a set of rules for System Verilog, listed below.
+The HDL coding guidelines :external+hdl:ref:`hdl_coding_guidelines` are also
+applicable here. In addition, there are a set of rules for System Verilog,
+listed below.
 
 2. Coding style
 -------------------------------------------------------------------------------

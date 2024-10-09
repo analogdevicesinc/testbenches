@@ -95,10 +95,11 @@ are in doubt, ask us on :ez:`fpga`.
 
 .. note::
 
-   You can find the release notes on the GitHub page of the
-   repository:
+   You can find the release notes on of the repositories at:
 
-   https://github.com/analogdevicesinc/testbenches/releases
+   :git-testbenches:`releases+`
+
+   :git-hdl:`releases+`
 
    The latest version of tools used on main can be found at:
    :git-hdl:`scripts/adi_env.tcl` (*required_vivado_version* variable).

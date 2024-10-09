@@ -1,4 +1,4 @@
-orphan:
+:orphan:
 
 .. _ad7616:
 

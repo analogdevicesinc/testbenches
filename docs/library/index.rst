@@ -10,7 +10,7 @@ ADI VIP
    :maxdepth: 1
 
    adi_vip/index
-   
+
 Custom IP
 -------------------------------------------------------------------------------
 
@@ -18,14 +18,14 @@ Custom IP
    :maxdepth: 1
 
    custom_ip/index
-   
+
 Utilities
 -------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 1
 
-   utilities/index     
+   utilities/index
 
 Xilinx VIP
 -------------------------------------------------------------------------------
@@ -34,4 +34,4 @@ Xilinx VIP
    :maxdepth: 1
 
    xilinx_vip/index
-     
+

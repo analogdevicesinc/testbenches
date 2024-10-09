@@ -8,5 +8,5 @@ Contents
 
 .. toctree::
    :maxdepth: 2
-   
+
    ADI VIP Template <adi_vip_template/index>

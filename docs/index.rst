@@ -3,7 +3,7 @@ HDL Testbenches
 
 .. attention::
 
-   Work-in-progress, not all content has been imported yet.
+   Work-in-progress, not all content has been included yet.
 
 .. image:: sources/HDL_logo.svg
    :align: center
@@ -24,4 +24,4 @@ Contents
 
    user_guide/index
    library/index
-   projects/index
+   testbenches/index

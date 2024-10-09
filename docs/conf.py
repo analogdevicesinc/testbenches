@@ -1,6 +1,6 @@
 # -- Project information ------------------------------------------------------
 
-repository = 'hdl'
+repository = 'testbenches'
 project = 'Testbenches'
 copyright = '2024, Analog Devices, Inc.'
 author = 'Analog Devices, Inc.'
@@ -14,7 +14,7 @@ extensions = [
 ]
 
 needs_extensions = {
-    'adi_doctools': '0.3'
+    'adi_doctools': '0.3.47'
 }
 
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']

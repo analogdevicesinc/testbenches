@@ -20,7 +20,7 @@ Project files for test benches
     -   ``utilities`` --- ADI Utilities
     -   ``xilinx_vip`` --- Xilinx VIPs
 
--  ``scripts`` --- used for creating and running the testbenches        
+-  ``scripts`` --- used for creating and running the testbenches
 
 -  ``testbenches``
 
@@ -82,7 +82,7 @@ Requirements:
 Process:
 
 -  Create a ``new configuration`` in ``cfg`` folder.
--  Check if the ``Makefile`` automatically includes the newly created ``configuration``, 
+-  Check if the ``Makefile`` automatically includes the newly created ``configuration``,
    otherwise add it to the list manually.
 -  If a ``new parameter`` needs to be added, make sure all of the other ``configuration``
    files are updated with the new parameter name and a new value as well
@@ -104,7 +104,7 @@ Requirements:
 Process:
 
 -  Create a ``new test program`` in tests folder.
--  Check if the ``Makefile`` automatically includes the newly created 
+-  Check if the ``Makefile`` automatically includes the newly created
    ``configuration``, otherwise add it to the list manually.
 -  Test the program with the existing configurations.
 
@@ -123,7 +123,7 @@ Process:
 
 -  Create a new parameter that tells the ``system_bd.tcl`` what to build.
         -   this parameter must be included in all of the existing and new
-            configuration files; 
+            configuration files;
         -   if the design already has multiple variations of the block design,
             update the existing parameter with the new value which corresponds
             to the new block design

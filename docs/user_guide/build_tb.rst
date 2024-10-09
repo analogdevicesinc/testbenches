@@ -3,7 +3,7 @@
 Build a test bench
 ===============================================================================
 
-**Please note that ADI only provides the source files necessary to create and 
+**Please note that ADI only provides the source files necessary to create and
 build the designs. This means that you are responsible for modifying and
 building these projects.**
 
@@ -25,35 +25,35 @@ Set up the Testbenches repository
 
    Before building any testbench, you **must**:
 
-   #. Clone the :git-hdl:`HDL repository </>` 
-   
+   #. Clone the :git-hdl:`HDL repository </>`
+
    #. Check the Vivado version needed by entering the
       :git-hdl:`hdl/scripts/adi_env.tcl <scripts/adi_env.tcl>` file. If you do
       not want to use that (although **we strongly advise you to use it**)
       then you have the alternative of setting ``export ADI_IGNORE_VERSION_CHECK=1``
       before building the project. Otherwise your project will fail.
 
-   #. :ref-hdl:`Set up the HDL repository <build_hdl>`
+   #. :external+hdl:ref:`Set up the HDL repository <build_hdl>`
 
 
 The :git-testbenches:`Testbenches repository </>` has to be cloned under the
 :git-hdl:`HDL repository </>` as follows:
 
-.. code-block:: bash
+.. shell::
 
-   [~] cd hdl
-   [~] git clone git@github.com:analogdevicesinc/testbenches.git
+   $cd hdl
+   $git clone git@github.com:analogdevicesinc/testbenches.git
 
 The above command clones the **default** branch, which is the **main** for
 Testbenches. The **main** branch always points to the latest stable release
 branch, but it also has features **that are not fully tested**. If you
 want to switch to any other branch you need to checkout that branch:
 
-.. code-block:: bash
+.. shell::
 
-   [~] cd testbenches/
-   [~] git branch
-   [~] git checkout 2022_r2      
+   $cd testbenches/
+   $git branch
+   $git checkout 2022_r2
 
 Building a test bench
 -------------------------------------------------------------------------------
@@ -66,10 +66,10 @@ Building a test bench
 The way of building a test bench in Cygwin and WSL is almost the same.
 In this example, it is building the **AD7616** test bench.
 
-.. code-block:: bash
+.. shell::
 
-   cd ad7616
-   make
+   $cd ad7616
+   $make
 
 The ``make`` builds all the libraries first and then builds the test bench.
 This assumes that you have the tools and licenses set up correctly. If
@@ -85,9 +85,9 @@ Also, there's an option to use ``make`` using GUI, so that at the end of the
 build it will launch Vivado and start the simulation with the waveform viewer
 started as well.
 
-.. code-block:: bash
+.. shell::
 
-   make MODE=gui
+   $make MODE=gui
 
 Some projects support adding additional ``make`` parameters to configure
 the project. This option gives you the ability to build only the configuration
@@ -103,9 +103,9 @@ Running the command below will create a folder named
 **cfg_si** for the following file combination: **cfg_si** configuration file and
 the **test_program_si** test program.
 
-.. code-block:: bash
+.. shell::
 
-   make MODE=gui CFG=cfg_si TST=test_program_si
+   $make MODE=gui CFG=cfg_si TST=test_program_si
 
 Environment
 -------------------------------------------------------------------------------
@@ -124,14 +124,14 @@ package name.
 
 You may have to install ``git`` (``sudo apt-get install git``)
 and the AMD tools. These tools come with certain **settings*.sh** scripts that
-you may source in your **.bashrc** file to set up the environment. 
+you may source in your **.bashrc** file to set up the environment.
 You may also do this manually (for better or worse); the following snippet is
 from a **.bashrc** file. Please note that unless you are an expert at manipulating
 these things, it is best to leave it to the tools to set up the environment.
 
-.. code-block:: bash
+.. shell::
 
-   export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
+   $export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
 
 Windows environment setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,17 +141,17 @@ The best option on Windows is to use
 ``make`` and ``git`` packages. You should do changes to your **.bashrc** in a
 similar manner to the Linux environment.
 
-.. code-block:: bash
+.. shell::
 
-   export PATH=$PATH:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
+   $export PATH=$PATH:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
 
 A very good alternative to Cygwin is
 `WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__. The
 manual changes to your **.bashrc** should look like:
 
-.. code-block:: bash
+.. shell::
 
-   export PATH=$PATH:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
+   $export PATH=$PATH:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
 
 If you do not want to install Cygwin, there might still be some
 alternative. There are ``make`` alternatives for **Windows Command

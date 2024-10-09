@@ -45,6 +45,6 @@ Test stimulus
 Resources
 -------------------------------------------------------------------------------
 
-.. include:: ../common/more_information.rst
+.. include:: ../../common/more_information.rst
 
-.. include:: ../common/support.rst
+.. include:: ../../common/support.rst

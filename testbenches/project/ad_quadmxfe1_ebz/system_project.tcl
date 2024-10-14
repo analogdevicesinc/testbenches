@@ -36,7 +36,7 @@ adi_sim_project_files [list \
  "../../../library/regmaps/adi_regmap_adc_pkg.sv" \
  "../../../library/regmaps/adi_regmap_jesd_tx_pkg.sv" \
  "../../../library/regmaps/adi_regmap_jesd_rx_pkg.sv" \
- "../../../library/drivers/xcvr/adi_regmap_xcvr_pkg.sv" \
+ "../../../library/regmaps/adi_regmap_xcvr_pkg.sv" \
  "../../../library/drivers/jesd/adi_jesd204_pkg.sv" \
  "../../../library/drivers/xcvr/adi_xcvr_pkg.sv" \
  "../../../library/regmaps/adi_peripheral_pkg.sv" \

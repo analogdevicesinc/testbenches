@@ -42,7 +42,7 @@ adi_sim_project_files [list \
  "../../../library/regmaps/adi_regmap_jesd_rx_pkg.sv" \
  "../../../library/drivers/dmac/dma_trans.sv" \
  "../../../library/utilities/test_harness_env.sv" \
- "../../../library/drivers/xcvr/adi_regmap_xcvr_pkg.sv" \
+ "../../../library/regmaps/adi_regmap_xcvr_pkg.sv" \
  "../../../library/regmaps/adi_peripheral_pkg.sv" \
  "../../../library/drivers/jesd/adi_jesd204_pkg.sv" \
  "../../../library/drivers/xcvr/adi_xcvr_pkg.sv" \

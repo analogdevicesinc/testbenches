@@ -33,11 +33,11 @@ adi_sim_project_xilinx $project_name $part
 adi_sim_project_files [list \
  "../../../library/utilities/utils.svh" \
  "../../../library/utilities/logger_pkg.sv" \
- "../../../library/utilities/reg_accessor.sv" \
- "../../../library/xilinx_vip/m_axis_sequencer.sv" \
- "../../../library/xilinx_vip/s_axis_sequencer.sv" \
- "../../../library/xilinx_vip/m_axi_sequencer.sv" \
- "../../../library/xilinx_vip/s_axi_sequencer.sv" \
+ "../../../library/regmaps/reg_accessor.sv" \
+ "../../../library/vip/amd/m_axis_sequencer.sv" \
+ "../../../library/vip/amd/s_axis_sequencer.sv" \
+ "../../../library/vip/amd/m_axi_sequencer.sv" \
+ "../../../library/vip/amd/s_axi_sequencer.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
  "tests/test_program_sync.sv" \

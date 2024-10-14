@@ -4,8 +4,8 @@
 ## Auto-generated, do not modify!
 ####################################################################################
 
-# Assumes this file is in <HDL>/testbenches/library/adi_vip/spi_vip/Makefile
-ADI_HDL_DIR := $(subst /testbenches/library/adi_vip/spi_vip/Makefile,,$(abspath $(lastword $(MAKEFILE_LIST))))
+# Assumes this file is in <HDL>/testbenches/library/vip/adi/spi_vip/Makefile
+ADI_HDL_DIR := $(subst /testbenches/library/vip/adi/spi_vip/Makefile,,$(abspath $(lastword $(MAKEFILE_LIST))))
 HDL_LIBRARY_PATH := $(ADI_HDL_DIR)/library/
 
 LIBRARY_NAME := adi_spi_vip

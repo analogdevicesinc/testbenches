@@ -7,12 +7,12 @@
 # All test-bench dependencies except test programs
 SV_DEPS += ../../../library/utilities/utils.svh
 SV_DEPS += ../../../library/utilities/logger_pkg.sv
-SV_DEPS += ../../../library/utilities/reg_accessor.sv
-SV_DEPS += ../../../library/xilinx_vip/m_axis_sequencer.sv
-SV_DEPS += ../../../library/xilinx_vip/s_axis_sequencer.sv
-SV_DEPS += ../../../library/xilinx_vip/m_axi_sequencer.sv
-SV_DEPS += ../../../library/xilinx_vip/s_axi_sequencer.sv
-SV_DEPS += ../../../library/utilities/adi_regmap_pkg.sv
+SV_DEPS += ../../../library/regmaps/reg_accessor.sv
+SV_DEPS += ../../../library/vip/amd/m_axis_sequencer.sv
+SV_DEPS += ../../../library/vip/amd/s_axis_sequencer.sv
+SV_DEPS += ../../../library/vip/amd/m_axi_sequencer.sv
+SV_DEPS += ../../../library/vip/amd/s_axi_sequencer.sv
+SV_DEPS += ../../../library/regmaps/adi_regmap_pkg.sv
 SV_DEPS += system_tb.sv
 
 ENV_DEPS += ../../../../library/util_cdc/sync_bits.v

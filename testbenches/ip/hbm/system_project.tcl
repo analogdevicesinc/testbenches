@@ -22,15 +22,15 @@ adi_sim_project_xilinx $project_name "xcvu37p-fsvh2892-2L-e"
 adi_sim_project_files [list \
  "../../../library/utilities/utils.svh" \
  "../../../library/utilities/logger_pkg.sv" \
- "../../../library/utilities/reg_accessor.sv" \
- "../../../library/xilinx_vip/m_axis_sequencer.sv" \
- "../../../library/xilinx_vip/s_axis_sequencer.sv" \
- "../../../library/xilinx_vip/m_axi_sequencer.sv" \
- "../../../library/xilinx_vip/s_axi_sequencer.sv" \
- "../../../library/ips/dmac/dmac_api.sv" \
- "../../../library/utilities/adi_regmap_pkg.sv" \
- "../../../library/ips/dmac/adi_regmap_dmac_pkg.sv" \
- "../../../library/ips/dmac/dma_trans.sv" \
+ "../../../library/regmaps/reg_accessor.sv" \
+ "../../../library/vip/amd/m_axis_sequencer.sv" \
+ "../../../library/vip/amd/s_axis_sequencer.sv" \
+ "../../../library/vip/amd/m_axi_sequencer.sv" \
+ "../../../library/vip/amd/s_axi_sequencer.sv" \
+ "../../../library/drivers/dmac/dmac_api.sv" \
+ "../../../library/regmaps/adi_regmap_pkg.sv" \
+ "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \
+ "../../../library/drivers/dmac/dma_trans.sv" \
  "../../../library/utilities/test_harness_env.sv" \
  "tests/test_program.sv" \
  "system_tb.sv" \

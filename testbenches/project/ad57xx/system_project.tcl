@@ -25,22 +25,22 @@ adi_sim_project_xilinx $project_name "xc7z007sclg400-1"
 adi_sim_project_files [list \
   "../../../library/utilities/utils.svh" \
   "../../../library/utilities/logger_pkg.sv" \
-  "../../../library/utilities/reg_accessor.sv" \
-  "../../../library/xilinx_vip/m_axis_sequencer.sv" \
-  "../../../library/xilinx_vip/s_axis_sequencer.sv" \
-  "../../../library/xilinx_vip/m_axi_sequencer.sv" \
-  "../../../library/xilinx_vip/s_axi_sequencer.sv" \
-  "../../../library/adi_vip/spi_vip/adi_spi_vip_pkg.sv" \
-  "../../../library/ips/spi_engine/s_spi_sequencer.sv" \
-  "../../../library/ips/dmac/dmac_api.sv" \
-  "../../../library/utilities/adi_regmap_pkg.sv" \
-  "../../../library/ips/adi_regmap_clkgen_pkg.sv" \
-  "../../../library/ips/dmac/adi_regmap_dmac_pkg.sv" \
-  "../../../library/ips/adi_regmap_pwm_gen_pkg.sv" \
-  "../../../library/ips/spi_engine/adi_regmap_spi_engine_pkg.sv" \
-  "../../../library/ips/dmac/dma_trans.sv" \
+  "../../../library/regmaps/reg_accessor.sv" \
+  "../../../library/vip/amd/m_axis_sequencer.sv" \
+  "../../../library/vip/amd/s_axis_sequencer.sv" \
+  "../../../library/vip/amd/m_axi_sequencer.sv" \
+  "../../../library/vip/amd/s_axi_sequencer.sv" \
+  "../../../library/vip/adi/spi_vip/adi_spi_vip_pkg.sv" \
+  "../../../library/vip/amd/spi_vip/s_spi_sequencer.sv" \
+  "../../../library/drivers/dmac/dmac_api.sv" \
+  "../../../library/regmaps/adi_regmap_pkg.sv" \
+  "../../../library/regmaps/adi_regmap_clkgen_pkg.sv" \
+  "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \
+  "../../../library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
+  "../../../library/regmaps/adi_regmap_spi_engine_pkg.sv" \
+  "../../../library/drivers/dmac/dma_trans.sv" \
   "../../../library/utilities/test_harness_env.sv" \
-  "../../../library/ips/spi_engine/spi_engine_instr_pkg.sv" \
+  "../../../library/drivers/spi_engine/spi_engine_instr_pkg.sv" \
   "ad57xx_environment.sv" \
   "tests/test_program.sv" \
   "system_tb.sv" \

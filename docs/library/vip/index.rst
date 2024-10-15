@@ -1,6 +1,6 @@
-.. _utilities:
+.. _vip:
 
-Utilities
+Verification IPs (VIP)
 ================================================================================
 
 Contents
@@ -9,3 +9,5 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   ADI <adi/index>
+   AMD <amd/index>

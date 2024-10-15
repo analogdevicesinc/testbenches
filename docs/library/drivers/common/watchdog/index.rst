@@ -1,11 +1,5 @@
-.. _utilities:
+.. _watchdog:
 
-Utilities
+Watchdog
 ================================================================================
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 2
 

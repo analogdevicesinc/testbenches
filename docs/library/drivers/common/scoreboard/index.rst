@@ -1,11 +1,5 @@
-.. _utilities:
+.. _scoreboard:
 
-Utilities
+Scoreboard
 ================================================================================
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 2
 

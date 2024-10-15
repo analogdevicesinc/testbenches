@@ -1,11 +1,5 @@
-.. _utilities:
+.. _monitor:
 
-Utilities
+Monitor
 ================================================================================
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 2
 

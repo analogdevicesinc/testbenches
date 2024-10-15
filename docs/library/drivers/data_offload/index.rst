@@ -1,11 +1,5 @@
-.. _utilities:
+.. _data_offload:
 
-Utilities
+Data Offload
 ================================================================================
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 2
 

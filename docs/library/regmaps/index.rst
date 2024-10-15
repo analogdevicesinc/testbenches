@@ -1,11 +1,8 @@
-.. _utilities:
+.. _regmaps:
 
-Utilities
+Registermaps
 ================================================================================
 
 Contents
 --------
-
-.. toctree::
-   :maxdepth: 2
 

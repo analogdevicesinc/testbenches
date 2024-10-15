@@ -1,6 +1,6 @@
-.. _utilities:
+.. _adi_vip:
 
-Utilities
+ADI VIPs
 ================================================================================
 
 Contents
@@ -8,4 +8,6 @@ Contents
 
 .. toctree::
    :maxdepth: 2
+
+   SPI VIP <spi_vip/index>
 

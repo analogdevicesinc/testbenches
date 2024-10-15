@@ -1,6 +1,6 @@
-.. _utilities:
+.. _common:
 
-Utilities
+Common
 ================================================================================
 
 Contents
@@ -9,3 +9,6 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   Monitor <monitor/index>
+   Scoreboard <scoreboard/index>
+   Watchdog <watchdog/index>

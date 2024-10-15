@@ -1,6 +1,6 @@
-.. _custom_ip:
+.. _common:
 
-Custom IPs
+Common
 ================================================================================
 
 Contents
@@ -9,4 +9,6 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   Custom IP Template <custom_ip_template/index>
+   Monitor <monitor/index>
+   Scoreboard <scoreboard/index>
+   Watchdog <watchdog/index>

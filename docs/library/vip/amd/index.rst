@@ -1,13 +1,13 @@
-.. _xilinx_vip:
+.. _amd_vip:
 
-Xilinx VIPs
+AMD VIPs
 ================================================================================
 
 Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    AXI VIP <axi_vip/index>
    AXIS VIP <axis_vip/index>

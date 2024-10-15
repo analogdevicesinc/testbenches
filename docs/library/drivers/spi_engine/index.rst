@@ -1,11 +1,5 @@
-.. _utilities:
+.. _spi_engine:
 
-Utilities
+SPI Engine
 ================================================================================
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 2
 

@@ -1,12 +1,8 @@
-.. _adi_vip:
+.. _regmaps:
 
-ADI VIPs
+Registermaps
 ================================================================================
 
 Contents
 --------
 
-.. toctree::
-   :maxdepth: 2
-
-   ADI VIP Template <adi_vip_template/index>

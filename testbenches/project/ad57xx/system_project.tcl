@@ -31,7 +31,7 @@ adi_sim_project_files [list \
   "../../../library/vip/amd/m_axi_sequencer.sv" \
   "../../../library/vip/amd/s_axi_sequencer.sv" \
   "../../../library/vip/adi/spi_vip/adi_spi_vip_pkg.sv" \
-  "../../../library/vip/amd/spi_vip/s_spi_sequencer.sv" \
+  "../../../library/vip/adi/spi_vip/s_spi_sequencer.sv" \
   "../../../library/drivers/dmac/dmac_api.sv" \
   "../../../library/regmaps/adi_regmap_pkg.sv" \
   "../../../library/regmaps/adi_regmap_clkgen_pkg.sv" \

@@ -38,26 +38,26 @@
 `include "utils.svh"
 
 module system_tb();
-  wire [3:0] quad_iso_adc_spi_cs;
-  wire quad_iso_adc_spi_sclk;
-  wire quad_iso_adc_spi_clk;
-  wire [`NUM_OF_SDI-1:0] quad_iso_adc_spi_sdi;
-  wire quad_iso_adc_spi_sdo;
-  wire quad_iso_adc_irq;
+  wire [3:0] quad_adaq77681_spi_cs;
+  wire quad_adaq77681_spi_sclk;
+  wire quad_adaq77681_spi_clk;
+  wire [`NUM_OF_SDI-1:0] quad_adaq77681_spi_sdi;
+  wire quad_adaq77681_spi_sdo;
+  wire quad_adaq77681_irq;
 
   `TEST_PROGRAM test(
-    .quad_iso_adc_irq(quad_iso_adc_irq),
-    .quad_iso_adc_spi_sclk(quad_iso_adc_spi_sclk),
-    .quad_iso_adc_spi_cs(quad_iso_adc_spi_cs),
-    .quad_iso_adc_spi_clk(quad_iso_adc_spi_clk),
-    .quad_iso_adc_spi_sdi(quad_iso_adc_spi_sdi));
+    .quad_adaq77681_irq(quad_adaq77681_irq),
+    .quad_adaq77681_spi_sclk(quad_adaq77681_spi_sclk),
+    .quad_adaq77681_spi_cs(quad_adaq77681_spi_cs),
+    .quad_adaq77681_spi_clk(quad_adaq77681_spi_clk),
+    .quad_adaq77681_spi_sdi(quad_adaq77681_spi_sdi));
 
   test_harness `TH (
-    .quad_iso_adc_irq(quad_iso_adc_irq),
-    .qadc_spi_cs(quad_iso_adc_spi_cs),
-    .qadc_spi_sclk(quad_iso_adc_spi_sclk),
-    .quad_iso_adc_spi_clk(quad_iso_adc_spi_clk),
-    .qadc_spi_sdi(quad_iso_adc_spi_sdi),
-    .qadc_spi_sdo(quad_iso_adc_spi_sdo));
+    .quad_adaq77681_irq(quad_adaq77681_irq),
+    .quad_adaq77681_spi_cs(quad_adaq77681_spi_cs),
+    .quad_adaq77681_spi_sclk(quad_adaq77681_spi_sclk),
+    .quad_adaq77681_spi_clk(quad_adaq77681_spi_clk),
+    .quad_adaq77681_spi_sdi(quad_adaq77681_spi_sdi),
+    .quad_adaq77681_spi_sdo(quad_adaq77681_spi_sdo));
 
 endmodule

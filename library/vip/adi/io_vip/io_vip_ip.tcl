@@ -3,7 +3,7 @@
 ### SPDX short identifier: ADIBSD
 ###############################################################################
 
-source ../../../../scripts/adi_env.tcl
+source ../../../../../scripts/adi_env.tcl
 source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 
 adi_ip_create io_vip
@@ -22,8 +22,6 @@ ipx::remove_all_bus_interface [ipx::current_core]
 
 adi_set_ports_dependency "in" \
       "(spirit:decode(id('MODELPARAM_VALUE.MODE')) = 0)"
-adi_set_ports_dependency "out" \
-      "(spirit:decode(id('MODELPARAM_VALUE.MODE')) = 1)"
 
 set cc [ipx::current_core]
 

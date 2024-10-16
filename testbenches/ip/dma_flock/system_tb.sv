@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,27 +33,12 @@
 // ***************************************************************************
 // ***************************************************************************
 
-module io_vip #(
-  parameter MODE = 1, // 1 - driver, 0 - monitor
-  parameter WIDTH = 1
-)(
-  input  clk,
-  input  in,
-  output out
-);
+`include "utils.svh"
 
-  io_vip_if #(
-    .MODE (MODE),
-    .WIDTH (WIDTH)
-  ) IF (
-    .clk(clk)
-  );
+module system_tb();
 
-  generate if (MODE) begin
-    assign out = IF.io;
-  end else begin
-    assign IF.io = in;
-  end
-  endgenerate
+  `TEST_PROGRAM test();
+
+  test_harness `TH ();
 
 endmodule

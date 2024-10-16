@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,43 +33,26 @@
 // ***************************************************************************
 // ***************************************************************************
 
-interface io_vip_if #(
-  int MODE = 0, // 1 - driver, 0 - monitor
-      WIDTH = 1
-) (
-  input bit clk
+module io_vip #(
+  parameter MODE = 1, // 1 - master, 0 - slave
+  parameter WIDTH = 1
+)(
+  input  clk,
+  input  [WIDTH-1:0] in,
+  output [WIDTH-1:0] out
 );
 
-  logic [WIDTH-1:0] io = 0;
+  io_vip_if #(
+    .MODE (MODE),
+    .WIDTH (WIDTH)
+  ) IF (
+    .clk(clk)
+  );
 
-  // Driver functions
-  function void set_io(int o);
-    if (MODE === 0) begin
-      $display("[ERROR] %0t Unsupported in monitor mode", $time);
-      $finish;
-    end else begin
-      io <= o[WIDTH-1:0];
-    end
-  endfunction
+  assign out = IF.io;
+  generate if (~MODE) begin
+    assign IF.io = in;
+  end
+  endgenerate
 
-  // Wait and set
-  task setw_io(int o, int w=1);
-    repeat(w) wait_posedge_clk();
-    set_io(o);
-  endtask
-
-  // Monitor functions
-  function int get_io();
-    return io;
-  endfunction
-
-  task wait_posedge_clk();
-    @(cb);
-  endtask
-
-  default clocking cb @(posedge clk);
-    default input #1step output #1ps;
-    inout io;
-  endclocking : cb
-
-endinterface
+endmodule

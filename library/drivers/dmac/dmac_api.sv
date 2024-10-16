@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2018, 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -59,34 +59,46 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
-    // Discover HW parameters                                                                 
-    task discover_params();                                                                   
+    // Discover HW parameters
+    task discover_params();
       bit [31:0] val;
       bit  [3:0] bpb_dest_log2, bpb_src_log2, bpb_width_log2;
-      this.axi_read(GetAddrs(DMAC_PERIPHERAL_ID), val);              
+      this.axi_read(GetAddrs(DMAC_PERIPHERAL_ID), val);
       p.ID = `GET_DMAC_PERIPHERAL_ID_PERIPHERAL_ID(val);
-      this.axi_read(GetAddrs(DMAC_INTERFACE_DESCRIPTION), val);      
-      bpb_dest_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BEAT_DEST_LOG2(val);          
+      this.axi_read(GetAddrs(DMAC_INTERFACE_DESCRIPTION_1), val);
+      bpb_dest_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_DEST_LOG2(val);
       p.DMA_DATA_WIDTH_DEST = (2**bpb_dest_log2)*8;
-      p.DMA_TYPE_DEST = `GET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_DEST(val);
-      bpb_src_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BEAT_SRC_LOG2(val);            
+      p.DMA_TYPE_DEST = `GET_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_DEST(val);
+      bpb_src_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_SRC_LOG2(val);
       p.DMA_DATA_WIDTH_SRC = (2**bpb_src_log2)*8;
-      p.DMA_TYPE_SRC = `GET_DMAC_INTERFACE_DESCRIPTION_DMA_TYPE_SRC(val);
-      bpb_width_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_BYTES_PER_BURST_WIDTH(val);            
+      p.DMA_TYPE_SRC = `GET_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_SRC(val);
+      bpb_width_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BURST_WIDTH(val);
       p.MAX_BYTES_PER_BURST = 2**bpb_width_log2;
-      this.axi_write(GetAddrs(DMAC_X_LENGTH),
-                        `SET_DMAC_X_LENGTH_X_LENGTH(32'h0));
+      p.DMA_2D_TLAST_MODE = `GET_DMAC_INTERFACE_DESCRIPTION_1_DMA_2D_TLAST_MODE(val);
+      p.MAX_NUM_FRAMES = `GET_DMAC_INTERFACE_DESCRIPTION_1_MAX_NUM_FRAMES(val);
+      p.USE_EXT_SYNC = `GET_DMAC_INTERFACE_DESCRIPTION_1_USE_EXT_SYNC(val);
+      p.HAS_AUTORUN = `GET_DMAC_INTERFACE_DESCRIPTION_1_HAS_AUTORUN(val);
+      if (!p.HAS_AUTORUN) begin
+        this.axi_write(GetAddrs(DMAC_X_LENGTH),
+                       `SET_DMAC_X_LENGTH_X_LENGTH(32'h0));
+      end
       this.axi_read(GetAddrs(DMAC_X_LENGTH), val);
       p.DMA_LENGTH_ALIGN = `GET_DMAC_X_LENGTH_X_LENGTH(val)+1;
-      this.axi_write(GetAddrs(DMAC_Y_LENGTH),
-                        `SET_DMAC_Y_LENGTH_Y_LENGTH(32'hFFFFFFFF));
+      if (!p.HAS_AUTORUN) begin
+        this.axi_write(GetAddrs(DMAC_Y_LENGTH),
+                       `SET_DMAC_Y_LENGTH_Y_LENGTH(32'hFFFFFFFF));
+      end
       this.axi_read(GetAddrs(DMAC_Y_LENGTH), val);
       if (val==0) begin
         p.DMA_2D_TRANSFER = 0;
-      end else begin 
+      end else begin
         p.DMA_2D_TRANSFER = 1;
-        this.axi_write(GetAddrs(DMAC_Y_LENGTH), 32'h0);
+        if (!p.HAS_AUTORUN) begin
+          this.axi_write(GetAddrs(DMAC_Y_LENGTH), 32'h0);
+        end
       end
+      this.axi_read(GetAddrs(DMAC_FLAGS), val);
+      p.FRAMELOCK = `GET_DMAC_CONTROL_FRAMELOCK(val);
     endtask : discover_params
 
     // -----------------
@@ -117,7 +129,7 @@ package dmac_api_pkg;
     // -----------------
     task enable_dma();
       this.axi_write(GetAddrs(DMAC_CONTROL),
-                        `SET_DMAC_CONTROL_ENABLE(1));
+                     `SET_DMAC_CONTROL_ENABLE(1));
     endtask : enable_dma
 
     // -----------------
@@ -125,17 +137,28 @@ package dmac_api_pkg;
     // -----------------
     task disable_dma();
       this.axi_write(GetAddrs(DMAC_CONTROL),
-                        `SET_DMAC_CONTROL_PAUSE(0));
+                     `SET_DMAC_CONTROL_PAUSE(0));
     endtask : disable_dma
 
     // -----------------
     //
     // -----------------
-    task set_flags(input bit[2:0] flags);
+    task set_control(input bit[3:0] control);
+      this.axi_write(GetAddrs(DMAC_CONTROL),
+                     `SET_DMAC_CONTROL_ENABLE(control[0]) |
+                     `SET_DMAC_CONTROL_PAUSE(control[1]) |
+                     `SET_DMAC_CONTROL_HWDESC(control[2]) |
+                     `SET_DMAC_CONTROL_FRAMELOCK(control[3]));
+    endtask : set_control
+
+    // -----------------
+    //
+    // -----------------
+    task set_flags(input bit[3:0] flags);
       this.axi_write(GetAddrs(DMAC_FLAGS),
-                        `SET_DMAC_FLAGS_CYCLIC(flags[0])|
-                        `SET_DMAC_FLAGS_TLAST(flags[1])|
-                        `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
+                     `SET_DMAC_FLAGS_CYCLIC(flags[0]) |
+                     `SET_DMAC_FLAGS_TLAST(flags[1]) |
+                     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
     endtask : set_flags
 
     // -----------------
@@ -169,7 +192,7 @@ package dmac_api_pkg;
     // -----------------
     task transfer_start;
       this.axi_write(GetAddrs(DMAC_TRANSFER_SUBMIT),
-                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+                     `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       `INFO(("Transfer start"));
     endtask : transfer_start
 
@@ -178,7 +201,7 @@ package dmac_api_pkg;
     // -----------------
     task set_dest_addr(input int xfer_addr);
       this.axi_write(GetAddrs(DMAC_DEST_ADDRESS),
-                        `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(xfer_addr));
+                     `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(xfer_addr));
     endtask : set_dest_addr
 
     // -----------------
@@ -186,7 +209,7 @@ package dmac_api_pkg;
     // -----------------
     task set_src_addr(input int xfer_addr);
       this.axi_write(GetAddrs(DMAC_SRC_ADDRESS),
-                        `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(xfer_addr));
+                     `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(xfer_addr));
     endtask : set_src_addr
 
     // -----------------
@@ -196,9 +219,9 @@ package dmac_api_pkg;
       input int xfer_length_x,
       input int xfer_length_y);
       this.axi_write(GetAddrs(DMAC_X_LENGTH),
-                        `SET_DMAC_X_LENGTH_X_LENGTH(xfer_length_x));
+                     `SET_DMAC_X_LENGTH_X_LENGTH(xfer_length_x));
       this.axi_write(GetAddrs(DMAC_Y_LENGTH),
-                        `SET_DMAC_Y_LENGTH_Y_LENGTH(xfer_length_y));
+                     `SET_DMAC_Y_LENGTH_Y_LENGTH(xfer_length_y));
     endtask : set_lengths
 
     // -----------------
@@ -275,6 +298,7 @@ package dmac_api_pkg;
                          output int next_transfer_id);
 
       dma_2d_segment t_2d;
+      dma_flocked_2d_segment t_fl_2d;
 
       wait_transfer_submission();
       `INFO((" Submitting up a segment of : "));
@@ -286,14 +310,14 @@ package dmac_api_pkg;
       end
       if (p.DMA_TYPE_SRC == 0) begin
         this.axi_write(GetAddrs(DMAC_SRC_ADDRESS),
-                          `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(t.src_addr));
+                       `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(t.src_addr));
       end
       if (p.DMA_TYPE_DEST == 0) begin
         this.axi_write(GetAddrs(DMAC_DEST_ADDRESS),
-                          `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(t.dst_addr));
+                       `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(t.dst_addr));
       end
       this.axi_write(GetAddrs(DMAC_X_LENGTH),
-                        `SET_DMAC_X_LENGTH_X_LENGTH(t.length-1));
+                     `SET_DMAC_X_LENGTH_X_LENGTH(t.length-1));
 
       if (p.DMA_2D_TRANSFER == 1) begin
         if (!$cast(t_2d,t)) begin
@@ -304,15 +328,25 @@ package dmac_api_pkg;
           t_2d.dst_stride = 0;
         end
         this.axi_write(GetAddrs(DMAC_Y_LENGTH),
-                          `SET_DMAC_Y_LENGTH_Y_LENGTH(t_2d.ylength-1));
+                       `SET_DMAC_Y_LENGTH_Y_LENGTH(t_2d.ylength-1));
         if (p.DMA_TYPE_SRC == 0) begin
           this.axi_write(GetAddrs(DMAC_SRC_STRIDE),
-                            `SET_DMAC_SRC_STRIDE_SRC_STRIDE(t_2d.src_stride));
+                         `SET_DMAC_SRC_STRIDE_SRC_STRIDE(t_2d.src_stride));
         end
         if (p.DMA_TYPE_DEST == 0) begin
           this.axi_write(GetAddrs(DMAC_DEST_STRIDE),
-                            `SET_DMAC_DEST_STRIDE_DEST_STRIDE(t_2d.dst_stride));
+                         `SET_DMAC_DEST_STRIDE_DEST_STRIDE(t_2d.dst_stride));
         end
+      end
+
+      if ($cast(t_fl_2d,t)) begin
+        this.axi_write(GetAddrs(DMAC_FRAMELOCK_CONFIG),
+                       `SET_DMAC_FRAMELOCK_CONFIG_FRAMENUM(t_fl_2d.flock_framenum) |
+                       `SET_DMAC_FRAMELOCK_CONFIG_MODE(t_fl_2d.flock_mode) |
+                       `SET_DMAC_FRAMELOCK_CONFIG_WAIT_WRITER(t_fl_2d.flock_wait_writer ) |
+                       `SET_DMAC_FRAMELOCK_CONFIG_DISTANCE(t_fl_2d.flock_distance-1));
+        this.axi_write(GetAddrs(DMAC_FRAMELOCK_STRIDE),
+                       `SET_DMAC_FRAMELOCK_STRIDE_STRIDE(t_fl_2d.flock_stride));
       end
 
       transfer_id_get(next_transfer_id);

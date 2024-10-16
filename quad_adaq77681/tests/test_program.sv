@@ -92,11 +92,11 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                      = INST_SLEEP | (a & 8'hFF);
 
 program test_program (
-  input quad_iso_adc_irq,
-  input quad_iso_adc_spi_sclk,
-  input [3:0] quad_iso_adc_spi_cs,
-  input quad_iso_adc_spi_clk,
-  input [`NUM_OF_SDI-1:0] quad_iso_adc_spi_sdi);
+  input quad_adaq77681_irq,
+  input quad_adaq77681_spi_sclk,
+  input [3:0] quad_adaq77681_spi_cs,
+  input quad_adaq77681_spi_clk,
+  input [`NUM_OF_SDI-1:0] quad_adaq77681_spi_sdi);
 test_harness_env env;
 
 // --------------------------
@@ -171,9 +171,9 @@ task sanity_test;
   bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
-  axi_read_v (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
-  axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  axi_read_v (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
+  axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  axi_read_v (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 endtask
 
@@ -185,13 +185,13 @@ task generate_transfer_cmd(
   input [7:0] sync_id);
 
     // assert CSN
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_ON);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_ON);
     // transfer data
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_WRD);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_WRD);
     // de-assert CSN
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_OFF);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_OFF);
     // SYNC command to generate interrupt
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
     $display("[%t] NOTE: Transfer generation finished.", $time);
 endtask
 
@@ -204,17 +204,17 @@ reg [7:0] sync_id = 0;
 
 initial begin
   while (1) begin
-    @(posedge quad_iso_adc_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
+    @(posedge quad_adaq77681_irq); // TODO: Make sure irq resets even the source remain active after clearing the IRQ register
     // read pending IRQs
-    axi_read (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    axi_read (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
-      axi_read (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      axi_read (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       $display("[%t] NOTE: Offload SYNC %d IRQ. An offload transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
-      axi_read (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      axi_read (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       $display("[%t] NOTE: SYNC %d IRQ. FIFO transfer just finished.", $time, sync_id);
     end
     // IRQ launched by SDI FIFO
@@ -230,7 +230,7 @@ initial begin
       $display("[%t] NOTE: CMD FIFO IRQ.", $time);
     end
     // Clear all pending IRQs
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
   end
 end
 
@@ -242,7 +242,7 @@ end
   reg     delay_clk = 0;
   wire    m_spi_sclk;
 
-  assign  m_spi_sclk = quad_iso_adc_spi_sclk;
+  assign  m_spi_sclk = quad_adaq77681_spi_sclk;
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
@@ -252,7 +252,7 @@ end
        end
     end
   end
-  assign quad_iso_adc_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
+  assign quad_adaq77681_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
 initial begin
   while(1) begin
@@ -265,9 +265,9 @@ end
 //---------------------------------------------------------------------------
 
 wire          end_of_word;
-wire          spi_sclk_bfm = quad_iso_adc_echo_sclk;
+wire          spi_sclk_bfm = quad_adaq77681_echo_sclk;
 wire  [3:0]   m_spi_csn_negedge_s;
-wire  [3:0]   m_spi_csn_int_s = &quad_iso_adc_spi_cs;
+wire  [3:0]   m_spi_csn_int_s = &quad_adaq77681_spi_cs;
 bit   [3:0]   m_spi_csn_int_d = 0;
 bit   [31:0]  sdi_shiftreg;
 bit   [7:0]   spi_sclk_pos_counter = 0;
@@ -277,7 +277,7 @@ bit   [31:0]  sdi_nreg[$];
 
 initial begin
   while(1) begin
-    @(posedge quad_iso_adc_spi_clk);
+    @(posedge quad_adaq77681_spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
 end
@@ -286,7 +286,7 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign quad_iso_adc_spi_sdi[i] = sdi_shiftreg[DATA_DLENGTH-1-i]; // SDI lanes got different data
+  assign quad_adaq77681_spi_sdi[i] = sdi_shiftreg[DATA_DLENGTH-1-i]; // SDI lanes got different data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
@@ -357,34 +357,60 @@ end
 
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
-bit [15:0]  sdi_store_cnt = 'h0;
+bit [15:0]   sdi_store_cnt = (`NUM_OF_SDI == 1) ? 'h1 : 'h0;
 bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store [7:0];
 bit [DATA_DLENGTH-1:0]  sdi_data_store;
+bit [31:0]  sdi_shiftreg_old;
 
 initial begin
   while(1) begin
-    @(posedge quad_iso_adc_echo_sclk);
+    @(posedge quad_adaq77681_echo_sclk);
     sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
-        sdi_store_cnt <= sdi_store_cnt + 2;
+        if (`NUM_OF_SDI == 1) begin
+          sdi_store_cnt <= sdi_store_cnt + 1;
+        end else begin
+          sdi_store_cnt <= sdi_store_cnt + 2;
       end
+    end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-        for (int i=0; i<8; i=i+1) begin
+        if (`NUM_OF_SDI == 1) begin
+          sdi_shiftreg_old <= sdi_shiftreg;
+          if (sdi_store_cnt [0] == 'h1 ) begin
+            for (int i=0; i<16; i=i+1) begin
+              offload_sdi_data_store_arr[sdi_store_cnt-1][16 + i] = sdi_shiftreg[2*i+1];
+              offload_sdi_data_store_arr[sdi_store_cnt-1][i] = sdi_shiftreg_old[2*i+1];
+              offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
+              offload_sdi_data_store_arr[sdi_store_cnt][16 + i] =  sdi_shiftreg[2*i];
+            end
+          end
+        end if (`NUM_OF_SDI == 2) begin  
+            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
+            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
+        end else if (`NUM_OF_SDI == 4) begin
+          for (int i=0; i<16; i=i+1) begin
+            offload_sdi_data_store_arr[sdi_store_cnt][2*i  ] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt][2*i+1] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i  ] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i+1] = sdi_shiftreg[i];
+          end
+        end else if (`NUM_OF_SDI == 8) begin
+          for (int i=0; i<8; i=i+1) begin
+            offload_sdi_data_store_arr[sdi_store_cnt][4*i+1] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt][4*i+2] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt][4*i+3] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt][4*i  ] = sdi_shiftreg[i];
 
-          offload_sdi_data_store_arr[sdi_store_cnt][4*i  ] = sdi_shiftreg[i];
-          offload_sdi_data_store_arr[sdi_store_cnt][4*i+1] = sdi_shiftreg[i];
-          offload_sdi_data_store_arr[sdi_store_cnt][4*i+2] = sdi_shiftreg[i];
-          offload_sdi_data_store_arr[sdi_store_cnt][4*i+3] = sdi_shiftreg[i];
-
-          offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i  ] = sdi_shiftreg[i];
-          offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+1] = sdi_shiftreg[i];
-          offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+2] = sdi_shiftreg[i];
-          offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+3] = sdi_shiftreg[i];
-        end
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i  ] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+1] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+2] = sdi_shiftreg[i];
+            offload_sdi_data_store_arr[sdi_store_cnt + 1][4*i+3] = sdi_shiftreg[i];
+          end
+      end
       end else begin
         sdi_fifo_data_store [0] = sdi_shiftreg;
         sdi_fifo_data_store [1] = {sdi_shiftreg[30:0],1'b0};
@@ -421,34 +447,38 @@ bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test();
     //Configure DMA
-    env.mng.RegWrite32(`QUAD_ISO_ADC_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    env.mng.RegWrite32(`QUAD_ISO_ADC_DMA_BA + GetAddrs(DMAC_FLAGS),
+    env.mng.RegWrite32(`QUAD_ADAQ77681_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    env.mng.RegWrite32(`QUAD_ADAQ77681_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    env.mng.RegWrite32(`QUAD_ISO_ADC_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`QUAD_ISO_ADC_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
-    env.mng.RegWrite32(`QUAD_ISO_ADC_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    env.mng.RegWrite32(`QUAD_ADAQ77681_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    env.mng.RegWrite32(`QUAD_ADAQ77681_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
+    env.mng.RegWrite32(`QUAD_ADAQ77681_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Configure the Offload module
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_PRESCALE);
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_DLENGTH);
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_ON);
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_RD);
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_OFF);
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_SYNC | 2);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_PRESCALE);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_DLENGTH);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_ON);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_RD);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_OFF);
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_SYNC | 2);
 
     offload_status = 1;
 
     // Start the offload
     #100
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     $display("[%t] Offload started.", $time);
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+    if (`NUM_OF_SDI == 1) begin
+      wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
+    end else begin
+      wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+    end
 
-    axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
+    axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     offload_status = 0;
 
     $display("[%t] Offload stopped.", $time);
@@ -483,37 +513,37 @@ bit   [31:0]  sdi_data_fifo_store_const;
 
 task fifo_spi_test();
   // Start spi clk generator
-  axi_write (`QUAD_ISO_ADC_AXI_SPI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+  axi_write (`QUAD_ADAQ77681_AXI_SPI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
     `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
     );
 
   // Start spi clk generator
-    axi_write (`QUAD_ISO_ADC_AXI_MCLK_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+    axi_write (`QUAD_ADAQ77681_AXI_MCLK_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
     `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
     );
 
   // Enable SPI Engine
-  axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+  axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
   // Configure the execution module
-  axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
-  axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_PRESCALE);
-  axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
+  axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
+  axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_PRESCALE);
+  axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
 
   // Set up the interrupts
-  axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+  axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
     `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );
 
   #100
 
-  for (int i = 0; i < 8; i++) begin
+  for (int i = 0; i < `NUM_OF_SDI; i++) begin
     // Generate a FIFO transaction, write SDO first
     repeat (NUM_OF_WORDS) begin
-      axi_write (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
+      axi_write (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
     end
     
     generate_transfer_cmd(1);
@@ -522,18 +552,16 @@ task fifo_spi_test();
     wait(sync_id == 1);
     #100
 
-      axi_read (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO) + i*4, sdi_fifo_data);
+      axi_read (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO) + i*4, sdi_fifo_data);
 
-      axi_read (`QUAD_ISO_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO) + i*4 + 'h38, sdi_fifo_data_peek);
+      axi_read (`QUAD_ADAQ77681_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO) + i*4 + 'h38, sdi_fifo_data_peek);
 
     if (sdi_fifo_data != sdi_fifo_data_store[i] && sdi_fifo_data_peek != sdi_fifo_data_store[i]) begin
       $display("sdi_fifo_data: %x; sdi_fifo_data_peek: %x; sdi_fifo_data_store[i] %x", sdi_fifo_data, sdi_fifo_data_peek, sdi_fifo_data_store[i]);
       `ERROR(("Fifo Read Test FAILED"));
-    end else begin
-      $display("sdi_fifo_data: %x; sdi_fifo_data_peek: %x; sdi_fifo_data_store[i] %x", sdi_fifo_data, sdi_fifo_data_peek, sdi_fifo_data_store[i]);
-      `INFO(("Fifo Read Test PASSED"));
-    end
+    end 
   end
+  `INFO(("Fifo Read Test PASSED"));
 endtask
 
 endprogram

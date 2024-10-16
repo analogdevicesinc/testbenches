@@ -45,26 +45,37 @@ adi_project_files [list \
 #  Block design under test
 #
 
-source ../../projects/quad_iso_adc_fmc/common/quad_iso_adc_fmc_bd.tcl
+source ../../projects/quad_adaq77681/common/quad_adaq77681_bd.tcl
 
-create_bd_port -dir O quad_iso_adc_spi_clk
-create_bd_port -dir O quad_iso_adc_irq
+create_bd_cell -type ip -vlnv xilinx.com:ip:clk_vip:1.0 mclk_clkgen_vip
+set_property -dict [list CONFIG.FREQ_HZ.VALUE_SRC USER] [get_bd_cells mclk_clkgen_vip]
 
-ad_connect quad_iso_adc_spi_clk spi_clkgen/clk_0
-ad_connect quad_iso_adc_irq quad_iso_adc/irq
+set_property -dict [list \
+  CONFIG.FREQ_HZ {32768000} \
+  CONFIG.INTERFACE_MODE {MASTER} \
+] [get_bd_cells mclk_clkgen_vip]
+
+delete_bd_objs [get_bd_nets quad_adaq77681_mclk_refclk_1]
+connect_bd_net [get_bd_pins mclk_clkgen_vip/clk_out] [get_bd_pins mclk_clkgen/clk]
+ 
+create_bd_port -dir O quad_adaq77681_spi_clk
+create_bd_port -dir O quad_adaq77681_irq
+
+ad_connect quad_adaq77681_spi_clk spi_clkgen/clk_0
+ad_connect quad_adaq77681_irq quad_adaq77681/irq
 
 set BA_SPI_REGMAP 0x44A00000
-set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/quad_iso_adc_axi_regmap}]
-adi_sim_add_define "QUAD_ISO_ADC_SPI_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
+set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/quad_adaq77681_axi_regmap}]
+adi_sim_add_define "QUAD_ADAQ77681_SPI_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
 
 set BA_DMA 0x44A30000
 set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_qadc_dma}]
-adi_sim_add_define "QUAD_ISO_ADC_DMA_BA=[format "%d" ${BA_DMA}]"
+adi_sim_add_define "QUAD_ADAQ77681_DMA_BA=[format "%d" ${BA_DMA}]"
 
 set BA_SPI_CLKGEN 0x44A70000
 set_property offset $BA_SPI_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
-adi_sim_add_define "QUAD_ISO_ADC_AXI_SPI_CLKGEN_BA=[format "%d" ${BA_SPI_CLKGEN}]"
+adi_sim_add_define "QUAD_ADAQ77681_AXI_SPI_CLKGEN_BA=[format "%d" ${BA_SPI_CLKGEN}]"
 
 set BA_MCLK_CLKGEN 0x44B00000
 set_property offset $BA_MCLK_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mclk_clkgen}]
-adi_sim_add_define "QUAD_ISO_ADC_AXI_MCLK_CLKGEN_BA=[format "%d" ${BA_MCLK_CLKGEN}]"
+adi_sim_add_define "QUAD_ADAQ77681_AXI_MCLK_CLKGEN_BA=[format "%d" ${BA_MCLK_CLKGEN}]"

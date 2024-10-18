@@ -56,13 +56,13 @@ package environment_pkg;
 
     x_axis_monitor #(`AGENT(test_harness, adc_src_axis_0, mst_t)) adc_src_axis_0_mon;
     x_axis_monitor #(`AGENT(test_harness, dac_dst_axis_0, slv_t)) dac_dst_axis_0_mon;
-    x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_0, passthrough_mem_t), WRITE_OP) adc_dst_axi_pt_0_mon;
-    x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_0, passthrough_mem_t), READ_OP) dac_src_axi_pt_0_mon;
+    x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_0, passthrough_mem_t), XIL_AXI_WRITE) adc_dst_axi_pt_0_mon;
+    x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_0, passthrough_mem_t), XIL_AXI_READ) dac_src_axi_pt_0_mon;
 
     // x_axis_monitor #(`AGENT(test_harness, adc_src_axis_1, mst_t)) adc_src_axis_1_mon;
     // x_axis_monitor #(`AGENT(test_harness, dac_dst_axis_1, slv_t)) dac_dst_axis_1_mon;
-    // x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_1, passthrough_mem_t), WRITE_OP) adc_dst_axi_pt_1_mon;
-    // x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_1, passthrough_mem_t), READ_OP) dac_src_axi_pt_1_mon;
+    // x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_1, passthrough_mem_t), XIL_AXI_WRITE) adc_dst_axi_pt_1_mon;
+    // x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_1, passthrough_mem_t), XIL_AXI_READ) dac_src_axi_pt_1_mon;
 
     scoreboard scoreboard_tx0;
     scoreboard scoreboard_rx0;

@@ -66,7 +66,7 @@ package scoreboard_pack_pkg;
             for (int j=0; j<inner_loop; j++) begin
               for (int k=0; k<this.width/8; k++) begin
                 source_byte = this.source_byte_stream.pop_back();
-                if (this.sink_type == CYCLIC)
+                if (this.transfer_type == CYCLIC)
                   this.source_byte_stream.push_front(source_byte);
                 else
                   this.source_byte_stream_size--;
@@ -79,10 +79,16 @@ package scoreboard_pack_pkg;
             end
           end
         end else begin
-          if ((this.source_byte_stream_size == 0) &&
-              (this.sink_byte_stream_size == 0)) begin
-            byte_streams_empty_sig = 1;
-            ->>byte_streams_empty;
+          if (this.sink_byte_stream_size < this.channels*this.samples*this.width/8) begin
+            if (this.transfer_type == CYCLIC) begin
+              byte_streams_empty_sig = 1;
+              ->>byte_streams_empty;
+            end else begin
+              if ((this.source_byte_stream_size == 0)) begin
+                byte_streams_empty_sig = 1;
+                ->>byte_streams_empty;
+              end
+            end
           end
           fork begin
             fork

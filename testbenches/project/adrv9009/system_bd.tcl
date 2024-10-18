@@ -238,15 +238,8 @@ ad_connect rx_device_clk i_rx_jesd_exerciser/device_clk
 ad_connect rx_device_clk i_rx_jesd_exerciser/link_clk
 ad_connect ref_clk_ex i_rx_jesd_exerciser/ref_clk
 
-<<<<<<< HEAD:testbenches/project/adrv9009/system_bd.tcl
-set_property -dict [list CONFIG.NUM_MI {18}] [get_bd_cells axi_axi_interconnect]
-ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M17_AXI
-ad_connect sys_cpu_clk axi_axi_interconnect/M17_ACLK
-ad_connect sys_cpu_resetn axi_axi_interconnect/M17_ARESETN
-=======
 set_property -dict [list CONFIG.NUM_MI {3}] [get_bd_cells axi_axi_interconnect_1]
 ad_connect i_rx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect_1/M02_AXI
->>>>>>> 6a9fc8d (cpu_interconnect: Cascaded interconnect support):adrv9009/system_bd.tcl
 
 create_bd_port -dir O ex_rx_sync
 ad_connect ex_rx_sync i_rx_jesd_exerciser/rx_sync_0
@@ -265,15 +258,8 @@ ad_connect tx_device_clk i_tx_jesd_exerciser/device_clk
 ad_connect tx_link_clk i_tx_jesd_exerciser/link_clk
 ad_connect ref_clk_ex i_tx_jesd_exerciser/ref_clk
 
-<<<<<<< HEAD:testbenches/project/adrv9009/system_bd.tcl
-set_property -dict [list CONFIG.NUM_MI {19}] [get_bd_cells axi_axi_interconnect]
-ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M18_AXI
-ad_connect sys_cpu_clk axi_axi_interconnect/M18_ACLK
-ad_connect sys_cpu_resetn axi_axi_interconnect/M18_ARESETN
-=======
 set_property -dict [list CONFIG.NUM_MI {4}] [get_bd_cells axi_axi_interconnect_1]
 ad_connect i_tx_jesd_exerciser/S00_AXI_0 axi_axi_interconnect_1/M03_AXI
->>>>>>> 6a9fc8d (cpu_interconnect: Cascaded interconnect support):adrv9009/system_bd.tcl
 
 create_bd_port -dir I ex_tx_sync
 ad_connect ex_tx_sync i_tx_jesd_exerciser/tx_sync_0
@@ -301,15 +287,8 @@ ad_connect tx_os_device_clk i_tx_os_jesd_exerciser/device_clk
 ad_connect tx_os_device_clk i_tx_os_jesd_exerciser/link_clk
 ad_connect ref_clk_ex i_tx_os_jesd_exerciser/ref_clk
 
-<<<<<<< HEAD:testbenches/project/adrv9009/system_bd.tcl
-set_property -dict [list CONFIG.NUM_MI {20}] [get_bd_cells axi_axi_interconnect]
-ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_axi_interconnect/M19_AXI
-ad_connect sys_cpu_clk axi_axi_interconnect/M19_ACLK
-ad_connect sys_cpu_resetn axi_axi_interconnect/M19_ARESETN
-=======
 set_property -dict [list CONFIG.NUM_MI {5}] [get_bd_cells axi_axi_interconnect_1]
 ad_connect i_tx_os_jesd_exerciser/S00_AXI_0 axi_axi_interconnect_1/M04_AXI
->>>>>>> 6a9fc8d (cpu_interconnect: Cascaded interconnect support):adrv9009/system_bd.tcl
 
 create_bd_port -dir I ex_tx_os_sync
 ad_connect ex_tx_os_sync i_tx_os_jesd_exerciser/tx_sync_0

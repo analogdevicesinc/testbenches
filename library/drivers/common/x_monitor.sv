@@ -8,13 +8,16 @@ package x_monitor_pkg;
   import logger_pkg::*;
   import mailbox_pkg::*;
 
+
   class x_monitor extends xil_component;
 
     mailbox_c #(logic [7:0]) mailbox;
     protected semaphore semaphore_key;
     protected event transaction_event;
+    protected event scoreboard_event;
 
     protected bit enabled;
+
 
     // constructor
     function new(input string name);
@@ -35,7 +38,7 @@ package x_monitor_pkg;
 
     // event functions
     task transaction_captured();
-      ->>this.transaction_event;
+      ->this.transaction_event;
     endtask
 
     task wait_for_transaction_event();
@@ -44,41 +47,27 @@ package x_monitor_pkg;
 
     // run task
     task run();
-
       fork
         this.enabled = 1;
         get_transaction();
       join_none
+    endtask
 
-    endtask /* run */
-
-    // virtual functions
-    virtual function void set_sink_type(input bit sink_type);
-    endfunction
-
-    virtual function bit get_sink_type();
+    virtual function bit get_packet_type();
     endfunction
 
     virtual task get_transaction();
     endtask
 
-  endclass
+  endclass: x_monitor
 
-  typedef enum bit {
-    READ_OP = 1'b0,
-    WRITE_OP = 1'b1
-  } operation_type_t;
   
-  class x_axi_monitor #( type T, operation_type_t operation_type ) extends x_monitor;
-    // operation type: 1 - write
-    //                 0 - read
+  class x_axi_monitor #( type T, xil_axi_cmd_t operation_type ) extends x_monitor;
 
     // analysis port from the monitor
     protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
 
     protected T agent;
-
-    protected int axi_byte_stream_size;
 
     // constructor
     function new(input string name, T agent);
@@ -90,63 +79,72 @@ package x_monitor_pkg;
       this.agent = agent;
       this.axi_ap = this.agent.monitor.item_collected_port;
 
-      this.axi_byte_stream_size = 0;
+    endfunction: new
 
-    endfunction /* new */
+    // check if monitor is sending an entire packet at once
+    virtual function bit get_packet_type();
+      return 1;
+    endfunction: get_packet_type
 
-    // collect data from the DDR interface, all WRITE transaction are coming
-    // from the ADC and all READ transactions are going to the DAC
+    // collect data from an AXI4 interface
+    // to monitor both operations, use 2 monitors
     virtual task get_transaction();
 
       axi_monitor_transaction transaction;
       xil_axi_data_beat data_beat;
       xil_axi_strb_beat strb_beat;
+      int transaction_length;
       int num_bytes;
-      logic [7:0] axi_byte;
+      int valid_bytes;
+      logic [7:0] axi_packet [];
 
       forever begin
-        this.get_key();
         this.axi_ap.get(transaction);
-        if (bit'(transaction.get_cmd_type()) == operation_type) begin
-          this.put_key();
+        if (transaction.get_cmd_type() == operation_type) begin
           num_bytes = transaction.get_data_width()/8;
-          for (int i=0; i<(transaction.get_len()+1); i++) begin
+          transaction_length = transaction.get_len()+1;
+          
+          for (int i=0; i<transaction_length; i++) begin
             data_beat = transaction.get_data_beat(i);
             strb_beat = transaction.get_strb_beat(i);
-            for (int j=0; j<num_bytes; j++) begin
-              axi_byte = data_beat[j*8+:8];
-              // put each beat into byte queues
-              if (operation_type == READ_OP) begin
-                this.mailbox.put(axi_byte);
-                this.axi_byte_stream_size++;
-              end else if (strb_beat[j] || !this.agent.vif_proxy.C_AXI_HAS_WSTRB) begin
-                this.mailbox.put(axi_byte);
-                this.axi_byte_stream_size++;
-              end
-            end
-            `INFOV(("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), 100);
-            this.transaction_captured();
-            #1step;
-            #1step;
-            this.mailbox.flush();
-            this.axi_byte_stream_size = 0;
+            `INFOV(("Packet received: %h - %h", data_beat, strb_beat), 200);
+
+            valid_bytes = 0;
+            if (this.agent.vif_proxy.C_AXI_HAS_WSTRB && transaction.get_cmd_type() == XIL_AXI_WRITE) begin
+              for (int j=0; j<num_bytes; j++)
+                if (strb_beat[j])
+                  valid_bytes++;
+            end else
+              valid_bytes = num_bytes;
+            axi_packet = new [axi_packet.size()+valid_bytes] (axi_packet);
+            `INFOV(("Monitor packet length: %d", valid_bytes), 200);
+
+            for (int j=0; j<valid_bytes; j++)
+              axi_packet[axi_packet.size()-valid_bytes+j] = data_beat[j*8+:8];
           end
+          
+          this.get_key();
+          for (int i=0; i<axi_packet.size(); i++)
+            this.mailbox.put(axi_packet[i]);
+          this.put_key();
+          `INFOV(("Packet mail length: %d", this.mailbox.num()), 200);
+          this.transaction_captured();
+          #1;
+          this.get_key();
+          this.mailbox.flush();
+          this.put_key();
         end else begin
           this.axi_ap.write(transaction);
-          this.put_key();
-          #1step;
+          #1;
         end
       end
 
-    endtask /* get_transaction */
+    endtask: get_transaction
 
-  endclass
+  endclass: x_axi_monitor
 
 
   class x_axis_monitor #( type T) extends x_monitor;
-
-    typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
-    protected sink_type_t tx_sink_type;
 
     // analysis port from the monitor
     protected xil_analysis_port #(axi4stream_monitor_transaction) axis_ap;
@@ -159,40 +157,26 @@ package x_monitor_pkg;
       super.new(name);
 
       this.enabled = 0;
-      this.tx_sink_type = CYCLIC;
 
       this.agent = agent;
       this.axis_ap = this.agent.monitor.item_collected_port;
 
-    endfunction /* new */
+    endfunction: new
 
-    // set sink type
-    virtual function void set_sink_type(input bit sink_type);
+    // check if monitor is sending an entire packet at once
+    virtual function bit get_packet_type();
+      return this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_LAST];
+    endfunction: get_packet_type
 
-      if (!this.enabled) begin
-        this.tx_sink_type = sink_type_t'(sink_type);
-      end else begin
-        `ERROR(("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
-      end
-
-    endfunction
-
-    // get sink type
-    virtual function bit get_sink_type();
-
-      return this.tx_sink_type;
-
-    endfunction
-
-    // collect data from the AXI4Strean interface of the stub, this task
-    // handles both ONESHOT and CYCLIC scenarios
+    // collect data from the AXI4Stream interface of the stub
     virtual task get_transaction();
 
       axi4stream_transaction transaction;
       xil_axi4stream_data_beat data_beat;
       xil_axi4stream_strb_beat keep_beat;
       int num_bytes;
-      logic [7:0] axi_byte;
+      int valid_bytes;
+      logic [7:0] axi_packet [];
 
       forever begin
         this.axis_ap.get(transaction);
@@ -200,19 +184,38 @@ package x_monitor_pkg;
         num_bytes = transaction.get_data_width()/8;
         data_beat = transaction.get_data_beat();
         keep_beat = transaction.get_keep_beat();
-        for (int j=0; j<num_bytes; j++) begin
-          axi_byte = data_beat[j*8+:8];
-          if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
-            this.mailbox.put(axi_byte);
+        `INFOV(("Packet received: %h - %h", data_beat, keep_beat), 200);
+
+        valid_bytes = 0;
+        if (this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP]) begin
+          for (int i=0; i<num_bytes; i++)
+            if (keep_beat[i])
+              valid_bytes++;
+        end else
+          valid_bytes = num_bytes;
+        axi_packet = new [axi_packet.size()+valid_bytes] (axi_packet);
+        `INFOV(("Monitor packet length: %d", valid_bytes), 200);
+        
+        for (int i=0; i<valid_bytes; i++)
+          axi_packet[axi_packet.size()-valid_bytes+i] = data_beat[i*8+:8];
+        
+        if (transaction.get_last()) begin
+          this.get_key();
+          for (int i=0; i<axi_packet.size(); i++)
+            this.mailbox.put(axi_packet[i]);
+          this.put_key();
+          `INFOV(("Packet mail length: %d", this.mailbox.num()), 200);
+          axi_packet = new [0];
+          this.transaction_captured();
+          #1;
+          this.get_key();
+          this.mailbox.flush();
+          this.put_key();
         end
-        `INFOV(("Caught an AXI4 stream transaction: %d", this.mailbox.num()), 100);
-        this.transaction_captured();
-        #1step;
-        this.mailbox.flush();
       end
 
-    endtask /* get_transaction */
+    endtask: get_transaction
 
-  endclass
+  endclass: x_axis_monitor
 
 endpackage

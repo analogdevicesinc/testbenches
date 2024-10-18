@@ -104,7 +104,7 @@ module system_tb();
       end
     end
 
-    assign num_chs = (ADC_N_BITS == 16) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
+    assign num_chs = (`ADC_N_BITS == 16) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
     assign rx_busy = (~rx_cnvst_n & rx_cnvst_n_d) ? 1'b1 : 1'b0;
     assign rx_ch_count = rx_ch_count_d;
     assign rx_data_ready = (~rx_rd_n & rx_rd_n_d) ? 1'b1 : 1'b0;
@@ -117,6 +117,7 @@ module system_tb();
       wire                   ad7606_spi_sdo;
       wire [`NUM_OF_SDI-1:0] ad7606_spi_sdi;
       wire                   ad7606_spi_cs;
+      wire                   spi_clk;
       wire                   adc_busy;
       wire                   adc_cnvst_n;
       wire                   ad7606_irq;

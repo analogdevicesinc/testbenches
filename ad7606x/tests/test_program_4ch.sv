@@ -121,7 +121,7 @@ initial begin
   #100
 
   sanity_test();
-  
+
   #100 adc_config_number_of_channels();
 
   #100 adc_config_SIMPLE_test();

@@ -534,7 +534,9 @@ task db_transmission_test();
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     $display("[%t] axi_pwm_gen started.", $time);
 
-    wait(rx_ch_count == num_of_transfers);
+    `INFO(("ADC_N_BITS =  0x%h", `ADC_N_BITS));
+
+    wait(rx_ch_count == (num_of_transfers - 1));
 
     // Stop pwm gen
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));

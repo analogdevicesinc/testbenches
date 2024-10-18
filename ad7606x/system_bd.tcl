@@ -73,6 +73,10 @@ if {$INTF == 0} {
   ad_connect ad7606_irq spi_ad7606/irq
 
   set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ad7606_axi_regmap}]
+
+  set BA_CLKGEN 0x44A70000
+  set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
+  adi_sim_add_define "AD7606X_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
 }
 
 set BA_DMA 0x44A30000
@@ -83,7 +87,7 @@ set BA_PWM 0x44A60000
 set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad7606_pwm_gen}]
 adi_sim_add_define "AXI_PWMGEN_BA=[format "%d" ${BA_PWM}]"
 
-set BA_CLKGEN 0x44A70000
-set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
-adi_sim_add_define "AD7606X_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
+#set BA_CLKGEN 0x44A70000
+#set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
+#adi_sim_add_define "AD7606X_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
 

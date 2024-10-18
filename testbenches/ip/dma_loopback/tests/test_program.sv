@@ -104,12 +104,12 @@ program test_program;
     //   `rx_dma_cfg_DMA_DATA_WIDTH_SRC,
     //   `rx_dma_cfg_DMA_DATA_WIDTH_DEST};
 
-    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA);
+    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA_BA);
     m_dmac_api.probe();
 
     // `INFO(("Parameter test example: %d", m_dmac_api.params.DMA_DATA_WIDTH_SRC));
 
-    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA);
+    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA_BA);
     s_dmac_api.probe();
 
     // `INFO(("Parameter test example: %d", s_dmac_api.params.DMA_DATA_WIDTH_SRC));

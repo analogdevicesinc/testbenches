@@ -52,9 +52,11 @@ set device_clk device_clk_vip/clk_out
 
 global ad_project_params
 
-ad_ip_instance axi_dmac dut_rx_dma $ad_project_params(rx_dma_cfg)
+set rx_dma_cfg $ad_project_params(rx_dma_cfg)
+set tx_dma_cfg $ad_project_params(tx_dma_cfg)
 
-ad_ip_instance axi_dmac dut_tx_dma $ad_project_params(tx_dma_cfg)
+ad_ip_instance axi_dmac dut_rx_dma $rx_dma_cfg
+ad_ip_instance axi_dmac dut_tx_dma $tx_dma_cfg
 
 foreach {k v} $rx_dma_cfg {
   adi_sim_add_define "rx_dma_cfg_${k}=${v}"

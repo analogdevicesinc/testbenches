@@ -1,5 +1,5 @@
-source ../scripts/adi_sim.tcl
-source ../../scripts/adi_env.tcl
+source ../../../scripts/adi_sim.tcl
+source ../../../../scripts/adi_env.tcl
 source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
 if {$argc < 1} {
@@ -20,22 +20,22 @@ adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
 # Add test files to the project
 adi_sim_project_files [list \
- "../common/sv/utils.svh" \
- "../common/sv/logger_pkg.sv" \
- "../common/sv/reg_accessor.sv" \
- "../common/sv/m_axis_sequencer.sv" \
- "../common/sv/s_axis_sequencer.sv" \
- "../common/sv/m_axi_sequencer.sv" \
- "../common/sv/s_axi_sequencer.sv" \
- "../common/sv/adi_peripheral_pkg.sv" \
- "../common/sv/adi_regmap_pkg.sv" \
- "../common/sv/test_harness_env.sv" \
- "../common/sv/mailbox.sv" \
- "../common/sv/x_monitor.sv" \
- "../common/sv/scoreboard.sv" \
- "../common/sv/dmac_api.sv" \
- "../common/sv/dma_trans.sv" \
- "../common/sv/adi_regmap_dmac_pkg.sv" \
+ "../../../library/utilities/utils.svh" \
+ "../../../library/utilities/logger_pkg.sv" \
+ "../../../library/regmaps/reg_accessor.sv" \
+ "../../../library/vip/amd/m_axis_sequencer.sv" \
+ "../../../library/vip/amd/s_axis_sequencer.sv" \
+ "../../../library/vip/amd/m_axi_sequencer.sv" \
+ "../../../library/vip/amd/s_axi_sequencer.sv" \
+ "../../../library/regmaps/adi_peripheral_pkg.sv" \
+ "../../../library/regmaps/adi_regmap_pkg.sv" \
+ "../../../library/utilities/test_harness_env.sv" \
+ "../../../library/drivers/common/mailbox.sv" \
+ "../../../library/drivers/common/x_monitor.sv" \
+ "../../../library/drivers/common/scoreboard.sv" \
+ "../../../library/drivers/dmac/dmac_api.sv" \
+ "../../../library/drivers/dmac/dma_trans.sv" \
+ "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \
  "environment.sv" \
  "tests/test_program.sv" \
  "system_tb.sv" \

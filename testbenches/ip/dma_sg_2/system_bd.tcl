@@ -35,7 +35,7 @@
 
 global ad_hdl_dir
 
-source ../../scripts/adi_env.tcl
+source ../../../../scripts/adi_env.tcl
 
 global ad_project_params
 

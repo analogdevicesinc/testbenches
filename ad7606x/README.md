@@ -26,10 +26,10 @@ Where:
  * <name of test> is a file from the tests directory without the tcl extension
 
 ** NOTE
- * cfg_p_16b_4ch - AD7605-4/AD7606-4 device selected;                   INTF=0, ADC_N_BITS=16, NUM_OF_CH=4;
- * cfg_p_16b_6ch - AD7606-6 device selected;                            INTF=0, ADC_N_BITS=16, NUM_OF_CH=6;
- * cfg_p_16b_8ch - AD76006B/AD7606C-16/AD7606-8/AD7607 device selected; INTF=0, ADC_N_BITS=16, NUM_OF_CH=8;
- * cfg_p_18b_8ch - AD7606C-18/AD7608/AD7609 device selected;            INTF=0, ADC_N_BITS=18, NUM_OF_CH=8;
+ * cfg_p_16b_4ch - AD7605-4/AD7606-4 device selected;                   INTF=0, ADC_N_BITS=16;
+ * cfg_p_16b_6ch - AD7606-6 device selected;                            INTF=0, ADC_N_BITS=16;
+ * cfg_p_16b_8ch - AD76006B/AD7606C-16/AD7606-8/AD7607 device selected; INTF=0, ADC_N_BITS=16;
+ * cfg_p_18b_8ch - AD7606C-18/AD7608/AD7609 device selected;            INTF=0, ADC_N_BITS=18;
  * cfg_s_sdi1    - any device selected;                                 INTF=1, NUM_OF_SDI=1;
  * cfg_s_sdi2    - any device selected;                                 INTF=1, NUM_OF_SDI=2;
  * cfg_s_sdi4    - AD7606B/AD7606C-16/AD7606C-18;                       INTF=1, NUM_OF_SDI=4;

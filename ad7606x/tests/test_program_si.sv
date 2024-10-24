@@ -47,6 +47,10 @@ import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
+`ifndef AD7606X_AXI_CLKGEN_BA
+`define AD7606X_AXI_CLKGEN_BA
+`endif
+
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------

@@ -39,7 +39,6 @@ source ../../scripts/adi_env.tcl
 set INTF  $ad_project_params(INTF)
 set ADC_N_BITS $ad_project_params(ADC_N_BITS)
 set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
-set NUM_OF_CH $ad_project_params(NUM_OF_CH)
 
 global ad_project_params
 
@@ -86,8 +85,3 @@ adi_sim_add_define "AD7606X_DMA_BA=[format "%d" ${BA_DMA}]"
 set BA_PWM 0x44A60000
 set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad7606_pwm_gen}]
 adi_sim_add_define "AXI_PWMGEN_BA=[format "%d" ${BA_PWM}]"
-
-#set BA_CLKGEN 0x44A70000
-#set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
-#adi_sim_add_define "AD7606X_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
-

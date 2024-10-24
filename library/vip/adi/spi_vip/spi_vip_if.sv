@@ -47,9 +47,6 @@ interface spi_vip_if #(
       CS_TO_MISO        = 0,
       DEFAULT_MISO_DATA = 'hCAFE
 ) ();
-
-  //import logger_pkg::*;
-
   logic sclk;
   wire  miso; // need net types here in case tb wants to tristate this
   wire  mosi; // need net types here in case tb wants to tristate this

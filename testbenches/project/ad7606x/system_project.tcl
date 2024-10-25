@@ -15,6 +15,17 @@ source "cfgs/${cfg_file}"
 # Set the project name
 set project_name [file rootname $cfg_file]
 
+# Set project params
+
+global ad_project_params
+
+set INTF $ad_project_params(INTF)
+set ADC_N_BITS $ad_project_params(ADC_N_BITS)
+set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
+
+#set a default test program
+adi_sim_add_define "TEST_PROGRAM=test_program_si"
+
 # Create the project
 adi_sim_project_xilinx $project_name "xc7z020clg484-1"
 
@@ -30,15 +41,17 @@ adi_sim_project_files [list \
  "../../../library/drivers/dmac/dmac_api.sv" \
  "../../../library/regmaps/adi_regmap_pkg.sv" \
  "../../../library/regmaps/adi_regmap_adc_pkg.sv" \
+ "../../../library/regmaps/adi_regmap_clkgen_pkg.sv" \
  "../../../library/regmaps/adi_regmap_common_pkg.sv" \
  "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \
  "../../../library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
+ "../../../library/regmaps/adi_regmap_spi_engine_pkg.sv" \
  "../../../library/drivers/dmac/dma_trans.sv" \
  "../../../library/utilities/test_harness_env.sv" \
- "tests/test_program.sv" \
+ "tests/test_program_8ch.sv" \
+ "tests/test_program_4ch.sv" \
+ "tests/test_program_6ch.sv" \
+ "tests/test_program_si.sv" \
  "system_tb.sv"]
-
-#set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_program"
 
 adi_sim_generate $project_name

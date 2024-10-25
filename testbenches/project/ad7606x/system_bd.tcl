@@ -36,8 +36,9 @@
 source ../../../../scripts/adi_env.tcl
 
 # system level parameters
-set DEV_CONFIG  $ad_project_params(DEV_CONFIG)
-set EXT_CLK $ad_project_params(EXT_CLK)
+set INTF  $ad_project_params(INTF)
+set ADC_N_BITS $ad_project_params(ADC_N_BITS)
+set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
 
 global ad_project_params
 
@@ -56,8 +57,26 @@ create_bd_port -dir O sys_clk
 ad_connect sys_clk sys_cpu_clk
 
 set BA_AD7606X 0x44A00000
-set_property offset $BA_AD7606X [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad7606x}]
 adi_sim_add_define "AXI_AD7606X_BA=[format "%d" ${BA_AD7606X}]"
+
+set BA_SPI_REGMAP 0x44A00000
+adi_sim_add_define "SPI_AD7606_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
+
+if {$INTF == 0} {
+  set_property offset $BA_AD7606X [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad7606x}]
+} else {
+  create_bd_port -dir O spi_clk
+  ad_connect spi_clk spi_clkgen/clk_0
+
+  create_bd_port -dir O ad7606_irq
+  ad_connect ad7606_irq spi_ad7606/irq
+
+  set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ad7606_axi_regmap}]
+
+  set BA_CLKGEN 0x44A70000
+  set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
+  adi_sim_add_define "AD7606X_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
+}
 
 set BA_DMA 0x44A30000
 set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad7606x_dma}]

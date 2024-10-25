@@ -135,6 +135,16 @@ package s_axis_sequencer_pkg;
       end
     endtask
 
+    // function for popping bytes that the test doesn't care about
+    task get_byte(
+        output bit [7:0] data);
+      if (byte_stream.size() == 0) begin
+        `ERROR(("Byte steam empty !!!"));
+      end else begin
+        data = byte_stream.pop_front();
+      end
+    endtask
+
     // call ready generation function
     task run();
       user_gen_tready();

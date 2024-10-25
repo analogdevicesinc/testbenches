@@ -38,74 +38,109 @@
 `include "utils.svh"
 
 module system_tb();
-  wire [1:0]  adc_config_mode;
-  wire        rx_cnvst_n;
-  wire        rx_busy;
-  wire [15:0] rx_db_i;
-  wire [15:0] rx_db_o;
-  wire        rx_db_t;
-  wire        rx_rd_n;
-  wire        rx_wr_n;
-  wire        rx_cs_n;
-  wire        rx_first_data;
-  wire        rx_data_ready;
-  wire [3:0]  rx_ch_count;
-  wire        sys_clk;
+ generate
+  if (`INTF == 0) begin //parallel interface
+    wire [1:0]  adc_config_mode;
+    wire        rx_cnvst_n;
+    wire        rx_busy;
+    wire [15:0] rx_db_i;
+    wire [15:0] rx_db_o;
+    wire        rx_db_t;
+    wire        rx_rd_n;
+    wire        rx_wr_n;
+    wire        rx_cs_n;
+    wire        rx_first_data;
+    wire        rx_data_ready;
+    wire [3:0]  rx_ch_count;
+    wire        sys_clk;
 
-  reg         rx_cnvst_n_d = 1'b0;
-  reg         rx_rd_n_d = 1'b0;
-  reg [3:0]   rx_ch_count_d = 4'b0;
+    reg         rx_cnvst_n_d = 1'b0;
+    reg         rx_rd_n_d = 1'b0;
+    reg [3:0]   rx_ch_count_d = 4'b0;
 
-  wire [4:0] num_chs;
+    wire [4:0] num_chs;
 
-  parameter DEV_CONFIG = 0;
-  localparam NEG_EDGE = 1;
+    parameter ADC_N_BITS = 16;
+    localparam NEG_EDGE = 1;
 
-  `TEST_PROGRAM test(
-    .adc_config_mode (adc_config_mode),
-    .rx_cnvst_n (rx_cnvst_n),
-    .rx_busy (rx_busy),
-    .rx_db_i (rx_db_i),
-    .rx_db_o (rx_db_o),
-    .rx_db_t (rx_db_t),
-    .rx_rd_n (rx_rd_n),
-    .rx_wr_n (rx_wr_n),
-    .rx_cs_n (rx_cs_n),
-    .rx_first_data (rx_first_data),
-    .rx_data_ready (rx_data_ready),
-    .rx_ch_count (rx_ch_count),
-    .sys_clk (sys_clk));
+    `TEST_PROGRAM test(
+      .adc_config_mode (adc_config_mode),
+      .rx_cnvst_n (rx_cnvst_n),
+      .rx_busy (rx_busy),
+      .rx_db_i (rx_db_i),
+      .rx_db_o (rx_db_o),
+      .rx_db_t (rx_db_t),
+      .rx_rd_n (rx_rd_n),
+      .rx_wr_n (rx_wr_n),
+      .rx_cs_n (rx_cs_n),
+      .rx_first_data (rx_first_data),
+      .rx_data_ready (rx_data_ready),
+      .rx_ch_count (rx_ch_count),
+      .sys_clk (sys_clk));
 
-  test_harness `TH (
-    .rx_cnvst_n (rx_cnvst_n),
-    .rx_busy (rx_busy),
-    .rx_db_i (rx_db_i),
-    .rx_db_o (rx_db_o),
-    .rx_db_t (rx_db_t),
-    .rx_rd_n (rx_rd_n),
-    .rx_wr_n (rx_wr_n),
-    .rx_cs_n (rx_cs_n),
-    .rx_first_data (rx_first_data),
-    .sys_clk (sys_clk));
+    test_harness `TH (
+      .rx_cnvst_n (rx_cnvst_n),
+      .rx_busy (rx_busy),
+      .rx_db_i (rx_db_i),
+      .rx_db_o (rx_db_o),
+      .rx_db_t (rx_db_t),
+      .rx_rd_n (rx_rd_n),
+      .rx_wr_n (rx_wr_n),
+      .rx_cs_n (rx_cs_n),
+      .rx_first_data (rx_first_data),
+      .sys_clk (sys_clk));
 
-  always @(posedge sys_clk) begin
-    rx_cnvst_n_d <= rx_cnvst_n;
-    rx_rd_n_d <= rx_rd_n;
-  end
-
-  always @(posedge sys_clk) begin
-    if (~rx_rd_n & rx_rd_n_d) begin
-      rx_ch_count_d <= rx_ch_count_d  + 1;
+    always @(posedge sys_clk) begin
+      rx_cnvst_n_d <= rx_cnvst_n;
+      rx_rd_n_d <= rx_rd_n;
     end
-    if (rx_ch_count_d  == num_chs && (rx_rd_n & ~rx_rd_n_d)) begin // if ch_count is equal to number of channels to be read and is the rising_edge rd_n after last channel
-      rx_ch_count_d <= 0;
-    end
-  end
 
-  assign num_chs = (DEV_CONFIG == 0 || DEV_CONFIG == 1) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
-  assign rx_busy = (~rx_cnvst_n & rx_cnvst_n_d) ? 1'b1 : 1'b0;
-  assign rx_ch_count = rx_ch_count_d;
-  assign rx_data_ready = (~rx_rd_n & rx_rd_n_d) ? 1'b1 : 1'b0;
-  assign rx_first_data = (rx_ch_count_d == 1'b1) ? 1'b1 : 1'b0;
+    always @(posedge sys_clk) begin
+      if (~rx_rd_n & rx_rd_n_d) begin
+        rx_ch_count_d <= rx_ch_count_d  + 1;
+      end
+      if (rx_ch_count_d  == num_chs && (rx_rd_n & ~rx_rd_n_d)) begin // if ch_count is equal to number of channels to be read and is the rising_edge rd_n after last channel
+        rx_ch_count_d <= 0;
+      end
+    end
+
+    assign num_chs = (`ADC_N_BITS == 16) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
+    assign rx_busy = (~rx_cnvst_n & rx_cnvst_n_d) ? 1'b1 : 1'b0;
+    assign rx_ch_count = rx_ch_count_d;
+    assign rx_data_ready = (~rx_rd_n & rx_rd_n_d) ? 1'b1 : 1'b0;
+    assign rx_first_data = (rx_ch_count_d == 1'b1) ? 1'b1 : 1'b0;
+
+  end
+  else //serial interface
+  begin
+      wire                   ad7606_spi_sclk;
+      wire                   ad7606_spi_sdo;
+      wire [`NUM_OF_SDI-1:0] ad7606_spi_sdi;
+      wire                   ad7606_spi_cs;
+      wire                   spi_clk;
+      wire                   adc_busy;
+      wire                   adc_cnvst_n;
+      wire                   ad7606_irq;
+
+    `TEST_PROGRAM test(
+      .spi_clk (spi_clk),
+      .ad7606_irq (ad7606_irq),
+      .ad7606_spi_sdi(ad7606_spi_sdi),
+      .ad7606_spi_cs (ad7606_spi_cs),
+      .ad7606_spi_sclk (ad7606_spi_sclk));
+
+    test_harness `TH (
+      .spi_clk (spi_clk),
+      .ad7606_irq (ad7606_irq),
+      .rx_busy (adc_busy),
+      .rx_cnvst_n (adc_cnvst_n),
+      .ad7606_spi_sdo (ad7606_spi_sdo),
+      .ad7606_spi_sdi (ad7606_spi_sdi),
+      .ad7606_spi_cs (ad7606_spi_cs),
+      .ad7606_spi_sclk (ad7606_spi_sclk));
+
+      assign adc_busy = adc_cnvst_n;
+    end
+    endgenerate
 
 endmodule

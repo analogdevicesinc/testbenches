@@ -15,10 +15,10 @@ desired). Furthermore, all ADI developed and supported IPs are presented in deta
 At the same time, the user guides are not intended to be a guide for any third
 party tool. To understand and use the HDL framework efficiently the user needs
 to have a **solid understanding on how an FPGA works, to be familiar with all
-the design tools and flows, testbenches, SystemVerilog and classes**. These
-testbenches are not using UVM, however, some ideas are used from the
-verification standard, meaning that a high level overview of UVM can be useful
-in understanding the design structure.
+the design tools and flows, testbenches, SystemVerilog and object-oriented
+programming (OOP)**. These testbenches are not using UVM, however, some ideas
+are used from the verification standard, meaning that a high level overview
+of UVM can be useful in understanding the design structure.
 
 If somebody does not have this knowledge we highly recommend to make some
 general research and go through some basic tutorials with the targeted

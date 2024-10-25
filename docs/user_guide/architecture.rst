@@ -8,17 +8,23 @@ File structure of a project
 
 .. tip::
 
-   In ``base/`` you can find a test bench base design.
+   In ``testbenches/ip/base/`` you can find a test bench base design.
 
 Project files for test benches
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  ``library`` --- common files that are used in many projects
 
-    -   ``adi_vip`` --- ADI VIPs
-    -   ``ips`` --- IPs
-    -   ``utilities`` --- ADI Utilities
-    -   ``xilinx_vip`` --- Xilinx VIPs
+    -  ``drivers`` --- drivers and APIs used for controlling IPs as well as VIPs;
+       these modules can use register map files, VIPs and other APIs
+    -  ``regmaps`` ---  register map files created for simulations based on the
+       HDL IP register maps along with a couple of utility files; these are macro
+       functions that are used to access a specific IP's register's field in a
+       given variable that is passed to these functions
+    -  ``utilities`` --- common scripts, modules and macros that are used for
+       testbench design and environment creation
+    -  ``vip`` --- ADI verification IPs (VIP) and additional auxiliary classes
+       which are vendor specific
 
 -  ``scripts`` --- used for creating and running the testbenches
 

@@ -46,6 +46,7 @@ import logger_pkg::*;
 import ad57xx_environment_pkg::*;
 import spi_engine_instr_pkg::*;
 import adi_spi_vip_pkg::*;
+import spi_engine_api_pkg::*;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -61,35 +62,12 @@ timeprecision 100ps;
 typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
 
 ad57xx_environment env;
-
-// --------------------------
-// Wrapper function for AXI read verify
-// --------------------------
-task axi_read_v(
-    input   [31:0]  raddr,
-    input   [31:0]  vdata);
-  env.mng.RegReadVerify32(raddr,vdata);
-endtask
-
-task axi_read(
-    input   [31:0]  raddr,
-    output  [31:0]  data);
-  env.mng.RegRead32(raddr,data);
-endtask
-
-// --------------------------
-// Wrapper function for AXI write
-// --------------------------
-task axi_write(
-    input [31:0]  waddr,
-    input [31:0]  wdata);
-  env.mng.RegWrite32(waddr,wdata);
-endtask
+spi_engine_api spi_api;
 
 // --------------------------
 // Wrapper function for SPI receive (from DUT)
 // --------------------------
-task spi_receive(
+task spi_vip_receive(
     output [`DATA_DLENGTH:0]  data);
   env.spi_seq.receive_data(data);
 endtask
@@ -97,7 +75,7 @@ endtask
 // --------------------------
 // Wrapper function for SPI send (to DUT)
 // --------------------------
-task spi_send(
+task spi_vip_send(
     input [`DATA_DLENGTH:0]  data);
   env.spi_seq.send_data(data);
 endtask
@@ -105,11 +83,9 @@ endtask
 // --------------------------
 // Wrapper function for waiting for all SPI
 // --------------------------
-task spi_wait_send();
+task spi_vip_wait_send();
   env.spi_seq.flush_send();
 endtask
-
-
 
 // --------------------------
 // Main procedure
@@ -124,6 +100,8 @@ initial begin
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
             `TH.`SPI_S.inst.IF);
+
+  spi_api = new("SPI_ENG", env.mng, `SPI_ENGINE_SPI_REGMAP_BA);
 
   setLoggerVerbosity(6);
   env.start();
@@ -155,9 +133,9 @@ task sanity_test();
   bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
-  axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
-  axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  spi_api.check_version(pcore_version);
+  spi_api.write_scratch(32'hDEADBEEF);
+  spi_api.check_scratch(32'hDEADBEEF);
   `INFO(("Sanity Test Done"));
 endtask
 
@@ -182,14 +160,13 @@ task generate_transfer_cmd(
     end
   endcase
   // assert CSN
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFE));
+  spi_api.write_fifo_instr(`SET_CS(8'hFE));
   // transfer data
-
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), transfer_instr);
+  spi_api.write_fifo_instr(transfer_instr);
   // de-assert CSN
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));
+  spi_api.write_fifo_instr(`SET_CS(8'hFF));
   // SYNC command to generate interrupt
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
+  spi_api.write_fifo_instr((`INST_SYNC | sync_id));
   `INFOV(("Transfer generation finished."), 6);
 endtask
 
@@ -204,16 +181,15 @@ initial begin
   forever begin
     @(posedge ad57xx_spi_irq);
     // read pending IRQs
-
-    axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    spi_api.get_pending_irq(irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
-      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      spi_api.get_sync_id(sync_id);
       `INFOV(("Offload SYNC %d IRQ. An offload transfer just finished.",  sync_id), 6);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
-      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      spi_api.get_sync_id(sync_id);
       `INFOV(("SYNC %d IRQ. FIFO transfer just finished.", sync_id),6);
     end
     // IRQ launched by SDI FIFO
@@ -229,7 +205,7 @@ initial begin
       `INFOV(("CMD FIFO IRQ."),6);
     end
     // Clear all pending IRQs
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    spi_api.clear_irq(irq_pending);
   end
 end
 
@@ -264,11 +240,11 @@ task offload_spi_test(
     endcase
     temp_data = {4'b0001,dac_word,2'b00};
     sdo_write_data_store [i] = temp_data;
-
+    // store dac payload in memory for streaming to DUT
     env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(.addr(`DDR_BA + 4*i),
                                                   .payload(temp_data),
                                                   .strb('1));
-    spi_send('0);
+    spi_vip_send('0);
   end
 
   //Configure TX DMA
@@ -282,26 +258,25 @@ task offload_spi_test(
   env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   // Configure the Offload module
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+  spi_api.write_offload_instr(`INST_CFG);
+  spi_api.write_offload_instr(`INST_PRESCALE);
+  spi_api.write_offload_instr(`INST_DLENGTH);
   if (`CS_ACTIVE_HIGH) begin
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+    spi_api.write_offload_instr(`SET_CS_INV_MASK(8'hFF));
   end
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+  spi_api.write_offload_instr(`SET_CS(8'hFE));
+  spi_api.write_offload_instr(`INST_WR);
+  spi_api.write_offload_instr(`SET_CS(8'hFF));
+  spi_api.write_offload_instr(`INST_SYNC | 2);
 
   // Start the offload
   #100ns
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+  spi_api.enable_offload();
   `INFOV(("Offload started."),6);
 
-  spi_wait_send();
+  spi_vip_wait_send();
 
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-
+  spi_api.disable_offload();
   `INFOV(("Offload stopped."),6);
 
   #2000ns
@@ -313,7 +288,7 @@ task offload_spi_test(
   end
 
   for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-    spi_receive(sdo_write_data[i]);
+    spi_vip_receive(sdo_write_data[i]);
     if (sdo_write_data[i] != sdo_write_data_store[i]) begin
       `INFOV(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]),6);
       `ERROR(("Offload Write Test FAILED"));
@@ -332,55 +307,52 @@ task config_spi();
   bit [23:0] cfg_readback;
 
   // Start spi clk generator
-  axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+  env.mng.RegWrite32(`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
     `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
     );
 
   // Config pwm
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  env.mng.RegWrite32(`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  env.mng.RegWrite32(`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
+  env.mng.RegWrite32(`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   `INFOV(("axi_pwm_gen started."),6);
 
   // Enable SPI Engine
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+  spi_api.enable_spi();
 
   // Enable SDO Offload
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + 'h10C,  1); // TODO: use regmap
+  spi_api.enable_sdo_streaming();
 
   // Configure the execution module
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
+  spi_api.write_fifo_instr(`INST_CFG);
+  spi_api.write_fifo_instr(`INST_PRESCALE);
+  spi_api.write_fifo_instr(`INST_DLENGTH);
   if (`CS_ACTIVE_HIGH) begin
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
+    spi_api.write_fifo_instr(`SET_CS_INV_MASK(8'hFF));
   end
 
   // Set up the interrupts
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
-    `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
-    `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
-    );
+  spi_api.set_irq_mask(5'b11000); // SYNC_EVENT | OFFLOAD_SYNC_ID_PENDING
 
   #100ns
 
   //  Write ad57xx control register
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (24'h200002));
+  spi_api.write_sdo_fifo(24'h200002);
   generate_transfer_cmd(1,2'b10); // write-only
 
   // Read ad57xx control register
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (24'hA00000));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (24'h000000));
+  spi_api.write_sdo_fifo(24'hA00000);
+  spi_api.write_sdo_fifo(24'h000000);
   generate_transfer_cmd(1,2'b10); // one write-only, then one write-read (writing 0 for nop)
-  spi_send(24'hA00002);
+  spi_vip_send(24'hA00002);
   generate_transfer_cmd(1,2'b11);
 
-  spi_wait_send();
+  spi_vip_wait_send();
 
-  repeat (3) spi_receive(temp_data);
+  repeat (3) spi_vip_receive(temp_data);
 
-  axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), cfg_readback);
+  spi_api.read_sdi_fifo(cfg_readback);
 
   if (cfg_readback !== 24'hA00002) begin
     `INFOV(("cfg_readback: %x; expected 'hA00002", cfg_readback),6);

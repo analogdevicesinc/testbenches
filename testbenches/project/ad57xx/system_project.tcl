@@ -33,6 +33,8 @@ adi_sim_project_files [list \
   "../../../library/vip/adi/spi_vip/adi_spi_vip_pkg.sv" \
   "../../../library/vip/adi/spi_vip/s_spi_sequencer.sv" \
   "../../../library/drivers/dmac/dmac_api.sv" \
+  "../../../library/drivers/spi_engine/spi_engine_api.sv" \
+  "../../../library/regmaps/adi_peripheral_pkg.sv" \
   "../../../library/regmaps/adi_regmap_pkg.sv" \
   "../../../library/regmaps/adi_regmap_clkgen_pkg.sv" \
   "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \

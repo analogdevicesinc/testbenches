@@ -15,6 +15,7 @@ SV_DEPS += ../../../library/vip/amd/s_axi_sequencer.sv
 SV_DEPS += ../../../library/vip/adi/spi_vip/s_spi_sequencer.sv
 SV_DEPS += ../../../library/vip/adi/spi_vip/adi_spi_vip_pkg.sv
 SV_DEPS += ../../../library/drivers/dmac/dmac_api.sv
+SV_DEPS += ../../../library/drivers/spi_engine/spi_engine_api.sv
 SV_DEPS += ../../../library/regmaps/adi_regmap_pkg.sv
 SV_DEPS += ../../../library/regmaps/adi_regmap_clkgen_pkg.sv
 SV_DEPS += ../../../library/regmaps/adi_regmap_dmac_pkg.sv

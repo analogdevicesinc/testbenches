@@ -107,13 +107,13 @@ package dma_trans_pkg;
     //
     // -----------------
     virtual function void print();
-      `INFO(("--------------------------"));
-      `INFO(("src_addr is 0x%h",src_addr));
-      `INFO(("dst_addr is 0x%h",dst_addr));
-      `INFO(("length   is %0d",length));
-      `INFO(("first    is %0d",first));
-      `INFO(("last     is %0d",last));
-      `INFO(("skip     is %0d",skip));
+      `INFO(("--------------------------"), ADI_VERBOSITY_DEBUG);
+      `INFO(("src_addr is 0x%h",src_addr), ADI_VERBOSITY_DEBUG);
+      `INFO(("dst_addr is 0x%h",dst_addr), ADI_VERBOSITY_DEBUG);
+      `INFO(("length   is %0d",length), ADI_VERBOSITY_DEBUG);
+      `INFO(("first    is %0d",first), ADI_VERBOSITY_DEBUG);
+      `INFO(("last     is %0d",last), ADI_VERBOSITY_DEBUG);
+      `INFO(("skip     is %0d",skip), ADI_VERBOSITY_DEBUG);
     endfunction
 
     // -----------------
@@ -174,7 +174,7 @@ package dma_trans_pkg;
     // -----------------
     virtual function void print();
       super.print();
-      `INFO(("partial length is %0d", reduced_length));
+      `INFO(("partial length is %0d", reduced_length), ADI_VERBOSITY_DEBUG);
     endfunction
 
     // length resolution
@@ -266,9 +266,9 @@ package dma_trans_pkg;
     // -----------------
     virtual function void print();
       super.print();
-      `INFO(("ylength    is %0d", ylength));
-      `INFO(("src_stride is 0x%0h", src_stride));
-      `INFO(("dst_stride is 0x%0h", dst_stride));
+      `INFO(("ylength    is %0d", ylength), ADI_VERBOSITY_DEBUG);
+      `INFO(("src_stride is 0x%0h", src_stride), ADI_VERBOSITY_DEBUG);
+      `INFO(("dst_stride is 0x%0h", dst_stride), ADI_VERBOSITY_DEBUG);
     endfunction
 
     // -----------------
@@ -348,8 +348,8 @@ package dma_trans_pkg;
     // -----------------
     virtual function void print();
       super.print();
-      `INFO(("partial_segment_no is %0d", partial_segment_no));
-      `INFO(("reduced_length is %0d", reduced_length));
+      `INFO(("partial_segment_no is %0d", partial_segment_no), ADI_VERBOSITY_DEBUG);
+      `INFO(("reduced_length is %0d", reduced_length), ADI_VERBOSITY_DEBUG);
     endfunction
 
     // -----------------
@@ -372,7 +372,7 @@ package dma_trans_pkg;
           if (i != ylength-1)
             s.last = 0;
           sa[i] = s;
-          `INFO((" generating segment "));
+          `INFO((" generating segment "), ADI_VERBOSITY_DEBUG);
           s.print();
         end else begin
           ps = new(p);
@@ -384,7 +384,7 @@ package dma_trans_pkg;
           ps.last = 1;
           sa[i] = ps;
           skip_segment = 1;
-          `INFO((" generating partial segment "));
+          `INFO((" generating partial segment "), ADI_VERBOSITY_DEBUG);
           ps.print();
         end
       end
@@ -422,11 +422,11 @@ package dma_trans_pkg;
     //
     // -----------------
     virtual function void print();
-      `INFO(("transfer S"));
+      `INFO(("transfer S"), ADI_VERBOSITY_DEBUG);
       for (int i=0; i<group.size(); i++) begin
         group[i].print();
       end
-      `INFO(("transfer E"));
+      `INFO(("transfer E"), ADI_VERBOSITY_DEBUG);
     endfunction
 
     // -----------------
@@ -435,7 +435,7 @@ package dma_trans_pkg;
     function void post_randomize();
       dma_segment s;
       group = new[size];
-      `INFO(("groups size %0d",group.size()));
+      `INFO(("groups size %0d",group.size()), ADI_VERBOSITY_DEBUG);
       for (int i=0;i<size;i++) begin
         s = new(p);
         if (i != size-1)
@@ -445,7 +445,7 @@ package dma_trans_pkg;
         if (s.randomize())
           group[i] = s;
         else
-          `ERROR(("randomization failed"));
+          `FATAL(("randomization failed"));
       end
     endfunction
 

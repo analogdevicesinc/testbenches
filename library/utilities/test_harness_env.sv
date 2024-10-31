@@ -37,6 +37,7 @@
 
 package test_harness_env_pkg;
 
+  import logger_pkg::*;
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
@@ -44,7 +45,7 @@ package test_harness_env_pkg;
   import `PKGIFY(test_harness, mng_axi_vip)::*;
   import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-  class test_harness_env;
+  class test_harness_env extends adi_component;
 
     // Agents
     `AGENT(test_harness, mng_axi_vip, mst_t) mng_agent;
@@ -67,6 +68,8 @@ package test_harness_env_pkg;
     // Constructor
     //============================================================================
     function new(
+      input string name,
+
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
@@ -76,6 +79,8 @@ package test_harness_env_pkg;
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
     );
+
+      super.new(name);
 
       this.sys_clk_vip_if = sys_clk_vip_if;
       this.dma_clk_vip_if = dma_clk_vip_if;
@@ -87,8 +92,8 @@ package test_harness_env_pkg;
       ddr_axi_agent = new("AXI DDR stub agent", ddr_vip_if);
 
       // Creating the sequencers
-      mng = new(mng_agent);
-      ddr_axi_seq = new(ddr_axi_agent);
+      mng = new("AXI Manager sequencer", mng_agent, this);
+      ddr_axi_seq = new("AXI DDR stub sequencer", ddr_axi_agent, this);
 
     endfunction
 

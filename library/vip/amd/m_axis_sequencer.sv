@@ -54,7 +54,7 @@ package m_axis_sequencer_pkg;
   } stop_policy_t;
 
 
-  class m_axis_sequencer_base;
+  class m_axis_sequencer_base extends adi_component;
 
     protected bit enabled;
     protected bit queue_empty_sig;
@@ -95,7 +95,12 @@ package m_axis_sequencer_pkg;
 
 
     // new
-    function new();
+    function new(
+      input string name,
+      input adi_component parent = null);
+      
+      super.new(name, parent);
+
       this.enabled = 1'b0;
       this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
       this.descriptor_gen_mode = 1'b0;
@@ -138,50 +143,50 @@ package m_axis_sequencer_pkg;
     // set disable policy
     function void set_stop_policy(input stop_policy_t stop_policy);
       if (enabled)
-        `ERROR(("Sequencer must be disabled before configuring stop policy"));
+        this.error($sformatf("Sequencer must be disabled before configuring stop policy"));
       this.stop_policy = stop_policy;
-      `INFOV(("Disable policy configured"), 55);
+      this.info($sformatf("Disable policy configured"), ADI_VERBOSITY_DEBUG);
     endfunction: set_stop_policy
 
     // set data generation mode
     function void set_data_gen_mode(input data_gen_mode_t data_gen_mode);
       if (enabled)
-        `ERROR(("Sequencer must be disabled before configuring data generation mode"));
+        this.error($sformatf("Sequencer must be disabled before configuring data generation mode"));
       this.data_gen_mode = data_gen_mode;
-      `INFOV(("Data generation mode configured"), 55);
+      this.info($sformatf("Data generation mode configured"), ADI_VERBOSITY_DEBUG);
     endfunction: set_data_gen_mode
 
     // set data generation mode
     function void set_descriptor_gen_mode(input bit descriptor_gen_mode);
       if (enabled)
-        `ERROR(("Sequencer must be disabled before configuring descriptor generation mode"));
+        this.error($sformatf("Sequencer must be disabled before configuring descriptor generation mode"));
       this.descriptor_gen_mode = descriptor_gen_mode;
-      `INFOV(("Descriptor generation mode configured"), 55);
+      this.info($sformatf("Descriptor generation mode configured"), ADI_VERBOSITY_DEBUG);
     endfunction: set_descriptor_gen_mode
 
     // set data beat delay
     function void set_data_beat_delay(input int data_beat_delay);
       this.data_beat_delay = data_beat_delay;
-      `INFOV(("Data beat delay configured"), 55);
+      this.info($sformatf("Data beat delay configured"), ADI_VERBOSITY_DEBUG);
     endfunction: set_data_beat_delay
 
     // set descriptor delay
     function void set_descriptor_delay(input int descriptor_delay);
       this.descriptor_delay = descriptor_delay;
-      `INFOV(("Descriptor delay configured"), 55);
+      this.info($sformatf("Descriptor delay configured"), ADI_VERBOSITY_DEBUG);
     endfunction: set_descriptor_delay
 
     // set all bytes valid in a sample, sets keep to 1
     function void set_keep_all();
       if (enabled)
-        `ERROR(("Sequencer must be disabled before configuring keep all parameter"));
+        this.error($sformatf("Sequencer must be disabled before configuring keep all parameter"));
       this.keep_all = 1;
     endfunction: set_keep_all
 
     // bytes in a sample may not be valid, sets some bits of keep to 0
     function void set_keep_some();
       if (enabled)
-        `ERROR(("Sequencer must be disabled before configuring keep all parameter"));
+        this.error($sformatf("Sequencer must be disabled before configuring keep all parameter"));
       this.keep_all = 0;
     endfunction: set_keep_some
 
@@ -195,8 +200,8 @@ package m_axis_sequencer_pkg;
       descriptor.num_bytes = bytes_to_generate;
       descriptor.gen_last = gen_last;
       descriptor.gen_sync = gen_sync;
-      // `INFOV(("Updating generator with %0d bytes with last %0d, sync %0d",
-      //          bytes_to_generate, gen_last, gen_sync), 5);
+      // this.info($sformatf("Updating generator with %0d bytes with last %0d, sync %0d",
+      //          bytes_to_generate, gen_last, gen_sync), ADI_VERBOSITY_DEBUG);
 
       descriptor_q.push_back(descriptor);
       this.queue_empty_sig = 0;
@@ -233,11 +238,11 @@ package m_axis_sequencer_pkg;
 
     // generate transfer with transfer descriptors
     protected task generator();
-      `INFOV(("generator start"), 55);
+      this.info($sformatf("generator start"), ADI_VERBOSITY_DEBUG);
       forever begin
-        `INFOV(("Waiting for enable"), 55);
+        this.info($sformatf("Waiting for enable"), ADI_VERBOSITY_DEBUG);
         @enable_ev;
-        `INFOV(("Enable found"), 55);
+        this.info($sformatf("Enable found"), ADI_VERBOSITY_DEBUG);
         fork begin
           fork
             begin
@@ -282,13 +287,13 @@ package m_axis_sequencer_pkg;
     endtask: data_beat_delay_subroutine
 
     task start();
-      `INFOV(("enable sequencer"), 55);
+      this.info($sformatf("enable sequencer"), ADI_VERBOSITY_DEBUG);
       enabled = 1;
       ->> enable_ev;
     endtask: start
 
     task stop();
-      `INFOV(("disable sequencer"), 55);
+      this.info($sformatf("disable sequencer"), ADI_VERBOSITY_DEBUG);
       enabled = 0;
       byte_count = 0;
       ->> disable_ev;
@@ -310,8 +315,12 @@ package m_axis_sequencer_pkg;
     protected T agent;
 
 
-    function new(T agent);
-      super.new();
+    function new(
+      input string name,
+      input T agent,
+      input adi_component parent = null);
+
+      super.new(name, parent);
 
       this.agent = agent;
       this.agent.vif_proxy.set_no_insert_x_when_keep_low(1);
@@ -352,7 +361,7 @@ package m_axis_sequencer_pkg;
       int byte_per_beat;
       descriptor_t descriptor;
 
-      `INFOV(("packetize start"), 55);
+      this.info($sformatf("packetize start"), ADI_VERBOSITY_DEBUG);
       byte_per_beat = AXIS_VIP_DATA_WIDTH/8;
       descriptor = descriptor_q.pop_front();
 
@@ -411,7 +420,7 @@ package m_axis_sequencer_pkg;
           endcase
         end
 
-        `INFOV(("generating axis transaction"), 55);
+        this.info($sformatf("generating axis transaction"), ADI_VERBOSITY_DEBUG);
         trans = agent.driver.create_transaction();
         trans.set_data(data);
         trans.set_id('h0);
@@ -428,7 +437,7 @@ package m_axis_sequencer_pkg;
           trans.set_user_beat((tc == 0) & descriptor.gen_sync);
 
         ->> data_av_ev;
-        `INFOV(("waiting transfer to complete"), 55);
+        this.info($sformatf("waiting transfer to complete"), ADI_VERBOSITY_DEBUG);
         @beat_done;
       end
       ->> packet_done;
@@ -436,11 +445,11 @@ package m_axis_sequencer_pkg;
 
     // packet sender function
     virtual protected task sender();
-      `INFOV(("sender start"), 55);
+      this.info($sformatf("sender start"), ADI_VERBOSITY_DEBUG);
       forever begin
-        `INFOV(("Waiting for enable"), 55);
+        this.info($sformatf("Waiting for enable"), ADI_VERBOSITY_DEBUG);
         @enable_ev;
-        `INFOV(("Enable found"), 55);
+        this.info($sformatf("Enable found"), ADI_VERBOSITY_DEBUG);
         fork begin
           fork
             begin
@@ -455,7 +464,7 @@ package m_axis_sequencer_pkg;
             end
             forever begin
               @data_av_ev;
-              `INFOV(("sending axis transaction"), 55);
+              this.info($sformatf("sending axis transaction"), ADI_VERBOSITY_DEBUG);
               agent.driver.send(trans);
               ->> beat_done;
             end

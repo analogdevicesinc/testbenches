@@ -8,7 +8,7 @@ package x_monitor_pkg;
   import logger_pkg::*;
   import mailbox_pkg::*;
 
-  class x_monitor extends xil_component;
+  class x_monitor extends adi_component;
 
     mailbox_c #(logic [7:0]) mailbox;
     protected semaphore semaphore_key;
@@ -17,10 +17,13 @@ package x_monitor_pkg;
     protected bit enabled;
 
     // constructor
-    function new(input string name);
-      super.new(name);
+    function new(
+      input string name,
+      input adi_component parent = null);
+      
+      super.new(name, parent);
 
-      this.mailbox = new;
+      this.mailbox = new("Mailbox", 0, this);
       this.semaphore_key = new(1);
     endfunction
 
@@ -81,9 +84,12 @@ package x_monitor_pkg;
     protected int axi_byte_stream_size;
 
     // constructor
-    function new(input string name, T agent);
+    function new(
+      input string name,
+      input T agent,
+      input adi_component parent = null);
 
-      super.new(name);
+      super.new(name, parent);
 
       this.enabled = 0;
 
@@ -124,7 +130,7 @@ package x_monitor_pkg;
                 this.axi_byte_stream_size++;
               end
             end
-            `INFOV(("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), 100);
+            this.info($sformatf("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), ADI_VERBOSITY_DEBUG);
             this.transaction_captured();
             #1step;
             #1step;
@@ -154,9 +160,12 @@ package x_monitor_pkg;
     protected T agent;
 
     // constructor
-    function new(input string name, T agent);
+    function new(
+      input string name,
+      input T agent,
+      input adi_component parent = null);
 
-      super.new(name);
+      super.new(name, parent);
 
       this.enabled = 0;
       this.tx_sink_type = CYCLIC;
@@ -172,7 +181,7 @@ package x_monitor_pkg;
       if (!this.enabled) begin
         this.tx_sink_type = sink_type_t'(sink_type);
       end else begin
-        `ERROR(("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
+        this.error($sformatf("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
       end
 
     endfunction
@@ -205,7 +214,7 @@ package x_monitor_pkg;
           if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
             this.mailbox.put(axi_byte);
         end
-        `INFOV(("Caught an AXI4 stream transaction: %d", this.mailbox.num()), 100);
+        this.info($sformatf("Caught an AXI4 stream transaction: %d", this.mailbox.num()), ADI_VERBOSITY_DEBUG);
         this.transaction_captured();
         #1step;
         this.mailbox.flush();

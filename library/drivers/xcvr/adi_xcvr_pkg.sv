@@ -86,7 +86,7 @@ package adi_xcvr_pkg;
         3: return 1;
         4: return 2;
         5: return 3;
-        default: `ERROR(("CPLL FBDIV value not supported"));
+        default: `FATAL(("CPLL FBDIV value not supported"));
       endcase
       return 0;
     endfunction : cpll_fbdiv_drp
@@ -98,7 +98,7 @@ package adi_xcvr_pkg;
       case (val)
         4: return 0;
         5: return 1;
-        default: `ERROR(("CPLL FBDIV_45 value not supported"));
+        default: `FATAL(("CPLL FBDIV_45 value not supported"));
       endcase
       return 0;
     endfunction : cpll_fbdiv_45_drp
@@ -110,7 +110,7 @@ package adi_xcvr_pkg;
       case (val)
         1: return 16;
         2: return 0;
-        default: `ERROR(("CPLL REFCLKDIV value not supported"));
+        default: `FATAL(("CPLL REFCLKDIV value not supported"));
       endcase
       return 0;
     endfunction : cpll_refclk_div_drp
@@ -125,7 +125,7 @@ package adi_xcvr_pkg;
         4: return 2;
         8: return 3;
         16: return 4;
-        default: `ERROR(("OUTDIV value not supported"));
+        default: `FATAL(("OUTDIV value not supported"));
       endcase
       return 0;
     endfunction : out_div_drp
@@ -142,7 +142,7 @@ package adi_xcvr_pkg;
         2: return 0;
         3: return 1;
         4: return 2;
-        default: `ERROR(("QPLL REFCLKDIV value not supported"));
+        default: `FATAL(("QPLL REFCLKDIV value not supported"));
       endcase
       return 0;
     endfunction : qpll_refclk_div_drp
@@ -323,13 +323,13 @@ package adi_xcvr_pkg;
     task probe ();
       super.probe();
       discover_capabs();
-      `INFO(("Found %0s %0s XCVR = %0s on %0d lanes, QPLL access : %0d" ,
+      this.info($sformatf("Found %0s %0s XCVR = %0s on %0d lanes, QPLL access : %0d" ,
         tx_or_rx_n ? "TX" : "RX",
         link_mode == 1 ? "8B10B" : link_mode == 2 ? "64B66B" : "Unknown",
         xcvr_type.name(),
         num_lanes,
         qpll_enable
-        ));
+        ), ADI_VERBOSITY_DEBUG);
       case (xcvr_type)
         GTXE2:
           begin
@@ -352,7 +352,7 @@ package adi_xcvr_pkg;
             p = GTHE4p;
           end
         default:
-          `ERROR(("Case not supported"));
+          this.error($sformatf("Case not supported"));
       endcase
 
     endtask : probe
@@ -502,9 +502,9 @@ package adi_xcvr_pkg;
         timeout--;
       end
       if (timeout == 0) begin
-        `ERROR(("[%s] XCVR status: 0, PLL lock: %0d", name, ~pll_lock_n));
+        this.error($sformatf("[%s] XCVR status: 0, PLL lock: %0d", name, ~pll_lock_n));
       end else begin
-        `INFO(("[%s] XCVR status: 1, PLL lock: %0d", name, ~pll_lock_n));
+        this.info($sformatf("[%s] XCVR status: 1, PLL lock: %0d", name, ~pll_lock_n), ADI_VERBOSITY_DEBUG);
       end
 
     endtask : up
@@ -542,7 +542,7 @@ package adi_xcvr_pkg;
 
             invalid_plls = plls_to_try.find(x) with (x == QPLL1);
             if (invalid_plls.size() != 0)
-              `ERROR(("QPLL1 is not supported on GTXE2"));
+              this.error($sformatf("QPLL1 is not supported on GTXE2"));
 
             out_clk_sel = OUTCLKPMA;
           end
@@ -556,7 +556,7 @@ package adi_xcvr_pkg;
             out_clk_sel = PROGDIVCLK;
           end
         default:
-          `ERROR(("Case not supported"));
+          this.error($sformatf("Case not supported"));
       endcase
 
       foreach (plls_to_try[pll_idx]) begin
@@ -568,7 +568,7 @@ package adi_xcvr_pkg;
           QPLL0:
               calc_qpll(lane_rate, ref_clk, 0, pll_success, out_div);
           default:
-            `ERROR(("Case not supported"));
+            this.error($sformatf("Case not supported"));
         endcase
         if (pll_success) begin
           pll_type = plls_to_try[pll_idx];
@@ -577,21 +577,21 @@ package adi_xcvr_pkg;
       end
 
       if (pll_success == 0) begin
-        `ERROR(("No PLL could be set"));
+        this.error($sformatf("No PLL could be set"));
       end
 
       for (int ch_idx = 0; ch_idx < num_lanes; ch_idx++) begin
         if (out_clk_sel == PROGDIVCLK) begin
           case (xcvr_type)
             GTXE2:
-              `ERROR(("No PROGDIV support"));
+              this.error($sformatf("No PROGDIV support"));
             GTHE3,
             GTHE4,
             GTYE3_NOT_SUPPORTED,
             GTYE4:
               set_progdiv(ch_idx, out_div);
             default:
-              `ERROR(("Case not supported"));
+              this.error($sformatf("Case not supported"));
           endcase
         end
 
@@ -622,16 +622,16 @@ package adi_xcvr_pkg;
       int f_fbdiv, f_fbdiv_45, f_refclk_div;
       int found = 0;
 
-      `INFO(("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk));
+      this.info($sformatf("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
       for (int fbdiv = 1; fbdiv <= 5; fbdiv++) begin
         for (int fbdiv_45 = 4; fbdiv_45 <= 5; fbdiv_45++) begin
           for (int refclk_div = 1; refclk_div <= 2; refclk_div++) begin
             cpll_vco = ref_clk * fbdiv_45 * fbdiv / refclk_div;
             if (p.cpll_check_vco_range(cpll_vco)) begin
-              `INFOV(("Skipping CPLL vco %0d . Out of range, [ %0d - %0d ]",
+              this.info($sformatf("Skipping CPLL vco %0d . Out of range, [ %0d - %0d ]",
                       cpll_vco,
                       p.cpll_vco_min,
-                      p.cpll_vco_max), 100);
+                      p.cpll_vco_max), ADI_VERBOSITY_DEBUG);
               continue;
             end
             for (int out_div_idx = 0; out_div_idx <= 3; out_div_idx++) begin
@@ -653,13 +653,13 @@ package adi_xcvr_pkg;
       end
 
       if (found) begin
-        `INFO(("Found cpll_vco : %0d", cpll_vco));
-        `INFO(("Found cpll_fbdiv : %0d", f_fbdiv));
-        `INFO(("Found cpll_fbdiv_45 : %0d", f_fbdiv_45));
-        `INFO(("Found cpll_refclk_div : %0d", f_refclk_div));
-        `INFO(("Found out_div : %0d", f_out_div));
+        this.info($sformatf("Found cpll_vco : %0d", cpll_vco), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found cpll_fbdiv : %0d", f_fbdiv), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found cpll_fbdiv_45 : %0d", f_fbdiv_45), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found cpll_refclk_div : %0d", f_refclk_div), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found out_div : %0d", f_out_div), ADI_VERBOSITY_DEBUG);
       end else begin
-        `INFO(("No valid config found for CPLL lane rate %0d ref clock %0d", lane_rate, ref_clk));
+        this.info($sformatf("No valid config found for CPLL lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
         success = 0;
         return;
       end
@@ -703,7 +703,7 @@ package adi_xcvr_pkg;
                             );
             end
           default:
-            `ERROR(("Case not supported"));
+            this.error($sformatf("Case not supported"));
         endcase
 
     endtask : set_cpll_divs
@@ -734,12 +734,12 @@ package adi_xcvr_pkg;
           qpll_clkoutrate_min = 2;  // Half rate
       endcase
 
-      `INFO(("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk));
+      this.info($sformatf("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
       foreach (p.qpll_fbdiv_drp[fbdiv]) begin : fbdiv_loop
         for (int refclk_div = 1; refclk_div <= 4; refclk_div++) begin
           qpll_vco = ref_clk * fbdiv / refclk_div;
           if (p.qpll_check_vco_range(qpll_vco, is_qpll1)) begin
-            `INFOV(("Skipping QPLL vco %0d . Out of range. fbdiv = %0d refclk_div = %0d", qpll_vco, fbdiv, refclk_div), 100);
+            this.info($sformatf("Skipping QPLL vco %0d . Out of range. fbdiv = %0d refclk_div = %0d", qpll_vco, fbdiv, refclk_div), ADI_VERBOSITY_DEBUG);
             continue;
           end
           for (qpll_clkoutrate = qpll_clkoutrate_min; qpll_clkoutrate <= 2; qpll_clkoutrate++) begin
@@ -761,13 +761,13 @@ package adi_xcvr_pkg;
       end
 
       if (found) begin
-        `INFO(("Found qpll_vco : %0d", qpll_vco));
-        `INFO(("Found qpll_fbdiv : %0d", f_fbdiv));
-        `INFO(("Found qpll_refclk_div : %0d", f_refclk_div));
-        `INFO(("Found qpll_clkoutrate : %0d", qpll_clkoutrate));
-        `INFO(("Found out_div : %0d", f_out_div));
+        this.info($sformatf("Found qpll_vco : %0d", qpll_vco), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found qpll_fbdiv : %0d", f_fbdiv), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found qpll_refclk_div : %0d", f_refclk_div), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found qpll_clkoutrate : %0d", qpll_clkoutrate), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found out_div : %0d", f_out_div), ADI_VERBOSITY_DEBUG);
       end else begin
-        `INFO(("No valid config found for QPLL%0d lane rate %0d ref clock %0d", is_qpll1, lane_rate, ref_clk));
+        this.info($sformatf("No valid config found for QPLL%0d lane rate %0d ref clock %0d", is_qpll1, lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
         success = 0;
         return;
       end
@@ -778,7 +778,7 @@ package adi_xcvr_pkg;
           if (qpll_enable)
             set_qpll_divs(ch_idx, is_qpll1, f_refclk_div, f_fbdiv, qpll_clkoutrate);
           else
-            `INFO(("WARNING: Skipping QPLL configuration. Current AXI_XCVR does not have access to the CM ports"));        
+            this.info($sformatf("WARNING: Skipping QPLL configuration. Current AXI_XCVR does not have access to the CM ports"), ADI_VERBOSITY_DEBUG);
         end
 
       end
@@ -824,7 +824,7 @@ package adi_xcvr_pkg;
               end
             end
           default:
-            `ERROR(("Case not supported"));
+            this.error($sformatf("Case not supported"));
         endcase
     endtask : set_qpll_divs
 
@@ -865,7 +865,7 @@ package adi_xcvr_pkg;
             end
           end
         default:
-          `ERROR(("Case not supported"));
+          this.error($sformatf("Case not supported"));
       endcase
     endtask : set_out_div
 
@@ -891,7 +891,7 @@ package adi_xcvr_pkg;
               2: progdiv = 40;
               4: progdiv = 80;
               default:
-                `ERROR(("Case not supported"));
+                this.error($sformatf("Case not supported"));
             endcase
           GTYE3_NOT_SUPPORTED,
           GTYE4:
@@ -901,10 +901,10 @@ package adi_xcvr_pkg;
               4: progdiv = 40;
               8: progdiv = 80;
               default:
-                `ERROR(("Case not supported"));
+                this.error($sformatf("Case not supported"));
             endcase
           default:
-            `ERROR(("Case not supported"));
+            this.error($sformatf("Case not supported"));
         endcase
 
       end else if (link_mode == 2) begin
@@ -913,11 +913,11 @@ package adi_xcvr_pkg;
           2: progdiv = 33;
           4: progdiv = 66;
           default:
-            `ERROR(("Case not supported"));
+            this.error($sformatf("Case not supported"));
         endcase
 
       end else begin
-        `ERROR(("Case not supported"));
+        this.error($sformatf("Case not supported"));
       end
 
       case (xcvr_type)

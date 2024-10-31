@@ -33,31 +33,92 @@
 // ***************************************************************************
 // ***************************************************************************
 
+`include "utils.svh"
+
 package logger_pkg;
 
-// info    - 2
-// warning - 1
-// error   - 0
-int verbosity = 2;
+  localparam int ADI_VERBOSITY_NONE   = 0;    // highest priority, test passed message, cannot be disabled
+  localparam int ADI_VERBOSITY_LOW    = 100;  // 
+  localparam int ADI_VERBOSITY_MEDIUM = 200;  // 
+  localparam int ADI_VERBOSITY_HIGH   = 300;  // 
+  localparam int ADI_VERBOSITY_FULL   = 400;  // 
+  localparam int ADI_VERBOSITY_DEBUG  = 500;  // lowest priority, library level debug messages
 
-int error_count = 0;
+  int verbosity = ADI_VERBOSITY_MEDIUM;
 
-function void PrintInfo(string inStr, integer msgVerborisity = 2);
-  if (verbosity >= msgVerborisity) begin
-    $display("[INFO] %0t %s", $time, inStr);
-  end
-endfunction
+  function void PrintInfo(
+    input string inStr,
+    input integer msgVerborisity);
 
-function void PrintError(string inStr);
-  if (verbosity >= 0) begin
-    error_count = error_count + 1;
-    $display("[ERROR] %0t %s", $time, inStr);
-    $finish;
-  end
-endfunction
+    if (verbosity >= msgVerborisity) begin
+      $display("[INFO] @ %0t: %s", $time, inStr);
+    end
+  endfunction: PrintInfo
 
-function void setLoggerVerbosity(int value);
-  verbosity = value;
-endfunction
+  function void PrintWarning(input string inStr);
+    $warning("[WARNING] @ %0t: %s", $time, inStr);
+  endfunction: PrintWarning
+
+  function void PrintError(input string inStr);
+    $error("[ERROR] @ %0t: %s", $time, inStr);
+  endfunction: PrintError
+
+  function void PrintFatal(input string inStr);
+    $fatal(1, "[FATAL] @ %0t: %s", $time, inStr);
+  endfunction: PrintFatal
+
+  function void setLoggerVerbosity(input int value);
+    verbosity = value;
+  endfunction: setLoggerVerbosity
+
+
+  class adi_reporter;
+    string name;
+    adi_reporter parent;
+    
+    function new(
+      input string name,
+      adi_reporter parent = null);
+
+      this.name = name;
+      this.parent = parent;
+    endfunction
+
+    function string get_path();
+      if (this.parent == null)
+        return this.name;
+      else
+        return $sformatf("%s.%s", this.parent.get_path(), this.name);
+    endfunction: get_path
+
+    function void info(
+      input string message,
+      input int verbosity);
+
+      `INFO(("[%s] %s", this.get_path(), message), verbosity);
+    endfunction: info
+
+    function void warning(input string message);
+      `WARNING(("[%s] %s", this.get_path(), message));
+    endfunction: warning
+
+    function void error(input string message);
+      `ERROR(("[%s] %s", this.get_path(), message));
+    endfunction: error
+
+    function void fatal(input string message);
+      `FATAL(("[%s] %s", this.get_path(), message));
+    endfunction: fatal
+  endclass: adi_reporter
+
+
+  class adi_component extends adi_reporter;
+    function new(
+      input string name,
+      adi_component parent = null);
+
+      super.new(name, parent);
+    endfunction: new
+  endclass: adi_component
 
 endpackage

@@ -50,15 +50,15 @@ package environment_pkg;
       mng_agent = new("AXI Manager Agent", mng_vip_if);
       ddr_agent = new("System DDR Agent", ddr_vip_if);
       plddr_agent = new("PL DDR Agent", pl_ddr_vip_if);
-      adc_src_axis_agent = new("ADC Source AXI Stream Agent", adc_src_axis_vip_if);
 
+      adc_src_axis_agent = new("ADC Source AXI Stream Agent", adc_src_axis_vip_if);
       dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", dac_dst_axis_vip_if);
 
       // create sequencers
-      mng = new(mng_agent);
-      ddr = new(ddr_agent);
-      adc_src_axis_seq = new(adc_src_axis_agent);
-      dac_dst_axis_seq = new(dac_dst_axis_agent);
+      mng = new("AXI Manager Seuencer", mng_agent);
+      ddr = new("System DDR Sequencer", ddr_agent);
+      adc_src_axis_seq = new("ADC Source AXI Stream Sequencer", adc_src_axis_agent);
+      dac_dst_axis_seq = new("DAC Destination AXI Stream Sequencer", dac_dst_axis_agent);
 
       // create scoreboard
       scoreboard = new("Data Offload Verification Environment Scoreboard");
@@ -123,7 +123,7 @@ package environment_pkg;
           ADC_TRANSACTION_FAIL: assert(rx_transaction.randomize());
           rx_transaction.set_delay(adc_data_rate_ratio - 1);
           adc_src_axis_agent.driver.send(rx_transaction);
-          `INFOV(("Sent new transaction to ADC driver"), 55);
+          `INFO(("Sent new transaction to ADC driver"), ADI_VERBOSITY_DEBUG);
           #0;
         end else begin
           #1;

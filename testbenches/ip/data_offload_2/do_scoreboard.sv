@@ -103,7 +103,7 @@ package do_scoreboard_pkg;
       if (!this.enabled) begin
         this.do_mode = do_mode_t'(do_mode);
       end else begin
-        `ERROR(("ERROR Scoreboard: Can not configure oneshot mode while scoreboard is running."));
+        `FATAL(("ERROR Scoreboard: Can not configure oneshot mode while scoreboard is running."));
       end
     endfunction
 
@@ -111,7 +111,7 @@ package do_scoreboard_pkg;
       if (!this.enabled) begin
         this.path_type = path_type_t'(path_type);
       end else begin
-        `ERROR(("ERROR Scoreboard: Can not configure path type while scoreboard is running!"));
+        `FATAL(("ERROR Scoreboard: Can not configure path type while scoreboard is running!"));
       end
     endfunction
 
@@ -131,7 +131,7 @@ package do_scoreboard_pkg;
 
       forever begin
         if (this.src_axis_ap.get_item_cnt() > 0) begin
-          `INFOV(("Caught a TX AXI4 stream transaction: %d", this.src_axis_ap.get_item_cnt()), 100);
+          `INFO(("Caught a TX AXI4 stream transaction: %d", this.src_axis_ap.get_item_cnt()), ADI_VERBOSITY_DEBUG);
           this.src_axis_ap.get(transaction);
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
@@ -170,7 +170,7 @@ package do_scoreboard_pkg;
 
       forever begin
         if (this.dst_axis_ap.get_item_cnt() > 0) begin
-          `INFOV(("Caught a RX AXI4 stream transaction: %d", this.dst_axis_ap.get_item_cnt()), 100);
+          `INFO(("Caught a RX AXI4 stream transaction: %d", this.dst_axis_ap.get_item_cnt()), ADI_VERBOSITY_DEBUG);
           this.dst_axis_ap.get(transaction);
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
@@ -181,7 +181,7 @@ package do_scoreboard_pkg;
           reading_lock.put();
 
           if (this.byte_stream.size() == 0) begin
-            `ERROR(("ERROR: Received unexpected transfer - is the data_offload running cyclically?"));
+            `FATAL(("ERROR: Received unexpected transfer - is the data_offload running cyclically?"));
             continue;
           end
 
@@ -202,12 +202,12 @@ package do_scoreboard_pkg;
 
     function void post_test();
       if (this.enabled == 0) begin
-        `INFO(("Scoreboard was inactive."));
+        `INFO(("Scoreboard was inactive."), ADI_VERBOSITY_DEBUG);
       end else begin
           if (this.do_mode == ONESHOT && this.byte_stream.size() > 0) begin
-            `ERROR(("ERROR: Not all samples have arrived yet!"));
+            `FATAL(("ERROR: Not all samples have arrived yet!"));
           end else begin
-            `INFO(("Scoreboard passed!"));
+            `INFO(("Scoreboard passed!"), ADI_VERBOSITY_DEBUG);
           end
       end
     endfunction /* post_tx_test */

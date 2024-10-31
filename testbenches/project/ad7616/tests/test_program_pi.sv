@@ -96,7 +96,8 @@ endtask
 initial begin
 
   //creating environment
-  env = new(`TH.`SYS_CLK.inst.IF,
+  env = new("AD7616 Environment",
+            `TH.`SYS_CLK.inst.IF,
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
@@ -118,8 +119,9 @@ initial begin
 
   data_acquisition_test();
 
-  `INFO(("Test Done"));
+  env.stop();
 
+  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
   $finish;
 
 end
@@ -170,7 +172,7 @@ end
 task sanity_test();
   axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   axi_read_v (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
-  `INFO(("Sanity Test Done"));
+  `INFO(("Sanity Test Done"), ADI_VERBOSITY_DEBUG);
 endtask
 
 //---------------------------------------------------------------------------
@@ -205,7 +207,7 @@ task data_acquisition_test();
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-    $display("[%t] axi_pwm_gen started.", $time);
+    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_DEBUG);
 
      // Configure DMA
     env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
@@ -242,7 +244,7 @@ task data_acquisition_test();
 
     // Stop pwm gen
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
-    $display("[%t] axi_pwm_gen stopped.", $time);
+    `INFO(("Axi_pwm_gen stopped"), ADI_VERBOSITY_DEBUG);
 
     #200
     axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_WRITE_DATA ), `SET_AXI_AD7616_REG_UP_WRITE_DATA_UP_WRITE_DATA(32'hDEAD));
@@ -258,7 +260,7 @@ task data_acquisition_test();
     if (captured_word_arr  != dma_data_store_arr) begin
       `ERROR(("Data Acquisition Test FAILED"));
     end else begin
-      `INFO(("Data Acquisition Test PASSED"));
+      `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_DEBUG);
     end
 endtask
 

@@ -77,7 +77,8 @@ program test_dma;
     int ref_sync_status = (`JESD_MODE != "64B66B");
 
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("AD QuadMXFE Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -223,7 +224,7 @@ program test_dma;
     fork : timeout_f
        begin
          #25us;
-         `ERROR(("Link bringup wait Timeout"));
+         `FATAL(("Link bringup wait Timeout"));
          timed_out = '1;
        end
     join_none
@@ -275,6 +276,11 @@ program test_dma;
 
 
     #2us;
+
+    env.stop();
+    
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+    $finish();
 
   end
 

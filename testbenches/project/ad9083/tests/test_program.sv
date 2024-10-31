@@ -70,7 +70,8 @@ program test_program;
   initial begin
 
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("AD9083 Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -380,7 +381,10 @@ program test_program;
       .max_sample(496)
     );
 
-    `INFO(("Test Done"));
+    env.stop();
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
 
   end
 

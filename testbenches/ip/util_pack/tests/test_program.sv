@@ -61,7 +61,8 @@ program test_program;
     setLoggerVerbosity(250);
 
     // create environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("Util Pack Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -83,15 +84,15 @@ program test_program;
     // configure environment sequencers
     env.configure(data_length);
 
-    `INFO(("Bring up IPs from reset."));
+    `INFO(("Bring up IPs from reset."), ADI_VERBOSITY_MEDIUM);
     systemBringUp();
     
     // Start the ADC/DAC stubs
-    `INFO(("Call the run() ..."));
+    `INFO(("Call the run() ..."), ADI_VERBOSITY_MEDIUM);
     env.run();
 
     // Generate DMA transfers
-    `INFO(("Start DMAs"));
+    `INFO(("Start DMAs"), ADI_VERBOSITY_MEDIUM);
     rx_dma_transfer(data_length);
     tx_dma_transfer(data_length);
 
@@ -100,7 +101,7 @@ program test_program;
     env.rx_src_axis_seq.start();
 
     // prepare watchdog with 20 us of wait time
-    packer_scoreboard_wd = new(20000, "Packers Scoreboard");
+    packer_scoreboard_wd = new("Packer watchdog", 20000, "Packers Scoreboard");
     packer_scoreboard_wd.start();
 
     #1us;
@@ -115,16 +116,16 @@ program test_program;
 
     env.stop();
     
-    `INFO(("Test bench done!"));
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end
 
   task systemBringUp();
 
-    `INFO(("Bring up RX DMAC 0"));
+    `INFO(("Bring up RX DMAC 0"), ADI_VERBOSITY_HIGH);
     dmac_rx.enable_dma();
-    `INFO(("Bring up TX DMAC 0"));
+    `INFO(("Bring up TX DMAC 0"), ADI_VERBOSITY_HIGH);
     dmac_tx.enable_dma();
 
   endtask

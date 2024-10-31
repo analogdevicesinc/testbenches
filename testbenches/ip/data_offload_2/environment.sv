@@ -81,9 +81,9 @@ package environment_pkg;
       dst_axis_agent = new("Destination AXI Stream Agent", dst_axis_vip_if);
 
       // create sequencers
-      mng = new(mng_agent);
-      src_axis_seq = new(src_axis_agent);
-      dst_axis_seq = new(dst_axis_agent);
+      mng = new("AXI Manager Sequencer", mng_agent);
+      src_axis_seq = new("Source AXI Stream Sequencer", src_axis_agent);
+      dst_axis_seq = new("Destination AXI Stream Sequencer", dst_axis_agent);
 
       scoreboard = new("do_scoreboard");
 
@@ -146,7 +146,7 @@ package environment_pkg;
           TRANSACTION_FAIL: assert(rx_transaction.randomize());
           rx_transaction.set_delay(data_rate_ratio - 1);
           src_axis_agent.driver.send(rx_transaction);
-          `INFOV(("Sent new transaction to ADC driver"), 55);
+          `INFO(("Sent new transaction to ADC driver"), ADI_VERBOSITY_DEBUG);
           #0;
         end else begin
           #1;

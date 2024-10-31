@@ -59,7 +59,8 @@ program test_program;
   initial begin
 
     // create environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("Axis Sequencers Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -69,9 +70,7 @@ program test_program;
               `TH.`DST_AXIS.inst.IF
              );
 
-    #1step;
-
-    setLoggerVerbosity(250);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     
     env.start();
     env.sys_reset();
@@ -89,7 +88,7 @@ program test_program;
     case (`DEST_BACKPRESSURE)
       1: env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
       2: env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-      default: `ERROR(("Destination backpressure mode parameter incorrect!"));
+      default: `FATAL(("Destination backpressure mode parameter incorrect!"));
     endcase
 
     case (`SRC_DESCRIPTORS)
@@ -99,24 +98,23 @@ program test_program;
         // env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
         env.src_axis_seq.add_xfer_descriptor_packet_size(32'd10, 1, 0);
 
-        send_data_wd = new(1000, "Send data");
+        send_data_wd = new("Axis Sequencer Watchdog", 1000, "Send data");
       end
       2: begin
         env.src_axis_seq.set_descriptor_gen_mode(0);
         env.src_axis_seq.set_stop_policy(STOP_POLICY_DESCRIPTOR_QUEUE);
         repeat (10) env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
 
-        send_data_wd = new(30000, "Send data");
+        send_data_wd = new("Axis Sequencer Watchdog", 30000, "Send data");
       end
       3: begin
         env.src_axis_seq.set_descriptor_gen_mode(1);
         env.src_axis_seq.set_stop_policy(STOP_POLICY_PACKET);
         env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
 
-        send_data_wd = new(20000, "Send data");
+        send_data_wd = new("Axis Sequencer Watchdog", 20000, "Send data");
       end
-      default:
-        `ERROR(("Source descriptor parameter incorrect!"));
+      default: `FATAL(("Source descriptor parameter incorrect!"));
     endcase
 
     send_data_wd.start();
@@ -143,7 +141,7 @@ program test_program;
 
     env.stop();
     
-    `INFO(("Test bench done!"));
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end

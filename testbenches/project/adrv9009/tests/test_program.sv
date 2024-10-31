@@ -89,7 +89,8 @@ program test_program;
 
   initial begin
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("ADRV9009 Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -193,7 +194,7 @@ program test_program;
       end else if (rx_sysref_clk < tx_os_sysref_clk && `fmod(tx_os_sysref_clk, rx_sysref_clk) == 0) begin
         common_sysref_clk = rx_sysref_clk;
       end else begin
-        `ERROR(("RX_SYSREF_CLK and TX_OS_SYSREF_CLK are not divisible!\n RX_SYSREF_CLK: %f\n TX_OS_SYSREF_CLK: %f\n", rx_sysref_clk, tx_os_sysref_clk));
+        `FATAL(("RX_SYSREF_CLK and TX_OS_SYSREF_CLK are not divisible!\n RX_SYSREF_CLK: %f\n TX_OS_SYSREF_CLK: %f\n", rx_sysref_clk, tx_os_sysref_clk));
       end
     end else if (tx_sysref_clk < rx_sysref_clk && `fmod(rx_sysref_clk, tx_sysref_clk) == 0) begin
       if (tx_sysref_clk >= tx_os_sysref_clk && `fmod(tx_sysref_clk, tx_os_sysref_clk) == 0) begin
@@ -201,10 +202,10 @@ program test_program;
       end else if (tx_sysref_clk < tx_os_sysref_clk && `fmod(tx_os_sysref_clk, tx_sysref_clk) == 0) begin
         common_sysref_clk = tx_sysref_clk;
       end else begin
-        `ERROR(("TX_SYSREF_CLK and TX_OS_SYSREF_CLK are not divisible!\n TX_SYSREF_CLK: %f\n TX_OS_SYSREF_CLK: %f\n", tx_sysref_clk, tx_os_sysref_clk));
+        `FATAL(("TX_SYSREF_CLK and TX_OS_SYSREF_CLK are not divisible!\n TX_SYSREF_CLK: %f\n TX_OS_SYSREF_CLK: %f\n", tx_sysref_clk, tx_os_sysref_clk));
       end
     end else begin
-      `ERROR(("RX_SYSREF_CLK and TX_SYSREF_CLK are not divisible!\n RX_SYSREF_CLK: %f\n TX_SYSREF_CLK: %f\n", rx_sysref_clk, tx_sysref_clk));
+      `FATAL(("RX_SYSREF_CLK and TX_SYSREF_CLK are not divisible!\n RX_SYSREF_CLK: %f\n TX_SYSREF_CLK: %f\n", rx_sysref_clk, tx_sysref_clk));
     end
 
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(common_sysref_clk));
@@ -238,9 +239,10 @@ program test_program;
     rx_tpl_test(.use_dds (0));
     rx_os_tpl_test(.use_dds (0));
 
-    `INFO(("======================="));
-    `INFO(("  JESD LINK TEST DONE  "));
-    `INFO(("======================="));
+    env.stop();
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
 
   end
 
@@ -488,7 +490,7 @@ program test_program;
           first = (first + 8'h01);
         end
       
-        `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
+        `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word), ADI_VERBOSITY_DEBUG);
         
         if (i > 20 && captured_word !== reference_word) begin
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));

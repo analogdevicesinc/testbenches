@@ -61,7 +61,8 @@ program test_program_64b66b;
 
   initial begin
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("AD QuadMXFE Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -80,16 +81,16 @@ program test_program_64b66b;
 
     #1us;
     env.mng.RegRead32(`DAC_TPL_BA+'h0c,tmp);
-    `INFO(("DAC TPL CONFIG is %h",tmp));
+    `INFO(("DAC TPL CONFIG is %h",tmp), ADI_VERBOSITY_DEBUG);
     env.mng.RegRead32(`DAC_TPL_BA+'h418,tmp);
-    `INFO(("DAC TPL CH0 SEL is %h",tmp));
+    `INFO(("DAC TPL CH0 SEL is %h",tmp), ADI_VERBOSITY_DEBUG);
     env.mng.RegRead32(`DAC_TPL_BA+'h458,tmp);
-    `INFO(("DAC TPL CH1 SEL is %h",tmp));
+    `INFO(("DAC TPL CH1 SEL is %h",tmp), ADI_VERBOSITY_DEBUG);
 
     env.mng.RegRead32(`RX_DMA_BA+32'h0010,tmp);
-   `INFO(("RX_DMA_BA interface setup is %h",tmp));
+   `INFO(("RX_DMA_BA interface setup is %h",tmp), ADI_VERBOSITY_DEBUG);
     env.mng.RegRead32(`TX_DMA_BA+32'h0010,tmp);
-   `INFO(("TX_DMA_BA interface setup is %h",tmp));
+   `INFO(("TX_DMA_BA interface setup is %h",tmp), ADI_VERBOSITY_DEBUG);
 
     //  -------------------------------------------------------
     //  Test DDS path
@@ -300,6 +301,11 @@ program test_program_64b66b;
     env.mng.RegReadVerify32(`AXI_JESD_TX_BA+GetAddrs(JESD_TX_LINK_STATUS),
                             `SET_JESD_TX_LINK_STATUS_STATUS_STATE(3));
     #2us;
+
+    env.stop();
+    
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+    $finish();
 
   end
 

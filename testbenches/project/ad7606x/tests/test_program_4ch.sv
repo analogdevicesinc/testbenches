@@ -104,7 +104,8 @@ endtask
 initial begin
 
   //creating environment
-  env = new(`TH.`SYS_CLK.inst.IF,
+  env = new("AD7606X Environment",
+            `TH.`SYS_CLK.inst.IF,
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
@@ -136,8 +137,9 @@ initial begin
 
   #100 db_transmission_test();
 
-  `INFO(("Test Done"));
+  env.stop();
 
+  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
   $finish;
 
 end
@@ -177,7 +179,7 @@ task sanity_test();
     // check ADC VERSION
     axi_read_v (`AXI_AD7606X_BA + GetAddrs(COMMON_REG_VERSION),
                     `SET_COMMON_REG_VERSION_VERSION('h000a0300));
-    $display("[%t] Sanity Test Done.", $time);
+    `INFO(("Sanity Test Done"), ADI_VERBOSITY_DEBUG);
 endtask
 
 //---------------------------------------------------------------------------
@@ -524,13 +526,13 @@ task db_transmission_test();
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH), `SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH('h63)); // set PWM pulse width
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-    $display("[%t] axi_pwm_gen started.", $time);
+    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_DEBUG);
 
     wait(rx_ch_count == num_of_transfers);
 
     // Stop pwm gen
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
-    $display("[%t] axi_pwm_gen stopped.", $time);
+    `INFO(("Axi_pwm_gen stopped"), ADI_VERBOSITY_DEBUG);
 endtask
 
 endprogram

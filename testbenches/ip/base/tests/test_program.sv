@@ -53,12 +53,13 @@ program test_program;
 
     current_process = process::self();
     current_process_random_state = current_process.get_randstate();
-    `INFO(("Randomization state: %s", current_process_random_state));
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
-    setLoggerVerbosity(250);
+    setLoggerVerbosity(ADI_VERBOSITY_MEDIUM);
 
     // Create environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("Base Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -77,7 +78,7 @@ program test_program;
         
     env.stop();
     
-    `INFO(("Test bench done!"));
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end

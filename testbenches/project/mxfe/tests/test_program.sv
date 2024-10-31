@@ -69,7 +69,8 @@ program test_program;
 
   initial begin
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("MXFE Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -149,9 +150,11 @@ program test_program;
     // =======================
     jesd_link_test_ext_sync(0);
 
-    `INFO(("======================="));
-    `INFO(("      TB   DONE        "));
-    `INFO(("======================="));
+    env.stop();
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
+
   end
 
   // -----------------
@@ -162,9 +165,9 @@ program test_program;
                       input tx_bypass = 0,
                       input tdd_enabled = 0);
 
-    `INFO(("======================="));
-    `INFO(("      JESD TEST        "+(use_dds ? "DDS" : "DMA")));
-    `INFO(("======================="));
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("      JESD TEST        "+(use_dds ? "DDS" : "DMA")), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
 
     // -----------------------
     // TX PHY INIT
@@ -333,9 +336,9 @@ program test_program;
     rx_xcvr.down();
     tx_xcvr.down();
 
-    `INFO(("======================="));
-    `INFO(("  JESD LINK TEST DONE  "));
-    `INFO(("======================="));
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
 
   endtask : jesd_link_test
 
@@ -344,9 +347,9 @@ program test_program;
   // -----------------
   task jesd_link_test_ext_sync(input use_dds = 1);
 
-    `INFO(("======================="));
-    `INFO(("      JESD TEST  EXT SYNC      "+(use_dds ? "DDS" : "DMA")));
-    `INFO(("======================="));
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("      JESD TEST  EXT SYNC      "+(use_dds ? "DDS" : "DMA")), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
     // -----------------------
     // TX PHY INIT
     // -----------------------
@@ -489,9 +492,9 @@ program test_program;
     rx_xcvr.down();
     tx_xcvr.down();
 
-    `INFO(("======================="));
-    `INFO(("  JESD LINK TEST DONE  "));
-    `INFO(("======================="));
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
 
   endtask : jesd_link_test_ext_sync
 

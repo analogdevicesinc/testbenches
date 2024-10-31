@@ -101,7 +101,8 @@ program test_program;
   initial begin
 
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("FMCOMMS2 Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -135,7 +136,10 @@ program test_program;
 
     dma_test();
 
-    `INFO(("Test Done"));
+    env.stop();
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
 
   end
 
@@ -470,7 +474,7 @@ program test_program;
         if (captured_word !== reference_word) begin
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end else begin
-          `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
+          `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word), ADI_VERBOSITY_DEBUG);
         end
       end
     end

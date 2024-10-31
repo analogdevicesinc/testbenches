@@ -119,7 +119,8 @@ endtask
 initial begin
 
   //creating environment
-  env = new(`TH.`SYS_CLK.inst.IF,
+  env = new("SPI Engine Environment",
+            `TH.`SYS_CLK.inst.IF,
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
@@ -154,7 +155,9 @@ initial begin
 
   cs_delay_test(3,3);
 
-  `INFO(("Test Done"));
+  env.stop();
+
+  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
 
   $finish;
 
@@ -171,7 +174,7 @@ task sanity_test();
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
   axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  `INFO(("Sanity Test Done"));
+  `INFO(("Sanity Test Done"), ADI_VERBOSITY_DEBUG);
 endtask
 
 //---------------------------------------------------------------------------
@@ -189,24 +192,24 @@ initial begin
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
       axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID), sync_id);
-      `INFOV(("Offload SYNC %d IRQ. An offload transfer just finished.", sync_id),6);
+      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.", sync_id), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
       axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFOV(("SYNC %d IRQ. FIFO transfer just finished.", sync_id),6);
+      `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SDI FIFO
     if (irq_pending & 5'b00100) begin
-      `INFOV(("SDI FIFO IRQ."),6);
+      `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SDO FIFO
     if (irq_pending & 5'b00010) begin
-      `INFOV(("SDO FIFO IRQ."),6);
+      `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SDO FIFO
     if (irq_pending & 5'b00001) begin
-      `INFOV(("CMD FIFO IRQ."),6);
+      `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_DEBUG);
     end
     // Clear all pending IRQs
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
@@ -295,7 +298,7 @@ task sleep_delay_test(
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d1000)); // set PWM period
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-  `INFOV(("axi_pwm_gen started."),6);
+  `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_DEBUG);
 
   // Enable SPI Engine
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
@@ -321,9 +324,9 @@ task sleep_delay_test(
   #2000ns
   sleep_time = sleep_instr_time.pop_back();
   if ((sleep_time != expected_sleep_time)) begin
-      `ERROR(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
+      `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
   end else begin
-      `INFO(("Sleep Test PASSED"));
+      `INFO(("Sleep Test PASSED"), ADI_VERBOSITY_DEBUG);
   end
 
   // change the SPI word size (this should not affect sleep delay)
@@ -333,9 +336,9 @@ task sleep_delay_test(
   sleep_time = sleep_instr_time.pop_back();
   #100ns
   if ((sleep_time != expected_sleep_time)) begin
-      `ERROR(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
+      `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
   end else begin
-      `INFO(("Sleep Test PASSED"));
+      `INFO(("Sleep Test PASSED"), ADI_VERBOSITY_DEBUG);
   end
 
   // Disable SPI Engine
@@ -367,7 +370,7 @@ task cs_delay_test(
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d1000)); // set PWM period
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
-  `INFOV(("axi_pwm_gen started."), 6);
+  `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_DEBUG);
 
   //Configure DMA
   env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
@@ -415,13 +418,13 @@ task cs_delay_test(
   // Start the offload
   #100ns
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-  `INFOV(("Offload started (no delay on CS change)."), 6);
+  `INFO(("Offload started (no delay on CS change)."), ADI_VERBOSITY_DEBUG);
 
   spi_wait_send();
 
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
-  `INFOV(("Offload stopped (no delay on CS change)."), 6);
+  `INFO(("Offload stopped (no delay on CS change)."), ADI_VERBOSITY_DEBUG);
 
   #2000ns
 
@@ -430,9 +433,9 @@ task cs_delay_test(
   end
 
   if (irq_pending == 'h0) begin
-    `ERROR(("IRQ Test FAILED"));
+    `FATAL(("IRQ Test FAILED"));
   end else begin
-    `INFO(("IRQ Test PASSED"));
+    `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_DEBUG);
   end
 
   if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
@@ -444,12 +447,12 @@ task cs_delay_test(
     cs_deactivate_time = cs_instr_time.pop_back();
   end
   if ((cs_activate_time != expected_cs_activate_time)) begin
-    `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
+    `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
   end
   if (cs_deactivate_time != expected_cs_deactivate_time) begin
-    `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
+    `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
   end
-  `INFO(("CS Delay Test PASSED"));
+  `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_DEBUG);
 
   #2000ns
   env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
@@ -475,13 +478,13 @@ task cs_delay_test(
   // Start the offload
   #100ns
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-  `INFOV(("Offload started (with delay on CS change)."), 6);
+  `INFO(("Offload started (with delay on CS change)."), ADI_VERBOSITY_DEBUG);
 
   spi_wait_send();
 
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
-  `INFOV(("Offload stopped (with delay on CS change)."), 6);
+  `INFO(("Offload stopped (with delay on CS change)."), ADI_VERBOSITY_DEBUG);
 
   #2000ns
 
@@ -490,9 +493,9 @@ task cs_delay_test(
   end
 
   if (irq_pending == 'h0) begin
-    `ERROR(("IRQ Test FAILED"));
+    `FATAL(("IRQ Test FAILED"));
   end else begin
-    `INFO(("IRQ Test PASSED"));
+    `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_DEBUG);
   end
 
   if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
@@ -503,12 +506,12 @@ task cs_delay_test(
     cs_deactivate_time = cs_instr_time.pop_back();
   end
   if ((cs_activate_time != expected_cs_activate_time)) begin
-    `ERROR(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
+    `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
   end
   if (cs_deactivate_time != expected_cs_deactivate_time) begin
-    `ERROR(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
+    `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
   end
-  `INFO(("CS Delay Test PASSED"));
+  `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_DEBUG);
 endtask
 
 endprogram

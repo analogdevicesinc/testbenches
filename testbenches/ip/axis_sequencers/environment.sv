@@ -32,6 +32,8 @@ package environment_pkg;
     // Constructor
     //============================================================================
     function new (
+      input string name,
+
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
@@ -46,7 +48,8 @@ package environment_pkg;
     );
 
       // creating the agents
-      super.new(sys_clk_vip_if, 
+      super.new(name,
+                sys_clk_vip_if, 
                 dma_clk_vip_if, 
                 ddr_clk_vip_if, 
                 sys_rst_vip_if, 
@@ -56,8 +59,8 @@ package environment_pkg;
       src_axis_agent = new("Source AXI Stream Agent", src_axis_vip_if);
       dst_axis_agent = new("Destination AXI Stream Agent", dst_axis_vip_if);
 
-      src_axis_seq = new(src_axis_agent);
-      dst_axis_seq = new(dst_axis_agent);
+      src_axis_seq = new("Source AXI Stream Agent", src_axis_agent, this);
+      dst_axis_seq = new("Destination AXI Stream Agent", dst_axis_agent, this);
 
     endfunction
 

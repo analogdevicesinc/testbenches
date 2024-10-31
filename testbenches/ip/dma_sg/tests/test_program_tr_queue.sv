@@ -56,7 +56,8 @@ program test_program_tr_queue;
   initial begin
 
     // Creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("DMA SG Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -71,10 +72,10 @@ program test_program_tr_queue;
     `TH.`DEVICE_CLK.inst.IF.start_clock();
     env.sys_reset();
 
-    m_dmac_api = new("TX_DMA_BA", env.mng, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA_BA", env.mng, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA_BA);
     s_dmac_api.probe();
 
     #1us;
@@ -152,6 +153,11 @@ program test_program_tr_queue;
       .dest_addr(`DDR_BA+'h8000),
       .length('h8000)
     );
+
+    env.stop();
+    
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+    $finish();
 
   end
 

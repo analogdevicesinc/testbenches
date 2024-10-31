@@ -102,29 +102,29 @@ module test_program();
     env.start();
 
     #100
-    `INFO(("Bring up IP from reset."));
+    `INFO(("Bring up IP from reset."), ADI_VERBOSITY_DEBUG);
     systemBringUp();
 
     //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
 
     // Start the ADC/DAC stubs
-    `INFO(("Call the run() ..."));
+    `INFO(("Call the run() ..."), ADI_VERBOSITY_DEBUG);
     env.run();
 
     env.adc_src_axis_seq.start();
 
     // Generate DMA transfers
     #100
-    `INFO(("Start RX DMA ..."));
+    `INFO(("Start RX DMA ..."), ADI_VERBOSITY_DEBUG);
     rx_dma_transfer(`RX_DMA_BA, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
     #10000
 
-    `INFO(("Initialize the memory ..."));
+    `INFO(("Initialize the memory ..."), ADI_VERBOSITY_DEBUG);
     init_mem_64(32'h80000000, 1024);
 
-    `INFO(("Start TX DMA ..."));
+    `INFO(("Start TX DMA ..."), ADI_VERBOSITY_DEBUG);
     tx_dma_transfer(`TX_DMA_BA, 32'h80000000, 1024);
 
     #30000
@@ -132,7 +132,7 @@ module test_program();
 
     stop_clocks();
 
-    `INFO(("Test bench done!"));
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end
@@ -171,9 +171,9 @@ module test_program();
   task systemBringUp();
     // bring up the Data Offload instances from reset
 
-    `INFO(("Bring up RX Data Offload"));
+    `INFO(("Bring up RX Data Offload"), ADI_VERBOSITY_DEBUG);
     env.mng.RegWrite32(`RX_DOFF_BA + `DO_ADDR_CONTROL_1, 32'h1);
-    `INFO(("Bring up TX Data Offload"));
+    `INFO(("Bring up TX Data Offload"), ADI_VERBOSITY_DEBUG);
     env.mng.RegWrite32(`TX_DOFF_BA + `DO_ADDR_CONTROL_1, 32'h1);
 
     // Enable tx oneshot mode
@@ -181,9 +181,9 @@ module test_program();
 
     // bring up the DMAC instances from reset
 
-    `INFO(("Bring up RX DMAC"));
+    `INFO(("Bring up RX DMAC"), ADI_VERBOSITY_DEBUG);
     env.mng.RegWrite32(`RX_DMA_BA + `DMAC_ADDR_CONTROL, 32'h1);
-    `INFO(("Bring up TX DMAC"));
+    `INFO(("Bring up TX DMAC"), ADI_VERBOSITY_DEBUG);
     env.mng.RegWrite32(`TX_DMA_BA + `DMAC_ADDR_CONTROL, 32'h1);
   endtask
 

@@ -68,7 +68,8 @@ program test_program;
 
   initial begin
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("JESD Loopback 64b",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -198,6 +199,12 @@ program test_program;
     // Read status back
     env.mng.RegReadVerify32(`AXI_JESD_RX_BA+GetAddrs(JESD_RX_LINK_STATUS),
                             `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    
+    env.stop();
+    $finish;
+
   end
 
 endprogram

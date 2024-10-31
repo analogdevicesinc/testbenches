@@ -90,15 +90,15 @@ package data_offload_pkg;
     task set_transfer_length(input bit [33:0] length);
       if (length & 34'h3f) begin
         // Transfer length not divisble by 64
-        `ERROR(("data_offload: Attempted to set transfer_length %x mod 64 != 0!", length));
+        `FATAL(("data_offload: Attempted to set transfer_length %x mod 64 != 0!", length));
       end
-      `INFO(("data_offload: Writing transfer length! %x", length));
+      `INFO(("data_offload: Writing transfer length! %x", length), ADI_VERBOSITY_DEBUG);
       this.bus.RegWrite32(this.base_address + `DO_ADDR_TRANSFER_LENGTH, length >> 6);
     endtask : set_transfer_length;
 
     task set_sync_config(input bit [1:0] sync_config);
       if (sync_config == 3)
-        `ERROR(("data_offload: Invalid sync_config mode 3 requested!"));
+        `FATAL(("data_offload: Invalid sync_config mode 3 requested!"));
 
       this.bus.RegWrite32(this.base_address + `DO_ADDR_SYNC_CONFIG, {30'h0, sync_config});
     endtask : set_sync_config;

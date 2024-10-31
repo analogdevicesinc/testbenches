@@ -49,6 +49,8 @@ package environment_pkg;
     // Constructor
     //============================================================================
     function new (
+      input string name,
+
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
@@ -65,7 +67,8 @@ package environment_pkg;
     );
 
       // creating the agents
-      super.new(sys_clk_vip_if, 
+      super.new(name,
+                sys_clk_vip_if, 
                 dma_clk_vip_if, 
                 ddr_clk_vip_if, 
                 sys_rst_vip_if, 
@@ -77,18 +80,18 @@ package environment_pkg;
       rx_src_axis_agent = new("RX Source AXI Stream Agent", rx_src_axis_vip_if);
       rx_dst_axis_agent = new("RX Destination AXI Stream Agent", rx_dst_axis_vip_if);
       
-      tx_src_axis_seq = new(tx_src_axis_agent);
-      tx_dst_axis_seq = new(tx_dst_axis_agent);
-      rx_src_axis_seq = new(rx_src_axis_agent);
-      rx_dst_axis_seq = new(rx_dst_axis_agent);
+      tx_src_axis_seq = new("TX Source AXI Stream Agent", tx_src_axis_agent, this);
+      tx_dst_axis_seq = new("TX Destination AXI Stream Agent", tx_dst_axis_agent, this);
+      rx_src_axis_seq = new("RX Source AXI Stream Agent", rx_src_axis_agent, this);
+      rx_dst_axis_seq = new("RX Destination AXI Stream Agent", rx_dst_axis_agent, this);
       
-      tx_src_axis_mon = new("TX Source AXIS Transaction Monitor", tx_src_axis_agent);
-      tx_dst_axis_mon = new("TX Destination AXIS Transaction Monitor", tx_dst_axis_agent);
-      rx_src_axis_mon = new("RX Source AXIS Transaction Monitor", rx_src_axis_agent);
-      rx_dst_axis_mon = new("RX Destination AXIS Transaction Monitor", rx_dst_axis_agent);
+      tx_src_axis_mon = new("TX Source AXIS Transaction Monitor", tx_src_axis_agent, this);
+      tx_dst_axis_mon = new("TX Destination AXIS Transaction Monitor", tx_dst_axis_agent, this);
+      rx_src_axis_mon = new("RX Source AXIS Transaction Monitor", rx_src_axis_agent, this);
+      rx_dst_axis_mon = new("RX Destination AXIS Transaction Monitor", rx_dst_axis_agent, this);
 
-      scoreboard_tx = new("Pack Verification Environment TX Scoreboard", `CHANNELS, `SAMPLES, `WIDTH, CPACK);
-      scoreboard_rx = new("Pack Verification Environment RX Scoreboard", `CHANNELS, `SAMPLES, `WIDTH, UPACK);
+      scoreboard_tx = new("TX Scoreboard", `CHANNELS, `SAMPLES, `WIDTH, CPACK, this);
+      scoreboard_rx = new("RX Scoreboard", `CHANNELS, `SAMPLES, `WIDTH, UPACK, this);
 
     endfunction
 

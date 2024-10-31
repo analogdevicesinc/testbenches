@@ -133,7 +133,8 @@ endtask
 initial begin
 
   //creating environment
-  env = new(`TH.`SYS_CLK.inst.IF,
+  env = new("Pulsar Environment",
+            `TH.`SYS_CLK.inst.IF,
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
@@ -158,8 +159,10 @@ initial begin
   #100
 
   offload_spi_test();
-  `INFO(("Test Done"));
+  
+  env.stop();
 
+  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
   $finish;
 
 end
@@ -175,7 +178,7 @@ task sanity_test;
   axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
   axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   axi_read_v (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  `INFO(("Sanity Test Done"));
+  `INFO(("Sanity Test Done"), ADI_VERBOSITY_DEBUG);
 endtask
 
 //---------------------------------------------------------------------------
@@ -193,7 +196,7 @@ task generate_transfer_cmd(
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_OFF);
     // SYNC command to generate interrupt
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
-    $display("[%t] NOTE: Transfer generation finished.", $time);
+    `INFO(("Transfer generation finished"), ADI_VERBOSITY_DEBUG);
 endtask
 
 //---------------------------------------------------------------------------
@@ -211,24 +214,24 @@ initial begin
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
       axi_read (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      $display("[%t] NOTE: Offload SYNC %d IRQ. An offload transfer just finished.", $time, sync_id);
+      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished", sync_id), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
       axi_read (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      $display("[%t] NOTE: SYNC %d IRQ. FIFO transfer just finished.", $time, sync_id);
+      `INFO(("SYNC %d IRQ. FIFO transfer just finished", sync_id), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SDI FIFO
     if (irq_pending & 5'b00100) begin
-      $display("[%t] NOTE: SDI FIFO IRQ.", $time);
+      `INFO(("SDI FIFO IRQ"), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SDO FIFO
     if (irq_pending & 5'b00010) begin
-      $display("[%t] NOTE: SDO FIFO IRQ.", $time);
+      `INFO(("SDO FIFO IRQ"), ADI_VERBOSITY_DEBUG);
     end
     // IRQ launched by SDO FIFO
     if (irq_pending & 5'b00001) begin
-      $display("[%t] NOTE: CMD FIFO IRQ.", $time);
+      `INFO(("CMD FIFO IRQ"), ADI_VERBOSITY_DEBUG);
     end
     // Clear all pending IRQs
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
@@ -427,14 +430,14 @@ task offload_spi_test();
     // Start the offload
     #100
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-    $display("[%t] Offload started.", $time);
+    `INFO(("Offload started"), ADI_VERBOSITY_DEBUG);
 
     wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
 
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     offload_status = 0;
 
-    $display("[%t] Offload stopped.", $time);
+    `INFO(("Offload stopped"), ADI_VERBOSITY_DEBUG);
 
     #2000
 
@@ -444,15 +447,15 @@ task offload_spi_test();
     end
 
     if (irq_pending == 'h0) begin
-      `ERROR(("IRQ Test FAILED"));
+      `FATAL(("IRQ Test FAILED"));
     end else begin
-      `INFO(("IRQ Test PASSED"));
+      `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_DEBUG);
     end
 
     if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
       `ERROR(("Offload Test FAILED"));
     end else begin
-      `INFO(("Offload Test PASSED"));
+      `INFO(("Offload Test PASSED"), ADI_VERBOSITY_DEBUG);
     end
 endtask
 
@@ -473,7 +476,7 @@ task fifo_spi_test();
   axi_write (`PULSAR_ADC_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
   axi_write (`PULSAR_ADC_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d121)); // set PWM period
   axi_write (`PULSAR_ADC_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-  $display("[%t] axi_pwm_gen started.", $time);
+  `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_DEBUG);
 
   // Enable SPI Engine
   axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
@@ -505,11 +508,11 @@ task fifo_spi_test();
     axi_read (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), sdi_fifo_data);
   end
 
+  `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_DEBUG);
+
   if (sdi_fifo_data != sdi_fifo_data_store) begin
-    $display("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store);
     `ERROR(("Fifo Read Test FAILED"));
   end else begin
-    $display("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store);
     `INFO(("Fifo Read Test PASSED"));
   end
 endtask

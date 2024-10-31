@@ -88,7 +88,8 @@ program test_program;
   initial begin
 
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("Axi TDD Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -190,7 +191,7 @@ program test_program;
       end
 
       if (val !== expected_val) begin
-        `ERROR(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, expected_val, val));
+        `FATAL(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, expected_val, val));
       end else begin
         success_count++;
       end
@@ -204,7 +205,7 @@ program test_program;
       end
 
       if (val !== expected_val) begin
-        `ERROR(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, expected_val, val));
+        `FATAL(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, expected_val, val));
       end else begin
         success_count++;
       end
@@ -214,7 +215,7 @@ program test_program;
     env.mng.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b00) begin
-      `ERROR(("Idle state: Expected 2'b00 found 2'b%b", current_state));
+      `FATAL(("Idle state: Expected 2'b00 found 2'b%b", current_state));
     end else begin
       success_count++;
     end
@@ -240,7 +241,7 @@ program test_program;
     env.mng.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b10) begin
-      `ERROR(("Waiting state: Expected 2'b10 found 2'b%b", current_state));
+      `FATAL(("Waiting state: Expected 2'b10 found 2'b%b", current_state));
     end else begin
       success_count++;
     end
@@ -256,7 +257,7 @@ program test_program;
 
     // Check the initial startup delay
     if (expected_delay !== read_delay) begin
-      `ERROR(("Initial counter delay: Expected %t found %t", expected_delay, read_delay));
+      `FATAL(("Initial counter delay: Expected %t found %t", expected_delay, read_delay));
     end else begin
       success_count++;
     end
@@ -266,7 +267,7 @@ program test_program;
     env.mng.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b11) begin
-      `ERROR(("Running state: Expected 2'b11 found 2'b%b", current_state));
+      `FATAL(("Running state: Expected 2'b11 found 2'b%b", current_state));
     end else begin
       success_count++;
     end
@@ -283,7 +284,7 @@ program test_program;
     env.mng.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b01) begin
-      `ERROR(("Armed state: Expected 2'b01 found 2'b%b", current_state));
+      `FATAL(("Armed state: Expected 2'b01 found 2'b%b", current_state));
     end else begin
       success_count++;
     end
@@ -361,7 +362,7 @@ program test_program;
       end
 
       if (val !== expected_val) begin
-        `ERROR(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, expected_val, val));
+        `FATAL(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, expected_val, val));
       end else begin
         success_count++;
       end
@@ -375,7 +376,7 @@ program test_program;
       end
 
       if (val !== expected_val) begin
-        `ERROR(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, expected_val, val));
+        `FATAL(("Address 0x%h Expected 0x%h found 0x%h", GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, expected_val, val));
       end else begin
         success_count++;
       end
@@ -480,7 +481,7 @@ program test_program;
 
     // Check the burst count value, thus validating that the TDD is still transferring the first frame
     if (`TH.dut_tdd.inst.i_counter.tdd_burst_counter !== (channel_count+2)) begin
-      `ERROR(("Burst counter: Expected %d found %d", channel_count+1, `TH.dut_tdd.inst.i_counter.tdd_burst_counter));
+      `FATAL(("Burst counter: Expected %d found %d", channel_count+1, `TH.dut_tdd.inst.i_counter.tdd_burst_counter));
     end else begin
       success_count++;
     end
@@ -529,7 +530,7 @@ program test_program;
       @(posedge `TH.dut_tdd.inst.tdd_endof_frame);
 
       if (`TH.dut_tdd.inst.i_counter.tdd_burst_counter !== 0) begin
-        `ERROR(("Burst counter: Expected 0 found %d", `TH.dut_tdd.inst.i_counter.tdd_burst_counter));
+        `FATAL(("Burst counter: Expected 0 found %d", `TH.dut_tdd.inst.i_counter.tdd_burst_counter));
       end else begin
         success_count++;
       end
@@ -547,7 +548,7 @@ program test_program;
       @(posedge `TH.dut_tdd.inst.tdd_endof_frame);
 
       if (`TH.dut_tdd.inst.i_counter.tdd_burst_counter !== 0) begin
-        `ERROR(("Burst counter: Expected 0 found %d", `TH.dut_tdd.inst.i_counter.tdd_burst_counter));
+        `FATAL(("Burst counter: Expected 0 found %d", `TH.dut_tdd.inst.i_counter.tdd_burst_counter));
       end else begin
         success_count++;
       end
@@ -564,6 +565,9 @@ program test_program;
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
 
     stop_clocks();
+
+    `INFO(("Testbench finished!"), ADI_VERBOSITY_DEBUG);
+    $finish;
 
   end
 
@@ -616,7 +620,7 @@ program test_program;
       end
 
       if (expected_pulse_lengh !== (t2-t1)) begin
-        `ERROR(("Pulse length channel[%2d]: Expected %t found %t", i, expected_pulse_lengh, t2-t1));
+        `FATAL(("Pulse length channel[%2d]: Expected %t found %t", i, expected_pulse_lengh, t2-t1));
       end else begin
         success_count++;
       end

@@ -66,7 +66,7 @@ package s_spi_sequencer_pkg;
       int unsigned received;
       this.agent.receive_data(received);
       if (received !== expected) begin
-        `ERROR(("Data mismatch. Received : %h; expected %h", received, expected));
+        this.error($sformatf("Data mismatch. Received : %h; expected %h", received, expected));
       end
     endtask : receive_data_verify
 

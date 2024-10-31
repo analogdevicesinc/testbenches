@@ -9,7 +9,7 @@ package scoreboard_pkg;
   import x_monitor_pkg::*;
   import mailbox_pkg::*;
 
-  class scoreboard extends xil_component;
+  class scoreboard extends adi_component;
 
     typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
     protected sink_type_t sink_type;
@@ -35,9 +35,11 @@ package scoreboard_pkg;
     protected event sink_transaction_event;
 
     // constructor
-    function new(input string name);
+    function new(
+      input string name,
+      input adi_component parent = null);
 
-      super.new(name);
+      super.new(name, parent);
 
       this.enabled = 0;
       this.sink_type = ONESHOT;
@@ -88,7 +90,7 @@ package scoreboard_pkg;
       if (!this.enabled) begin
         this.sink_type = sink_type_t'(sink_type);
       end else begin
-        `ERROR(("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
+        this.error($sformatf("Can not configure sink_type while scoreboard is running."));
       end
 
     endfunction: set_sink_type
@@ -137,7 +139,7 @@ package scoreboard_pkg;
           this.source_byte_stream.push_front(source_byte);
         end
         this.source_byte_stream_size += this.source_monitor.mailbox.num();
-        `INFOV(("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size), 200);
+        this.info($sformatf("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size), ADI_VERBOSITY_DEBUG);
         ->>source_transaction_event;
         this.source_monitor.put_key();
       end
@@ -168,7 +170,7 @@ package scoreboard_pkg;
           this.sink_byte_stream.push_front(sink_byte);
         end
         this.sink_byte_stream_size += this.sink_monitor.mailbox.num();
-        `INFOV(("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size), 200);
+        this.info($sformatf("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size), ADI_VERBOSITY_DEBUG);
         ->>sink_transaction_event;
         this.sink_monitor.put_key();
       end
@@ -181,7 +183,7 @@ package scoreboard_pkg;
       logic [7:0] source_byte;
       logic [7:0] sink_byte;
 
-      `INFOV(("Scoreboard started"), 100);
+      this.info($sformatf("Started"), ADI_VERBOSITY_DEBUG);
 
       forever begin : tx_path
         if (this.enabled == 0)
@@ -196,9 +198,9 @@ package scoreboard_pkg;
             this.source_byte_stream_size--;
           sink_byte = this.sink_byte_stream.pop_back();
           this.sink_byte_stream_size--;
-          `INFOV(("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
+          this.info($sformatf("Source-sink data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_DEBUG);
           if (source_byte != sink_byte) begin
-            `ERROR(("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
+            this.error($sformatf("Failed at: exp %h - rcv %h", source_byte, sink_byte));
           end
         end else begin
           if ((this.source_byte_stream_size == 0) &&

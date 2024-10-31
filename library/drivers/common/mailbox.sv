@@ -4,7 +4,7 @@ package mailbox_pkg;
 
   import logger_pkg::*;
 
-  class mailbox_c #(type T);
+  class mailbox_c #(type T) extends adi_component;
 
     T queue[$];
 
@@ -13,7 +13,13 @@ package mailbox_pkg;
     event q_event;
 
     // constructor
-    function new(int size_max = 0);
+    function new(
+      input string name,
+      input int size_max = 0,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+      
       this.size_max = size_max;
     endfunction
 
@@ -36,14 +42,14 @@ package mailbox_pkg;
       return 1;
     endfunction
 
-    task put(T element);
+    task put(input T element);
       if (this.size_max == this.num() && this.size_max != 0)
         @this.q_event;
       this.queue.push_front(element);
       ->this.q_event;
     endtask
 
-    function int try_put(T element);
+    function int try_put(input T element);
       if (this.size_max == this.num() && this.size_max != 0)
         return 0;
       this.queue.push_front(element);

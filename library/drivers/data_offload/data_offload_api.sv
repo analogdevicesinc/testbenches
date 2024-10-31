@@ -48,8 +48,13 @@ package data_offload_api_pkg;
     // -----------------
     //
     // -----------------
-    function new(string name, reg_accessor bus, bit [31:0] base_address);
-      super.new(name, bus, base_address);
+    function new(
+      input string name,
+      input reg_accessor bus,
+      input bit [31:0] base_address,
+      input adi_component parent = null);
+
+      super.new(name, bus, base_address, parent);
     endfunction
 
     // -----------------

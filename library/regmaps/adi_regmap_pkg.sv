@@ -65,7 +65,7 @@ package adi_regmap_pkg;
     int lsb, msb;
 
     if (!register.fields.exists(field))
-      `ERROR(("Field %s in reg %s does not exists", field, register.name));
+      `FATAL(("Field %s in reg %s does not exists", field, register.name));
 
     lsb = register.fields[field].lsb;
     msb = register.fields[field].msb;
@@ -75,7 +75,7 @@ package adi_regmap_pkg;
       ret[i]=1'b0;
     end
 
-    `INFOV(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value, ret), 10);
+    `INFO(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value, ret), ADI_VERBOSITY_DEBUG);
 
     return ret;
   endfunction;
@@ -87,7 +87,7 @@ package adi_regmap_pkg;
     int lsb, msb;
 
     if (!register.fields.exists(field))
-      `ERROR(("Field %s in reg %s does not exists", field, register.name));
+      `FATAL(("Field %s in reg %s does not exists", field, register.name));
 
     lsb = register.fields[field].lsb;
     msb = register.fields[field].msb;
@@ -109,7 +109,7 @@ package adi_regmap_pkg;
     bit [31:0] ret = curregvalue;
 
     if (!register.fields.exists(field))
-      `ERROR(("Field %s in reg %s does not exists", field, register.name));
+      `FATAL(("Field %s in reg %s does not exists", field, register.name));
 
     ret = ret & (~SetField(register, field, 'hFFFF)); // mask
     ret = ret | SetField(register, field, regvalue); // update register

@@ -36,17 +36,28 @@
 package reg_accessor_pkg;
 
   import axi_vip_pkg::*;
+  import logger_pkg::*;
 
-  virtual class reg_accessor;
+  class reg_accessor extends adi_component;
 
-    pure virtual task automatic RegWrite32(input xil_axi_ulong addr =0,
+    function new(
+      input string name,
+      input adi_component parent = null);
+      
+      super.new(name, parent);
+    endfunction
+
+    virtual task automatic RegWrite32(input xil_axi_ulong addr =0,
                                            input bit [31:0]    data);
+    endtask: RegWrite32
 
-    pure virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
+    virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
                                           output bit [31:0]    data);
+    endtask: RegRead32
 
-    pure virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
+    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
                                                 input bit [31:0]     data);
+    endtask: RegReadVerify32
 
   endclass
 

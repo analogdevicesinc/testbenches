@@ -40,7 +40,7 @@ package s_axis_sequencer_pkg;
   import axi4stream_vip_pkg::*;
   import logger_pkg::*;
 
-  class s_axis_sequencer_base;
+  class s_axis_sequencer_base extends adi_component;
 
     protected xil_axi4stream_data_byte byte_stream [$];
     protected xil_axi4stream_ready_gen_policy_t mode;
@@ -58,7 +58,12 @@ package s_axis_sequencer_pkg;
 
 
     // new
-    function new();
+    function new(
+      input string name,
+      input adi_component parent = null);
+      
+      super.new(name, parent);
+
       this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
       this.low_time = 0;
       this.high_time = 1;
@@ -126,11 +131,11 @@ package s_axis_sequencer_pkg;
     task verify_byte(input bit [7:0] refdata);
       bit [7:0] data;
       if (byte_stream.size() == 0) begin
-        `ERROR(("Byte steam empty !!!"));
+        this.error($sformatf("Byte steam empty !!!"));
       end else begin
         data = byte_stream.pop_front();
         if (data !== refdata) begin
-          `ERROR(("Unexpected data received. Expected: %0h Found: %0h Left : %0d", refdata, data, byte_stream.size()));
+          this.error($sformatf("Unexpected data received. Expected: %0h Found: %0h Left : %0d", refdata, data, byte_stream.size()));
         end
       end
     endtask
@@ -156,8 +161,12 @@ package s_axis_sequencer_pkg;
     protected T agent;
 
 
-    function new(T agent);
-      super.new();
+    function new(
+      input string name,
+      input T agent,
+      input adi_component parent = null);
+      
+      super.new(name, parent);
 
       this.agent = agent;
     endfunction

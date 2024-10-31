@@ -37,7 +37,7 @@ fi; \
 (ERR=0; \
 END=$$(date +%s); \
 DIFF=$$(( $$END - $$START )); \
-ERRS=`grep -v ^# $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -e "\[ERROR\]" -e "while\\ executing" -C 10 |  sed 's/</\&lt;/g' | sed 's/>/\&gt;/g'`; \
+ERRS=`grep -v ^# $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -e "\[ERROR\]" -e "\[FATAL\]" -e "while\\ executing" -C 10 |  sed 's/</\&lt;/g' | sed 's/>/\&gt;/g'`; \
 if [[ $$ERRS > 0 ]]; then \
 	ERR=1; \
 fi; \

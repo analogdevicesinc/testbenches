@@ -163,7 +163,7 @@ package adi_spi_vip_pkg;
               if (!vif.cs_active) begin
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
-                  `FATAL(("tx_miso: early exit due to unexpected CS inactive!"));
+                  this.fatal($sformatf("tx_miso: early exit due to unexpected CS inactive!"));
                 end
                 break;
               end else if (pending_mbx) begin
@@ -179,7 +179,7 @@ package adi_spi_vip_pkg;
                   miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
                 end
                 if (i == SPI_VIP_DATA_DLENGTH-1) begin
-                  `INFO(("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_FULL);
+                  this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_FULL);
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
                     miso_mbx.get(miso_reg);
@@ -252,7 +252,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                `INFO(("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_FULL);
+                this.info($sformatf("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_FULL);
                 this.stop_flag = 0;
               end
               begin
@@ -264,7 +264,7 @@ package adi_spi_vip_pkg;
         join
         this.clear_active();
       end else begin
-        `ERROR(("Already running!"));
+        this.error($sformatf("Already running!"));
       end
     endtask
 
@@ -272,7 +272,7 @@ package adi_spi_vip_pkg;
       if (this.get_active()) begin
         this.stop_flag = 1;
       end else begin
-        `ERROR(("Already inactive!"));
+        this.error($sformatf("Already inactive!"));
       end
     endtask
 

@@ -76,21 +76,21 @@ program test_program_64b66b;
     `TH.`DRP_CLK.inst.IF.start_clock;
     `TH.`SYSREF_CLK.inst.IF.start_clock;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     #1us;
     env.mng.RegRead32(`DAC_TPL_BA+'h0c,tmp);
-    `INFO(("DAC TPL CONFIG is %h",tmp), ADI_VERBOSITY_DEBUG);
+    `INFO(("DAC TPL CONFIG is %h",tmp), ADI_VERBOSITY_LOW);
     env.mng.RegRead32(`DAC_TPL_BA+'h418,tmp);
-    `INFO(("DAC TPL CH0 SEL is %h",tmp), ADI_VERBOSITY_DEBUG);
+    `INFO(("DAC TPL CH0 SEL is %h",tmp), ADI_VERBOSITY_LOW);
     env.mng.RegRead32(`DAC_TPL_BA+'h458,tmp);
-    `INFO(("DAC TPL CH1 SEL is %h",tmp), ADI_VERBOSITY_DEBUG);
+    `INFO(("DAC TPL CH1 SEL is %h",tmp), ADI_VERBOSITY_LOW);
 
     env.mng.RegRead32(`RX_DMA_BA+32'h0010,tmp);
-   `INFO(("RX_DMA_BA interface setup is %h",tmp), ADI_VERBOSITY_DEBUG);
+   `INFO(("RX_DMA_BA interface setup is %h",tmp), ADI_VERBOSITY_LOW);
     env.mng.RegRead32(`TX_DMA_BA+32'h0010,tmp);
-   `INFO(("TX_DMA_BA interface setup is %h",tmp), ADI_VERBOSITY_DEBUG);
+   `INFO(("TX_DMA_BA interface setup is %h",tmp), ADI_VERBOSITY_LOW);
 
     //  -------------------------------------------------------
     //  Test DDS path

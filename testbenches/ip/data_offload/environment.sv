@@ -123,7 +123,7 @@ package environment_pkg;
           ADC_TRANSACTION_FAIL: assert(rx_transaction.randomize());
           rx_transaction.set_delay(adc_data_rate_ratio - 1);
           adc_src_axis_agent.driver.send(rx_transaction);
-          `INFO(("Sent new transaction to ADC driver"), ADI_VERBOSITY_DEBUG);
+          `INFO(("Sent new transaction to ADC driver"), ADI_VERBOSITY_LOW);
           #0;
         end else begin
           #1;

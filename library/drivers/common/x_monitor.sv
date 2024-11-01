@@ -130,7 +130,7 @@ package x_monitor_pkg;
                 this.axi_byte_stream_size++;
               end
             end
-            this.info($sformatf("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), ADI_VERBOSITY_DEBUG);
+            this.info($sformatf("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), ADI_VERBOSITY_MEDIUM);
             this.transaction_captured();
             #1step;
             #1step;
@@ -214,7 +214,7 @@ package x_monitor_pkg;
           if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
             this.mailbox.put(axi_byte);
         end
-        this.info($sformatf("Caught an AXI4 stream transaction: %d", this.mailbox.num()), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Caught an AXI4 stream transaction: %d", this.mailbox.num()), ADI_VERBOSITY_MEDIUM);
         this.transaction_captured();
         #1step;
         this.mailbox.flush();

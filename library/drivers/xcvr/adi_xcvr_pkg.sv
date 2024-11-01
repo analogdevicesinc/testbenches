@@ -329,7 +329,7 @@ package adi_xcvr_pkg;
         xcvr_type.name(),
         num_lanes,
         qpll_enable
-        ), ADI_VERBOSITY_DEBUG);
+        ), ADI_VERBOSITY_MEDIUM);
       case (xcvr_type)
         GTXE2:
           begin
@@ -504,7 +504,7 @@ package adi_xcvr_pkg;
       if (timeout == 0) begin
         this.error($sformatf("[%s] XCVR status: 0, PLL lock: %0d", name, ~pll_lock_n));
       end else begin
-        this.info($sformatf("[%s] XCVR status: 1, PLL lock: %0d", name, ~pll_lock_n), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("[%s] XCVR status: 1, PLL lock: %0d", name, ~pll_lock_n), ADI_VERBOSITY_MEDIUM);
       end
 
     endtask : up
@@ -622,7 +622,7 @@ package adi_xcvr_pkg;
       int f_fbdiv, f_fbdiv_45, f_refclk_div;
       int found = 0;
 
-      this.info($sformatf("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_MEDIUM);
       for (int fbdiv = 1; fbdiv <= 5; fbdiv++) begin
         for (int fbdiv_45 = 4; fbdiv_45 <= 5; fbdiv_45++) begin
           for (int refclk_div = 1; refclk_div <= 2; refclk_div++) begin
@@ -631,7 +631,7 @@ package adi_xcvr_pkg;
               this.info($sformatf("Skipping CPLL vco %0d . Out of range, [ %0d - %0d ]",
                       cpll_vco,
                       p.cpll_vco_min,
-                      p.cpll_vco_max), ADI_VERBOSITY_DEBUG);
+                      p.cpll_vco_max), ADI_VERBOSITY_MEDIUM);
               continue;
             end
             for (int out_div_idx = 0; out_div_idx <= 3; out_div_idx++) begin
@@ -653,13 +653,13 @@ package adi_xcvr_pkg;
       end
 
       if (found) begin
-        this.info($sformatf("Found cpll_vco : %0d", cpll_vco), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found cpll_fbdiv : %0d", f_fbdiv), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found cpll_fbdiv_45 : %0d", f_fbdiv_45), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found cpll_refclk_div : %0d", f_refclk_div), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found out_div : %0d", f_out_div), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found cpll_vco : %0d", cpll_vco), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found cpll_fbdiv : %0d", f_fbdiv), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found cpll_fbdiv_45 : %0d", f_fbdiv_45), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found cpll_refclk_div : %0d", f_refclk_div), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found out_div : %0d", f_out_div), ADI_VERBOSITY_MEDIUM);
       end else begin
-        this.info($sformatf("No valid config found for CPLL lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("No valid config found for CPLL lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_MEDIUM);
         success = 0;
         return;
       end
@@ -734,12 +734,12 @@ package adi_xcvr_pkg;
           qpll_clkoutrate_min = 2;  // Half rate
       endcase
 
-      this.info($sformatf("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf("Searching valid config for lane rate %0d ref clock %0d", lane_rate, ref_clk), ADI_VERBOSITY_MEDIUM);
       foreach (p.qpll_fbdiv_drp[fbdiv]) begin : fbdiv_loop
         for (int refclk_div = 1; refclk_div <= 4; refclk_div++) begin
           qpll_vco = ref_clk * fbdiv / refclk_div;
           if (p.qpll_check_vco_range(qpll_vco, is_qpll1)) begin
-            this.info($sformatf("Skipping QPLL vco %0d . Out of range. fbdiv = %0d refclk_div = %0d", qpll_vco, fbdiv, refclk_div), ADI_VERBOSITY_DEBUG);
+            this.info($sformatf("Skipping QPLL vco %0d . Out of range. fbdiv = %0d refclk_div = %0d", qpll_vco, fbdiv, refclk_div), ADI_VERBOSITY_MEDIUM);
             continue;
           end
           for (qpll_clkoutrate = qpll_clkoutrate_min; qpll_clkoutrate <= 2; qpll_clkoutrate++) begin
@@ -761,13 +761,13 @@ package adi_xcvr_pkg;
       end
 
       if (found) begin
-        this.info($sformatf("Found qpll_vco : %0d", qpll_vco), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found qpll_fbdiv : %0d", f_fbdiv), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found qpll_refclk_div : %0d", f_refclk_div), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found qpll_clkoutrate : %0d", qpll_clkoutrate), ADI_VERBOSITY_DEBUG);
-        this.info($sformatf("Found out_div : %0d", f_out_div), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Found qpll_vco : %0d", qpll_vco), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found qpll_fbdiv : %0d", f_fbdiv), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found qpll_refclk_div : %0d", f_refclk_div), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found qpll_clkoutrate : %0d", qpll_clkoutrate), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("Found out_div : %0d", f_out_div), ADI_VERBOSITY_MEDIUM);
       end else begin
-        this.info($sformatf("No valid config found for QPLL%0d lane rate %0d ref clock %0d", is_qpll1, lane_rate, ref_clk), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("No valid config found for QPLL%0d lane rate %0d ref clock %0d", is_qpll1, lane_rate, ref_clk), ADI_VERBOSITY_MEDIUM);
         success = 0;
         return;
       end
@@ -778,7 +778,7 @@ package adi_xcvr_pkg;
           if (qpll_enable)
             set_qpll_divs(ch_idx, is_qpll1, f_refclk_div, f_fbdiv, qpll_clkoutrate);
           else
-            this.info($sformatf("WARNING: Skipping QPLL configuration. Current AXI_XCVR does not have access to the CM ports"), ADI_VERBOSITY_DEBUG);
+            this.info($sformatf("WARNING: Skipping QPLL configuration. Current AXI_XCVR does not have access to the CM ports"), ADI_VERBOSITY_MEDIUM);
         end
 
       end

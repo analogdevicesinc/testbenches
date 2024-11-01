@@ -70,7 +70,7 @@ package m_axi_sequencer_pkg;
       static xil_axi_uint       id =0;
 
       writer_s.get(1);
-      this.info($sformatf("writing to address %h value %h", addr , data), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf("writing to address %h value %h", addr , data), ADI_VERBOSITY_HIGH);
 
       single_write_transaction_readback_api(.id(id),
                                             .addr(addr),
@@ -99,7 +99,7 @@ package m_axi_sequencer_pkg;
                                             .Rdatabeat(DataBeat_for_read));
       id++;
       data = DataBeat_for_read[0][0+:32];
-      this.info($sformatf(" Reading data : %h @ 0x%h", data, addr), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf(" Reading data : %h @ 0x%h", data, addr), ADI_VERBOSITY_HIGH);
 
       reader_s.put(1);
 

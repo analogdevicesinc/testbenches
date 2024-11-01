@@ -98,7 +98,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     start_clocks();
@@ -566,7 +566,7 @@ program test_program;
 
     stop_clocks();
 
-    `INFO(("Testbench finished!"), ADI_VERBOSITY_DEBUG);
+    `INFO(("Testbench finished!"), ADI_VERBOSITY_NONE);
     $finish;
 
   end

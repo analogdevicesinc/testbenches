@@ -116,10 +116,10 @@ package dmac_api_pkg;
         p.DMA_TYPE_DEST == 0 ? "AXI MemoryMap" : p.DMA_TYPE_DEST == 1 ? "AXI Stream" : p.DMA_TYPE_DEST == 2 ? "FIFO" : "Unknown",
         p.DMA_DATA_WIDTH_DEST,
         p.DMA_TYPE_SRC == 0 ? "AXI MemoryMap" : p.DMA_TYPE_SRC == 1 ? "AXI Stream" : p.DMA_TYPE_SRC == 2 ? "FIFO" : "Unknown",
-        p.DMA_DATA_WIDTH_SRC), ADI_VERBOSITY_DEBUG);
-      this.info($sformatf("Found %0d max bytes per burst" , p.MAX_BYTES_PER_BURST), ADI_VERBOSITY_DEBUG);
-      this.info($sformatf("Transfer length alignment requirement: %0d bytes" , p.DMA_LENGTH_ALIGN), ADI_VERBOSITY_DEBUG);
-      this.info($sformatf("Enabled support for 2D transfers: %0d" , p.DMA_2D_TRANSFER), ADI_VERBOSITY_DEBUG);
+        p.DMA_DATA_WIDTH_SRC), ADI_VERBOSITY_MEDIUM);
+      this.info($sformatf("Found %0d max bytes per burst" , p.MAX_BYTES_PER_BURST), ADI_VERBOSITY_MEDIUM);
+      this.info($sformatf("Transfer length alignment requirement: %0d bytes" , p.DMA_LENGTH_ALIGN), ADI_VERBOSITY_MEDIUM);
+      this.info($sformatf("Enabled support for 2D transfers: %0d" , p.DMA_2D_TRANSFER), ADI_VERBOSITY_MEDIUM);
     endtask : probe
 
     // -----------------
@@ -180,7 +180,7 @@ package dmac_api_pkg;
           do
             this.axi_read(GetAddrs(DMAC_TRANSFER_SUBMIT), regData);
           while (`GET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(regData) != 0);
-          this.info($sformatf("Ready for submission "), ADI_VERBOSITY_DEBUG);
+          this.info($sformatf("Ready for submission "), ADI_VERBOSITY_MEDIUM);
         end
         begin
           #2ms;
@@ -198,7 +198,7 @@ package dmac_api_pkg;
     task transfer_start;
       this.axi_write(GetAddrs(DMAC_TRANSFER_SUBMIT),
                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-      this.info($sformatf("Transfer start"), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf("Transfer start"), ADI_VERBOSITY_MEDIUM);
     endtask : transfer_start
 
     // -----------------
@@ -248,7 +248,7 @@ package dmac_api_pkg;
           while (~regData[transfer_id]) begin
             this.axi_read(GetAddrs(DMAC_TRANSFER_DONE), regData);
           end
-          this.info($sformatf("Transfer id %0d DONE",transfer_id), ADI_VERBOSITY_DEBUG);
+          this.info($sformatf("Transfer id %0d DONE",transfer_id), ADI_VERBOSITY_MEDIUM);
 
           partial_info_available = `GET_DMAC_TRANSFER_DONE_PARTIAL_TRANSFER_DONE(regData);
 
@@ -257,14 +257,14 @@ package dmac_api_pkg;
               this.error($sformatf("Partial transfer info availability not set for ID %0d", transfer_id));
             end
 
-            this.info($sformatf("Found partial data info for ID  %0d",transfer_id), ADI_VERBOSITY_DEBUG);
+            this.info($sformatf("Found partial data info for ID  %0d",transfer_id), ADI_VERBOSITY_MEDIUM);
             this.axi_read(GetAddrs(DMAC_PARTIAL_TRANSFER_LENGTH), regData);
             segment_length_found = `GET_DMAC_PARTIAL_TRANSFER_LENGTH_PARTIAL_LENGTH(regData);
             if (segment_length_found != segment_length) begin
               this.error($sformatf("Partial transfer length does not match Expected %0d Found %0d",
                       segment_length, segment_length_found));
             end else begin
-              this.info($sformatf("Found partial data info length is %0d",segment_length), ADI_VERBOSITY_DEBUG);
+              this.info($sformatf("Found partial data info length is %0d",segment_length), ADI_VERBOSITY_MEDIUM);
             end
             this.axi_read(GetAddrs(DMAC_PARTIAL_TRANSFER_ID), regData);
             id_found = `GET_DMAC_PARTIAL_TRANSFER_ID_PARTIAL_TRANSFER_ID(regData);
@@ -293,7 +293,7 @@ package dmac_api_pkg;
     // -----------------
     task transfer_id_get(output bit [3:0] transfer_id);
       this.axi_read(GetAddrs(DMAC_TRANSFER_ID), transfer_id);
-      this.info($sformatf("Found transfer ID = %0d", transfer_id), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf("Found transfer ID = %0d", transfer_id), ADI_VERBOSITY_MEDIUM);
     endtask : transfer_id_get
 
     // -----------------
@@ -306,9 +306,9 @@ package dmac_api_pkg;
       dma_flocked_2d_segment t_fl_2d;
 
       wait_transfer_submission();
-      this.info($sformatf(" Submitting up a segment of : "), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf(" Submitting up a segment of : "), ADI_VERBOSITY_MEDIUM);
       t.print();
-      this.info($sformatf(" --------------------------"), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf(" --------------------------"), ADI_VERBOSITY_MEDIUM);
 
       if (t.length % p.DMA_LENGTH_ALIGN > 0) begin
         this.error($sformatf("Transfer length (%0d) must be multiple of largest interface (%0d)", t.length, p.DMA_LENGTH_ALIGN));

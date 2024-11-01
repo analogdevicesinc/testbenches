@@ -87,7 +87,7 @@ program test_dma;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     if (`JESD_MODE != "64B66B") begin

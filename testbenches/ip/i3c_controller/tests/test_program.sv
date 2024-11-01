@@ -203,11 +203,11 @@ endtask
 // Information
 //---------------------------------------------------------------------------
 task print_cmdr (input int data);
-  `INFO(("[%t] Got CMDR error %d, length %d, sync %d", $time, data[23:20], data[19:8], data[7:0]), ADI_VERBOSITY_DEBUG);
+  `INFO(("[%t] Got CMDR error %d, length %d, sync %d", $time, data[23:20], data[19:8], data[7:0]), ADI_VERBOSITY_LOW);
 endtask
 
 task print_ibi(input int data);
-  `INFO(("[%t] Got IBI DA %b, MDB %b, Sync %d.", $time, data[23:17], data[15:08], data[7:0]), ADI_VERBOSITY_DEBUG);
+  `INFO(("[%t] Got IBI DA %b, MDB %b, Sync %d.", $time, data[23:17], data[15:08], data[7:0]), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -256,7 +256,7 @@ initial begin
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(6);
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
   env.start();
   env.sys_reset();
@@ -302,13 +302,13 @@ initial begin
     axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
     if (irq_pending & (1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING)) begin
-      `INFO(("[%t] NOTE: Got CMDR IRQ", $time), ADI_VERBOSITY_DEBUG);
+      `INFO(("[%t] NOTE: Got CMDR IRQ", $time), ADI_VERBOSITY_LOW);
     end else if (irq_pending & (1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING)) begin
-      `INFO(("[%t] NOTE: Got IBI IRQ", $time), ADI_VERBOSITY_DEBUG);
+      `INFO(("[%t] NOTE: Got IBI IRQ", $time), ADI_VERBOSITY_LOW);
     end else if (irq_pending & (1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING)) begin
-      `INFO(("[%t] NOTE: Got DAA IRQ", $time), ADI_VERBOSITY_DEBUG);
+      `INFO(("[%t] NOTE: Got DAA IRQ", $time), ADI_VERBOSITY_LOW);
     end else begin
-      `INFO(("[%t] NOTE: Got IRQ %h", $time, irq_pending), ADI_VERBOSITY_DEBUG);
+      `INFO(("[%t] NOTE: Got IRQ %h", $time, irq_pending), ADI_VERBOSITY_LOW);
     end
   end
 end
@@ -317,12 +317,12 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 task sanity_test();
-  `INFO(("Sanity Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Sanity Started"), ADI_VERBOSITY_LOW);
   axi_read_v (`I3C_CONTROLLER_BA, `I3C_REGMAP_VERSION,       I3C_VERSION_CHECK);
   axi_read_v (`I3C_CONTROLLER_BA, `I3C_REGMAP_DEVICE_ID,     I3C_DEVICE_ID_CHECK);
   axi_write  (`I3C_CONTROLLER_BA, `I3C_REGMAP_SCRATCH,       I3C_SCRATCH_CHECK);
   axi_read_v (`I3C_CONTROLLER_BA, `I3C_REGMAP_SCRATCH,       I3C_SCRATCH_CHECK);
-  `INFO(("Sanity Test Done"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -332,7 +332,7 @@ bit   [31:0]  cmdr_fifo_data = 0;
 bit   [31:0]  sdi_fifo_data = 0;
 
 task ccc_i3c_test;
-  `INFO(("CCC I3C Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("CCC I3C Started"), ADI_VERBOSITY_LOW);
 
   auto_ack <= 1'b1;
 
@@ -343,7 +343,7 @@ task ccc_i3c_test;
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h20);
 
   // Test #1, CCC without payload
-  `INFO(("CCC I3C Test #1"), ADI_VERBOSITY_DEBUG);
+  `INFO(("CCC I3C Test #1"), ADI_VERBOSITY_LOW);
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_CMD_RSTDAA); // CCC, length 0
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_RSTDAA);
   @(posedge i3c_irq);
@@ -354,7 +354,7 @@ task ccc_i3c_test;
     `FATAL(("CMD -> CMDR read length test FAILED"));
 
   // Test #2, CCC with length 1 write payload
-  `INFO(("CCC I3C Test #2"), ADI_VERBOSITY_DEBUG);
+  `INFO(("CCC I3C Test #2"), ADI_VERBOSITY_LOW);
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000000b); // See DISEC spec. for +info
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_CMD_DISEC); // CCC, length tx 1
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_DISEC);
@@ -366,7 +366,7 @@ task ccc_i3c_test;
     `FATAL(("CMD -> CMDR write length test FAILED"));
 
   // Test #3, CCC with length 6 read payload but DA is unknown
-  `INFO(("CCC I3C Test #3"), ADI_VERBOSITY_DEBUG);
+  `INFO(("CCC I3C Test #3"), ADI_VERBOSITY_LOW);
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETPID_UDA); // CCC, length rx 6
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETPID);
   wait (i3c_irq);
@@ -377,7 +377,7 @@ task ccc_i3c_test;
     `FATAL(("#4: CMD -> CMDR UDA_ERROR assertion FAILED"));
 
   // Test #4, CCC with length 6 read payload, DA is known
-  `INFO(("CCC I3C Test #4"), ADI_VERBOSITY_DEBUG);
+  `INFO(("CCC I3C Test #4"), ADI_VERBOSITY_LOW);
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETPID); // CCC, length rx 6
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETPID);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
@@ -396,7 +396,7 @@ task ccc_i3c_test;
     `FATAL(("CMD -> CMDR read length test FAILED"));
 
   // Test #5, CCC with length 1 read payload, DA is known
-  `INFO(("CCC I3C Test #5"), ADI_VERBOSITY_DEBUG);
+  `INFO(("CCC I3C Test #5"), ADI_VERBOSITY_LOW);
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETDCR); // CCC, length rx 1
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETDCR);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
@@ -416,14 +416,14 @@ task ccc_i3c_test;
   // Clear all pending IRQs
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
-  `INFO(("CCC I3C Test Done"), ADI_VERBOSITY_DEBUG);
+  `INFO(("CCC I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
 // Private transfer I3C Test
 //---------------------------------------------------------------------------
 task priv_i3c_test();
-  `INFO(("Private Transfer I3C Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Private Transfer I3C Started"), ADI_VERBOSITY_LOW);
 
   // Disable IBI
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b00);
@@ -435,7 +435,7 @@ task priv_i3c_test();
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h20);
 
   // Test #1, controller does private write transfer that is ACK
-  `INFO(("PRIV I3C Test #1"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I3C Test #1"), ADI_VERBOSITY_LOW);
 
   // Write SDO payload
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
@@ -446,7 +446,7 @@ task priv_i3c_test();
   `WAIT (`DUT_I3C_BIT_MOD.nop == 1, 100000);
 
   // Test #2, controller does private read transfer that is ACK
-  `INFO(("PRIV I3C Test #2"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I3C Test #2"), ADI_VERBOSITY_LOW);
 
   // Change speed grade to 6.25 MHz
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_OPS, {2'b10, 4'd0, 1'b0});
@@ -464,7 +464,7 @@ task priv_i3c_test();
 
   // Test #3, controller does private read transfer that is cancelled
   // at the first T-Bit
-  `INFO(("PRIV I3C Test #3"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I3C Test #3"), ADI_VERBOSITY_LOW);
 
   // Write CMD instruction
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_3);
@@ -481,7 +481,7 @@ task priv_i3c_test();
 
   // Test #4, controller does private write transfer to an unknown DA.
   // Expected result: return UDA_ERROR in receipt
-  `INFO(("PRIV I3C Test #4"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I3C Test #4"), ADI_VERBOSITY_LOW);
 
   // Write SDO payload
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
@@ -491,7 +491,7 @@ task priv_i3c_test();
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Test #5, controller does private read transfer that is NACK
-  `INFO(("PRIV I3C Test #5"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I3C Test #5"), ADI_VERBOSITY_LOW);
 
   // Write SDO payload
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
@@ -505,7 +505,7 @@ task priv_i3c_test();
 
   // Test #6, controller does private read transfer that is ACK,
   // no broadcast address.
-  `INFO(("PRIV I3C Test #6"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I3C Test #6"), ADI_VERBOSITY_LOW);
 
   // Write CMD instruction
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_5);
@@ -569,20 +569,20 @@ task priv_i3c_test();
   // Clear all pending IRQs
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
-  `INFO(("Private Transfer I3C Ended"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Private Transfer I3C Ended"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
 // Private transfer I²C Test
 //---------------------------------------------------------------------------
 task priv_i2c_test();
-  `INFO(("Private Transfer I2C Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Private Transfer I2C Started"), ADI_VERBOSITY_LOW);
 
   // Unmask CMDR interrupt
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h20);
 
   // Test #1, controller does private write transfer that is ACK
-  `INFO(("PRIV I2C Test #1"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I2C Test #1"), ADI_VERBOSITY_LOW);
   auto_ack <= 1'b1;
 
   // Write SDO payload
@@ -598,7 +598,7 @@ task priv_i2c_test();
 
   // Test #2, controller does private read transfer and ACKs all receiving
   // bytes.
-  `INFO(("PRIV I2C Test #2"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I2C Test #2"), ADI_VERBOSITY_LOW);
 
   // Write CMD instruction
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_2);
@@ -617,7 +617,7 @@ task priv_i2c_test();
   auto_ack <= 1'b1;
 
   // Test #3, controller does private write transfer that stalls for a while
-  `INFO(("PRIV I2C Test #3"), ADI_VERBOSITY_DEBUG);
+  `INFO(("PRIV I2C Test #3"), ADI_VERBOSITY_LOW);
   auto_ack <= 1'b1;
 
   // Write SDO payload
@@ -664,7 +664,7 @@ task priv_i2c_test();
     axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
   end
 
-  `INFO(("Private Transfer I2C Ended"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Private Transfer I2C Ended"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -675,7 +675,7 @@ bit   [31:0]  ibi_fifo_data = 0;
 task ibi_i3c_test();
   auto_ack <= 1'b0;
 
-  `INFO(("IBI I3C Test Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test Started"), ADI_VERBOSITY_LOW);
 
   // Unask IBI, CMDR interrupt
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h60);
@@ -687,7 +687,7 @@ task ibi_i3c_test();
   // Expected result: the controller accepts the IBI by driving SCL,
   // obtains the DA and MDB from the IBI.
 
-  `INFO(("IBI I3C Test #1"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test #1"), ADI_VERBOSITY_LOW);
   write_ibi_da(DEVICE_DA1);
 
   @(posedge i3c_irq);
@@ -702,7 +702,7 @@ task ibi_i3c_test();
   // Expected result: the controller retrieves the DA and MDB from the IBI,
   // and continues the cmd transfer after resolving the IBI request.
 
-  `INFO(("IBI I3C Test #2"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test #2"), ADI_VERBOSITY_LOW);
   // Write SDO payload
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
 
@@ -735,7 +735,7 @@ task ibi_i3c_test();
   // Expected result: the controller rejects the IBI by NACKIng the,
   // request. No ibi is written to the FIFO.
 
-  `INFO(("IBI I3C Test #3"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test #3"), ADI_VERBOSITY_LOW);
   auto_ack <= 1'b0;
   write_ibi_da(START_DA);
 
@@ -750,7 +750,7 @@ task ibi_i3c_test();
   // after resolving the IBI request.
 
   #12000ns
-  `INFO(("IBI I3C Test #4"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test #4"), ADI_VERBOSITY_LOW);
   // Write SDO payload
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
 
@@ -777,7 +777,7 @@ task ibi_i3c_test();
   // ACKs the IBI and follows with a Stop.
 
   #12000ns
-  `INFO(("IBI I3C Test #5"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test #5"), ADI_VERBOSITY_LOW);
   auto_ack <= 1'b0;
   write_ibi_da(DEVICE_DA1+1);
 
@@ -797,7 +797,7 @@ task ibi_i3c_test();
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b10);
 
   #12000ns
-  `INFO(("IBI I3C Test #6"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test #6"), ADI_VERBOSITY_LOW);
   auto_ack <= 1'b0;
   write_ibi_da(DEVICE_DA1+1);
 
@@ -816,14 +816,14 @@ task ibi_i3c_test();
   // Clear all pending IRQs
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
-  `INFO(("IBI I3C Test Done"), ADI_VERBOSITY_DEBUG);
+  `INFO(("IBI I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
 // DAA I3C Test
 //---------------------------------------------------------------------------
 task daa_i3c_test();
-  `INFO(("DAA I3C Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("DAA I3C Started"), ADI_VERBOSITY_LOW);
 
   // Unmask the CMDR and DAA interrupt
   axi_write (`I3C_CONTROLLER_BA,`I3C_REGMAP_IRQ_MASK, 32'ha0);
@@ -845,7 +845,7 @@ task daa_i3c_test();
   `WAIT (`DUT_I3C_FRAMING.st == `CMDW_START, 10000);
 
   @(posedge i3c_irq);
-  `INFO(("GOT DAA IRQ"), ADI_VERBOSITY_DEBUG);
+  `INFO(("GOT DAA IRQ"), ADI_VERBOSITY_LOW);
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
     `FATAL(("Wrong SDI FIFO level"));
@@ -855,7 +855,7 @@ task daa_i3c_test();
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
   if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_DAA_PENDING])
     `FATAL(("DAA IRQ should not have been cleared"));
-  `INFO(("Writing DA 1"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Writing DA 1"), ADI_VERBOSITY_LOW);
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, {24'h0, DEVICE_DA1, ~^DEVICE_DA1[6:0]});
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
 
@@ -871,7 +871,7 @@ task daa_i3c_test();
   axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
   axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
 
-  `INFO(("Writing DA 2"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Writing DA 2"), ADI_VERBOSITY_LOW);
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, {24'h0, DEVICE_DA2, ~^DEVICE_DA2[6:0]});
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
 
@@ -888,7 +888,7 @@ task daa_i3c_test();
   // Clear all pending IRQs
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
 
-  `INFO(("DAA I3C Test Done"), ADI_VERBOSITY_DEBUG);
+  `INFO(("DAA I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -903,7 +903,7 @@ bit [3:0]  dev_char_3 = 4'b0011;
 bit [31:0] dev_char_data = 0;
 
 task dev_char_i3c_test();
-  `INFO(("Device Characteristics I3C Test Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Device Characteristics I3C Test Started"), ADI_VERBOSITY_LOW);
   // Write DEV_CHAR of four devices
   axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1, 1'b1, 4'h0, dev_char_0});
   axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA2, 1'b1, 4'h0, dev_char_1});
@@ -913,17 +913,17 @@ task dev_char_i3c_test();
   // Read first and check value
   axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1 , 9'h0});
   axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, dev_char_data);
-  `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_DEBUG);
+  `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_LOW);
   if (dev_char_data[3:0] != dev_char_0 || dev_char_data[15:9] != DEVICE_DA1)
     `FATAL(("DEV_CHAR_0 FAILED"));
   // Read second and check value
   axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA2, 9'h0});
   axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, dev_char_data);
-  `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_DEBUG);
+  `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_LOW);
   if (dev_char_data[3:0] != dev_char_1 || dev_char_data[15:9] != DEVICE_DA2)
     `FATAL(("DEV_CHAR_0 FAILED"));
 
-  `INFO(("Device Characteristics I3C Test Done"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Device Characteristics I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -937,7 +937,7 @@ task offload_i3c_test();
   // Mask all interrupts
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h00);
 
-  `INFO(("Offload I3C Test Started"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Offload I3C Test Started"), ADI_VERBOSITY_LOW);
 
   offload_trigger_l = 1'b1;
   #10ns offload_trigger_l = 1'b0;
@@ -973,7 +973,7 @@ task offload_i3c_test();
   offload_trigger_l = 1'b1;
   #10ns offload_trigger_l = 1'b0;
 
-  `INFO(("Offload I3C Test Done"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Offload I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 endprogram

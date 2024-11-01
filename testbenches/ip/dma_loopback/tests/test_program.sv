@@ -66,7 +66,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     m_dmac_api = new("TX_DMA", env.mng, `TX_DMA_BA);

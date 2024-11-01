@@ -92,7 +92,7 @@ package data_offload_pkg;
         // Transfer length not divisble by 64
         `FATAL(("data_offload: Attempted to set transfer_length %x mod 64 != 0!", length));
       end
-      `INFO(("data_offload: Writing transfer length! %x", length), ADI_VERBOSITY_DEBUG);
+      `INFO(("data_offload: Writing transfer length! %x", length), ADI_VERBOSITY_LOW);
       this.bus.RegWrite32(this.base_address + `DO_ADDR_TRANSFER_LENGTH, length >> 6);
     endtask : set_transfer_length;
 

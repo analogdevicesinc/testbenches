@@ -75,7 +75,7 @@ package adi_regmap_pkg;
       ret[i]=1'b0;
     end
 
-    `INFO(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value, ret), ADI_VERBOSITY_DEBUG);
+    `INFO(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value, ret), ADI_VERBOSITY_HIGH);
 
     return ret;
   endfunction;

@@ -66,7 +66,7 @@ program test_program_1d;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     env.start();
     `TH.`DEVICE_CLK.inst.IF.start_clock();

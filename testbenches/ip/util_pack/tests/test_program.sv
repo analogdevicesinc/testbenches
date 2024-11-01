@@ -58,7 +58,7 @@ program test_program;
 
   initial begin
 
-    setLoggerVerbosity(250);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     // create environment
     env = new("Util Pack Environment",
@@ -84,15 +84,15 @@ program test_program;
     // configure environment sequencers
     env.configure(data_length);
 
-    `INFO(("Bring up IPs from reset."), ADI_VERBOSITY_MEDIUM);
+    `INFO(("Bring up IPs from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
     
     // Start the ADC/DAC stubs
-    `INFO(("Call the run() ..."), ADI_VERBOSITY_MEDIUM);
+    `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     env.run();
 
     // Generate DMA transfers
-    `INFO(("Start DMAs"), ADI_VERBOSITY_MEDIUM);
+    `INFO(("Start DMAs"), ADI_VERBOSITY_LOW);
     rx_dma_transfer(data_length);
     tx_dma_transfer(data_length);
 
@@ -123,9 +123,9 @@ program test_program;
 
   task systemBringUp();
 
-    `INFO(("Bring up RX DMAC 0"), ADI_VERBOSITY_HIGH);
+    `INFO(("Bring up RX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_rx.enable_dma();
-    `INFO(("Bring up TX DMAC 0"), ADI_VERBOSITY_HIGH);
+    `INFO(("Bring up TX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_tx.enable_dma();
 
   endtask

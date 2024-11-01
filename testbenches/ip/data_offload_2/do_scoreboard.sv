@@ -131,7 +131,7 @@ package do_scoreboard_pkg;
 
       forever begin
         if (this.src_axis_ap.get_item_cnt() > 0) begin
-          `INFO(("Caught a TX AXI4 stream transaction: %d", this.src_axis_ap.get_item_cnt()), ADI_VERBOSITY_DEBUG);
+          `INFO(("Caught a TX AXI4 stream transaction: %d", this.src_axis_ap.get_item_cnt()), ADI_VERBOSITY_LOW);
           this.src_axis_ap.get(transaction);
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
@@ -170,7 +170,7 @@ package do_scoreboard_pkg;
 
       forever begin
         if (this.dst_axis_ap.get_item_cnt() > 0) begin
-          `INFO(("Caught a RX AXI4 stream transaction: %d", this.dst_axis_ap.get_item_cnt()), ADI_VERBOSITY_DEBUG);
+          `INFO(("Caught a RX AXI4 stream transaction: %d", this.dst_axis_ap.get_item_cnt()), ADI_VERBOSITY_LOW);
           this.dst_axis_ap.get(transaction);
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
@@ -202,12 +202,12 @@ package do_scoreboard_pkg;
 
     function void post_test();
       if (this.enabled == 0) begin
-        `INFO(("Scoreboard was inactive."), ADI_VERBOSITY_DEBUG);
+        `INFO(("Scoreboard was inactive."), ADI_VERBOSITY_LOW);
       end else begin
           if (this.do_mode == ONESHOT && this.byte_stream.size() > 0) begin
             `FATAL(("ERROR: Not all samples have arrived yet!"));
           end else begin
-            `INFO(("Scoreboard passed!"), ADI_VERBOSITY_DEBUG);
+            `INFO(("Scoreboard passed!"), ADI_VERBOSITY_LOW);
           end
       end
     endfunction /* post_tx_test */

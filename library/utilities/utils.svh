@@ -187,6 +187,8 @@
 `define AXIS 1
 `define FIFO 2
 
+`define RELATIVE_PATH(src) {"../../../../../../", src}
+
 // Macros used in Simulation files during simulation
 `define INFO(m,v)  \
   PrintInfo($sformatf("%s", \

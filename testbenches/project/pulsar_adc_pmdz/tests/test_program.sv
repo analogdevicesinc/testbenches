@@ -513,7 +513,7 @@ task fifo_spi_test();
   if (sdi_fifo_data != sdi_fifo_data_store) begin
     `ERROR(("Fifo Read Test FAILED"));
   end else begin
-    `INFO(("Fifo Read Test PASSED"));
+    `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_DEBUG);
   end
 endtask
 

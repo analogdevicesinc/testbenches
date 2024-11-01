@@ -37,14 +37,12 @@
 
 package logger_pkg;
 
-  localparam int ADI_VERBOSITY_NONE   = 0;    // highest priority, test passed message, cannot be disabled
-  localparam int ADI_VERBOSITY_LOW    = 100;  // 
-  localparam int ADI_VERBOSITY_MEDIUM = 200;  // 
-  localparam int ADI_VERBOSITY_HIGH   = 300;  // 
-  localparam int ADI_VERBOSITY_FULL   = 400;  // 
-  localparam int ADI_VERBOSITY_DEBUG  = 500;  // lowest priority, library level debug messages
+  localparam int ADI_VERBOSITY_NONE   = 0;    // highest priority, test passed message, randomization state, cannot be disabled
+  localparam int ADI_VERBOSITY_LOW    = 100;  // test_program level debugging
+  localparam int ADI_VERBOSITY_MEDIUM = 200;  // driver level debugging
+  localparam int ADI_VERBOSITY_HIGH   = 300;  // VIP, regmap, utilities level debugging
 
-  int verbosity = ADI_VERBOSITY_MEDIUM;
+  int verbosity = ADI_VERBOSITY_HIGH;
 
   function void PrintInfo(
     input string inStr,

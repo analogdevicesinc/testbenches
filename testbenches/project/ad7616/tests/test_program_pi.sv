@@ -104,7 +104,7 @@ initial begin
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(6);
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
   env.start();
 
   //asserts all the resets for 100 ns
@@ -172,7 +172,7 @@ end
 task sanity_test();
   axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
   axi_read_v (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
-  `INFO(("Sanity Test Done"), ADI_VERBOSITY_DEBUG);
+  `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -207,7 +207,7 @@ task data_acquisition_test();
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_DEBUG);
+    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
 
      // Configure DMA
     env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
@@ -244,7 +244,7 @@ task data_acquisition_test();
 
     // Stop pwm gen
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
-    `INFO(("Axi_pwm_gen stopped"), ADI_VERBOSITY_DEBUG);
+    `INFO(("Axi_pwm_gen stopped"), ADI_VERBOSITY_LOW);
 
     #200
     axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_WRITE_DATA ), `SET_AXI_AD7616_REG_UP_WRITE_DATA_UP_WRITE_DATA(32'hDEAD));
@@ -260,7 +260,7 @@ task data_acquisition_test();
     if (captured_word_arr  != dma_data_store_arr) begin
       `ERROR(("Data Acquisition Test FAILED"));
     end else begin
-      `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_DEBUG);
+      `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_LOW);
     end
 endtask
 

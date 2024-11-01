@@ -78,7 +78,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     link = new;
@@ -152,9 +152,9 @@ program test_program;
   // -----------------
   task jesd_link_test(input use_dds = 1);
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("      JESD TEST        "+(use_dds ? "DDS" : "DMA")), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("      JESD TEST        "+(use_dds ? "DDS" : "DMA")), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
     // -----------------------
     // TX PHY INIT
     // -----------------------
@@ -289,9 +289,9 @@ program test_program;
       tx_xcvr.down();
     end
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
 
   endtask : jesd_link_test
 
@@ -300,9 +300,9 @@ program test_program;
   // -----------------
   task jesd_link_test_ext_sync(input use_dds = 1);
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("      JESD TEST  EXT SYNC      "+(use_dds ? "DDS" : "DMA")), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("      JESD TEST  EXT SYNC      "+(use_dds ? "DDS" : "DMA")), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
     // -----------------------
     // TX PHY INIT
     // -----------------------
@@ -442,9 +442,9 @@ program test_program;
       tx_xcvr.down();
     end
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
 
   endtask : jesd_link_test_ext_sync
 

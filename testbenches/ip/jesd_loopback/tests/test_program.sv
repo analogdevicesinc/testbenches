@@ -88,7 +88,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     link = new;
@@ -147,9 +147,9 @@ program test_program;
     arm_disarm_test();
 
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("      TB   DONE        "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("      TB   DONE        "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
 
     env.stop();
     $finish;
@@ -161,9 +161,9 @@ program test_program;
   // -----------------
   task jesd_link_test();
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("      JESD TEST        "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("      JESD TEST        "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
     // -----------------------
     // TX PHY INIT
     // -----------------------
@@ -299,9 +299,9 @@ program test_program;
     rx_xcvr.down();
     tx_xcvr.down();
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
 
   endtask : jesd_link_test
 
@@ -330,9 +330,9 @@ program test_program;
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(0));
     env.mng.RegReadVerify32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
                             `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(0));                           
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("  ARM-DISARM TEST DONE "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("  ARM-DISARM TEST DONE "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
                             
   endtask : arm_disarm_test
 
@@ -345,9 +345,9 @@ program test_program;
     bit [2:0] rx_out_clk_sel;
     bit [2:0] tx_out_clk_sel;
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("      PRBS TEST        "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("      PRBS TEST        "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
 
     // Disable gearbox path for 64b66b mode
     // PRBS is on the buffer path
@@ -464,9 +464,9 @@ program test_program;
 
     end
 
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
-    `INFO(("   PRBS TEST DONE      "), ADI_VERBOSITY_DEBUG);
-    `INFO(("======================="), ADI_VERBOSITY_DEBUG);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("   PRBS TEST DONE      "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
 
   endtask : prbs_test
 

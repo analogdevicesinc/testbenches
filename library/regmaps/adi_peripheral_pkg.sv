@@ -75,7 +75,7 @@ package adi_peripheral_pkg;
       bit [31:0] val;
       this.bus.RegRead32(this.base_address + 'h0, val);
       {ver_major, ver_minor, ver_patch} = val;
-      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
     endtask
 
     // -----------------

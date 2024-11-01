@@ -179,7 +179,7 @@ package adi_spi_vip_pkg;
                   miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
                 end
                 if (i == SPI_VIP_DATA_DLENGTH-1) begin
-                  this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_FULL);
+                  this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
                     miso_mbx.get(miso_reg);
@@ -252,7 +252,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                this.info($sformatf("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_FULL);
+                this.info($sformatf("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_HIGH);
                 this.stop_flag = 0;
               end
               begin

@@ -67,7 +67,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     `TH.`HBM_CLK.inst.IF.start_clock;

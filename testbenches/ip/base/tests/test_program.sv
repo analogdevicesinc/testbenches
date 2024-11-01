@@ -55,7 +55,7 @@ program test_program;
     current_process_random_state = current_process.get_randstate();
     `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
-    setLoggerVerbosity(ADI_VERBOSITY_MEDIUM);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     // Create environment
     env = new("Base Environment",

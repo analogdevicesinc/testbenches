@@ -112,7 +112,7 @@ initial begin
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(6);
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
   env.start();
 
   //asserts all the resets for 100 ns
@@ -179,7 +179,7 @@ task sanity_test();
     // check ADC VERSION
     axi_read_v (`AXI_AD7606X_BA + GetAddrs(COMMON_REG_VERSION),
                     `SET_COMMON_REG_VERSION_VERSION('h000a0300));
-    `INFO(("Sanity Test Done"), ADI_VERBOSITY_DEBUG);
+    `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -526,13 +526,13 @@ task db_transmission_test();
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH), `SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH('h63)); // set PWM pulse width
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_DEBUG);
+    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
 
     wait(rx_ch_count == num_of_transfers);
 
     // Stop pwm gen
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
-    `INFO(("Axi_pwm_gen stopped"), ADI_VERBOSITY_DEBUG);
+    `INFO(("Axi_pwm_gen stopped"), ADI_VERBOSITY_LOW);
 endtask
 
 endprogram

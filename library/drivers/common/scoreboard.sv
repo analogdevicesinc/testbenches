@@ -139,7 +139,7 @@ package scoreboard_pkg;
           this.source_byte_stream.push_front(source_byte);
         end
         this.source_byte_stream_size += this.source_monitor.mailbox.num();
-        this.info($sformatf("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Source transaction received, size: %d - %d", this.source_monitor.mailbox.num(), this.source_byte_stream_size), ADI_VERBOSITY_MEDIUM);
         ->>source_transaction_event;
         this.source_monitor.put_key();
       end
@@ -170,7 +170,7 @@ package scoreboard_pkg;
           this.sink_byte_stream.push_front(sink_byte);
         end
         this.sink_byte_stream_size += this.sink_monitor.mailbox.num();
-        this.info($sformatf("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size), ADI_VERBOSITY_DEBUG);
+        this.info($sformatf("Sink transaction received, size: %d - %d", this.sink_monitor.mailbox.num(), this.sink_byte_stream_size), ADI_VERBOSITY_MEDIUM);
         ->>sink_transaction_event;
         this.sink_monitor.put_key();
       end
@@ -183,7 +183,7 @@ package scoreboard_pkg;
       logic [7:0] source_byte;
       logic [7:0] sink_byte;
 
-      this.info($sformatf("Started"), ADI_VERBOSITY_DEBUG);
+      this.info($sformatf("Started"), ADI_VERBOSITY_MEDIUM);
 
       forever begin : tx_path
         if (this.enabled == 0)
@@ -198,7 +198,7 @@ package scoreboard_pkg;
             this.source_byte_stream_size--;
           sink_byte = this.sink_byte_stream.pop_back();
           this.sink_byte_stream_size--;
-          this.info($sformatf("Source-sink data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_DEBUG);
+          this.info($sformatf("Source-sink data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_MEDIUM);
           if (source_byte != sink_byte) begin
             this.error($sformatf("Failed at: exp %h - rcv %h", source_byte, sink_byte));
           end

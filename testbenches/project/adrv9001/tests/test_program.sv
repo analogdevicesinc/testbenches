@@ -147,7 +147,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     //set source synchronous interface clock frequency
@@ -166,7 +166,7 @@ program test_program;
     // R2T2 tests
     R1_MODE = 0;
     if (SYMB_OP[0] & SYMB_8_16B[0]) begin
-    `INFO(("PN Test Skipped in 8 bits symbol mode"), ADI_VERBOSITY_DEBUG);
+    `INFO(("PN Test Skipped in 8 bits symbol mode"), ADI_VERBOSITY_LOW);
     end else begin
       pn_test(`NIBBLE_RAMP);
       pn_test(`FULL_RAMP);

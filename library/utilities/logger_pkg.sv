@@ -37,16 +37,18 @@
 
 package logger_pkg;
 
-  localparam int ADI_VERBOSITY_NONE   = 0;    // highest priority, test passed message, randomization state, cannot be disabled
-  localparam int ADI_VERBOSITY_LOW    = 100;  // test_program level debugging
-  localparam int ADI_VERBOSITY_MEDIUM = 200;  // driver level debugging
-  localparam int ADI_VERBOSITY_HIGH   = 300;  // VIP, regmap, utilities level debugging
+  typedef enum {
+    ADI_VERBOSITY_NONE,   // highest priority, test passed message, randomization state, cannot be disabled
+    ADI_VERBOSITY_LOW,    // test_program level debugging
+    ADI_VERBOSITY_MEDIUM, // driver level debugging
+    ADI_VERBOSITY_HIGH    // VIP, regmap, utilities level debugging
+  } adi_verbosity_t;
 
-  int verbosity = ADI_VERBOSITY_HIGH;
+  adi_verbosity_t verbosity = ADI_VERBOSITY_HIGH;
 
   function void PrintInfo(
     input string inStr,
-    input integer msgVerborisity);
+    input adi_verbosity_t msgVerborisity);
 
     if (verbosity >= msgVerborisity) begin
       $display("[INFO] @ %0t: %s", $time, inStr);
@@ -65,7 +67,7 @@ package logger_pkg;
     $fatal(1, "[FATAL] @ %0t: %s", $time, inStr);
   endfunction: PrintFatal
 
-  function void setLoggerVerbosity(input int value);
+  function void setLoggerVerbosity(input adi_verbosity_t value);
     verbosity = value;
   endfunction: setLoggerVerbosity
 
@@ -91,7 +93,7 @@ package logger_pkg;
 
     function void info(
       input string message,
-      input int verbosity);
+      input adi_verbosity_t verbosity);
 
       `INFO(("[%s] %s", this.get_path(), message), verbosity);
     endfunction: info

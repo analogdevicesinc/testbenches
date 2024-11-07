@@ -1,3 +1,5 @@
+:orphan:
+
 .. _project_based_template:
 
 Project based test bench template

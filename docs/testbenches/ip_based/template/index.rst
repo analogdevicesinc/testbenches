@@ -1,3 +1,5 @@
+:orphan:
+
 .. _ip_based_template:
 
 IP based test bench template

@@ -1,4 +1,4 @@
 More information
 -------------------------------------------------------------------------------
 
-To be done.
+-  :ref:`ADI Testbenches User guide <user_guide>`

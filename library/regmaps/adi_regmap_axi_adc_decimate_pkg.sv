@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014 - 2024 Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,12 +35,12 @@
 /* Auto generated Register Map */
 /* Nov 08 14:35:39 2024 v0.3.49 */
 
-package adi_regmap_system_id_pkg;
+package adi_regmap_axi_adc_decimate_pkg;
   import regmap_pkg::*;
 
-  class adi_regmap_system_id #(int ID);
+  class adi_regmap_axi_adc_decimate;
 
-    /* System ID (axi_system_id) */
+    /* Analog Decimation (axi_adc_decimate) */
     class VERSION_CLASS extends register_base;
       field_base VERSION_MAJOR_F;
       field_base VERSION_MINOR_F;
@@ -53,19 +53,7 @@ package adi_regmap_system_id_pkg;
         super.new(name, address);
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
-        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
-      endfunction: new
-    endclass
-
-    class PERIPHERAL_ID_CLASS #(int ID) extends register_base;
-      field_base PERIPHERAL_ID_F;
-
-      function new(
-        input string name,
-        input int address);
-
-        super.new(name, address);
-        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
       endfunction: new
     endclass
 
@@ -81,56 +69,84 @@ package adi_regmap_system_id_pkg;
       endfunction: new
     endclass
 
-    class IDENTIFICATION_CLASS extends register_base;
-      field_base IDENTIFICATION_F;
+    class DECIMATION_RATIO_CLASS extends register_base;
+      field_base DECIMATION_RATIO_F;
 
       function new(
         input string name,
         input int address);
 
         super.new(name, address);
-        this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h53594944, this);
+        this.DECIMATION_RATIO_F = new("DECIMATION_RATIO", 31, 0, RW, 'h0, this);
       endfunction: new
     endclass
 
-    class SYSROM_START_CLASS extends register_base;
-      field_base SYSROM_START_F;
+    class DECIMATION_STAGE_ENABLE_CLASS extends register_base;
+      field_base FILTERED_DECIMATION_RATIO_F;
 
       function new(
         input string name,
         input int address);
 
         super.new(name, address);
-        this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+        this.FILTERED_DECIMATION_RATIO_F = new("FILTERED_DECIMATION_RATIO", 2, 0, RW, 'h0, this);
       endfunction: new
     endclass
 
-    class PRROM_START_CLASS extends register_base;
-      field_base SYSROM_START_F;
+    class CONFIG_CLASS extends register_base;
+      field_base CORRECTION_ENABLE_B_F;
+      field_base CORRECTION_ENABLE_A_F;
 
       function new(
         input string name,
         input int address);
 
         super.new(name, address);
-        this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+        this.CORRECTION_ENABLE_B_F = new("CORRECTION_ENABLE_B", 1, 1, RW, 'h0, this);
+        this.CORRECTION_ENABLE_A_F = new("CORRECTION_ENABLE_A", 0, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
+
+    class CORRECTION_COEFFICIENT_A_CLASS extends register_base;
+      field_base CORRECTION_COEFFICIENT_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
+
+    class CORRECTION_COEFFICIENT_B_CLASS extends register_base;
+      field_base CORRECTION_COEFFICIENT_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'h0, this);
       endfunction: new
     endclass
 
     VERSION_CLASS VERSION_R;
-    PERIPHERAL_ID_CLASS #(ID) PERIPHERAL_ID_R;
     SCRATCH_CLASS SCRATCH_R;
-    IDENTIFICATION_CLASS IDENTIFICATION_R;
-    SYSROM_START_CLASS SYSROM_START_R;
-    PRROM_START_CLASS PRROM_START_R;
+    DECIMATION_RATIO_CLASS DECIMATION_RATIO_R;
+    DECIMATION_STAGE_ENABLE_CLASS DECIMATION_STAGE_ENABLE_R;
+    CONFIG_CLASS CONFIG_R;
+    CORRECTION_COEFFICIENT_A_CLASS CORRECTION_COEFFICIENT_A_R;
+    CORRECTION_COEFFICIENT_B_CLASS CORRECTION_COEFFICIENT_B_R;
 
     function new();
       this.VERSION_R = new("VERSION", 'h0);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc);
-      this.SYSROM_START_R = new("SYSROM_START", 'h800);
-      this.PRROM_START_R = new("PRROM_START", 'h1000);
+      this.SCRATCH_R = new("SCRATCH", 'h4);
+      this.DECIMATION_RATIO_R = new("DECIMATION_RATIO", 'h40);
+      this.DECIMATION_STAGE_ENABLE_R = new("DECIMATION_STAGE_ENABLE", 'h44);
+      this.CONFIG_R = new("CONFIG", 'h48);
+      this.CORRECTION_COEFFICIENT_A_R = new("CORRECTION_COEFFICIENT_A", 'h4c);
+      this.CORRECTION_COEFFICIENT_B_R = new("CORRECTION_COEFFICIENT_B", 'h50);
     endfunction: new;
 
   endclass;

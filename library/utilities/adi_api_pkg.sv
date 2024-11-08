@@ -39,7 +39,8 @@ package adi_api_pkg;
 
   import logger_pkg::*;
   import adi_common_pkg::*;
-  import m_axi_sequencer_pkg::*;
+  import reg_accessor_pkg::*;
+  import regmap_pkg::*;
 
   class adi_api extends adi_component;
   
@@ -78,6 +79,16 @@ package adi_api_pkg;
       this.bus.RegRead32(this.base_address + addr, data);
     endtask: axi_read
 
+    task axi_read_reg(input register_base register);
+      automatic logic [31:0] data;
+
+      this.bus.RegRead32(register.get_address(), data);
+      register.set(data);
+    endtask: axi_read_reg
+
+    // -----------------
+    //
+    // -----------------
     task axi_write(
       input [31:0] addr,
       input [31:0] data);
@@ -85,6 +96,13 @@ package adi_api_pkg;
       this.bus.RegWrite32(this.base_address + addr, data);
     endtask: axi_write
 
+    task axi_write_reg(input register_base register);
+      this.bus.RegWrite32(this.base_address + register.get_address(), register.get());
+    endtask: axi_write_reg
+
+    // -----------------
+    //
+    // -----------------
     task axi_verify(
       input [31:0] addr,
       input [31:0] data);

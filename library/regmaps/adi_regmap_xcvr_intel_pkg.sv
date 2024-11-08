@@ -35,12 +35,12 @@
 /* Auto generated Register Map */
 /* Nov 08 14:35:39 2024 v0.3.49 */
 
-package adi_regmap_axi_ad7616_pkg;
+package adi_regmap_xcvr_intel_pkg;
   import regmap_pkg::*;
 
-  class adi_regmap_axi_ad7616;
+  class adi_regmap_xcvr_intel #(int NUM_OF_LANES);
 
-    /* AXI AD7616 (axi_ad7616) */
+    /* Intel XCVR (axi_xcvr) */
     class VERSION_CLASS extends register_base;
       field_base VERSION_F;
 
@@ -49,7 +49,7 @@ package adi_regmap_axi_ad7616_pkg;
         input int address);
 
         super.new(name, address);
-        this.VERSION_F = new("VERSION", 31, 0, RO, 'h1002, this);
+        this.VERSION_F = new("VERSION", 31, 0, RO, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
@@ -61,7 +61,7 @@ package adi_regmap_axi_ad7616_pkg;
         input int address);
 
         super.new(name, address);
-        this.ID_F = new("ID", 31, 0, RO, 'h0, this);
+        this.ID_F = new("ID", 31, 0, RO, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
@@ -73,12 +73,11 @@ package adi_regmap_axi_ad7616_pkg;
         input int address);
 
         super.new(name, address);
-        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
-    class UP_CNTRL_CLASS extends register_base;
-      field_base CNVST_EN_F;
+    class RESETN_CLASS extends register_base;
       field_base RESETN_F;
 
       function new(
@@ -86,77 +85,102 @@ package adi_regmap_axi_ad7616_pkg;
         input int address);
 
         super.new(name, address);
-        this.CNVST_EN_F = new("CNVST_EN", 1, 1, RW, 'h0, this);
-        this.RESETN_F = new("RESETN", 0, 0, RW, 'h0, this);
+        this.RESETN_F = new("RESETN", 0, 0, RW, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
-    class UP_CONV_RATE_CLASS extends register_base;
-      field_base UP_CONV_RATE_F;
+    class STATUS_CLASS extends register_base;
+      field_base STATUS_F;
 
       function new(
         input string name,
         input int address);
 
         super.new(name, address);
-        this.UP_CONV_RATE_F = new("UP_CONV_RATE", 31, 0, RW, 'h0, this);
+        this.STATUS_F = new("STATUS", 0, 0, RO, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
-    class UP_BURST_LENGTH_CLASS extends register_base;
-      field_base UP_BURST_LENGTH_F;
+    class STATUS_32_CLASS #(int NUM_OF_LANES) extends register_base;
+      field_base UP_PLL_LOCKED_F;
+      field_base CHANNEL_N_READY_F;
 
       function new(
         input string name,
         input int address);
 
         super.new(name, address);
-        this.UP_BURST_LENGTH_F = new("UP_BURST_LENGTH", 4, 0, RW, 'h0, this);
+        this.UP_PLL_LOCKED_F = new("UP_PLL_LOCKED", NUM_OF_LANES, NUM_OF_LANES, RO, 'hXXXXXXXX, this);
+        this.CHANNEL_N_READY_F = new("CHANNEL_N_READY", NUM_OF_LANES-1, 0, RO, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
-    class UP_READ_DATA_CLASS extends register_base;
-      field_base UP_READ_DATA_F;
+    class FPGA_INFO_CLASS extends register_base;
+      field_base FPGA_TECHNOLOGY_F;
+      field_base FPGA_FAMILY_F;
+      field_base SPEED_GRADE_F;
+      field_base DEV_PACKAGE_F;
 
       function new(
         input string name,
         input int address);
 
         super.new(name, address);
-        this.UP_READ_DATA_F = new("UP_READ_DATA", 31, 0, RO, 'h0, this);
+        this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'hXXXXXXXX, this);
+        this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'hXXXXXXXX, this);
+        this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'hXXXXXXXX, this);
+        this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
-    class UP_WRITE_DATA_CLASS extends register_base;
-      field_base UP_WRITE_DATA_F;
+    class GENERIC_INFO_CLASS extends register_base;
+      field_base XCVR_TYPE_F;
+      field_base TX_OR_RX_N_F;
+      field_base NUM_OF_LANES_F;
 
       function new(
         input string name,
         input int address);
 
         super.new(name, address);
-        this.UP_WRITE_DATA_F = new("UP_WRITE_DATA", 31, 0, WO, 'h0, this);
+        this.XCVR_TYPE_F = new("XCVR_TYPE", 27, 24, RO, 'hXXXXXXXX, this);
+        this.TX_OR_RX_N_F = new("TX_OR_RX_N", 8, 8, RO, 'hXXXXXXXX, this);
+        this.NUM_OF_LANES_F = new("NUM_OF_LANES", 7, 0, RO, 'hXXXXXXXX, this);
+      endfunction: new
+    endclass
+
+    class FPGA_VOLTAGE_CLASS extends register_base;
+      field_base FPGA_VOLTAGE_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'hXXXXXXXX, this);
       endfunction: new
     endclass
 
     VERSION_CLASS VERSION_R;
     ID_CLASS ID_R;
     SCRATCH_CLASS SCRATCH_R;
-    UP_CNTRL_CLASS UP_CNTRL_R;
-    UP_CONV_RATE_CLASS UP_CONV_RATE_R;
-    UP_BURST_LENGTH_CLASS UP_BURST_LENGTH_R;
-    UP_READ_DATA_CLASS UP_READ_DATA_R;
-    UP_WRITE_DATA_CLASS UP_WRITE_DATA_R;
+    RESETN_CLASS RESETN_R;
+    STATUS_CLASS STATUS_R;
+    STATUS_32_CLASS #(NUM_OF_LANES) STATUS_32_R;
+    FPGA_INFO_CLASS FPGA_INFO_R;
+    GENERIC_INFO_CLASS GENERIC_INFO_R;
+    FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
 
     function new();
-      this.VERSION_R = new("VERSION", 'h400);
-      this.ID_R = new("ID", 'h404);
-      this.SCRATCH_R = new("SCRATCH", 'h408);
-      this.UP_CNTRL_R = new("UP_CNTRL", 'h440);
-      this.UP_CONV_RATE_R = new("UP_CONV_RATE", 'h444);
-      this.UP_BURST_LENGTH_R = new("UP_BURST_LENGTH", 'h448);
-      this.UP_READ_DATA_R = new("UP_READ_DATA", 'h44c);
-      this.UP_WRITE_DATA_R = new("UP_WRITE_DATA", 'h450);
+      this.VERSION_R = new("VERSION", 'h0);
+      this.ID_R = new("ID", 'h4);
+      this.SCRATCH_R = new("SCRATCH", 'h8);
+      this.RESETN_R = new("RESETN", 'h10);
+      this.STATUS_R = new("STATUS", 'h14);
+      this.STATUS_32_R = new("STATUS_32", 'h18);
+      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c);
+      this.GENERIC_INFO_R = new("GENERIC_INFO", 'h24);
+      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140);
     endfunction: new;
 
   endclass;

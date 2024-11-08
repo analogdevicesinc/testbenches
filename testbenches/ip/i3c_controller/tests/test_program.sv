@@ -125,12 +125,14 @@ localparam I3C_CMD_3           = {3'b010, 12'd5, DEVICE_DA2[6:0], 1'b1};
 localparam I3C_CMD_4           = {3'b010, 12'd2,   START_DA[6:0], 1'b0};
 // Read 1 byte, no bcast address
 localparam I3C_CMD_5           = {3'b000, 12'd1, DEVICE_DA2[6:0], 1'b1};
-// Write 2 bytes
-localparam I2C_CMD_1           = {3'b010, 12'd2, DEVICE_SA1[6:0], 1'b0};
+// Write 1 bytes with SR
+localparam I2C_CMD_1           = {3'b001, 12'd1, DEVICE_SA1[6:0], 1'b0};
 // Read 5 bytes
-localparam I2C_CMD_2           = {3'b010, 12'd5, DEVICE_SA2[6:0], 1'b1};
+localparam I2C_CMD_2           = {3'b000, 12'd5, DEVICE_SA2[6:0], 1'b1};
 // Write 6 bytes
-localparam I2C_CMD_3           = {3'b010, 12'd6, DEVICE_SA1[6:0], 1'b0};
+localparam I2C_CMD_3           = {3'b000, 12'd6, DEVICE_SA1[6:0], 1'b0};
+// Write 1 byte
+localparam I2C_CMD_4           = {3'b000, 12'd1, DEVICE_SA1[6:0], 1'b0};
 
 program test_program (
   input  i3c_irq,
@@ -180,7 +182,7 @@ endtask
 reg i3c_dev_sda = 1'bZ;
 assign i3c_sda = i3c_dev_sda;
 // Logic to drive the offload trigger
-logic offload_trigger_l = 1'b1;
+logic offload_trigger_l = 1'b0;
 assign offload_trigger = offload_trigger_l;
 // Always ready to receive offload data
 assign offload_sdi_ready = 1'b1;
@@ -581,35 +583,29 @@ task priv_i2c_test();
   // Unmask CMDR interrupt
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h20);
 
-  // Test #1, controller does private write transfer that is ACK
-  `INFO(("PRIV I2C Test #1"), ADI_VERBOSITY_LOW);
+  // Test #1, controller does private write transfer that is ACK and SR
+  // Test #2, controller does private read transfer and ACKs all receiving
+  // Mocks a Write address then read transfer.
+  `INFO(("PRIV I2C Test #1, #2"), ADI_VERBOSITY_LOW);
   auto_ack <= 1'b1;
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
+  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000_00EF);
 
   // Write CMD instruction
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_1);
+  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_2);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Assert is in I²C mode
   if (`DUT_I3C_BIT_MOD.i2c_mode !== 1)
-   `FATAL(("Not in I2C mode!"));
-  wait (`DUT_I3C_BIT_MOD.nop == 1);
-
-  // Test #2, controller does private read transfer and ACKs all receiving
-  // bytes.
-  `INFO(("PRIV I2C Test #2"), ADI_VERBOSITY_LOW);
-
-  // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_2);
-
+   `ERROR(("Not in I2C mode!"));
   // Dummy LOW peripheral write + ACK continue
   wait (`DUT_I3C_WORD.st == `CMDW_I2C_RX);
   auto_ack <= 1'b0;
   i3c_dev_sda <= 1'b0;
-  // Count 5 ACK-bit asserted low by the controller (sampling before
+  // Count n ACK-bit asserted low by the controller (sampling before
   // tri-state)
-  repeat (5) @(negedge `DUT_I3C_BIT_MOD.sdo);
+  repeat (I2C_CMD_2[15:8]) @(negedge `DUT_I3C_BIT_MOD.sdo);
   i3c_dev_sda <= 1'bZ;
 
   wait (`DUT_I3C_BIT_MOD.nop == 0);
@@ -634,6 +630,18 @@ task priv_i2c_test();
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000_00DE);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
+  // Test #4, controller does private write transfer that is NACK
+  `INFO(("PRIV I2C Test #4"), ADI_VERBOSITY_LOW);
+  auto_ack <= 1'b0;
+
+  // Write SDO payload
+  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000_00EF);
+  // Write CMD instruction
+  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_4);
+
+  wait (`DUT_I3C_BIT_MOD.nop == 0);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
+
   // Read Results
 
   if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_CMDR_PENDING])
@@ -654,6 +662,13 @@ task priv_i2c_test();
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 12'd6) // Wrote 6 bytes
     `FATAL(("#3: CMD -> CMDR write length test FAILED"));
+
+  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  print_cmdr (cmdr_fifo_data);
+  if (cmdr_fifo_data[19:8] != 12'd0) // Wrote 0 bytes
+    `ERROR(("#4: CMD -> CMDR write length test FAILED"));
+  if (cmdr_fifo_data[23:20] != 4'd6)
+    `ERROR(("#4: CMD -> CMDR NACK_RESP check FAILED"));
 
   // Mask CMDR interrupt
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h00);
@@ -939,21 +954,19 @@ task offload_i3c_test();
 
   `INFO(("Offload I3C Test Started"), ADI_VERBOSITY_LOW);
 
-  offload_trigger_l = 1'b1;
-  #10ns offload_trigger_l = 1'b0;
+  offload_trigger_l = 1'b0;
 
   // Write SDO payload
   axi_write (`I3C_CONTROLLER_BA, {`I3C_REGMAP_OFFLOAD_SDO_, 4'h0}, 32'hDEAD_BEEF);
 
   // Write CMD instruction
   axi_write (`I3C_CONTROLLER_BA, {`I3C_REGMAP_OFFLOAD_CMD_, 4'h0}, I3C_CMD_1);
-
-  // Write CMD instruction
   axi_write (`I3C_CONTROLLER_BA, {`I3C_REGMAP_OFFLOAD_CMD_, 4'h1}, I3C_CMD_3);
 
   // Set offload length and enter offload mode
   axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_OPS, {2'b11, 4'd2, 1'b1});
 
+  auto_ack <= 1'b1;
   offload_trigger_l = 1'b1;
   #10ns offload_trigger_l = 1'b0;
 

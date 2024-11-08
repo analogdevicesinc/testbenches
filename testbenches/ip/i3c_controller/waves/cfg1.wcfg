@@ -67,7 +67,7 @@
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/i3c/core/inst/i_i3c_controller_framing/sm">
          <obj_property name="ElementShortName">sm[2:0]</obj_property>
-         <obj_property name="ObjectShortName">sm[2:0]</obj_property>
+         <obj_property name="ObjectShortName">framing sm[2:0]</obj_property>
          <obj_property name="CustomSignalColor">#FFFF00</obj_property>
          <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>

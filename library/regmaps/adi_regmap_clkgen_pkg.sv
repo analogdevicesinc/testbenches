@@ -33,80 +33,111 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Nov 08 14:35:39 2024 v0.3.49 */
 
 package adi_regmap_clkgen_pkg;
-  import adi_regmap_pkg::*;
+  import regmap_pkg::*;
 
+  class adi_regmap_clkgen;
 
-/* Clock Generator (axi_clkgen) */
+    /* Clock Generator (axi_clkgen) */
+    class RSTN_CLASS extends register_base;
+      field_base MMCM_RSTN_F;
+      field_base RSTN_F;
 
-  const reg_t AXI_CLKGEN_REG_RSTN = '{ 'h0040, "REG_RSTN" , '{
-    "MMCM_RSTN": '{ 1, 1, RW, 'h0 },
-    "RSTN": '{ 0, 0, RW, 'h0 }}};
-  `define SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(x) SetField(AXI_CLKGEN_REG_RSTN,"MMCM_RSTN",x)
-  `define GET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(x) GetField(AXI_CLKGEN_REG_RSTN,"MMCM_RSTN",x)
-  `define DEFAULT_AXI_CLKGEN_REG_RSTN_MMCM_RSTN GetResetValue(AXI_CLKGEN_REG_RSTN,"MMCM_RSTN")
-  `define UPDATE_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(x,y) UpdateField(AXI_CLKGEN_REG_RSTN,"MMCM_RSTN",x,y)
-  `define SET_AXI_CLKGEN_REG_RSTN_RSTN(x) SetField(AXI_CLKGEN_REG_RSTN,"RSTN",x)
-  `define GET_AXI_CLKGEN_REG_RSTN_RSTN(x) GetField(AXI_CLKGEN_REG_RSTN,"RSTN",x)
-  `define DEFAULT_AXI_CLKGEN_REG_RSTN_RSTN GetResetValue(AXI_CLKGEN_REG_RSTN,"RSTN")
-  `define UPDATE_AXI_CLKGEN_REG_RSTN_RSTN(x,y) UpdateField(AXI_CLKGEN_REG_RSTN,"RSTN",x,y)
+      function new(
+        input string name,
+        input int address);
 
-  const reg_t AXI_CLKGEN_REG_CLK_SEL = '{ 'h0044, "REG_CLK_SEL" , '{
-    "CLK_SEL": '{ 0, 0, RW, 'h0 }}};
-  `define SET_AXI_CLKGEN_REG_CLK_SEL_CLK_SEL(x) SetField(AXI_CLKGEN_REG_CLK_SEL,"CLK_SEL",x)
-  `define GET_AXI_CLKGEN_REG_CLK_SEL_CLK_SEL(x) GetField(AXI_CLKGEN_REG_CLK_SEL,"CLK_SEL",x)
-  `define DEFAULT_AXI_CLKGEN_REG_CLK_SEL_CLK_SEL GetResetValue(AXI_CLKGEN_REG_CLK_SEL,"CLK_SEL")
-  `define UPDATE_AXI_CLKGEN_REG_CLK_SEL_CLK_SEL(x,y) UpdateField(AXI_CLKGEN_REG_CLK_SEL,"CLK_SEL",x,y)
+        super.new(name, address);
+        this.MMCM_RSTN_F = new("MMCM_RSTN", 1, 1, RW, 'h0, this);
+        this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
 
-  const reg_t AXI_CLKGEN_REG_MMCM_STATUS = '{ 'h005c, "REG_MMCM_STATUS" , '{
-    "MMCM_LOCKED": '{ 0, 0, RO, 'h0 }}};
-  `define SET_AXI_CLKGEN_REG_MMCM_STATUS_MMCM_LOCKED(x) SetField(AXI_CLKGEN_REG_MMCM_STATUS,"MMCM_LOCKED",x)
-  `define GET_AXI_CLKGEN_REG_MMCM_STATUS_MMCM_LOCKED(x) GetField(AXI_CLKGEN_REG_MMCM_STATUS,"MMCM_LOCKED",x)
-  `define DEFAULT_AXI_CLKGEN_REG_MMCM_STATUS_MMCM_LOCKED GetResetValue(AXI_CLKGEN_REG_MMCM_STATUS,"MMCM_LOCKED")
-  `define UPDATE_AXI_CLKGEN_REG_MMCM_STATUS_MMCM_LOCKED(x,y) UpdateField(AXI_CLKGEN_REG_MMCM_STATUS,"MMCM_LOCKED",x,y)
+    class CLK_SEL_CLASS extends register_base;
+      field_base CLK_SEL_F;
 
-  const reg_t AXI_CLKGEN_REG_DRP_CNTRL = '{ 'h0070, "REG_DRP_CNTRL" , '{
-    "DRP_RWN": '{ 28, 28, RW, 'h0 },
-    "DRP_ADDRESS": '{ 27, 16, RW, 'h000 },
-    "DRP_WDATA": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_AXI_CLKGEN_REG_DRP_CNTRL_DRP_RWN(x) SetField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_RWN",x)
-  `define GET_AXI_CLKGEN_REG_DRP_CNTRL_DRP_RWN(x) GetField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_RWN",x)
-  `define DEFAULT_AXI_CLKGEN_REG_DRP_CNTRL_DRP_RWN GetResetValue(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_RWN")
-  `define UPDATE_AXI_CLKGEN_REG_DRP_CNTRL_DRP_RWN(x,y) UpdateField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_RWN",x,y)
-  `define SET_AXI_CLKGEN_REG_DRP_CNTRL_DRP_ADDRESS(x) SetField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_ADDRESS",x)
-  `define GET_AXI_CLKGEN_REG_DRP_CNTRL_DRP_ADDRESS(x) GetField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_ADDRESS",x)
-  `define DEFAULT_AXI_CLKGEN_REG_DRP_CNTRL_DRP_ADDRESS GetResetValue(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_ADDRESS")
-  `define UPDATE_AXI_CLKGEN_REG_DRP_CNTRL_DRP_ADDRESS(x,y) UpdateField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_ADDRESS",x,y)
-  `define SET_AXI_CLKGEN_REG_DRP_CNTRL_DRP_WDATA(x) SetField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_WDATA",x)
-  `define GET_AXI_CLKGEN_REG_DRP_CNTRL_DRP_WDATA(x) GetField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_WDATA",x)
-  `define DEFAULT_AXI_CLKGEN_REG_DRP_CNTRL_DRP_WDATA GetResetValue(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_WDATA")
-  `define UPDATE_AXI_CLKGEN_REG_DRP_CNTRL_DRP_WDATA(x,y) UpdateField(AXI_CLKGEN_REG_DRP_CNTRL,"DRP_WDATA",x,y)
+      function new(
+        input string name,
+        input int address);
 
-  const reg_t AXI_CLKGEN_REG_DRP_STATUS = '{ 'h0074, "REG_DRP_STATUS" , '{
-    "MMCM_LOCKED": '{ 17, 17, RO, 'h0 },
-    "DRP_STATUS": '{ 16, 16, RO, 'h0 },
-    "DRP_RDATA": '{ 15, 0, RO, 'h0000 }}};
-  `define SET_AXI_CLKGEN_REG_DRP_STATUS_MMCM_LOCKED(x) SetField(AXI_CLKGEN_REG_DRP_STATUS,"MMCM_LOCKED",x)
-  `define GET_AXI_CLKGEN_REG_DRP_STATUS_MMCM_LOCKED(x) GetField(AXI_CLKGEN_REG_DRP_STATUS,"MMCM_LOCKED",x)
-  `define DEFAULT_AXI_CLKGEN_REG_DRP_STATUS_MMCM_LOCKED GetResetValue(AXI_CLKGEN_REG_DRP_STATUS,"MMCM_LOCKED")
-  `define UPDATE_AXI_CLKGEN_REG_DRP_STATUS_MMCM_LOCKED(x,y) UpdateField(AXI_CLKGEN_REG_DRP_STATUS,"MMCM_LOCKED",x,y)
-  `define SET_AXI_CLKGEN_REG_DRP_STATUS_DRP_STATUS(x) SetField(AXI_CLKGEN_REG_DRP_STATUS,"DRP_STATUS",x)
-  `define GET_AXI_CLKGEN_REG_DRP_STATUS_DRP_STATUS(x) GetField(AXI_CLKGEN_REG_DRP_STATUS,"DRP_STATUS",x)
-  `define DEFAULT_AXI_CLKGEN_REG_DRP_STATUS_DRP_STATUS GetResetValue(AXI_CLKGEN_REG_DRP_STATUS,"DRP_STATUS")
-  `define UPDATE_AXI_CLKGEN_REG_DRP_STATUS_DRP_STATUS(x,y) UpdateField(AXI_CLKGEN_REG_DRP_STATUS,"DRP_STATUS",x,y)
-  `define SET_AXI_CLKGEN_REG_DRP_STATUS_DRP_RDATA(x) SetField(AXI_CLKGEN_REG_DRP_STATUS,"DRP_RDATA",x)
-  `define GET_AXI_CLKGEN_REG_DRP_STATUS_DRP_RDATA(x) GetField(AXI_CLKGEN_REG_DRP_STATUS,"DRP_RDATA",x)
-  `define DEFAULT_AXI_CLKGEN_REG_DRP_STATUS_DRP_RDATA GetResetValue(AXI_CLKGEN_REG_DRP_STATUS,"DRP_RDATA")
-  `define UPDATE_AXI_CLKGEN_REG_DRP_STATUS_DRP_RDATA(x,y) UpdateField(AXI_CLKGEN_REG_DRP_STATUS,"DRP_RDATA",x,y)
+        super.new(name, address);
+        this.CLK_SEL_F = new("CLK_SEL", 0, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
 
-  const reg_t AXI_CLKGEN_REG_FPGA_VOLTAGE = '{ 'h0140, "REG_FPGA_VOLTAGE" , '{
-    "FPGA_VOLTAGE": '{ 15, 0, RO, 'h0 }}};
-  `define SET_AXI_CLKGEN_REG_FPGA_VOLTAGE_FPGA_VOLTAGE(x) SetField(AXI_CLKGEN_REG_FPGA_VOLTAGE,"FPGA_VOLTAGE",x)
-  `define GET_AXI_CLKGEN_REG_FPGA_VOLTAGE_FPGA_VOLTAGE(x) GetField(AXI_CLKGEN_REG_FPGA_VOLTAGE,"FPGA_VOLTAGE",x)
-  `define DEFAULT_AXI_CLKGEN_REG_FPGA_VOLTAGE_FPGA_VOLTAGE GetResetValue(AXI_CLKGEN_REG_FPGA_VOLTAGE,"FPGA_VOLTAGE")
-  `define UPDATE_AXI_CLKGEN_REG_FPGA_VOLTAGE_FPGA_VOLTAGE(x,y) UpdateField(AXI_CLKGEN_REG_FPGA_VOLTAGE,"FPGA_VOLTAGE",x,y)
+    class MMCM_STATUS_CLASS extends register_base;
+      field_base MMCM_LOCKED_F;
 
+      function new(
+        input string name,
+        input int address);
 
+        super.new(name, address);
+        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 0, 0, RO, 'h0, this);
+      endfunction: new
+    endclass
+
+    class DRP_CNTRL_CLASS extends register_base;
+      field_base DRP_RWN_F;
+      field_base DRP_ADDRESS_F;
+      field_base DRP_WDATA_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.DRP_RWN_F = new("DRP_RWN", 28, 28, RW, 'h0, this);
+        this.DRP_ADDRESS_F = new("DRP_ADDRESS", 27, 16, RW, 'h0, this);
+        this.DRP_WDATA_F = new("DRP_WDATA", 15, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
+
+    class DRP_STATUS_CLASS extends register_base;
+      field_base MMCM_LOCKED_F;
+      field_base DRP_STATUS_F;
+      field_base DRP_RDATA_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 17, 17, RO, 'h0, this);
+        this.DRP_STATUS_F = new("DRP_STATUS", 16, 16, RO, 'h0, this);
+        this.DRP_RDATA_F = new("DRP_RDATA", 15, 0, RO, 'h0, this);
+      endfunction: new
+    endclass
+
+    class FPGA_VOLTAGE_CLASS extends register_base;
+      field_base FPGA_VOLTAGE_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'h0, this);
+      endfunction: new
+    endclass
+
+    RSTN_CLASS RSTN_R;
+    CLK_SEL_CLASS CLK_SEL_R;
+    MMCM_STATUS_CLASS MMCM_STATUS_R;
+    DRP_CNTRL_CLASS DRP_CNTRL_R;
+    DRP_STATUS_CLASS DRP_STATUS_R;
+    FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
+
+    function new();
+      this.RSTN_R = new("RSTN", 'h40);
+      this.CLK_SEL_R = new("CLK_SEL", 'h44);
+      this.MMCM_STATUS_R = new("MMCM_STATUS", 'h5c);
+      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70);
+      this.DRP_STATUS_R = new("DRP_STATUS", 'h74);
+      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140);
+    endfunction: new;
+
+  endclass;
 endpackage

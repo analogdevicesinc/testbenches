@@ -35,12 +35,12 @@
 /* Auto generated Register Map */
 /* Nov 08 14:35:39 2024 v0.3.49 */
 
-package adi_regmap_dac_pkg;
+package adi_regmap_axi_dac_template_pkg;
   import regmap_pkg::*;
 
-  class adi_regmap_dac;
+  class adi_regmap_axi_dac_template;
 
-    /* DAC Common (axi_ad) */
+    /* AXI TEMPLATE DAC Common (axi_template) */
     class RSTN_CLASS extends register_base;
       field_base CE_N_F;
       field_base MMCM_RSTN_F;
@@ -325,7 +325,7 @@ package adi_regmap_dac_pkg;
       endfunction: new
     endclass
 
-    /* DAC Channel (axi_ad*) */
+    /* AXI TEMPLATE DAC Channel (axi_template_dac_channel) */
     class CHAN_CNTRLn_1_CLASS extends register_base;
       field_base DDS_PHASE_DW_F;
       field_base DDS_SCALE_1_F;

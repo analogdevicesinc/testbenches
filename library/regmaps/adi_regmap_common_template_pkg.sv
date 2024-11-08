@@ -35,12 +35,12 @@
 /* Auto generated Register Map */
 /* Nov 08 14:35:39 2024 v0.3.49 */
 
-package adi_regmap_common_pkg;
+package adi_regmap_common_template_pkg;
   import regmap_pkg::*;
 
-  class adi_regmap_common;
+  class adi_regmap_common_template;
 
-    /* Base (common to all cores) */
+    /* Base */
     class VERSION_CLASS extends register_base;
       field_base VERSION_F;
 

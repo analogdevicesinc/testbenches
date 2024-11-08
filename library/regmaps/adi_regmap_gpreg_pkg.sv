@@ -33,48 +33,237 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Nov 08 14:35:39 2024 v0.3.49 */
 
 package adi_regmap_gpreg_pkg;
-  import adi_regmap_pkg::*;
+  import regmap_pkg::*;
 
+  class adi_regmap_gpreg;
 
-/* General Purpose Registers (axi_gpreg) */
+    /* General Purpose Registers (axi_gpreg) */
+    class IO_ENBn_CLASS extends register_base;
+      field_base IO_ENB_F;
 
-  const reg_t AXI_GPREG_REG_IO_ENB = '{ 'h0400, "REG_IO_ENB" , '{
-    "IO_ENB": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_IO_ENB_IO_ENB(x) SetField(AXI_GPREG_REG_IO_ENB,"IO_ENB",x)
-  `define GET_AXI_GPREG_REG_IO_ENB_IO_ENB(x) GetField(AXI_GPREG_REG_IO_ENB,"IO_ENB",x)
-  `define DEFAULT_AXI_GPREG_REG_IO_ENB_IO_ENB GetResetValue(AXI_GPREG_REG_IO_ENB,"IO_ENB")
-  `define UPDATE_AXI_GPREG_REG_IO_ENB_IO_ENB(x,y) UpdateField(AXI_GPREG_REG_IO_ENB,"IO_ENB",x,y)
+      function new(
+        input string name,
+        input int address);
 
-  const reg_t AXI_GPREG_REG_IO_OUT = '{ 'h0404, "REG_IO_OUT" , '{
-    "IO_ENB": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_IO_OUT_IO_ENB(x) SetField(AXI_GPREG_REG_IO_OUT,"IO_ENB",x)
-  `define GET_AXI_GPREG_REG_IO_OUT_IO_ENB(x) GetField(AXI_GPREG_REG_IO_OUT,"IO_ENB",x)
-  `define DEFAULT_AXI_GPREG_REG_IO_OUT_IO_ENB GetResetValue(AXI_GPREG_REG_IO_OUT,"IO_ENB")
-  `define UPDATE_AXI_GPREG_REG_IO_OUT_IO_ENB(x,y) UpdateField(AXI_GPREG_REG_IO_OUT,"IO_ENB",x,y)
+        super.new(name, address);
+        this.IO_ENB_F = new("IO_ENB", 31, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
 
-  const reg_t AXI_GPREG_REG_IO_IN = '{ 'h0408, "REG_IO_IN" , '{
-    "IO_IN": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_IO_IN_IO_IN(x) SetField(AXI_GPREG_REG_IO_IN,"IO_IN",x)
-  `define GET_AXI_GPREG_REG_IO_IN_IO_IN(x) GetField(AXI_GPREG_REG_IO_IN,"IO_IN",x)
-  `define DEFAULT_AXI_GPREG_REG_IO_IN_IO_IN GetResetValue(AXI_GPREG_REG_IO_IN,"IO_IN")
-  `define UPDATE_AXI_GPREG_REG_IO_IN_IO_IN(x,y) UpdateField(AXI_GPREG_REG_IO_IN,"IO_IN",x,y)
+    class IO_OUTn_CLASS extends register_base;
+      field_base IO_OUT_F;
 
-  const reg_t AXI_GPREG_REG_CM_RESET = '{ 'h0800, "REG_CM_RESET" , '{
-    "CM_RESET_N": '{ 0, 0, RW, 'h0 }}};
-  `define SET_AXI_GPREG_REG_CM_RESET_CM_RESET_N(x) SetField(AXI_GPREG_REG_CM_RESET,"CM_RESET_N",x)
-  `define GET_AXI_GPREG_REG_CM_RESET_CM_RESET_N(x) GetField(AXI_GPREG_REG_CM_RESET,"CM_RESET_N",x)
-  `define DEFAULT_AXI_GPREG_REG_CM_RESET_CM_RESET_N GetResetValue(AXI_GPREG_REG_CM_RESET,"CM_RESET_N")
-  `define UPDATE_AXI_GPREG_REG_CM_RESET_CM_RESET_N(x,y) UpdateField(AXI_GPREG_REG_CM_RESET,"CM_RESET_N",x,y)
+      function new(
+        input string name,
+        input int address);
 
-  const reg_t AXI_GPREG_REG_CM_COUNT = '{ 'h0808, "REG_CM_COUNT" , '{
-    "CM_CLK_COUNT": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT(x) SetField(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT",x)
-  `define GET_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT(x) GetField(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT",x)
-  `define DEFAULT_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT GetResetValue(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT")
-  `define UPDATE_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT(x,y) UpdateField(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT",x,y)
+        super.new(name, address);
+        this.IO_OUT_F = new("IO_OUT", 31, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
 
+    class IO_INn_CLASS extends register_base;
+      field_base IO_IN_F;
 
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.IO_IN_F = new("IO_IN", 31, 0, RO, 'h0, this);
+      endfunction: new
+    endclass
+
+    class CM_RESETn_CLASS extends register_base;
+      field_base CM_RESET_N_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.CM_RESET_N_F = new("CM_RESET_N", 0, 0, RW, 'h0, this);
+      endfunction: new
+    endclass
+
+    class CM_COUNTn_CLASS extends register_base;
+      field_base CM_CLK_COUNT_F;
+
+      function new(
+        input string name,
+        input int address);
+
+        super.new(name, address);
+        this.CM_CLK_COUNT_F = new("CM_CLK_COUNT", 31, 0, RO, 'h0, this);
+      endfunction: new
+    endclass
+
+    IO_ENBn_CLASS IO_ENB0_R;
+    IO_ENBn_CLASS IO_ENB1_R;
+    IO_ENBn_CLASS IO_ENB2_R;
+    IO_ENBn_CLASS IO_ENB3_R;
+    IO_ENBn_CLASS IO_ENB4_R;
+    IO_ENBn_CLASS IO_ENB5_R;
+    IO_ENBn_CLASS IO_ENB6_R;
+    IO_ENBn_CLASS IO_ENB7_R;
+    IO_ENBn_CLASS IO_ENB8_R;
+    IO_ENBn_CLASS IO_ENB9_R;
+    IO_ENBn_CLASS IO_ENB10_R;
+    IO_ENBn_CLASS IO_ENB11_R;
+    IO_ENBn_CLASS IO_ENB12_R;
+    IO_ENBn_CLASS IO_ENB13_R;
+    IO_ENBn_CLASS IO_ENB14_R;
+    IO_ENBn_CLASS IO_ENB15_R;
+    IO_OUTn_CLASS IO_OUT0_R;
+    IO_OUTn_CLASS IO_OUT1_R;
+    IO_OUTn_CLASS IO_OUT2_R;
+    IO_OUTn_CLASS IO_OUT3_R;
+    IO_OUTn_CLASS IO_OUT4_R;
+    IO_OUTn_CLASS IO_OUT5_R;
+    IO_OUTn_CLASS IO_OUT6_R;
+    IO_OUTn_CLASS IO_OUT7_R;
+    IO_OUTn_CLASS IO_OUT8_R;
+    IO_OUTn_CLASS IO_OUT9_R;
+    IO_OUTn_CLASS IO_OUT10_R;
+    IO_OUTn_CLASS IO_OUT11_R;
+    IO_OUTn_CLASS IO_OUT12_R;
+    IO_OUTn_CLASS IO_OUT13_R;
+    IO_OUTn_CLASS IO_OUT14_R;
+    IO_OUTn_CLASS IO_OUT15_R;
+    IO_INn_CLASS IO_IN0_R;
+    IO_INn_CLASS IO_IN1_R;
+    IO_INn_CLASS IO_IN2_R;
+    IO_INn_CLASS IO_IN3_R;
+    IO_INn_CLASS IO_IN4_R;
+    IO_INn_CLASS IO_IN5_R;
+    IO_INn_CLASS IO_IN6_R;
+    IO_INn_CLASS IO_IN7_R;
+    IO_INn_CLASS IO_IN8_R;
+    IO_INn_CLASS IO_IN9_R;
+    IO_INn_CLASS IO_IN10_R;
+    IO_INn_CLASS IO_IN11_R;
+    IO_INn_CLASS IO_IN12_R;
+    IO_INn_CLASS IO_IN13_R;
+    IO_INn_CLASS IO_IN14_R;
+    IO_INn_CLASS IO_IN15_R;
+    CM_RESETn_CLASS CM_RESET0_R;
+    CM_RESETn_CLASS CM_RESET1_R;
+    CM_RESETn_CLASS CM_RESET2_R;
+    CM_RESETn_CLASS CM_RESET3_R;
+    CM_RESETn_CLASS CM_RESET4_R;
+    CM_RESETn_CLASS CM_RESET5_R;
+    CM_RESETn_CLASS CM_RESET6_R;
+    CM_RESETn_CLASS CM_RESET7_R;
+    CM_RESETn_CLASS CM_RESET8_R;
+    CM_RESETn_CLASS CM_RESET9_R;
+    CM_RESETn_CLASS CM_RESET10_R;
+    CM_RESETn_CLASS CM_RESET11_R;
+    CM_RESETn_CLASS CM_RESET12_R;
+    CM_RESETn_CLASS CM_RESET13_R;
+    CM_RESETn_CLASS CM_RESET14_R;
+    CM_RESETn_CLASS CM_RESET15_R;
+    CM_COUNTn_CLASS CM_COUNT0_R;
+    CM_COUNTn_CLASS CM_COUNT1_R;
+    CM_COUNTn_CLASS CM_COUNT2_R;
+    CM_COUNTn_CLASS CM_COUNT3_R;
+    CM_COUNTn_CLASS CM_COUNT4_R;
+    CM_COUNTn_CLASS CM_COUNT5_R;
+    CM_COUNTn_CLASS CM_COUNT6_R;
+    CM_COUNTn_CLASS CM_COUNT7_R;
+    CM_COUNTn_CLASS CM_COUNT8_R;
+    CM_COUNTn_CLASS CM_COUNT9_R;
+    CM_COUNTn_CLASS CM_COUNT10_R;
+    CM_COUNTn_CLASS CM_COUNT11_R;
+    CM_COUNTn_CLASS CM_COUNT12_R;
+    CM_COUNTn_CLASS CM_COUNT13_R;
+    CM_COUNTn_CLASS CM_COUNT14_R;
+    CM_COUNTn_CLASS CM_COUNT15_R;
+
+    function new();
+      this.IO_ENB0_R = new("IO_ENB0", 'h400);
+      this.IO_ENB1_R = new("IO_ENB1", 'h458);
+      this.IO_ENB2_R = new("IO_ENB2", 'h4b0);
+      this.IO_ENB3_R = new("IO_ENB3", 'h508);
+      this.IO_ENB4_R = new("IO_ENB4", 'h560);
+      this.IO_ENB5_R = new("IO_ENB5", 'h5b8);
+      this.IO_ENB6_R = new("IO_ENB6", 'h610);
+      this.IO_ENB7_R = new("IO_ENB7", 'h668);
+      this.IO_ENB8_R = new("IO_ENB8", 'h6c0);
+      this.IO_ENB9_R = new("IO_ENB9", 'h718);
+      this.IO_ENB10_R = new("IO_ENB10", 'h770);
+      this.IO_ENB11_R = new("IO_ENB11", 'h7c8);
+      this.IO_ENB12_R = new("IO_ENB12", 'h820);
+      this.IO_ENB13_R = new("IO_ENB13", 'h878);
+      this.IO_ENB14_R = new("IO_ENB14", 'h8d0);
+      this.IO_ENB15_R = new("IO_ENB15", 'h928);
+      this.IO_OUT0_R = new("IO_OUT0", 'h404);
+      this.IO_OUT1_R = new("IO_OUT1", 'h45c);
+      this.IO_OUT2_R = new("IO_OUT2", 'h4b4);
+      this.IO_OUT3_R = new("IO_OUT3", 'h50c);
+      this.IO_OUT4_R = new("IO_OUT4", 'h564);
+      this.IO_OUT5_R = new("IO_OUT5", 'h5bc);
+      this.IO_OUT6_R = new("IO_OUT6", 'h614);
+      this.IO_OUT7_R = new("IO_OUT7", 'h66c);
+      this.IO_OUT8_R = new("IO_OUT8", 'h6c4);
+      this.IO_OUT9_R = new("IO_OUT9", 'h71c);
+      this.IO_OUT10_R = new("IO_OUT10", 'h774);
+      this.IO_OUT11_R = new("IO_OUT11", 'h7cc);
+      this.IO_OUT12_R = new("IO_OUT12", 'h824);
+      this.IO_OUT13_R = new("IO_OUT13", 'h87c);
+      this.IO_OUT14_R = new("IO_OUT14", 'h8d4);
+      this.IO_OUT15_R = new("IO_OUT15", 'h92c);
+      this.IO_IN0_R = new("IO_IN0", 'h408);
+      this.IO_IN1_R = new("IO_IN1", 'h460);
+      this.IO_IN2_R = new("IO_IN2", 'h4b8);
+      this.IO_IN3_R = new("IO_IN3", 'h510);
+      this.IO_IN4_R = new("IO_IN4", 'h568);
+      this.IO_IN5_R = new("IO_IN5", 'h5c0);
+      this.IO_IN6_R = new("IO_IN6", 'h618);
+      this.IO_IN7_R = new("IO_IN7", 'h670);
+      this.IO_IN8_R = new("IO_IN8", 'h6c8);
+      this.IO_IN9_R = new("IO_IN9", 'h720);
+      this.IO_IN10_R = new("IO_IN10", 'h778);
+      this.IO_IN11_R = new("IO_IN11", 'h7d0);
+      this.IO_IN12_R = new("IO_IN12", 'h828);
+      this.IO_IN13_R = new("IO_IN13", 'h880);
+      this.IO_IN14_R = new("IO_IN14", 'h8d8);
+      this.IO_IN15_R = new("IO_IN15", 'h930);
+      this.CM_RESET0_R = new("CM_RESET0", 'h800);
+      this.CM_RESET1_R = new("CM_RESET1", 'h858);
+      this.CM_RESET2_R = new("CM_RESET2", 'h8b0);
+      this.CM_RESET3_R = new("CM_RESET3", 'h908);
+      this.CM_RESET4_R = new("CM_RESET4", 'h960);
+      this.CM_RESET5_R = new("CM_RESET5", 'h9b8);
+      this.CM_RESET6_R = new("CM_RESET6", 'ha10);
+      this.CM_RESET7_R = new("CM_RESET7", 'ha68);
+      this.CM_RESET8_R = new("CM_RESET8", 'hac0);
+      this.CM_RESET9_R = new("CM_RESET9", 'hb18);
+      this.CM_RESET10_R = new("CM_RESET10", 'hb70);
+      this.CM_RESET11_R = new("CM_RESET11", 'hbc8);
+      this.CM_RESET12_R = new("CM_RESET12", 'hc20);
+      this.CM_RESET13_R = new("CM_RESET13", 'hc78);
+      this.CM_RESET14_R = new("CM_RESET14", 'hcd0);
+      this.CM_RESET15_R = new("CM_RESET15", 'hd28);
+      this.CM_COUNT0_R = new("CM_COUNT0", 'h808);
+      this.CM_COUNT1_R = new("CM_COUNT1", 'h860);
+      this.CM_COUNT2_R = new("CM_COUNT2", 'h8b8);
+      this.CM_COUNT3_R = new("CM_COUNT3", 'h910);
+      this.CM_COUNT4_R = new("CM_COUNT4", 'h968);
+      this.CM_COUNT5_R = new("CM_COUNT5", 'h9c0);
+      this.CM_COUNT6_R = new("CM_COUNT6", 'ha18);
+      this.CM_COUNT7_R = new("CM_COUNT7", 'ha70);
+      this.CM_COUNT8_R = new("CM_COUNT8", 'hac8);
+      this.CM_COUNT9_R = new("CM_COUNT9", 'hb20);
+      this.CM_COUNT10_R = new("CM_COUNT10", 'hb78);
+      this.CM_COUNT11_R = new("CM_COUNT11", 'hbd0);
+      this.CM_COUNT12_R = new("CM_COUNT12", 'hc28);
+      this.CM_COUNT13_R = new("CM_COUNT13", 'hc80);
+      this.CM_COUNT14_R = new("CM_COUNT14", 'hcd8);
+      this.CM_COUNT15_R = new("CM_COUNT15", 'hd30);
+    endfunction: new;
+
+  endclass;
 endpackage

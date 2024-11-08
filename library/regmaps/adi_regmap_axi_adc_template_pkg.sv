@@ -35,12 +35,12 @@
 /* Auto generated Register Map */
 /* Nov 08 14:35:39 2024 v0.3.49 */
 
-package adi_regmap_adc_pkg;
+package adi_regmap_axi_adc_template_pkg;
   import regmap_pkg::*;
 
-  class adi_regmap_adc;
+  class adi_regmap_axi_adc_template;
 
-    /* ADC Common (axi_ad*) */
+    /* AXI TEMPLATE ADC Common (axi_template) */
     class RSTN_CLASS extends register_base;
       field_base CE_N_F;
       field_base MMCM_RSTN_F;
@@ -154,40 +154,6 @@ package adi_regmap_adc_pkg;
         this.PN_OOS_F = new("PN_OOS", 2, 2, RO, 'h0, this);
         this.OVER_RANGE_F = new("OVER_RANGE", 1, 1, RO, 'h0, this);
         this.STATUS_F = new("STATUS", 0, 0, RO, 'h0, this);
-      endfunction: new
-    endclass
-
-    class DELAY_CNTRL_CLASS extends register_base;
-      field_base DELAY_SEL_F;
-      field_base DELAY_RWN_F;
-      field_base DELAY_ADDRESS_F;
-      field_base DELAY_WDATA_F;
-
-      function new(
-        input string name,
-        input int address);
-
-        super.new(name, address);
-        this.DELAY_SEL_F = new("DELAY_SEL", 17, 17, RW, 'h0, this);
-        this.DELAY_RWN_F = new("DELAY_RWN", 16, 16, RW, 'h0, this);
-        this.DELAY_ADDRESS_F = new("DELAY_ADDRESS", 15, 8, RW, 'h0, this);
-        this.DELAY_WDATA_F = new("DELAY_WDATA", 4, 0, RW, 'h0, this);
-      endfunction: new
-    endclass
-
-    class DELAY_STATUS_CLASS extends register_base;
-      field_base DELAY_LOCKED_F;
-      field_base DELAY_STATUS_F;
-      field_base DELAY_RDATA_F;
-
-      function new(
-        input string name,
-        input int address);
-
-        super.new(name, address);
-        this.DELAY_LOCKED_F = new("DELAY_LOCKED", 9, 9, RO, 'h0, this);
-        this.DELAY_STATUS_F = new("DELAY_STATUS", 8, 8, RO, 'h0, this);
-        this.DELAY_RDATA_F = new("DELAY_RDATA", 4, 0, RO, 'h0, this);
       endfunction: new
     endclass
 
@@ -379,7 +345,7 @@ package adi_regmap_adc_pkg;
       endfunction: new
     endclass
 
-    /* ADC Channel (axi_ad*) */
+    /* AXI TEMPLATE ADC Channel (axi_template_adc_channel) */
     class CHAN_CNTRLn_CLASS extends register_base;
       field_base ADC_LB_OWR_F;
       field_base ADC_PN_SEL_OWR_F;
@@ -535,8 +501,6 @@ package adi_regmap_adc_pkg;
     CLK_FREQ_CLASS CLK_FREQ_R;
     CLK_RATIO_CLASS CLK_RATIO_R;
     STATUS_CLASS STATUS_R;
-    DELAY_CNTRL_CLASS DELAY_CNTRL_R;
-    DELAY_STATUS_CLASS DELAY_STATUS_R;
     SYNC_STATUS_CLASS SYNC_STATUS_R;
     DRP_CNTRL_CLASS DRP_CNTRL_R;
     DRP_STATUS_CLASS DRP_STATUS_R;
@@ -705,8 +669,6 @@ package adi_regmap_adc_pkg;
       this.CLK_FREQ_R = new("CLK_FREQ", 'h54);
       this.CLK_RATIO_R = new("CLK_RATIO", 'h58);
       this.STATUS_R = new("STATUS", 'h5c);
-      this.DELAY_CNTRL_R = new("DELAY_CNTRL", 'h60);
-      this.DELAY_STATUS_R = new("DELAY_STATUS", 'h64);
       this.SYNC_STATUS_R = new("SYNC_STATUS", 'h68);
       this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70);
       this.DRP_STATUS_R = new("DRP_STATUS", 'h74);

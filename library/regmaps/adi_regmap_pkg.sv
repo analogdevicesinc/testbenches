@@ -35,95 +35,148 @@
 
 `include "utils.svh"
 
-package adi_regmap_pkg;
+package regmap_pkg;
 
   import logger_pkg::*;
 
   typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S, WO} acc_t;
 
-  // Used in generic definitions
-  const int n = 0;
 
-  typedef struct {
-    int msb;
-    int lsb;
-    acc_t access;
-    int reset_value;
-  } field_t;
+  class register_base;
 
-  typedef struct{
-    int addr;
-    string name;
-    field_t fields[string];
-  } reg_t;
+    protected string name;
+    logic [31:0] value;
+    protected logic [31:0] reset_value;
+    protected int address;
+    protected bit initialization_done;
+
+    function new(
+      input string name,
+      input int address);
+      
+      this.name = name;
+      this.value = 'h0;
+      this.reset_value = 'h0;
+      this.address = address;
+      this.initialization_done = 0;
+    endfunction
+
+    function logic [31:0] get();
+      `INFOV(("Getting reg %s with value %h", this.name, this.value), 10);
+
+      return value;
+    endfunction
+
+    function void set(input logic [31:0] value);
+      `INFOV(("Setting reg %s with value %h (%h)", this.name, value, this.value), 10);
+
+      this.value = value;
+    endfunction
+
+    function logic [31:0] get_reset_value();
+      `INFOV(("Getting reg %s with reset value %h", this.name, this.reset_value), 10);
+
+      return reset_value;
+    endfunction
+
+    function void set_reset_value(input logic [31:0] reset_value);
+      if (initialization_done)
+        `ERROR(("Changing the reset value after the registermap is created is not allowed!"));
+
+      `INFOV(("Setting reg %s with reset value %h (%h)", this.name, reset_value, this.reset_value), 10);
+    
+      this.reset_value = this.reset_value | reset_value;
+    endfunction
+
+    function int get_address();
+      return this.address;
+    endfunction
+
+    function string get_name();
+      return this.name;
+    endfunction
+
+  endclass
 
 
-  function bit [31:0] SetField(reg_t register,
-                               string field,
-                               bit [31:0] value);
-    bit [31:0] ret = 'h0;
-    int lsb, msb;
+  class field_base;
 
-    if (!register.fields.exists(field))
-      `FATAL(("Field %s in reg %s does not exists", field, register.name));
+    local string name;
+    local int msb;
+    local int lsb;
+    local acc_t access;
+    local logic [31:0] reset_value;
 
-    lsb = register.fields[field].lsb;
-    msb = register.fields[field].msb;
+    local register_base reg_handle;
 
-    ret = value << lsb;
-    for (int i=msb+1;i<=31;i++) begin
-      ret[i]=1'b0;
-    end
+    function new(
+      input string name,
+      input int msb,
+      input int lsb,
+      input acc_t access,
+      input int reset_value,
+      input register_base reg_handle);
 
-    `INFO(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value, ret), ADI_VERBOSITY_HIGH);
+      automatic logic [31:0] update_value = 'h0;
 
-    return ret;
-  endfunction;
+      this.name = name;
+      this.msb = msb;
+      this.lsb = lsb;
+      this.access = access;
+      this.reset_value = reset_value;
+      this.reg_handle = reg_handle;
 
-  function bit [31:0] GetField(reg_t register,
-                               string field,
-                               bit [31:0] regvalue);
-    bit [31:0] ret = 'h0;
-    int lsb, msb;
+      update_value = reset_value << this.lsb;
+      for (int i=this.msb+1; i<=31; i++) begin
+        update_value[i]=1'b0;
+      end
 
-    if (!register.fields.exists(field))
-      `FATAL(("Field %s in reg %s does not exists", field, register.name));
+      this.reg_handle.set_reset_value(update_value);
+    endfunction
 
-    lsb = register.fields[field].lsb;
-    msb = register.fields[field].msb;
+    function logic [31:0] get();
+      automatic logic [31:0] value = 'h0;
+      automatic logic [31:0] regvalue = this.reg_handle.get();
 
-    for (int i=msb+1;i<=31;i++) begin
-      regvalue[i]=1'b0;
-    end
-    ret = regvalue >> lsb;
+      for (int i=this.msb+1; i<32; i++) begin
+        regvalue[i]=1'b0;
+      end
+      value = regvalue >> this.lsb;
 
-//    `INFOV(("Setting reg %s[%0d:%0d] field %s with %h (%h)", register.name, msb, lsb, field, value, ret), 4);
+      `INFOV(("Getting reg %s[%0d:%0d] field %s with %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, value), 10);
 
-    return ret;
-  endfunction;
+      return value;
+    endfunction
 
-  function bit [31:0] UpdateField(reg_t register,
-                                  string field,
-                                  bit [31:0] regvalue,
-                                  bit [31:0] curregvalue);
-    bit [31:0] ret = curregvalue;
+    function void set(input logic [31:0] set_value);
+      automatic logic [31:0] update_value = 'h0;
+      automatic logic [31:0] mask = 'hFFFF;
 
-    if (!register.fields.exists(field))
-      `FATAL(("Field %s in reg %s does not exists", field, register.name));
+      if (this.access == NA || this.access == R || this.access == RO || this.access == ROV)
+        `ERROR(("Modifying a read only field!"));
 
-    ret = ret & (~SetField(register, field, 'hFFFF)); // mask
-    ret = ret | SetField(register, field, regvalue); // update register
+      update_value = set_value << this.lsb;
+      for (int i=this.msb+1;i<=31;i++) begin
+        update_value[i]=1'b0;
+      end
 
-    return ret;
-  endfunction
+      mask = mask << this.lsb;
+      for (int i=this.msb+1; i<32; i++) begin
+        mask[i]=1'b0;
+      end
 
-  function int GetAddrs(reg_t register);
-    return register.addr;
-  endfunction;
+      this.reg_handle.set(this.reg_handle.get() & ~mask);
+      this.reg_handle.set(this.reg_handle.get() | update_value);
 
-  function int GetResetValue(reg_t register, 
-                             string field);
-    return register.fields[field].reset_value;
-  endfunction;
+      `INFOV(("Setting reg %s[%0d:%0d] field %s with %h (%h)", this.reg_handle.get_name(), this.msb, this.lsb, this.name, set_value, this.reg_handle.get()), 10);
+    endfunction
 
+    function logic [31:0] get_reset_value();
+      `INFOV(("Getting reg %s[%0d:%0d] field %s with reset value %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, this.reset_value), 10);
+
+      return this.reset_value;
+    endfunction
+
+  endclass
+  
 endpackage

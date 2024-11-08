@@ -127,7 +127,7 @@ package regmap_pkg;
       this.reg_handle = reg_handle;
 
       update_value = reset_value << this.lsb;
-      for (int i=this.msb+1;i<=31;i++) begin
+      for (int i=this.msb+1; i<=31; i++) begin
         update_value[i]=1'b0;
       end
 
@@ -152,7 +152,7 @@ package regmap_pkg;
       automatic logic [31:0] update_value = 'h0;
       automatic logic [31:0] mask = 'hFFFF;
 
-      if (this.access == acc_t::NA || this.access == acc_t::R || this.access == acc_t::RO || this.access == acc_t::ROV)
+      if (this.access == NA || this.access == R || this.access == RO || this.access == ROV)
         `ERROR(("Modifying a read only field!"));
 
       update_value = set_value << this.lsb;

@@ -48,35 +48,6 @@
 // Help build VIP parameter name  e.g. test_harness_dst_axis_vip_0_VIP_DATA_WIDTH
 `define GETPARAM(th,vip,param) th``_``vip``_0_``param
 
-`define DMAC_PARAMS(th,vip) th``_``vip``_0_ID, \
-                            th``_``vip``_0_DMA_DATA_WIDTH_SRC, \
-                            th``_``vip``_0_DMA_DATA_WIDTH_DEST, \
-                            th``_``vip``_0_DMA_LENGTH_WIDTH, \
-                            th``_``vip``_0_DMA_2D_TRANSFER, \
-                            th``_``vip``_0_DMA_2D_TLAST_MODE, \
-                            th``_``vip``_0_ASYNC_CLK_REQ_SRC, \
-                            th``_``vip``_0_ASYNC_CLK_SRC_DEST, \
-                            th``_``vip``_0_ASYNC_CLK_DEST_REQ, \
-                            th``_``vip``_0_AXI_SLICE_DEST, \
-                            th``_``vip``_0_AXI_SLICE_SRC, \
-                            th``_``vip``_0_SYNC_TRANSFER_START, \
-                            th``_``vip``_0_CYCLIC, \
-                            th``_``vip``_0_DMA_AXI_PROTOCOL_DEST, \
-                            th``_``vip``_0_DMA_AXI_PROTOCOL_SRC, \
-                            th``_``vip``_0_DMA_TYPE_DEST, \
-                            th``_``vip``_0_DMA_TYPE_SRC, \
-                            th``_``vip``_0_DMA_AXI_ADDR_WIDTH, \
-                            th``_``vip``_0_MAX_BYTES_PER_BURST, \
-                            th``_``vip``_0_FIFO_SIZE, \
-                            th``_``vip``_0_AXI_ID_WIDTH_SRC, \
-                            th``_``vip``_0_AXI_ID_WIDTH_DEST, \
-                            th``_``vip``_0_DISABLE_DEBUG_REGISTERS, \
-                            th``_``vip``_0_ENABLE_DIAGNOSTICS_IF, \
-                            th``_``vip``_0_ENABLE_FRAME_LOCK, \
-                            th``_``vip``_0_MAX_NUM_FRAMES, \
-                            th``_``vip``_0_USE_EXT_SYNC, \
-                            th``_``vip``_0_HAS_AUTORUN
-
 // Help build VIP Interface parameters name
 `define AXI_VIP_IF_PARAMS(th,vip)    th``_``vip``_0_VIP_PROTOCOL,\
                                      th``_``vip``_0_VIP_ADDR_WIDTH,\
@@ -99,14 +70,6 @@
                                      th``_``vip``_0_VIP_HAS_WSTRB,\
                                      th``_``vip``_0_VIP_HAS_BRESP,\
                                      th``_``vip``_0_VIP_HAS_RRESP,\
-                                     th``_``vip``_0_VIP_HAS_ARESETN
-
-`define AXIS_VIP_IF_PARAMS(th,vip)   th``_``vip``_0_VIP_SIGNAL_SET,\
-                                     th``_``vip``_0_VIP_DEST_WIDTH,\
-                                     th``_``vip``_0_VIP_DATA_WIDTH,\
-                                     th``_``vip``_0_VIP_ID_WIDTH,\
-                                     th``_``vip``_0_VIP_USER_WIDTH,\
-                                     th``_``vip``_0_VIP_USER_BITS_PER_BYTE,\
                                      th``_``vip``_0_VIP_HAS_ARESETN
 
 `define AXI_VIP_PARAM_DECL   int AXI_VIP_PROTOCOL=0,\
@@ -155,6 +118,14 @@
                               AXI_VIP_HAS_RRESP,\
                               AXI_VIP_HAS_ARESETN
 
+`define AXIS_VIP_IF_PARAMS(th,vip)  th``_``vip``_0_VIP_SIGNAL_SET,\
+                                    th``_``vip``_0_VIP_DEST_WIDTH,\
+                                    th``_``vip``_0_VIP_DATA_WIDTH,\
+                                    th``_``vip``_0_VIP_ID_WIDTH,\
+                                    th``_``vip``_0_VIP_USER_WIDTH,\
+                                    th``_``vip``_0_VIP_USER_BITS_PER_BYTE,\
+                                    th``_``vip``_0_VIP_HAS_ARESETN
+
 `define AXIS_VIP_PARAM_DECL   int AXIS_VIP_INTERFACE_MODE     = 2,\
                                   AXIS_VIP_SIGNAL_SET         = 8'b00000011,\
                                   AXIS_VIP_DATA_WIDTH         = 8,\
@@ -182,10 +153,6 @@
                                 th``_``vip``_0_VIP_HAS_TLAST,\
                                 th``_``vip``_0_VIP_HAS_ACLKEN,\
                                 th``_``vip``_0_VIP_HAS_ARESETN
-
-`define AXI 0
-`define AXIS 1
-`define FIFO 2
 
 `define ERROR(m)  \
   do begin  \

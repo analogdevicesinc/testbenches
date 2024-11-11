@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_system_id_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_system_id #(int ID);
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_system_id #(int ID) extends adi_component;
 
     /* System ID (axi_system_id) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_system_id_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_system_id_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_system_id_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_system_id_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h53594944, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -98,10 +116,14 @@ package adi_regmap_system_id_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -110,10 +132,14 @@ package adi_regmap_system_id_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -124,14 +150,20 @@ package adi_regmap_system_id_pkg;
     SYSROM_START_CLASS SYSROM_START_R;
     PRROM_START_CLASS PRROM_START_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc);
-      this.SYSROM_START_R = new("SYSROM_START", 'h800);
-      this.PRROM_START_R = new("PRROM_START", 'h1000);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
+      this.SYSROM_START_R = new("SYSROM_START", 'h800, this);
+      this.PRROM_START_R = new("PRROM_START", 'h1000, this);
     endfunction: new;
 
   endclass;
+
 endpackage

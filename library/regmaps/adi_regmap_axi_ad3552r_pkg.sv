@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_axi_ad3552r_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_axi_ad3552r;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_axi_ad3552r extends adi_component;
 
     /* AXI AD3552R DAC Common (axi_ad3552r_dac_common) */
     class CNTRL_1_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_axi_ad3552r_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.EXT_SYNC_ARM_F = new("EXT_SYNC_ARM", 1, 1, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -59,11 +65,15 @@ package adi_regmap_axi_ad3552r_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDR_DDR_N_F = new("SDR_DDR_N", 16, 16, RW, 'h0, this);
         this.SYMB_8_16B_F = new("SYMB_8_16B", 14, 14, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -72,10 +82,14 @@ package adi_regmap_axi_ad3552r_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DATA_WRITE_F = new("DATA_WRITE", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -84,10 +98,14 @@ package adi_regmap_axi_ad3552r_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IF_BUSY_F = new("IF_BUSY", 4, 4, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -98,12 +116,16 @@ package adi_regmap_axi_ad3552r_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADDRESS_F = new("ADDRESS", 31, 24, RW, 'h0, this);
         this.STREAM_F = new("STREAM", 1, 1, RW, 'h0, this);
         this.TRANSFER_DATA_F = new("TRANSFER_DATA", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -113,10 +135,14 @@ package adi_regmap_axi_ad3552r_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DAC_DDS_SEL_F = new("DAC_DDS_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -125,10 +151,14 @@ package adi_regmap_axi_ad3552r_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DAC_DDS_SEL_F = new("DAC_DDS_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -140,15 +170,21 @@ package adi_regmap_axi_ad3552r_pkg;
     CHAN_CNTRL0_7_CLASS CHAN_CNTRL0_7_R;
     CHAN_CNTRL1_7_CLASS CHAN_CNTRL1_7_R;
 
-    function new();
-      this.CNTRL_1_R = new("CNTRL_1", 'h44);
-      this.CNTRL_2_R = new("CNTRL_2", 'h48);
-      this.DAC_CUSTOM_WR_R = new("DAC_CUSTOM_WR", 'h84);
-      this.UI_STATUS_R = new("UI_STATUS", 'h88);
-      this.DAC_CUSTOM_CTRL_R = new("DAC_CUSTOM_CTRL", 'h8c);
-      this.CHAN_CNTRL0_7_R = new("CHAN_CNTRL0_7", 'h400);
-      this.CHAN_CNTRL1_7_R = new("CHAN_CNTRL1_7", 'h458);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.CNTRL_1_R = new("CNTRL_1", 'h44, this);
+      this.CNTRL_2_R = new("CNTRL_2", 'h48, this);
+      this.DAC_CUSTOM_WR_R = new("DAC_CUSTOM_WR", 'h84, this);
+      this.UI_STATUS_R = new("UI_STATUS", 'h88, this);
+      this.DAC_CUSTOM_CTRL_R = new("DAC_CUSTOM_CTRL", 'h8c, this);
+      this.CHAN_CNTRL0_7_R = new("CHAN_CNTRL0_7", 'h400, this);
+      this.CHAN_CNTRL1_7_R = new("CHAN_CNTRL1_7", 'h458, this);
     endfunction: new;
 
   endclass;
+
 endpackage

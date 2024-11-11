@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_common_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_common;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_common extends adi_component;
 
     /* Base (common to all cores) */
     class VERSION_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_common_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_F = new("VERSION", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -58,10 +64,14 @@ package adi_regmap_common_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ID_F = new("ID", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -70,10 +80,14 @@ package adi_regmap_common_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -93,9 +107,11 @@ package adi_regmap_common_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IQCORRECTION_DISABLE_F = new("IQCORRECTION_DISABLE", 0, 0, RO, 'h0, this);
         this.DCFILTER_DISABLE_F = new("DCFILTER_DISABLE", 1, 1, RO, 'h0, this);
         this.DATAFORMAT_DISABLE_F = new("DATAFORMAT_DISABLE", 2, 2, RO, 'h0, this);
@@ -108,6 +124,8 @@ package adi_regmap_common_pkg;
         this.SCALECORRECTION_ONLY_F = new("SCALECORRECTION_ONLY", 9, 9, RO, 'h0, this);
         this.EXT_SYNC_F = new("EXT_SYNC", 12, 12, RO, 'h0, this);
         this.RD_RAW_DATA_F = new("RD_RAW_DATA", 13, 13, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -116,10 +134,14 @@ package adi_regmap_common_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PPS_IRQ_MASK_F = new("PPS_IRQ_MASK", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -131,13 +153,17 @@ package adi_regmap_common_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'h0, this);
         this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'h0, this);
         this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'h0, this);
         this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -148,14 +174,20 @@ package adi_regmap_common_pkg;
     PPS_IRQ_MASK_CLASS PPS_IRQ_MASK_R;
     FPGA_INFO_CLASS FPGA_INFO_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.ID_R = new("ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.CONFIG_R = new("CONFIG", 'hc);
-      this.PPS_IRQ_MASK_R = new("PPS_IRQ_MASK", 'h10);
-      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.CONFIG_R = new("CONFIG", 'hc, this);
+      this.PPS_IRQ_MASK_R = new("PPS_IRQ_MASK", 'h10, this);
+      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c, this);
     endfunction: new;
 
   endclass;
+
 endpackage

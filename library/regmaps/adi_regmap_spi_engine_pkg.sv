@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_spi_engine_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_spi_engine #(int CFG_INFO_0, int CFG_INFO_1, int CFG_INFO_2, int CFG_INFO_3, int CMD_FIFO_ADDRESS_WIDTH, int DATA_WIDTH, int ID, int NUM_OF_SDI, int SDO_FIFO_ADDRESS_WIDTH);
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_spi_engine #(int CFG_INFO_0, int CFG_INFO_1, int CFG_INFO_2, int CFG_INFO_3, int CMD_FIFO_ADDRESS_WIDTH, int DATA_WIDTH, int ID, int NUM_OF_SDI, int SDO_FIFO_ADDRESS_WIDTH) extends adi_component;
 
     /* SPI Engine (axi_spi_engine) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h4, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -87,11 +101,15 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.NUM_OF_SDI_F = new("NUM_OF_SDI", 7, 4, RO, NUM_OF_SDI, this);
         this.DATA_WIDTH_F = new("DATA_WIDTH", 3, 0, RO, DATA_WIDTH, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -101,11 +119,15 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDO_MEM_ADDRESS_WIDTH_F = new("SDO_MEM_ADDRESS_WIDTH", 15, 8, RO, 'h4, this);
         this.CMD_MEM_ADDRESS_WIDTH_F = new("CMD_MEM_ADDRESS_WIDTH", 7, 0, RO, 'h4, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -117,13 +139,17 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDI_FIFO_ADDRESS_WIDTH_F = new("SDI_FIFO_ADDRESS_WIDTH", 31, 24, RO, 'h5, this);
         this.SDO_FIFO_ADDRESS_WIDTH_F = new("SDO_FIFO_ADDRESS_WIDTH", 23, 16, RO, 'h5, this);
         this.SYNC_FIFO_ADDRESS_WIDTH_F = new("SYNC_FIFO_ADDRESS_WIDTH", 15, 8, RO, 'h4, this);
         this.CMD_FIFO_ADDRESS_WIDTH_F = new("CMD_FIFO_ADDRESS_WIDTH", 7, 0, RO, 'h4, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -132,10 +158,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ENABLE_F = new("ENABLE", 31, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -148,14 +178,18 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CMD_ALMOST_EMPTY_F = new("CMD_ALMOST_EMPTY", 0, 0, RW, 'h0, this);
         this.SDO_ALMOST_EMPTY_F = new("SDO_ALMOST_EMPTY", 1, 1, RW, 'h0, this);
         this.SDI_ALMOST_FULL_F = new("SDI_ALMOST_FULL", 2, 2, RW, 'h0, this);
         this.SYNC_EVENT_F = new("SYNC_EVENT", 3, 3, RW, 'h0, this);
         this.OFFLOAD_SYNC_ID_PENDING_F = new("OFFLOAD_SYNC_ID_PENDING", 4, 4, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -164,10 +198,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IRQ_PENDING_F = new("IRQ_PENDING", 31, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -176,10 +214,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IRQ_SOURCE_F = new("IRQ_SOURCE", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -188,10 +230,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYNC_ID_F = new("SYNC_ID", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -200,10 +246,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OFFLOAD_SYNC_ID_F = new("OFFLOAD_SYNC_ID", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -212,10 +262,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CMD_FIFO_ROOM_F = new("CMD_FIFO_ROOM", 31, 0, RO, $clog2((2**CMD_FIFO_ADDRESS_WIDTH)-1), this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -224,10 +278,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDO_FIFO_ROOM_F = new("SDO_FIFO_ROOM", 31, 0, RO, $clog2((2**SDO_FIFO_ADDRESS_WIDTH)-1), this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -236,10 +294,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDI_FIFO_LEVEL_F = new("SDI_FIFO_LEVEL", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -248,10 +310,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CMD_FIFO_F = new("CMD_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -260,10 +326,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDO_FIFO_F = new("SDO_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -272,10 +342,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDI_FIFO_F = new("SDI_FIFO", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -284,10 +358,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDI_FIFO_MSB_F = new("SDI_FIFO_MSB", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -296,10 +374,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDI_FIFO_PEEK_F = new("SDI_FIFO_PEEK", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -308,10 +390,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OFFLOAD0_EN_F = new("OFFLOAD0_EN", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -320,10 +406,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OFFLOAD0_STATUS_F = new("OFFLOAD0_STATUS", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -332,10 +422,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OFFLOAD0_MEM_RESET_F = new("OFFLOAD0_MEM_RESET", 31, 0, WO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -344,10 +438,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OFFLOAD0_CDM_FIFO_F = new("OFFLOAD0_CDM_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -356,10 +454,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OFFLOAD0_SDO_FIFO_F = new("OFFLOAD0_SDO_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -368,10 +470,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CFG_INFO_0_F = new("CFG_INFO_0", 31, 0, RO, CFG_INFO_0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -380,10 +486,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CFG_INFO_1_F = new("CFG_INFO_1", 31, 0, RO, CFG_INFO_1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -392,10 +502,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CFG_INFO_2_F = new("CFG_INFO_2", 31, 0, RO, CFG_INFO_2, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -404,10 +518,14 @@ package adi_regmap_spi_engine_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CFG_INFO_4_F = new("CFG_INFO_4", 31, 0, RO, CFG_INFO_3, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -441,37 +559,43 @@ package adi_regmap_spi_engine_pkg;
     CFG_INFO_2_CLASS #(CFG_INFO_2) CFG_INFO_2_R;
     CFG_INFO_3_CLASS #(CFG_INFO_3) CFG_INFO_3_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.DATA_WIDTH_R = new("DATA_WIDTH", 'hc);
-      this.OFFLOAD_MEM_ADDR_WIDTH_R = new("OFFLOAD_MEM_ADDR_WIDTH", 'h10);
-      this.FIFO_ADDR_WIDTH_R = new("FIFO_ADDR_WIDTH", 'h14);
-      this.ENABLE_R = new("ENABLE", 'h40);
-      this.IRQ_MASK_R = new("IRQ_MASK", 'h80);
-      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84);
-      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88);
-      this.SYNC_ID_R = new("SYNC_ID", 'hc0);
-      this.OFFLOAD_SYNC_ID_R = new("OFFLOAD_SYNC_ID", 'hc4);
-      this.CMD_FIFO_ROOM_R = new("CMD_FIFO_ROOM", 'hd0);
-      this.SDO_FIFO_ROOM_R = new("SDO_FIFO_ROOM", 'hd4);
-      this.SDI_FIFO_LEVEL_R = new("SDI_FIFO_LEVEL", 'hd8);
-      this.CMD_FIFO_R = new("CMD_FIFO", 'he0);
-      this.SDO_FIFO_R = new("SDO_FIFO", 'he4);
-      this.SDI_FIFO_R = new("SDI_FIFO", 'he8);
-      this.SDI_FIFO_MSB_R = new("SDI_FIFO_MSB", 'hec);
-      this.SDI_FIFO_PEEK_R = new("SDI_FIFO_PEEK", 'hf0);
-      this.OFFLOAD0_EN_R = new("OFFLOAD0_EN", 'h100);
-      this.OFFLOAD0_STATUS_R = new("OFFLOAD0_STATUS", 'h104);
-      this.OFFLOAD0_MEM_RESET_R = new("OFFLOAD0_MEM_RESET", 'h108);
-      this.OFFLOAD0_CDM_FIFO_R = new("OFFLOAD0_CDM_FIFO", 'h110);
-      this.OFFLOAD0_SDO_FIFO_R = new("OFFLOAD0_SDO_FIFO", 'h114);
-      this.CFG_INFO_0_R = new("CFG_INFO_0", 'h200);
-      this.CFG_INFO_1_R = new("CFG_INFO_1", 'h204);
-      this.CFG_INFO_2_R = new("CFG_INFO_2", 'h208);
-      this.CFG_INFO_3_R = new("CFG_INFO_3", 'h20c);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.DATA_WIDTH_R = new("DATA_WIDTH", 'hc, this);
+      this.OFFLOAD_MEM_ADDR_WIDTH_R = new("OFFLOAD_MEM_ADDR_WIDTH", 'h10, this);
+      this.FIFO_ADDR_WIDTH_R = new("FIFO_ADDR_WIDTH", 'h14, this);
+      this.ENABLE_R = new("ENABLE", 'h40, this);
+      this.IRQ_MASK_R = new("IRQ_MASK", 'h80, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88, this);
+      this.SYNC_ID_R = new("SYNC_ID", 'hc0, this);
+      this.OFFLOAD_SYNC_ID_R = new("OFFLOAD_SYNC_ID", 'hc4, this);
+      this.CMD_FIFO_ROOM_R = new("CMD_FIFO_ROOM", 'hd0, this);
+      this.SDO_FIFO_ROOM_R = new("SDO_FIFO_ROOM", 'hd4, this);
+      this.SDI_FIFO_LEVEL_R = new("SDI_FIFO_LEVEL", 'hd8, this);
+      this.CMD_FIFO_R = new("CMD_FIFO", 'he0, this);
+      this.SDO_FIFO_R = new("SDO_FIFO", 'he4, this);
+      this.SDI_FIFO_R = new("SDI_FIFO", 'he8, this);
+      this.SDI_FIFO_MSB_R = new("SDI_FIFO_MSB", 'hec, this);
+      this.SDI_FIFO_PEEK_R = new("SDI_FIFO_PEEK", 'hf0, this);
+      this.OFFLOAD0_EN_R = new("OFFLOAD0_EN", 'h100, this);
+      this.OFFLOAD0_STATUS_R = new("OFFLOAD0_STATUS", 'h104, this);
+      this.OFFLOAD0_MEM_RESET_R = new("OFFLOAD0_MEM_RESET", 'h108, this);
+      this.OFFLOAD0_CDM_FIFO_R = new("OFFLOAD0_CDM_FIFO", 'h110, this);
+      this.OFFLOAD0_SDO_FIFO_R = new("OFFLOAD0_SDO_FIFO", 'h114, this);
+      this.CFG_INFO_0_R = new("CFG_INFO_0", 'h200, this);
+      this.CFG_INFO_1_R = new("CFG_INFO_1", 'h204, this);
+      this.CFG_INFO_2_R = new("CFG_INFO_2", 'h208, this);
+      this.CFG_INFO_3_R = new("CFG_INFO_3", 'h20c, this);
     endfunction: new;
 
   endclass;
+
 endpackage

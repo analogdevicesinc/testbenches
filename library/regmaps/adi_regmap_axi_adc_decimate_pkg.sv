@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_axi_adc_decimate_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_axi_adc_decimate;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_axi_adc_decimate extends adi_component;
 
     /* Analog Decimation (axi_adc_decimate) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_axi_adc_decimate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_axi_adc_decimate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_axi_adc_decimate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DECIMATION_RATIO_F = new("DECIMATION_RATIO", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_axi_adc_decimate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FILTERED_DECIMATION_RATIO_F = new("FILTERED_DECIMATION_RATIO", 2, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -99,11 +117,15 @@ package adi_regmap_axi_adc_decimate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CORRECTION_ENABLE_B_F = new("CORRECTION_ENABLE_B", 1, 1, RW, 'h0, this);
         this.CORRECTION_ENABLE_A_F = new("CORRECTION_ENABLE_A", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -112,10 +134,14 @@ package adi_regmap_axi_adc_decimate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -124,10 +150,14 @@ package adi_regmap_axi_adc_decimate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -139,15 +169,21 @@ package adi_regmap_axi_adc_decimate_pkg;
     CORRECTION_COEFFICIENT_A_CLASS CORRECTION_COEFFICIENT_A_R;
     CORRECTION_COEFFICIENT_B_CLASS CORRECTION_COEFFICIENT_B_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.SCRATCH_R = new("SCRATCH", 'h4);
-      this.DECIMATION_RATIO_R = new("DECIMATION_RATIO", 'h40);
-      this.DECIMATION_STAGE_ENABLE_R = new("DECIMATION_STAGE_ENABLE", 'h44);
-      this.CONFIG_R = new("CONFIG", 'h48);
-      this.CORRECTION_COEFFICIENT_A_R = new("CORRECTION_COEFFICIENT_A", 'h4c);
-      this.CORRECTION_COEFFICIENT_B_R = new("CORRECTION_COEFFICIENT_B", 'h50);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.SCRATCH_R = new("SCRATCH", 'h4, this);
+      this.DECIMATION_RATIO_R = new("DECIMATION_RATIO", 'h40, this);
+      this.DECIMATION_STAGE_ENABLE_R = new("DECIMATION_STAGE_ENABLE", 'h44, this);
+      this.CONFIG_R = new("CONFIG", 'h48, this);
+      this.CORRECTION_COEFFICIENT_A_R = new("CORRECTION_COEFFICIENT_A", 'h4c, this);
+      this.CORRECTION_COEFFICIENT_B_R = new("CORRECTION_COEFFICIENT_B", 'h50, this);
     endfunction: new;
 
   endclass;
+
 endpackage

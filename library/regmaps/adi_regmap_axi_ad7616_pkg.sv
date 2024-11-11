@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_axi_ad7616_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_axi_ad7616;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_axi_ad7616 extends adi_component;
 
     /* AXI AD7616 (axi_ad7616) */
     class VERSION_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_F = new("VERSION", 31, 0, RO, 'h1002, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -58,10 +64,14 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ID_F = new("ID", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -70,10 +80,14 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -83,11 +97,15 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CNVST_EN_F = new("CNVST_EN", 1, 1, RW, 'h0, this);
         this.RESETN_F = new("RESETN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -96,10 +114,14 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.UP_CONV_RATE_F = new("UP_CONV_RATE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -108,10 +130,14 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.UP_BURST_LENGTH_F = new("UP_BURST_LENGTH", 4, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -120,10 +146,14 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.UP_READ_DATA_F = new("UP_READ_DATA", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -132,10 +162,14 @@ package adi_regmap_axi_ad7616_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.UP_WRITE_DATA_F = new("UP_WRITE_DATA", 31, 0, WO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -148,16 +182,22 @@ package adi_regmap_axi_ad7616_pkg;
     UP_READ_DATA_CLASS UP_READ_DATA_R;
     UP_WRITE_DATA_CLASS UP_WRITE_DATA_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h400);
-      this.ID_R = new("ID", 'h404);
-      this.SCRATCH_R = new("SCRATCH", 'h408);
-      this.UP_CNTRL_R = new("UP_CNTRL", 'h440);
-      this.UP_CONV_RATE_R = new("UP_CONV_RATE", 'h444);
-      this.UP_BURST_LENGTH_R = new("UP_BURST_LENGTH", 'h448);
-      this.UP_READ_DATA_R = new("UP_READ_DATA", 'h44c);
-      this.UP_WRITE_DATA_R = new("UP_WRITE_DATA", 'h450);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h400, this);
+      this.ID_R = new("ID", 'h404, this);
+      this.SCRATCH_R = new("SCRATCH", 'h408, this);
+      this.UP_CNTRL_R = new("UP_CNTRL", 'h440, this);
+      this.UP_CONV_RATE_R = new("UP_CONV_RATE", 'h444, this);
+      this.UP_BURST_LENGTH_R = new("UP_BURST_LENGTH", 'h448, this);
+      this.UP_READ_DATA_R = new("UP_READ_DATA", 'h44c, this);
+      this.UP_WRITE_DATA_R = new("UP_WRITE_DATA", 'h450, this);
     endfunction: new;
 
   endclass;
+
 endpackage

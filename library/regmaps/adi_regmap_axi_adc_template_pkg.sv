@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_axi_adc_template_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_axi_adc_template;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_axi_adc_template extends adi_component;
 
     /* AXI TEMPLATE ADC Common (axi_template) */
     class RSTN_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CE_N_F = new("CE_N", 2, 2, RW, 'h0, this);
         this.MMCM_RSTN_F = new("MMCM_RSTN", 1, 1, RW, 'h0, this);
         this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -69,9 +75,11 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SDR_DDR_N_F = new("SDR_DDR_N", 16, 16, RW, 'h0, this);
         this.SYMB_OP_F = new("SYMB_OP", 15, 15, RW, 'h0, this);
         this.SYMB_8_16B_F = new("SYMB_8_16B", 14, 14, RW, 'h0, this);
@@ -80,6 +88,8 @@ package adi_regmap_axi_adc_template_pkg;
         this.R1_MODE_F = new("R1_MODE", 2, 2, RW, 'h0, this);
         this.DDR_EDGESEL_F = new("DDR_EDGESEL", 1, 1, RW, 'h0, this);
         this.PIN_MODE_F = new("PIN_MODE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -90,12 +100,16 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.EXT_SYNC_ARM_F = new("EXT_SYNC_ARM", 1, 1, RW, 'h0, this);
         this.EXT_SYNC_DISARM_F = new("EXT_SYNC_DISARM", 2, 2, RW, 'h0, this);
         this.MANUAL_SYNC_REQUEST_F = new("MANUAL_SYNC_REQUEST", 8, 8, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -105,11 +119,15 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CRC_EN_F = new("CRC_EN", 8, 8, RW, 'h0, this);
         this.CUSTOM_CONTROL_F = new("CUSTOM_CONTROL", 7, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -118,10 +136,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLK_FREQ_F = new("CLK_FREQ", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -130,10 +152,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLK_RATIO_F = new("CLK_RATIO", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -146,14 +172,18 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_CTRL_STATUS_F = new("ADC_CTRL_STATUS", 4, 4, RO, 'h0, this);
         this.PN_ERR_F = new("PN_ERR", 3, 3, RO, 'h0, this);
         this.PN_OOS_F = new("PN_OOS", 2, 2, RO, 'h0, this);
         this.OVER_RANGE_F = new("OVER_RANGE", 1, 1, RO, 'h0, this);
         this.STATUS_F = new("STATUS", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -162,10 +192,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_SYNC_F = new("ADC_SYNC", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -175,11 +209,15 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DRP_RWN_F = new("DRP_RWN", 28, 28, RW, 'h0, this);
         this.DRP_ADDRESS_F = new("DRP_ADDRESS", 27, 16, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -189,11 +227,15 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DRP_LOCKED_F = new("DRP_LOCKED", 17, 17, RO, 'h0, this);
         this.DRP_STATUS_F = new("DRP_STATUS", 16, 16, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -202,10 +244,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DRP_WDATA_F = new("DRP_WDATA", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -214,10 +260,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DRP_RDATA_F = new("DRP_RDATA", 15, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -226,10 +276,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_CONFIG_WR_F = new("ADC_CONFIG_WR", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -238,10 +292,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_CONFIG_RD_F = new("ADC_CONFIG_RD", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -252,12 +310,16 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.UI_OVF_F = new("UI_OVF", 2, 2, RW1C, 'h0, this);
         this.UI_UNF_F = new("UI_UNF", 1, 1, RW1C, 'h0, this);
         this.UI_RESERVED_F = new("UI_RESERVED", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -266,10 +328,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_CONFIG_CTRL_F = new("ADC_CONFIG_CTRL", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -278,10 +344,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.USR_CHANMAX_F = new("USR_CHANMAX", 7, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -290,10 +360,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_START_CODE_F = new("ADC_START_CODE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -302,10 +376,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_GPIO_IN_F = new("ADC_GPIO_IN", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -314,10 +392,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_GPIO_OUT_F = new("ADC_GPIO_OUT", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -326,10 +408,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PPS_COUNTER_F = new("PPS_COUNTER", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -338,10 +424,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PPS_STATUS_F = new("PPS_STATUS", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -359,9 +449,11 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_LB_OWR_F = new("ADC_LB_OWR", 11, 11, RW, 'h0, this);
         this.ADC_PN_SEL_OWR_F = new("ADC_PN_SEL_OWR", 10, 10, RW, 'h0, this);
         this.IQCOR_ENB_F = new("IQCOR_ENB", 9, 9, RW, 'h0, this);
@@ -371,6 +463,8 @@ package adi_regmap_axi_adc_template_pkg;
         this.FORMAT_ENABLE_F = new("FORMAT_ENABLE", 4, 4, RW, 'h0, this);
         this.ADC_PN_TYPE_OWR_F = new("ADC_PN_TYPE_OWR", 1, 1, RW, 'h0, this);
         this.ENABLE_F = new("ENABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -383,14 +477,18 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CRC_ERR_F = new("CRC_ERR", 12, 12, RW1C, 'h0, this);
         this.STATUS_HEADER_F = new("STATUS_HEADER", 11, 4, RO, 'h0, this);
         this.PN_ERR_F = new("PN_ERR", 2, 2, RW1C, 'h0, this);
         this.PN_OOS_F = new("PN_OOS", 1, 1, RW1C, 'h0, this);
         this.OVER_RANGE_F = new("OVER_RANGE", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -399,10 +497,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_READ_DATA_F = new("ADC_READ_DATA", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -412,11 +514,15 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DCFILT_OFFSET_F = new("DCFILT_OFFSET", 31, 16, RW, 'h0, this);
         this.DCFILT_COEFF_F = new("DCFILT_COEFF", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -426,11 +532,15 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IQCOR_COEFF_1_F = new("IQCOR_COEFF_1", 31, 16, RW, 'h0, this);
         this.IQCOR_COEFF_2_F = new("IQCOR_COEFF_2", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -440,11 +550,15 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ADC_PN_SEL_F = new("ADC_PN_SEL", 19, 16, RW, 'h0, this);
         this.ADC_DATA_SEL_F = new("ADC_DATA_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -457,14 +571,18 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.USR_DATATYPE_BE_F = new("USR_DATATYPE_BE", 25, 25, RO, 'h0, this);
         this.USR_DATATYPE_SIGNED_F = new("USR_DATATYPE_SIGNED", 24, 24, RO, 'h0, this);
         this.USR_DATATYPE_SHIFT_F = new("USR_DATATYPE_SHIFT", 23, 16, RO, 'h0, this);
         this.USR_DATATYPE_TOTAL_BITS_F = new("USR_DATATYPE_TOTAL_BITS", 15, 8, RO, 'h0, this);
         this.USR_DATATYPE_BITS_F = new("USR_DATATYPE_BITS", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -474,11 +592,15 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.USR_DECIMATION_M_F = new("USR_DECIMATION_M", 31, 16, RW, 'h0, this);
         this.USR_DECIMATION_N_F = new("USR_DECIMATION_N", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -487,10 +609,14 @@ package adi_regmap_axi_adc_template_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SOFTSPAN_F = new("SOFTSPAN", 2, 0, RW, 'h7, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -661,174 +787,180 @@ package adi_regmap_axi_adc_template_pkg;
     CHAN_CNTRLn_4_CLASS CHAN_CNTRL14_4_R;
     CHAN_CNTRLn_4_CLASS CHAN_CNTRL15_4_R;
 
-    function new();
-      this.RSTN_R = new("RSTN", 'h40);
-      this.CNTRL_R = new("CNTRL", 'h44);
-      this.CNTRL_2_R = new("CNTRL_2", 'h48);
-      this.CNTRL_3_R = new("CNTRL_3", 'h4c);
-      this.CLK_FREQ_R = new("CLK_FREQ", 'h54);
-      this.CLK_RATIO_R = new("CLK_RATIO", 'h58);
-      this.STATUS_R = new("STATUS", 'h5c);
-      this.SYNC_STATUS_R = new("SYNC_STATUS", 'h68);
-      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70);
-      this.DRP_STATUS_R = new("DRP_STATUS", 'h74);
-      this.DRP_WDATA_R = new("DRP_WDATA", 'h78);
-      this.DRP_RDATA_R = new("DRP_RDATA", 'h7c);
-      this.ADC_CONFIG_WR_R = new("ADC_CONFIG_WR", 'h80);
-      this.ADC_CONFIG_RD_R = new("ADC_CONFIG_RD", 'h84);
-      this.UI_STATUS_R = new("UI_STATUS", 'h88);
-      this.ADC_CONFIG_CTRL_R = new("ADC_CONFIG_CTRL", 'h8c);
-      this.USR_CNTRL_1_R = new("USR_CNTRL_1", 'ha0);
-      this.ADC_START_CODE_R = new("ADC_START_CODE", 'ha4);
-      this.ADC_GPIO_IN_R = new("ADC_GPIO_IN", 'hb8);
-      this.ADC_GPIO_OUT_R = new("ADC_GPIO_OUT", 'hbc);
-      this.PPS_COUNTER_R = new("PPS_COUNTER", 'hc0);
-      this.PPS_STATUS_R = new("PPS_STATUS", 'hc4);
-      this.CHAN_CNTRL0_R = new("CHAN_CNTRL0", 'h400);
-      this.CHAN_CNTRL1_R = new("CHAN_CNTRL1", 'h458);
-      this.CHAN_CNTRL2_R = new("CHAN_CNTRL2", 'h4b0);
-      this.CHAN_CNTRL3_R = new("CHAN_CNTRL3", 'h508);
-      this.CHAN_CNTRL4_R = new("CHAN_CNTRL4", 'h560);
-      this.CHAN_CNTRL5_R = new("CHAN_CNTRL5", 'h5b8);
-      this.CHAN_CNTRL6_R = new("CHAN_CNTRL6", 'h610);
-      this.CHAN_CNTRL7_R = new("CHAN_CNTRL7", 'h668);
-      this.CHAN_CNTRL8_R = new("CHAN_CNTRL8", 'h6c0);
-      this.CHAN_CNTRL9_R = new("CHAN_CNTRL9", 'h718);
-      this.CHAN_CNTRL10_R = new("CHAN_CNTRL10", 'h770);
-      this.CHAN_CNTRL11_R = new("CHAN_CNTRL11", 'h7c8);
-      this.CHAN_CNTRL12_R = new("CHAN_CNTRL12", 'h820);
-      this.CHAN_CNTRL13_R = new("CHAN_CNTRL13", 'h878);
-      this.CHAN_CNTRL14_R = new("CHAN_CNTRL14", 'h8d0);
-      this.CHAN_CNTRL15_R = new("CHAN_CNTRL15", 'h928);
-      this.CHAN_STATUS0_R = new("CHAN_STATUS0", 'h404);
-      this.CHAN_STATUS1_R = new("CHAN_STATUS1", 'h45c);
-      this.CHAN_STATUS2_R = new("CHAN_STATUS2", 'h4b4);
-      this.CHAN_STATUS3_R = new("CHAN_STATUS3", 'h50c);
-      this.CHAN_STATUS4_R = new("CHAN_STATUS4", 'h564);
-      this.CHAN_STATUS5_R = new("CHAN_STATUS5", 'h5bc);
-      this.CHAN_STATUS6_R = new("CHAN_STATUS6", 'h614);
-      this.CHAN_STATUS7_R = new("CHAN_STATUS7", 'h66c);
-      this.CHAN_STATUS8_R = new("CHAN_STATUS8", 'h6c4);
-      this.CHAN_STATUS9_R = new("CHAN_STATUS9", 'h71c);
-      this.CHAN_STATUS10_R = new("CHAN_STATUS10", 'h774);
-      this.CHAN_STATUS11_R = new("CHAN_STATUS11", 'h7cc);
-      this.CHAN_STATUS12_R = new("CHAN_STATUS12", 'h824);
-      this.CHAN_STATUS13_R = new("CHAN_STATUS13", 'h87c);
-      this.CHAN_STATUS14_R = new("CHAN_STATUS14", 'h8d4);
-      this.CHAN_STATUS15_R = new("CHAN_STATUS15", 'h92c);
-      this.CHAN_RAW_DATA0_R = new("CHAN_RAW_DATA0", 'h408);
-      this.CHAN_RAW_DATA1_R = new("CHAN_RAW_DATA1", 'h460);
-      this.CHAN_RAW_DATA2_R = new("CHAN_RAW_DATA2", 'h4b8);
-      this.CHAN_RAW_DATA3_R = new("CHAN_RAW_DATA3", 'h510);
-      this.CHAN_RAW_DATA4_R = new("CHAN_RAW_DATA4", 'h568);
-      this.CHAN_RAW_DATA5_R = new("CHAN_RAW_DATA5", 'h5c0);
-      this.CHAN_RAW_DATA6_R = new("CHAN_RAW_DATA6", 'h618);
-      this.CHAN_RAW_DATA7_R = new("CHAN_RAW_DATA7", 'h670);
-      this.CHAN_RAW_DATA8_R = new("CHAN_RAW_DATA8", 'h6c8);
-      this.CHAN_RAW_DATA9_R = new("CHAN_RAW_DATA9", 'h720);
-      this.CHAN_RAW_DATA10_R = new("CHAN_RAW_DATA10", 'h778);
-      this.CHAN_RAW_DATA11_R = new("CHAN_RAW_DATA11", 'h7d0);
-      this.CHAN_RAW_DATA12_R = new("CHAN_RAW_DATA12", 'h828);
-      this.CHAN_RAW_DATA13_R = new("CHAN_RAW_DATA13", 'h880);
-      this.CHAN_RAW_DATA14_R = new("CHAN_RAW_DATA14", 'h8d8);
-      this.CHAN_RAW_DATA15_R = new("CHAN_RAW_DATA15", 'h930);
-      this.CHAN_CNTRL0_1_R = new("CHAN_CNTRL0_1", 'h410);
-      this.CHAN_CNTRL1_1_R = new("CHAN_CNTRL1_1", 'h468);
-      this.CHAN_CNTRL2_1_R = new("CHAN_CNTRL2_1", 'h4c0);
-      this.CHAN_CNTRL3_1_R = new("CHAN_CNTRL3_1", 'h518);
-      this.CHAN_CNTRL4_1_R = new("CHAN_CNTRL4_1", 'h570);
-      this.CHAN_CNTRL5_1_R = new("CHAN_CNTRL5_1", 'h5c8);
-      this.CHAN_CNTRL6_1_R = new("CHAN_CNTRL6_1", 'h620);
-      this.CHAN_CNTRL7_1_R = new("CHAN_CNTRL7_1", 'h678);
-      this.CHAN_CNTRL8_1_R = new("CHAN_CNTRL8_1", 'h6d0);
-      this.CHAN_CNTRL9_1_R = new("CHAN_CNTRL9_1", 'h728);
-      this.CHAN_CNTRL10_1_R = new("CHAN_CNTRL10_1", 'h780);
-      this.CHAN_CNTRL11_1_R = new("CHAN_CNTRL11_1", 'h7d8);
-      this.CHAN_CNTRL12_1_R = new("CHAN_CNTRL12_1", 'h830);
-      this.CHAN_CNTRL13_1_R = new("CHAN_CNTRL13_1", 'h888);
-      this.CHAN_CNTRL14_1_R = new("CHAN_CNTRL14_1", 'h8e0);
-      this.CHAN_CNTRL15_1_R = new("CHAN_CNTRL15_1", 'h938);
-      this.CHAN_CNTRL0_2_R = new("CHAN_CNTRL0_2", 'h414);
-      this.CHAN_CNTRL1_2_R = new("CHAN_CNTRL1_2", 'h46c);
-      this.CHAN_CNTRL2_2_R = new("CHAN_CNTRL2_2", 'h4c4);
-      this.CHAN_CNTRL3_2_R = new("CHAN_CNTRL3_2", 'h51c);
-      this.CHAN_CNTRL4_2_R = new("CHAN_CNTRL4_2", 'h574);
-      this.CHAN_CNTRL5_2_R = new("CHAN_CNTRL5_2", 'h5cc);
-      this.CHAN_CNTRL6_2_R = new("CHAN_CNTRL6_2", 'h624);
-      this.CHAN_CNTRL7_2_R = new("CHAN_CNTRL7_2", 'h67c);
-      this.CHAN_CNTRL8_2_R = new("CHAN_CNTRL8_2", 'h6d4);
-      this.CHAN_CNTRL9_2_R = new("CHAN_CNTRL9_2", 'h72c);
-      this.CHAN_CNTRL10_2_R = new("CHAN_CNTRL10_2", 'h784);
-      this.CHAN_CNTRL11_2_R = new("CHAN_CNTRL11_2", 'h7dc);
-      this.CHAN_CNTRL12_2_R = new("CHAN_CNTRL12_2", 'h834);
-      this.CHAN_CNTRL13_2_R = new("CHAN_CNTRL13_2", 'h88c);
-      this.CHAN_CNTRL14_2_R = new("CHAN_CNTRL14_2", 'h8e4);
-      this.CHAN_CNTRL15_2_R = new("CHAN_CNTRL15_2", 'h93c);
-      this.CHAN_CNTRL0_3_R = new("CHAN_CNTRL0_3", 'h418);
-      this.CHAN_CNTRL1_3_R = new("CHAN_CNTRL1_3", 'h470);
-      this.CHAN_CNTRL2_3_R = new("CHAN_CNTRL2_3", 'h4c8);
-      this.CHAN_CNTRL3_3_R = new("CHAN_CNTRL3_3", 'h520);
-      this.CHAN_CNTRL4_3_R = new("CHAN_CNTRL4_3", 'h578);
-      this.CHAN_CNTRL5_3_R = new("CHAN_CNTRL5_3", 'h5d0);
-      this.CHAN_CNTRL6_3_R = new("CHAN_CNTRL6_3", 'h628);
-      this.CHAN_CNTRL7_3_R = new("CHAN_CNTRL7_3", 'h680);
-      this.CHAN_CNTRL8_3_R = new("CHAN_CNTRL8_3", 'h6d8);
-      this.CHAN_CNTRL9_3_R = new("CHAN_CNTRL9_3", 'h730);
-      this.CHAN_CNTRL10_3_R = new("CHAN_CNTRL10_3", 'h788);
-      this.CHAN_CNTRL11_3_R = new("CHAN_CNTRL11_3", 'h7e0);
-      this.CHAN_CNTRL12_3_R = new("CHAN_CNTRL12_3", 'h838);
-      this.CHAN_CNTRL13_3_R = new("CHAN_CNTRL13_3", 'h890);
-      this.CHAN_CNTRL14_3_R = new("CHAN_CNTRL14_3", 'h8e8);
-      this.CHAN_CNTRL15_3_R = new("CHAN_CNTRL15_3", 'h940);
-      this.CHAN_USR_CNTRL0_1_R = new("CHAN_USR_CNTRL0_1", 'h420);
-      this.CHAN_USR_CNTRL1_1_R = new("CHAN_USR_CNTRL1_1", 'h478);
-      this.CHAN_USR_CNTRL2_1_R = new("CHAN_USR_CNTRL2_1", 'h4d0);
-      this.CHAN_USR_CNTRL3_1_R = new("CHAN_USR_CNTRL3_1", 'h528);
-      this.CHAN_USR_CNTRL4_1_R = new("CHAN_USR_CNTRL4_1", 'h580);
-      this.CHAN_USR_CNTRL5_1_R = new("CHAN_USR_CNTRL5_1", 'h5d8);
-      this.CHAN_USR_CNTRL6_1_R = new("CHAN_USR_CNTRL6_1", 'h630);
-      this.CHAN_USR_CNTRL7_1_R = new("CHAN_USR_CNTRL7_1", 'h688);
-      this.CHAN_USR_CNTRL8_1_R = new("CHAN_USR_CNTRL8_1", 'h6e0);
-      this.CHAN_USR_CNTRL9_1_R = new("CHAN_USR_CNTRL9_1", 'h738);
-      this.CHAN_USR_CNTRL10_1_R = new("CHAN_USR_CNTRL10_1", 'h790);
-      this.CHAN_USR_CNTRL11_1_R = new("CHAN_USR_CNTRL11_1", 'h7e8);
-      this.CHAN_USR_CNTRL12_1_R = new("CHAN_USR_CNTRL12_1", 'h840);
-      this.CHAN_USR_CNTRL13_1_R = new("CHAN_USR_CNTRL13_1", 'h898);
-      this.CHAN_USR_CNTRL14_1_R = new("CHAN_USR_CNTRL14_1", 'h8f0);
-      this.CHAN_USR_CNTRL15_1_R = new("CHAN_USR_CNTRL15_1", 'h948);
-      this.CHAN_USR_CNTRL0_2_R = new("CHAN_USR_CNTRL0_2", 'h424);
-      this.CHAN_USR_CNTRL1_2_R = new("CHAN_USR_CNTRL1_2", 'h47c);
-      this.CHAN_USR_CNTRL2_2_R = new("CHAN_USR_CNTRL2_2", 'h4d4);
-      this.CHAN_USR_CNTRL3_2_R = new("CHAN_USR_CNTRL3_2", 'h52c);
-      this.CHAN_USR_CNTRL4_2_R = new("CHAN_USR_CNTRL4_2", 'h584);
-      this.CHAN_USR_CNTRL5_2_R = new("CHAN_USR_CNTRL5_2", 'h5dc);
-      this.CHAN_USR_CNTRL6_2_R = new("CHAN_USR_CNTRL6_2", 'h634);
-      this.CHAN_USR_CNTRL7_2_R = new("CHAN_USR_CNTRL7_2", 'h68c);
-      this.CHAN_USR_CNTRL8_2_R = new("CHAN_USR_CNTRL8_2", 'h6e4);
-      this.CHAN_USR_CNTRL9_2_R = new("CHAN_USR_CNTRL9_2", 'h73c);
-      this.CHAN_USR_CNTRL10_2_R = new("CHAN_USR_CNTRL10_2", 'h794);
-      this.CHAN_USR_CNTRL11_2_R = new("CHAN_USR_CNTRL11_2", 'h7ec);
-      this.CHAN_USR_CNTRL12_2_R = new("CHAN_USR_CNTRL12_2", 'h844);
-      this.CHAN_USR_CNTRL13_2_R = new("CHAN_USR_CNTRL13_2", 'h89c);
-      this.CHAN_USR_CNTRL14_2_R = new("CHAN_USR_CNTRL14_2", 'h8f4);
-      this.CHAN_USR_CNTRL15_2_R = new("CHAN_USR_CNTRL15_2", 'h94c);
-      this.CHAN_CNTRL0_4_R = new("CHAN_CNTRL0_4", 'h428);
-      this.CHAN_CNTRL1_4_R = new("CHAN_CNTRL1_4", 'h480);
-      this.CHAN_CNTRL2_4_R = new("CHAN_CNTRL2_4", 'h4d8);
-      this.CHAN_CNTRL3_4_R = new("CHAN_CNTRL3_4", 'h530);
-      this.CHAN_CNTRL4_4_R = new("CHAN_CNTRL4_4", 'h588);
-      this.CHAN_CNTRL5_4_R = new("CHAN_CNTRL5_4", 'h5e0);
-      this.CHAN_CNTRL6_4_R = new("CHAN_CNTRL6_4", 'h638);
-      this.CHAN_CNTRL7_4_R = new("CHAN_CNTRL7_4", 'h690);
-      this.CHAN_CNTRL8_4_R = new("CHAN_CNTRL8_4", 'h6e8);
-      this.CHAN_CNTRL9_4_R = new("CHAN_CNTRL9_4", 'h740);
-      this.CHAN_CNTRL10_4_R = new("CHAN_CNTRL10_4", 'h798);
-      this.CHAN_CNTRL11_4_R = new("CHAN_CNTRL11_4", 'h7f0);
-      this.CHAN_CNTRL12_4_R = new("CHAN_CNTRL12_4", 'h848);
-      this.CHAN_CNTRL13_4_R = new("CHAN_CNTRL13_4", 'h8a0);
-      this.CHAN_CNTRL14_4_R = new("CHAN_CNTRL14_4", 'h8f8);
-      this.CHAN_CNTRL15_4_R = new("CHAN_CNTRL15_4", 'h950);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.RSTN_R = new("RSTN", 'h40, this);
+      this.CNTRL_R = new("CNTRL", 'h44, this);
+      this.CNTRL_2_R = new("CNTRL_2", 'h48, this);
+      this.CNTRL_3_R = new("CNTRL_3", 'h4c, this);
+      this.CLK_FREQ_R = new("CLK_FREQ", 'h54, this);
+      this.CLK_RATIO_R = new("CLK_RATIO", 'h58, this);
+      this.STATUS_R = new("STATUS", 'h5c, this);
+      this.SYNC_STATUS_R = new("SYNC_STATUS", 'h68, this);
+      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70, this);
+      this.DRP_STATUS_R = new("DRP_STATUS", 'h74, this);
+      this.DRP_WDATA_R = new("DRP_WDATA", 'h78, this);
+      this.DRP_RDATA_R = new("DRP_RDATA", 'h7c, this);
+      this.ADC_CONFIG_WR_R = new("ADC_CONFIG_WR", 'h80, this);
+      this.ADC_CONFIG_RD_R = new("ADC_CONFIG_RD", 'h84, this);
+      this.UI_STATUS_R = new("UI_STATUS", 'h88, this);
+      this.ADC_CONFIG_CTRL_R = new("ADC_CONFIG_CTRL", 'h8c, this);
+      this.USR_CNTRL_1_R = new("USR_CNTRL_1", 'ha0, this);
+      this.ADC_START_CODE_R = new("ADC_START_CODE", 'ha4, this);
+      this.ADC_GPIO_IN_R = new("ADC_GPIO_IN", 'hb8, this);
+      this.ADC_GPIO_OUT_R = new("ADC_GPIO_OUT", 'hbc, this);
+      this.PPS_COUNTER_R = new("PPS_COUNTER", 'hc0, this);
+      this.PPS_STATUS_R = new("PPS_STATUS", 'hc4, this);
+      this.CHAN_CNTRL0_R = new("CHAN_CNTRL0", 'h400, this);
+      this.CHAN_CNTRL1_R = new("CHAN_CNTRL1", 'h458, this);
+      this.CHAN_CNTRL2_R = new("CHAN_CNTRL2", 'h4b0, this);
+      this.CHAN_CNTRL3_R = new("CHAN_CNTRL3", 'h508, this);
+      this.CHAN_CNTRL4_R = new("CHAN_CNTRL4", 'h560, this);
+      this.CHAN_CNTRL5_R = new("CHAN_CNTRL5", 'h5b8, this);
+      this.CHAN_CNTRL6_R = new("CHAN_CNTRL6", 'h610, this);
+      this.CHAN_CNTRL7_R = new("CHAN_CNTRL7", 'h668, this);
+      this.CHAN_CNTRL8_R = new("CHAN_CNTRL8", 'h6c0, this);
+      this.CHAN_CNTRL9_R = new("CHAN_CNTRL9", 'h718, this);
+      this.CHAN_CNTRL10_R = new("CHAN_CNTRL10", 'h770, this);
+      this.CHAN_CNTRL11_R = new("CHAN_CNTRL11", 'h7c8, this);
+      this.CHAN_CNTRL12_R = new("CHAN_CNTRL12", 'h820, this);
+      this.CHAN_CNTRL13_R = new("CHAN_CNTRL13", 'h878, this);
+      this.CHAN_CNTRL14_R = new("CHAN_CNTRL14", 'h8d0, this);
+      this.CHAN_CNTRL15_R = new("CHAN_CNTRL15", 'h928, this);
+      this.CHAN_STATUS0_R = new("CHAN_STATUS0", 'h404, this);
+      this.CHAN_STATUS1_R = new("CHAN_STATUS1", 'h45c, this);
+      this.CHAN_STATUS2_R = new("CHAN_STATUS2", 'h4b4, this);
+      this.CHAN_STATUS3_R = new("CHAN_STATUS3", 'h50c, this);
+      this.CHAN_STATUS4_R = new("CHAN_STATUS4", 'h564, this);
+      this.CHAN_STATUS5_R = new("CHAN_STATUS5", 'h5bc, this);
+      this.CHAN_STATUS6_R = new("CHAN_STATUS6", 'h614, this);
+      this.CHAN_STATUS7_R = new("CHAN_STATUS7", 'h66c, this);
+      this.CHAN_STATUS8_R = new("CHAN_STATUS8", 'h6c4, this);
+      this.CHAN_STATUS9_R = new("CHAN_STATUS9", 'h71c, this);
+      this.CHAN_STATUS10_R = new("CHAN_STATUS10", 'h774, this);
+      this.CHAN_STATUS11_R = new("CHAN_STATUS11", 'h7cc, this);
+      this.CHAN_STATUS12_R = new("CHAN_STATUS12", 'h824, this);
+      this.CHAN_STATUS13_R = new("CHAN_STATUS13", 'h87c, this);
+      this.CHAN_STATUS14_R = new("CHAN_STATUS14", 'h8d4, this);
+      this.CHAN_STATUS15_R = new("CHAN_STATUS15", 'h92c, this);
+      this.CHAN_RAW_DATA0_R = new("CHAN_RAW_DATA0", 'h408, this);
+      this.CHAN_RAW_DATA1_R = new("CHAN_RAW_DATA1", 'h460, this);
+      this.CHAN_RAW_DATA2_R = new("CHAN_RAW_DATA2", 'h4b8, this);
+      this.CHAN_RAW_DATA3_R = new("CHAN_RAW_DATA3", 'h510, this);
+      this.CHAN_RAW_DATA4_R = new("CHAN_RAW_DATA4", 'h568, this);
+      this.CHAN_RAW_DATA5_R = new("CHAN_RAW_DATA5", 'h5c0, this);
+      this.CHAN_RAW_DATA6_R = new("CHAN_RAW_DATA6", 'h618, this);
+      this.CHAN_RAW_DATA7_R = new("CHAN_RAW_DATA7", 'h670, this);
+      this.CHAN_RAW_DATA8_R = new("CHAN_RAW_DATA8", 'h6c8, this);
+      this.CHAN_RAW_DATA9_R = new("CHAN_RAW_DATA9", 'h720, this);
+      this.CHAN_RAW_DATA10_R = new("CHAN_RAW_DATA10", 'h778, this);
+      this.CHAN_RAW_DATA11_R = new("CHAN_RAW_DATA11", 'h7d0, this);
+      this.CHAN_RAW_DATA12_R = new("CHAN_RAW_DATA12", 'h828, this);
+      this.CHAN_RAW_DATA13_R = new("CHAN_RAW_DATA13", 'h880, this);
+      this.CHAN_RAW_DATA14_R = new("CHAN_RAW_DATA14", 'h8d8, this);
+      this.CHAN_RAW_DATA15_R = new("CHAN_RAW_DATA15", 'h930, this);
+      this.CHAN_CNTRL0_1_R = new("CHAN_CNTRL0_1", 'h410, this);
+      this.CHAN_CNTRL1_1_R = new("CHAN_CNTRL1_1", 'h468, this);
+      this.CHAN_CNTRL2_1_R = new("CHAN_CNTRL2_1", 'h4c0, this);
+      this.CHAN_CNTRL3_1_R = new("CHAN_CNTRL3_1", 'h518, this);
+      this.CHAN_CNTRL4_1_R = new("CHAN_CNTRL4_1", 'h570, this);
+      this.CHAN_CNTRL5_1_R = new("CHAN_CNTRL5_1", 'h5c8, this);
+      this.CHAN_CNTRL6_1_R = new("CHAN_CNTRL6_1", 'h620, this);
+      this.CHAN_CNTRL7_1_R = new("CHAN_CNTRL7_1", 'h678, this);
+      this.CHAN_CNTRL8_1_R = new("CHAN_CNTRL8_1", 'h6d0, this);
+      this.CHAN_CNTRL9_1_R = new("CHAN_CNTRL9_1", 'h728, this);
+      this.CHAN_CNTRL10_1_R = new("CHAN_CNTRL10_1", 'h780, this);
+      this.CHAN_CNTRL11_1_R = new("CHAN_CNTRL11_1", 'h7d8, this);
+      this.CHAN_CNTRL12_1_R = new("CHAN_CNTRL12_1", 'h830, this);
+      this.CHAN_CNTRL13_1_R = new("CHAN_CNTRL13_1", 'h888, this);
+      this.CHAN_CNTRL14_1_R = new("CHAN_CNTRL14_1", 'h8e0, this);
+      this.CHAN_CNTRL15_1_R = new("CHAN_CNTRL15_1", 'h938, this);
+      this.CHAN_CNTRL0_2_R = new("CHAN_CNTRL0_2", 'h414, this);
+      this.CHAN_CNTRL1_2_R = new("CHAN_CNTRL1_2", 'h46c, this);
+      this.CHAN_CNTRL2_2_R = new("CHAN_CNTRL2_2", 'h4c4, this);
+      this.CHAN_CNTRL3_2_R = new("CHAN_CNTRL3_2", 'h51c, this);
+      this.CHAN_CNTRL4_2_R = new("CHAN_CNTRL4_2", 'h574, this);
+      this.CHAN_CNTRL5_2_R = new("CHAN_CNTRL5_2", 'h5cc, this);
+      this.CHAN_CNTRL6_2_R = new("CHAN_CNTRL6_2", 'h624, this);
+      this.CHAN_CNTRL7_2_R = new("CHAN_CNTRL7_2", 'h67c, this);
+      this.CHAN_CNTRL8_2_R = new("CHAN_CNTRL8_2", 'h6d4, this);
+      this.CHAN_CNTRL9_2_R = new("CHAN_CNTRL9_2", 'h72c, this);
+      this.CHAN_CNTRL10_2_R = new("CHAN_CNTRL10_2", 'h784, this);
+      this.CHAN_CNTRL11_2_R = new("CHAN_CNTRL11_2", 'h7dc, this);
+      this.CHAN_CNTRL12_2_R = new("CHAN_CNTRL12_2", 'h834, this);
+      this.CHAN_CNTRL13_2_R = new("CHAN_CNTRL13_2", 'h88c, this);
+      this.CHAN_CNTRL14_2_R = new("CHAN_CNTRL14_2", 'h8e4, this);
+      this.CHAN_CNTRL15_2_R = new("CHAN_CNTRL15_2", 'h93c, this);
+      this.CHAN_CNTRL0_3_R = new("CHAN_CNTRL0_3", 'h418, this);
+      this.CHAN_CNTRL1_3_R = new("CHAN_CNTRL1_3", 'h470, this);
+      this.CHAN_CNTRL2_3_R = new("CHAN_CNTRL2_3", 'h4c8, this);
+      this.CHAN_CNTRL3_3_R = new("CHAN_CNTRL3_3", 'h520, this);
+      this.CHAN_CNTRL4_3_R = new("CHAN_CNTRL4_3", 'h578, this);
+      this.CHAN_CNTRL5_3_R = new("CHAN_CNTRL5_3", 'h5d0, this);
+      this.CHAN_CNTRL6_3_R = new("CHAN_CNTRL6_3", 'h628, this);
+      this.CHAN_CNTRL7_3_R = new("CHAN_CNTRL7_3", 'h680, this);
+      this.CHAN_CNTRL8_3_R = new("CHAN_CNTRL8_3", 'h6d8, this);
+      this.CHAN_CNTRL9_3_R = new("CHAN_CNTRL9_3", 'h730, this);
+      this.CHAN_CNTRL10_3_R = new("CHAN_CNTRL10_3", 'h788, this);
+      this.CHAN_CNTRL11_3_R = new("CHAN_CNTRL11_3", 'h7e0, this);
+      this.CHAN_CNTRL12_3_R = new("CHAN_CNTRL12_3", 'h838, this);
+      this.CHAN_CNTRL13_3_R = new("CHAN_CNTRL13_3", 'h890, this);
+      this.CHAN_CNTRL14_3_R = new("CHAN_CNTRL14_3", 'h8e8, this);
+      this.CHAN_CNTRL15_3_R = new("CHAN_CNTRL15_3", 'h940, this);
+      this.CHAN_USR_CNTRL0_1_R = new("CHAN_USR_CNTRL0_1", 'h420, this);
+      this.CHAN_USR_CNTRL1_1_R = new("CHAN_USR_CNTRL1_1", 'h478, this);
+      this.CHAN_USR_CNTRL2_1_R = new("CHAN_USR_CNTRL2_1", 'h4d0, this);
+      this.CHAN_USR_CNTRL3_1_R = new("CHAN_USR_CNTRL3_1", 'h528, this);
+      this.CHAN_USR_CNTRL4_1_R = new("CHAN_USR_CNTRL4_1", 'h580, this);
+      this.CHAN_USR_CNTRL5_1_R = new("CHAN_USR_CNTRL5_1", 'h5d8, this);
+      this.CHAN_USR_CNTRL6_1_R = new("CHAN_USR_CNTRL6_1", 'h630, this);
+      this.CHAN_USR_CNTRL7_1_R = new("CHAN_USR_CNTRL7_1", 'h688, this);
+      this.CHAN_USR_CNTRL8_1_R = new("CHAN_USR_CNTRL8_1", 'h6e0, this);
+      this.CHAN_USR_CNTRL9_1_R = new("CHAN_USR_CNTRL9_1", 'h738, this);
+      this.CHAN_USR_CNTRL10_1_R = new("CHAN_USR_CNTRL10_1", 'h790, this);
+      this.CHAN_USR_CNTRL11_1_R = new("CHAN_USR_CNTRL11_1", 'h7e8, this);
+      this.CHAN_USR_CNTRL12_1_R = new("CHAN_USR_CNTRL12_1", 'h840, this);
+      this.CHAN_USR_CNTRL13_1_R = new("CHAN_USR_CNTRL13_1", 'h898, this);
+      this.CHAN_USR_CNTRL14_1_R = new("CHAN_USR_CNTRL14_1", 'h8f0, this);
+      this.CHAN_USR_CNTRL15_1_R = new("CHAN_USR_CNTRL15_1", 'h948, this);
+      this.CHAN_USR_CNTRL0_2_R = new("CHAN_USR_CNTRL0_2", 'h424, this);
+      this.CHAN_USR_CNTRL1_2_R = new("CHAN_USR_CNTRL1_2", 'h47c, this);
+      this.CHAN_USR_CNTRL2_2_R = new("CHAN_USR_CNTRL2_2", 'h4d4, this);
+      this.CHAN_USR_CNTRL3_2_R = new("CHAN_USR_CNTRL3_2", 'h52c, this);
+      this.CHAN_USR_CNTRL4_2_R = new("CHAN_USR_CNTRL4_2", 'h584, this);
+      this.CHAN_USR_CNTRL5_2_R = new("CHAN_USR_CNTRL5_2", 'h5dc, this);
+      this.CHAN_USR_CNTRL6_2_R = new("CHAN_USR_CNTRL6_2", 'h634, this);
+      this.CHAN_USR_CNTRL7_2_R = new("CHAN_USR_CNTRL7_2", 'h68c, this);
+      this.CHAN_USR_CNTRL8_2_R = new("CHAN_USR_CNTRL8_2", 'h6e4, this);
+      this.CHAN_USR_CNTRL9_2_R = new("CHAN_USR_CNTRL9_2", 'h73c, this);
+      this.CHAN_USR_CNTRL10_2_R = new("CHAN_USR_CNTRL10_2", 'h794, this);
+      this.CHAN_USR_CNTRL11_2_R = new("CHAN_USR_CNTRL11_2", 'h7ec, this);
+      this.CHAN_USR_CNTRL12_2_R = new("CHAN_USR_CNTRL12_2", 'h844, this);
+      this.CHAN_USR_CNTRL13_2_R = new("CHAN_USR_CNTRL13_2", 'h89c, this);
+      this.CHAN_USR_CNTRL14_2_R = new("CHAN_USR_CNTRL14_2", 'h8f4, this);
+      this.CHAN_USR_CNTRL15_2_R = new("CHAN_USR_CNTRL15_2", 'h94c, this);
+      this.CHAN_CNTRL0_4_R = new("CHAN_CNTRL0_4", 'h428, this);
+      this.CHAN_CNTRL1_4_R = new("CHAN_CNTRL1_4", 'h480, this);
+      this.CHAN_CNTRL2_4_R = new("CHAN_CNTRL2_4", 'h4d8, this);
+      this.CHAN_CNTRL3_4_R = new("CHAN_CNTRL3_4", 'h530, this);
+      this.CHAN_CNTRL4_4_R = new("CHAN_CNTRL4_4", 'h588, this);
+      this.CHAN_CNTRL5_4_R = new("CHAN_CNTRL5_4", 'h5e0, this);
+      this.CHAN_CNTRL6_4_R = new("CHAN_CNTRL6_4", 'h638, this);
+      this.CHAN_CNTRL7_4_R = new("CHAN_CNTRL7_4", 'h690, this);
+      this.CHAN_CNTRL8_4_R = new("CHAN_CNTRL8_4", 'h6e8, this);
+      this.CHAN_CNTRL9_4_R = new("CHAN_CNTRL9_4", 'h740, this);
+      this.CHAN_CNTRL10_4_R = new("CHAN_CNTRL10_4", 'h798, this);
+      this.CHAN_CNTRL11_4_R = new("CHAN_CNTRL11_4", 'h7f0, this);
+      this.CHAN_CNTRL12_4_R = new("CHAN_CNTRL12_4", 'h848, this);
+      this.CHAN_CNTRL13_4_R = new("CHAN_CNTRL13_4", 'h8a0, this);
+      this.CHAN_CNTRL14_4_R = new("CHAN_CNTRL14_4", 'h8f8, this);
+      this.CHAN_CNTRL15_4_R = new("CHAN_CNTRL15_4", 'h950, this);
     endfunction: new;
 
   endclass;
+
 endpackage

@@ -38,10 +38,10 @@
 package logger_pkg;
 
   typedef enum {
-    ADI_VERBOSITY_NONE,   // highest priority, test passed message, randomization state, cannot be disabled
-    ADI_VERBOSITY_LOW,    // test_program level debugging
-    ADI_VERBOSITY_MEDIUM, // driver level debugging
-    ADI_VERBOSITY_HIGH    // VIP, regmap, utilities level debugging
+    ADI_VERBOSITY_NONE = 0,   // highest priority, test passed message, randomization state, cannot be disabled
+    ADI_VERBOSITY_LOW = 1,    // test_program level debugging
+    ADI_VERBOSITY_MEDIUM = 2, // driver level debugging
+    ADI_VERBOSITY_HIGH = 3    // VIP, regmap, utilities level debugging
   } adi_verbosity_t;
 
   adi_verbosity_t verbosity = ADI_VERBOSITY_HIGH;

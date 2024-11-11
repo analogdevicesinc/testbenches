@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_tdd_gen_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_tdd_gen #(int BURST_COUNT_WIDTH, int CHANNEL_COUNT, int DEFAULT_POLARITY, int ID, int REGISTER_WIDTH, int SYNC_COUNT_WIDTH, int SYNC_EXTERNAL, int SYNC_EXTERNAL_CDC, int SYNC_INTERNAL);
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_tdd_gen #(int BURST_COUNT_WIDTH, int CHANNEL_COUNT, int DEFAULT_POLARITY, int ID, int REGISTER_WIDTH, int SYNC_COUNT_WIDTH, int SYNC_EXTERNAL, int SYNC_EXTERNAL_CDC, int SYNC_INTERNAL) extends adi_component;
 
     /* Generic TDD Control (axi_tdd) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h2, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h62, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h5444444e, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -104,9 +122,11 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYNC_COUNT_WIDTH_F = new("SYNC_COUNT_WIDTH", 30, 24, RO, SYNC_COUNT_WIDTH, this);
         this.BURST_COUNT_WIDTH_F = new("BURST_COUNT_WIDTH", 21, 16, RO, BURST_COUNT_WIDTH, this);
         this.REGISTER_WIDTH_F = new("REGISTER_WIDTH", 13, 8, RO, REGISTER_WIDTH, this);
@@ -114,6 +134,8 @@ package adi_regmap_tdd_gen_pkg;
         this.SYNC_EXTERNAL_F = new("SYNC_EXTERNAL", 6, 6, RO, SYNC_EXTERNAL, this);
         this.SYNC_INTERNAL_F = new("SYNC_INTERNAL", 5, 5, RO, SYNC_INTERNAL, this);
         this.CHANNEL_COUNT_EXTRA_F = new("CHANNEL_COUNT_EXTRA", 4, 0, RO, CHANNEL_COUNT-1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -122,10 +144,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DEFAULT_POLARITY_F = new("DEFAULT_POLARITY", 31, 0, RO, DEFAULT_POLARITY, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -138,14 +164,18 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYNC_SOFT_F = new("SYNC_SOFT", 4, 4, RW1C, 'h0, this);
         this.SYNC_EXT_F = new("SYNC_EXT", 3, 3, RW, 'h0, this);
         this.SYNC_INT_F = new("SYNC_INT", 2, 2, RW, 'h0, this);
         this.SYNC_RST_F = new("SYNC_RST", 1, 1, RW, 'h0, this);
         this.ENABLE_F = new("ENABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -154,10 +184,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CHANNEL_ENABLE_F = new("CHANNEL_ENABLE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -166,10 +200,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CHANNEL_POLARITY_F = new("CHANNEL_POLARITY", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -178,10 +216,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.BURST_COUNT_F = new("BURST_COUNT", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -190,10 +232,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.STARTUP_DELAY_F = new("STARTUP_DELAY", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -202,10 +248,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FRAME_LENGTH_F = new("FRAME_LENGTH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -214,10 +264,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYNC_PERIOD_LOW_F = new("SYNC_PERIOD_LOW", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -226,10 +280,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYNC_PERIOD_HIGH_F = new("SYNC_PERIOD_HIGH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -238,10 +296,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.STATE_F = new("STATE", 1, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -250,10 +312,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CHn_ON_F = new("CHn_ON", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -262,10 +328,14 @@ package adi_regmap_tdd_gen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CHn_OFF_F = new("CHn_OFF", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -349,87 +419,93 @@ package adi_regmap_tdd_gen_pkg;
     CHn_OFF_CLASS CH30_OFF_R;
     CHn_OFF_CLASS CH31_OFF_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc);
-      this.INTERFACE_DESCRIPTION_R = new("INTERFACE_DESCRIPTION", 'h10);
-      this.DEFAULT_POLARITY_R = new("DEFAULT_POLARITY", 'h14);
-      this.CONTROL_R = new("CONTROL", 'h40);
-      this.CHANNEL_ENABLE_R = new("CHANNEL_ENABLE", 'h44);
-      this.CHANNEL_POLARITY_R = new("CHANNEL_POLARITY", 'h48);
-      this.BURST_COUNT_R = new("BURST_COUNT", 'h4c);
-      this.STARTUP_DELAY_R = new("STARTUP_DELAY", 'h50);
-      this.FRAME_LENGTH_R = new("FRAME_LENGTH", 'h54);
-      this.SYNC_PERIOD_LOW_R = new("SYNC_PERIOD_LOW", 'h58);
-      this.SYNC_PERIOD_HIGH_R = new("SYNC_PERIOD_HIGH", 'h5c);
-      this.STATUS_R = new("STATUS", 'h60);
-      this.CH0_ON_R = new("CH0_ON", 'h80);
-      this.CH1_ON_R = new("CH1_ON", 'h88);
-      this.CH2_ON_R = new("CH2_ON", 'h90);
-      this.CH3_ON_R = new("CH3_ON", 'h98);
-      this.CH4_ON_R = new("CH4_ON", 'ha0);
-      this.CH5_ON_R = new("CH5_ON", 'ha8);
-      this.CH6_ON_R = new("CH6_ON", 'hb0);
-      this.CH7_ON_R = new("CH7_ON", 'hb8);
-      this.CH8_ON_R = new("CH8_ON", 'hc0);
-      this.CH9_ON_R = new("CH9_ON", 'hc8);
-      this.CH10_ON_R = new("CH10_ON", 'hd0);
-      this.CH11_ON_R = new("CH11_ON", 'hd8);
-      this.CH12_ON_R = new("CH12_ON", 'he0);
-      this.CH13_ON_R = new("CH13_ON", 'he8);
-      this.CH14_ON_R = new("CH14_ON", 'hf0);
-      this.CH15_ON_R = new("CH15_ON", 'hf8);
-      this.CH16_ON_R = new("CH16_ON", 'h100);
-      this.CH17_ON_R = new("CH17_ON", 'h108);
-      this.CH18_ON_R = new("CH18_ON", 'h110);
-      this.CH19_ON_R = new("CH19_ON", 'h118);
-      this.CH20_ON_R = new("CH20_ON", 'h120);
-      this.CH21_ON_R = new("CH21_ON", 'h128);
-      this.CH22_ON_R = new("CH22_ON", 'h130);
-      this.CH23_ON_R = new("CH23_ON", 'h138);
-      this.CH24_ON_R = new("CH24_ON", 'h140);
-      this.CH25_ON_R = new("CH25_ON", 'h148);
-      this.CH26_ON_R = new("CH26_ON", 'h150);
-      this.CH27_ON_R = new("CH27_ON", 'h158);
-      this.CH28_ON_R = new("CH28_ON", 'h160);
-      this.CH29_ON_R = new("CH29_ON", 'h168);
-      this.CH30_ON_R = new("CH30_ON", 'h170);
-      this.CH31_ON_R = new("CH31_ON", 'h178);
-      this.CH0_OFF_R = new("CH0_OFF", 'h84);
-      this.CH1_OFF_R = new("CH1_OFF", 'h8c);
-      this.CH2_OFF_R = new("CH2_OFF", 'h94);
-      this.CH3_OFF_R = new("CH3_OFF", 'h9c);
-      this.CH4_OFF_R = new("CH4_OFF", 'ha4);
-      this.CH5_OFF_R = new("CH5_OFF", 'hac);
-      this.CH6_OFF_R = new("CH6_OFF", 'hb4);
-      this.CH7_OFF_R = new("CH7_OFF", 'hbc);
-      this.CH8_OFF_R = new("CH8_OFF", 'hc4);
-      this.CH9_OFF_R = new("CH9_OFF", 'hcc);
-      this.CH10_OFF_R = new("CH10_OFF", 'hd4);
-      this.CH11_OFF_R = new("CH11_OFF", 'hdc);
-      this.CH12_OFF_R = new("CH12_OFF", 'he4);
-      this.CH13_OFF_R = new("CH13_OFF", 'hec);
-      this.CH14_OFF_R = new("CH14_OFF", 'hf4);
-      this.CH15_OFF_R = new("CH15_OFF", 'hfc);
-      this.CH16_OFF_R = new("CH16_OFF", 'h104);
-      this.CH17_OFF_R = new("CH17_OFF", 'h10c);
-      this.CH18_OFF_R = new("CH18_OFF", 'h114);
-      this.CH19_OFF_R = new("CH19_OFF", 'h11c);
-      this.CH20_OFF_R = new("CH20_OFF", 'h124);
-      this.CH21_OFF_R = new("CH21_OFF", 'h12c);
-      this.CH22_OFF_R = new("CH22_OFF", 'h134);
-      this.CH23_OFF_R = new("CH23_OFF", 'h13c);
-      this.CH24_OFF_R = new("CH24_OFF", 'h144);
-      this.CH25_OFF_R = new("CH25_OFF", 'h14c);
-      this.CH26_OFF_R = new("CH26_OFF", 'h154);
-      this.CH27_OFF_R = new("CH27_OFF", 'h15c);
-      this.CH28_OFF_R = new("CH28_OFF", 'h164);
-      this.CH29_OFF_R = new("CH29_OFF", 'h16c);
-      this.CH30_OFF_R = new("CH30_OFF", 'h174);
-      this.CH31_OFF_R = new("CH31_OFF", 'h17c);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
+      this.INTERFACE_DESCRIPTION_R = new("INTERFACE_DESCRIPTION", 'h10, this);
+      this.DEFAULT_POLARITY_R = new("DEFAULT_POLARITY", 'h14, this);
+      this.CONTROL_R = new("CONTROL", 'h40, this);
+      this.CHANNEL_ENABLE_R = new("CHANNEL_ENABLE", 'h44, this);
+      this.CHANNEL_POLARITY_R = new("CHANNEL_POLARITY", 'h48, this);
+      this.BURST_COUNT_R = new("BURST_COUNT", 'h4c, this);
+      this.STARTUP_DELAY_R = new("STARTUP_DELAY", 'h50, this);
+      this.FRAME_LENGTH_R = new("FRAME_LENGTH", 'h54, this);
+      this.SYNC_PERIOD_LOW_R = new("SYNC_PERIOD_LOW", 'h58, this);
+      this.SYNC_PERIOD_HIGH_R = new("SYNC_PERIOD_HIGH", 'h5c, this);
+      this.STATUS_R = new("STATUS", 'h60, this);
+      this.CH0_ON_R = new("CH0_ON", 'h80, this);
+      this.CH1_ON_R = new("CH1_ON", 'h88, this);
+      this.CH2_ON_R = new("CH2_ON", 'h90, this);
+      this.CH3_ON_R = new("CH3_ON", 'h98, this);
+      this.CH4_ON_R = new("CH4_ON", 'ha0, this);
+      this.CH5_ON_R = new("CH5_ON", 'ha8, this);
+      this.CH6_ON_R = new("CH6_ON", 'hb0, this);
+      this.CH7_ON_R = new("CH7_ON", 'hb8, this);
+      this.CH8_ON_R = new("CH8_ON", 'hc0, this);
+      this.CH9_ON_R = new("CH9_ON", 'hc8, this);
+      this.CH10_ON_R = new("CH10_ON", 'hd0, this);
+      this.CH11_ON_R = new("CH11_ON", 'hd8, this);
+      this.CH12_ON_R = new("CH12_ON", 'he0, this);
+      this.CH13_ON_R = new("CH13_ON", 'he8, this);
+      this.CH14_ON_R = new("CH14_ON", 'hf0, this);
+      this.CH15_ON_R = new("CH15_ON", 'hf8, this);
+      this.CH16_ON_R = new("CH16_ON", 'h100, this);
+      this.CH17_ON_R = new("CH17_ON", 'h108, this);
+      this.CH18_ON_R = new("CH18_ON", 'h110, this);
+      this.CH19_ON_R = new("CH19_ON", 'h118, this);
+      this.CH20_ON_R = new("CH20_ON", 'h120, this);
+      this.CH21_ON_R = new("CH21_ON", 'h128, this);
+      this.CH22_ON_R = new("CH22_ON", 'h130, this);
+      this.CH23_ON_R = new("CH23_ON", 'h138, this);
+      this.CH24_ON_R = new("CH24_ON", 'h140, this);
+      this.CH25_ON_R = new("CH25_ON", 'h148, this);
+      this.CH26_ON_R = new("CH26_ON", 'h150, this);
+      this.CH27_ON_R = new("CH27_ON", 'h158, this);
+      this.CH28_ON_R = new("CH28_ON", 'h160, this);
+      this.CH29_ON_R = new("CH29_ON", 'h168, this);
+      this.CH30_ON_R = new("CH30_ON", 'h170, this);
+      this.CH31_ON_R = new("CH31_ON", 'h178, this);
+      this.CH0_OFF_R = new("CH0_OFF", 'h84, this);
+      this.CH1_OFF_R = new("CH1_OFF", 'h8c, this);
+      this.CH2_OFF_R = new("CH2_OFF", 'h94, this);
+      this.CH3_OFF_R = new("CH3_OFF", 'h9c, this);
+      this.CH4_OFF_R = new("CH4_OFF", 'ha4, this);
+      this.CH5_OFF_R = new("CH5_OFF", 'hac, this);
+      this.CH6_OFF_R = new("CH6_OFF", 'hb4, this);
+      this.CH7_OFF_R = new("CH7_OFF", 'hbc, this);
+      this.CH8_OFF_R = new("CH8_OFF", 'hc4, this);
+      this.CH9_OFF_R = new("CH9_OFF", 'hcc, this);
+      this.CH10_OFF_R = new("CH10_OFF", 'hd4, this);
+      this.CH11_OFF_R = new("CH11_OFF", 'hdc, this);
+      this.CH12_OFF_R = new("CH12_OFF", 'he4, this);
+      this.CH13_OFF_R = new("CH13_OFF", 'hec, this);
+      this.CH14_OFF_R = new("CH14_OFF", 'hf4, this);
+      this.CH15_OFF_R = new("CH15_OFF", 'hfc, this);
+      this.CH16_OFF_R = new("CH16_OFF", 'h104, this);
+      this.CH17_OFF_R = new("CH17_OFF", 'h10c, this);
+      this.CH18_OFF_R = new("CH18_OFF", 'h114, this);
+      this.CH19_OFF_R = new("CH19_OFF", 'h11c, this);
+      this.CH20_OFF_R = new("CH20_OFF", 'h124, this);
+      this.CH21_OFF_R = new("CH21_OFF", 'h12c, this);
+      this.CH22_OFF_R = new("CH22_OFF", 'h134, this);
+      this.CH23_OFF_R = new("CH23_OFF", 'h13c, this);
+      this.CH24_OFF_R = new("CH24_OFF", 'h144, this);
+      this.CH25_OFF_R = new("CH25_OFF", 'h14c, this);
+      this.CH26_OFF_R = new("CH26_OFF", 'h154, this);
+      this.CH27_OFF_R = new("CH27_OFF", 'h15c, this);
+      this.CH28_OFF_R = new("CH28_OFF", 'h164, this);
+      this.CH29_OFF_R = new("CH29_OFF", 'h16c, this);
+      this.CH30_OFF_R = new("CH30_OFF", 'h174, this);
+      this.CH31_OFF_R = new("CH31_OFF", 'h17c, this);
     endfunction: new;
 
   endclass;
+
 endpackage

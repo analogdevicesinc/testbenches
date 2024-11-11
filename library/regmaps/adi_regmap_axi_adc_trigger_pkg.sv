@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_axi_adc_trigger_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_axi_adc_trigger;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_axi_adc_trigger extends adi_component;
 
     /* AXI ADC Trigger (axi_adc_trigger) */
     class VERSION_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_F = new("VERSION", 31, 0, RO, 'h30000, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -58,10 +64,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -71,11 +81,15 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_O_1_F = new("TRIGGER_O_1", 1, 1, RW, 'h0, this);
         this.TRIGGER_O_0_F = new("TRIGGER_O_0", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -87,13 +101,17 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_O_1_F = new("TRIGGER_O_1", 7, 5, RW, 'h0, this);
         this.TRIGGER_O_0_F = new("TRIGGER_O_0", 4, 2, RW, 'h0, this);
         this.IO_SELECTION_1_F = new("IO_SELECTION_1", 1, 1, RW, 'h0, this);
         this.IO_SELECTION_0_F = new("IO_SELECTION_0", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -106,14 +124,18 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FALL_EDGE_F = new("FALL_EDGE", 9, 8, RW, 'h0, this);
         this.RISE_EDGE_F = new("RISE_EDGE", 7, 6, RW, 'h0, this);
         this.ANY_EDGE_F = new("ANY_EDGE", 5, 4, RW, 'h0, this);
         this.HIGH_LEVEL_F = new("HIGH_LEVEL", 3, 2, RW, 'h0, this);
         this.LOW_LEVEL_F = new("LOW_LEVEL", 1, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -122,10 +144,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.LIMIT_A_F = new("LIMIT_A", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -134,10 +160,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_FUNCTION_A_F = new("TRIGGER_FUNCTION_A", 1, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -146,10 +176,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.HYSTERESIS_A_F = new("HYSTERESIS_A", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -158,10 +192,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_MUX_A_F = new("TRIGGER_MUX_A", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -170,10 +208,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.LIMIT_B_F = new("LIMIT_B", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -182,10 +224,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_FUNCTION_B_F = new("TRIGGER_FUNCTION_B", 1, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -194,10 +240,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.HYSTERESIS_B_F = new("HYSTERESIS_B", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -206,10 +256,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_MUX_B_F = new("TRIGGER_MUX_B", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -219,11 +273,15 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.EMBEDDED_TRIGGER_F = new("EMBEDDED_TRIGGER", 16, 16, RW, 'h0, this);
         this.TRIGGER_MUX_OUT_F = new("TRIGGER_MUX_OUT", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -232,10 +290,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FIFO_DEPTH_F = new("FIFO_DEPTH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -244,10 +306,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGERED_F = new("TRIGGERED", 1, 1, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -256,10 +322,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_DELAY_F = new("TRIGGER_DELAY", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -268,10 +338,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.STREAMING_F = new("STREAMING", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -280,10 +354,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_HOLDOFF_F = new("TRIGGER_HOLDOFF", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -292,10 +370,14 @@ package adi_regmap_axi_adc_trigger_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_OUT_HOLD_PINS_F = new("TRIGGER_OUT_HOLD_PINS", 1, 1, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -320,28 +402,34 @@ package adi_regmap_axi_adc_trigger_pkg;
     TRIGGER_HOLDOFF_CLASS TRIGGER_HOLDOFF_R;
     TRIGGER_OUT_HOLD_PINS_CLASS TRIGGER_OUT_HOLD_PINS_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.SCRATCH_R = new("SCRATCH", 'h4);
-      this.TRIGGER_O_R = new("TRIGGER_O", 'h8);
-      this.IO_SELECTION_R = new("IO_SELECTION", 'hc);
-      this.CONFIG_TRIGGER_I_R = new("CONFIG_TRIGGER_I", 'h10);
-      this.LIMIT_A_R = new("LIMIT_A", 'h14);
-      this.FUNCTION_A_R = new("FUNCTION_A", 'h18);
-      this.HYSTERESIS_A_R = new("HYSTERESIS_A", 'h1c);
-      this.TRIGGER_MUX_A_R = new("TRIGGER_MUX_A", 'h20);
-      this.LIMIT_B_R = new("LIMIT_B", 'h24);
-      this.FUNCTION_B_R = new("FUNCTION_B", 'h28);
-      this.HYSTERESIS_B_R = new("HYSTERESIS_B", 'h2c);
-      this.TRIGGER_MUX_B_R = new("TRIGGER_MUX_B", 'h30);
-      this.TRIGGER_OUT_CONTROL_R = new("TRIGGER_OUT_CONTROL", 'h34);
-      this.FIFO_DEPTH_R = new("FIFO_DEPTH", 'h38);
-      this.TRIGGERED_R = new("TRIGGERED", 'h3c);
-      this.TRIGGER_DELAY_R = new("TRIGGER_DELAY", 'h40);
-      this.STREAMING_R = new("STREAMING", 'h44);
-      this.TRIGGER_HOLDOFF_R = new("TRIGGER_HOLDOFF", 'h48);
-      this.TRIGGER_OUT_HOLD_PINS_R = new("TRIGGER_OUT_HOLD_PINS", 'h4c);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.SCRATCH_R = new("SCRATCH", 'h4, this);
+      this.TRIGGER_O_R = new("TRIGGER_O", 'h8, this);
+      this.IO_SELECTION_R = new("IO_SELECTION", 'hc, this);
+      this.CONFIG_TRIGGER_I_R = new("CONFIG_TRIGGER_I", 'h10, this);
+      this.LIMIT_A_R = new("LIMIT_A", 'h14, this);
+      this.FUNCTION_A_R = new("FUNCTION_A", 'h18, this);
+      this.HYSTERESIS_A_R = new("HYSTERESIS_A", 'h1c, this);
+      this.TRIGGER_MUX_A_R = new("TRIGGER_MUX_A", 'h20, this);
+      this.LIMIT_B_R = new("LIMIT_B", 'h24, this);
+      this.FUNCTION_B_R = new("FUNCTION_B", 'h28, this);
+      this.HYSTERESIS_B_R = new("HYSTERESIS_B", 'h2c, this);
+      this.TRIGGER_MUX_B_R = new("TRIGGER_MUX_B", 'h30, this);
+      this.TRIGGER_OUT_CONTROL_R = new("TRIGGER_OUT_CONTROL", 'h34, this);
+      this.FIFO_DEPTH_R = new("FIFO_DEPTH", 'h38, this);
+      this.TRIGGERED_R = new("TRIGGERED", 'h3c, this);
+      this.TRIGGER_DELAY_R = new("TRIGGER_DELAY", 'h40, this);
+      this.STREAMING_R = new("STREAMING", 'h44, this);
+      this.TRIGGER_HOLDOFF_R = new("TRIGGER_HOLDOFF", 'h48, this);
+      this.TRIGGER_OUT_HOLD_PINS_R = new("TRIGGER_OUT_HOLD_PINS", 'h4c, this);
     endfunction: new;
 
   endclass;
+
 endpackage

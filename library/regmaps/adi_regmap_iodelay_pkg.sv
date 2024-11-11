@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_iodelay_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_iodelay;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_iodelay extends adi_component;
 
     /* IO Delay Control (axi_ad*) */
     class DELAY_CONTROL_n_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_iodelay_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DELAY_CONTROL_IO_n_F = new("DELAY_CONTROL_IO_n", 4, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -70,24 +76,30 @@ package adi_regmap_iodelay_pkg;
     DELAY_CONTROL_n_CLASS DELAY_CONTROL_14_R;
     DELAY_CONTROL_n_CLASS DELAY_CONTROL_15_R;
 
-    function new();
-      this.DELAY_CONTROL_0_R = new("DELAY_CONTROL_0", 'h0);
-      this.DELAY_CONTROL_1_R = new("DELAY_CONTROL_1", 'h4);
-      this.DELAY_CONTROL_2_R = new("DELAY_CONTROL_2", 'h8);
-      this.DELAY_CONTROL_3_R = new("DELAY_CONTROL_3", 'hc);
-      this.DELAY_CONTROL_4_R = new("DELAY_CONTROL_4", 'h10);
-      this.DELAY_CONTROL_5_R = new("DELAY_CONTROL_5", 'h14);
-      this.DELAY_CONTROL_6_R = new("DELAY_CONTROL_6", 'h18);
-      this.DELAY_CONTROL_7_R = new("DELAY_CONTROL_7", 'h1c);
-      this.DELAY_CONTROL_8_R = new("DELAY_CONTROL_8", 'h20);
-      this.DELAY_CONTROL_9_R = new("DELAY_CONTROL_9", 'h24);
-      this.DELAY_CONTROL_10_R = new("DELAY_CONTROL_10", 'h28);
-      this.DELAY_CONTROL_11_R = new("DELAY_CONTROL_11", 'h2c);
-      this.DELAY_CONTROL_12_R = new("DELAY_CONTROL_12", 'h30);
-      this.DELAY_CONTROL_13_R = new("DELAY_CONTROL_13", 'h34);
-      this.DELAY_CONTROL_14_R = new("DELAY_CONTROL_14", 'h38);
-      this.DELAY_CONTROL_15_R = new("DELAY_CONTROL_15", 'h3c);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.DELAY_CONTROL_0_R = new("DELAY_CONTROL_0", 'h0, this);
+      this.DELAY_CONTROL_1_R = new("DELAY_CONTROL_1", 'h4, this);
+      this.DELAY_CONTROL_2_R = new("DELAY_CONTROL_2", 'h8, this);
+      this.DELAY_CONTROL_3_R = new("DELAY_CONTROL_3", 'hc, this);
+      this.DELAY_CONTROL_4_R = new("DELAY_CONTROL_4", 'h10, this);
+      this.DELAY_CONTROL_5_R = new("DELAY_CONTROL_5", 'h14, this);
+      this.DELAY_CONTROL_6_R = new("DELAY_CONTROL_6", 'h18, this);
+      this.DELAY_CONTROL_7_R = new("DELAY_CONTROL_7", 'h1c, this);
+      this.DELAY_CONTROL_8_R = new("DELAY_CONTROL_8", 'h20, this);
+      this.DELAY_CONTROL_9_R = new("DELAY_CONTROL_9", 'h24, this);
+      this.DELAY_CONTROL_10_R = new("DELAY_CONTROL_10", 'h28, this);
+      this.DELAY_CONTROL_11_R = new("DELAY_CONTROL_11", 'h2c, this);
+      this.DELAY_CONTROL_12_R = new("DELAY_CONTROL_12", 'h30, this);
+      this.DELAY_CONTROL_13_R = new("DELAY_CONTROL_13", 'h34, this);
+      this.DELAY_CONTROL_14_R = new("DELAY_CONTROL_14", 'h38, this);
+      this.DELAY_CONTROL_15_R = new("DELAY_CONTROL_15", 'h3c, this);
     endfunction: new;
 
   endclass;
+
 endpackage

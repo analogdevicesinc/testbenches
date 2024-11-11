@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_jesd_tpl_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_jesd_tpl;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_jesd_tpl extends adi_component;
 
     /* JESD TPL (up_tpl_common) */
     class TPL_CNTRL_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_jesd_tpl_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PROFILE_SEL_F = new("PROFILE_SEL", 3, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -58,10 +64,14 @@ package adi_regmap_jesd_tpl_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PROFILE_NUM_F = new("PROFILE_NUM", 3, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -73,13 +83,17 @@ package adi_regmap_jesd_tpl_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.JESD_F_F = new("JESD_F", 31, 24, RO, 'hXXXXXXXX, this);
         this.JESD_S_F = new("JESD_S", 23, 16, RO, 'hXXXXXXXX, this);
         this.JESD_L_F = new("JESD_L", 15, 8, RO, 'hXXXXXXXX, this);
         this.JESD_M_F = new("JESD_M", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -89,11 +103,15 @@ package adi_regmap_jesd_tpl_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.JESD_N_F = new("JESD_N", 7, 0, RO, 'hXXXXXXXX, this);
         this.JESD_NP_F = new("JESD_NP", 15, 8, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -106,16 +124,22 @@ package adi_regmap_jesd_tpl_pkg;
     TPL_DESCRIPTORn_2_CLASS TPL_DESCRIPTOR1_2_R;
     TPL_DESCRIPTORn_2_CLASS TPL_DESCRIPTOR2_2_R;
 
-    function new();
-      this.TPL_CNTRL_R = new("TPL_CNTRL", 'h200);
-      this.TPL_STATUS_R = new("TPL_STATUS", 'h204);
-      this.TPL_DESCRIPTOR0_1_R = new("TPL_DESCRIPTOR0_1", 'h240);
-      this.TPL_DESCRIPTOR1_1_R = new("TPL_DESCRIPTOR1_1", 'h248);
-      this.TPL_DESCRIPTOR2_1_R = new("TPL_DESCRIPTOR2_1", 'h250);
-      this.TPL_DESCRIPTOR0_2_R = new("TPL_DESCRIPTOR0_2", 'h244);
-      this.TPL_DESCRIPTOR1_2_R = new("TPL_DESCRIPTOR1_2", 'h24c);
-      this.TPL_DESCRIPTOR2_2_R = new("TPL_DESCRIPTOR2_2", 'h254);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.TPL_CNTRL_R = new("TPL_CNTRL", 'h200, this);
+      this.TPL_STATUS_R = new("TPL_STATUS", 'h204, this);
+      this.TPL_DESCRIPTOR0_1_R = new("TPL_DESCRIPTOR0_1", 'h240, this);
+      this.TPL_DESCRIPTOR1_1_R = new("TPL_DESCRIPTOR1_1", 'h248, this);
+      this.TPL_DESCRIPTOR2_1_R = new("TPL_DESCRIPTOR2_1", 'h250, this);
+      this.TPL_DESCRIPTOR0_2_R = new("TPL_DESCRIPTOR0_2", 'h244, this);
+      this.TPL_DESCRIPTOR1_2_R = new("TPL_DESCRIPTOR1_2", 'h24c, this);
+      this.TPL_DESCRIPTOR2_2_R = new("TPL_DESCRIPTOR2_2", 'h254, this);
     endfunction: new;
 
   endclass;
+
 endpackage

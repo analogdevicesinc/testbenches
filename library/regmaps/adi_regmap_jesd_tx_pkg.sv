@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_jesd_tx_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_jesd_tx #(int ASYNC_CLK);
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_jesd_tx #(int ASYNC_CLK) extends adi_component;
 
     /* JESD204 TX (axi_jesd204_tx) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h3, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h32303454, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -98,10 +116,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYNTH_NUM_LANES_F = new("SYNTH_NUM_LANES", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -111,11 +133,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TPL_DATA_PATH_WIDTH_F = new("TPL_DATA_PATH_WIDTH", 15, 8, RO, 'h2, this);
         this.SYNTH_DATA_PATH_WIDTH_F = new("SYNTH_DATA_PATH_WIDTH", 7, 0, RO, 'h2, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -127,13 +153,17 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ENABLE_CHAR_REPLACE_F = new("ENABLE_CHAR_REPLACE", 18, 18, RO, 'h0, this);
         this.ASYNC_CLK_F = new("ASYNC_CLK", 12, 12, RO, ASYNC_CLK, this);
         this.ENCODER_F = new("ENCODER", 9, 8, RO, 'hXXXXXXXX, this);
         this.NUM_LINKS_F = new("NUM_LINKS", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -142,10 +172,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IRQ_ENABLE_F = new("IRQ_ENABLE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -154,10 +188,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IRQ_PENDING_F = new("IRQ_PENDING", 31, 0, RW1CV, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -166,10 +204,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IRQ_SOURCE_F = new("IRQ_SOURCE", 31, 0, RW1CV, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -178,10 +220,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.LINK_DISABLE_F = new("LINK_DISABLE", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -191,11 +237,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.EXTERNAL_RESET_F = new("EXTERNAL_RESET", 1, 1, RO, 'hXXXXXXXX, this);
         this.LINK_STATE_F = new("LINK_STATE", 0, 0, RO, 'h1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -204,10 +254,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.LINK_CLK_FREQ_F = new("LINK_CLK_FREQ", 31, 0, ROV, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -216,10 +270,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DEVICE_CLK_FREQ_F = new("DEVICE_CLK_FREQ", 20, 0, ROV, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -229,11 +287,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYSREF_ONESHOT_F = new("SYSREF_ONESHOT", 1, 1, RW, 'h0, this);
         this.SYSREF_DISABLE_F = new("SYSREF_DISABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -242,10 +304,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYSREF_LMFC_OFFSET_F = new("SYSREF_LMFC_OFFSET", 9, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -255,11 +321,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SYSREF_ALIGNMENT_ERROR_F = new("SYSREF_ALIGNMENT_ERROR", 1, 1, RW1CV, 'h0, this);
         this.SYSREF_DETECTED_F = new("SYSREF_DETECTED", 0, 0, RW1CV, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -299,9 +369,11 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.LANE_DISABLE0_F = new("LANE_DISABLE0", 0, 0, RW, 'h0, this);
         this.LANE_DISABLE1_F = new("LANE_DISABLE1", 1, 1, RW, 'h0, this);
         this.LANE_DISABLE2_F = new("LANE_DISABLE2", 2, 2, RW, 'h0, this);
@@ -334,6 +406,8 @@ package adi_regmap_jesd_tx_pkg;
         this.LANE_DISABLE29_F = new("LANE_DISABLE29", 29, 29, RW, 'h0, this);
         this.LANE_DISABLE30_F = new("LANE_DISABLE30", 30, 30, RW, 'h0, this);
         this.LANE_DISABLE31_F = new("LANE_DISABLE31", 31, 31, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -343,11 +417,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OCTETS_PER_FRAME_F = new("OCTETS_PER_FRAME", 18, 16, RW, 'h0, this);
         this.OCTETS_PER_MULTIFRAME_F = new("OCTETS_PER_MULTIFRAME", 9, 0, RW, 'h3, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -357,11 +435,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CHAR_REPLACEMENT_DISABLE_F = new("CHAR_REPLACEMENT_DISABLE", 1, 1, RW, 'h0, this);
         this.SCRAMBLER_DISABLE_F = new("SCRAMBLER_DISABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -401,9 +483,11 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.LINK_DISABLE0_F = new("LINK_DISABLE0", 0, 0, RW, 'h0, this);
         this.LINK_DISABLE1_F = new("LINK_DISABLE1", 1, 1, RW, 'h0, this);
         this.LINK_DISABLE2_F = new("LINK_DISABLE2", 2, 2, RW, 'h0, this);
@@ -436,6 +520,8 @@ package adi_regmap_jesd_tx_pkg;
         this.LINK_DISABLE29_F = new("LINK_DISABLE29", 29, 29, RW, 'h0, this);
         this.LINK_DISABLE30_F = new("LINK_DISABLE30", 30, 30, RW, 'h0, this);
         this.LINK_DISABLE31_F = new("LINK_DISABLE31", 31, 31, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -444,10 +530,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TPL_BEATS_PER_MULTIFRAME_F = new("TPL_BEATS_PER_MULTIFRAME", 7, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -458,12 +548,16 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SKIP_ILAS_F = new("SKIP_ILAS", 2, 2, RW, 'h0, this);
         this.CONTINUOUS_ILAS_F = new("CONTINUOUS_ILAS", 1, 1, RW, 'h0, this);
         this.CONTINUOUS_CGS_F = new("CONTINUOUS_CGS", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -472,10 +566,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.MFRAMES_PER_ILAS_F = new("MFRAMES_PER_ILAS", 7, 0, RW, 'h3, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -484,10 +582,14 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.MANUAL_SYNC_REQUEST_F = new("MANUAL_SYNC_REQUEST", 0, 0, W1S, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -497,11 +599,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.STATUS_SYNC_F = new("STATUS_SYNC", 11, 4, ROV, 'hXXXXXXXX, this);
         this.STATUS_STATE_F = new("STATUS_STATE", 1, 0, ROV, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -511,11 +617,15 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.BID_F = new("BID", 27, 24, RW, 'h0, this);
         this.DID_F = new("DID", 23, 16, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -528,14 +638,18 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.K_F = new("K", 28, 24, RW, 'h0, this);
         this.F_F = new("F", 23, 16, RW, 'h0, this);
         this.SCR_F = new("SCR", 15, 15, RW, 'h0, this);
         this.L_F = new("L", 12, 8, RW, 'h0, this);
         this.LID_F = new("LID", 4, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -550,9 +664,11 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.JESDV_F = new("JESDV", 31, 29, RW, 'h0, this);
         this.S_F = new("S", 28, 24, RW, 'h0, this);
         this.SUBCLASSV_F = new("SUBCLASSV", 23, 21, RW, 'h0, this);
@@ -560,6 +676,8 @@ package adi_regmap_jesd_tx_pkg;
         this.CS_F = new("CS", 15, 14, RW, 'h0, this);
         this.N_F = new("N", 12, 8, RW, 'h0, this);
         this.M_F = new("M", 7, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -570,12 +688,16 @@ package adi_regmap_jesd_tx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FCHK_F = new("FCHK", 31, 24, RW, 'h0, this);
         this.HD_F = new("HD", 7, 7, RW, 'h0, this);
         this.CF_F = new("CF", 4, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -734,162 +856,168 @@ package adi_regmap_jesd_tx_pkg;
     LANEn_ILAS3_CLASS LANE30_ILAS3_R;
     LANEn_ILAS3_CLASS LANE31_ILAS3_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc);
-      this.SYNTH_NUM_LANES_R = new("SYNTH_NUM_LANES", 'h10);
-      this.SYNTH_DATA_PATH_WIDTH_R = new("SYNTH_DATA_PATH_WIDTH", 'h14);
-      this.SYNTH_1_R = new("SYNTH_1", 'h18);
-      this.IRQ_ENABLE_R = new("IRQ_ENABLE", 'h80);
-      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84);
-      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88);
-      this.LINK_DISABLE_R = new("LINK_DISABLE", 'hc0);
-      this.LINK_STATE_R = new("LINK_STATE", 'hc4);
-      this.LINK_CLK_FREQ_R = new("LINK_CLK_FREQ", 'hc8);
-      this.DEVICE_CLK_FREQ_R = new("DEVICE_CLK_FREQ", 'hcc);
-      this.SYSREF_CONF_R = new("SYSREF_CONF", 'h100);
-      this.SYSREF_LMFC_OFFSET_R = new("SYSREF_LMFC_OFFSET", 'h104);
-      this.SYSREF_STATUS_R = new("SYSREF_STATUS", 'h108);
-      this.LANES_DISABLE_R = new("LANES_DISABLE", 'h200);
-      this.LINK_CONF0_R = new("LINK_CONF0", 'h210);
-      this.LINK_CONF1_R = new("LINK_CONF1", 'h214);
-      this.MULTI_LINK_DISABLE_R = new("MULTI_LINK_DISABLE", 'h218);
-      this.LINK_CONF4_R = new("LINK_CONF4", 'h21c);
-      this.LINK_CONF2_R = new("LINK_CONF2", 'h240);
-      this.LINK_CONF3_R = new("LINK_CONF3", 'h244);
-      this.MANUAL_SYNC_REQUEST_R = new("MANUAL_SYNC_REQUEST", 'h248);
-      this.LINK_STATUS_R = new("LINK_STATUS", 'h280);
-      this.LANE0_ILAS0_R = new("LANE0_ILAS0", 'h310);
-      this.LANE1_ILAS0_R = new("LANE1_ILAS0", 'h330);
-      this.LANE2_ILAS0_R = new("LANE2_ILAS0", 'h350);
-      this.LANE3_ILAS0_R = new("LANE3_ILAS0", 'h370);
-      this.LANE4_ILAS0_R = new("LANE4_ILAS0", 'h390);
-      this.LANE5_ILAS0_R = new("LANE5_ILAS0", 'h3b0);
-      this.LANE6_ILAS0_R = new("LANE6_ILAS0", 'h3d0);
-      this.LANE7_ILAS0_R = new("LANE7_ILAS0", 'h3f0);
-      this.LANE8_ILAS0_R = new("LANE8_ILAS0", 'h410);
-      this.LANE9_ILAS0_R = new("LANE9_ILAS0", 'h430);
-      this.LANE10_ILAS0_R = new("LANE10_ILAS0", 'h450);
-      this.LANE11_ILAS0_R = new("LANE11_ILAS0", 'h470);
-      this.LANE12_ILAS0_R = new("LANE12_ILAS0", 'h490);
-      this.LANE13_ILAS0_R = new("LANE13_ILAS0", 'h4b0);
-      this.LANE14_ILAS0_R = new("LANE14_ILAS0", 'h4d0);
-      this.LANE15_ILAS0_R = new("LANE15_ILAS0", 'h4f0);
-      this.LANE16_ILAS0_R = new("LANE16_ILAS0", 'h510);
-      this.LANE17_ILAS0_R = new("LANE17_ILAS0", 'h530);
-      this.LANE18_ILAS0_R = new("LANE18_ILAS0", 'h550);
-      this.LANE19_ILAS0_R = new("LANE19_ILAS0", 'h570);
-      this.LANE20_ILAS0_R = new("LANE20_ILAS0", 'h590);
-      this.LANE21_ILAS0_R = new("LANE21_ILAS0", 'h5b0);
-      this.LANE22_ILAS0_R = new("LANE22_ILAS0", 'h5d0);
-      this.LANE23_ILAS0_R = new("LANE23_ILAS0", 'h5f0);
-      this.LANE24_ILAS0_R = new("LANE24_ILAS0", 'h610);
-      this.LANE25_ILAS0_R = new("LANE25_ILAS0", 'h630);
-      this.LANE26_ILAS0_R = new("LANE26_ILAS0", 'h650);
-      this.LANE27_ILAS0_R = new("LANE27_ILAS0", 'h670);
-      this.LANE28_ILAS0_R = new("LANE28_ILAS0", 'h690);
-      this.LANE29_ILAS0_R = new("LANE29_ILAS0", 'h6b0);
-      this.LANE30_ILAS0_R = new("LANE30_ILAS0", 'h6d0);
-      this.LANE31_ILAS0_R = new("LANE31_ILAS0", 'h6f0);
-      this.LANE0_ILAS1_R = new("LANE0_ILAS1", 'h314);
-      this.LANE1_ILAS1_R = new("LANE1_ILAS1", 'h334);
-      this.LANE2_ILAS1_R = new("LANE2_ILAS1", 'h354);
-      this.LANE3_ILAS1_R = new("LANE3_ILAS1", 'h374);
-      this.LANE4_ILAS1_R = new("LANE4_ILAS1", 'h394);
-      this.LANE5_ILAS1_R = new("LANE5_ILAS1", 'h3b4);
-      this.LANE6_ILAS1_R = new("LANE6_ILAS1", 'h3d4);
-      this.LANE7_ILAS1_R = new("LANE7_ILAS1", 'h3f4);
-      this.LANE8_ILAS1_R = new("LANE8_ILAS1", 'h414);
-      this.LANE9_ILAS1_R = new("LANE9_ILAS1", 'h434);
-      this.LANE10_ILAS1_R = new("LANE10_ILAS1", 'h454);
-      this.LANE11_ILAS1_R = new("LANE11_ILAS1", 'h474);
-      this.LANE12_ILAS1_R = new("LANE12_ILAS1", 'h494);
-      this.LANE13_ILAS1_R = new("LANE13_ILAS1", 'h4b4);
-      this.LANE14_ILAS1_R = new("LANE14_ILAS1", 'h4d4);
-      this.LANE15_ILAS1_R = new("LANE15_ILAS1", 'h4f4);
-      this.LANE16_ILAS1_R = new("LANE16_ILAS1", 'h514);
-      this.LANE17_ILAS1_R = new("LANE17_ILAS1", 'h534);
-      this.LANE18_ILAS1_R = new("LANE18_ILAS1", 'h554);
-      this.LANE19_ILAS1_R = new("LANE19_ILAS1", 'h574);
-      this.LANE20_ILAS1_R = new("LANE20_ILAS1", 'h594);
-      this.LANE21_ILAS1_R = new("LANE21_ILAS1", 'h5b4);
-      this.LANE22_ILAS1_R = new("LANE22_ILAS1", 'h5d4);
-      this.LANE23_ILAS1_R = new("LANE23_ILAS1", 'h5f4);
-      this.LANE24_ILAS1_R = new("LANE24_ILAS1", 'h614);
-      this.LANE25_ILAS1_R = new("LANE25_ILAS1", 'h634);
-      this.LANE26_ILAS1_R = new("LANE26_ILAS1", 'h654);
-      this.LANE27_ILAS1_R = new("LANE27_ILAS1", 'h674);
-      this.LANE28_ILAS1_R = new("LANE28_ILAS1", 'h694);
-      this.LANE29_ILAS1_R = new("LANE29_ILAS1", 'h6b4);
-      this.LANE30_ILAS1_R = new("LANE30_ILAS1", 'h6d4);
-      this.LANE31_ILAS1_R = new("LANE31_ILAS1", 'h6f4);
-      this.LANE0_ILAS2_R = new("LANE0_ILAS2", 'h318);
-      this.LANE1_ILAS2_R = new("LANE1_ILAS2", 'h338);
-      this.LANE2_ILAS2_R = new("LANE2_ILAS2", 'h358);
-      this.LANE3_ILAS2_R = new("LANE3_ILAS2", 'h378);
-      this.LANE4_ILAS2_R = new("LANE4_ILAS2", 'h398);
-      this.LANE5_ILAS2_R = new("LANE5_ILAS2", 'h3b8);
-      this.LANE6_ILAS2_R = new("LANE6_ILAS2", 'h3d8);
-      this.LANE7_ILAS2_R = new("LANE7_ILAS2", 'h3f8);
-      this.LANE8_ILAS2_R = new("LANE8_ILAS2", 'h418);
-      this.LANE9_ILAS2_R = new("LANE9_ILAS2", 'h438);
-      this.LANE10_ILAS2_R = new("LANE10_ILAS2", 'h458);
-      this.LANE11_ILAS2_R = new("LANE11_ILAS2", 'h478);
-      this.LANE12_ILAS2_R = new("LANE12_ILAS2", 'h498);
-      this.LANE13_ILAS2_R = new("LANE13_ILAS2", 'h4b8);
-      this.LANE14_ILAS2_R = new("LANE14_ILAS2", 'h4d8);
-      this.LANE15_ILAS2_R = new("LANE15_ILAS2", 'h4f8);
-      this.LANE16_ILAS2_R = new("LANE16_ILAS2", 'h518);
-      this.LANE17_ILAS2_R = new("LANE17_ILAS2", 'h538);
-      this.LANE18_ILAS2_R = new("LANE18_ILAS2", 'h558);
-      this.LANE19_ILAS2_R = new("LANE19_ILAS2", 'h578);
-      this.LANE20_ILAS2_R = new("LANE20_ILAS2", 'h598);
-      this.LANE21_ILAS2_R = new("LANE21_ILAS2", 'h5b8);
-      this.LANE22_ILAS2_R = new("LANE22_ILAS2", 'h5d8);
-      this.LANE23_ILAS2_R = new("LANE23_ILAS2", 'h5f8);
-      this.LANE24_ILAS2_R = new("LANE24_ILAS2", 'h618);
-      this.LANE25_ILAS2_R = new("LANE25_ILAS2", 'h638);
-      this.LANE26_ILAS2_R = new("LANE26_ILAS2", 'h658);
-      this.LANE27_ILAS2_R = new("LANE27_ILAS2", 'h678);
-      this.LANE28_ILAS2_R = new("LANE28_ILAS2", 'h698);
-      this.LANE29_ILAS2_R = new("LANE29_ILAS2", 'h6b8);
-      this.LANE30_ILAS2_R = new("LANE30_ILAS2", 'h6d8);
-      this.LANE31_ILAS2_R = new("LANE31_ILAS2", 'h6f8);
-      this.LANE0_ILAS3_R = new("LANE0_ILAS3", 'h31c);
-      this.LANE1_ILAS3_R = new("LANE1_ILAS3", 'h33c);
-      this.LANE2_ILAS3_R = new("LANE2_ILAS3", 'h35c);
-      this.LANE3_ILAS3_R = new("LANE3_ILAS3", 'h37c);
-      this.LANE4_ILAS3_R = new("LANE4_ILAS3", 'h39c);
-      this.LANE5_ILAS3_R = new("LANE5_ILAS3", 'h3bc);
-      this.LANE6_ILAS3_R = new("LANE6_ILAS3", 'h3dc);
-      this.LANE7_ILAS3_R = new("LANE7_ILAS3", 'h3fc);
-      this.LANE8_ILAS3_R = new("LANE8_ILAS3", 'h41c);
-      this.LANE9_ILAS3_R = new("LANE9_ILAS3", 'h43c);
-      this.LANE10_ILAS3_R = new("LANE10_ILAS3", 'h45c);
-      this.LANE11_ILAS3_R = new("LANE11_ILAS3", 'h47c);
-      this.LANE12_ILAS3_R = new("LANE12_ILAS3", 'h49c);
-      this.LANE13_ILAS3_R = new("LANE13_ILAS3", 'h4bc);
-      this.LANE14_ILAS3_R = new("LANE14_ILAS3", 'h4dc);
-      this.LANE15_ILAS3_R = new("LANE15_ILAS3", 'h4fc);
-      this.LANE16_ILAS3_R = new("LANE16_ILAS3", 'h51c);
-      this.LANE17_ILAS3_R = new("LANE17_ILAS3", 'h53c);
-      this.LANE18_ILAS3_R = new("LANE18_ILAS3", 'h55c);
-      this.LANE19_ILAS3_R = new("LANE19_ILAS3", 'h57c);
-      this.LANE20_ILAS3_R = new("LANE20_ILAS3", 'h59c);
-      this.LANE21_ILAS3_R = new("LANE21_ILAS3", 'h5bc);
-      this.LANE22_ILAS3_R = new("LANE22_ILAS3", 'h5dc);
-      this.LANE23_ILAS3_R = new("LANE23_ILAS3", 'h5fc);
-      this.LANE24_ILAS3_R = new("LANE24_ILAS3", 'h61c);
-      this.LANE25_ILAS3_R = new("LANE25_ILAS3", 'h63c);
-      this.LANE26_ILAS3_R = new("LANE26_ILAS3", 'h65c);
-      this.LANE27_ILAS3_R = new("LANE27_ILAS3", 'h67c);
-      this.LANE28_ILAS3_R = new("LANE28_ILAS3", 'h69c);
-      this.LANE29_ILAS3_R = new("LANE29_ILAS3", 'h6bc);
-      this.LANE30_ILAS3_R = new("LANE30_ILAS3", 'h6dc);
-      this.LANE31_ILAS3_R = new("LANE31_ILAS3", 'h6fc);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
+      this.SYNTH_NUM_LANES_R = new("SYNTH_NUM_LANES", 'h10, this);
+      this.SYNTH_DATA_PATH_WIDTH_R = new("SYNTH_DATA_PATH_WIDTH", 'h14, this);
+      this.SYNTH_1_R = new("SYNTH_1", 'h18, this);
+      this.IRQ_ENABLE_R = new("IRQ_ENABLE", 'h80, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88, this);
+      this.LINK_DISABLE_R = new("LINK_DISABLE", 'hc0, this);
+      this.LINK_STATE_R = new("LINK_STATE", 'hc4, this);
+      this.LINK_CLK_FREQ_R = new("LINK_CLK_FREQ", 'hc8, this);
+      this.DEVICE_CLK_FREQ_R = new("DEVICE_CLK_FREQ", 'hcc, this);
+      this.SYSREF_CONF_R = new("SYSREF_CONF", 'h100, this);
+      this.SYSREF_LMFC_OFFSET_R = new("SYSREF_LMFC_OFFSET", 'h104, this);
+      this.SYSREF_STATUS_R = new("SYSREF_STATUS", 'h108, this);
+      this.LANES_DISABLE_R = new("LANES_DISABLE", 'h200, this);
+      this.LINK_CONF0_R = new("LINK_CONF0", 'h210, this);
+      this.LINK_CONF1_R = new("LINK_CONF1", 'h214, this);
+      this.MULTI_LINK_DISABLE_R = new("MULTI_LINK_DISABLE", 'h218, this);
+      this.LINK_CONF4_R = new("LINK_CONF4", 'h21c, this);
+      this.LINK_CONF2_R = new("LINK_CONF2", 'h240, this);
+      this.LINK_CONF3_R = new("LINK_CONF3", 'h244, this);
+      this.MANUAL_SYNC_REQUEST_R = new("MANUAL_SYNC_REQUEST", 'h248, this);
+      this.LINK_STATUS_R = new("LINK_STATUS", 'h280, this);
+      this.LANE0_ILAS0_R = new("LANE0_ILAS0", 'h310, this);
+      this.LANE1_ILAS0_R = new("LANE1_ILAS0", 'h330, this);
+      this.LANE2_ILAS0_R = new("LANE2_ILAS0", 'h350, this);
+      this.LANE3_ILAS0_R = new("LANE3_ILAS0", 'h370, this);
+      this.LANE4_ILAS0_R = new("LANE4_ILAS0", 'h390, this);
+      this.LANE5_ILAS0_R = new("LANE5_ILAS0", 'h3b0, this);
+      this.LANE6_ILAS0_R = new("LANE6_ILAS0", 'h3d0, this);
+      this.LANE7_ILAS0_R = new("LANE7_ILAS0", 'h3f0, this);
+      this.LANE8_ILAS0_R = new("LANE8_ILAS0", 'h410, this);
+      this.LANE9_ILAS0_R = new("LANE9_ILAS0", 'h430, this);
+      this.LANE10_ILAS0_R = new("LANE10_ILAS0", 'h450, this);
+      this.LANE11_ILAS0_R = new("LANE11_ILAS0", 'h470, this);
+      this.LANE12_ILAS0_R = new("LANE12_ILAS0", 'h490, this);
+      this.LANE13_ILAS0_R = new("LANE13_ILAS0", 'h4b0, this);
+      this.LANE14_ILAS0_R = new("LANE14_ILAS0", 'h4d0, this);
+      this.LANE15_ILAS0_R = new("LANE15_ILAS0", 'h4f0, this);
+      this.LANE16_ILAS0_R = new("LANE16_ILAS0", 'h510, this);
+      this.LANE17_ILAS0_R = new("LANE17_ILAS0", 'h530, this);
+      this.LANE18_ILAS0_R = new("LANE18_ILAS0", 'h550, this);
+      this.LANE19_ILAS0_R = new("LANE19_ILAS0", 'h570, this);
+      this.LANE20_ILAS0_R = new("LANE20_ILAS0", 'h590, this);
+      this.LANE21_ILAS0_R = new("LANE21_ILAS0", 'h5b0, this);
+      this.LANE22_ILAS0_R = new("LANE22_ILAS0", 'h5d0, this);
+      this.LANE23_ILAS0_R = new("LANE23_ILAS0", 'h5f0, this);
+      this.LANE24_ILAS0_R = new("LANE24_ILAS0", 'h610, this);
+      this.LANE25_ILAS0_R = new("LANE25_ILAS0", 'h630, this);
+      this.LANE26_ILAS0_R = new("LANE26_ILAS0", 'h650, this);
+      this.LANE27_ILAS0_R = new("LANE27_ILAS0", 'h670, this);
+      this.LANE28_ILAS0_R = new("LANE28_ILAS0", 'h690, this);
+      this.LANE29_ILAS0_R = new("LANE29_ILAS0", 'h6b0, this);
+      this.LANE30_ILAS0_R = new("LANE30_ILAS0", 'h6d0, this);
+      this.LANE31_ILAS0_R = new("LANE31_ILAS0", 'h6f0, this);
+      this.LANE0_ILAS1_R = new("LANE0_ILAS1", 'h314, this);
+      this.LANE1_ILAS1_R = new("LANE1_ILAS1", 'h334, this);
+      this.LANE2_ILAS1_R = new("LANE2_ILAS1", 'h354, this);
+      this.LANE3_ILAS1_R = new("LANE3_ILAS1", 'h374, this);
+      this.LANE4_ILAS1_R = new("LANE4_ILAS1", 'h394, this);
+      this.LANE5_ILAS1_R = new("LANE5_ILAS1", 'h3b4, this);
+      this.LANE6_ILAS1_R = new("LANE6_ILAS1", 'h3d4, this);
+      this.LANE7_ILAS1_R = new("LANE7_ILAS1", 'h3f4, this);
+      this.LANE8_ILAS1_R = new("LANE8_ILAS1", 'h414, this);
+      this.LANE9_ILAS1_R = new("LANE9_ILAS1", 'h434, this);
+      this.LANE10_ILAS1_R = new("LANE10_ILAS1", 'h454, this);
+      this.LANE11_ILAS1_R = new("LANE11_ILAS1", 'h474, this);
+      this.LANE12_ILAS1_R = new("LANE12_ILAS1", 'h494, this);
+      this.LANE13_ILAS1_R = new("LANE13_ILAS1", 'h4b4, this);
+      this.LANE14_ILAS1_R = new("LANE14_ILAS1", 'h4d4, this);
+      this.LANE15_ILAS1_R = new("LANE15_ILAS1", 'h4f4, this);
+      this.LANE16_ILAS1_R = new("LANE16_ILAS1", 'h514, this);
+      this.LANE17_ILAS1_R = new("LANE17_ILAS1", 'h534, this);
+      this.LANE18_ILAS1_R = new("LANE18_ILAS1", 'h554, this);
+      this.LANE19_ILAS1_R = new("LANE19_ILAS1", 'h574, this);
+      this.LANE20_ILAS1_R = new("LANE20_ILAS1", 'h594, this);
+      this.LANE21_ILAS1_R = new("LANE21_ILAS1", 'h5b4, this);
+      this.LANE22_ILAS1_R = new("LANE22_ILAS1", 'h5d4, this);
+      this.LANE23_ILAS1_R = new("LANE23_ILAS1", 'h5f4, this);
+      this.LANE24_ILAS1_R = new("LANE24_ILAS1", 'h614, this);
+      this.LANE25_ILAS1_R = new("LANE25_ILAS1", 'h634, this);
+      this.LANE26_ILAS1_R = new("LANE26_ILAS1", 'h654, this);
+      this.LANE27_ILAS1_R = new("LANE27_ILAS1", 'h674, this);
+      this.LANE28_ILAS1_R = new("LANE28_ILAS1", 'h694, this);
+      this.LANE29_ILAS1_R = new("LANE29_ILAS1", 'h6b4, this);
+      this.LANE30_ILAS1_R = new("LANE30_ILAS1", 'h6d4, this);
+      this.LANE31_ILAS1_R = new("LANE31_ILAS1", 'h6f4, this);
+      this.LANE0_ILAS2_R = new("LANE0_ILAS2", 'h318, this);
+      this.LANE1_ILAS2_R = new("LANE1_ILAS2", 'h338, this);
+      this.LANE2_ILAS2_R = new("LANE2_ILAS2", 'h358, this);
+      this.LANE3_ILAS2_R = new("LANE3_ILAS2", 'h378, this);
+      this.LANE4_ILAS2_R = new("LANE4_ILAS2", 'h398, this);
+      this.LANE5_ILAS2_R = new("LANE5_ILAS2", 'h3b8, this);
+      this.LANE6_ILAS2_R = new("LANE6_ILAS2", 'h3d8, this);
+      this.LANE7_ILAS2_R = new("LANE7_ILAS2", 'h3f8, this);
+      this.LANE8_ILAS2_R = new("LANE8_ILAS2", 'h418, this);
+      this.LANE9_ILAS2_R = new("LANE9_ILAS2", 'h438, this);
+      this.LANE10_ILAS2_R = new("LANE10_ILAS2", 'h458, this);
+      this.LANE11_ILAS2_R = new("LANE11_ILAS2", 'h478, this);
+      this.LANE12_ILAS2_R = new("LANE12_ILAS2", 'h498, this);
+      this.LANE13_ILAS2_R = new("LANE13_ILAS2", 'h4b8, this);
+      this.LANE14_ILAS2_R = new("LANE14_ILAS2", 'h4d8, this);
+      this.LANE15_ILAS2_R = new("LANE15_ILAS2", 'h4f8, this);
+      this.LANE16_ILAS2_R = new("LANE16_ILAS2", 'h518, this);
+      this.LANE17_ILAS2_R = new("LANE17_ILAS2", 'h538, this);
+      this.LANE18_ILAS2_R = new("LANE18_ILAS2", 'h558, this);
+      this.LANE19_ILAS2_R = new("LANE19_ILAS2", 'h578, this);
+      this.LANE20_ILAS2_R = new("LANE20_ILAS2", 'h598, this);
+      this.LANE21_ILAS2_R = new("LANE21_ILAS2", 'h5b8, this);
+      this.LANE22_ILAS2_R = new("LANE22_ILAS2", 'h5d8, this);
+      this.LANE23_ILAS2_R = new("LANE23_ILAS2", 'h5f8, this);
+      this.LANE24_ILAS2_R = new("LANE24_ILAS2", 'h618, this);
+      this.LANE25_ILAS2_R = new("LANE25_ILAS2", 'h638, this);
+      this.LANE26_ILAS2_R = new("LANE26_ILAS2", 'h658, this);
+      this.LANE27_ILAS2_R = new("LANE27_ILAS2", 'h678, this);
+      this.LANE28_ILAS2_R = new("LANE28_ILAS2", 'h698, this);
+      this.LANE29_ILAS2_R = new("LANE29_ILAS2", 'h6b8, this);
+      this.LANE30_ILAS2_R = new("LANE30_ILAS2", 'h6d8, this);
+      this.LANE31_ILAS2_R = new("LANE31_ILAS2", 'h6f8, this);
+      this.LANE0_ILAS3_R = new("LANE0_ILAS3", 'h31c, this);
+      this.LANE1_ILAS3_R = new("LANE1_ILAS3", 'h33c, this);
+      this.LANE2_ILAS3_R = new("LANE2_ILAS3", 'h35c, this);
+      this.LANE3_ILAS3_R = new("LANE3_ILAS3", 'h37c, this);
+      this.LANE4_ILAS3_R = new("LANE4_ILAS3", 'h39c, this);
+      this.LANE5_ILAS3_R = new("LANE5_ILAS3", 'h3bc, this);
+      this.LANE6_ILAS3_R = new("LANE6_ILAS3", 'h3dc, this);
+      this.LANE7_ILAS3_R = new("LANE7_ILAS3", 'h3fc, this);
+      this.LANE8_ILAS3_R = new("LANE8_ILAS3", 'h41c, this);
+      this.LANE9_ILAS3_R = new("LANE9_ILAS3", 'h43c, this);
+      this.LANE10_ILAS3_R = new("LANE10_ILAS3", 'h45c, this);
+      this.LANE11_ILAS3_R = new("LANE11_ILAS3", 'h47c, this);
+      this.LANE12_ILAS3_R = new("LANE12_ILAS3", 'h49c, this);
+      this.LANE13_ILAS3_R = new("LANE13_ILAS3", 'h4bc, this);
+      this.LANE14_ILAS3_R = new("LANE14_ILAS3", 'h4dc, this);
+      this.LANE15_ILAS3_R = new("LANE15_ILAS3", 'h4fc, this);
+      this.LANE16_ILAS3_R = new("LANE16_ILAS3", 'h51c, this);
+      this.LANE17_ILAS3_R = new("LANE17_ILAS3", 'h53c, this);
+      this.LANE18_ILAS3_R = new("LANE18_ILAS3", 'h55c, this);
+      this.LANE19_ILAS3_R = new("LANE19_ILAS3", 'h57c, this);
+      this.LANE20_ILAS3_R = new("LANE20_ILAS3", 'h59c, this);
+      this.LANE21_ILAS3_R = new("LANE21_ILAS3", 'h5bc, this);
+      this.LANE22_ILAS3_R = new("LANE22_ILAS3", 'h5dc, this);
+      this.LANE23_ILAS3_R = new("LANE23_ILAS3", 'h5fc, this);
+      this.LANE24_ILAS3_R = new("LANE24_ILAS3", 'h61c, this);
+      this.LANE25_ILAS3_R = new("LANE25_ILAS3", 'h63c, this);
+      this.LANE26_ILAS3_R = new("LANE26_ILAS3", 'h65c, this);
+      this.LANE27_ILAS3_R = new("LANE27_ILAS3", 'h67c, this);
+      this.LANE28_ILAS3_R = new("LANE28_ILAS3", 'h69c, this);
+      this.LANE29_ILAS3_R = new("LANE29_ILAS3", 'h6bc, this);
+      this.LANE30_ILAS3_R = new("LANE30_ILAS3", 'h6dc, this);
+      this.LANE31_ILAS3_R = new("LANE31_ILAS3", 'h6fc, this);
     endfunction: new;
 
   endclass;
+
 endpackage

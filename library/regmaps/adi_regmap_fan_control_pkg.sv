@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_fan_control_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_fan_control #(int ID, int INTERNAL_SYSMONE, int PWM_PERIOD, int TACHO_T100, int TACHO_T25, int TACHO_T50, int TACHO_T75, int TACHO_TOL_PERCENT, int TEMP_00_H, int TEMP_100_L, int TEMP_25_H, int TEMP_25_L, int TEMP_50_H, int TEMP_50_L, int TEMP_75_H, int TEMP_75_L);
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_fan_control #(int ID, int INTERNAL_SYSMONE, int PWM_PERIOD, int TACHO_T100, int TACHO_T25, int TACHO_T50, int TACHO_T75, int TACHO_TOL_PERCENT, int TEMP_00_H, int TEMP_100_L, int TEMP_25_H, int TEMP_25_L, int TEMP_50_H, int TEMP_50_L, int TEMP_75_H, int TEMP_75_L) extends adi_component;
 
     /* Fan Controller (axi_fan_control) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h46414e43, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -101,13 +119,17 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.NEW_TACHO_MEASUREMENT_F = new("NEW_TACHO_MEASUREMENT", 3, 3, RW, 'h1, this);
         this.TEMP_INCREASE_F = new("TEMP_INCREASE", 2, 2, RW, 'h1, this);
         this.TACHO_ERR_F = new("TACHO_ERR", 1, 1, RW, 'h1, this);
         this.PWM_CHANGED_F = new("PWM_CHANGED", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -119,13 +141,17 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.NEW_TACHO_MEASUREMENT_F = new("NEW_TACHO_MEASUREMENT", 3, 3, RW1C, 'h0, this);
         this.TEMP_INCREASE_F = new("TEMP_INCREASE", 2, 2, RW1C, 'h0, this);
         this.TACHO_ERR_F = new("TACHO_ERR", 1, 1, RW1C, 'h0, this);
         this.PWM_CHANGED_F = new("PWM_CHANGED", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -137,13 +163,17 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.NEW_TACHO_MEASUREMENT_F = new("NEW_TACHO_MEASUREMENT", 3, 3, RO, 'h0, this);
         this.TEMP_INCREASE_F = new("TEMP_INCREASE", 2, 2, RO, 'h0, this);
         this.TACHO_ERR_F = new("TACHO_ERR", 1, 1, RO, 'h0, this);
         this.PWM_CHANGED_F = new("PWM_CHANGED", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -152,10 +182,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -164,10 +198,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PWM_WIDTH_F = new("PWM_WIDTH", 31, 0, RW, PWM_PERIOD, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -176,10 +214,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_PERIOD_F = new("TACHO_PERIOD", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -188,10 +230,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_TOLERANCE_F = new("TACHO_TOLERANCE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -200,10 +246,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_DATA_SOURCE_F = new("TEMP_DATA_SOURCE", 31, 0, RO, INTERNAL_SYSMONE, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -212,10 +262,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PWM_PERIOD_F = new("PWM_PERIOD", 31, 0, RO, 'h4e20, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -224,10 +278,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_MEASUREMENT_F = new("TACHO_MEASUREMENT", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -236,10 +294,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMPERATURE_F = new("TEMPERATURE", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -248,10 +310,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_00_H_F = new("TEMP_00_H", 31, 0, RW, TEMP_00_H, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -260,10 +326,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_25_L_F = new("TEMP_25_L", 31, 0, RW, TEMP_25_L, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -272,10 +342,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_25_H_F = new("TEMP_25_H", 31, 0, RW, TEMP_25_H, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -284,10 +358,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_50_L_F = new("TEMP_50_L", 31, 0, RW, TEMP_50_L, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -296,10 +374,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_50_H_F = new("TEMP_50_H", 31, 0, RW, TEMP_50_H, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -308,10 +390,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_75_L_F = new("TEMP_75_L", 31, 0, RW, TEMP_75_L, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -320,10 +406,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_75_H_F = new("TEMP_75_H", 31, 0, RW, TEMP_75_H, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -332,10 +422,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TEMP_100_L_F = new("TEMP_100_L", 31, 0, RW, TEMP_100_L, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -344,10 +438,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_25_F = new("TACHO_25", 31, 0, RW, TACHO_T25, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -356,10 +454,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_50_F = new("TACHO_50", 31, 0, RW, TACHO_T50, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -368,10 +470,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_75_F = new("TACHO_75", 31, 0, RW, TACHO_T75, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -380,10 +486,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_100_F = new("TACHO_100", 31, 0, RW, TACHO_T100, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -392,10 +502,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_25_TOL_F = new("TACHO_25_TOL", 31, 0, RW, TACHO_T25*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -404,10 +518,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_50_TOL_F = new("TACHO_50_TOL", 31, 0, RW, TACHO_T50*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -416,10 +534,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_75_TOL_F = new("TACHO_75_TOL", 31, 0, RW, TACHO_T75*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -428,10 +550,14 @@ package adi_regmap_fan_control_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TACHO_100_TOL_F = new("TACHO_100_TOL", 31, 0, RW, TACHO_T100*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -467,39 +593,45 @@ package adi_regmap_fan_control_pkg;
     TACHO_75_TOL_CLASS #(TACHO_T75, TACHO_TOL_PERCENT) TACHO_75_TOL_R;
     TACHO_100_TOL_CLASS #(TACHO_T100, TACHO_TOL_PERCENT) TACHO_100_TOL_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc);
-      this.IRQ_MASK_R = new("IRQ_MASK", 'h40);
-      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h44);
-      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h48);
-      this.RSTN_R = new("RSTN", 'h80);
-      this.PWM_WIDTH_R = new("PWM_WIDTH", 'h84);
-      this.TACHO_PERIOD_R = new("TACHO_PERIOD", 'h88);
-      this.TACHO_TOLERANCE_R = new("TACHO_TOLERANCE", 'h8c);
-      this.TEMP_DATA_SOURCE_R = new("TEMP_DATA_SOURCE", 'h90);
-      this.PWM_PERIOD_R = new("PWM_PERIOD", 'hc0);
-      this.TACHO_MEASUREMENT_R = new("TACHO_MEASUREMENT", 'hc4);
-      this.TEMPERATURE_R = new("TEMPERATURE", 'hc8);
-      this.TEMP_00_H_R = new("TEMP_00_H", 'h100);
-      this.TEMP_25_L_R = new("TEMP_25_L", 'h104);
-      this.TEMP_25_H_R = new("TEMP_25_H", 'h108);
-      this.TEMP_50_L_R = new("TEMP_50_L", 'h10c);
-      this.TEMP_50_H_R = new("TEMP_50_H", 'h110);
-      this.TEMP_75_L_R = new("TEMP_75_L", 'h114);
-      this.TEMP_75_H_R = new("TEMP_75_H", 'h118);
-      this.TEMP_100_L_R = new("TEMP_100_L", 'h11c);
-      this.TACHO_25_R = new("TACHO_25", 'h140);
-      this.TACHO_50_R = new("TACHO_50", 'h144);
-      this.TACHO_75_R = new("TACHO_75", 'h148);
-      this.TACHO_100_R = new("TACHO_100", 'h14c);
-      this.TACHO_25_TOL_R = new("TACHO_25_TOL", 'h150);
-      this.TACHO_50_TOL_R = new("TACHO_50_TOL", 'h154);
-      this.TACHO_75_TOL_R = new("TACHO_75_TOL", 'h158);
-      this.TACHO_100_TOL_R = new("TACHO_100_TOL", 'h15c);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
+      this.IRQ_MASK_R = new("IRQ_MASK", 'h40, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h44, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h48, this);
+      this.RSTN_R = new("RSTN", 'h80, this);
+      this.PWM_WIDTH_R = new("PWM_WIDTH", 'h84, this);
+      this.TACHO_PERIOD_R = new("TACHO_PERIOD", 'h88, this);
+      this.TACHO_TOLERANCE_R = new("TACHO_TOLERANCE", 'h8c, this);
+      this.TEMP_DATA_SOURCE_R = new("TEMP_DATA_SOURCE", 'h90, this);
+      this.PWM_PERIOD_R = new("PWM_PERIOD", 'hc0, this);
+      this.TACHO_MEASUREMENT_R = new("TACHO_MEASUREMENT", 'hc4, this);
+      this.TEMPERATURE_R = new("TEMPERATURE", 'hc8, this);
+      this.TEMP_00_H_R = new("TEMP_00_H", 'h100, this);
+      this.TEMP_25_L_R = new("TEMP_25_L", 'h104, this);
+      this.TEMP_25_H_R = new("TEMP_25_H", 'h108, this);
+      this.TEMP_50_L_R = new("TEMP_50_L", 'h10c, this);
+      this.TEMP_50_H_R = new("TEMP_50_H", 'h110, this);
+      this.TEMP_75_L_R = new("TEMP_75_L", 'h114, this);
+      this.TEMP_75_H_R = new("TEMP_75_H", 'h118, this);
+      this.TEMP_100_L_R = new("TEMP_100_L", 'h11c, this);
+      this.TACHO_25_R = new("TACHO_25", 'h140, this);
+      this.TACHO_50_R = new("TACHO_50", 'h144, this);
+      this.TACHO_75_R = new("TACHO_75", 'h148, this);
+      this.TACHO_100_R = new("TACHO_100", 'h14c, this);
+      this.TACHO_25_TOL_R = new("TACHO_25_TOL", 'h150, this);
+      this.TACHO_50_TOL_R = new("TACHO_50_TOL", 'h154, this);
+      this.TACHO_75_TOL_R = new("TACHO_75_TOL", 'h158, this);
+      this.TACHO_100_TOL_R = new("TACHO_100_TOL", 'h15c, this);
     endfunction: new;
 
   endclass;
+
 endpackage

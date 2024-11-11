@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_interpolate_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_interpolate;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_interpolate extends adi_component;
 
     /* Analog Interpolation (axi_dac_interpolate) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h2, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h5, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FILTERED_INTERPOLATION_F = new("FILTERED_INTERPOLATION", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FILTERED_INTERPOLATION_F = new("FILTERED_INTERPOLATION", 2, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -98,10 +116,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FILTERED_INTERPOLATION_F = new("FILTERED_INTERPOLATION", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -110,10 +132,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FILTERED_INTERPOLATION_F = new("FILTERED_INTERPOLATION", 2, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -122,10 +148,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SUSPEND_TRANSFER_F = new("SUSPEND_TRANSFER", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -135,11 +165,15 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CORRECTION_ENABLE_B_F = new("CORRECTION_ENABLE_B", 1, 1, RW, 'hXXXXXXXX, this);
         this.CORRECTION_ENABLE_A_F = new("CORRECTION_ENABLE_A", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -148,10 +182,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -160,10 +198,14 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -181,9 +223,11 @@ package adi_regmap_interpolate_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.AUTO_REARM_TRIGGER_F = new("AUTO_REARM_TRIGGER", 20, 20, RW, 'hXXXXXXXX, this);
         this.EN_TRIGGER_LA_F = new("EN_TRIGGER_LA", 19, 19, RW, 'hXXXXXXXX, this);
         this.EN_TRIGGER_ADC_F = new("EN_TRIGGER_ADC", 18, 18, RW, 'hXXXXXXXX, this);
@@ -194,6 +238,8 @@ package adi_regmap_interpolate_pkg;
         this.ANY_EDGE_F = new("ANY_EDGE", 5, 4, RW, 'hXXXXXXXX, this);
         this.HIGH_LEVEL_F = new("HIGH_LEVEL", 3, 2, RW, 'hXXXXXXXX, this);
         this.LOW_LEVEL_F = new("LOW_LEVEL", 1, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -209,19 +255,25 @@ package adi_regmap_interpolate_pkg;
     CORRECTION_COEFFICIENT_B_CLASS CORRECTION_COEFFICIENT_B_R;
     TRIGGER_CONFIG_CLASS TRIGGER_CONFIG_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.SCRATCH_R = new("SCRATCH", 'h4);
-      this.ARBITRARY_INTERPOLATION_RATIO_A_R = new("ARBITRARY_INTERPOLATION_RATIO_A", 'h40);
-      this.INTERPOLATION_RATIO_A_R = new("INTERPOLATION_RATIO_A", 'h44);
-      this.ARBITRARY_INTERPOLATION_RATIO_B_R = new("ARBITRARY_INTERPOLATION_RATIO_B", 'h48);
-      this.INTERPOLATION_RATIO_B_R = new("INTERPOLATION_RATIO_B", 'h4c);
-      this.FLAGS_R = new("FLAGS", 'h50);
-      this.CONFIG_R = new("CONFIG", 'h54);
-      this.CORRECTION_COEFFICIENT_A_R = new("CORRECTION_COEFFICIENT_A", 'h58);
-      this.CORRECTION_COEFFICIENT_B_R = new("CORRECTION_COEFFICIENT_B", 'h5c);
-      this.TRIGGER_CONFIG_R = new("TRIGGER_CONFIG", 'h60);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.SCRATCH_R = new("SCRATCH", 'h4, this);
+      this.ARBITRARY_INTERPOLATION_RATIO_A_R = new("ARBITRARY_INTERPOLATION_RATIO_A", 'h40, this);
+      this.INTERPOLATION_RATIO_A_R = new("INTERPOLATION_RATIO_A", 'h44, this);
+      this.ARBITRARY_INTERPOLATION_RATIO_B_R = new("ARBITRARY_INTERPOLATION_RATIO_B", 'h48, this);
+      this.INTERPOLATION_RATIO_B_R = new("INTERPOLATION_RATIO_B", 'h4c, this);
+      this.FLAGS_R = new("FLAGS", 'h50, this);
+      this.CONFIG_R = new("CONFIG", 'h54, this);
+      this.CORRECTION_COEFFICIENT_A_R = new("CORRECTION_COEFFICIENT_A", 'h58, this);
+      this.CORRECTION_COEFFICIENT_B_R = new("CORRECTION_COEFFICIENT_B", 'h5c, this);
+      this.TRIGGER_CONFIG_R = new("TRIGGER_CONFIG", 'h60, this);
     endfunction: new;
 
   endclass;
+
 endpackage

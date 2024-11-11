@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_xcvr_xilinx_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_xcvr_xilinx;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_xcvr_xilinx extends adi_component;
 
     /* Xilinx XCVR (axi_xcvr) */
     class VERSION_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_F = new("VERSION", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -58,10 +64,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ID_F = new("ID", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -70,10 +80,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -83,11 +97,15 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.BUFSTATUS_RST_F = new("BUFSTATUS_RST", 1, 1, RW, 'hXXXXXXXX, this);
         this.RESETN_F = new("RESETN", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -98,12 +116,16 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.BUFSTATUS_F = new("BUFSTATUS", 6, 5, RO, 'hXXXXXXXX, this);
         this.PLL_LOCK_N_F = new("PLL_LOCK_N", 4, 4, RO, 'hXXXXXXXX, this);
         this.STATUS_F = new("STATUS", 0, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -115,13 +137,17 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'hXXXXXXXX, this);
         this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'hXXXXXXXX, this);
         this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'hXXXXXXXX, this);
         this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -133,13 +159,17 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.LPM_DFE_N_F = new("LPM_DFE_N", 12, 12, RW, 'hXXXXXXXX, this);
         this.RATE_F = new("RATE", 10, 8, RW, 'hXXXXXXXX, this);
         this.SYSCLK_SEL_F = new("SYSCLK_SEL", 5, 4, RW, 'hXXXXXXXX, this);
         this.OUTCLK_SEL_F = new("OUTCLK_SEL", 2, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -152,14 +182,18 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.QPLL_ENABLE_F = new("QPLL_ENABLE", 20, 20, RO, 'hXXXXXXXX, this);
         this.XCVR_TYPE_F = new("XCVR_TYPE", 19, 16, RO, 'hXXXXXXXX, this);
         this.LINK_MODE_F = new("LINK_MODE", 13, 12, RO, 'hXXXXXXXX, this);
         this.TX_OR_RX_N_F = new("TX_OR_RX_N", 8, 8, RO, 'hXXXXXXXX, this);
         this.NUM_OF_LANES_F = new("NUM_OF_LANES", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -168,10 +202,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CM_SEL_F = new("CM_SEL", 7, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -182,12 +220,16 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CM_WR_F = new("CM_WR", 28, 28, RW, 'hXXXXXXXX, this);
         this.CM_ADDR_F = new("CM_ADDR", 27, 16, RW, 'hXXXXXXXX, this);
         this.CM_WDATA_F = new("CM_WDATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -197,11 +239,15 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CM_BUSY_F = new("CM_BUSY", 16, 16, RO, 'hXXXXXXXX, this);
         this.CM_RDATA_F = new("CM_RDATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -210,10 +256,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CH_SEL_F = new("CH_SEL", 7, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -224,12 +274,16 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CH_WR_F = new("CH_WR", 28, 28, RW, 'hXXXXXXXX, this);
         this.CH_ADDR_F = new("CH_ADDR", 27, 16, RW, 'hXXXXXXXX, this);
         this.CH_WDATA_F = new("CH_WDATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -239,11 +293,15 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CH_BUSY_F = new("CH_BUSY", 16, 16, RO, 'hXXXXXXXX, this);
         this.CH_RDATA_F = new("CH_RDATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -252,10 +310,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_SEL_F = new("ES_SEL", 7, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -264,10 +326,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_REQ_F = new("ES_REQ", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -276,10 +342,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_PRESCALE_F = new("ES_PRESCALE", 4, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -291,13 +361,17 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_VOFFSET_RANGE_F = new("ES_VOFFSET_RANGE", 25, 24, RW, 'hXXXXXXXX, this);
         this.ES_VOFFSET_STEP_F = new("ES_VOFFSET_STEP", 23, 16, RW, 'hXXXXXXXX, this);
         this.ES_VOFFSET_MAX_F = new("ES_VOFFSET_MAX", 15, 8, RW, 'hXXXXXXXX, this);
         this.ES_VOFFSET_MIN_F = new("ES_VOFFSET_MIN", 7, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -307,11 +381,15 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_HOFFSET_MAX_F = new("ES_HOFFSET_MAX", 27, 16, RW, 'hXXXXXXXX, this);
         this.ES_HOFFSET_MIN_F = new("ES_HOFFSET_MIN", 11, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -320,10 +398,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_HOFFSET_STEP_F = new("ES_HOFFSET_STEP", 11, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -332,10 +414,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_STARTADDR_F = new("ES_STARTADDR", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -344,10 +430,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_STATUS_F = new("ES_STATUS", 0, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -387,9 +477,11 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ES_RESET0_F = new("ES_RESET0", 0, 0, RW, 'hXXXXXXXX, this);
         this.ES_RESET1_F = new("ES_RESET1", 1, 1, RW, 'hXXXXXXXX, this);
         this.ES_RESET2_F = new("ES_RESET2", 2, 2, RW, 'hXXXXXXXX, this);
@@ -422,6 +514,8 @@ package adi_regmap_xcvr_xilinx_pkg;
         this.ES_RESET29_F = new("ES_RESET29", 29, 29, RW, 'hXXXXXXXX, this);
         this.ES_RESET30_F = new("ES_RESET30", 30, 30, RW, 'hXXXXXXXX, this);
         this.ES_RESET31_F = new("ES_RESET31", 31, 31, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -430,10 +524,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TX_DIFFCTRL_F = new("TX_DIFFCTRL", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -442,10 +540,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TX_POSTCURSOR_F = new("TX_POSTCURSOR", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -454,10 +556,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TX_PRECURSOR_F = new("TX_PRECURSOR", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -466,10 +572,14 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -480,12 +590,16 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PRBSFORCEERR_F = new("PRBSFORCEERR", 16, 16, RW, 'hXXXXXXXX, this);
         this.PRBSCNTRESET_F = new("PRBSCNTRESET", 8, 8, RW, 'hXXXXXXXX, this);
         this.PRBSSEL_F = new("PRBSSEL", 3, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -495,11 +609,15 @@ package adi_regmap_xcvr_xilinx_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PRBSERR_F = new("PRBSERR", 8, 8, RO, 'hXXXXXXXX, this);
         this.PRBSLOCKED_F = new("PRBSLOCKED", 0, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -533,37 +651,43 @@ package adi_regmap_xcvr_xilinx_pkg;
     PRBS_CNTRL_CLASS PRBS_CNTRL_R;
     PRBS_STATUS_CLASS PRBS_STATUS_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.ID_R = new("ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.RESETN_R = new("RESETN", 'h10);
-      this.STATUS_R = new("STATUS", 'h14);
-      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c);
-      this.CONTROL_R = new("CONTROL", 'h20);
-      this.GENERIC_INFO_R = new("GENERIC_INFO", 'h24);
-      this.CM_SEL_R = new("CM_SEL", 'h40);
-      this.CM_CONTROL_R = new("CM_CONTROL", 'h44);
-      this.CM_STATUS_R = new("CM_STATUS", 'h48);
-      this.CH_SEL_R = new("CH_SEL", 'h60);
-      this.CH_CONTROL_R = new("CH_CONTROL", 'h64);
-      this.CH_STATUS_R = new("CH_STATUS", 'h68);
-      this.ES_SEL_R = new("ES_SEL", 'h80);
-      this.ES_REQ_R = new("ES_REQ", 'ha0);
-      this.ES_CONTROL_1_R = new("ES_CONTROL_1", 'ha4);
-      this.ES_CONTROL_2_R = new("ES_CONTROL_2", 'ha8);
-      this.ES_CONTROL_3_R = new("ES_CONTROL_3", 'hac);
-      this.ES_CONTROL_4_R = new("ES_CONTROL_4", 'hb0);
-      this.ES_CONTROL_5_R = new("ES_CONTROL_5", 'hb4);
-      this.ES_STATUS_R = new("ES_STATUS", 'hb8);
-      this.ES_RESET_R = new("ES_RESET", 'hbc);
-      this.TX_DIFFCTRL_R = new("TX_DIFFCTRL", 'hc0);
-      this.TX_POSTCURSOR_R = new("TX_POSTCURSOR", 'hc4);
-      this.TX_PRECURSOR_R = new("TX_PRECURSOR", 'hc8);
-      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140);
-      this.PRBS_CNTRL_R = new("PRBS_CNTRL", 'h180);
-      this.PRBS_STATUS_R = new("PRBS_STATUS", 'h184);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.RESETN_R = new("RESETN", 'h10, this);
+      this.STATUS_R = new("STATUS", 'h14, this);
+      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c, this);
+      this.CONTROL_R = new("CONTROL", 'h20, this);
+      this.GENERIC_INFO_R = new("GENERIC_INFO", 'h24, this);
+      this.CM_SEL_R = new("CM_SEL", 'h40, this);
+      this.CM_CONTROL_R = new("CM_CONTROL", 'h44, this);
+      this.CM_STATUS_R = new("CM_STATUS", 'h48, this);
+      this.CH_SEL_R = new("CH_SEL", 'h60, this);
+      this.CH_CONTROL_R = new("CH_CONTROL", 'h64, this);
+      this.CH_STATUS_R = new("CH_STATUS", 'h68, this);
+      this.ES_SEL_R = new("ES_SEL", 'h80, this);
+      this.ES_REQ_R = new("ES_REQ", 'ha0, this);
+      this.ES_CONTROL_1_R = new("ES_CONTROL_1", 'ha4, this);
+      this.ES_CONTROL_2_R = new("ES_CONTROL_2", 'ha8, this);
+      this.ES_CONTROL_3_R = new("ES_CONTROL_3", 'hac, this);
+      this.ES_CONTROL_4_R = new("ES_CONTROL_4", 'hb0, this);
+      this.ES_CONTROL_5_R = new("ES_CONTROL_5", 'hb4, this);
+      this.ES_STATUS_R = new("ES_STATUS", 'hb8, this);
+      this.ES_RESET_R = new("ES_RESET", 'hbc, this);
+      this.TX_DIFFCTRL_R = new("TX_DIFFCTRL", 'hc0, this);
+      this.TX_POSTCURSOR_R = new("TX_POSTCURSOR", 'hc4, this);
+      this.TX_PRECURSOR_R = new("TX_PRECURSOR", 'hc8, this);
+      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
+      this.PRBS_CNTRL_R = new("PRBS_CNTRL", 'h180, this);
+      this.PRBS_STATUS_R = new("PRBS_STATUS", 'h184, this);
     endfunction: new;
 
   endclass;
+
 endpackage

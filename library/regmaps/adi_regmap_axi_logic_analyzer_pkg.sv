@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_axi_logic_analyzer_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_axi_logic_analyzer;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_axi_logic_analyzer extends adi_component;
 
     /* Logic Analyzer and Pattern Generator (axi_logic_analyzer) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h2, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h1, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DIVIDER_COUNTER_F = new("DIVIDER_COUNTER", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DIVIDER_COUNTER_F = new("DIVIDER_COUNTER", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -98,10 +116,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DIRECTION_F = new("DIRECTION", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -111,11 +133,15 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_F = new("TRIGGER", 17, 16, RW, 'hXXXXXXXX, this);
         this.DATA_F = new("DATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -125,11 +151,15 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_F = new("TRIGGER", 17, 16, RW, 'hXXXXXXXX, this);
         this.DATA_F = new("DATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -139,11 +169,15 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_F = new("TRIGGER", 17, 16, RW, 'hXXXXXXXX, this);
         this.DATA_F = new("DATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -153,11 +187,15 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_F = new("TRIGGER", 17, 16, RW, 'hXXXXXXXX, this);
         this.DATA_F = new("DATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -167,11 +205,15 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_F = new("TRIGGER", 17, 16, RW, 'hXXXXXXXX, this);
         this.DATA_F = new("DATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -180,10 +222,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FIFO_DEPTH_F = new("FIFO_DEPTH", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -193,11 +239,15 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_MUX_OUT_F = new("TRIGGER_MUX_OUT", 6, 4, RW, 'hXXXXXXXX, this);
         this.TRIGGER_LOGIC_F = new("TRIGGER_LOGIC", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -206,10 +256,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLOCK_SELECT_F = new("CLOCK_SELECT", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -218,10 +272,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OVERWRITE_MASK_F = new("OVERWRITE_MASK", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -230,10 +288,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OVERWRITE_DATA_F = new("OVERWRITE_DATA", 15, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -242,10 +304,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.INPUT_DATA_F = new("INPUT_DATA", 15, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -254,10 +320,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.OUTPUT_MODE_F = new("OUTPUT_MODE", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -266,10 +336,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_DELAY_F = new("TRIGGER_DELAY", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -278,10 +352,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGERED_F = new("TRIGGERED", 0, 0, RW1C, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -290,10 +368,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.STREAMING_F = new("STREAMING", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -302,10 +384,14 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TRIGGER_HOLDOFF_F = new("TRIGGER_HOLDOFF", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -322,9 +408,11 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.EN_TRIGGER_LA_F = new("EN_TRIGGER_LA", 19, 19, RW, 'hXXXXXXXX, this);
         this.EN_TRIGGER_ADC_F = new("EN_TRIGGER_ADC", 18, 18, RW, 'hXXXXXXXX, this);
         this.EN_TRIGGER_TO_F = new("EN_TRIGGER_TO", 17, 17, RW, 'hXXXXXXXX, this);
@@ -334,6 +422,8 @@ package adi_regmap_axi_logic_analyzer_pkg;
         this.FALL_EDGE_F = new("FALL_EDGE", 5, 4, RW, 'hXXXXXXXX, this);
         this.RISE_EDGE_F = new("RISE_EDGE", 3, 2, RW, 'hXXXXXXXX, this);
         this.ANY_EDGE_F = new("ANY_EDGE", 1, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -344,12 +434,16 @@ package adi_regmap_axi_logic_analyzer_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.MASTER_DELAY_CTRL_F = new("MASTER_DELAY_CTRL", 9, 9, RW, 'hXXXXXXXX, this);
         this.RATE_GEN_SELECT_F = new("RATE_GEN_SELECT", 8, 8, RW, 'hXXXXXXXX, this);
         this.MANUAL_DATA_DELAY_F = new("MANUAL_DATA_DELAY", 5, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -377,31 +471,37 @@ package adi_regmap_axi_logic_analyzer_pkg;
     PG_TRIGGER_CONFIG_CLASS PG_TRIGGER_CONFIG_R;
     DATA_DELAY_CONTROL_CLASS DATA_DELAY_CONTROL_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.SCRATCH_R = new("SCRATCH", 'h4);
-      this.DIVIDER_COUNTER_LA_R = new("DIVIDER_COUNTER_LA", 'h8);
-      this.DIVIDER_COUNTER_PG_R = new("DIVIDER_COUNTER_PG", 'hc);
-      this.IO_SELECTION_R = new("IO_SELECTION", 'h10);
-      this.EDGE_DETECT_CONTROL_R = new("EDGE_DETECT_CONTROL", 'h14);
-      this.RISE_EDGE_CONTROL_R = new("RISE_EDGE_CONTROL", 'h18);
-      this.FALL_EDGE_CONTROL_R = new("FALL_EDGE_CONTROL", 'h1c);
-      this.LOW_LEVEL_CONTROL_R = new("LOW_LEVEL_CONTROL", 'h20);
-      this.HIGH_LEVEL_CONTROL_R = new("HIGH_LEVEL_CONTROL", 'h24);
-      this.FIFO_DEPTH_R = new("FIFO_DEPTH", 'h28);
-      this.TRIGGER_LOGIC_R = new("TRIGGER_LOGIC", 'h2c);
-      this.CLOCK_SELECT_R = new("CLOCK_SELECT", 'h30);
-      this.OVERWRITE_MASK_R = new("OVERWRITE_MASK", 'h34);
-      this.OVERWRITE_DATA_R = new("OVERWRITE_DATA", 'h38);
-      this.INPUT_DATA_R = new("INPUT_DATA", 'h3c);
-      this.OUTPUT_MODE_R = new("OUTPUT_MODE", 'h40);
-      this.TRIGGER_DELAY_R = new("TRIGGER_DELAY", 'h44);
-      this.TRIGGERED_R = new("TRIGGERED", 'h48);
-      this.STREAMING_R = new("STREAMING", 'h4c);
-      this.TRIGGER_HOLDOFF_R = new("TRIGGER_HOLDOFF", 'h50);
-      this.PG_TRIGGER_CONFIG_R = new("PG_TRIGGER_CONFIG", 'h54);
-      this.DATA_DELAY_CONTROL_R = new("DATA_DELAY_CONTROL", 'h50);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.SCRATCH_R = new("SCRATCH", 'h4, this);
+      this.DIVIDER_COUNTER_LA_R = new("DIVIDER_COUNTER_LA", 'h8, this);
+      this.DIVIDER_COUNTER_PG_R = new("DIVIDER_COUNTER_PG", 'hc, this);
+      this.IO_SELECTION_R = new("IO_SELECTION", 'h10, this);
+      this.EDGE_DETECT_CONTROL_R = new("EDGE_DETECT_CONTROL", 'h14, this);
+      this.RISE_EDGE_CONTROL_R = new("RISE_EDGE_CONTROL", 'h18, this);
+      this.FALL_EDGE_CONTROL_R = new("FALL_EDGE_CONTROL", 'h1c, this);
+      this.LOW_LEVEL_CONTROL_R = new("LOW_LEVEL_CONTROL", 'h20, this);
+      this.HIGH_LEVEL_CONTROL_R = new("HIGH_LEVEL_CONTROL", 'h24, this);
+      this.FIFO_DEPTH_R = new("FIFO_DEPTH", 'h28, this);
+      this.TRIGGER_LOGIC_R = new("TRIGGER_LOGIC", 'h2c, this);
+      this.CLOCK_SELECT_R = new("CLOCK_SELECT", 'h30, this);
+      this.OVERWRITE_MASK_R = new("OVERWRITE_MASK", 'h34, this);
+      this.OVERWRITE_DATA_R = new("OVERWRITE_DATA", 'h38, this);
+      this.INPUT_DATA_R = new("INPUT_DATA", 'h3c, this);
+      this.OUTPUT_MODE_R = new("OUTPUT_MODE", 'h40, this);
+      this.TRIGGER_DELAY_R = new("TRIGGER_DELAY", 'h44, this);
+      this.TRIGGERED_R = new("TRIGGERED", 'h48, this);
+      this.STREAMING_R = new("STREAMING", 'h4c, this);
+      this.TRIGGER_HOLDOFF_R = new("TRIGGER_HOLDOFF", 'h50, this);
+      this.PG_TRIGGER_CONFIG_R = new("PG_TRIGGER_CONFIG", 'h54, this);
+      this.DATA_DELAY_CONTROL_R = new("DATA_DELAY_CONTROL", 'h50, this);
     endfunction: new;
 
   endclass;
+
 endpackage

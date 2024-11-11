@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_xcvr_intel_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_xcvr_intel #(int NUM_OF_LANES);
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_xcvr_intel #(int NUM_OF_LANES) extends adi_component;
 
     /* Intel XCVR (axi_xcvr) */
     class VERSION_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_F = new("VERSION", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -58,10 +64,14 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ID_F = new("ID", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -70,10 +80,14 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -82,10 +96,14 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.RESETN_F = new("RESETN", 0, 0, RW, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -94,10 +112,14 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.STATUS_F = new("STATUS", 0, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -107,11 +129,15 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.UP_PLL_LOCKED_F = new("UP_PLL_LOCKED", NUM_OF_LANES, NUM_OF_LANES, RO, 'hXXXXXXXX, this);
         this.CHANNEL_N_READY_F = new("CHANNEL_N_READY", NUM_OF_LANES-1, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -123,13 +149,17 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'hXXXXXXXX, this);
         this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'hXXXXXXXX, this);
         this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'hXXXXXXXX, this);
         this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -140,12 +170,16 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.XCVR_TYPE_F = new("XCVR_TYPE", 27, 24, RO, 'hXXXXXXXX, this);
         this.TX_OR_RX_N_F = new("TX_OR_RX_N", 8, 8, RO, 'hXXXXXXXX, this);
         this.NUM_OF_LANES_F = new("NUM_OF_LANES", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -154,10 +188,14 @@ package adi_regmap_xcvr_intel_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -171,17 +209,23 @@ package adi_regmap_xcvr_intel_pkg;
     GENERIC_INFO_CLASS GENERIC_INFO_R;
     FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.ID_R = new("ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.RESETN_R = new("RESETN", 'h10);
-      this.STATUS_R = new("STATUS", 'h14);
-      this.STATUS_32_R = new("STATUS_32", 'h18);
-      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c);
-      this.GENERIC_INFO_R = new("GENERIC_INFO", 'h24);
-      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.RESETN_R = new("RESETN", 'h10, this);
+      this.STATUS_R = new("STATUS", 'h14, this);
+      this.STATUS_32_R = new("STATUS_32", 'h18, this);
+      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c, this);
+      this.GENERIC_INFO_R = new("GENERIC_INFO", 'h24, this);
+      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
     endfunction: new;
 
   endclass;
+
 endpackage

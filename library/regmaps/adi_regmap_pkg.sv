@@ -35,16 +35,15 @@
 
 `include "utils.svh"
 
-package regmap_pkg;
+package adi_regmap_pkg;
 
   import logger_pkg::*;
 
   typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S, WO} acc_t;
 
 
-  class register_base;
+  class register_base extends adi_component;
 
-    protected string name;
     logic [31:0] value;
     protected logic [31:0] reset_value;
     protected int address;
@@ -52,7 +51,10 @@ package regmap_pkg;
 
     function new(
       input string name,
-      input int address);
+      input int address,
+      input adi_component parent = null);
+
+      super.new(name, parent);
       
       this.name = name;
       this.value = 'h0;
@@ -62,28 +64,28 @@ package regmap_pkg;
     endfunction
 
     function logic [31:0] get();
-      `INFOV(("Getting reg %s with value %h", this.name, this.value), 10);
+      this.info($sformatf("Getting reg %s with value %h", this.name, this.value), ADI_VERBOSITY_HIGH);
 
       return value;
     endfunction
 
     function void set(input logic [31:0] value);
-      `INFOV(("Setting reg %s with value %h (%h)", this.name, value, this.value), 10);
+      this.info($sformatf("Setting reg %s with value %h (%h)", this.name, value, this.value), ADI_VERBOSITY_HIGH);
 
       this.value = value;
     endfunction
 
     function logic [31:0] get_reset_value();
-      `INFOV(("Getting reg %s with reset value %h", this.name, this.reset_value), 10);
+      this.info($sformatf("Getting reg %s with reset value %h", this.name, this.reset_value), ADI_VERBOSITY_HIGH);
 
       return reset_value;
     endfunction
 
     function void set_reset_value(input logic [31:0] reset_value);
       if (initialization_done)
-        `ERROR(("Changing the reset value after the registermap is created is not allowed!"));
+        this.fatal($sformatf("Changing the reset value after the registermap is created is not allowed!"));
 
-      `INFOV(("Setting reg %s with reset value %h (%h)", this.name, reset_value, this.reset_value), 10);
+      this.info($sformatf("Setting reg %s with reset value %h (%h)", this.name, reset_value, this.reset_value), ADI_VERBOSITY_HIGH);
     
       this.reset_value = this.reset_value | reset_value;
     endfunction
@@ -99,9 +101,8 @@ package regmap_pkg;
   endclass
 
 
-  class field_base;
+  class field_base extends adi_component;
 
-    local string name;
     local int msb;
     local int lsb;
     local acc_t access;
@@ -115,16 +116,18 @@ package regmap_pkg;
       input int lsb,
       input acc_t access,
       input int reset_value,
-      input register_base reg_handle);
+      input register_base parent = null);
 
       automatic logic [31:0] update_value = 'h0;
+
+      super.new(name, parent);
 
       this.name = name;
       this.msb = msb;
       this.lsb = lsb;
       this.access = access;
       this.reset_value = reset_value;
-      this.reg_handle = reg_handle;
+      this.reg_handle = parent;
 
       update_value = reset_value << this.lsb;
       for (int i=this.msb+1; i<=31; i++) begin
@@ -143,7 +146,7 @@ package regmap_pkg;
       end
       value = regvalue >> this.lsb;
 
-      `INFOV(("Getting reg %s[%0d:%0d] field %s with %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, value), 10);
+      this.info($sformatf("Getting reg %s[%0d:%0d] field %s with %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, value), ADI_VERBOSITY_HIGH);
 
       return value;
     endfunction
@@ -153,7 +156,7 @@ package regmap_pkg;
       automatic logic [31:0] mask = 'hFFFF;
 
       if (this.access == NA || this.access == R || this.access == RO || this.access == ROV)
-        `ERROR(("Modifying a read only field!"));
+        this.error($sformatf("Modifying a read only field!"));
 
       update_value = set_value << this.lsb;
       for (int i=this.msb+1;i<=31;i++) begin
@@ -168,11 +171,11 @@ package regmap_pkg;
       this.reg_handle.set(this.reg_handle.get() & ~mask);
       this.reg_handle.set(this.reg_handle.get() | update_value);
 
-      `INFOV(("Setting reg %s[%0d:%0d] field %s with %h (%h)", this.reg_handle.get_name(), this.msb, this.lsb, this.name, set_value, this.reg_handle.get()), 10);
+      this.info($sformatf("Setting reg %s[%0d:%0d] field %s with %h (%h)", this.reg_handle.get_name(), this.msb, this.lsb, this.name, set_value, this.reg_handle.get()), ADI_VERBOSITY_HIGH);
     endfunction
 
     function logic [31:0] get_reset_value();
-      `INFOV(("Getting reg %s[%0d:%0d] field %s with reset value %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, this.reset_value), 10);
+      this.info($sformatf("Getting reg %s[%0d:%0d] field %s with reset value %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, this.reset_value), ADI_VERBOSITY_HIGH);
 
       return this.reset_value;
     endfunction

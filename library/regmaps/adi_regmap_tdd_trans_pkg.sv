@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_tdd_trans_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_tdd_trans;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_tdd_trans extends adi_component;
 
     /* Transceiver TDD Control (axi_ad*) */
     class TDD_CONTROL_0_CLASS extends register_base;
@@ -51,15 +53,19 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_GATED_TX_DMAPATH_F = new("TDD_GATED_TX_DMAPATH", 5, 5, RW, 'h0, this);
         this.TDD_GATED_RX_DMAPATH_F = new("TDD_GATED_RX_DMAPATH", 4, 4, RW, 'h0, this);
         this.TDD_TXONLY_F = new("TDD_TXONLY", 3, 3, RW, 'h0, this);
         this.TDD_RXONLY_F = new("TDD_RXONLY", 2, 2, RW, 'h0, this);
         this.TDD_SECONDARY_F = new("TDD_SECONDARY", 1, 1, RW, 'h0, this);
         this.TDD_ENABLE_F = new("TDD_ENABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -68,10 +74,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_BURST_COUNT_F = new("TDD_BURST_COUNT", 7, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -80,10 +90,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_COUNTER_INIT_F = new("TDD_COUNTER_INIT", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -92,10 +106,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_FRAME_LENGTH_F = new("TDD_FRAME_LENGTH", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -104,10 +122,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_SYNC_TERMINAL_TYPE_F = new("TDD_SYNC_TERMINAL_TYPE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -117,11 +139,15 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RXTX_VCO_OVERLAP_F = new("TDD_RXTX_VCO_OVERLAP", 0, 0, RO, 'h0, this);
         this.TDD_RXTX_RF_OVERLAP_F = new("TDD_RXTX_RF_OVERLAP", 1, 1, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -130,10 +156,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_RX_ON_1_F = new("TDD_VCO_RX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -142,10 +172,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_RX_OFF_1_F = new("TDD_VCO_RX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -154,10 +188,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_TX_ON_1_F = new("TDD_VCO_TX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -166,10 +204,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_TX_OFF_1_F = new("TDD_VCO_TX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -178,10 +220,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_ON_1_F = new("TDD_RX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -190,10 +236,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_OFF_1_F = new("TDD_RX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -202,10 +252,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_ON_1_F = new("TDD_TX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -214,10 +268,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_OFF_1_F = new("TDD_TX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -226,10 +284,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_DP_ON_1_F = new("TDD_RX_DP_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -238,10 +300,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_DP_OFF_1_F = new("TDD_RX_DP_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -250,10 +316,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_DP_ON_1_F = new("TDD_TX_DP_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -262,10 +332,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_DP_OFF_1_F = new("TDD_TX_DP_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -274,10 +348,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_RX_ON_2_F = new("TDD_VCO_RX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -286,10 +364,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_RX_OFF_2_F = new("TDD_VCO_RX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -298,10 +380,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_TX_ON_2_F = new("TDD_VCO_TX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -310,10 +396,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_VCO_TX_OFF_2_F = new("TDD_VCO_TX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -322,10 +412,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_ON_2_F = new("TDD_RX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -334,10 +428,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_OFF_2_F = new("TDD_RX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -346,10 +444,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_ON_2_F = new("TDD_TX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -358,10 +460,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_OFF_2_F = new("TDD_TX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -370,10 +476,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_DP_ON_2_F = new("TDD_RX_DP_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -382,10 +492,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_RX_DP_OFF_2_F = new("TDD_RX_DP_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -394,10 +508,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_DP_ON_2_F = new("TDD_TX_DP_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -406,10 +524,14 @@ package adi_regmap_tdd_trans_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TDD_TX_DP_OFF_2_F = new("TDD_TX_DP_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -444,38 +566,44 @@ package adi_regmap_tdd_trans_pkg;
     TDD_TX_DP_ON_2_CLASS TDD_TX_DP_ON_2_R;
     TDD_TX_DP_OFF_2_CLASS TDD_TX_DP_OFF_2_R;
 
-    function new();
-      this.TDD_CONTROL_0_R = new("TDD_CONTROL_0", 'h40);
-      this.TDD_CONTROL_1_R = new("TDD_CONTROL_1", 'h44);
-      this.TDD_CONTROL_2_R = new("TDD_CONTROL_2", 'h48);
-      this.TDD_FRAME_LENGTH_R = new("TDD_FRAME_LENGTH", 'h4c);
-      this.TDD_SYNC_TERMINAL_TYPE_R = new("TDD_SYNC_TERMINAL_TYPE", 'h50);
-      this.TDD_STATUS_R = new("TDD_STATUS", 'h60);
-      this.TDD_VCO_RX_ON_1_R = new("TDD_VCO_RX_ON_1", 'h80);
-      this.TDD_VCO_RX_OFF_1_R = new("TDD_VCO_RX_OFF_1", 'h84);
-      this.TDD_VCO_TX_ON_1_R = new("TDD_VCO_TX_ON_1", 'h88);
-      this.TDD_VCO_TX_OFF_1_R = new("TDD_VCO_TX_OFF_1", 'h8c);
-      this.TDD_RX_ON_1_R = new("TDD_RX_ON_1", 'h90);
-      this.TDD_RX_OFF_1_R = new("TDD_RX_OFF_1", 'h94);
-      this.TDD_TX_ON_1_R = new("TDD_TX_ON_1", 'h98);
-      this.TDD_TX_OFF_1_R = new("TDD_TX_OFF_1", 'h9c);
-      this.TDD_RX_DP_ON_1_R = new("TDD_RX_DP_ON_1", 'ha0);
-      this.TDD_RX_DP_OFF_1_R = new("TDD_RX_DP_OFF_1", 'ha4);
-      this.TDD_TX_DP_ON_1_R = new("TDD_TX_DP_ON_1", 'ha8);
-      this.TDD_TX_DP_OFF_1_R = new("TDD_TX_DP_OFF_1", 'hac);
-      this.TDD_VCO_RX_ON_2_R = new("TDD_VCO_RX_ON_2", 'hc0);
-      this.TDD_VCO_RX_OFF_2_R = new("TDD_VCO_RX_OFF_2", 'hc4);
-      this.TDD_VCO_TX_ON_2_R = new("TDD_VCO_TX_ON_2", 'hc8);
-      this.TDD_VCO_TX_OFF_2_R = new("TDD_VCO_TX_OFF_2", 'hcc);
-      this.TDD_RX_ON_2_R = new("TDD_RX_ON_2", 'hd0);
-      this.TDD_RX_OFF_2_R = new("TDD_RX_OFF_2", 'hd4);
-      this.TDD_TX_ON_2_R = new("TDD_TX_ON_2", 'hd8);
-      this.TDD_TX_OFF_2_R = new("TDD_TX_OFF_2", 'hdc);
-      this.TDD_RX_DP_ON_2_R = new("TDD_RX_DP_ON_2", 'he0);
-      this.TDD_RX_DP_OFF_2_R = new("TDD_RX_DP_OFF_2", 'he4);
-      this.TDD_TX_DP_ON_2_R = new("TDD_TX_DP_ON_2", 'he8);
-      this.TDD_TX_DP_OFF_2_R = new("TDD_TX_DP_OFF_2", 'hec);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.TDD_CONTROL_0_R = new("TDD_CONTROL_0", 'h40, this);
+      this.TDD_CONTROL_1_R = new("TDD_CONTROL_1", 'h44, this);
+      this.TDD_CONTROL_2_R = new("TDD_CONTROL_2", 'h48, this);
+      this.TDD_FRAME_LENGTH_R = new("TDD_FRAME_LENGTH", 'h4c, this);
+      this.TDD_SYNC_TERMINAL_TYPE_R = new("TDD_SYNC_TERMINAL_TYPE", 'h50, this);
+      this.TDD_STATUS_R = new("TDD_STATUS", 'h60, this);
+      this.TDD_VCO_RX_ON_1_R = new("TDD_VCO_RX_ON_1", 'h80, this);
+      this.TDD_VCO_RX_OFF_1_R = new("TDD_VCO_RX_OFF_1", 'h84, this);
+      this.TDD_VCO_TX_ON_1_R = new("TDD_VCO_TX_ON_1", 'h88, this);
+      this.TDD_VCO_TX_OFF_1_R = new("TDD_VCO_TX_OFF_1", 'h8c, this);
+      this.TDD_RX_ON_1_R = new("TDD_RX_ON_1", 'h90, this);
+      this.TDD_RX_OFF_1_R = new("TDD_RX_OFF_1", 'h94, this);
+      this.TDD_TX_ON_1_R = new("TDD_TX_ON_1", 'h98, this);
+      this.TDD_TX_OFF_1_R = new("TDD_TX_OFF_1", 'h9c, this);
+      this.TDD_RX_DP_ON_1_R = new("TDD_RX_DP_ON_1", 'ha0, this);
+      this.TDD_RX_DP_OFF_1_R = new("TDD_RX_DP_OFF_1", 'ha4, this);
+      this.TDD_TX_DP_ON_1_R = new("TDD_TX_DP_ON_1", 'ha8, this);
+      this.TDD_TX_DP_OFF_1_R = new("TDD_TX_DP_OFF_1", 'hac, this);
+      this.TDD_VCO_RX_ON_2_R = new("TDD_VCO_RX_ON_2", 'hc0, this);
+      this.TDD_VCO_RX_OFF_2_R = new("TDD_VCO_RX_OFF_2", 'hc4, this);
+      this.TDD_VCO_TX_ON_2_R = new("TDD_VCO_TX_ON_2", 'hc8, this);
+      this.TDD_VCO_TX_OFF_2_R = new("TDD_VCO_TX_OFF_2", 'hcc, this);
+      this.TDD_RX_ON_2_R = new("TDD_RX_ON_2", 'hd0, this);
+      this.TDD_RX_OFF_2_R = new("TDD_RX_OFF_2", 'hd4, this);
+      this.TDD_TX_ON_2_R = new("TDD_TX_ON_2", 'hd8, this);
+      this.TDD_TX_OFF_2_R = new("TDD_TX_OFF_2", 'hdc, this);
+      this.TDD_RX_DP_ON_2_R = new("TDD_RX_DP_ON_2", 'he0, this);
+      this.TDD_RX_DP_OFF_2_R = new("TDD_RX_DP_OFF_2", 'he4, this);
+      this.TDD_TX_DP_ON_2_R = new("TDD_TX_DP_ON_2", 'he8, this);
+      this.TDD_TX_DP_OFF_2_R = new("TDD_TX_DP_OFF_2", 'hec, this);
     endfunction: new;
 
   endclass;
+
 endpackage

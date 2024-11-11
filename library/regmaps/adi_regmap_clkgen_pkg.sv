@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_clkgen_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_clkgen;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_clkgen extends adi_component;
 
     /* Clock Generator (axi_clkgen) */
     class RSTN_CLASS extends register_base;
@@ -47,11 +49,15 @@ package adi_regmap_clkgen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.MMCM_RSTN_F = new("MMCM_RSTN", 1, 1, RW, 'h0, this);
         this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -60,10 +66,14 @@ package adi_regmap_clkgen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLK_SEL_F = new("CLK_SEL", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -72,10 +82,14 @@ package adi_regmap_clkgen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.MMCM_LOCKED_F = new("MMCM_LOCKED", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,12 +100,16 @@ package adi_regmap_clkgen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DRP_RWN_F = new("DRP_RWN", 28, 28, RW, 'h0, this);
         this.DRP_ADDRESS_F = new("DRP_ADDRESS", 27, 16, RW, 'h0, this);
         this.DRP_WDATA_F = new("DRP_WDATA", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -102,12 +120,16 @@ package adi_regmap_clkgen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.MMCM_LOCKED_F = new("MMCM_LOCKED", 17, 17, RO, 'h0, this);
         this.DRP_STATUS_F = new("DRP_STATUS", 16, 16, RO, 'h0, this);
         this.DRP_RDATA_F = new("DRP_RDATA", 15, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -116,10 +138,14 @@ package adi_regmap_clkgen_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -130,14 +156,20 @@ package adi_regmap_clkgen_pkg;
     DRP_STATUS_CLASS DRP_STATUS_R;
     FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
 
-    function new();
-      this.RSTN_R = new("RSTN", 'h40);
-      this.CLK_SEL_R = new("CLK_SEL", 'h44);
-      this.MMCM_STATUS_R = new("MMCM_STATUS", 'h5c);
-      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70);
-      this.DRP_STATUS_R = new("DRP_STATUS", 'h74);
-      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.RSTN_R = new("RSTN", 'h40, this);
+      this.CLK_SEL_R = new("CLK_SEL", 'h44, this);
+      this.MMCM_STATUS_R = new("MMCM_STATUS", 'h5c, this);
+      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70, this);
+      this.DRP_STATUS_R = new("DRP_STATUS", 'h74, this);
+      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
     endfunction: new;
 
   endclass;
+
 endpackage

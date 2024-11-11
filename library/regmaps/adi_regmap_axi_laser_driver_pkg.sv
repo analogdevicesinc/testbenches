@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_axi_laser_driver_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_axi_laser_driver #(int ID, int PULSE_PERIOD, int PULSE_WIDTH);
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_axi_laser_driver #(int ID, int PULSE_PERIOD, int PULSE_WIDTH) extends adi_component;
 
     /* AXI Laser Driver (axi_laser_driver) */
     class VERSION_CLASS extends register_base;
@@ -48,12 +50,16 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
         this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h1, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -62,10 +68,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.ID_F = new("ID", 31, 0, RO, ID, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -74,10 +84,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -86,10 +100,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.RESET_F = new("RESET", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -98,10 +116,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PWM_PERIOD_F = new("PWM_PERIOD", 31, 0, RW, PULSE_PERIOD, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -110,10 +132,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.PWM_WIDTH_F = new("PWM_WIDTH", 31, 0, RW, PULSE_WIDTH, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -122,10 +148,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.DRIVER_OTW_F = new("DRIVER_OTW", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -134,10 +164,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.EXT_CLK_FREQ_F = new("EXT_CLK_FREQ", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -148,12 +182,16 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IRQ_PULSE_PENDING_F = new("IRQ_PULSE_PENDING", 0, 0, RW1C, 'h0, this);
         this.IRQ_OTW_ENTER_PENDING_F = new("IRQ_OTW_ENTER_PENDING", 1, 1, RW1C, 'h0, this);
         this.IRQ_OTW_EXIT_PENDING_F = new("IRQ_OTW_EXIT_PENDING", 2, 2, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -164,12 +202,16 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.IRQ_PULSE_SOURCE_F = new("IRQ_PULSE_SOURCE", 0, 0, RO, 'h0, this);
         this.IRQ_OTW_ENTER_SOURCE_F = new("IRQ_OTW_ENTER_SOURCE", 1, 1, RO, 'h0, this);
         this.IRQ_OTW_EXIT_SOURCE_F = new("IRQ_OTW_EXIT_SOURCE", 2, 2, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -179,11 +221,15 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SEQUENCER_ENABLE_F = new("SEQUENCER_ENABLE", 0, 0, RW, 'h0, this);
         this.AUTO_SEQUENCE_EN_F = new("AUTO_SEQUENCE_EN", 1, 1, RW, 'h1, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -192,10 +238,14 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TIA_CHSEL_OFFSET_F = new("TIA_CHSEL_OFFSET", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -207,13 +257,17 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SEQUENCE_VALUE0_F = new("SEQUENCE_VALUE0", 1, 0, RW, 'h0, this);
         this.SEQUENCE_VALUE1_F = new("SEQUENCE_VALUE1", 5, 4, RW, 'h1, this);
         this.SEQUENCE_VALUE2_F = new("SEQUENCE_VALUE2", 9, 8, RW, 'h2, this);
         this.SEQUENCE_VALUE3_F = new("SEQUENCE_VALUE3", 13, 12, RW, 'h3, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -225,13 +279,17 @@ package adi_regmap_axi_laser_driver_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.TIA0_CHSEL_MANUAL_F = new("TIA0_CHSEL_MANUAL", 1, 0, RW, 'h0, this);
         this.TIA1_CHSEL_MANUAL_F = new("TIA1_CHSEL_MANUAL", 5, 4, RW, 'h0, this);
         this.TIA2_CHSEL_MANUAL_F = new("TIA2_CHSEL_MANUAL", 9, 8, RW, 'h0, this);
         this.TIA3_CHSEL_MANUAL_F = new("TIA3_CHSEL_MANUAL", 13, 12, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -250,22 +308,28 @@ package adi_regmap_axi_laser_driver_pkg;
     SEQUENCE_AUTO_CONFIG_CLASS SEQUENCE_AUTO_CONFIG_R;
     TIA_MANUAL_CONFIG_CLASS TIA_MANUAL_CONFIG_R;
 
-    function new();
-      this.VERSION_R = new("VERSION", 'h0);
-      this.ID_R = new("ID", 'h4);
-      this.SCRATCH_R = new("SCRATCH", 'h8);
-      this.CONFIG_PWM_R = new("CONFIG_PWM", 'h10);
-      this.CONFIG_PERIOD_R = new("CONFIG_PERIOD", 'h14);
-      this.CONFIG_WIDTH_R = new("CONFIG_WIDTH", 'h18);
-      this.STATUS_LDRIVER_R = new("STATUS_LDRIVER", 'h84);
-      this.EXT_CLK_MONITOR_R = new("EXT_CLK_MONITOR", 'h88);
-      this.IRQ_PENDING_R = new("IRQ_PENDING", 'ha4);
-      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'ha8);
-      this.SEQUENCER_CONTROL_R = new("SEQUENCER_CONTROL", 'hac);
-      this.SEQUENCER_OFFSET_R = new("SEQUENCER_OFFSET", 'hb0);
-      this.SEQUENCE_AUTO_CONFIG_R = new("SEQUENCE_AUTO_CONFIG", 'hb4);
-      this.TIA_MANUAL_CONFIG_R = new("TIA_MANUAL_CONFIG", 'hb8);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.CONFIG_PWM_R = new("CONFIG_PWM", 'h10, this);
+      this.CONFIG_PERIOD_R = new("CONFIG_PERIOD", 'h14, this);
+      this.CONFIG_WIDTH_R = new("CONFIG_WIDTH", 'h18, this);
+      this.STATUS_LDRIVER_R = new("STATUS_LDRIVER", 'h84, this);
+      this.EXT_CLK_MONITOR_R = new("EXT_CLK_MONITOR", 'h88, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'ha4, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'ha8, this);
+      this.SEQUENCER_CONTROL_R = new("SEQUENCER_CONTROL", 'hac, this);
+      this.SEQUENCER_OFFSET_R = new("SEQUENCER_OFFSET", 'hb0, this);
+      this.SEQUENCE_AUTO_CONFIG_R = new("SEQUENCE_AUTO_CONFIG", 'hb4, this);
+      this.TIA_MANUAL_CONFIG_R = new("TIA_MANUAL_CONFIG", 'hb8, this);
     endfunction: new;
 
   endclass;
+
 endpackage

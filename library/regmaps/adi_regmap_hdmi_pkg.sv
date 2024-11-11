@@ -33,12 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Nov 08 14:35:39 2024 v0.3.49 */
+/* Nov 08 16:38:17 2024 v0.3.49 */
 
 package adi_regmap_hdmi_pkg;
-  import regmap_pkg::*;
 
-  class adi_regmap_hdmi;
+  import logger_pkg::*;
+  import adi_regmap_pkg::*;
+
+  class adi_regmap_hdmi extends adi_component;
 
     /* HDMI Transmit (axi_hdmi_tx) */
     class RSTN_TX_CLASS extends register_base;
@@ -46,10 +48,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -59,11 +65,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SS_BYPASS_F = new("SS_BYPASS", 2, 2, RW, 'h0, this);
         this.CSC_BYPASS_F = new("CSC_BYPASS", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -72,10 +82,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.SOURCE_SEL_F = new("SOURCE_SEL", 1, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -84,10 +98,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CONST_RGB_F = new("CONST_RGB", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -96,10 +114,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLK_FREQ_F = new("CLK_FREQ", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -108,10 +130,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLK_RATIO_F = new("CLK_RATIO", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -120,10 +146,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.STATUS_F = new("STATUS", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -133,11 +163,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VDMA_OVF_F = new("VDMA_OVF", 1, 1, RW1C, 'h0, this);
         this.VDMA_UNF_F = new("VDMA_UNF", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -147,11 +181,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.HDMI_TPM_OOS_F = new("HDMI_TPM_OOS", 1, 1, RW1C, 'h0, this);
         this.VDMA_TPM_OOS_F = new("VDMA_TPM_OOS", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -162,12 +200,16 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.R_MAXorCR_MAX_F = new("R_MAXorCR_MAX", 23, 16, RW, 'hf0, this);
         this.G_MAXorY_MAX_F = new("G_MAXorY_MAX", 16, 8, RW, 'heb, this);
         this.B_MAXorCB_MAX_F = new("B_MAXorCB_MAX", 7, 0, RW, 'hf0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -178,12 +220,16 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.R_MINorCR_MIN_F = new("R_MINorCR_MIN", 23, 16, RW, 'h10, this);
         this.G_MINorY_MIN_F = new("G_MINorY_MIN", 16, 8, RW, 'h10, this);
         this.B_MINorCB_MIN_F = new("B_MINorCB_MIN", 7, 0, RW, 'h10, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -193,11 +239,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.H_LINE_ACTIVE_F = new("H_LINE_ACTIVE", 31, 16, RW, 'h0, this);
         this.H_LINE_WIDTH_F = new("H_LINE_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -206,10 +256,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.H_SYNC_WIDTH_F = new("H_SYNC_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -219,11 +273,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.H_ENABLE_MAX_F = new("H_ENABLE_MAX", 31, 16, RW, 'h0, this);
         this.H_ENABLE_MIN_F = new("H_ENABLE_MIN", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -233,11 +291,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.V_FRAME_ACTIVE_F = new("V_FRAME_ACTIVE", 31, 16, RW, 'h0, this);
         this.V_FRAME_WIDTH_F = new("V_FRAME_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -246,10 +308,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.V_SYNC_WIDTH_F = new("V_SYNC_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -259,11 +325,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.V_ENABLE_MAX_F = new("V_ENABLE_MAX", 31, 16, RW, 'h0, this);
         this.V_ENABLE_MIN_F = new("V_ENABLE_MIN", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -273,10 +343,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -288,13 +362,17 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.EDGE_SEL_F = new("EDGE_SEL", 3, 3, RW, 'h0, this);
         this.BGR_F = new("BGR", 2, 2, RW, 'h0, this);
         this.PACKED_F = new("PACKED", 1, 1, RW, 'h0, this);
         this.CSC_BYPASS_F = new("CSC_BYPASS", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -303,10 +381,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLK_FREQ_F = new("CLK_FREQ", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -315,10 +397,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.CLK_RATIO_F = new("CLK_RATIO", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -328,11 +414,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VDMA_OVF_F = new("VDMA_OVF", 1, 1, RW1C, 'h0, this);
         this.VDMA_UNF_F = new("VDMA_UNF", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -341,10 +431,14 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.HDMI_TPM_OOS_F = new("HDMI_TPM_OOS", 1, 1, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -356,13 +450,17 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VS_OOS_F = new("VS_OOS", 3, 3, RW1C, 'h0, this);
         this.HS_OOS_F = new("HS_OOS", 2, 2, RW1C, 'h0, this);
         this.VS_MISMATCH_F = new("VS_MISMATCH", 1, 1, RW1C, 'h0, this);
         this.HS_MISMATCH_F = new("HS_MISMATCH", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -372,11 +470,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VS_COUNT_F = new("VS_COUNT", 31, 16, RW, 'h0, this);
         this.HS_COUNT_F = new("HS_COUNT", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -386,11 +488,15 @@ package adi_regmap_hdmi_pkg;
 
       function new(
         input string name,
-        input int address);
+        input int address,
+        input adi_component parent = null);
 
-        super.new(name, address);
+        super.new(name, address, parent);
+
         this.VS_COUNT_F = new("VS_COUNT", 31, 16, RO, 'h0, this);
         this.HS_COUNT_F = new("HS_COUNT", 15, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
       endfunction: new
     endclass
 
@@ -421,34 +527,40 @@ package adi_regmap_hdmi_pkg;
     HVCOUNTS1_CLASS HVCOUNTS1_R;
     HVCOUNTS2_CLASS HVCOUNTS2_R;
 
-    function new();
-      this.RSTN_TX_R = new("RSTN_TX", 'h40);
-      this.CNTRL1_R = new("CNTRL1", 'h44);
-      this.CNTRL2_R = new("CNTRL2", 'h48);
-      this.CNTRL3_R = new("CNTRL3", 'h4c);
-      this.CLK_FREQ_TX_R = new("CLK_FREQ_TX", 'h54);
-      this.CLK_RATIO_TX_R = new("CLK_RATIO_TX", 'h58);
-      this.STATUS_R = new("STATUS", 'h5c);
-      this.VDMA_STATUS_TX_R = new("VDMA_STATUS_TX", 'h60);
-      this.TPM_STATUS_R = new("TPM_STATUS", 'h64);
-      this.CLIPP_MAX_R = new("CLIPP_MAX", 'h68);
-      this.CLIPP_MIN_R = new("CLIPP_MIN", 'h6c);
-      this.HSYNC_1_R = new("HSYNC_1", 'h400);
-      this.HSYNC_2_R = new("HSYNC_2", 'h404);
-      this.HSYNC_3_R = new("HSYNC_3", 'h408);
-      this.VSYNC_1_R = new("VSYNC_1", 'h440);
-      this.VSYNC_2_R = new("VSYNC_2", 'h444);
-      this.VSYNC_3_R = new("VSYNC_3", 'h448);
-      this.RSTN_RX_R = new("RSTN_RX", 'h40);
-      this.CNTRL_R = new("CNTRL", 'h44);
-      this.CLK_FREQ_RX_R = new("CLK_FREQ_RX", 'h54);
-      this.CLK_RATIO_RX_R = new("CLK_RATIO_RX", 'h58);
-      this.VDMA_STATUS_RX_R = new("VDMA_STATUS_RX", 'h60);
-      this.TPM_STATUS1_R = new("TPM_STATUS1", 'h64);
-      this.TPM_STATUS2_R = new("TPM_STATUS2", 'h80);
-      this.HVCOUNTS1_R = new("HVCOUNTS1", 'h400);
-      this.HVCOUNTS2_R = new("HVCOUNTS2", 'h404);
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.RSTN_TX_R = new("RSTN_TX", 'h40, this);
+      this.CNTRL1_R = new("CNTRL1", 'h44, this);
+      this.CNTRL2_R = new("CNTRL2", 'h48, this);
+      this.CNTRL3_R = new("CNTRL3", 'h4c, this);
+      this.CLK_FREQ_TX_R = new("CLK_FREQ_TX", 'h54, this);
+      this.CLK_RATIO_TX_R = new("CLK_RATIO_TX", 'h58, this);
+      this.STATUS_R = new("STATUS", 'h5c, this);
+      this.VDMA_STATUS_TX_R = new("VDMA_STATUS_TX", 'h60, this);
+      this.TPM_STATUS_R = new("TPM_STATUS", 'h64, this);
+      this.CLIPP_MAX_R = new("CLIPP_MAX", 'h68, this);
+      this.CLIPP_MIN_R = new("CLIPP_MIN", 'h6c, this);
+      this.HSYNC_1_R = new("HSYNC_1", 'h400, this);
+      this.HSYNC_2_R = new("HSYNC_2", 'h404, this);
+      this.HSYNC_3_R = new("HSYNC_3", 'h408, this);
+      this.VSYNC_1_R = new("VSYNC_1", 'h440, this);
+      this.VSYNC_2_R = new("VSYNC_2", 'h444, this);
+      this.VSYNC_3_R = new("VSYNC_3", 'h448, this);
+      this.RSTN_RX_R = new("RSTN_RX", 'h40, this);
+      this.CNTRL_R = new("CNTRL", 'h44, this);
+      this.CLK_FREQ_RX_R = new("CLK_FREQ_RX", 'h54, this);
+      this.CLK_RATIO_RX_R = new("CLK_RATIO_RX", 'h58, this);
+      this.VDMA_STATUS_RX_R = new("VDMA_STATUS_RX", 'h60, this);
+      this.TPM_STATUS1_R = new("TPM_STATUS1", 'h64, this);
+      this.TPM_STATUS2_R = new("TPM_STATUS2", 'h80, this);
+      this.HVCOUNTS1_R = new("HVCOUNTS1", 'h400, this);
+      this.HVCOUNTS2_R = new("HVCOUNTS2", 'h404, this);
     endfunction: new;
 
   endclass;
+
 endpackage

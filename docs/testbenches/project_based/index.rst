@@ -10,4 +10,4 @@ Contents
    :maxdepth: 1
 
    ad463x/index
-
+   ad738x/index

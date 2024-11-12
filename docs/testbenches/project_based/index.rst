@@ -9,3 +9,5 @@ Contents
 .. toctree::
    :maxdepth: 1
 
+   ad463x/index
+

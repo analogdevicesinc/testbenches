@@ -98,7 +98,7 @@ program test_program;
 
     //=========================================================================
 
-    setLoggerVerbosity(250);
+    setLoggerVerbosity(9);
     
     env.start();
     env.sys_reset();

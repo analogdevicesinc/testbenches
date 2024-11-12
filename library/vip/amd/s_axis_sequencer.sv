@@ -59,7 +59,7 @@ package s_axis_sequencer_pkg;
 
     // new
     function new();
-      this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
+      this.mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
       this.low_time = 0;
       this.high_time = 1;
       this.high_time_min = 1;

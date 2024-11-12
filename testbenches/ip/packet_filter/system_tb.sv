@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -32,60 +32,14 @@
 //
 // ***************************************************************************
 // ***************************************************************************
+
+`timescale 1ns/1ps
+
 `include "utils.svh"
 
-package watchdog_pkg;
+module system_tb();
 
-  import logger_pkg::*;
+  `TEST_PROGRAM test();
+  test_harness `TH ();
 
-  class watchdog;
-    
-    protected event stop_event;
-    protected bit [31:0] timer;
-    protected string message;
-
-    
-    function new(
-      bit [31:0] timer, 
-      string message);
-
-      this.timer = timer;
-      this.message = message;
-    endfunction
-
-    function void update_message(string message);
-      this.message = message;
-    endfunction: update_message
-
-    function void update_timer(bit [31:0] timer);
-      this.timer = timer;
-    endfunction: update_timer
-
-    task reset();
-      this.stop();
-      this.start();
-    endtask: reset
-
-    task stop();
-      ->this.stop_event;
-    endtask: stop
-
-    task start();
-      fork
-        begin
-          fork
-            begin
-              #(this.timer*1ns);
-              `ERROR(("Watchdog timer timed out! %s", this.message));
-            end
-            @this.stop_event;
-          join_any
-          disable fork;
-          `INFOV(("Watchdog timer reset. %s", this.message), 100);
-        end
-      join_none
-    endtask: start
-
-  endclass
-
-endpackage
+endmodule

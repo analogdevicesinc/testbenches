@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2024(c) Analog Devices, Inc.
+## Copyright 2022(c) Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -18,11 +18,8 @@ SV_DEPS += ../../../library/regmaps/adi_regmap_pkg.sv
 SV_DEPS += ../../../library/drivers/common/mailbox.sv
 SV_DEPS += ../../../library/drivers/common/x_monitor.sv
 SV_DEPS += ../../../library/drivers/common/scoreboard.sv
-SV_DEPS += ../../../library/drivers/common/scoreboard_pack.sv
 SV_DEPS += ../../../library/drivers/common/filter.sv
-SV_DEPS += ../../../library/drivers/dmac/dmac_api.sv
-SV_DEPS += ../../../library/drivers/dmac/dma_trans.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_dmac_pkg.sv
+SV_DEPS += ../../../library/drivers/common/interfaces.svh
 SV_DEPS += ../../../library/drivers/common/watchdog.sv
 SV_DEPS += environment.sv
 SV_DEPS += system_tb.sv
@@ -34,9 +31,7 @@ ENV_DEPS += ../../../scripts/run_sim.tcl
 
 LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
-LIB_DEPS += axi_dmac
-LIB_DEPS += util_pack/util_cpack2
-LIB_DEPS += util_pack/util_upack2
+LIB_DEPS += util_axis_fifo_asym
 
 # default test program
 TP := test_program
@@ -44,12 +39,11 @@ TP := test_program
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl
 CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
+#$(warning $(CFG_FILES))
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
-#TESTS += cfg1:test_program
-#TESTS += cfg_rand:test_program
 
 include ../../../scripts/project-sim.mk
 

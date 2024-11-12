@@ -40,7 +40,7 @@ package adi_api_pkg;
   import logger_pkg::*;
   import adi_common_pkg::*;
   import reg_accessor_pkg::*;
-  import regmap_pkg::*;
+  import adi_regmap_pkg::*;
 
   class adi_api extends adi_component;
   

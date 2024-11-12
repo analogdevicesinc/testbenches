@@ -38,7 +38,7 @@ package adi_peripheral_pkg;
 
   import logger_pkg::*;
   import reg_accessor_pkg::*;
-  import regmap_pkg::*;
+  import adi_regmap_pkg::*;
 
    //============================================================================
   // Base peripheral class

@@ -48,7 +48,7 @@ package s_axi_sequencer_pkg;
     function new(
       input string name,
       input T agent,
-      adi_component parent = null);
+      input adi_component parent = null);
 
       super.new(name, parent);
       

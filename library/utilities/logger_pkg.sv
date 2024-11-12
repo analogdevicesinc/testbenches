@@ -78,7 +78,7 @@ package logger_pkg;
     
     function new(
       input string name,
-      adi_reporter parent = null);
+      input adi_reporter parent = null);
 
       this.name = name;
       this.parent = parent;
@@ -115,7 +115,7 @@ package logger_pkg;
   class adi_component extends adi_reporter;
     function new(
       input string name,
-      adi_component parent = null);
+      input adi_component parent = null);
 
       super.new(name, parent);
     endfunction: new

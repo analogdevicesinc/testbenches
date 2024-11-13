@@ -10,7 +10,7 @@ The purpose of this testbench is to validate the serial interface functionality
 of the :git-hdl:`projects/ad738x_fmc` reference design.
 
 The entire HDL documentation can be found here
-:ref-hdl:`AD738x-FMC HDL project <ad738x_fmc>`.
+:external+hdl:ref:`AD738x-FMC HDL project <ad738x_fmc>`.
 
 Block design
 -------------------------------------------------------------------------------

@@ -36,7 +36,7 @@ if {[expr {![info exists use_smartconnect]}]} {
 }
 
 # Create the project
-adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
+adi_sim_project_xilinx $project_name "xc7z020clg484-1"
 
 # Add test files to the project
 adi_sim_project_files [list \

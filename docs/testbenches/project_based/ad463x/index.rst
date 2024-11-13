@@ -10,7 +10,7 @@ The purpose of this testbench is to validate the serial interface functionality
 of the :git-hdl:`projects/ad4630_fmc` reference design.
 
 The entire HDL documentation can be found here
-:ref-hdl:`AD4630-FMC HDL project <ad4630_fmc>`.
+:external+hdl:ref:`AD4630-FMC HDL project <ad4630_fmc>`.
 
 Block design
 -------------------------------------------------------------------------------
@@ -274,40 +274,40 @@ HDL related dependencies
      - ---
    * - AXI_CLKGEN
      - :git-hdl:`library/axi_clkgen`
-     - :ref-hdl:`here <axi_clkgen>`
+     - :external+hdl:ref:`here <axi_clkgen>`
    * - AXI_DMAC
      - :git-hdl:`library/axi_dmac`
-     - :ref-hdl:`here <axi_dmac>`
+     - :external+hdl:ref:`here <axi_dmac>`
    * - AXI_HDMI_TX
      - :git-hdl:`library/axi_hdmi_tx`
-     - :ref-hdl:`here <axi_hdmi_tx>`
+     - :external+hdl:ref:`here <axi_hdmi_tx>`
    * - AXI_I2S_ADI
      - :git-hdl:`library/axi_i2s_adi`
      - ---
    * - AXI_PWM_GEN
      - :git-hdl:`library/axi_pwm_gen`
-     - :ref-hdl:`here <axi_pwm_gen>`
+     - :external+hdl:ref:`here <axi_pwm_gen>`
    * - AXI_SPDIF_TX
      - :git-hdl:`library/axi_spdif_tx`
      - ---
    * - AXI_SPI_ENGINE
      - :git-hdl:`library/spi_engine/axi_spi_engine`
-     - :ref-hdl:`here <spi_engine axi>`
+     - :external+hdl:ref:`here <spi_engine axi>`
    * - SPI_AXIS_REORDER
      - :git-hdl:`library/spi_engine/spi_axis_reorder`
      - ---
    * - SPI_ENGINE_EXECUTION
      - :git-hdl:`library/spi_engine/spi_engine_execution`
-     - :ref-hdl:`here <spi_engine execution>`
+     - :external+hdl:ref:`here <spi_engine execution>`
    * - SPI_ENGINE_INTERCONNECT
      - :git-hdl:`library/spi_engine/spi_engine_interconnect`
-     - :ref-hdl:`here <spi_engine interconnect>`
+     - :external+hdl:ref:`here <spi_engine interconnect>`
    * - SPI_ENGINE_OFFLOAD
      - :git-hdl:`library/spi_engine/spi_engine_offload`
-     - :ref-hdl:`here <spi_engine offload>`
+     - :external+hdl:ref:`here <spi_engine offload>`
    * - SYSID_ROM
      - :git-hdl:`library/sysid_rom`
-     - :ref-hdl:`here <axi_sysid>`
+     - :external+hdl:ref:`here <axi_sysid>`
    * - UTIL_I2C_MIXER
      - :git-hdl:`library/util_i2c_mixer <library/util_i2c_mixer>`
      - ---

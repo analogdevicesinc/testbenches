@@ -105,4 +105,4 @@ Other use-cases for the watchdog timer:
   allows for a stricter watchdog timer value, which may stop a hanging
   simulation sooner without waiting for the whole process to finish. 
 
-.. include:: ../../../../../common/support.rst
+.. include:: ../../../../common/support.rst

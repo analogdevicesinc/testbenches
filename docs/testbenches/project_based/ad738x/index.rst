@@ -326,6 +326,6 @@ Testbenches related dependencies
      - :git-testbenches:`library/utilities/utils.svh`
      - ---
 
-.. include:: ../../common/more_information.rst
+.. include:: ../../../common/more_information.rst
 
-.. include:: ../../common/support.rst
+.. include:: ../../../common/support.rst

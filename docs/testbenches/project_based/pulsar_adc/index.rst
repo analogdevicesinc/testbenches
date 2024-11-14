@@ -21,7 +21,7 @@ along with VIPs used for clocking, reset, PS and DDR simulations.
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: ../pulsar_adc_pmdz_tb.svg
+.. image:: ./pulsar_adc_pmdz_tb.svg
    :width: 800
    :align: center
    :alt: PulSAR ADC/Testbench block diagram
@@ -121,6 +121,7 @@ Environment Bringup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The steps of the environment bringup are:
+
 * Create the environment
 * Start the environment
 * Start the clocks
@@ -130,8 +131,8 @@ Sanity Test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This test is used to check the communication with the AXI REGMAP module of the
-AD463X SPI Engine interface, by reading the core VERSION register, along with 
-writing and reading the SCRATCH register.
+PulSAR ADC SPI Engine interface, by reading the core VERSION register, along
+with writing and reading the SCRATCH register.
 
 FIFO SPI Test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

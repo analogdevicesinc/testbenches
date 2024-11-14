@@ -118,6 +118,7 @@ Environment Bringup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The steps of the environment bringup are:
+
 * Create the environment
 * Start the environment
 * Start the clocks

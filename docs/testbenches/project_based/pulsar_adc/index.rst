@@ -271,8 +271,9 @@ HDL related dependencies
      - :external+hdl:ref:`here <axi_sysid>`
    * - UTIL_I2C_MIXER
      - :git-hdl:`library/util_i2c_mixer <library/util_i2c_mixer>` *
+     - ---
 
-     .. admonition:: Legend
+.. admonition:: Legend
    :class: note
 
    ``*`` instantiated only for AD40xx/ADAQ40xx

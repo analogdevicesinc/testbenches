@@ -101,7 +101,22 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Watchdog</a></li>
+<li><a class="reference internal" href="#">Watchdog</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#function-new-bit-31-0-timer-string-message">function new(bit [31:0] timer, string message);</a></li>
+<li><a class="reference internal" href="#function-void-update-message-string-message">function void update_message(string message);</a></li>
+<li><a class="reference internal" href="#function-void-update-timer-bit-31-0-timer">function void update_timer(bit [31:0] timer);</a></li>
+<li><a class="reference internal" href="#task-start">task start();</a></li>
+<li><a class="reference internal" href="#task-stop">task stop();</a></li>
+<li><a class="reference internal" href="#task-reset">task reset();</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage-and-recommendations">Usage and recommendations</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
 </ul>
 
         </nav>
@@ -210,6 +225,110 @@ Content on this topic
             
   <section id="watchdog">
 <span id="id1"></span><h1>Watchdog<a class="headerlink" href="#watchdog" title="Link to this heading">#</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>The purpose of this class is to provide an object that can stop a simulation
+run, most importantly to prevent system hangs, never ending simulation runs.
+The designer of the test stimulus needs to have a good understanding of the
+design under test to be able to configure the watchdog module properly. The
+watchdog object can be used on the entire test stimulus or on smaller test
+cases, where there is a moderate chance that the system may hang, and to
+prevent such instances to happen.</p>
+</section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h2>
+<p>None are available for direct external access.</p>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<section id="function-new-bit-31-0-timer-string-message">
+<h3>function new(bit [31:0] timer, string message);<a class="headerlink" href="#function-new-bit-31-0-timer-string-message" title="Link to this heading">#</a></h3>
+<p>Creates the watchdog object. The timer variable is used to set the default
+timer value after which the watchdog is triggered. This value must be set in
+nanoseconds. The message value sets the default output message when the
+watchdog is triggered.</p>
+</section>
+<section id="function-void-update-message-string-message">
+<h3>function void update_message(string message);<a class="headerlink" href="#function-void-update-message-string-message" title="Link to this heading">#</a></h3>
+<p>Used to update the timer value. The timer variable is used to set the new timer
+value after which the watchdog is triggered.</p>
+</section>
+<section id="function-void-update-timer-bit-31-0-timer">
+<h3>function void update_timer(bit [31:0] timer);<a class="headerlink" href="#function-void-update-timer-bit-31-0-timer" title="Link to this heading">#</a></h3>
+<p>Used to update the watchdog message. The message value sets the watchdog output
+message when this is triggered. This value must be set in nanoseconds.</p>
+</section>
+<section id="task-start">
+<h3>task start();<a class="headerlink" href="#task-start" title="Link to this heading">#</a></h3>
+<p>Starts the watchdog timer in a separate thread. This allows other code to be
+run in parallel with it. When the watchdog timer reaches the wait time that was
+set prior to starting of the watchdog, either with a default value or an
+updated value, it is triggered, prints out the watchdog message and then the
+simulation is halted. If the watchdog receives a stop event, the thread is
+killed and the counting stops. This means that the watchdog will not trigger in
+this instance and the simulation will not be halted.</p>
+</section>
+<section id="task-stop">
+<h3>task stop();<a class="headerlink" href="#task-stop" title="Link to this heading">#</a></h3>
+<p>Stops the watchdog timer when called. Used when the designer wants to stop the
+watchdog timer.</p>
+</section>
+<section id="task-reset">
+<h3>task reset();<a class="headerlink" href="#task-reset" title="Link to this heading">#</a></h3>
+<p>Stops and then starts again the watchdog timer using the start and stop
+functions.</p>
+</section>
+</section>
+<section id="usage-and-recommendations">
+<h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading">#</a></h2>
+<p>Basic usage of the watchdog timer:</p>
+<ul class="simple">
+<li><p>Declare the watchdog timer, give an initial value for the timer and the
+message. These can be changed later</p></li>
+<li><p>Update the watchdog timer value and message if needed</p></li>
+<li><p>Start the watchdog timer</p></li>
+<li><p>Add test stimulus that needs to be timed by the watchdog timer</p></li>
+<li><p>Stop the watchdog timer if the stimulus finished the process</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<ul class="simple">
+<li><p>The watchdog timer value must be set higher than the time the stimulus needs
+to finish the execution of the process. At the initial development of the
+test stimulus, this value should be oversized by a couple times the estimated
+value, to ensure that the test case has enough time to complete the process
+in case the original execution time is well underestimated. After a couple of
+iterations when the process execution time bounds are known, the watchdog
+timer should be reduced to the value that is: highest execution time for the
+process +20-30% of this time to ensure that the process can terminate
+properly.</p></li>
+<li><p>Multiple instances of the same watchdog timer object should not be started,
+before the previous one is stopped. This will cause multiple instances of the
+same watchdog to be started in separate threads. When the stop function is
+called for this watchdog timer object, it will stop all currently active
+watchdog timers. To use multiple watchdog timers all at the same  time,
+multiple watchdog timer objects need to be created, each with its own message
+and timer value. This will allow each one of these to be controlled
+independently.</p></li>
+</ul>
+</div>
+<p>Other use-cases for the watchdog timer:</p>
+<ul class="simple">
+<li><p>Repetitive test stimulus that takes a long time to finish and may cause
+system hanging. In this case it is more advisable have a watchdog timer
+stopped and started or reset each time a repetitive task is completed. This
+allows for a stricter watchdog timer value, which may stop a hanging
+simulation sooner without waiting for the whole process to finish.</p></li>
+</ul>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://www.analog.com/en/index.html">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/">reference design</a> with <a class="reference external" href="https://www.analog.com/en/index.html">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="reference external" href="https://www.analog.com/en/index.html">ADI</a> engineers.</p>
+</section>
 </section>
 
     <script type="text/javascript">

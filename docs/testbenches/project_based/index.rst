@@ -11,3 +11,4 @@ Contents
 
    ad463x/index
    ad738x/index
+   pulsar_adc/index

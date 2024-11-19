@@ -1,6 +1,4 @@
 source ../../../scripts/adi_sim.tcl
-source ../../../../scripts/adi_env.tcl
-source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
 if {$argc < 1} {
   puts "Expecting at least one argument that specifies the test configuration"
@@ -38,26 +36,16 @@ if {[expr {![info exists use_smartconnect]}]} {
 # Create the project
 adi_sim_project_xilinx $project_name "xc7z020clg484-1"
 
+source $ad_tb_dir/library/includes/sp_include_dmac.tcl
+source $ad_tb_dir/library/includes/sp_include_spi_engine.tcl
+
 # Add test files to the project
 adi_sim_project_files [list \
- "../../../library/utilities/utils.svh" \
- "../../../library/utilities/logger_pkg.sv" \
- "../../../library/regmaps/reg_accessor.sv" \
- "../../../library/vip/amd/m_axis_sequencer.sv" \
- "../../../library/vip/amd/s_axis_sequencer.sv" \
- "../../../library/vip/amd/m_axi_sequencer.sv" \
- "../../../library/vip/amd/s_axi_sequencer.sv" \
- "../../../library/drivers/dmac/dmac_api.sv" \
- "../../../library/regmaps/adi_regmap_pkg.sv" \
- "../../../library/regmaps/adi_regmap_axi_ad7616_pkg.sv" \
- "../../../library/regmaps/adi_regmap_clkgen_pkg.sv" \
- "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \
- "../../../library/regmaps/adi_regmap_spi_engine_pkg.sv" \
- "../../../library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
- "../../../library/drivers/dmac/dma_trans.sv" \
- "../../../library/utilities/test_harness_env.sv" \
- "tests/test_program_si.sv" \
- "tests/test_program_pi.sv" \
- "system_tb.sv"]
+  "$ad_tb_dir/library/regmaps/adi_regmap_axi_ad7616_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_clkgen_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
+  "tests/test_program_si.sv" \
+  "tests/test_program_pi.sv" \
+]
 
 adi_sim_generate $project_name

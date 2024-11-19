@@ -33,16 +33,14 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
+global ad_project_params
 
 # system level parameters
 set SER_PAR_N  $ad_project_params(SER_PAR_N)
 
-global ad_project_params
-
 adi_project_files [list \
-	"../../../../library/common/ad_edge_detect.v" \
-	"../../../../library/util_cdc/sync_bits.v"]
+	"$ad_hdl_dir/library/common/ad_edge_detect.v" \
+	"$ad_hdl_dir/library/util_cdc/sync_bits.v"]
 
 #
 #  Block design under test

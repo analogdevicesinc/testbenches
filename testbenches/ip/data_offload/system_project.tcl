@@ -1,7 +1,5 @@
 
 source ../../../scripts/adi_sim.tcl
-source ../../../../scripts/adi_env.tcl
-source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
 if {$argc < 1} {
   puts "Expecting at least one argument that specifies the test configuration"
@@ -30,19 +28,13 @@ set part "xczu9eg-ffvb1156-2-e"
 
 adi_sim_project_xilinx $project_name $part
 
+source $ad_tb_dir/library/includes/sp_include_axis.tcl
+
 # Add test files to the project
 adi_sim_project_files [list \
- "../../../library/utilities/utils.svh" \
- "../../../library/utilities/logger_pkg.sv" \
- "../../../library/regmaps/reg_accessor.sv" \
- "../../../library/vip/amd/m_axis_sequencer.sv" \
- "../../../library/vip/amd/s_axis_sequencer.sv" \
- "../../../library/vip/amd/m_axi_sequencer.sv" \
- "../../../library/vip/amd/s_axi_sequencer.sv" \
- "do_scoreboard.sv" \
- "environment.sv" \
- "tests/test_program.sv" \
- "system_tb.sv" \
+  "do_scoreboard.sv" \
+  "environment.sv" \
+  "tests/test_program.sv" \
 ]
 
 #set a default test program

@@ -33,15 +33,11 @@
 # ***************************************************************************
 # ***************************************************************************
 
+global ad_project_params
+
 proc log2 {x} {
   return [expr {log($x) / log(2)}]
 }
-
-global ad_hdl_dir
-
-source ../../../../scripts/adi_env.tcl
-
-global ad_project_params
 
 set CHANNELS $ad_project_params(CHANNELS)
 set SAMPLES $ad_project_params(SAMPLES)

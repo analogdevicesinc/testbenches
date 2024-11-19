@@ -36,7 +36,6 @@
 `include "utils.svh"
 
 import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import environment_pkg::*;
 

@@ -4,15 +4,10 @@ package environment_pkg;
 
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
-  import m_axis_sequencer_pkg::*;
-  import s_axis_sequencer_pkg::*;
   import logger_pkg::*;
 
   import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
   import test_harness_env_pkg::*;
-  import scoreboard_pkg::*;
-  import x_monitor_pkg::*;
 
   import `PKGIFY(test_harness, mng_axi_vip)::*;
   import `PKGIFY(test_harness, ddr_axi_vip)::*;

@@ -1,6 +1,4 @@
 source ../../../scripts/adi_sim.tcl
-source ../../../../scripts/adi_env.tcl
-source $ad_hdl_dir/projects/scripts/adi_board.tcl
 
 if {$argc < 1} {
   puts "Expecting at least one argument that specifies the test configuration"
@@ -18,33 +16,18 @@ set project_name [file rootname $cfg_file]
 # Create the project
 adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
+source $ad_tb_dir/library/includes/sp_include_dmac.tcl
+source $ad_tb_dir/library/includes/sp_include_jesd.tcl
+source $ad_tb_dir/library/includes/sp_include_xcvr.tcl
+source $ad_tb_dir/library/includes/sp_include_tdd.tcl
+
 # Add test files to the project
 adi_sim_project_files [list \
- "../../../library/utilities/utils.svh" \
- "../../../library/utilities/logger_pkg.sv" \
- "../../../library/regmaps/reg_accessor.sv" \
- "../../../library/vip/amd/m_axis_sequencer.sv" \
- "../../../library/vip/amd/s_axis_sequencer.sv" \
- "../../../library/vip/amd/m_axi_sequencer.sv" \
- "../../../library/vip/amd/s_axi_sequencer.sv" \
- "../../../library/drivers/dmac/dmac_api.sv" \
- "../../../library/regmaps/adi_regmap_pkg.sv" \
- "../../../library/regmaps/adi_regmap_dmac_pkg.sv" \
- "../../../library/regmaps/adi_regmap_dac_pkg.sv" \
- "../../../library/regmaps/adi_regmap_common_pkg.sv" \
- "../../../library/regmaps/adi_regmap_adc_pkg.sv" \
- "../../../library/regmaps/adi_regmap_jesd_tx_pkg.sv" \
- "../../../library/regmaps/adi_regmap_jesd_rx_pkg.sv" \
- "../../../library/regmaps/adi_regmap_xcvr_pkg.sv" \
- "../../../library/regmaps/adi_regmap_tdd_gen_pkg.sv" \
- "../../../library/drivers/dmac/dma_trans.sv" \
- "../../../library/drivers/jesd/adi_jesd204_pkg.sv" \
- "../../../library/regmaps/adi_peripheral_pkg.sv" \
- "../../../library/drivers/xcvr/adi_xcvr_pkg.sv" \
- "../../../library/utilities/test_harness_env.sv" \
- "tests/test_program.sv" \
- "system_tb.sv" \
- ]
+  "$ad_tb_dir/library/regmaps/adi_regmap_dac_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_common_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_adc_pkg.sv" \
+  "tests/test_program.sv" \
+]
 
 #set a default test program
 adi_sim_add_define "TEST_PROGRAM=test_program"

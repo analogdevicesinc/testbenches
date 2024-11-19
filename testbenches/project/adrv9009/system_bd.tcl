@@ -33,10 +33,9 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
-source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
-
 global ad_project_params
+
+source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
 
 source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
 source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl

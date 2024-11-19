@@ -4,24 +4,17 @@
 ####################################################################################
 ####################################################################################
 
-# All test-bench dependencies except test programs
-SV_DEPS += ../../../library/utilities/utils.svh
-SV_DEPS += ../../../library/utilities/logger_pkg.sv
-SV_DEPS += ../../../library/regmaps/reg_accessor.sv
-SV_DEPS += ../../../library/vip/amd/m_axis_sequencer.sv
-SV_DEPS += ../../../library/vip/amd/s_axis_sequencer.sv
-SV_DEPS += ../../../library/vip/amd/m_axi_sequencer.sv
-SV_DEPS += ../../../library/vip/amd/s_axi_sequencer.sv
+# Makeincludes
+include ../../../scripts/make_tb_path
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_common
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_axis
+
+# Remaining test-bench dependencies except test programs
 SV_DEPS += do_scoreboard.sv
 SV_DEPS += environment.sv
-SV_DEPS += system_tb.sv
 SV_DEPS += data_offload_pkg.sv
 
 ENV_DEPS += cfgs/common_cfg.tcl
-ENV_DEPS += system_project.tcl
-ENV_DEPS += system_bd.tcl
-ENV_DEPS += ../../../scripts/adi_sim.tcl
-ENV_DEPS += ../../../scripts/run_sim.tcl
 
 LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
@@ -43,7 +36,7 @@ $(warning $(CFG_FILES))
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 TESTS += cfg3:test_program_sync
 
-include ../../../scripts/project-sim.mk
+include $(ADI_TB_DIR)/scripts/project-sim.mk
 
 ####################################################################################
 ####################################################################################

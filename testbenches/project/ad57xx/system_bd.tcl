@@ -33,16 +33,14 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
-source $ad_hdl_dir/library/spi_engine/scripts/spi_engine.tcl
-
-
 global ad_project_params
 
+source $ad_hdl_dir/library/spi_engine/scripts/spi_engine.tcl
+
 adi_project_files [list \
-    "../../../../library/common/ad_edge_detect.v" \
-    "../../../../library/util_cdc/sync_bits.v" \
-    "../../../../library/common/ad_iobuf.v" \
+    "$ad_hdl_dir/library/common/ad_edge_detect.v" \
+    "$ad_hdl_dir/library/util_cdc/sync_bits.v" \
+    "$ad_hdl_dir/library/common/ad_iobuf.v" \
 ]
 
 #

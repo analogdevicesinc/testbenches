@@ -33,8 +33,9 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
-source ../../../../library/util_hbm/scripts/adi_util_hbm.tcl
+global ad_project_params
+
+source $ad_hdl_dir/library/util_hbm/scripts/adi_util_hbm.tcl
 
 # hbm clk/reset
 ad_ip_instance clk_vip hbm_clk_vip [ list \
@@ -54,7 +55,6 @@ ad_connect hbm_clk_vip/clk_out hbm_rst_vip/sync_clk
 set hbm_reset hbm_rst_vip/rst_out
 
 ## DUT configuration
-global ad_project_params
 
 set src_clock_freq $ad_project_params(SRC_CLOCK_FREQ)
 set dst_clock_freq $ad_project_params(DST_CLOCK_FREQ)

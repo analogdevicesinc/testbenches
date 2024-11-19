@@ -33,10 +33,6 @@
 # ***************************************************************************
 # ***************************************************************************
 
-global ad_hdl_dir
-
-source ../../../../scripts/adi_env.tcl
-
 global ad_project_params
 
 ad_ip_instance axi4stream_vip src_axis [list \

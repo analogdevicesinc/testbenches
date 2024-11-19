@@ -75,7 +75,7 @@ package dmac_api_pkg;
       bpb_width_log2 = `GET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BURST_WIDTH(val);
       p.MAX_BYTES_PER_BURST = 2**bpb_width_log2;
       p.DMA_2D_TLAST_MODE = `GET_DMAC_INTERFACE_DESCRIPTION_1_DMA_2D_TLAST_MODE(val);
-      p.MAX_NUM_FRAMES = `GET_DMAC_INTERFACE_DESCRIPTION_1_MAX_NUM_FRAMES(val);
+      p.MAX_NUM_FRAMES_WIDTH = $clog2(`GET_DMAC_INTERFACE_DESCRIPTION_1_MAX_NUM_FRAMES(val))+1;
       p.USE_EXT_SYNC = `GET_DMAC_INTERFACE_DESCRIPTION_1_USE_EXT_SYNC(val);
       p.HAS_AUTORUN = `GET_DMAC_INTERFACE_DESCRIPTION_1_HAS_AUTORUN(val);
       if (!p.HAS_AUTORUN) begin
@@ -341,10 +341,10 @@ package dmac_api_pkg;
 
       if ($cast(t_fl_2d,t)) begin
         this.axi_write(GetAddrs(DMAC_FRAMELOCK_CONFIG),
-                       `SET_DMAC_FRAMELOCK_CONFIG_FRAMENUM(t_fl_2d.flock_framenum) |
                        `SET_DMAC_FRAMELOCK_CONFIG_MODE(t_fl_2d.flock_mode) |
                        `SET_DMAC_FRAMELOCK_CONFIG_WAIT_WRITER(t_fl_2d.flock_wait_writer ) |
-                       `SET_DMAC_FRAMELOCK_CONFIG_DISTANCE(t_fl_2d.flock_distance-1));
+                       `SET_DMAC_FRAMELOCK_CONFIG_FRAMENUM(t_fl_2d.flock_framenum) |
+                       `SET_DMAC_FRAMELOCK_CONFIG_DISTANCE(t_fl_2d.flock_distance));
         this.axi_write(GetAddrs(DMAC_FRAMELOCK_STRIDE),
                        `SET_DMAC_FRAMELOCK_STRIDE_STRIDE(t_fl_2d.flock_stride));
       end

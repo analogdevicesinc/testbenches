@@ -73,7 +73,7 @@
                             th``_``vip``_0_DISABLE_DEBUG_REGISTERS, \
                             th``_``vip``_0_ENABLE_DIAGNOSTICS_IF, \
                             th``_``vip``_0_ENABLE_FRAME_LOCK, \
-                            th``_``vip``_0_MAX_NUM_FRAMES, \
+                            th``_``vip``_0_MAX_NUM_FRAMES_WIDTH, \
                             th``_``vip``_0_USE_EXT_SYNC, \
                             th``_``vip``_0_HAS_AUTORUN
 

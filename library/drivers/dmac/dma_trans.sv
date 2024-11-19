@@ -50,7 +50,7 @@ package dma_trans_pkg;
     int DMA_LENGTH_ALIGN;
     int MAX_BYTES_PER_BURST;
     int FRAMELOCK;
-    int MAX_NUM_FRAMES;
+    int MAX_NUM_FRAMES_WIDTH;
     int USE_EXT_SYNC;
     int HAS_AUTORUN;
   } axi_dmac_params_t;
@@ -430,7 +430,7 @@ package dma_trans_pkg;
       ds.flock_wait_writer = flock_wait_writer;
     endfunction
 
-    constraint c_buf_num  {flock_framenum < p.MAX_NUM_FRAMES;};
+    constraint c_buf_num  {flock_framenum < (p.MAX_NUM_FRAMES_WIDTH-1)**2;};
     constraint c_frm_dist {flock_distance < flock_framenum;};
 
     virtual function void print();

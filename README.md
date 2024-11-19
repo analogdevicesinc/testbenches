@@ -1,3 +1,18 @@
+<p align="center">
+<img src="docs/sources/HDL_logo.png" width="500" alt="ADI HDL Logo"> </br>
+</p>
+
+<p align="center">
+<a href="http://analogdevicesinc.github.io/testbenches/">
+<img alt="GitHub Pages" src="https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg">
+</a>
+
+<a href="https://ez.analog.com/fpga/f/q-a">
+<img alt="EngineerZone" src="https://img.shields.io/badge/Support-on%20EngineerZone-blue.svg">
+</a>
+</p>
+
+---
 # General description
 
 This repository contains testbenches and verification components for system level projects or components connected at block level from the [hdl](https://github.com/analogdevicesinc/hdl) repository.

@@ -69,8 +69,6 @@ program test_program;
               `TH.`DST_AXIS.inst.IF
              );
 
-    #1step;
-
     setLoggerVerbosity(250);
     
     env.start();
@@ -122,8 +120,6 @@ program test_program;
     send_data_wd.start();
 
     env.src_axis_seq.start();
-
-    #1step;
 
     case (`SRC_DESCRIPTORS)
       1: //env.src_axis_seq.beat_sent();

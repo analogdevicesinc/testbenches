@@ -7,5 +7,6 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
+   Test Harness <test_harness/index>

@@ -2,6 +2,13 @@
 variable adi_sim_defines {}
 variable design_name "test_harness"
 
+global ad_hdl_dir
+global ad_tb_dir
+
+source ../../../scripts/adi_tb_env.tcl
+
+source $ad_hdl_dir/projects/scripts/adi_board.tcl
+
 proc adi_sim_add_define {value} {
   global adi_sim_defines
   lappend adi_sim_defines $value
@@ -12,7 +19,8 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   global ad_project_params
   global use_smartconnect
   global ad_hdl_dir
-
+  global ad_tb_dir
+  
   # Create project
   create_project ${project_name} ./runs/${project_name} -part $part -force
 
@@ -21,7 +29,7 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   # Set IP repository paths
   set lib_dirs $ad_hdl_dir/library
-  lappend lib_dirs [file normalize "./../../../library"]
+  lappend lib_dirs "$ad_tb_dir/library"
   set_property ip_repo_paths $lib_dirs \
     [get_filesets sources_1]
 
@@ -35,7 +43,7 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   global sys_zynq
   set sys_zynq -1
   if { ![info exists ad_project_params(CUSTOM_HARNESS)] || !$ad_project_params(CUSTOM_HARNESS) } {
-    source ../../../library/utilities/test_harness_system_bd.tcl
+    source $ad_tb_dir/library/utilities/test_harness_system_bd.tcl
   }
 
   # transfer tcl parameters as defines to verilog
@@ -75,6 +83,8 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   # Use a define for the top module
   adi_sim_add_define "TB=system_tb"
+
+  source $ad_tb_dir/library/includes/sp_include_common.tcl
 }
 
 proc adi_sim_project_files {project_files} {

@@ -37,17 +37,17 @@
 
 package s_axi_sequencer_pkg;
 
-  import xil_common_vip_pkg::*;
   import axi_vip_pkg::*;
+  import adi_common_pkg::*;
   import logger_pkg::*;
 
-  class s_axi_sequencer #( type T ) extends adi_component;
+  class s_axi_sequencer #(int `AXI_VIP_PARAM_ORDER(s)) extends adi_component;
 
-    T agent;
+    axi_slv_mem_agent #(`AXI_VIP_PARAM_ORDER(s)) agent;
 
     function new(
       input string name,
-      input T agent,
+      input axi_slv_mem_agent #(`AXI_VIP_PARAM_ORDER(s)) agent,
       input adi_component parent = null);
 
       super.new(name, parent);

@@ -6,6 +6,7 @@ package scoreboard_pkg;
   import axi4stream_vip_pkg::*;
   import axi_vip_pkg::*;
   import logger_pkg::*;
+  import adi_common_pkg::*;
   import x_monitor_pkg::*;
   import mailbox_pkg::*;
 

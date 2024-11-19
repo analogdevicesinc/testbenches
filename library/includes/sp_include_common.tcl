@@ -39,6 +39,7 @@ source $ad_tb_dir/library/includes/sp_include_axi.tcl
 adi_sim_project_files [list \
   "$ad_tb_dir/library/utilities/utils.svh" \
   "$ad_tb_dir/library/utilities/logger_pkg.sv" \
+  "$ad_tb_dir/library/utilities/adi_common_pkg.sv" \
   "$ad_tb_dir/library/utilities/test_harness_env.sv" \
   "$ad_tb_dir/library/drivers/common/watchdog.sv" \
   "system_tb.sv" \

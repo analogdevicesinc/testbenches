@@ -38,22 +38,49 @@
 package test_harness_env_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
+  import x_monitor_pkg::*;
 
-  class test_harness_env extends adi_component;
+
+  class adi_axi_master_agent #(int `AXI_VIP_PARAM_ORDER(master)) extends adi_agent;
+
+    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(master)) agent;
+    m_axi_sequencer #(`AXI_VIP_PARAM_ORDER(master)) sequencer;
+    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(master), WRITE_OP) monitor;
+
+    function new(
+      input string name,
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(master)) master_vip_if,
+      input adi_environment parent = null);
+
+      super.new(name, parent);
+
+      this.agent = new("Agent", master_vip_if);
+      this.sequencer = new("Sequencer", this.agent, this);
+      this.monitor = new("Monitor", this.agent.monitor, this);
+
+      this.sequencer.info($sformatf("5 star"), ADI_VERBOSITY_NONE);
+      this.monitor.info($sformatf("5 star"), ADI_VERBOSITY_NONE);
+    endfunction: new
+
+  endclass: adi_axi_master_agent
+
+
+  class test_harness_env #(int `AXI_VIP_PARAM_ORDER(mng), int `AXI_VIP_PARAM_ORDER(ddr)) extends adi_environment;
 
     // Agents
-    `AGENT(test_harness, mng_axi_vip, mst_t) mng_agent;
-    `AGENT(test_harness, ddr_axi_vip, slv_mem_t) ddr_axi_agent;
+    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng_agent;
+    axi_slv_mem_agent #(`AXI_VIP_PARAM_ORDER(ddr)) ddr_agent;
+
+    adi_axi_master_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng_prot;
 
     // Sequencers
-    m_axi_sequencer #(`AGENT(test_harness, mng_axi_vip, mst_t)) mng;
-    s_axi_sequencer #(`AGENT(test_harness, ddr_axi_vip, slv_mem_t)) ddr_axi_seq;
+    m_axi_sequencer #(`AXI_VIP_PARAM_ORDER(mng)) mng_seq;
+    s_axi_sequencer #(`AXI_VIP_PARAM_ORDER(ddr)) ddr_seq;
 
     // Register accessors
     bit done = 0;
@@ -76,9 +103,8 @@ package test_harness_env_pkg;
 
       virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
 
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
-    );
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(mng)) mng_vip_if,
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(ddr)) ddr_vip_if);
 
       super.new(name);
 
@@ -87,13 +113,15 @@ package test_harness_env_pkg;
       this.ddr_clk_vip_if = ddr_clk_vip_if;
       this.sys_rst_vip_if = sys_rst_vip_if;
 
+      mng_prot = new("AXI Manager agent", mng_vip_if, this);
+
       // Creating the agents
       mng_agent = new("AXI Manager agent", mng_vip_if);
-      ddr_axi_agent = new("AXI DDR stub agent", ddr_vip_if);
+      ddr_agent = new("AXI DDR stub agent", ddr_vip_if);
 
       // Creating the sequencers
-      mng = new("AXI Manager sequencer", mng_agent, this);
-      ddr_axi_seq = new("AXI DDR stub sequencer", ddr_axi_agent, this);
+      mng_seq = new("AXI Manager sequencer", mng_agent, this);
+      ddr_seq = new("AXI DDR stub sequencer", ddr_agent, this);
 
     endfunction
 
@@ -104,7 +132,7 @@ package test_harness_env_pkg;
     //============================================================================
     task start();
       mng_agent.start_master();
-      ddr_axi_agent.start_slave();
+      ddr_agent.start_slave();
 
       sys_clk_vip_if.start_clock;
       dma_clk_vip_if.start_clock;
@@ -112,38 +140,11 @@ package test_harness_env_pkg;
     endtask
 
     //============================================================================
-    // Start the test
-    //   - start the scoreboard
-    //   - start the sequencers
-    //============================================================================
-    task test();
-      fork
-
-      join_none
-    endtask
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // wait until done
-      wait_done();
-    endtask
-
-    //============================================================================
-    // Run subroutine
-    //============================================================================
-    task run;
-      test();
-      post_test();
-    endtask
-
-    //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
+    task stop();
       mng_agent.stop_master();
-      ddr_axi_agent.stop_slave();
+      ddr_agent.stop_slave();
 
       sys_clk_vip_if.stop_clock;
       dma_clk_vip_if.stop_clock;
@@ -151,24 +152,9 @@ package test_harness_env_pkg;
     endtask
 
     //============================================================================
-    // Wait until all component are done
-    //============================================================================
-    task wait_done;
-      wait (done == 1);
-      //`INFO(("Shutting down"));
-    endtask
-
-    //============================================================================
-    // Test controller routine
-    //============================================================================
-    task test_c_run();
-      done = 1;
-    endtask
-
-    //============================================================================
     // System reset routine
     //============================================================================
-    task sys_reset;
+    task sys_reset();
       //asserts all the resets for 100 ns
       sys_rst_vip_if.assert_reset;
       #200;

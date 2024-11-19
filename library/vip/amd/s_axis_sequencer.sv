@@ -38,6 +38,7 @@
 package s_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
+  import adi_common_pkg::*;
   import logger_pkg::*;
 
   class s_axis_sequencer_base extends adi_component;

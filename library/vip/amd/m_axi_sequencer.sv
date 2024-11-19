@@ -39,18 +39,19 @@ package m_axi_sequencer_pkg;
 
   import axi_vip_pkg::*;
   import logger_pkg::*;
+  import adi_common_pkg::*;
   import reg_accessor_pkg::*;
 
-  class m_axi_sequencer #( type T ) extends reg_accessor;
+  class m_axi_sequencer #(int `AXI_VIP_PARAM_ORDER(m)) extends reg_accessor;
 
-    T agent;
+    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(m)) agent;
 
     semaphore reader_s;
     semaphore writer_s;
 
     function new(
       input string name,
-      input T agent,
+      input axi_mst_agent #(`AXI_VIP_PARAM_ORDER(m)) agent,
       input adi_component parent = null);
 
       super.new(name, parent);

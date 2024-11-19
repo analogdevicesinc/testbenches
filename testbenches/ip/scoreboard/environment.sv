@@ -7,15 +7,12 @@ package environment_pkg;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
   import logger_pkg::*;
+  import adi_common_pkg::*;
 
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
-  import test_harness_env_pkg::*;
   import scoreboard_pkg::*;
   import x_monitor_pkg::*;
-
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
   import `PKGIFY(test_harness, adc_src_axis_0)::*;
   import `PKGIFY(test_harness, dac_dst_axis_0)::*;
@@ -27,7 +24,7 @@ package environment_pkg;
   // import `PKGIFY(test_harness, adc_dst_axi_pt_1)::*;
   // import `PKGIFY(test_harness, dac_src_axi_pt_1)::*;
 
-  class environment extends test_harness_env;
+  class scoreboard_environment extends adi_environment;
 
     // agents and sequencers
     `AGENT(test_harness, adc_src_axis_0, mst_t) adc_src_axis_agent_0;
@@ -75,15 +72,6 @@ package environment_pkg;
     function new (
       input string name,
 
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
-
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, adc_src_axis_0)) adc_src_axis_vip_if_0,
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dac_dst_axis_0)) dac_dst_axis_vip_if_0,
       virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, adc_dst_axi_pt_0)) adc_dst_axi_pt_vip_if_0,
@@ -93,17 +81,10 @@ package environment_pkg;
       // virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dac_dst_axis_1)) dac_dst_axis_vip_if_1,
       // virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, adc_dst_axi_pt_1)) adc_dst_axi_pt_vip_if_1,
       // virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, dac_src_axi_pt_1)) dac_src_axi_pt_vip_if_1
-
     );
 
       // creating the agents
-      super.new(name,
-                sys_clk_vip_if, 
-                dma_clk_vip_if, 
-                ddr_clk_vip_if, 
-                sys_rst_vip_if, 
-                mng_vip_if, 
-                ddr_vip_if);
+      super.new(name);
 
       adc_src_axis_agent_0 = new("ADC Source AXI Stream Agent 0", adc_src_axis_vip_if_0);
       dac_dst_axis_agent_0 = new("DAC Destination AXI Stream Agent 0", dac_dst_axis_vip_if_0);
@@ -139,7 +120,6 @@ package environment_pkg;
       scoreboard_rx0 = new("Data Offload RX 0 Scoreboard", this);
       // scoreboard_tx1 = new("Data Offload TX 1 Scoreboard", this);
       // scoreboard_rx1 = new("Data Offload RX 1 Scoreboard", this);
-
     endfunction
 
     //============================================================================
@@ -147,7 +127,6 @@ package environment_pkg;
     //   - Configure the sequencer VIPs with an initial configuration before starting them
     //============================================================================
     task configure(int bytes_to_generate);
-
       // ADC stub
       adc_src_axis_seq_0.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
       adc_src_axis_seq_0.add_xfer_descriptor(bytes_to_generate, 0, 0);
@@ -161,7 +140,6 @@ package environment_pkg;
 
       // // DAC stub
       // dac_dst_axis_seq_1.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-
     endtask
 
     //============================================================================
@@ -170,9 +148,6 @@ package environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-
-      super.start();
-
       adc_src_axis_agent_0.start_master();
       dac_dst_axis_agent_0.start_slave();
       adc_dst_axi_pt_agent_0.start_monitor();
@@ -194,18 +169,12 @@ package environment_pkg;
 
       // scoreboard_rx1.set_source_stream(adc_src_axis_1_mon);
       // scoreboard_rx1.set_sink_stream(adc_dst_axi_pt_1_mon);
-
     endtask
 
     //============================================================================
-    // Start the test
-    //   - start the RX scoreboard and sequencer
-    //   - start the TX scoreboard and sequencer
-    //   - setup the RX DMA
-    //   - setup the TX DMA
+    // Run subroutine
     //============================================================================
-    task test();
-
+    task run;
       fork
         adc_src_axis_seq_0.run();
         dac_dst_axis_seq_0.run();
@@ -229,34 +198,12 @@ package environment_pkg;
         // scoreboard_tx1.run();
         // scoreboard_rx1.run();
       join_none
-
-    endtask
-
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // Evaluate the scoreboard's results
-    endtask
-
-    //============================================================================
-    // Run subroutine
-    //============================================================================
-    task run;
-
-      //pre_test();
-      test();
-
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
     task stop;
-
-      super.stop();
-
       adc_src_axis_seq_0.stop();
       adc_src_axis_agent_0.stop_master();
       dac_dst_axis_agent_0.stop_slave();
@@ -264,9 +211,6 @@ package environment_pkg;
       // adc_src_axis_seq_1.stop();
       // adc_src_axis_agent_1.stop_master();
       // dac_dst_axis_agent_1.stop_slave();
-
-      post_test();
-
     endtask
 
   endclass

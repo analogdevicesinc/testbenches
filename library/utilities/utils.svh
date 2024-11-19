@@ -48,112 +48,75 @@
 // Help build VIP parameter name  e.g. test_harness_dst_axis_vip_0_VIP_DATA_WIDTH
 `define GETPARAM(th,vip,param) th``_``vip``_0_``param
 
-`define DMAC_PARAMS(th,vip) th``_``vip``_0_ID, \
-                            th``_``vip``_0_DMA_DATA_WIDTH_SRC, \
-                            th``_``vip``_0_DMA_DATA_WIDTH_DEST, \
-                            th``_``vip``_0_DMA_LENGTH_WIDTH, \
-                            th``_``vip``_0_DMA_2D_TRANSFER, \
-                            th``_``vip``_0_DMA_2D_TLAST_MODE, \
-                            th``_``vip``_0_ASYNC_CLK_REQ_SRC, \
-                            th``_``vip``_0_ASYNC_CLK_SRC_DEST, \
-                            th``_``vip``_0_ASYNC_CLK_DEST_REQ, \
-                            th``_``vip``_0_AXI_SLICE_DEST, \
-                            th``_``vip``_0_AXI_SLICE_SRC, \
-                            th``_``vip``_0_SYNC_TRANSFER_START, \
-                            th``_``vip``_0_CYCLIC, \
-                            th``_``vip``_0_DMA_AXI_PROTOCOL_DEST, \
-                            th``_``vip``_0_DMA_AXI_PROTOCOL_SRC, \
-                            th``_``vip``_0_DMA_TYPE_DEST, \
-                            th``_``vip``_0_DMA_TYPE_SRC, \
-                            th``_``vip``_0_DMA_AXI_ADDR_WIDTH, \
-                            th``_``vip``_0_MAX_BYTES_PER_BURST, \
-                            th``_``vip``_0_FIFO_SIZE, \
-                            th``_``vip``_0_AXI_ID_WIDTH_SRC, \
-                            th``_``vip``_0_AXI_ID_WIDTH_DEST, \
-                            th``_``vip``_0_DISABLE_DEBUG_REGISTERS, \
-                            th``_``vip``_0_ENABLE_DIAGNOSTICS_IF, \
-                            th``_``vip``_0_ENABLE_FRAME_LOCK, \
-                            th``_``vip``_0_MAX_NUM_FRAMES, \
-                            th``_``vip``_0_USE_EXT_SYNC, \
-                            th``_``vip``_0_HAS_AUTORUN
-
 // Help build VIP Interface parameters name
-`define AXI_VIP_IF_PARAMS(th,vip)    th``_``vip``_0_VIP_PROTOCOL,\
-                                     th``_``vip``_0_VIP_ADDR_WIDTH,\
-                                     th``_``vip``_0_VIP_DATA_WIDTH,\
-                                     th``_``vip``_0_VIP_DATA_WIDTH,\
-                                     th``_``vip``_0_VIP_ID_WIDTH,\
-                                     th``_``vip``_0_VIP_ID_WIDTH,\
-                                     th``_``vip``_0_VIP_AWUSER_WIDTH,\
-                                     th``_``vip``_0_VIP_WUSER_WIDTH,\
-                                     th``_``vip``_0_VIP_BUSER_WIDTH,\
-                                     th``_``vip``_0_VIP_ARUSER_WIDTH,\
-                                     th``_``vip``_0_VIP_RUSER_WIDTH,\
-                                     th``_``vip``_0_VIP_SUPPORTS_NARROW,\
-                                     th``_``vip``_0_VIP_HAS_BURST,\
-                                     th``_``vip``_0_VIP_HAS_LOCK,\
-                                     th``_``vip``_0_VIP_HAS_CACHE,\
-                                     th``_``vip``_0_VIP_HAS_REGION,\
-                                     th``_``vip``_0_VIP_HAS_PROT,\
-                                     th``_``vip``_0_VIP_HAS_QOS,\
-                                     th``_``vip``_0_VIP_HAS_WSTRB,\
-                                     th``_``vip``_0_VIP_HAS_BRESP,\
-                                     th``_``vip``_0_VIP_HAS_RRESP,\
-                                     th``_``vip``_0_VIP_HAS_ARESETN
+`define AXI_VIP_IF_PARAMS(n)  n``_VIP_PROTOCOL,\
+                              n``_VIP_ADDR_WIDTH,\
+                              n``_VIP_WDATA_WIDTH,\
+                              n``_VIP_RDATA_WIDTH,\
+                              n``_VIP_WID_WIDTH,\
+                              n``_VIP_RID_WIDTH,\
+                              n``_VIP_AWUSER_WIDTH,\
+                              n``_VIP_WUSER_WIDTH,\
+                              n``_VIP_BUSER_WIDTH,\
+                              n``_VIP_ARUSER_WIDTH,\
+                              n``_VIP_RUSER_WIDTH,\
+                              n``_VIP_SUPPORTS_NARROW,\
+                              n``_VIP_HAS_BURST,\
+                              n``_VIP_HAS_LOCK,\
+                              n``_VIP_HAS_CACHE,\
+                              n``_VIP_HAS_REGION,\
+                              n``_VIP_HAS_PROT,\
+                              n``_VIP_HAS_QOS,\
+                              n``_VIP_HAS_WSTRB,\
+                              n``_VIP_HAS_BRESP,\
+                              n``_VIP_HAS_RRESP,\
+                              n``_VIP_HAS_ARESETN
 
-`define AXIS_VIP_IF_PARAMS(th,vip)   th``_``vip``_0_VIP_SIGNAL_SET,\
-                                     th``_``vip``_0_VIP_DEST_WIDTH,\
-                                     th``_``vip``_0_VIP_DATA_WIDTH,\
-                                     th``_``vip``_0_VIP_ID_WIDTH,\
-                                     th``_``vip``_0_VIP_USER_WIDTH,\
-                                     th``_``vip``_0_VIP_USER_BITS_PER_BYTE,\
-                                     th``_``vip``_0_VIP_HAS_ARESETN
+`define AXI_VIP_PARAM_ORDER(n)  n``_VIP_PROTOCOL,\
+                                n``_VIP_ADDR_WIDTH,\
+                                n``_VIP_WDATA_WIDTH,\
+                                n``_VIP_RDATA_WIDTH,\
+                                n``_VIP_WID_WIDTH,\
+                                n``_VIP_RID_WIDTH,\
+                                n``_VIP_AWUSER_WIDTH,\
+                                n``_VIP_WUSER_WIDTH,\
+                                n``_VIP_BUSER_WIDTH,\
+                                n``_VIP_ARUSER_WIDTH,\
+                                n``_VIP_RUSER_WIDTH,\
+                                n``_VIP_SUPPORTS_NARROW,\
+                                n``_VIP_HAS_BURST,\
+                                n``_VIP_HAS_LOCK,\
+                                n``_VIP_HAS_CACHE,\
+                                n``_VIP_HAS_REGION,\
+                                n``_VIP_HAS_PROT,\
+                                n``_VIP_HAS_QOS,\
+                                n``_VIP_HAS_WSTRB,\
+                                n``_VIP_HAS_BRESP,\
+                                n``_VIP_HAS_RRESP,\
+                                n``_VIP_HAS_ARESETN
 
-`define AXI_VIP_PARAM_DECL   int AXI_VIP_PROTOCOL=0,\
-                                 AXI_VIP_ADDR_WIDTH=32,\
-                                 AXI_VIP_WDATA_WIDTH=32,\
-                                 AXI_VIP_RDATA_WIDTH=32,\
-                                 AXI_VIP_WID_WIDTH = 0,\
-                                 AXI_VIP_RID_WIDTH = 0,\
-                                 AXI_VIP_AWUSER_WIDTH=0,\
-                                 AXI_VIP_WUSER_WIDTH=0,\
-                                 AXI_VIP_BUSER_WIDTH=0,\
-                                 AXI_VIP_ARUSER_WIDTH=0,\
-                                 AXI_VIP_RUSER_WIDTH=0,\
-                                 AXI_VIP_SUPPORTS_NARROW = 1,\
-                                 AXI_VIP_HAS_BURST = 1,\
-                                 AXI_VIP_HAS_LOCK = 1,\
-                                 AXI_VIP_HAS_CACHE= 1,\
-                                 AXI_VIP_HAS_REGION = 1,\
-                                 AXI_VIP_HAS_PROT= 1,\
-                                 AXI_VIP_HAS_QOS= 1,\
-                                 AXI_VIP_HAS_WSTRB= 1,\
-                                 AXI_VIP_HAS_BRESP= 1,\
-                                 AXI_VIP_HAS_RRESP= 1,\
-                                 AXI_VIP_HAS_ARESETN = 1
-
-`define AXI_VIP_PARAM_ORDER   AXI_VIP_PROTOCOL,\
-                              AXI_VIP_ADDR_WIDTH,\
-                              AXI_VIP_WDATA_WIDTH,\
-                              AXI_VIP_RDATA_WIDTH,\
-                              AXI_VIP_WID_WIDTH,\
-                              AXI_VIP_RID_WIDTH,\
-                              AXI_VIP_AWUSER_WIDTH,\
-                              AXI_VIP_WUSER_WIDTH,\
-                              AXI_VIP_BUSER_WIDTH,\
-                              AXI_VIP_ARUSER_WIDTH,\
-                              AXI_VIP_RUSER_WIDTH,\
-                              AXI_VIP_SUPPORTS_NARROW,\
-                              AXI_VIP_HAS_BURST,\
-                              AXI_VIP_HAS_LOCK,\
-                              AXI_VIP_HAS_CACHE,\
-                              AXI_VIP_HAS_REGION,\
-                              AXI_VIP_HAS_PROT,\
-                              AXI_VIP_HAS_QOS,\
-                              AXI_VIP_HAS_WSTRB,\
-                              AXI_VIP_HAS_BRESP,\
-                              AXI_VIP_HAS_RRESP,\
-                              AXI_VIP_HAS_ARESETN
+`define AXI_VIP_PARAMS(th,vip)  th``_``vip``_0_VIP_PROTOCOL,\
+                                th``_``vip``_0_VIP_ADDR_WIDTH,\
+                                th``_``vip``_0_VIP_DATA_WIDTH,\
+                                th``_``vip``_0_VIP_DATA_WIDTH,\
+                                th``_``vip``_0_VIP_ID_WIDTH,\
+                                th``_``vip``_0_VIP_ID_WIDTH,\
+                                th``_``vip``_0_VIP_AWUSER_WIDTH,\
+                                th``_``vip``_0_VIP_WUSER_WIDTH,\
+                                th``_``vip``_0_VIP_BUSER_WIDTH,\
+                                th``_``vip``_0_VIP_ARUSER_WIDTH,\
+                                th``_``vip``_0_VIP_RUSER_WIDTH,\
+                                th``_``vip``_0_VIP_SUPPORTS_NARROW,\
+                                th``_``vip``_0_VIP_HAS_BURST,\
+                                th``_``vip``_0_VIP_HAS_LOCK,\
+                                th``_``vip``_0_VIP_HAS_CACHE,\
+                                th``_``vip``_0_VIP_HAS_REGION,\
+                                th``_``vip``_0_VIP_HAS_PROT,\
+                                th``_``vip``_0_VIP_HAS_QOS,\
+                                th``_``vip``_0_VIP_HAS_WSTRB,\
+                                th``_``vip``_0_VIP_HAS_BRESP,\
+                                th``_``vip``_0_VIP_HAS_RRESP,\
+                                th``_``vip``_0_VIP_HAS_ARESETN
 
 `define AXIS_VIP_PARAM_DECL   int AXIS_VIP_INTERFACE_MODE     = 2,\
                                   AXIS_VIP_SIGNAL_SET         = 8'b00000011,\
@@ -182,6 +145,14 @@
                                 th``_``vip``_0_VIP_HAS_TLAST,\
                                 th``_``vip``_0_VIP_HAS_ACLKEN,\
                                 th``_``vip``_0_VIP_HAS_ARESETN
+
+`define AXIS_VIP_IF_PARAMS(th,vip)   th``_``vip``_0_VIP_SIGNAL_SET,\
+                                     th``_``vip``_0_VIP_DEST_WIDTH,\
+                                     th``_``vip``_0_VIP_DATA_WIDTH,\
+                                     th``_``vip``_0_VIP_ID_WIDTH,\
+                                     th``_``vip``_0_VIP_USER_WIDTH,\
+                                     th``_``vip``_0_VIP_USER_BITS_PER_BYTE,\
+                                     th``_``vip``_0_VIP_HAS_ARESETN
 
 `define AXI 0
 `define AXIS 1

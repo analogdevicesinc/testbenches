@@ -3,6 +3,7 @@
 package mailbox_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
 
   class mailbox_c #(type T) extends adi_component;
 

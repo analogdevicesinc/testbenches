@@ -38,6 +38,7 @@
 package m_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
+  import adi_common_pkg::*;
   import logger_pkg::*;
 
   typedef enum {
@@ -310,7 +311,7 @@ package m_axis_sequencer_pkg;
   endclass: m_axis_sequencer_base
 
 
-  class m_axis_sequencer #( type T, `AXIS_VIP_PARAM_DECL) extends m_axis_sequencer_base;
+  class m_axis_sequencer #( type T, int `AXIS_VIP_PARAM_DECL) extends m_axis_sequencer_base;
 
     protected T agent;
 

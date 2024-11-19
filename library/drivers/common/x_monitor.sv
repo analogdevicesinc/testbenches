@@ -6,9 +6,10 @@ package x_monitor_pkg;
   import axi4stream_vip_pkg::*;
   import axi_vip_pkg::*;
   import logger_pkg::*;
+  import adi_common_pkg::*;
   import mailbox_pkg::*;
 
-  class x_monitor extends adi_component;
+  class x_monitor extends adi_monitor;
 
     mailbox_c #(logic [7:0]) mailbox;
     protected semaphore semaphore_key;
@@ -67,34 +68,38 @@ package x_monitor_pkg;
 
   endclass
 
-  typedef enum bit {
-    READ_OP = 1'b0,
-    WRITE_OP = 1'b1
+  typedef enum bit [1:0] {
+    READ_OP = 2'b00,
+    WRITE_OP = 2'b01,
+    DUPLEX_OP = 2'b10
   } operation_type_t;
   
-  class x_axi_monitor #( type T, operation_type_t operation_type ) extends x_monitor;
+  class x_axi_monitor #(int `AXI_VIP_PARAM_ORDER(axi), operation_type_t operation_type) extends x_monitor;
     // operation type: 1 - write
     //                 0 - read
 
     // analysis port from the monitor
-    protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
+    protected axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor;
 
-    protected T agent;
+    protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
+    protected axi_vif_mem_proxy #(`AXI_VIP_IF_PARAMS(axi)) vif_proxy;
 
     protected int axi_byte_stream_size;
 
     // constructor
     function new(
       input string name,
-      input T agent,
+      input axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor,
       input adi_component parent = null);
 
       super.new(name, parent);
 
       this.enabled = 0;
 
-      this.agent = agent;
-      this.axi_ap = this.agent.monitor.item_collected_port;
+      this.monitor = monitor;
+
+      this.vif_proxy = this.monitor.vif_proxy;
+      this.axi_ap = this.monitor.item_collected_port;
 
       this.axi_byte_stream_size = 0;
 
@@ -113,7 +118,7 @@ package x_monitor_pkg;
       forever begin
         this.get_key();
         this.axi_ap.get(transaction);
-        if (bit'(transaction.get_cmd_type()) == operation_type) begin
+        if (operation_type[1] == 1'b1 || bit'(transaction.get_cmd_type()) == operation_type[0]) begin
           this.put_key();
           num_bytes = transaction.get_data_width()/8;
           for (int i=0; i<(transaction.get_len()+1); i++) begin
@@ -122,10 +127,10 @@ package x_monitor_pkg;
             for (int j=0; j<num_bytes; j++) begin
               axi_byte = data_beat[j*8+:8];
               // put each beat into byte queues
-              if (operation_type == READ_OP) begin
+              if (bit'(transaction.get_cmd_type()) == READ_OP) begin
                 this.mailbox.put(axi_byte);
                 this.axi_byte_stream_size++;
-              end else if (strb_beat[j] || !this.agent.vif_proxy.C_AXI_HAS_WSTRB) begin
+              end else if (strb_beat[j] || !this.vif_proxy.C_AXI_HAS_WSTRB) begin
                 this.mailbox.put(axi_byte);
                 this.axi_byte_stream_size++;
               end

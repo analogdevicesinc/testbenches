@@ -79,7 +79,7 @@ module adi_spi_vip #(
   initial begin : ASSERT_PARAMETERS
     assert (MODE == MODE_SLAVE)
     else   begin
-      `ERRORV(("Unsupported mode %s. Valid values are 0=SLAVE, 1=MASTER, 2=MONITOR. Only 0(SLAVE) is currently supported.", MODE));
+      $error("Unsupported mode %s. Valid values are 0=SLAVE, 1=MASTER, 2=MONITOR. Only 0(SLAVE) is currently supported.", MODE);
     end
   end : ASSERT_PARAMETERS
 

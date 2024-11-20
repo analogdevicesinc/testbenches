@@ -95,19 +95,19 @@ package logger_pkg;
       input string message,
       input adi_verbosity_t verbosity);
 
-      `INFO(("[%s] %s", this.get_path(), message), verbosity);
+      PrintInfo($sformatf("[%s] %s", this.get_path(), message), verbosity);
     endfunction: info
 
     function void warning(input string message);
-      `WARNING(("[%s] %s", this.get_path(), message));
+      PrintWarning($sformatf("[%s] %s", this.get_path(), message));
     endfunction: warning
 
     function void error(input string message);
-      `ERROR(("[%s] %s", this.get_path(), message));
+      PrintError($sformatf("[%s] %s", this.get_path(), message));
     endfunction: error
 
     function void fatal(input string message);
-      `FATAL(("[%s] %s", this.get_path(), message));
+      PrintFatal($sformatf("[%s] %s", this.get_path(), message));
     endfunction: fatal
   endclass: adi_reporter
 

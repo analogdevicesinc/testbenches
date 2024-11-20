@@ -48,8 +48,15 @@ package m_axi_sequencer_pkg;
     semaphore reader_s;
     semaphore writer_s;
 
-    function new(T agent);
+    function new(
+      input string name,
+      input T agent,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
       this.agent = agent;
+      
       reader_s = new(1);
       writer_s = new(1);
     endfunction
@@ -63,7 +70,7 @@ package m_axi_sequencer_pkg;
       static xil_axi_uint       id =0;
 
       writer_s.get(1);
-      `INFOV(("writing to address %h value %h", addr , data), 10);
+      this.info($sformatf("writing to address %h value %h", addr , data), ADI_VERBOSITY_HIGH);
 
       single_write_transaction_readback_api(.id(id),
                                             .addr(addr),
@@ -92,7 +99,7 @@ package m_axi_sequencer_pkg;
                                             .Rdatabeat(DataBeat_for_read));
       id++;
       data = DataBeat_for_read[0][0+:32];
-      `INFOV((" Reading data : %h @ 0x%h", data, addr), 10);
+      this.info($sformatf(" Reading data : %h @ 0x%h", data, addr), ADI_VERBOSITY_HIGH);
 
       reader_s.put(1);
 
@@ -100,12 +107,12 @@ package m_axi_sequencer_pkg;
 
     virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
                                            input bit [31:0]     data);
-     bit [31:0]    data_out;
-     RegRead32(.addr(addr),
-               .data(data_out));
-     if (data !== data_out) begin
-       `ERROR((" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
-     end
+      bit [31:0]    data_out;
+      RegRead32(.addr(addr),
+                .data(data_out));
+      if (data !== data_out) begin
+        this.error($sformatf(" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
+      end
 
     endtask : RegReadVerify32
 

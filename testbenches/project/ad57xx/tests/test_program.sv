@@ -117,7 +117,8 @@ endtask
 initial begin
 
   //creating environment
-  env = new(`TH.`SYS_CLK.inst.IF,
+  env = new("Axis Sequencers Environment",
+            `TH.`SYS_CLK.inst.IF,
             `TH.`DMA_CLK.inst.IF,
             `TH.`DDR_CLK.inst.IF,
             `TH.`SYS_RST.inst.IF,
@@ -125,7 +126,7 @@ initial begin
             `TH.`DDR_AXI.inst.IF,
             `TH.`SPI_S.inst.IF);
 
-  setLoggerVerbosity(6);
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
   env.start();
 
   env.spi_seq.set_default_miso_data('h0);
@@ -141,8 +142,10 @@ initial begin
   #100ns
 
   offload_spi_test(`TEST_DATA_MODE);
-  `INFO(("Test Done"));
 
+  env.stop();
+
+  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
   $finish;
 
 end
@@ -158,7 +161,7 @@ task sanity_test();
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
   axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  `INFO(("Sanity Test Done"));
+  `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -190,7 +193,7 @@ task generate_transfer_cmd(
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));
   // SYNC command to generate interrupt
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
-  `INFOV(("Transfer generation finished."), 6);
+  `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -209,24 +212,24 @@ initial begin
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
       axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFOV(("Offload SYNC %d IRQ. An offload transfer just finished.",  sync_id), 6);
+      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.",  sync_id), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
       axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFOV(("SYNC %d IRQ. FIFO transfer just finished.", sync_id),6);
+      `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SDI FIFO
     if (irq_pending & 5'b00100) begin
-      `INFOV(("SDI FIFO IRQ."),6);
+      `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SDO FIFO
     if (irq_pending & 5'b00010) begin
-      `INFOV(("SDO FIFO IRQ."),6);
+      `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SDO FIFO
     if (irq_pending & 5'b00001) begin
-      `INFOV(("CMD FIFO IRQ."),6);
+      `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
     // Clear all pending IRQs
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
@@ -296,30 +299,30 @@ task offload_spi_test(
   // Start the offload
   #100ns
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-  `INFOV(("Offload started."),6);
+  `INFO(("Offload started."), ADI_VERBOSITY_LOW);
 
   spi_wait_send();
 
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
-  `INFOV(("Offload stopped."),6);
+  `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
   #2000ns
 
   if (irq_pending == 'h0) begin
-    `ERROR(("IRQ Test FAILED"));
+    `FATAL(("IRQ Test FAILED"));
   end else begin
-    `INFO(("IRQ Test PASSED"));
+    `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
   end
 
   for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
     spi_receive(sdo_write_data[i]);
     if (sdo_write_data[i] != sdo_write_data_store[i]) begin
-      `INFOV(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]),6);
+      `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]), ADI_VERBOSITY_LOW);
       `ERROR(("Offload Write Test FAILED"));
     end
   end
-  `INFO(("Offload Test PASSED"));
+  `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
 
 endtask
 
@@ -341,7 +344,7 @@ task config_spi();
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
   axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-  `INFOV(("axi_pwm_gen started."),6);
+  `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
 
   // Enable SPI Engine
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
@@ -380,10 +383,10 @@ task config_spi();
   axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), cfg_readback);
 
   if (cfg_readback !== 24'hA00002) begin
-    `INFOV(("cfg_readback: %x; expected 'hA00002", cfg_readback),6);
-    `ERROR(("Cfg Test FAILED"));
+    `INFO(("cfg_readback: %x; expected 'hA00002", cfg_readback), ADI_VERBOSITY_LOW);
+    `FATAL(("Cfg Test FAILED"));
   end else begin
-    `INFO(("Cfg Test PASSED"));
+    `INFO(("Cfg Test PASSED"), ADI_VERBOSITY_LOW);
   end
 endtask
 

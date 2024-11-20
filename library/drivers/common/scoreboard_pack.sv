@@ -29,9 +29,10 @@ package scoreboard_pack_pkg;
       input int channels,
       input int samples,
       input int width,
-      input pack_type mode);
+      input pack_type mode,
+      input adi_component parent = null);
 
-      super.new(name);
+      super.new(name, parent);
 
       this.channels = channels;
       this.samples = samples;
@@ -50,7 +51,7 @@ package scoreboard_pack_pkg;
       int outer_loop = (this.mode == CPACK) ? this.channels : this.samples;
       int inner_loop = (this.mode == CPACK) ? this.samples : this.channels;
 
-      `INFOV(("Scoreboard started"), 100);
+      this.info($sformatf("Scoreboard started"), 100);
 
       forever begin : tx_path
         if (this.enabled == 0)
@@ -71,9 +72,9 @@ package scoreboard_pack_pkg;
                 else
                   this.source_byte_stream_size--;
                 sink_byte = sink_byte_stream_block[(outer_loop*j+i)*this.width/8+k];
-                `INFOV(("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
+                this.info($sformatf("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
                 if (source_byte != sink_byte) begin
-                  `ERROR(("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
+                  this.error($sformatf("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
                 end
               end
             end

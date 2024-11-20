@@ -137,7 +137,8 @@ program test_program;
   initial begin
 
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("ADRV9001 Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -146,7 +147,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     //set source synchronous interface clock frequency
@@ -165,7 +166,7 @@ program test_program;
     // R2T2 tests
     R1_MODE = 0;
     if (SYMB_OP[0] & SYMB_8_16B[0]) begin
-    `INFO(("PN Test Skipped in 8 bits symbol mode"));
+    `INFO(("PN Test Skipped in 8 bits symbol mode"), ADI_VERBOSITY_LOW);
     end else begin
       pn_test(`NIBBLE_RAMP);
       pn_test(`FULL_RAMP);
@@ -199,7 +200,10 @@ program test_program;
       dma_test_ch2();
     end
 
-    `INFO(("Test Done"));
+    env.stop();
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
 
   end
 

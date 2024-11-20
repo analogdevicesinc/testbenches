@@ -101,7 +101,8 @@ program test_program;
   initial begin
 
     // Creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("Pluto Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -110,7 +111,7 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     // Set source synchronous interface clock frequency
@@ -146,7 +147,10 @@ program test_program;
 
     tdd_test();
 
-    `INFO(("Test Done"));
+    env.stop();
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
 
   end
 

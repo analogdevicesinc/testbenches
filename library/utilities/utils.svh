@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -187,24 +187,22 @@
 `define AXIS 1
 `define FIFO 2
 
+// Macros used in Simulation files during simulation
+`define INFO(m,v)  \
+  PrintInfo($sformatf("%s", \
+    $sformatf m ),v)
+
+`define WARNING(m)  \
+  PrintWarning($sformatf("%s", \
+    $sformatf m ))
+
 `define ERROR(m)  \
-  do begin  \
-    PrintError($sformatf(" %s \n found in %s:%0d", \
-      $sformatf m , `__FILE__, `__LINE__)); \
-  end while(0)
+  PrintError($sformatf("%s", \
+    $sformatf m ))
 
-`define INFO(m)  \
-  do begin  \
-    PrintInfo($sformatf(" %s", \
-      $sformatf m )); \
-  end while(0)
-
-// Info with verbosity option
-`define INFOV(m,v)  \
-  do begin  \
-    PrintInfo($sformatf(" %s", \
-      $sformatf m ),v); \
-  end while(0)
+`define FATAL(m)  \
+  PrintFatal($sformatf("%s\n  found in %s:%0d", \
+    $sformatf m , `__FILE__, `__LINE__))
 
 `define MAX(a,b) ((a > b) ? a : b)
 `define MIN(a,b) ((a > b) ? b : a)

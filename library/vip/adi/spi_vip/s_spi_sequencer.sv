@@ -40,11 +40,17 @@ package s_spi_sequencer_pkg;
   import logger_pkg::*;
   import adi_spi_vip_pkg::*;
 
-  class s_spi_sequencer #(`SPI_VIP_PARAM_ORDER);
+  class s_spi_sequencer #(`SPI_VIP_PARAM_ORDER) extends adi_component;
 
     protected adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent;
 
-    function new(adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent);
+    function new(
+      input string name,
+      input adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
       this.agent = agent;
     endfunction: new
 
@@ -60,7 +66,7 @@ package s_spi_sequencer_pkg;
       int unsigned received;
       this.agent.receive_data(received);
       if (received !== expected) begin
-        `ERROR(("Data mismatch. Received : %h; expected %h", received, expected));
+        this.error($sformatf("Data mismatch. Received : %h; expected %h", received, expected));
       end
     endtask : receive_data_verify
 

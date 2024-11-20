@@ -64,7 +64,8 @@ program test_program;
   initial begin
 
     // create environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("Scoreboard Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -98,7 +99,7 @@ program test_program;
 
     //=========================================================================
 
-    setLoggerVerbosity(250);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     
     env.start();
     env.sys_reset();
@@ -106,30 +107,30 @@ program test_program;
     // configure environment sequencers
     env.configure(`ADC_TRANSFER_LENGTH);
 
-    `INFO(("Bring up IP from reset."));
+    `INFO(("Bring up IP from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
 
     //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
     
     // Start the ADC/DAC stubs
-    `INFO(("Call the run() ..."));
+    `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     env.run();
 
     env.adc_src_axis_seq_0.start();
     // env.adc_src_axis_seq_1.start();
 
     // Generate DMA transfers
-    `INFO(("Start RX DMA ..."));
+    `INFO(("Start RX DMA ..."), ADI_VERBOSITY_LOW);
     rx_dma_transfer(dmac_rx_0, 32'h80000000, `ADC_TRANSFER_LENGTH);
     // rx_dma_transfer(dmac_rx_1, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
     env.scoreboard_rx0.wait_until_complete();
 
-    `INFO(("Initialize the memory ..."));
+    `INFO(("Initialize the memory ..."), ADI_VERBOSITY_LOW);
     init_mem_64(32'h80000000, 1024);
 
-    `INFO(("Start TX DMA ..."));
+    `INFO(("Start TX DMA ..."), ADI_VERBOSITY_LOW);
     tx_dma_transfer(dmac_tx_0, 32'h80000000, 1024);
     // tx_dma_transfer(dmac_tx_1, 32'h80000000, 1024);
 
@@ -138,7 +139,7 @@ program test_program;
         
     env.stop();
     
-    `INFO(("Test bench done!"));
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end
@@ -147,14 +148,14 @@ program test_program;
 
     // bring up the Data Offload instances from reset
 
-    `INFO(("Bring up RX Data Offload 0"));
+    `INFO(("Bring up RX Data Offload 0"), ADI_VERBOSITY_LOW);
     do_rx_0.deassert_reset();
-    `INFO(("Bring up TX Data Offload 0"));
+    `INFO(("Bring up TX Data Offload 0"), ADI_VERBOSITY_LOW);
     do_tx_0.deassert_reset();
 
-    // `INFO(("Bring up RX Data Offload 1"));
+    // `INFO(("Bring up RX Data Offload 1"), ADI_VERBOSITY_LOW);
     // do_rx_1.deassert_reset();
-    // `INFO(("Bring up TX Data Offload 1"));
+    // `INFO(("Bring up TX Data Offload 1"), ADI_VERBOSITY_LOW);
     // do_tx_1.deassert_reset();
 
     // Enable tx oneshot mode
@@ -164,14 +165,14 @@ program test_program;
 
     // bring up the DMAC instances from reset
 
-    `INFO(("Bring up RX DMAC 0"));
+    `INFO(("Bring up RX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_rx_0.enable_dma();
-    `INFO(("Bring up TX DMAC 0"));
+    `INFO(("Bring up TX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_tx_0.enable_dma();
 
-    // `INFO(("Bring up RX DMAC 1"));
+    // `INFO(("Bring up RX DMAC 1"), ADI_VERBOSITY_LOW);
     // dmac_rx_1.enable_dma();
-    // `INFO(("Bring up TX DMAC 1"));
+    // `INFO(("Bring up TX DMAC 1"), ADI_VERBOSITY_LOW);
     // dmac_tx_1.enable_dma();
 
   endtask
@@ -208,11 +209,11 @@ program test_program;
   task init_mem_64(
     input longint unsigned addr, 
     input int byte_length);
-    `INFO(("Initial address: %x", addr));
+    `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin
       env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
     end
-    `INFO(("Final address: %x", addr + byte_length*8));
+    `INFO(("Final address: %x", addr + byte_length*8), ADI_VERBOSITY_LOW);
   endtask
 
 endprogram

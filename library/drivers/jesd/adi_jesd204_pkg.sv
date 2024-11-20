@@ -124,22 +124,22 @@ package adi_jesd204_pkg;
     //
     // -----------------
     virtual function void print();
-      `INFO(("--------------------------"));
-      `INFO(("--Link parameters---------"));
-      `INFO(("--------------------------"));
-      `INFO(("L         is %0d", L));
-      `INFO(("M         is %0d", M));
-      `INFO(("F         is %0d", F));
-      `INFO(("S         is %0d", S));
-      `INFO(("K         is %0d", K));
-      `INFO(("E         is %0d", E));
-      `INFO(("N         is %0d", N));
-      `INFO(("N'        is %0d", NP));
-      `INFO(("CS        is %0d", CS));
-      `INFO(("HD        is %0d", HD));
-      `INFO(("SCR       is %0d", SCR));
-      `INFO(("SUBCLASSV is %0d", SUBCLASSV));
-      `INFO(("ENCODING  is %s", encoding_s[encoding]));
+      `INFO(("--------------------------"), ADI_VERBOSITY_MEDIUM);
+      `INFO(("--Link parameters---------"), ADI_VERBOSITY_MEDIUM);
+      `INFO(("--------------------------"), ADI_VERBOSITY_MEDIUM);
+      `INFO(("L         is %0d", L), ADI_VERBOSITY_MEDIUM);
+      `INFO(("M         is %0d", M), ADI_VERBOSITY_MEDIUM);
+      `INFO(("F         is %0d", F), ADI_VERBOSITY_MEDIUM);
+      `INFO(("S         is %0d", S), ADI_VERBOSITY_MEDIUM);
+      `INFO(("K         is %0d", K), ADI_VERBOSITY_MEDIUM);
+      `INFO(("E         is %0d", E), ADI_VERBOSITY_MEDIUM);
+      `INFO(("N         is %0d", N), ADI_VERBOSITY_MEDIUM);
+      `INFO(("N'        is %0d", NP), ADI_VERBOSITY_MEDIUM);
+      `INFO(("CS        is %0d", CS), ADI_VERBOSITY_MEDIUM);
+      `INFO(("HD        is %0d", HD), ADI_VERBOSITY_MEDIUM);
+      `INFO(("SCR       is %0d", SCR), ADI_VERBOSITY_MEDIUM);
+      `INFO(("SUBCLASSV is %0d", SUBCLASSV), ADI_VERBOSITY_MEDIUM);
+      `INFO(("ENCODING  is %s", encoding_s[encoding]), ADI_VERBOSITY_MEDIUM);
     endfunction
 
     // -----------------
@@ -148,7 +148,7 @@ package adi_jesd204_pkg;
     function int check_config();
       // 8 * F * L = M * N' * S
       if (8 * F * L != M * NP * S) begin
-        `ERROR(("Configuration mismatch. 8 * F * L != M * N' * S"));
+        `FATAL(("Configuration mismatch. 8 * F * L != M * N' * S"));
         return 1;
       end
       return 0;
@@ -259,7 +259,7 @@ package adi_jesd204_pkg;
       sysref_clk = link_clk * dp_width / (link.K * link.F);
       sysref_clk_fract = sysref_clk - $floor(sysref_clk);
       if (sysref_clk_fract != 0)
-        `ERROR(("Current clock generator can't generate this exact frequency: %f", sysref_clk));
+        this.error($sformatf("Current clock generator can't generate this exact frequency: %f", sysref_clk));
       return sysref_clk;
     endfunction : calc_sysref_clk;
 
@@ -370,11 +370,11 @@ package adi_jesd204_pkg;
         if (link.encoding == enc8b10b) begin
           lane_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
           if (lane_state != ls_8b10b_data)
-            `ERROR(("Lane %d state %s",i,rx_lane_states_8b10b[i]));
+            this.error($sformatf("Lane %d state %s",i,rx_lane_states_8b10b[i]));
         end else begin
           lane_state = `GET_JESD_RX_LANEn_STATUS_EMB_STATE(val);
           if (lane_state != ls_64b66b_emb_lock)
-            `ERROR(("Lane %d state %s",i,rx_lane_states_64b66b[i]));
+            this.error($sformatf("Lane %d state %s",i,rx_lane_states_64b66b[i]));
         end
       end
 
@@ -411,15 +411,15 @@ package adi_jesd204_pkg;
       bit [31:0] val;
       this.bus.RegRead32(this.base_address + GetAddrs(JESD_RX_LINK_STATUS), val);
       if (link.encoding == enc8b10b) begin
-        `INFO(("Link status : %s", rx_link_states_8b10b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]));
+        this.info($sformatf("Link status : %s", rx_link_states_8b10b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]), ADI_VERBOSITY_MEDIUM);
       end else begin
-        `INFO(("Link status : %s", rx_link_states_64b66b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]));
+        this.info($sformatf("Link status : %s", rx_link_states_64b66b[`GET_JESD_RX_LINK_STATUS_STATUS_STATE(val)]), ADI_VERBOSITY_MEDIUM);
       end
 
       // Check SYSREF alignment ERROR
       this.bus.RegRead32(this.base_address + GetAddrs(JESD_RX_SYSREF_STATUS), val);
-      `INFO(("SYSREF captured : %s", `GET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"));
-      `INFO(("SYSREF alignment error : %s", `GET_JESD_RX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"));
+      this.info($sformatf("SYSREF captured : %s", `GET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"), ADI_VERBOSITY_MEDIUM);
+      this.info($sformatf("SYSREF alignment error : %s", `GET_JESD_RX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"), ADI_VERBOSITY_MEDIUM);
 
     endtask : link_status_print
 
@@ -551,16 +551,16 @@ package adi_jesd204_pkg;
       // There is no SYNC signal in 64b66b
       this.bus.RegRead32(this.base_address + GetAddrs(JESD_TX_LINK_STATUS), val);
       if (link.encoding == enc8b10b) begin
-        `INFO(("Link status : %s", tx_link_states_8b10b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]));
-        `INFO(("SYNC~ : %s", `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(val) ? "deasserted" : "asserted"));
+        this.info($sformatf("Link status : %s", tx_link_states_8b10b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]), ADI_VERBOSITY_MEDIUM);
+        this.info($sformatf("SYNC~ : %s", `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(val) ? "deasserted" : "asserted"), ADI_VERBOSITY_MEDIUM);
       end else begin
-        `INFO(("Link status %s", tx_link_states_64b66b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]));
+        this.info($sformatf("Link status %s", tx_link_states_64b66b[`GET_JESD_TX_LINK_STATUS_STATUS_STATE(val)]), ADI_VERBOSITY_MEDIUM);
       end
 
       // Check SYSREF alignment ERROR
       this.bus.RegRead32(this.base_address + GetAddrs(JESD_TX_SYSREF_STATUS), val);
-      `INFO(("SYSREF captured : %s", `GET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"));
-      `INFO(("SYSREF alignment error : %s", `GET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"));
+      this.info($sformatf("SYSREF captured : %s", `GET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(val) ? "Yes" : "No"), ADI_VERBOSITY_MEDIUM);
+      this.info($sformatf("SYSREF alignment error : %s", `GET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(val) ? "Yes" : "No"), ADI_VERBOSITY_MEDIUM);
 
     endtask : link_status_print
 

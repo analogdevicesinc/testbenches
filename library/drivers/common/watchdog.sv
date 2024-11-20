@@ -38,7 +38,7 @@ package watchdog_pkg;
 
   import logger_pkg::*;
 
-  class watchdog;
+  class watchdog extends adi_component;
     
     protected event stop_event;
     protected bit [31:0] timer;
@@ -46,18 +46,22 @@ package watchdog_pkg;
 
     
     function new(
-      bit [31:0] timer, 
-      string message);
+      input string name,
+      input bit [31:0] timer, 
+      input string message,
+      input adi_component parent = null);
+
+      super.new(name, parent);
 
       this.timer = timer;
       this.message = message;
     endfunction
 
-    function void update_message(string message);
+    function void update_message(input string message);
       this.message = message;
     endfunction: update_message
 
-    function void update_timer(bit [31:0] timer);
+    function void update_timer(input bit [31:0] timer);
       this.timer = timer;
     endfunction: update_timer
 
@@ -77,12 +81,12 @@ package watchdog_pkg;
           fork
             begin
               #(this.timer*1ns);
-              `ERROR(("Watchdog timer timed out! %s", this.message));
+              this.error($sformatf("Watchdog timer timed out! %s", this.message));
             end
             @this.stop_event;
           join_any
           disable fork;
-          `INFOV(("Watchdog timer reset. %s", this.message), 100);
+          this.info($sformatf("Watchdog timer reset. %s", this.message), ADI_VERBOSITY_MEDIUM);
         end
       join_none
     endtask: start

@@ -37,6 +37,8 @@
 
 package adi_spi_vip_pkg;
 
+  import logger_pkg::*;
+
   `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
                                     SPI_VIP_CPOL              ,\
                                     SPI_VIP_CPHA              ,\
@@ -61,7 +63,7 @@ package adi_spi_vip_pkg;
                                     th``_``vip``_0_VIP_CS_TO_MISO,\
                                     th``_``vip``_0_VIP_DEFAULT_MISO_DATA
 
-  class adi_spi_driver #(int `SPI_VIP_PARAM_ORDER);
+  class adi_spi_driver #(int `SPI_VIP_PARAM_ORDER) extends adi_component;
 
     typedef mailbox #(logic [SPI_VIP_DATA_DLENGTH-1:0]) spi_mbx_t;
     protected spi_mbx_t mosi_mbx;
@@ -73,7 +75,13 @@ package adi_spi_vip_pkg;
     protected event tx_mbx_updated;
     virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) vif;
 
-    function new(virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf);
+    function new(
+      input string name,
+      virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+      
       this.vif = intf;
       this.active = 0;
       this.stop_flag = 0;
@@ -155,7 +163,7 @@ package adi_spi_vip_pkg;
               if (!vif.cs_active) begin
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
-                  $error("tx_miso: early exit due to unexpected CS inactive!");
+                  this.fatal($sformatf("tx_miso: early exit due to unexpected CS inactive!"));
                 end
                 break;
               end else if (pending_mbx) begin
@@ -171,7 +179,7 @@ package adi_spi_vip_pkg;
                   miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
                 end
                 if (i == SPI_VIP_DATA_DLENGTH-1) begin
-                  $display("[SPI VIP] MISO Tx end of transfer.");
+                  this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
                     miso_mbx.get(miso_reg);
@@ -244,7 +252,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                $display("[SPI VIP] Stop event triggered.");
+                this.info($sformatf("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_HIGH);
                 this.stop_flag = 0;
               end
               begin
@@ -256,7 +264,7 @@ package adi_spi_vip_pkg;
         join
         this.clear_active();
       end else begin
-        $error("Already running!");
+        this.error($sformatf("Already running!"));
       end
     endtask
 
@@ -264,18 +272,24 @@ package adi_spi_vip_pkg;
       if (this.get_active()) begin
         this.stop_flag = 1;
       end else begin
-        $error("Already inactive!");
+        this.error($sformatf("Already inactive!"));
       end
     endtask
 
   endclass
 
-  class adi_spi_agent #(int `SPI_VIP_PARAM_ORDER);
+  class adi_spi_agent #(int `SPI_VIP_PARAM_ORDER) extends adi_component;
 
     protected adi_spi_driver #(`SPI_VIP_PARAM_ORDER) driver;
 
-    function new(virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf);
-      this.driver = new(intf);
+    function new(
+      input string name,
+      virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+
+      this.driver = new("Driver", intf, this);
     endfunction
 
     virtual task send_data(input int unsigned data);

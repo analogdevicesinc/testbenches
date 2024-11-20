@@ -42,7 +42,7 @@ package adi_peripheral_pkg;
    //============================================================================
   // Base peripheral class
   //============================================================================
-  class adi_peripheral;
+  class adi_peripheral extends adi_component;
     reg_accessor bus;
     bit [31:0] base_address;
 
@@ -56,8 +56,14 @@ package adi_peripheral_pkg;
     // -----------------
     //
     // -----------------
-    function new (string name, reg_accessor bus, bit [31:0] base_address);
-      this.name = name;
+    function new(
+      input string name,
+      input reg_accessor bus,
+      input bit [31:0] base_address,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+      
       this.bus = bus;
       this.base_address = base_address;
     endfunction
@@ -69,7 +75,7 @@ package adi_peripheral_pkg;
       bit [31:0] val;
       this.bus.RegRead32(this.base_address + 'h0, val);
       {ver_major, ver_minor, ver_patch} = val;
-      `INFO(("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch));
+      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
     endtask
 
     // -----------------

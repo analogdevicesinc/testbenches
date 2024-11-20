@@ -41,15 +41,21 @@ package s_axi_sequencer_pkg;
   import axi_vip_pkg::*;
   import logger_pkg::*;
 
-  class s_axi_sequencer #( type T );
+  class s_axi_sequencer #( type T ) extends adi_component;
 
     T agent;
 
-    function new(T agent);
+    function new(
+      input string name,
+      input T agent,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+      
       this.agent = agent;
     endfunction
 
-    task get_byte_from_mem(xil_axi_ulong addr,
+    task get_byte_from_mem(input xil_axi_ulong addr,
                            output bit [7:0] data);
       bit [31:0] four_bytes;
       four_bytes = agent.mem_model.backdoor_memory_read_4byte(addr);
@@ -61,7 +67,7 @@ package s_axi_sequencer_pkg;
       endcase
     endtask
 
-    task set_byte_in_mem(xil_axi_ulong addr,
+    task set_byte_in_mem(input xil_axi_ulong addr,
                          input bit [7:0] data);
       bit [3:0] strb;
       case (addr[1:0])
@@ -75,13 +81,13 @@ package s_axi_sequencer_pkg;
                                                   .strb(strb));
     endtask
 
-    task verify_byte(xil_axi_ulong addr,
+    task verify_byte(input xil_axi_ulong addr,
                      input bit [7:0] refdata);
       bit [7:0] data;
 
       get_byte_from_mem (addr, data);
       if (data !== refdata) begin
-        `ERROR(("Unexpected value at address %0h . Expected: %0h Found: %0h", addr, refdata, data));
+        this.error($sformatf("Unexpected value at address %0h . Expected: %0h Found: %0h", addr, refdata, data));
       end
     endtask
 

@@ -73,6 +73,8 @@ package environment_pkg;
     // Constructor
     //============================================================================
     function new (
+      input string name,
+
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
@@ -95,7 +97,8 @@ package environment_pkg;
     );
 
       // creating the agents
-      super.new(sys_clk_vip_if, 
+      super.new(name,
+                sys_clk_vip_if, 
                 dma_clk_vip_if, 
                 ddr_clk_vip_if, 
                 sys_rst_vip_if, 
@@ -112,30 +115,30 @@ package environment_pkg;
       // adc_dst_axi_pt_agent_1 = new("ADC Destination AXI Agent 1", adc_dst_axi_pt_vip_if_1);
       // dac_src_axi_pt_agent_1 = new("DAC Source AXI Agent 1", dac_src_axi_pt_vip_if_1);
 
-      adc_src_axis_seq_0 = new(adc_src_axis_agent_0);
-      dac_dst_axis_seq_0 = new(dac_dst_axis_agent_0);
-      adc_dst_axi_pt_seq_0 = new(adc_dst_axi_pt_agent_0);
-      dac_src_axi_pt_seq_0 = new(dac_src_axi_pt_agent_0);
+      adc_src_axis_seq_0 = new("ADC Source AXI Stream Sequencer 0", adc_src_axis_agent_0, this);
+      dac_dst_axis_seq_0 = new("DAC Destination AXI Stream Sequencer 0", dac_dst_axis_agent_0, this);
+      adc_dst_axi_pt_seq_0 = new("ADC Destination AXI Sequencer 0", adc_dst_axi_pt_agent_0, this);
+      dac_src_axi_pt_seq_0 = new("DAC Source AXI Sequencer 0", dac_src_axi_pt_agent_0, this);
 
-      // adc_src_axis_seq_1 = new(adc_src_axis_agent_1);
-      // dac_dst_axis_seq_1 = new(dac_dst_axis_agent_1);
-      // adc_dst_axi_pt_seq_1 = new(adc_dst_axi_pt_agent_1);
-      // dac_src_axi_pt_seq_1 = new(dac_src_axi_pt_agent_1);
+      // adc_src_axis_seq_1 = new("ADC Source AXI Stream Sequencer 1", adc_src_axis_agent_1, this);
+      // dac_dst_axis_seq_1 = new("DAC Destination AXI Stream Sequencer 1", dac_dst_axis_agent_1, this);
+      // adc_dst_axi_pt_seq_1 = new("ADC Destination AXI Sequencer 1", adc_dst_axi_pt_agent_1, this);
+      // dac_src_axi_pt_seq_1 = new("DAC Source AXI Sequencer 1", dac_src_axi_pt_agent_1, this);
 
-      adc_src_axis_0_mon = new("ADC Source AXIS 0 Transaction Monitor", adc_src_axis_agent_0);
-      dac_dst_axis_0_mon = new("DAC Destination AXIS 0 Transaction Monitor", dac_dst_axis_agent_0);
-      adc_dst_axi_pt_0_mon = new("ADC Destination AXI 0 Transaction Monitor", adc_dst_axi_pt_agent_0);
-      dac_src_axi_pt_0_mon = new("DAC Source AXI 0 Transaction Monitor", dac_src_axi_pt_agent_0);
+      adc_src_axis_0_mon = new("ADC Source AXIS 0 Transaction Monitor", adc_src_axis_agent_0, this);
+      dac_dst_axis_0_mon = new("DAC Destination AXIS 0 Transaction Monitor", dac_dst_axis_agent_0, this);
+      adc_dst_axi_pt_0_mon = new("ADC Destination AXI 0 Transaction Monitor", adc_dst_axi_pt_agent_0, this);
+      dac_src_axi_pt_0_mon = new("DAC Source AXI 0 Transaction Monitor", dac_src_axi_pt_agent_0, this);
 
-      // adc_src_axis_1_mon = new("ADC Source AXIS 1 Transaction Monitor", adc_src_axis_agent_1);
-      // dac_dst_axis_1_mon = new("DAC Destination AXIS 1 Transaction Monitor", dac_dst_axis_agent_1);
-      // adc_dst_axi_pt_1_mon = new("ADC Destination AXI 1 Transaction Monitor", adc_dst_axi_pt_agent_1);
-      // dac_src_axi_pt_1_mon = new("DAC Source AXI 1 Transaction Monitor", dac_src_axi_pt_agent_1);
+      // adc_src_axis_1_mon = new("ADC Source AXIS 1 Transaction Monitor", adc_src_axis_agent_1, this);
+      // dac_dst_axis_1_mon = new("DAC Destination AXIS 1 Transaction Monitor", dac_dst_axis_agent_1, this);
+      // adc_dst_axi_pt_1_mon = new("ADC Destination AXI 1 Transaction Monitor", adc_dst_axi_pt_agent_1, this);
+      // dac_src_axi_pt_1_mon = new("DAC Source AXI 1 Transaction Monitor", dac_src_axi_pt_agent_1, this);
 
-      scoreboard_tx0 = new("Data Offload Verification Environment TX 0 Scoreboard");
-      scoreboard_rx0 = new("Data Offload Verification Environment RX 0 Scoreboard");
-      // scoreboard_tx1 = new("Data Offload Verification Environment TX 1 Scoreboard");
-      // scoreboard_rx1 = new("Data Offload Verification Environment RX 1 Scoreboard");
+      scoreboard_tx0 = new("Data Offload TX 0 Scoreboard", this);
+      scoreboard_rx0 = new("Data Offload RX 0 Scoreboard", this);
+      // scoreboard_tx1 = new("Data Offload TX 1 Scoreboard", this);
+      // scoreboard_rx1 = new("Data Offload RX 1 Scoreboard", this);
 
     endfunction
 

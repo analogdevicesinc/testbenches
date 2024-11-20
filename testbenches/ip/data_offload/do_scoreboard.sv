@@ -85,7 +85,7 @@ package do_scoreboard_pkg;
       if (!this.enabled) begin
         this.tx_sink_type = sink_type_t'(sink_type);
       end else begin
-        `ERROR(("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
+        `FATAL(("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
       end
     endfunction
 
@@ -111,11 +111,11 @@ package do_scoreboard_pkg;
             for (int j=0; j<num_bytes; j++) begin
               // put each beat into byte queues
               if (transaction.get_cmd_type() == 1'b1) begin  // WRITE
-                `INFOV(("Caught a DDR WRITE transaction: %d -- %d", data_beat[j*8+:8], this.rx_sink_byte_stream_size), 100);
+                `INFO(("Caught a DDR WRITE transaction: %d -- %d", data_beat[j*8+:8], this.rx_sink_byte_stream_size), ADI_VERBOSITY_LOW);
                 this.rx_sink_byte_stream.push_back(data_beat[j*8+:8]);
                 this.rx_sink_byte_stream_size++;
               end else begin  // READ
-                `INFOV(("Caught a DDR READ transaction: %d -- %d", data_beat[j*8+:8], this.tx_source_byte_stream_size), 100);
+                `INFO(("Caught a DDR READ transaction: %d -- %d", data_beat[j*8+:8], this.tx_source_byte_stream_size), ADI_VERBOSITY_LOW);
                 this.tx_source_byte_stream.push_back(data_beat[j*8+:8]);
                 this.tx_cyclic_sink_byte_stream.push_back(data_beat[j*8+:8]);
                 this.tx_source_byte_stream_size++;
@@ -142,7 +142,7 @@ package do_scoreboard_pkg;
 
       forever begin
         if (this.tx_sink_axis_ap.get_item_cnt() > 0) begin
-          `INFOV(("Caught a TX AXI4 stream transaction: %d", this.tx_sink_axis_ap.get_item_cnt()), 100);
+          `INFO(("Caught a TX AXI4 stream transaction: %d", this.tx_sink_axis_ap.get_item_cnt()), ADI_VERBOSITY_LOW);
           this.tx_sink_axis_ap.get(transaction);
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
@@ -175,7 +175,7 @@ package do_scoreboard_pkg;
 
       forever begin
         if (this.rx_source_axis_ap.get_item_cnt() > 0) begin
-          `INFOV(("Caught a RX AXI4 stream transaction: %d", this.rx_source_axis_ap.get_item_cnt()), 100);
+          `INFO(("Caught a RX AXI4 stream transaction: %d", this.rx_source_axis_ap.get_item_cnt()), ADI_VERBOSITY_LOW);
           this.rx_source_axis_ap.get(transaction);
           // all bytes from a beat are valid
           num_bytes = transaction.get_data_width()/8;
@@ -203,7 +203,7 @@ package do_scoreboard_pkg;
           this.rx_source_byte_stream_size--;
           sink_byte = this.rx_sink_byte_stream.pop_front();
           this.rx_sink_byte_stream_size--;
-          `INFOV(("Scoreboard RX sink/source data: exp %h - rcv %h", source_byte, sink_byte), 100);
+          `INFO(("Scoreboard RX sink/source data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_LOW);
           if (source_byte !== sink_byte) begin
             `ERROR(("RX Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
             this.rx_error_cnt++;
@@ -229,9 +229,9 @@ package do_scoreboard_pkg;
           this.tx_source_byte_stream_size--;
           sink_byte = this.tx_sink_byte_stream.pop_front();
           this.tx_sink_byte_stream_size--;
-          `INFOV(("Scoreboard TX sink/source data: exp %h - rcv %h", source_byte, sink_byte), 100);
+          `INFO(("Scoreboard TX sink/source data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_LOW);
           if (source_byte !== sink_byte) begin
-            `INFOV(("TX Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte), 100);
+            `INFO(("TX Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_LOW);
             this.tx_error_cnt++;
             this.tx_comparison_cnt++;
           end else begin
@@ -273,31 +273,29 @@ package do_scoreboard_pkg;
 
     function void post_tx_test();
       if (this.enabled == 0) begin
-        `INFO(("Scoreboard was inactive."));
+        `INFO(("Scoreboard was inactive."), ADI_VERBOSITY_LOW);
       end else begin
           if (tx_comparison_cnt == 0) begin
-            `ERROR(("TX scoreboard is empty! Check your interfaces or increase the runtime. Collected transactions are %d for source side and %d for sink side.", this.tx_source_byte_stream_size, this.tx_sink_byte_stream_size));
+            `FATAL(("TX scoreboard is empty! Check your interfaces or increase the runtime. Collected transactions are %d for source side and %d for sink side.", this.tx_source_byte_stream_size, this.tx_sink_byte_stream_size));
           end else if (tx_error_cnt > 0) begin
-            `ERROR(("ERROR: TX scoreboard has %d errors!", tx_error_cnt));
-            `INFO(("TX scoreboard has passed. %d bytes were checked.", this.tx_comparison_cnt));
-            `INFO(("TX transfer size are %d bytes.", this.tx_all_transfer_size));
+            `FATAL(("ERROR: TX scoreboard has %d errors!", tx_error_cnt));
           end else begin
-            `INFO(("TX scoreboard has passed. %d bytes were checked.", this.tx_comparison_cnt));
-            `INFO(("TX transfer size are %d bytes.", this.tx_all_transfer_size));
+            `INFO(("TX scoreboard has passed. %d bytes were checked.", this.tx_comparison_cnt), ADI_VERBOSITY_LOW);
+            `INFO(("TX transfer size are %d bytes.", this.tx_all_transfer_size), ADI_VERBOSITY_LOW);
           end
       end
     endfunction /* post_tx_test */
 
     function void post_rx_test();
       if (this.enabled == 0) begin
-        `INFO(("Scoreboard was inactive."));
+        `INFO(("Scoreboard was inactive."), ADI_VERBOSITY_LOW);
       end else begin
         if (rx_comparison_cnt == 0) begin
-          `ERROR(("RX scoreboard is empty! Check your interfaces or increase the runtime. Collected transactions are %d for source side and %d for sink side.", this.rx_source_byte_stream_size, this.rx_sink_byte_stream_size));
+          `FATAL(("RX scoreboard is empty! Check your interfaces or increase the runtime. Collected transactions are %d for source side and %d for sink side.", this.rx_source_byte_stream_size, this.rx_sink_byte_stream_size));
         end else if (rx_error_cnt > 0) begin
-          `ERROR(("ERROR: RX scoreboard has %d errors!", rx_error_cnt));
+          `FATAL(("ERROR: RX scoreboard has %d errors!", rx_error_cnt));
         end else begin
-          `INFO(("RX scoreboard has passed. %d bytes were checked.", this.rx_comparison_cnt));
+          `INFO(("RX scoreboard has passed. %d bytes were checked.", this.rx_comparison_cnt), ADI_VERBOSITY_LOW);
         end
       end
     endfunction /* post_rx_test */

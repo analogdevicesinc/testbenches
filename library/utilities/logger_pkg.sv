@@ -33,31 +33,92 @@
 // ***************************************************************************
 // ***************************************************************************
 
+`include "utils.svh"
+
 package logger_pkg;
 
-// info    - 2
-// warning - 1
-// error   - 0
-int verbosity = 2;
+  typedef enum {
+    ADI_VERBOSITY_NONE = 0,   // highest priority, test passed message, randomization state, cannot be disabled
+    ADI_VERBOSITY_LOW = 1,    // test_program level debugging
+    ADI_VERBOSITY_MEDIUM = 2, // driver level debugging
+    ADI_VERBOSITY_HIGH = 3    // VIP, regmap, utilities level debugging
+  } adi_verbosity_t;
 
-int error_count = 0;
+  adi_verbosity_t verbosity = ADI_VERBOSITY_HIGH;
 
-function void PrintInfo(string inStr, integer msgVerborisity = 2);
-  if (verbosity >= msgVerborisity) begin
-    $display("[INFO] %0t %s", $time, inStr);
-  end
-endfunction
+  function void PrintInfo(
+    input string inStr,
+    input adi_verbosity_t msgVerborisity);
 
-function void PrintError(string inStr);
-  if (verbosity >= 0) begin
-    error_count = error_count + 1;
-    $display("[ERROR] %0t %s", $time, inStr);
-    $finish;
-  end
-endfunction
+    if (verbosity >= msgVerborisity) begin
+      $display("[INFO] @ %0t: %s", $time, inStr);
+    end
+  endfunction: PrintInfo
 
-function void setLoggerVerbosity(int value);
-  verbosity = value;
-endfunction
+  function void PrintWarning(input string inStr);
+    $warning("%s", inStr);
+  endfunction: PrintWarning
+
+  function void PrintError(input string inStr);
+    $error("%s", inStr);
+  endfunction: PrintError
+
+  function void PrintFatal(input string inStr);
+    $fatal(1, "%s", inStr);
+  endfunction: PrintFatal
+
+  function void setLoggerVerbosity(input adi_verbosity_t value);
+    verbosity = value;
+  endfunction: setLoggerVerbosity
+
+
+  class adi_reporter;
+    string name;
+    adi_reporter parent;
+    
+    function new(
+      input string name,
+      input adi_reporter parent = null);
+
+      this.name = name;
+      this.parent = parent;
+    endfunction
+
+    function string get_path();
+      if (this.parent == null)
+        return this.name;
+      else
+        return $sformatf("%s.%s", this.parent.get_path(), this.name);
+    endfunction: get_path
+
+    function void info(
+      input string message,
+      input adi_verbosity_t verbosity);
+
+      PrintInfo($sformatf("[%s] %s", this.get_path(), message), verbosity);
+    endfunction: info
+
+    function void warning(input string message);
+      PrintWarning($sformatf("[%s] %s", this.get_path(), message));
+    endfunction: warning
+
+    function void error(input string message);
+      PrintError($sformatf("[%s] %s", this.get_path(), message));
+    endfunction: error
+
+    function void fatal(input string message);
+      PrintFatal($sformatf("[%s] %s", this.get_path(), message));
+    endfunction: fatal
+  endclass: adi_reporter
+
+
+  class adi_component extends adi_reporter;
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
+    endfunction: new
+  endclass: adi_component
 
 endpackage

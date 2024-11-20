@@ -73,6 +73,8 @@ package spi_environment_pkg;
     // Constructor
     //============================================================================
     function new(
+      input string name,
+
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
@@ -87,7 +89,8 @@ package spi_environment_pkg;
       virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
     );
 
-      super.new(sys_clk_vip_if,
+      super.new(name,
+                sys_clk_vip_if,
                 dma_clk_vip_if,
                 ddr_clk_vip_if,
                 sys_rst_vip_if,
@@ -95,15 +98,15 @@ package spi_environment_pkg;
                 ddr_vip_if);
 
       // Creating the agents
-      spi_agent = new(spi_s_vip_if);
+      spi_agent = new("SPI VIP Agent", spi_s_vip_if, this);
       `ifdef DEF_SDO_STREAMING
       sdo_src_agent = new("SDO Source AXI Stream Agent", sdo_src_axis_vip_if);
       `endif
 
       // Creating the sequencers
-      spi_seq = new(spi_agent);
+      spi_seq = new("SPI VIP Agent", spi_agent, this);
       `ifdef DEF_SDO_STREAMING
-      sdo_src_seq = new(sdo_src_agent);
+      sdo_src_seq = new("SPI VIP Agent", sdo_src_agent, this);
       `endif
 
       // downgrade reset check: we are currently using a clock generator for the SPI clock,

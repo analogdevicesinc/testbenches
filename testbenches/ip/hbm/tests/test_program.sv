@@ -57,7 +57,8 @@ program test_program;
   initial begin
 
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("HBM Environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -66,15 +67,12 @@ program test_program;
 
     #2ps;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
 
     `TH.`HBM_CLK.inst.IF.start_clock;
 
-    //asserts all the resets for 100 ns
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    #100
-    `TH.`SYS_RST.inst.IF.deassert_reset;
+    env.sys_reset();
 
     #1us;
 
@@ -100,6 +98,11 @@ program test_program;
 //      .dest_addr(`DDR_BASE+'h2000),
 //      .length('h1000)
 //    );
+//
+//    env.stop();
+//
+//    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+//    $finish();
 //
   end
 

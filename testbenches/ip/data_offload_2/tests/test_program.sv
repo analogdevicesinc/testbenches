@@ -90,7 +90,7 @@ module test_program(
 
     //=========================================================================
 
-    setLoggerVerbosity(250);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     env.scoreboard.set_oneshot(`OFFLOAD_ONESHOT);
     env.scoreboard.set_path_type(`OFFLOAD_PATH_TYPE);
@@ -109,13 +109,13 @@ module test_program(
     `endif
 
     #100
-    `INFO(("Bring up IP from reset."));
+    `INFO(("Bring up IP from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
 
     env.src_axis_seq.start();
 
     // Start the ADC/DAC stubs
-    `INFO(("Call the run() ..."));
+    `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     env.run();
 
     init_req <= 1'b1;
@@ -145,7 +145,7 @@ module test_program(
 
     stop_clocks();
 
-    `INFO(("Test bench done!"));
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end
@@ -182,7 +182,7 @@ module test_program(
 
   task systemBringUp();
     // bring up the Data Offload instances from reset
-    `INFO(("Bring up TX Data Offload"));
+    `INFO(("Bring up TX Data Offload"), ADI_VERBOSITY_LOW);
 
     dut.set_oneshot(`OFFLOAD_ONESHOT);
 

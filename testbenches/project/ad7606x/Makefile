@@ -63,16 +63,16 @@ TP := test_program_si
 #TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 
 # Parallel interface configurations
-#TESTS += cfg_p_16b:test_program_4ch
-#TESTS += cfg_p_16b:test_program_6ch
-#TESTS += cfg_p_16b:test_program_8ch
-#TESTS += cfg_p_18b:test_program_8ch
+TESTS += cfg_p_16b:test_program_4ch
+TESTS += cfg_p_16b:test_program_6ch
+TESTS += cfg_p_16b:test_program_8ch
+TESTS += cfg_p_18b_8ch:test_program_8ch
 
 # Serial interface configurations
-#TESTS += cfg_s_sdi1:test_program_si
-#TESTS += cfg_s_sdi2:test_program_si
-#TESTS += cfg_s_sdi4:test_program_si
-#TESTS += cfg_s_sdi8:test_program_si
+TESTS += cfg_s_sdi1:test_program_si
+TESTS += cfg_s_sdi2:test_program_si
+TESTS += cfg_s_sdi4:test_program_si
+TESTS += cfg_s_sdi8:test_program_si
 
 include ../../../scripts/project-sim.mk
 

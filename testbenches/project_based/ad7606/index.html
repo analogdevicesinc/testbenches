@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>AD463x &#8212; Testbenches  documentation</title>
+    <title>AD7606 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=95305861" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -18,8 +18,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="AD738x" href="../ad738x/index.html" />
-    <link rel="prev" title="Project Based" href="../index.html" />
+    <link rel="next" title="PulSAR ADC PMDZ" href="../pulsar_adc/index.html" />
+    <link rel="prev" title="AD738x" href="../ad738x/index.html" />
    
   
   <meta name="global_root" content="../../../../">
@@ -101,7 +101,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">AD463x</a><ul>
+<li><a class="reference internal" href="#">AD7606</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -112,7 +112,6 @@
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#clock-scheme">Clock scheme</a></li>
 <li><a class="reference internal" href="#cpu-memory-interconnect-addresses">CPU/Memory interconnect addresses</a></li>
 <li><a class="reference internal" href="#interrupts">Interrupts</a></li>
 </ul>
@@ -120,8 +119,10 @@
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
 <li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
 <li><a class="reference internal" href="#sanity-test">Sanity Test</a></li>
-<li><a class="reference internal" href="#fifo-spi-test">FIFO SPI Test</a></li>
-<li><a class="reference internal" href="#offload-spi-test">Offload SPI Test</a></li>
+<li><a class="reference internal" href="#simple-configuration-test">SIMPLE Configuration Test</a></li>
+<li><a class="reference internal" href="#crc-configuration-test">CRC Configuration Test</a></li>
+<li><a class="reference internal" href="#status-configuration-test">STATUS Configuration Test</a></li>
+<li><a class="reference internal" href="#status-crc-configuration-test">STATUS CRC Configuration Test</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
@@ -221,9 +222,9 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AD7606</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
 </ul>
 </li>
@@ -242,41 +243,38 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="ad463x">
-<span id="id1"></span><h1>AD463x<a class="headerlink" href="#ad463x" title="Link to this heading">#</a></h1>
+  <section id="ad7606">
+<span id="id1"></span><h1>AD7606<a class="headerlink" href="#ad7606" title="Link to this heading">#</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <p>The purpose of this testbench is to validate the serial interface functionality
-of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/ad4630_fmc">projects/ad4630_fmc</a> reference design.</p>
+of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/ad7606x_fmc">projects/ad7606x_fmc</a> reference design.</p>
 <p>The entire HDL documentation can be found here
-<a class="reference external" href="https://analogdevicesinc.github.io/hdl/projects/ad4630_fmc/index.html#ad4630-fmc" title="(in HDL)"><span class="xref std std-ref">AD4630-FMC HDL project</span></a>.</p>
+<a class="reference external" href="https://analogdevicesinc.github.io/hdl/projects/ad7606x_fmc/index.html#ad7606x-fmc" title="(in HDL)"><span class="xref std std-ref">AD7606x-FMC HDL project</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading">#</a></h2>
-<p>The testbench block design includes part of the AD4630-FMC HDL reference design,
+<p>The testbench block design includes part of the AD7606x-FMC HDL reference design,
 along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading">#</a></h3>
 <p>The data path and clock domains are depicted in the below diagram:</p>
-<a class="reference internal image-reference" href="../../../_images/ad463x_tb.svg"><img alt="AD463x/Testbench block diagram" class="align-center" src="../../../_images/ad463x_tb.svg" style="width: 800px;" />
+<a class="reference internal image-reference" href="../../../_images/ad7606x_tb.svg"><img alt="AD738x/Testbench block diagram" class="align-center" src="../../../_images/ad7606x_tb.svg" style="width: 800px;" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading">#</a></h3>
 <p>The following parameters of this project that can be configured:</p>
 <ul class="simple">
-<li><p>CLK_MODE: defines clocking mode of the device’s digital interface:
-Options: 0 - SPI mode, 1 - Echo-clock or Master clock mode</p></li>
+<li><p>DEV_CONFIG: defines the device:
+Options: 0 - AD7606B, 1 - AD7606C-16, 2 - AD7606C-18</p></li>
+<li><p>EXT_CLK: defines the usage of an external clock:
+Options: 0 - without external clock, 1 - with external clock</p></li>
+<li><p>INTF: defines the interface type:
+Options: 0 - Parallel, 1 - Serial</p></li>
 <li><p>NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
 Options: 1 - Interleaved mode, 2 - 1 lane per channel,
 4 - 2 lanes per channel, 8 - 4 lanes per channel</p></li>
-<li><p>CAPTURE_ZONE: defines the capture zone of the next sample.
-There are two capture zones: 1 - from negative edge of the BUSY line
-until the next CNV positive edge -20ns, 2 - from the next consecutive CNV
-positive edge +20ns until the second next consecutive CNV positive edge -20ns</p></li>
-<li><p>DDR_EN: defines the type of data transfer. In echo and master clock mode
-the SDI lines can have Single or Double Data Rates.
-Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
 </ul>
 <section id="build-parameters">
 <h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading">#</a></h4>
@@ -285,7 +283,7 @@ the following example:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CLK_MODE</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">NUM_OF_SDI</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">CAPTURE_ZONE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">DDR_EN</span><span class="o">=</span><span class="m">0</span>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">DEV_CONFIG</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">EXT_CLK</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">INTF</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">NUM_OF_SDI</span><span class="o">=</span><span class="m">2</span>
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>but we recommend using the already tested build configuration modes, that can be
@@ -301,77 +299,29 @@ found in the <code class="docutils literal notranslate"><span class="pre">cfg</s
 <tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
 <th class="head" colspan="4"><p>Parameters</p></th>
 </tr>
-<tr class="row-even"><th class="head"><p>CLK_MODE</p></th>
+<tr class="row-even"><th class="head"><p>DEV_CONFIG</p></th>
+<th class="head"><p>EXT_CLK</p></th>
+<th class="head"><p>INTF</p></th>
 <th class="head"><p>NUM_OF_SDI</p></th>
-<th class="head"><p>CAPTURE_ZONE</p></th>
-<th class="head"><p>DDR_EN</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-odd"><td><p>cfg_cm0_sdi2_cz1_ddr0</p></td>
+<tr class="row-odd"><td><p>cfg1</p></td>
 <td><p>0</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
 <td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm0_sdi2_cz2_ddr0</p></td>
 <td><p>0</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm0_sdi4_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>4</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm0_sdi8_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi1_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi2_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi2_cz2_ddr1</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi4_cz2_ddr0</p></td>
+<tr class="row-even"><td><p>cfg2</p></td>
 <td><p>1</p></td>
-<td><p>4</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg3</p></td>
 <td><p>2</p></td>
 <td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi4_cz2_ddr1</p></td>
-<td><p>1</p></td>
-<td><p>4</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi8_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
 <td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi8_cz2_ddr1</p></td>
-<td><p>1</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
 <td><p>1</p></td>
 </tr>
 </tbody>
@@ -402,33 +352,6 @@ found in the <code class="docutils literal notranslate"><span class="pre">cfg</s
 <p>The test program is compatible with all of the above mentioned configurations.</p>
 </section>
 </section>
-<section id="clock-scheme">
-<h3>Clock scheme<a class="headerlink" href="#clock-scheme" title="Link to this heading">#</a></h3>
-<p>The design supports the following interface and clock modes both in SDR and DDR:</p>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Mode</p></th>
-<th class="head"><p>1 Lane per channel</p></th>
-<th class="head"><p>2 Lane per channel</p></th>
-<th class="head"><p>4 lane per channel</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>SPI mode</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-</tr>
-<tr class="row-odd"><td><p>Echo Clock mode</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
 <section id="cpu-memory-interconnect-addresses">
 <h3>CPU/Memory interconnect addresses<a class="headerlink" href="#cpu-memory-interconnect-addresses" title="Link to this heading">#</a></h3>
 <p>Below are the CPU/Memory interconnect addresses used in this project:</p>
@@ -440,20 +363,17 @@ found in the <code class="docutils literal notranslate"><span class="pre">cfg</s
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>spi_ad463x_axi_regmap</p></td>
+<tr class="row-even"><td><p>spi_ad7616_axi_regmap</p></td>
 <td><p>0x44A0_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>axi_ad463x_dma</p></td>
+<tr class="row-odd"><td><p>axi_ad7606x_dma</p></td>
 <td><p>0x44A3_0000</p></td>
 </tr>
 <tr class="row-even"><td><p>spi_clkgen</p></td>
 <td><p>0x44A7_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>cnv_generator</p></td>
+<tr class="row-odd"><td><p>ad7606_pwm_gen</p></td>
 <td><p>0x44B0_0000</p></td>
-</tr>
-<tr class="row-even"><td><p>sync_generator</p></td>
-<td><p>0x44C0_0000</p></td>
 </tr>
 </tbody>
 </table>
@@ -470,10 +390,10 @@ found in the <code class="docutils literal notranslate"><span class="pre">cfg</s
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>axi_ad463x_dma</p></td>
+<tr class="row-even"><td><p>axi_ad7606_dma</p></td>
 <td><p>13</p></td>
 </tr>
-<tr class="row-odd"><td><p>spi_ad463x</p></td>
+<tr class="row-odd"><td><p>spi_ad7606</p></td>
 <td><p>12</p></td>
 </tr>
 </tbody>
@@ -497,32 +417,55 @@ found in the <code class="docutils literal notranslate"><span class="pre">cfg</s
 <section id="sanity-test">
 <h3>Sanity Test<a class="headerlink" href="#sanity-test" title="Link to this heading">#</a></h3>
 <p>This test is used to check the communication with the AXI REGMAP module of the
-AD463X SPI Engine interface, by reading the core VERSION register, along with
+AD7606 SPI Engine interface, by reading the core VERSION register, along with
 writing and reading the SCRATCH register.</p>
 </section>
-<section id="fifo-spi-test">
-<h3>FIFO SPI Test<a class="headerlink" href="#fifo-spi-test" title="Link to this heading">#</a></h3>
-<p>The FIFO SPI Test verifies the simple serial transfers, made through the
-Execution module.</p>
+<section id="simple-configuration-test">
+<h3>SIMPLE Configuration Test<a class="headerlink" href="#simple-configuration-test" title="Link to this heading">#</a></h3>
+<p>The adc_config_SIMPLE_test is used for verifying the mode 0 of the ADC.</p>
 <p>The steps of this test are:</p>
 <ul class="simple">
-<li><p>Start the SPI clock generator (axi_clkgen)</p></li>
-<li><p>Configure the conversion signal generator (axi_pwmgen)</p></li>
-<li><p>Enable SPI Engine &amp; configure the Execution module</p></li>
-<li><p>Set up the interrupts</p></li>
-<li><p>Generate a FIFO transaction</p></li>
-<li><p>Capture and compare the results, using the PEEK register of the AXI SPI Engine</p></li>
+<li><p>Get the ADC common core out of reset</p></li>
+<li><p>Set &amp; read the ADC_CONFIG WR &amp; CTRL registers of the ADC_COMMON</p></li>
+<li><p>Read data on the rx_db_o port</p></li>
+<li><p>Set HDL config mode 0</p></li>
 </ul>
 </section>
-<section id="offload-spi-test">
-<h3>Offload SPI Test<a class="headerlink" href="#offload-spi-test" title="Link to this heading">#</a></h3>
-<p>The Offload SPI Test verifies the Offload module functionality.</p>
+<section id="crc-configuration-test">
+<h3>CRC Configuration Test<a class="headerlink" href="#crc-configuration-test" title="Link to this heading">#</a></h3>
+<p>The adc_config_CRC_test is used for verifying the mode 1 of the ADC.</p>
 <p>The steps of this test are:</p>
 <ul class="simple">
-<li><p>Configure the DMA</p></li>
-<li><p>Configure the Offload module</p></li>
-<li><p>Start the Offload module</p></li>
-<li><p>Capture and compare the Offload SDI data</p></li>
+<li><p>Get the ADC common core out of reset</p></li>
+<li><p>Set CRC and static data setup</p></li>
+<li><p>Set &amp; read the ADC_CONFIG WR &amp; CTRL registers of the ADC_COMMON</p></li>
+<li><p>Read data on the rx_db_o port</p></li>
+<li><p>Set HDL config mode 1</p></li>
+</ul>
+</section>
+<section id="status-configuration-test">
+<h3>STATUS Configuration Test<a class="headerlink" href="#status-configuration-test" title="Link to this heading">#</a></h3>
+<p>The adc_config_STATUS_test is used for verifying the mode 2 of the ADC.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Get the ADC common core out of reset</p></li>
+<li><p>Set STATUS and static data setup</p></li>
+<li><p>Set &amp; read the ADC_CONFIG WR &amp; CTRL registers of the ADC_COMMON</p></li>
+<li><p>Read data on the rx_db_o port</p></li>
+<li><p>Set HDL config mode 2</p></li>
+</ul>
+</section>
+<section id="status-crc-configuration-test">
+<h3>STATUS CRC Configuration Test<a class="headerlink" href="#status-crc-configuration-test" title="Link to this heading">#</a></h3>
+<p>The adc_config_STATUS_CRC_test is used for verifying the mode 3 of the ADC.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Get the ADC common core out of reset</p></li>
+<li><p>Set CRC and static data setup</p></li>
+<li><p>Set STATUS and static data setup</p></li>
+<li><p>Set &amp; read the ADC_CONFIG WR &amp; CTRL registers of the ADC_COMMON</p></li>
+<li><p>Read data on the rx_db_o port</p></li>
+<li><p>Set HDL config mode 3</p></li>
 </ul>
 </section>
 </section>
@@ -542,10 +485,10 @@ command line.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad463x
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad7606x
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad463x$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad7606x$
 </pre></div>
 </div>
 <div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make
@@ -558,10 +501,10 @@ the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad463x
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad7606x
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad463x$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad7606x$
 </pre></div>
 </div>
 <div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -574,22 +517,22 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad463x
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad7606x
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad463x$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad7606x$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_cm0_sdi2_cz1_ddr0<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
 specific build has it’s own folder named after the configuration file’s name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):</p>
-<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_cm0_sdi2_cz1_ddr0</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg1</span></code></p>
 <p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
-<p><code class="docutils literal notranslate"><span class="pre">cfg_cm0_sdi2_cz1_ddr0</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg1</span></code></p>
 </section>
 <section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">#</a></h2>
@@ -609,9 +552,17 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AD463X_DATA_CAPTURE</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/ad463x_data_capture">library/ad463x_data_capture</a></p></td>
+<tr class="row-even"><td><p>SYNC_BITS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_cdc/sync_bits.v">library/util_cdc/sync_bits.v</a> **</p></td>
 <td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>AD_EDGE_DETECT</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/common/ad_edge_detect.v">library/common/ad_edge_detect.v</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_AD7606x</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ad7606x">library/axi_ad7606x</a> *</p></td>
+<td><p><a class="reference external" href="https://wiki.analog.com/resources/fpga/docs/axi_ad7606x">[Wiki]</a></p></td>
 </tr>
 <tr class="row-odd"><td><p>AXI_CLKGEN</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_clkgen">library/axi_clkgen</a></p></td>
@@ -637,24 +588,24 @@ clean folder (no runs folder available):</p>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_spdif_tx">library/axi_spdif_tx</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>AXI_SPI_ENGINE</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/axi_spi_engine">library/spi_engine/axi_spi_engine</a></p></td>
+<tr class="row-odd"><td><p>AXI_SYSID</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_sysid">library/axi_sysid</a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_SPI_ENGINE</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/axi_spi_engine">library/spi_engine/axi_spi_engine</a>  **</p></td>
 <td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/axi_spi_engine.html#spi-engine-axi" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>SPI_AXIS_REORDER</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_axis_reorder">library/spi_engine/spi_axis_reorder</a></p></td>
-<td><p>—</p></td>
-</tr>
 <tr class="row-odd"><td><p>SPI_ENGINE_EXECUTION</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_execution">library/spi_engine/spi_engine_execution</a></p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_execution">library/spi_engine/spi_engine_execution</a> **</p></td>
 <td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_execution.html#spi-engine-execution" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>SPI_ENGINE_INTERCONNECT</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_interconnect">library/spi_engine/spi_engine_interconnect</a></p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_interconnect">library/spi_engine/spi_engine_interconnect</a> **</p></td>
 <td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_interconnect.html#spi-engine-interconnect" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>SPI_ENGINE_OFFLOAD</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_offload">library/spi_engine/spi_engine_offload</a></p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_offload">library/spi_engine/spi_engine_offload</a> **</p></td>
 <td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_offload.html#spi-engine-offload" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>SYSID_ROM</p></td>
@@ -665,8 +616,19 @@ clean folder (no runs folder available):</p>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_i2c_mixer">library/util_i2c_mixer</a></p></td>
 <td><p>—</p></td>
 </tr>
+<tr class="row-even"><td><p>UTIL_CPACK2</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_pack/util_cpack2">library/util_pack/util_cpack2</a> *</p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/util_pack/util_cpack2.html#util-cpack2" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+</tr>
 </tbody>
 </table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only for INTF=0 (parallel interface)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">**</span></code> instantiated only for INTF=1 (serial interface)</p></li>
+</ul>
 </div>
 </section>
 <section id="testbenches-related-dependencies">
@@ -685,24 +647,24 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>ADI_REGMAP_CLKGEN_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_clkgen_pkg.sv">library/regmaps/adi_regmap_clkgen_pkg.sv</a></p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_ADC_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_adc_pkg.sv">library/regmaps/adi_regmap_adc_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_common_pkg.sv">library/regmaps/adi_regmap_common_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.">library/regmaps/adi_regmap_dmac_pkg.</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv">library/regmaps/adi_regmap_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_PWM_GEN_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_PWM_GEN_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pwm_gen_pkg.sv">library/regmaps/adi_regmap_pwm_gen_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>ADI_REGMAP_SPI_ENGINE_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_spi_engine_pkg.sv">library/regmaps/adi_regmap_spi_engine_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
 <tr class="row-odd"><td><p>DMA_TRANS</p></td>
@@ -772,8 +734,8 @@ are, the lower the chances to receive support from <a class="reference external"
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Project Based</a>
-    <a href="../ad738x/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">AD738x</a>
+    <a href="../ad738x/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD738x</a>
+    <a href="../pulsar_adc/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">PulSAR ADC PMDZ</a>
               </div>
           
         </div>

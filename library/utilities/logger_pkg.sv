@@ -56,15 +56,15 @@ package logger_pkg;
   endfunction: PrintInfo
 
   function void PrintWarning(input string inStr);
-    $warning("[WARNING] @ %0t: %s", $time, inStr);
+    $warning("%s", inStr);
   endfunction: PrintWarning
 
   function void PrintError(input string inStr);
-    $error("[ERROR] @ %0t: %s", $time, inStr);
+    $error("%s", inStr);
   endfunction: PrintError
 
   function void PrintFatal(input string inStr);
-    $fatal(1, "[FATAL] @ %0t: %s", $time, inStr);
+    $fatal(1, "%s", inStr);
   endfunction: PrintFatal
 
   function void setLoggerVerbosity(input adi_verbosity_t value);

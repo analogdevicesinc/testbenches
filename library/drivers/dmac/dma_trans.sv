@@ -435,9 +435,9 @@ package dma_trans_pkg;
 
     virtual function void print();
       super.print();
-      `INFO(("flock_framenum is %0d", flock_framenum));
-      `INFO(("flock_distance is %0d", flock_distance));
-      `INFO(("flock_stride is 0x%0h", flock_stride));
+      `INFO(("flock_framenum is %0d", flock_framenum), ADI_VERBOSITY_MEDIUM);
+      `INFO(("flock_distance is %0d", flock_distance), ADI_VERBOSITY_MEDIUM);
+      `INFO(("flock_stride is 0x%0h", flock_stride), ADI_VERBOSITY_MEDIUM);
     endfunction
 
 

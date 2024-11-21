@@ -58,7 +58,8 @@ program test_program;
 
   initial begin
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("DMA Flock environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -73,7 +74,7 @@ program test_program;
     has_sfsync = `M_DMA_CFG_USE_EXT_SYNC;
     has_dfsync = `S_DMA_CFG_USE_EXT_SYNC;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
     start_clocks();
     env.sys_reset();
@@ -117,7 +118,7 @@ program test_program;
     stop_clocks();
     env.stop();
 
-    `INFO(("Testbench done!"));
+    `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end
@@ -150,7 +151,7 @@ program test_program;
                                          length == 1024;
                                          ylength == 8;
                                          dst_stride == length; };
-    if (rand_succ == 0) `ERROR(("randomization failed"));
+    if (rand_succ == 0) `FATAL(("randomization failed"));
 
     m_seg.flock_framenum = flock_framenum;
     m_seg.flock_distance = flock_distance;

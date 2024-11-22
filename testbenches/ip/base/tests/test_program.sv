@@ -42,6 +42,98 @@ import test_harness_env_pkg::*;
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
+/////////////////////////////////////
+
+class abs_sub #(type data_type = int);
+  protected static bit [15:0] last_id = 'd0;
+  bit [15:0] id;
+
+  function new();
+  endfunction: new
+
+  virtual function void update(input data_type data);
+  endfunction: update
+endclass: abs_sub
+
+/////////////////////////////////////
+
+class pub #(type data_type = int);
+  protected abs_sub #(data_type) subscriber_list[bit[15:0]];
+  
+  function new();
+  endfunction: new
+
+  function void subscribe(input abs_sub #(data_type) subscriber);
+    if (this.subscriber_list.exists(subscriber.id))
+      `ERROR(("Subscriber already in the list!"));
+    else
+      this.subscriber_list[subscriber.id] = subscriber;
+  endfunction: subscribe
+
+  function void unsubscribe(input abs_sub #(data_type) subscriber);
+    if (!this.subscriber_list.exists(subscriber.id))
+      `ERROR(("Subscriber does not exist in list!"));
+    else
+      this.subscriber_list.delete(subscriber.id);
+  endfunction: unsubscribe
+
+  function void notify(input data_type data);
+    foreach (this.subscriber_list[i])
+      this.subscriber_list[i].update(data);
+  endfunction: notify
+endclass: pub
+
+/////////////////////////////////////
+
+class axis;
+  pub #(logic [7:0]) publisher;
+
+  function new();
+    this.publisher = new();
+  endfunction: new
+
+  function void subscribe(input abs_sub #(logic [7:0]) subscriber);
+    this.publisher.subscribe(subscriber);
+  endfunction: subscribe
+
+  task job();
+    this.publisher.notify('hA);
+    this.publisher.notify('h5);
+  endtask: job
+endclass: axis
+
+/////////////////////////////////////
+
+class scoreboard;
+  class sub extends abs_sub #(logic [7:0]);
+    protected scoreboard scb_ref;
+
+    function new(input scoreboard scb_ref);
+      this.scb_ref = scb_ref;
+
+      this.last_id++;
+      this.id = this.last_id;
+    endfunction: new
+
+    virtual function void update(input data_type data);
+      `INFO(("Data received: %h", data), ADI_VERBOSITY_NONE);
+    endfunction: update
+  endclass: sub
+
+  sub subscriber_tx;
+  sub subscriber_rx;
+
+  function new();
+    this.subscriber_tx = new(this);
+    this.subscriber_rx = new(this);
+  endfunction: new
+
+  task run();
+  endtask: run
+endclass: scoreboard
+
+/////////////////////////////////////
+
 program test_program;
 
   // Declare the class instances
@@ -50,6 +142,11 @@ program test_program;
   // Process variables
   process current_process;
   string current_process_random_state;
+
+  axis axis1;
+  axis axis2;
+
+  scoreboard scb;
   
 
   initial begin
@@ -73,6 +170,19 @@ program test_program;
     env.sys_reset();
 
     /* Add stimulus tasks */
+
+    axis1 = new();
+    axis2 = new();
+    
+    scb = new();
+
+    axis1.subscribe(scb.subscriber_tx);
+    axis2.subscribe(scb.subscriber_rx);
+
+    scb.run();
+
+    axis1.job();
+    axis2.job();
         
     env.stop();
     

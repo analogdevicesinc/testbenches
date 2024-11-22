@@ -157,26 +157,26 @@ package s_axis_sequencer_pkg;
   endclass: s_axis_sequencer_base
 
 
-  class s_axis_sequencer #( type T ) extends s_axis_sequencer_base;
+  class s_axis_sequencer #(int `AXIS_VIP_PARAM_ORDER(AXIS)) extends s_axis_sequencer_base;
 
-    protected T agent;
+    protected axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver;
 
 
     function new(
       input string name,
-      input T agent,
+      input axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
       input adi_component parent = null);
       
       super.new(name, parent);
 
-      this.agent = agent;
+      this.driver = driver;
     endfunction
 
 
     virtual task user_gen_tready();
       axi4stream_ready_gen tready_gen;
       
-      tready_gen = agent.driver.create_ready("TREADY");
+      tready_gen = this.driver.create_ready("TREADY");
       
       tready_gen.set_ready_policy(this.mode);
 
@@ -192,26 +192,8 @@ package s_axis_sequencer_pkg;
         tready_gen.set_low_time_range(this.low_time_min, this.low_time_max);
         tready_gen.set_high_time_range(this.high_time_min, this.high_time_max);
       end
-      agent.driver.send_tready(tready_gen);
+      this.driver.send_tready(tready_gen);
     endtask
-
-    // Get transfer from the monitor and serialize data into a byte stream
-    // Assumption: all bytes from beat are valid (no position or null bytes)
-    virtual task get_transfer();
-
-      axi4stream_monitor_transaction mytrans;
-      xil_axi4stream_data_beat  data_beat;
-
-      agent.monitor.item_collected_port.get(mytrans);
-
-      //$display(mytrans.convert2string);
-
-      data_beat = mytrans.get_data_beat();
-
-      for (int i=0; i<mytrans.get_data_width()/8; i++) begin
-        byte_stream.push_back(data_beat[i*8+:8]);
-      end
-    endtask;
 
   endclass
 

@@ -82,7 +82,6 @@ package x_monitor_pkg;
     protected axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor;
 
     protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
-    protected axi_vif_mem_proxy #(`AXI_VIP_IF_PARAMS(axi)) vif_proxy;
 
     protected int axi_byte_stream_size;
 
@@ -98,8 +97,7 @@ package x_monitor_pkg;
 
       this.monitor = monitor;
 
-      this.vif_proxy = this.monitor.vif_proxy;
-      this.axi_ap = this.monitor.item_collected_port;
+      this.axi_ap = monitor.item_collected_port;
 
       this.axi_byte_stream_size = 0;
 
@@ -130,7 +128,7 @@ package x_monitor_pkg;
               if (bit'(transaction.get_cmd_type()) == READ_OP) begin
                 this.mailbox.put(axi_byte);
                 this.axi_byte_stream_size++;
-              end else if (strb_beat[j] || !this.vif_proxy.C_AXI_HAS_WSTRB) begin
+              end else if (strb_beat[j] || !this.monitor.vif_proxy.C_AXI_HAS_WSTRB) begin
                 this.mailbox.put(axi_byte);
                 this.axi_byte_stream_size++;
               end
@@ -154,7 +152,7 @@ package x_monitor_pkg;
   endclass
 
 
-  class x_axis_monitor #( type T) extends x_monitor;
+  class x_axis_monitor #(int `AXIS_VIP_PARAM_ORDER(axis)) extends x_monitor;
 
     typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
     protected sink_type_t tx_sink_type;
@@ -162,12 +160,12 @@ package x_monitor_pkg;
     // analysis port from the monitor
     protected xil_analysis_port #(axi4stream_monitor_transaction) axis_ap;
 
-    protected T agent;
+    protected axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(axis)) monitor;
 
     // constructor
     function new(
       input string name,
-      input T agent,
+      input axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(axis)) monitor,
       input adi_component parent = null);
 
       super.new(name, parent);
@@ -175,8 +173,8 @@ package x_monitor_pkg;
       this.enabled = 0;
       this.tx_sink_type = CYCLIC;
 
-      this.agent = agent;
-      this.axis_ap = this.agent.monitor.item_collected_port;
+      this.monitor = monitor;
+      this.axis_ap = monitor.item_collected_port;
 
     endfunction /* new */
 
@@ -216,7 +214,7 @@ package x_monitor_pkg;
         keep_beat = transaction.get_keep_beat();
         for (int j=0; j<num_bytes; j++) begin
           axi_byte = data_beat[j*8+:8];
-          if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
+          if (keep_beat[j+:1] || !this.monitor.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
             this.mailbox.put(axi_byte);
         end
         this.info($sformatf("Caught an AXI4 stream transaction: %d", this.mailbox.num()), ADI_VERBOSITY_MEDIUM);

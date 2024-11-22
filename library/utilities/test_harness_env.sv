@@ -121,7 +121,7 @@ package test_harness_env_pkg;
 
       // Creating the sequencers
       mng_seq = new("AXI Manager sequencer", mng_agent, this);
-      ddr_seq = new("AXI DDR stub sequencer", ddr_agent, this);
+      ddr_seq = new("AXI DDR stub sequencer", ddr_agent.mem_model, this);
 
     endfunction
 

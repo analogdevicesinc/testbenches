@@ -45,13 +45,21 @@ import test_harness_env_pkg::*;
 import dmac_api_pkg::*;
 import data_offload_api_pkg::*;
 
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+import `PKGIFY(test_harness, adc_src_axis_0)::*;
+import `PKGIFY(test_harness, dac_dst_axis_0)::*;
+import `PKGIFY(test_harness, adc_dst_axi_pt_0)::*;
+import `PKGIFY(test_harness, dac_src_axi_pt_0)::*;
+
 `define ADC_TRANSFER_LENGTH 32'h600
 
 program test_program;
 
   // declare the class instances
-  test_harness_env base_env;
-  scoreboard_environment scb_env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_0), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis_0), `AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_0), `AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_0)) scb_env;
 
   dmac_api dmac_tx_0;
   dmac_api dmac_rx_0;
@@ -88,15 +96,15 @@ program test_program;
                   // `TH.`DAC_SRC_AXI_PT_1.inst.IF
                 );
 
-    dmac_tx_0 = new("DMAC TX 0", base_env.mng, `TX_DMA_BA_0);
-    dmac_rx_0 = new("DMAC RX 0", base_env.mng, `RX_DMA_BA_0);
-    // dmac_tx_1 = new("DMAC TX 1", base_env.mng, `TX_DMA_BA_1);
-    // dmac_rx_1 = new("DMAC RX 1", base_env.mng, `RX_DMA_BA_1);
+    dmac_tx_0 = new("DMAC TX 0", base_env.mng_seq, `TX_DMA_BA_0);
+    dmac_rx_0 = new("DMAC RX 0", base_env.mng_seq, `RX_DMA_BA_0);
+    // dmac_tx_1 = new("DMAC TX 1", base_env.mng_seq, `TX_DMA_BA_1);
+    // dmac_rx_1 = new("DMAC RX 1", base_env.mng_seq, `RX_DMA_BA_1);
 
-    do_tx_0 = new("Data Offload TX 0", base_env.mng, `TX_DOFF_BA_0);
-    do_rx_0 = new("Data Offload RX 0", base_env.mng, `RX_DOFF_BA_0);
-    // do_tx_1 = new("Data Offload TX 1", base_env.mng, `TX_DOFF_BA_1);
-    // do_rx_1 = new("Data Offload RX 1", base_env.mng, `RX_DOFF_BA_1);
+    do_tx_0 = new("Data Offload TX 0", base_env.mng_seq, `TX_DOFF_BA_0);
+    do_rx_0 = new("Data Offload RX 0", base_env.mng_seq, `RX_DOFF_BA_0);
+    // do_tx_1 = new("Data Offload TX 1", base_env.mng_seq, `TX_DOFF_BA_1);
+    // do_rx_1 = new("Data Offload RX 1", base_env.mng_seq, `RX_DOFF_BA_1);
 
     //=========================================================================
     // Setup generator/monitor stubs
@@ -219,7 +227,7 @@ program test_program;
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin
-      base_env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      base_env.ddr_agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
     end
     `INFO(("Final address: %x", addr + byte_length*8), ADI_VERBOSITY_LOW);
   endtask

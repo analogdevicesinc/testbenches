@@ -118,19 +118,33 @@
                                 th``_``vip``_0_VIP_HAS_RRESP,\
                                 th``_``vip``_0_VIP_HAS_ARESETN
 
-`define AXIS_VIP_PARAM_DECL   int AXIS_VIP_INTERFACE_MODE     = 2,\
-                                  AXIS_VIP_SIGNAL_SET         = 8'b00000011,\
-                                  AXIS_VIP_DATA_WIDTH         = 8,\
-                                  AXIS_VIP_ID_WIDTH           = 0,\
-                                  AXIS_VIP_DEST_WIDTH         = 0,\
-                                  AXIS_VIP_USER_WIDTH         = 0,\
-                                  AXIS_VIP_USER_BITS_PER_BYTE = 0,\
-                                  AXIS_VIP_HAS_TREADY         = 1,\
-                                  AXIS_VIP_HAS_TSTRB          = 0,\
-                                  AXIS_VIP_HAS_TKEEP          = 0,\
-                                  AXIS_VIP_HAS_TLAST          = 0,\
-                                  AXIS_VIP_HAS_ACLKEN         = 0,\
-                                  AXIS_VIP_HAS_ARESETN        = 1
+`define AXIS_VIP_PARAM_DECL AXIS_VIP_INTERFACE_MODE     = 2,\
+                            AXIS_VIP_SIGNAL_SET         = 8'b00000011,\
+                            AXIS_VIP_DATA_WIDTH         = 8,\
+                            AXIS_VIP_ID_WIDTH           = 0,\
+                            AXIS_VIP_DEST_WIDTH         = 0,\
+                            AXIS_VIP_USER_WIDTH         = 0,\
+                            AXIS_VIP_USER_BITS_PER_BYTE = 0,\
+                            AXIS_VIP_HAS_TREADY         = 1,\
+                            AXIS_VIP_HAS_TSTRB          = 0,\
+                            AXIS_VIP_HAS_TKEEP          = 0,\
+                            AXIS_VIP_HAS_TLAST          = 0,\
+                            AXIS_VIP_HAS_ACLKEN         = 0,\
+                            AXIS_VIP_HAS_ARESETN        = 1
+
+`define AXIS_VIP_PARAM_ORDER(n) n``_VIP_INTERFACE_MODE,\
+                                n``_VIP_SIGNAL_SET,\
+                                n``_VIP_DATA_WIDTH,\
+                                n``_VIP_ID_WIDTH,\
+                                n``_VIP_DEST_WIDTH,\
+                                n``_VIP_USER_WIDTH,\
+                                n``_VIP_USER_BITS_PER_BYTE,\
+                                n``_VIP_HAS_TREADY,\
+                                n``_VIP_HAS_TSTRB,\
+                                n``_VIP_HAS_TKEEP,\
+                                n``_VIP_HAS_TLAST,\
+                                n``_VIP_HAS_ACLKEN,\
+                                n``_VIP_HAS_ARESETN
 
 `define AXIS_VIP_PARAMS(th,vip) th``_``vip``_0_VIP_INTERFACE_MODE,\
                                 th``_``vip``_0_VIP_SIGNAL_SET,\
@@ -146,13 +160,13 @@
                                 th``_``vip``_0_VIP_HAS_ACLKEN,\
                                 th``_``vip``_0_VIP_HAS_ARESETN
 
-`define AXIS_VIP_IF_PARAMS(th,vip)   th``_``vip``_0_VIP_SIGNAL_SET,\
-                                     th``_``vip``_0_VIP_DEST_WIDTH,\
-                                     th``_``vip``_0_VIP_DATA_WIDTH,\
-                                     th``_``vip``_0_VIP_ID_WIDTH,\
-                                     th``_``vip``_0_VIP_USER_WIDTH,\
-                                     th``_``vip``_0_VIP_USER_BITS_PER_BYTE,\
-                                     th``_``vip``_0_VIP_HAS_ARESETN
+`define AXIS_VIP_IF_PARAMS(n) n``_VIP_SIGNAL_SET,\
+                              n``_VIP_DEST_WIDTH,\
+                              n``_VIP_DATA_WIDTH,\
+                              n``_VIP_ID_WIDTH,\
+                              n``_VIP_USER_WIDTH,\
+                              n``_VIP_USER_BITS_PER_BYTE,\
+                              n``_VIP_HAS_ARESETN
 
 `define AXI 0
 `define AXIS 1

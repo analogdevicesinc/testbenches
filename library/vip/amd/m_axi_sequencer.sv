@@ -52,7 +52,7 @@ package m_axi_sequencer_pkg;
     function new(
       input string name,
       input axi_mst_agent #(`AXI_VIP_PARAM_ORDER(m)) agent,
-      input adi_component parent = null);
+      input adi_agent parent = null);
 
       super.new(name, parent);
 

@@ -35,6 +35,7 @@
 
 # Add test files to the project
 adi_sim_project_files [list \
+  "$ad_tb_dir/library/vip/amd/adi_axi_agent.sv" \
   "$ad_tb_dir/library/vip/amd/m_axi_sequencer.sv" \
   "$ad_tb_dir/library/vip/amd/s_axi_sequencer.sv" \
   "$ad_tb_dir/library/drivers/common/x_monitor.sv" \

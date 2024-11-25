@@ -6,6 +6,9 @@
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="\$unit_xpm_cdc_sv_220102727 " />
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axis_agent_pkg" />
+            <top_module name="adi_common_pkg" />
             <top_module name="adi_peripheral_pkg" />
             <top_module name="adi_regmap_data_offload_pkg" />
             <top_module name="adi_regmap_dmac_pkg" />
@@ -28,13 +31,7 @@
             <top_module name="scoreboard_pkg" />
             <top_module name="std" />
             <top_module name="system_tb" />
-            <top_module name="test_harness_adc_dst_axi_pt_0_0_pkg" />
-            <top_module name="test_harness_adc_src_axis_0_0_pkg" />
-            <top_module name="test_harness_dac_dst_axis_0_0_pkg" />
-            <top_module name="test_harness_dac_src_axi_pt_0_0_pkg" />
-            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
             <top_module name="test_harness_env_pkg" />
-            <top_module name="test_harness_mng_axi_vip_0_pkg" />
             <top_module name="vpkg" />
             <top_module name="x_monitor_pkg" />
             <top_module name="xil_common_vip_pkg" />
@@ -42,21 +39,21 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="710.001 ns"></ZoomEndTime>
-      <Cursor1Time time="0.000 ns"></Cursor1Time>
+      <ZoomStartTime time="4.584087 us"></ZoomStartTime>
+      <ZoomEndTime time="18.424467 us"></ZoomEndTime>
+      <Cursor1Time time="17.924087 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="201"></NameColumnWidth>
-      <ValueColumnWidth column_width="88"></ValueColumnWidth>
+      <ValueColumnWidth column_width="84"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="7" />
+   <WVObjectSize size="13" />
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/mng_axi_vip/M_AXI">
       <obj_property name="ElementShortName">M_AXI</obj_property>
       <obj_property name="ObjectShortName">M_AXI</obj_property>
    </wvobject>
    <wvobject fp_name="divider256" type="divider">
-      <obj_property name="label">RX</obj_property>
+      <obj_property name="label">RX 0</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group258">
@@ -86,7 +83,7 @@
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider257" type="divider">
-      <obj_property name="label">TX</obj_property>
+      <obj_property name="label">TX 0</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group259">
@@ -111,6 +108,66 @@
          <obj_property name="ObjectShortName">s_axis</obj_property>
       </wvobject>
       <wvobject type="protoinst" fp_name="/system_tb/test_harness/TX_DUT_0/m_axis">
+         <obj_property name="ElementShortName">m_axis</obj_property>
+         <obj_property name="ObjectShortName">m_axis</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider130" type="divider">
+      <obj_property name="label">RX 1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group133">
+      <obj_property name="label">RX_DO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/RX_DUT_1/s_axis">
+         <obj_property name="ElementShortName">s_axis</obj_property>
+         <obj_property name="ObjectShortName">s_axis</obj_property>
+      </wvobject>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/RX_DUT_1/m_axis">
+         <obj_property name="ElementShortName">m_axis</obj_property>
+         <obj_property name="ObjectShortName">m_axis</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group134">
+      <obj_property name="label">RX_DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_dmac_1/s_axis">
+         <obj_property name="ElementShortName">s_axis</obj_property>
+         <obj_property name="ObjectShortName">s_axis</obj_property>
+      </wvobject>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_dmac_1/m_dest_axi">
+         <obj_property name="ElementShortName">m_dest_axi</obj_property>
+         <obj_property name="ObjectShortName">m_dest_axi</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider130" type="divider">
+      <obj_property name="label">TX 1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group135">
+      <obj_property name="label">TX_DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_dmac_1/m_src_axi">
+         <obj_property name="ElementShortName">m_src_axi</obj_property>
+         <obj_property name="ObjectShortName">m_src_axi</obj_property>
+      </wvobject>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_dmac_1/m_axis">
+         <obj_property name="ElementShortName">m_axis</obj_property>
+         <obj_property name="ObjectShortName">m_axis</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group136">
+      <obj_property name="label">TX_DO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/TX_DUT_1/s_axis">
+         <obj_property name="ElementShortName">s_axis</obj_property>
+         <obj_property name="ObjectShortName">s_axis</obj_property>
+      </wvobject>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/TX_DUT_1/m_axis">
          <obj_property name="ElementShortName">m_axis</obj_property>
          <obj_property name="ObjectShortName">m_axis</obj_property>
       </wvobject>

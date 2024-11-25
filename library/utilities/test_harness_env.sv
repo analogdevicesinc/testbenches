@@ -43,47 +43,15 @@ package test_harness_env_pkg;
   import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
-  import x_monitor_pkg::*;
-
-
-  class adi_axi_master_agent #(int `AXI_VIP_PARAM_ORDER(master)) extends adi_agent;
-
-    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(master)) agent;
-    m_axi_sequencer #(`AXI_VIP_PARAM_ORDER(master)) sequencer;
-    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(master), WRITE_OP) monitor;
-
-    function new(
-      input string name,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(master)) master_vip_if,
-      input adi_environment parent = null);
-
-      super.new(name, parent);
-
-      this.agent = new("Agent", master_vip_if);
-      this.sequencer = new("Sequencer", this.agent, this);
-      this.monitor = new("Monitor", this.agent.monitor, this);
-
-      this.sequencer.info($sformatf("5 star"), ADI_VERBOSITY_NONE);
-      this.monitor.info($sformatf("5 star"), ADI_VERBOSITY_NONE);
-    endfunction: new
-
-  endclass: adi_axi_master_agent
+  import adi_axi_agent_pkg::*;
+  import adi_axis_agent_pkg::*;
 
 
   class test_harness_env #(int `AXI_VIP_PARAM_ORDER(mng), int `AXI_VIP_PARAM_ORDER(ddr)) extends adi_environment;
 
     // Agents
-    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng_agent;
-    axi_slv_mem_agent #(`AXI_VIP_PARAM_ORDER(ddr)) ddr_agent;
-
-    adi_axi_master_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng_prot;
-
-    // Sequencers
-    m_axi_sequencer #(`AXI_VIP_PARAM_ORDER(mng)) mng_seq;
-    s_axi_sequencer #(`AXI_VIP_PARAM_ORDER(ddr)) ddr_seq;
-
-    // Register accessors
-    bit done = 0;
+    adi_axi_master_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng;
+    adi_axi_slave_mem_agent #(`AXI_VIP_PARAM_ORDER(ddr)) ddr;
 
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if;
@@ -113,16 +81,9 @@ package test_harness_env_pkg;
       this.ddr_clk_vip_if = ddr_clk_vip_if;
       this.sys_rst_vip_if = sys_rst_vip_if;
 
-      mng_prot = new("AXI Manager agent", mng_vip_if, this);
-
       // Creating the agents
-      mng_agent = new("AXI Manager agent", mng_vip_if);
-      ddr_agent = new("AXI DDR stub agent", ddr_vip_if);
-
-      // Creating the sequencers
-      mng_seq = new("AXI Manager sequencer", mng_agent, this);
-      ddr_seq = new("AXI DDR stub sequencer", ddr_agent.mem_model, this);
-
+      this.mng = new("AXI Manager agent", mng_vip_if, this);
+      this.ddr = new("AXI DDR stub agent", ddr_vip_if, this);
     endfunction
 
     //============================================================================
@@ -131,24 +92,24 @@ package test_harness_env_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      mng_agent.start_master();
-      ddr_agent.start_slave();
+      this.mng.agent.start_master();
+      this.ddr.agent.start_slave();
 
-      sys_clk_vip_if.start_clock;
-      dma_clk_vip_if.start_clock;
-      ddr_clk_vip_if.start_clock;
+      this.sys_clk_vip_if.start_clock;
+      this.dma_clk_vip_if.start_clock;
+      this.ddr_clk_vip_if.start_clock;
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
     task stop();
-      mng_agent.stop_master();
-      ddr_agent.stop_slave();
+      this.mng.agent.stop_master();
+      this.ddr.agent.stop_slave();
 
-      sys_clk_vip_if.stop_clock;
-      dma_clk_vip_if.stop_clock;
-      ddr_clk_vip_if.stop_clock;
+      this.sys_clk_vip_if.stop_clock;
+      this.dma_clk_vip_if.stop_clock;
+      this.ddr_clk_vip_if.stop_clock;
     endtask
 
     //============================================================================
@@ -156,9 +117,9 @@ package test_harness_env_pkg;
     //============================================================================
     task sys_reset();
       //asserts all the resets for 100 ns
-      sys_rst_vip_if.assert_reset;
+      this.sys_rst_vip_if.assert_reset;
       #200;
-      sys_rst_vip_if.deassert_reset;
+      this.sys_rst_vip_if.deassert_reset;
       #800;
     endtask
 

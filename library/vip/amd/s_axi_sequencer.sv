@@ -48,7 +48,7 @@ package s_axi_sequencer_pkg;
     function new(
       input string name,
       input xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(s)) mem_model,
-      input adi_component parent = null);
+      input adi_agent parent = null);
 
       super.new(name, parent);
       

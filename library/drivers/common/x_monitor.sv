@@ -20,7 +20,7 @@ package x_monitor_pkg;
     // constructor
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_agent parent = null);
       
       super.new(name, parent);
 
@@ -68,10 +68,9 @@ package x_monitor_pkg;
 
   endclass
 
-  typedef enum bit [1:0] {
-    READ_OP = 2'b00,
-    WRITE_OP = 2'b01,
-    DUPLEX_OP = 2'b10
+  typedef enum bit {
+    READ_OP = 1'b0,
+    WRITE_OP = 1'b1
   } operation_type_t;
   
   class x_axi_monitor #(int `AXI_VIP_PARAM_ORDER(axi), operation_type_t operation_type) extends x_monitor;
@@ -89,7 +88,7 @@ package x_monitor_pkg;
     function new(
       input string name,
       input axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor,
-      input adi_component parent = null);
+      input adi_agent parent = null);
 
       super.new(name, parent);
 
@@ -116,7 +115,7 @@ package x_monitor_pkg;
       forever begin
         this.get_key();
         this.axi_ap.get(transaction);
-        if (operation_type[1] == 1'b1 || bit'(transaction.get_cmd_type()) == operation_type[0]) begin
+        if (bit'(transaction.get_cmd_type()) == operation_type) begin
           this.put_key();
           num_bytes = transaction.get_data_width()/8;
           for (int i=0; i<(transaction.get_len()+1); i++) begin
@@ -166,7 +165,7 @@ package x_monitor_pkg;
     function new(
       input string name,
       input axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(axis)) monitor,
-      input adi_component parent = null);
+      input adi_agent parent = null);
 
       super.new(name, parent);
 

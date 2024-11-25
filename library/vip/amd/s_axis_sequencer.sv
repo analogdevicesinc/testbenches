@@ -61,7 +61,7 @@ package s_axis_sequencer_pkg;
     // new
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_agent parent = null);
       
       super.new(name, parent);
 
@@ -165,7 +165,7 @@ package s_axis_sequencer_pkg;
     function new(
       input string name,
       input axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
-      input adi_component parent = null);
+      input adi_agent parent = null);
       
       super.new(name, parent);
 

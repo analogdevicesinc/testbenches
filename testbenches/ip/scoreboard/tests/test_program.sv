@@ -53,13 +53,19 @@ import `PKGIFY(test_harness, dac_dst_axis_0)::*;
 import `PKGIFY(test_harness, adc_dst_axi_pt_0)::*;
 import `PKGIFY(test_harness, dac_src_axi_pt_0)::*;
 
+import `PKGIFY(test_harness, adc_src_axis_1)::*;
+import `PKGIFY(test_harness, dac_dst_axis_1)::*;
+import `PKGIFY(test_harness, adc_dst_axi_pt_1)::*;
+import `PKGIFY(test_harness, dac_src_axi_pt_1)::*;
+
 `define ADC_TRANSFER_LENGTH 32'h600
 
 program test_program;
 
   // declare the class instances
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_0), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis_0), `AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_0), `AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_0)) scb_env;
+  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_0), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis_0), `AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_0), `AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_0)) scb_env_0;
+  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_1), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis_1), `AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_1), `AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_1)) scb_env_1;
 
   dmac_api dmac_tx_0;
   dmac_api dmac_rx_0;
@@ -75,7 +81,6 @@ program test_program;
 
     // create environment
     base_env = new("Base Environment",
-
                     `TH.`SYS_CLK.inst.IF,
                     `TH.`DMA_CLK.inst.IF,
                     `TH.`DDR_CLK.inst.IF,
@@ -83,28 +88,27 @@ program test_program;
                     `TH.`MNG_AXI.inst.IF,
                     `TH.`DDR_AXI.inst.IF);
 
-    scb_env = new("Scoreboard Environment",
+    scb_env_0 = new("Scoreboard Environment 0",
+                    `TH.`ADC_SRC_AXIS_0.inst.IF,
+                    `TH.`DAC_DST_AXIS_0.inst.IF,
+                    `TH.`ADC_DST_AXI_PT_0.inst.IF,
+                    `TH.`DAC_SRC_AXI_PT_0.inst.IF);
 
-                  `TH.`ADC_SRC_AXIS_0.inst.IF,
-                  `TH.`DAC_DST_AXIS_0.inst.IF,
-                  `TH.`ADC_DST_AXI_PT_0.inst.IF,
-                  `TH.`DAC_SRC_AXI_PT_0.inst.IF
+    scb_env_1 = new("Scoreboard Environment 1",
+                    `TH.`ADC_SRC_AXIS_1.inst.IF,
+                    `TH.`DAC_DST_AXIS_1.inst.IF,
+                    `TH.`ADC_DST_AXI_PT_1.inst.IF,
+                    `TH.`DAC_SRC_AXI_PT_1.inst.IF);
 
-                  // `TH.`ADC_SRC_AXIS_1.inst.IF,
-                  // `TH.`DAC_DST_AXIS_1.inst.IF,
-                  // `TH.`ADC_DST_AXI_PT_1.inst.IF,
-                  // `TH.`DAC_SRC_AXI_PT_1.inst.IF
-                );
+    dmac_tx_0 = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA_0);
+    dmac_rx_0 = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA_0);
+    dmac_tx_1 = new("DMAC TX 1", base_env.mng.sequencer, `TX_DMA_BA_1);
+    dmac_rx_1 = new("DMAC RX 1", base_env.mng.sequencer, `RX_DMA_BA_1);
 
-    dmac_tx_0 = new("DMAC TX 0", base_env.mng_seq, `TX_DMA_BA_0);
-    dmac_rx_0 = new("DMAC RX 0", base_env.mng_seq, `RX_DMA_BA_0);
-    // dmac_tx_1 = new("DMAC TX 1", base_env.mng_seq, `TX_DMA_BA_1);
-    // dmac_rx_1 = new("DMAC RX 1", base_env.mng_seq, `RX_DMA_BA_1);
-
-    do_tx_0 = new("Data Offload TX 0", base_env.mng_seq, `TX_DOFF_BA_0);
-    do_rx_0 = new("Data Offload RX 0", base_env.mng_seq, `RX_DOFF_BA_0);
-    // do_tx_1 = new("Data Offload TX 1", base_env.mng_seq, `TX_DOFF_BA_1);
-    // do_rx_1 = new("Data Offload RX 1", base_env.mng_seq, `RX_DOFF_BA_1);
+    do_tx_0 = new("Data Offload TX 0", base_env.mng.sequencer, `TX_DOFF_BA_0);
+    do_rx_0 = new("Data Offload RX 0", base_env.mng.sequencer, `RX_DOFF_BA_0);
+    do_tx_1 = new("Data Offload TX 1", base_env.mng.sequencer, `TX_DOFF_BA_1);
+    do_rx_1 = new("Data Offload RX 1", base_env.mng.sequencer, `RX_DOFF_BA_1);
 
     //=========================================================================
     // Setup generator/monitor stubs
@@ -115,12 +119,14 @@ program test_program;
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
     
     base_env.start();
-    scb_env.start();
+    scb_env_0.start();
+    scb_env_1.start();
 
     base_env.sys_reset();
 
     // configure environment sequencers
-    scb_env.configure(`ADC_TRANSFER_LENGTH);
+    scb_env_0.configure(`ADC_TRANSFER_LENGTH);
+    scb_env_1.configure(`ADC_TRANSFER_LENGTH);
 
     `INFO(("Bring up IP from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
@@ -130,29 +136,37 @@ program test_program;
     
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
-    scb_env.run();
+    scb_env_0.run();
+    scb_env_1.run();
 
-    scb_env.adc_src_axis_seq_0.start();
-    // scb_env.adc_src_axis_seq_1.start();
+    scb_env_0.adc_src_axis_agent.sequencer.start();
+    scb_env_1.adc_src_axis_agent.sequencer.start();
 
     // Generate DMA transfers
     `INFO(("Start RX DMA ..."), ADI_VERBOSITY_LOW);
     rx_dma_transfer(dmac_rx_0, 32'h80000000, `ADC_TRANSFER_LENGTH);
-    // rx_dma_transfer(dmac_rx_1, 32'h80000000, `ADC_TRANSFER_LENGTH);
+    rx_dma_transfer(dmac_rx_1, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
-    scb_env.scoreboard_rx0.wait_until_complete();
+    fork
+      scb_env_0.scoreboard_rx.wait_until_complete();
+      scb_env_1.scoreboard_rx.wait_until_complete();
+    join
 
     `INFO(("Initialize the memory ..."), ADI_VERBOSITY_LOW);
     init_mem_64(32'h80000000, 1024);
 
     `INFO(("Start TX DMA ..."), ADI_VERBOSITY_LOW);
     tx_dma_transfer(dmac_tx_0, 32'h80000000, 1024);
-    // tx_dma_transfer(dmac_tx_1, 32'h80000000, 1024);
+    tx_dma_transfer(dmac_tx_1, 32'h80000000, 1024);
 
     #1us;
-    scb_env.scoreboard_tx0.wait_until_complete();
+    fork
+      scb_env_0.scoreboard_tx.wait_until_complete();
+      scb_env_1.scoreboard_tx.wait_until_complete();
+    join
 
-    scb_env.stop();
+    scb_env_0.stop();
+    scb_env_1.stop();
     base_env.stop();
     
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
@@ -161,46 +175,39 @@ program test_program;
   end
 
   task systemBringUp();
-
     // bring up the Data Offload instances from reset
-
     `INFO(("Bring up RX Data Offload 0"), ADI_VERBOSITY_LOW);
     do_rx_0.deassert_reset();
     `INFO(("Bring up TX Data Offload 0"), ADI_VERBOSITY_LOW);
     do_tx_0.deassert_reset();
 
-    // `INFO(("Bring up RX Data Offload 1"), ADI_VERBOSITY_LOW);
-    // do_rx_1.deassert_reset();
-    // `INFO(("Bring up TX Data Offload 1"), ADI_VERBOSITY_LOW);
-    // do_tx_1.deassert_reset();
+    `INFO(("Bring up RX Data Offload 1"), ADI_VERBOSITY_LOW);
+    do_rx_1.deassert_reset();
+    `INFO(("Bring up TX Data Offload 1"), ADI_VERBOSITY_LOW);
+    do_tx_1.deassert_reset();
 
     // Enable tx oneshot mode
     do_tx_0.enable_oneshot_mode();
-
-    // do_tx_1.enable_oneshot_mode();
+    do_tx_1.enable_oneshot_mode();
 
     // bring up the DMAC instances from reset
-
     `INFO(("Bring up RX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_rx_0.enable_dma();
     `INFO(("Bring up TX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_tx_0.enable_dma();
 
-    // `INFO(("Bring up RX DMAC 1"), ADI_VERBOSITY_LOW);
-    // dmac_rx_1.enable_dma();
-    // `INFO(("Bring up TX DMAC 1"), ADI_VERBOSITY_LOW);
-    // dmac_tx_1.enable_dma();
-
+    `INFO(("Bring up RX DMAC 1"), ADI_VERBOSITY_LOW);
+    dmac_rx_1.enable_dma();
+    `INFO(("Bring up TX DMAC 1"), ADI_VERBOSITY_LOW);
+    dmac_tx_1.enable_dma();
   endtask
 
   task do_set_transfer_length(input int length);
     do_rx_0.set_transfer_length(length);
-
-    // do_rx_1.set_transfer_length(length);
+    do_rx_1.set_transfer_length(length);
   endtask
 
   // RX DMA transfer generator
-
   task rx_dma_transfer(
     input dmac_api dmac, 
     input int xfer_addr, 
@@ -211,6 +218,7 @@ program test_program;
     dmac.transfer_start();
   endtask
 
+  // TX DMA transfer generator
   task tx_dma_transfer(
     input dmac_api dmac, 
     input int xfer_addr, 
@@ -227,7 +235,7 @@ program test_program;
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin
-      base_env.ddr_agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
     end
     `INFO(("Final address: %x", addr + byte_length*8), ADI_VERBOSITY_LOW);
   endtask

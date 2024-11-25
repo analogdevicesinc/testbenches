@@ -102,7 +102,7 @@ package adi_common_pkg;
   class adi_api extends adi_component;
     function new(
       input string name,
-      input adi_environment parent = null);
+      input adi_component parent = null);
 
       super.new(name, parent);
     endfunction: new
@@ -142,7 +142,7 @@ package adi_common_pkg;
   class adi_sequencer extends adi_component;
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_agent parent = null);
 
       super.new(name, parent);
     endfunction: new
@@ -152,7 +152,7 @@ package adi_common_pkg;
   class adi_monitor extends adi_component;
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_agent parent = null);
 
       super.new(name, parent);
     endfunction: new

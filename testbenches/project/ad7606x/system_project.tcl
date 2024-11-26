@@ -15,14 +15,6 @@ source "cfgs/${cfg_file}"
 # Set the project name
 set project_name [file rootname $cfg_file]
 
-# Set project params
-
-global ad_project_params
-
-set INTF $ad_project_params(INTF)
-set ADC_N_BITS $ad_project_params(ADC_N_BITS)
-set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
-
 #set a default test program
 adi_sim_add_define "TEST_PROGRAM=test_program_si"
 

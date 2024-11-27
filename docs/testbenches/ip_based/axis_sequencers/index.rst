@@ -58,8 +58,7 @@ in the following example:
 .. shell::
    :showuser:
 
-   $make SRC_DESCRIPTORS=3 SRC_BEAT_DELAY=0 SRC_DESCRIPTOR_DELAY=0
-   DEST_BACKPRESSURE=2 DEST_BEAT_DELAY_HIGH=1 DEST_BEAT_DELAY_LOW=5
+   $make SRC_DESCRIPTORS=3 SRC_BEAT_DELAY=0 SRC_DESCRIPTOR_DELAY=0 DEST_BACKPRESSURE=2 DEST_BEAT_DELAY_HIGH=1 DEST_BEAT_DELAY_LOW=5
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

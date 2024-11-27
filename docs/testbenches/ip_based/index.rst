@@ -10,3 +10,4 @@ Contents
    :maxdepth: 1
 
    base/index
+   axis_sequencers/index

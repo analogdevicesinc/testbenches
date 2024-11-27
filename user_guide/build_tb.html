@@ -109,6 +109,7 @@
 <li><a class="reference internal" href="#windows-environment-setup">Windows environment setup</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#opening-a-testbench">Opening a testbench</a></li>
 </ul>
 </li>
 </ul>
@@ -326,8 +327,8 @@ started as well.</p>
 the project. This option gives you the ability to build only the configuration
 that you’re interested in, without building the rest of the available
 configurations, as well as running the chosen test program, if it is the case.</p>
-<p>If parameters were used, the result of the build will be in a folder under runs/,
-named by the configuration used.</p>
+<p>If parameters were used, the result of the build will be in a folder under
+<code class="docutils literal notranslate"><span class="pre">runs/</span></code>, named by the configuration used.</p>
 <p><strong>Example</strong></p>
 <p>Running the command below will create a folder named
 <strong>cfg_si</strong> for the following file combination: <strong>cfg_si</strong> configuration file and
@@ -393,6 +394,59 @@ If you are an AMD user, use the <strong>gnuwin</strong> installed as part of the
 usually at <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\Vitis\202x.x\gnuwin\bin</span></code>.</p>
 </section>
 </section>
+<section id="opening-a-testbench">
+<h2>Opening a testbench<a class="headerlink" href="#opening-a-testbench" title="Link to this heading">#</a></h2>
+<p>If you want to open the testbench and check the block design and/or the
+waveform, there are two options:</p>
+<ul class="simple">
+<li><p>Build the testbench using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">MODE=gui</span></code> and it will open Vivado in GUI
+mode right after it builds the block design.</p></li>
+</ul>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><ul class="simple">
+<li><p>Build the testbench using <code class="docutils literal notranslate"><span class="pre">make</span></code> and open Vivado manually after the block
+design is built and the simulation is finished. In the project folder, after
+running <code class="docutils literal notranslate"><span class="pre">make</span></code>, a <code class="docutils literal notranslate"><span class="pre">runs/</span></code> folder will be created. Under <code class="docutils literal notranslate"><span class="pre">runs/</span></code> you’ll
+find one or more configuration folder, depending on how you ran the <code class="docutils literal notranslate"><span class="pre">make</span></code>
+command. Under the folder named after the configuration is the Vivado project
+that can be opened.</p></li>
+</ul>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>runs/cfg_si
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616/runs/cfg_si$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>./cfg_si.xpr
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
 </section>
 
     <script type="text/javascript">

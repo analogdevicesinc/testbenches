@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>IP based test bench template &#8212; Testbenches  documentation</title>
+    <title>Base &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=95305861" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -18,6 +18,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Project Based" href="../../project_based/index.html" />
+    <link rel="prev" title="IP Based" href="../index.html" />
    
   
   <meta name="global_root" content="../../../../">
@@ -99,7 +101,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">IP based test bench template</a><ul>
+<li><a class="reference internal" href="#">Base</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -110,14 +112,15 @@
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#clock-scheme">Clock scheme</a></li>
 <li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
 <li><a class="reference internal" href="#interrupts">Interrupts</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
+<li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
-<li><a class="reference internal" href="#test-stimulus">Test stimulus</a></li>
-<li><a class="reference internal" href="#resources">Resources</a></li>
 <li><a class="reference internal" href="#more-information">More information</a></li>
 <li><a class="reference internal" href="#support">Support</a></li>
 </ul>
@@ -157,7 +160,7 @@ Content on this topic
 </div>
 <div class="toc-tree">
   <html>
-  <body><ul>
+  <body><ul class="current">
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction.html">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository.html">Git repository</a></li>
@@ -204,9 +207,9 @@ Content on this topic
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Base</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
@@ -231,49 +234,147 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="ip-based-test-bench-template">
-<span id="ip-based-template"></span><h1>IP based test bench template<a class="headerlink" href="#ip-based-test-bench-template" title="Link to this heading">#</a></h1>
+  <section id="base">
+<span id="id1"></span><h1>Base<a class="headerlink" href="#base" title="Link to this heading">#</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>The purpose of this testbench is to be a reference design for the other
+testbenches.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading">#</a></h2>
+<p>The block design found in this testbench is in many instances referred to as
+the test harness. It has a simulated Processing System that has an AXI4Lite
+interface, a DDR memory, which is set to a size of 2GB, and auxiliary IPs and
+VIPs, such as interconnects, clocks and resets.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading">#</a></h3>
+<a class="reference internal image-reference" href="../../../_images/base_tb.svg"><img alt="Base/Testbench block diagram" class="align-center" src="../../../_images/base_tb.svg" style="width: 800px;" />
+</a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading">#</a></h3>
+<p>This project has no configuration parameters.</p>
 <section id="build-parameters">
 <h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading">#</a></h4>
+<p>No additional build parameters are available for this testbench.</p>
 </section>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading">#</a></h4>
+<p>The testbench has an empty configuration file included in the file structure
+which allows the testbench to be built and run by default.</p>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading">#</a></h4>
+<p>The following test program file is available:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test program</p></th>
+<th class="head"><p>Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>test_program</p></td>
+<td><p>Creates a basic test stimulus.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading">#</a></h4>
+<p>The test program is compatible with the configuration.</p>
 </section>
-</section>
-<section id="clock-scheme">
-<h3>Clock scheme<a class="headerlink" href="#clock-scheme" title="Link to this heading">#</a></h3>
 </section>
 <section id="cpu-memory-interconnects-addresses">
 <h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading">#</a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance</p></th>
+<th class="head"><p>Address</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>axi_intc</p></td>
+<td><p>0x4120_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 <section id="interrupts">
 <h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading">#</a></h3>
+<p>No interrupt signals are connected to the interrupt controller.</p>
+</section>
+</section>
+<section id="test-stimulus">
+<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading">#</a></h2>
+<p>The test program is only responsible for the environment bringup:</p>
+<section id="environment-bringup">
+<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading">#</a></h3>
+<p>The steps of the environment bringup are:</p>
+<ul class="simple">
+<li><p>Set logger verbosity</p></li>
+<li><p>Print the randomization state</p></li>
+<li><p>Create the environment</p></li>
+<li><p>Start the environment</p></li>
+<li><p>Start the clocks</p></li>
+<li><p>Assert the resets</p></li>
+<li><p>Stop the environment</p></li>
+</ul>
 </section>
 </section>
 <section id="building-the-test-bench">
 <h2>Building the test bench<a class="headerlink" href="#building-the-test-bench" title="Link to this heading">#</a></h2>
-</section>
-<section id="test-stimulus">
-<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading">#</a></h2>
-</section>
-<section id="resources">
-<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">#</a></h2>
+<p>The testbench is built upon ADI’s generic HDL reference design framework.
+ADI does not distribute compiled files of these projects so they must be built
+from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">here</a>,
+with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
+To get the source you must
+<a class="reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository">clone</a>
+the HDL repository, and then build the project as follows:</p>
+<p><strong>Linux/Cygwin/WSL</strong></p>
+<p><em>Example 1</em></p>
+<p>Building and simulating the testbench using only the command line.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/base
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 2</em></p>
+<p>Building and simulating the testbench using the Vivado GUI. This command will
+launch Vivado, will run the simulation and display the waveforms.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/base
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+specific build has its own folder named after the configuration file’s name.
+Example: if the following command was run for a single configuration in the
+clean folder (no runs folder available):</p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg1</span></code></p>
+<p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg1</span></code></p>
 </section>
 <section id="more-information">
 <h2>More information<a class="headerlink" href="#more-information" title="Link to this heading">#</a></h2>
@@ -301,8 +402,8 @@ are, the lower the chances to receive support from <a class="reference external"
           </div>
               <div class="related">
                 &nbsp;
-    <div></div>
-    <div></div>
+    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">IP Based</a>
+    <a href="../../project_based/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Project Based</a>
               </div>
           
         </div>

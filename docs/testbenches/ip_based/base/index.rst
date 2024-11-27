@@ -38,7 +38,7 @@ No additional build parameters are available for this testbench.
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It testbench has an empty configuration file included in the file structure
+The testbench has an empty configuration file included in the file structure
 which allows the testbench to be built and run by default.
 
 Tests

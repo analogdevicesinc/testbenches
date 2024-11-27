@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Project based test bench template &#8212; Testbenches  documentation</title>
+    <title>AXIS Sequencers &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=95305861" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -18,6 +18,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Project Based" href="../../project_based/index.html" />
+    <link rel="prev" title="Base" href="../base/index.html" />
    
   
   <meta name="global_root" content="../../../../">
@@ -99,7 +101,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Project based test bench template</a><ul>
+<li><a class="reference internal" href="#">AXIS Sequencers</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -110,14 +112,20 @@
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#clock-scheme">Clock scheme</a></li>
 <li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
 <li><a class="reference internal" href="#interrupts">Interrupts</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
+<li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
+<li><a class="reference internal" href="#sequencer-testing">Sequencer testing</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
-<li><a class="reference internal" href="#test-stimulus">Test stimulus</a></li>
-<li><a class="reference internal" href="#resources">Resources</a></li>
+<li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#more-information">More information</a></li>
 <li><a class="reference internal" href="#support">Support</a></li>
 </ul>
@@ -157,7 +165,7 @@ Content on this topic
 </div>
 <div class="toc-tree">
   <html>
-  <body><ul>
+  <body><ul class="current">
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction.html">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository.html">Git repository</a></li>
@@ -204,17 +212,17 @@ Content on this topic
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/base/index.html">Base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AXIS Sequencers</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad7606/index.html">AD7606</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
 </ul>
 </li>
 </ul>
@@ -232,129 +240,66 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="project-based-test-bench-template">
-<span id="project-based-template"></span><h1>Project based test bench template<a class="headerlink" href="#project-based-test-bench-template" title="Link to this heading">#</a></h1>
+  <section id="axis-sequencers">
+<span id="id1"></span><h1>AXIS Sequencers<a class="headerlink" href="#axis-sequencers" title="Link to this heading">#</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>The purpose of this testbench is to give engineers a sandbox testbench, where
+they can test different configuration parameters for the AXI4 Stream VIPs and
+sequencers.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading">#</a></h2>
+<p>The block design is based on the test harness with the addition of two AXI4
+Stream VIPs from AMD. This testbench does not require the presence of the test
+harness, as it can work without it, but since it was created based on the base
+design, this was inherited. One of the VIPs is configured as master, while the
+other one is configured as slave. The TLAST and TREADY signals are set to be
+enabled for the VIPs. TKEEP support for this testbench will be added later. If
+your desire is to enable/disable other signals in this testbench, you’ll have
+to modify the block design. Dynamic configuration of these parameters will be
+added later in the configuration file.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading">#</a></h3>
-<a class="reference internal image-reference" href="../../../_images/project_based_template_bd.svg"><img alt="Template/Testbench block diagram" class="align-center" src="../../../_images/project_based_template_bd.svg" style="width: 800px;" />
+<a class="reference internal image-reference" href="../../../_images/axis_sequencers_tb.svg"><img alt="AXIS_Sequencers/Testbench block diagram" class="align-center" src="../../../_images/axis_sequencers_tb.svg" style="width: 800px;" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading">#</a></h3>
+<p>The following parameters of this project that can be configured:</p>
+<ul class="simple">
+<li><p>SRC_DESCRIPTORS: defines the data generation mode:
+Options: 1 - single packet, 2 - multiple packets, 3 - repeating packets</p></li>
+<li><p>SRC_BEAT_DELAY: defines the valid delays between data beats:
+Integer value</p></li>
+<li><p>SRC_DESCRIPTOR_DELAY: defines the valid delays between packets:
+Integer value</p></li>
+<li><p>DEST_BACKPRESSURE: defines the backpressure type for the slave interface:
+Options: 1 - backpressure enabled, 2 - no backpressure</p></li>
+<li><p>DEST_BEAT_DELAY_HIGH: defines the high time of the ready signal:
+Integer, non-0 value</p></li>
+<li><p>DEST_BEAT_DELAY_LOW: defines the low time of the ready signal:
+Integer, non-0 value</p></li>
+</ul>
 <section id="build-parameters">
 <h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading">#</a></h4>
-<p>The following are the parameters of this project that can be configured:</p>
-<ul class="simple">
-<li><p>CLK_MODE: defines clocking mode of the device’s digital interface:
-Options: 0 - SPI mode, 1 - Echo-clock or Master clock mode</p></li>
-<li><p>NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
-Options: 1 - Interleaved mode, 2 - 1 lane per channel,
-4 - 2 lanes per channel, 8 - 4 lanes per channel</p></li>
-<li><p>CAPTURE_ZONE: defines the capture zone of the next sample.
-There are two capture zones: 1 - from negative edge of the BUSY line
-until the next CNV positive edge -20ns, 2 - from the next consecutive CNV
-positive edge +20ns until the second next consecutive CNV positive edge -20ns</p></li>
-<li><p>DDR_EN: defines the type of data transfer. In echo and master clock mode
-the SDI lines can have Single or Double Data Rates.
-Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
-</ul>
-</section>
+<p>The parameters mentioned above can be configured when starting the build, like
+in the following example:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">SRC_DESCRIPTORS</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">SRC_BEAT_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">SRC_DESCRIPTOR_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">DEST_BACKPRESSURE</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_HIGH</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_LOW</span><span class="o">=</span><span class="m">5</span>
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading">#</a></h4>
-<p>The following are available configurations for the test bench:</p>
-<blockquote>
-<div><div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
-<th class="head" colspan="4"><p>Parameters</p></th>
-</tr>
-<tr class="row-even"><th class="head"><p>CLK_MODE</p></th>
-<th class="head"><p>NUM_OF_SDI</p></th>
-<th class="head"><p>CAPTURE_ZONE</p></th>
-<th class="head"><p>DDR_EN</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-odd"><td><p>cfg_cm0_sdi2_cz1_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm0_sdi2_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm0_sdi4_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>4</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm0_sdi8_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi1_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi2_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi2_cz2_ddr1</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi4_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>4</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi4_cz2_ddr1</p></td>
-<td><p>1</p></td>
-<td><p>4</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi8_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi8_cz2_ddr1</p></td>
-<td><p>1</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div></blockquote>
+<p>As this is a sandbox testbench, engineers are encouraged to change parameters
+and see what happens in the simulation.</p>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading">#</a></h4>
-<p>The following test program files are available:</p>
+<p>The following test program file is available:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -363,11 +308,8 @@ Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>test_program_si</p></td>
-<td><p>Tests the parallel interface capabilities.</p></td>
-</tr>
-<tr class="row-odd"><td><p>test_program_pi</p></td>
-<td><p>Tests the serial interface capabilities.</p></td>
+<tr class="row-even"><td><p>test_program</p></td>
+<td><p>Creates a basic test stimulus.</p></td>
 </tr>
 </tbody>
 </table>
@@ -375,41 +317,52 @@ Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading">#</a></h4>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Configuration</p></th>
-<th class="head"><p>Test</p></th>
-<th class="head"><p>Build command</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>cfg_si</p></td>
-<td><p>test_program_si</p></td>
-<td><p>make CFG=cfg_si TST=test_program_si</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_pi</p></td>
-<td><p>test_program_pi</p></td>
-<td><p>make CFG=cfg_pi TST=test_program_pi</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Mixing a wrong pair of CFG and TST will result in a building errror.
-Please checkout the proposed combinations before running a custom test.</p>
-</div>
+<p>The test program is compatible with the configuration.</p>
 </section>
-</section>
-<section id="clock-scheme">
-<h3>Clock scheme<a class="headerlink" href="#clock-scheme" title="Link to this heading">#</a></h3>
 </section>
 <section id="cpu-memory-interconnects-addresses">
 <h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading">#</a></h3>
+<p>Irrelevant for this testbench.</p>
 </section>
 <section id="interrupts">
 <h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading">#</a></h3>
+<p>Irrelevant for this testbench.</p>
+</section>
+</section>
+<section id="test-stimulus">
+<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading">#</a></h2>
+<p>The test program is responsible for configuring and running the sequencers.</p>
+<section id="environment-bringup">
+<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading">#</a></h3>
+<p>The steps of the environment bringup are:</p>
+<ul class="simple">
+<li><p>Create the environment</p></li>
+<li><p>Start the environment</p></li>
+<li><p>Start the clocks</p></li>
+<li><p>Assert the resets</p></li>
+</ul>
+</section>
+<section id="sequencer-testing">
+<h3>Sequencer testing<a class="headerlink" href="#sequencer-testing" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Configures the source and destination sequencers’ ready and valid signals
+uptime and downtime with the parameters set in the configuration file</p></li>
+<li><p>Configures the data generation part, where the parameters are also read from
+the same file</p></li>
+<li><p>A watchdog is initialized, which ensures that the simulation doesn’t run off
+into infinity</p></li>
+<li><p>Some of the parameters for the packet sizes are hardcoded, these can be
+changed to test some more specific use-cases</p></li>
+<li><p>The watchdog and the sequencers are started at the same time</p></li>
+<li><p>Simulation waits for the stop condition, depending on the packet generation
+mode</p></li>
+<li><p>Stops watchdog</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Depending on the configuration parameters and/or changed hardcoded values,
+the watchdog may trigger prematurely!</p>
+</div>
 </section>
 </section>
 <section id="building-the-test-bench">
@@ -420,34 +373,32 @@ from the sources available <a class="icon git reference external" href="https://
 with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
 To get the source you must
 <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository">clone</a>
-the HDL repository, and then build the project as follows:.</p>
+the HDL repository, and then build the project as follows:</p>
 <p><strong>Linux/Cygwin/WSL</strong></p>
 <p><em>Example 1</em></p>
-<p>Build all the possible combinations of tests and configurations, using only the
-command line.</p>
+<p>Building and simulating the testbench using only the command line.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ad7616
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ad7616$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
 </pre></div>
 </div>
 <div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p><em>Example 2</em></p>
-<p>Build all the possible combinations of tests and configurations, using the
-Vivado GUI. This command will launch Vivado, will run the simulation and display
-the waveforms.</p>
+<p>Building and simulating the testbench using the Vivado GUI. This command will
+launch Vivado, will run the simulation and display the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ad7616
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ad7616$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
 </pre></div>
 </div>
 <div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -460,28 +411,61 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ad7616
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ad7616$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_pi<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_pi
+<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
-<div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration specific
-build has it’s own folder named after the configuration file’s name.
-Example: if the following command was run for a single configuration in the clean folder
-(no runs folder available):</p>
-<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_pi</span></code></p>
+<div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+specific build has its own folder named after the configuration file’s name.
+Example: if the following command was run for a single configuration in the
+clean folder (no runs folder available):</p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg1</span></code></p>
 <p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
-<p><code class="docutils literal notranslate"><span class="pre">cfg_pi</span></code></p>
-</section>
-<section id="test-stimulus">
-<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cfg1</span></code></p>
 </section>
 <section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">#</a></h2>
+<section id="testbenches-related-dependencies">
+<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading">#</a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>M_AXIS_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axis_sequencer.sv">library/vip/amd/m_axis_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>S_AXIS_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axis_sequencer.sv">library/vip/amd/s_axis_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>WATCHDOG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/common/watchdog.sv">library/drivers/common/watchdog.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/drivers/common/watchdog/index.html#watchdog"><span class="std std-ref">Watchdog</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>UTILS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/utils.svh">library/utilities/utils.svh</a></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 </section>
 <section id="more-information">
 <h2>More information<a class="headerlink" href="#more-information" title="Link to this heading">#</a></h2>
@@ -509,8 +493,8 @@ are, the lower the chances to receive support from <a class="reference external"
           </div>
               <div class="related">
                 &nbsp;
-    <div></div>
-    <div></div>
+    <a href="../base/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Base</a>
+    <a href="../../project_based/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Project Based</a>
               </div>
           
         </div>

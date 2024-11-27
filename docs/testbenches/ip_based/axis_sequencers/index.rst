@@ -106,7 +106,6 @@ The steps of the environment bringup are:
 * Start the environment
 * Start the clocks
 * Assert the resets
-* Stop the environment
 
 Sequencer testing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

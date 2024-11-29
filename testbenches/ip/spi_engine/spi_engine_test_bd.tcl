@@ -80,6 +80,11 @@ ad_mem_hp1_interconnect $sys_cpu_clk sys_ps7/S_AXI_HP1
 ad_mem_hp1_interconnect $sys_cpu_clk axi_spi_engine_dma/m_dest_axi
 
 if {$ad_project_params(ECHO_SCLK)} {
+  # currently, if ECHO_SCLK is active, CPOL/CPHA have to be set at synthesis-time
+  # this is communicated to the SPI Engine through DEFAULT_SPI_CFG
+  set cpol $ad_project_params(CPOL)
+  set cpha $ad_project_params(CPHA)
+  ad_ip_parameter $hier_spi_engine/${hier_spi_engine}_execution CONFIG.DEFAULT_SPI_CFG [expr {$cpol*2+$cpha}]
   adi_sim_add_define DEF_ECHO_SCLK
 }
 if {$ad_project_params(SDO_STREAMING)} {

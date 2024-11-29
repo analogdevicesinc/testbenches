@@ -153,7 +153,7 @@ initial begin
   env.run();
 
   env.spi_seq.set_default_miso_data('h2AA55);
-  
+
   env.cmd_src_seq.start(); // start command source (will wait for data enqueued)
   env.sdo_src_seq.start();
 

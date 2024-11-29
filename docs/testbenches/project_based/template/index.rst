@@ -338,47 +338,11 @@ Testbench specific dependencies:
    * - SV dependency name
      - Source code link
      - Documentation link
-   * - ADI_REGMAP_ADC_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_adc_pkg.sv`
+   * - ADI_REGMAP_CLKGEN_PKG
+     - :git-testbenches:`library/regmaps/adi_regmap_clkgen_pkg.sv`
      - ---
-   * - ADI_REGMAP_COMMON_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_common_pkg.sv`
-     - ---          
    * - ADI_REGMAP_DMAC_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.`
-     - ---
-   * - ADI_REGMAP_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_pkg.sv`
-     - ---
-   * - ADI_REGMAP_PWM_GEN_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_pwm_gen_pkg.sv`
-     - ---
-   * - DMA_TRANS
-     - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
-     - ---
-   * - DMAC_API
-     - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
-     - ---
-   * - LOGGER_PKG
-     - :git-testbenches:`library/utilities/logger_pkg.sv`
-     - ---     
-   * - M_AXI_SEQUENCER
-     - :git-testbenches:`library/vip/amd/m_axi_sequencer.sv`
-     - ---
-   * - M_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/m_axis_sequencer.sv`
-     - ---
-   * - REG_ACCESSOR
-     - :git-testbenches:`library/regmaps/reg_accessor.sv`
-     - ---                            
-   * - S_AXI_SEQUENCER
-     - :git-testbenches:`library/vip/amd/s_axi_sequencer.sv`
-     - ---
-   * - S_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/s_axis_sequencer.sv`
-     - ---     
-   * - UTILS
-     - :git-testbenches:`library/utilities/utils.svh`
+     - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
      - ---
 
 .. include:: ../../../common/more_information.rst

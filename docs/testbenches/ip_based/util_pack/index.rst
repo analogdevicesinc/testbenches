@@ -6,13 +6,13 @@ Util Pack
 Overview
 -------------------------------------------------------------------------------
 
-The purpose of this testbench is to validate the serial interface functionality
-of the :git-hdl:`library/util_pack/util_cpack2 <library/util_pack/util_cpack2>`
-and :git-hdl:`library/util_pack/util_upack2 <library/util_pack/util_upack2>` IP
+The purpose of this testbench is to validate the packaging functionality of the
+:git-hdl:`library/util_pack/util_cpack2 <library/util_pack/util_cpack2>` and
+:git-hdl:`library/util_pack/util_upack2 <library/util_pack/util_upack2>` IP
 cores.
 
-The entire HDL documentation can be found here
-:external+hdl:ref:`here <util_cpack2>` and here
+The entire HDL documentation can be found
+:external+hdl:ref:`here <util_cpack2>` and
 :external+hdl:ref:`here <util_upack2>`.
 
 Block design

@@ -141,7 +141,7 @@ Resources
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. include:: ../../dependency_common.rst
+.. include:: ../../common/dependency_common.rst
 
 .. include:: ../../../common/more_information.rst
 

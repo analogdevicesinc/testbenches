@@ -190,7 +190,7 @@ Test stimulus
 Resources
 -------------------------------------------------------------------------------
 
-.. include:: ../../dependency_common.rst
+.. include:: ../../common/dependency_common.rst
 
 Testbench specific dependencies:
 

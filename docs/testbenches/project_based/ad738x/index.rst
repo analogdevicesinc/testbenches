@@ -276,7 +276,7 @@ HDL related dependencies
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. include:: ../../dependency_common.rst
+.. include:: ../../common/dependency_common.rst
 
 Testbench specific dependencies:
 

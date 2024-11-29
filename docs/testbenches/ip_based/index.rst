@@ -9,5 +9,6 @@ Contents
 .. toctree::
    :maxdepth: 1
 
-   base/index
    axis_sequencers/index
+   base/index
+   util_pack/index

@@ -135,6 +135,14 @@ Then the subfolder under ``runs`` name will be:
 
 ``cfg1``
 
+Resources
+-------------------------------------------------------------------------------
+
+Testbenches related dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: ../../common/dependency_common.rst
+
 .. include:: ../../../common/more_information.rst
 
 .. include:: ../../../common/support.rst

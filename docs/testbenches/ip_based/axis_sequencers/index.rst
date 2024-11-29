@@ -191,6 +191,10 @@ Resources
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. include:: ../../common/dependency_common.rst
+
+Testbench specific dependencies:
+
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
@@ -203,12 +207,6 @@ Testbenches related dependencies
      - ---
    * - S_AXIS_SEQUENCER
      - :git-testbenches:`library/vip/amd/s_axis_sequencer.sv`
-     - ---
-   * - WATCHDOG
-     - :git-testbenches:`library/drivers/common/watchdog.sv`
-     - :ref:`watchdog`
-   * - UTILS
-     - :git-testbenches:`library/utilities/utils.svh`
      - ---
 
 .. include:: ../../../common/more_information.rst

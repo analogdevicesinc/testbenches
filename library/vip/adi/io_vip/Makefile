@@ -4,7 +4,7 @@
 ####################################################################################
 
 # Makeincludes
-include ../../../../scripts/make_tb_path
+include ../../../../scripts/make_tb_path.mk
 
 LIBRARY_NAME := io_vip
 

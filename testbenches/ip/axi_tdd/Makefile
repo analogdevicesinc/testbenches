@@ -5,9 +5,9 @@
 ####################################################################################
 
 # Makeincludes
-include ../../../scripts/make_tb_path
-#include $(TB_LIBRARY_PATH)/includes/Makeinclude_common
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_tdd
+include ../../../scripts/make_tb_path.mk
+#include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_tdd.mk
 
 # Remaining test-bench dependencies except test programs
 LIB_DEPS += axi_tdd

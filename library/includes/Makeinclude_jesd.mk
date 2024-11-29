@@ -3,7 +3,7 @@
 ####################################################################################
 
 # Makeincludes
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_regmap
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_regmap.mk
 
 # All test-bench dependencies except test programs
 SV_DEPS += $(TB_LIBRARY_PATH)/drivers/jesd/adi_jesd204_pkg.sv

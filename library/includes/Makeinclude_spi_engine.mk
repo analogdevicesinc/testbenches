@@ -3,7 +3,7 @@
 ####################################################################################
 
 # Makeincludes
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_regmap
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_regmap.mk
 
 # All test-bench dependencies except test programs
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/adi/spi_vip/adi_spi_vip_pkg.sv

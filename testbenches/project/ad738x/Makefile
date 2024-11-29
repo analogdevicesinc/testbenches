@@ -5,10 +5,10 @@
 ####################################################################################
 
 # Makeincludes
-include ../../../scripts/make_tb_path
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_common
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_spi_engine
+include ../../../scripts/make_tb_path.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_spi_engine.mk
 
 # Remaining test-bench dependencies except test programs
 SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_clkgen_pkg.sv

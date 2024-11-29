@@ -5,8 +5,8 @@
 ####################################################################################
 
 # Makeincludes
-include ../../../scripts/make_tb_path
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_common
+include ../../../scripts/make_tb_path.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
 
 # Remaining test-bench dependencies except test programs
 SV_DEPS += environment.sv

@@ -3,7 +3,7 @@
 ####################################################################################
 
 # Makeincludes
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_axi
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_axi.mk
 
 # All test-bench dependencies except test programs
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/utils.svh

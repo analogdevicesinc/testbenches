@@ -4,7 +4,7 @@
 ####################################################################################
 ####################################################################################
 
-include $(ADI_TB_DIR)/library/includes/Makeinclude_common
+include $(ADI_TB_DIR)/library/includes/Makeinclude_common.mk
 
 include $(ADI_HDL_DIR)/quiet.mk
 

@@ -20,8 +20,13 @@ Block design
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the testbench has multiple ways of configuration, then make subsections to
-this section and show the default configuration and some other popular modes.
+If the testbench has multiple configurations that change the block design
+itself, then make subsections for each of these configuration-block design
+pairs.
+Example: project is configured in serial mode or parallel mode. If there are
+many configuration options on how the block design looks, try to find ways to
+generalize them (eg. multiple interfaces of the same type are enabled by a
+parameter).
 
 \**\* KEEP THIS PARAGRAPH \**\*
 The data path and clock domains are depicted in the below diagram:
@@ -39,7 +44,7 @@ different diagrams \*\*
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-\**\* MENTION IF ANY MODES ARE AVAILABLE FOR CONFIGURATION \**\*
+\**\* MENTION IF THERE ARE ANY CONFIGURATION PARAMETERS AND/OR MODES \**\*
 
 Build parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

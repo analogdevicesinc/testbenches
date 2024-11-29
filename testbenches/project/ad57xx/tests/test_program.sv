@@ -349,6 +349,9 @@ task config_spi();
   // Enable SPI Engine
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
+  // Enable SDO Offload
+  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_SRC_SEL), `SET_AXI_SPI_ENGINE_OFFLOAD0_SDO_SRC_SEL_OFFLOAD0_SDO_SRC_SEL(1));
+
   // Configure the execution module
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);

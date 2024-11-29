@@ -8,7 +8,6 @@ source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 
 adi_ip_create adi_spi_vip
 adi_ip_files adi_spi_vip [list \
-    "adi_spi_vip_pkg.sv" \
     "adi_spi_vip.sv" \
     "spi_vip_if.sv" \
     "adi_spi_vip_pkg.ttcl" \
@@ -157,7 +156,7 @@ set_property -dict [list \
 ## DEFAULT_MISO_DATA
 set_property	-dict [list \
   "value_bit_string_length" "32" \
-  "value_format" "bit_string" \
+  "value_format" "bitString" \
   "enablement_tcl_expr" "\$MODE==0" \
 ] \
 [ipx::get_user_parameters DEFAULT_MISO_DATA -of_objects $cc]

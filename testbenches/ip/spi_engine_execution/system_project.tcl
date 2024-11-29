@@ -41,10 +41,8 @@ adi_sim_project_files [list \
  "../../../library/drivers/dmac/dma_trans.sv" \
  "../../../library/utilities/test_harness_env.sv" \
  "../../../library/drivers/spi_engine/spi_engine_instr_pkg.sv" \
- "spi_environment.sv" \
+ "spi_execution_environment.sv" \
  "tests/test_program.sv" \
- "tests/test_sleep_delay.sv" \
- "tests/test_slowdata.sv" \
  "system_tb.sv" \
  ]
 

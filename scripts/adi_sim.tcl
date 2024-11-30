@@ -33,7 +33,11 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   create_bd_design $design_name
 
   global sys_zynq
+  global sys_cpu_interconnect_cascade
+
   set sys_zynq -1
+  set sys_cpu_interconnect_cascade 1
+  
   if { ![info exists ad_project_params(CUSTOM_HARNESS)] || !$ad_project_params(CUSTOM_HARNESS) } {
     source ../../../library/utilities/test_harness_system_bd.tcl
   }

@@ -33,8 +33,6 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
-
 global ad_project_params
 
 source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl

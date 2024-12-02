@@ -33,7 +33,7 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
+global ad_project_params
 
 # Device clk
 ad_ip_instance clk_vip device_clk_vip [ list \

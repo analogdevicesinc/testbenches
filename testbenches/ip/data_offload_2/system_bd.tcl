@@ -1,8 +1,6 @@
-global ad_hdl_dir
+global ad_project_params
 
 source "$ad_hdl_dir/projects/common/xilinx/data_offload_bd.tcl"
-
-global ad_project_params
 
 ## DUT configuration
 

@@ -33,7 +33,7 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
+global ad_project_params
 
 # Device clk
 ad_ip_instance clk_vip device_clk_vip [ list \
@@ -49,8 +49,6 @@ set device_clk device_clk_vip/clk_out
 # Blocks under test 
 #
 #  ------------------
-
-global ad_project_params
 
 ad_ip_instance axi_dmac dut_rx_dma $ad_project_params(rx_dma_cfg)
 

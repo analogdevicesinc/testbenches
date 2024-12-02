@@ -4,13 +4,12 @@
 ####################################################################################
 ####################################################################################
 
-# Assumes this file is in <HDL>/testbenches/scripts/project-sim.mk 
-ADI_HDL_DIR := $(subst /testbenches/scripts/project-sim.mk,,$(abspath $(lastword $(MAKEFILE_LIST))))
-HDL_LIBRARY_PATH := $(ADI_HDL_DIR)/library/
+include $(ADI_TB_DIR)/library/includes/Makeinclude_common.mk
+
 include $(ADI_HDL_DIR)/quiet.mk
 
 ENV_DEPS += $(foreach dep,$(LIB_DEPS),$(HDL_LIBRARY_PATH)$(dep)/component.xml)
-ENV_DEPS += $(foreach dep,$(SIM_LIB_DEPS),$(ADI_HDL_DIR)/testbenches/library/vip/adi/$(dep)/component.xml)
+ENV_DEPS += $(foreach dep,$(SIM_LIB_DEPS),$(ADI_TB_DIR)/library/vip/adi/$(dep)/component.xml)
 
 SHELL:=/bin/bash
 
@@ -71,11 +70,11 @@ endef
 ifeq ($(OS), Windows_NT)
 CMD_PRE = cmd /C "
 CMD_POST = "
-RUN_SIM_PATH = $(shell cygpath -m $(ADI_HDL_DIR)/testbenches/scripts/run_sim.tcl)
+RUN_SIM_PATH = $(shell cygpath -m $(ADI_TB_DIR)/scripts/run_sim.tcl)
 else
 CMD_PRE =
 CMD_POST =
-RUN_SIM_PATH = $(ADI_HDL_DIR)/testbenches/scripts/run_sim.tcl
+RUN_SIM_PATH = $(ADI_TB_DIR)/scripts/run_sim.tcl
 endif
 
 # This rule template will build the environment
@@ -160,9 +159,9 @@ $(HDL_LIBRARY_PATH)%/component.xml: FORCE
 	"; exit $$?
 
 # Create here the targets which build the sim libraries
-$(ADI_HDL_DIR)/testbenches/library/vip/adi/%/component.xml: TARGET:=xilinx
+$(ADI_TB_DIR)/library/vip/adi/%/component.xml: TARGET:=xilinx
 FORCE:
-$(ADI_HDL_DIR)/testbenches/library/vip/adi/%/component.xml: FORCE
+$(ADI_TB_DIR)/library/vip/adi/%/component.xml: FORCE
 	flock $(dir $@).lock -c " \
 	$(MAKE) -C $(dir $@) xilinx; \
 	"; exit $$?

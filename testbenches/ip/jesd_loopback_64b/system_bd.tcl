@@ -33,10 +33,9 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
-source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
-
 global ad_project_params
+
+source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
 
 set JESD_F $ad_project_params(JESD_F)
 # For F=3,6,12 use dual clock

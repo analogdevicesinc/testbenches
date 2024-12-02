@@ -33,10 +33,9 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../../scripts/adi_env.tcl
-source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
-
 global ad_project_params
+
+source $ad_hdl_dir/library/jesd204/scripts/jesd204.tcl
 
 set LINK_MODE  $ad_project_params(LINK_MODE)
 

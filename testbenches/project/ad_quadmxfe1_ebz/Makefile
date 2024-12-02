@@ -4,30 +4,17 @@
 ####################################################################################
 ####################################################################################
 
-# All test-bench dependencies except test programs
-SV_DEPS += ../../../library/utilities/utils.svh
-SV_DEPS += ../../../library/utilities/logger_pkg.sv
-SV_DEPS += ../../../library/regmaps/reg_accessor.sv
-SV_DEPS += ../../../library/vip/amd/m_axis_sequencer.sv
-SV_DEPS += ../../../library/vip/amd/s_axis_sequencer.sv
-SV_DEPS += ../../../library/vip/amd/m_axi_sequencer.sv
-SV_DEPS += ../../../library/vip/amd/s_axi_sequencer.sv
-SV_DEPS += ../../../library/drivers/dmac/dmac_api.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_pkg.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_dmac_pkg.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_dac_pkg.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_common_pkg.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_adc_pkg.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_jesd_tx_pkg.sv
-SV_DEPS += ../../../library/regmaps/adi_regmap_jesd_rx_pkg.sv
-SV_DEPS += ../../../library/drivers/dmac/dma_trans.sv
-SV_DEPS += ../../../library/utilities/test_harness_env.sv
-SV_DEPS += system_tb.sv
+# Makeincludes
+include ../../../scripts/make_tb_path.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_jesd.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_xcvr.mk
 
-ENV_DEPS += system_project.tcl
-ENV_DEPS += system_bd.tcl
-ENV_DEPS += ../../../scripts/adi_sim.tcl
-ENV_DEPS += ../../../scripts/run_sim.tcl
+# Remaining test-bench dependencies except test programs
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_dac_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_common_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_adc_pkg.sv
 
 LIB_DEPS += axi_dmac
 LIB_DEPS += jesd204/ad_ip_jesd204_tpl_dac
@@ -72,7 +59,7 @@ TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 #TESTS += cfg5_64b66b_Tx23_Rx25_LR_24_75:test_dma
 #TESTS += cfg6_64b66b_Tx29_Rx24_LR_24_75:test_dma
 
-include ../../../scripts/project-sim.mk
+include $(ADI_TB_DIR)/scripts/project-sim.mk
 
 # usage :
 #

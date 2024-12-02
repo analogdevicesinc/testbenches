@@ -1,0 +1,19 @@
+## Copyright 2024(c) Analog Devices, Inc.
+####################################################################################
+####################################################################################
+
+# Makeincludes
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_axi.mk
+
+# All test-bench dependencies except test programs
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/utils.svh
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/logger_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/test_harness_env.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/drivers/common/watchdog.sv
+
+SV_DEPS += system_tb.sv
+
+ENV_DEPS += system_project.tcl
+ENV_DEPS += system_bd.tcl
+ENV_DEPS += $(ADI_TB_DIR)/scripts/adi_sim.tcl
+ENV_DEPS += $(ADI_TB_DIR)/scripts/run_sim.tcl

@@ -291,8 +291,12 @@ want to switch to any other branch you need to checkout that branch:</p>
 <h2>Building a test bench<a class="headerlink" href="#building-a-test-bench" title="Link to this heading">#</a></h2>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>Before building any test bench, you must have the environment prepared and the
-proper tools.</p>
+<p>Before building any test bench, you must have the environment prepared each
+time a new terminal session is started:</p>
+<ol class="arabic simple">
+<li><p>Set the HDL repository path with <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_HDL_DIR=&lt;path</span> <span class="pre">to</span> <span class="pre">dir&gt;</span></code>.</p></li>
+<li><p>Set the Testbenches repository path with <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_TB_DIR=&lt;path</span> <span class="pre">to</span> <span class="pre">dir&gt;</span></code>.</p></li>
+</ol>
 </div>
 <p>The way of building a test bench in Cygwin and WSL is almost the same.
 In this example, it is building the <strong>AD7616</strong> test bench.</p>

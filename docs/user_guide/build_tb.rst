@@ -60,8 +60,12 @@ Building a test bench
 
 .. caution::
 
-   Before building any test bench, you must have the environment prepared and the
-   proper tools.
+   Before building any test bench, you must have the environment prepared each
+   time a new terminal session is started:
+
+   #. Set the HDL repository path with ``export ADI_HDL_DIR=<path to dir>``.
+
+   #. Set the Testbenches repository path with ``export ADI_TB_DIR=<path to dir>``.
 
 The way of building a test bench in Cygwin and WSL is almost the same.
 In this example, it is building the **AD7616** test bench.

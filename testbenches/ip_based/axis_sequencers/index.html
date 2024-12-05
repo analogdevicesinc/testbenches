@@ -7,14 +7,14 @@
 
     <title>AXIS Sequencers &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=95305861" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=ab97267f" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="https://wavedrom.com/skins/default.js"></script>
     <script src="https://wavedrom.com/wavedrom.min.js"></script>
-    <script defer="" src="../../../_static/app.umd.js?v=c93eadd1"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=689b8755"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -96,7 +96,7 @@
     <div class="localtoc">
       <div class="tocwrapper">
         <div>
-          <div class="localtoc-header">On this page</div>
+          <div class="localtoc-header"></div>
           <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
         </div>
         <nav>
@@ -242,15 +242,15 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="axis-sequencers">
-<span id="id1"></span><h1>AXIS Sequencers<a class="headerlink" href="#axis-sequencers" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1>AXIS Sequencers<a class="headerlink" href="#axis-sequencers" title="Link to this heading"></a></h1>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>The purpose of this testbench is to give engineers a sandbox testbench, where
 they can test different configuration parameters for the AXI4 Stream VIPs and
 sequencers.</p>
 </section>
 <section id="block-design">
-<h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading">#</a></h2>
+<h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
 <p>The block design is based on the test harness with the addition of two AXI4
 Stream VIPs from AMD. This testbench does not require the presence of the test
 harness, as it can work without it, but since it was created based on the base
@@ -261,12 +261,12 @@ your desire is to enable/disable other signals in this testbench, you’ll have
 to modify the block design. Dynamic configuration of these parameters will be
 added later in the configuration file.</p>
 <section id="block-diagram">
-<h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading">#</a></h3>
+<h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
 <a class="reference internal image-reference" href="../../../_images/axis_sequencers_tb.svg"><img alt="AXIS_Sequencers/Testbench block diagram" class="align-center" src="../../../_images/axis_sequencers_tb.svg" style="width: 800px;" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
-<h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading">#</a></h3>
+<h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
 <p>The following parameters of this project that can be configured:</p>
 <ul class="simple">
 <li><p>SRC_DESCRIPTORS: defines the data generation mode:
@@ -283,23 +283,23 @@ Integer, non-0 value</p></li>
 Integer, non-0 value</p></li>
 </ul>
 <section id="build-parameters">
-<h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading">#</a></h4>
+<h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading"></a></h4>
 <p>The parameters mentioned above can be configured when starting the build, like
 in the following example:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">SRC_DESCRIPTORS</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">SRC_BEAT_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">SRC_DESCRIPTOR_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">DEST_BACKPRESSURE</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_HIGH</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_LOW</span><span class="o">=</span><span class="m">5</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">SRC_DESCRIPTORS</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">SRC_BEAT_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">SRC_DESCRIPTOR_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">DEST_BACKPRESSURE</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_HIGH</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_LOW</span><span class="o">=</span><span class="m">5</span>
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
 <section id="configuration-files">
-<h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading">#</a></h4>
+<h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
 <p>As this is a sandbox testbench, engineers are encouraged to change parameters
 and see what happens in the simulation.</p>
 </section>
 <section id="tests">
-<h4>Tests<a class="headerlink" href="#tests" title="Link to this heading">#</a></h4>
+<h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
 <p>The following test program file is available:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
@@ -317,24 +317,24 @@ and see what happens in the simulation.</p>
 </div>
 </section>
 <section id="available-configurations-tests-combinations">
-<h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading">#</a></h4>
+<h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
 <p>The test program is compatible with the configuration.</p>
 </section>
 </section>
 <section id="cpu-memory-interconnects-addresses">
-<h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading">#</a></h3>
+<h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading"></a></h3>
 <p>Irrelevant for this testbench.</p>
 </section>
 <section id="interrupts">
-<h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading">#</a></h3>
+<h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
 <p>Irrelevant for this testbench.</p>
 </section>
 </section>
 <section id="test-stimulus">
-<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading">#</a></h2>
+<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
 <p>The test program is responsible for configuring and running the sequencers.</p>
 <section id="environment-bringup">
-<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading">#</a></h3>
+<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
 <p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
@@ -344,7 +344,7 @@ and see what happens in the simulation.</p>
 </ul>
 </section>
 <section id="sequencer-testing">
-<h3>Sequencer testing<a class="headerlink" href="#sequencer-testing" title="Link to this heading">#</a></h3>
+<h3>Sequencer testing<a class="headerlink" href="#sequencer-testing" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Configures the source and destination sequencers’ ready and valid signals
 uptime and downtime with the parameters set in the configuration file</p></li>
@@ -367,7 +367,7 @@ the watchdog may trigger prematurely!</p>
 </section>
 </section>
 <section id="building-the-test-bench">
-<h2>Building the test bench<a class="headerlink" href="#building-the-test-bench" title="Link to this heading">#</a></h2>
+<h2>Building the test bench<a class="headerlink" href="#building-the-test-bench" title="Link to this heading"></a></h2>
 <p>The testbench is built upon ADI’s generic HDL reference design framework.
 ADI does not distribute compiled files of these projects so they must be built
 from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">here</a>,
@@ -381,13 +381,13 @@ the HDL repository, and then build the project as follows:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p><em>Example 2</em></p>
@@ -396,13 +396,13 @@ launch Vivado, will run the simulation and display the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p><em>Example 3</em></p>
@@ -412,13 +412,13 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
@@ -430,9 +430,9 @@ clean folder (no runs folder available):</p>
 <p><code class="docutils literal notranslate"><span class="pre">cfg1</span></code></p>
 </section>
 <section id="resources">
-<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">#</a></h2>
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
 <section id="testbenches-related-dependencies">
-<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading">#</a></h3>
+<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
 <p>Common with most testbenches:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
@@ -508,13 +508,13 @@ clean folder (no runs folder available):</p>
 </section>
 </section>
 <section id="more-information">
-<h2>More information<a class="headerlink" href="#more-information" title="Link to this heading">#</a></h2>
+<h2>More information<a class="headerlink" href="#more-information" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">ADI Testbenches User guide</span></a></p></li>
 </ul>
 </section>
 <section id="support">
-<h2>Support<a class="headerlink" href="#support" title="Link to this heading">#</a></h2>
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
 <p><a class="reference external" href="https://www.analog.com/en/index.html">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
 using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/">reference design</a> with <a class="reference external" href="https://www.analog.com/en/index.html">ADI</a> components via
 the <a class="icon ez reference external" href="https://ez.analog.com/fpga">EngineerZone</a> FPGA reference designs forum.</p>

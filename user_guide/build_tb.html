@@ -7,14 +7,14 @@
 
     <title>Build a test bench &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/style.min.css?v=95305861" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.min.css?v=ab97267f" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="https://wavedrom.com/skins/default.js"></script>
     <script src="https://wavedrom.com/wavedrom.min.js"></script>
-    <script defer="" src="../_static/app.umd.js?v=c93eadd1"></script>
+    <script defer="" src="../_static/app.umd.js?v=689b8755"></script>
     <link rel="icon" href="../_static/icon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -96,7 +96,7 @@
     <div class="localtoc">
       <div class="tocwrapper">
         <div>
-          <div class="localtoc-header">On this page</div>
+          <div class="localtoc-header"></div>
           <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
         </div>
         <nav>
@@ -224,7 +224,7 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="build-a-test-bench">
-<span id="build-tb"></span><h1>Build a test bench<a class="headerlink" href="#build-a-test-bench" title="Link to this heading">#</a></h1>
+<span id="build-tb"></span><h1>Build a test bench<a class="headerlink" href="#build-a-test-bench" title="Link to this heading"></a></h1>
 <p><strong>Please note that ADI only provides the source files necessary to create and
 build the designs. This means that you are responsible for modifying and
 building these projects.</strong></p>
@@ -236,7 +236,7 @@ The only catch is that if you run into problems, you have to resolve them indepe
 many ways. We use <strong>command line</strong> and mostly <strong>Linux systems</strong>. On Windows, we
 use <strong>Cygwin</strong>.</p>
 <section id="set-up-the-testbenches-repository">
-<span id="build-tb-set-up-tb-repo"></span><h2>Set up the Testbenches repository<a class="headerlink" href="#set-up-the-testbenches-repository" title="Link to this heading">#</a></h2>
+<span id="build-tb-set-up-tb-repo"></span><h2>Set up the Testbenches repository<a class="headerlink" href="#set-up-the-testbenches-repository" title="Link to this heading"></a></h2>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>Before building any testbench, you <strong>must</strong>:</p>
@@ -255,13 +255,13 @@ before building the project. Otherwise your project will fail.</p></li>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>hdl
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>hdl
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/hdl$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:analogdevicesinc/testbenches.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:analogdevicesinc/testbenches.git
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>The above command clones the <strong>default</strong> branch, which is the <strong>main</strong> for
@@ -271,24 +271,24 @@ want to switch to any other branch you need to checkout that branch:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/testbenches$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>branch
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>branch
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/testbenches$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>2022_r2
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>2022_r2
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
 <section id="building-a-test-bench">
-<h2>Building a test bench<a class="headerlink" href="#building-a-test-bench" title="Link to this heading">#</a></h2>
+<h2>Building a test bench<a class="headerlink" href="#building-a-test-bench" title="Link to this heading"></a></h2>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>Before building any test bench, you must have the environment prepared each
@@ -303,13 +303,13 @@ In this example, it is building the <strong>AD7616</strong> test bench.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>The <code class="docutils literal notranslate"><span class="pre">make</span></code> builds all the libraries first and then builds the test bench.
@@ -327,7 +327,7 @@ started as well.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>Some projects support adding additional <code class="docutils literal notranslate"><span class="pre">make</span></code> parameters to configure
@@ -343,18 +343,18 @@ the <strong>test_program_si</strong> test program.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_si<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_si
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_si<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_si
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
 <section id="environment">
-<h2>Environment<a class="headerlink" href="#environment" title="Link to this heading">#</a></h2>
+<h2>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h2>
 <p>As mentioned above, our recommended build flow is to use <code class="docutils literal notranslate"><span class="pre">make</span></code> and the
 command line version of the tools. This method facilitates our
 overall build and release process as it automatically builds the
 required libraries and dependencies.</p>
 <section id="linux-environment-setup">
-<h3>Linux environment setup<a class="headerlink" href="#linux-environment-setup" title="Link to this heading">#</a></h3>
+<h3>Linux environment setup<a class="headerlink" href="#linux-environment-setup" title="Link to this heading"></a></h3>
 <p>All major distributions should have <code class="docutils literal notranslate"><span class="pre">make</span></code> installed by default. If not,
 if you try the command, it should tell you how to install it with the
 package name.</p>
@@ -367,12 +367,12 @@ these things, it is best to leave it to the tools to set up the environment.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
 <section id="windows-environment-setup">
-<h3>Windows environment setup<a class="headerlink" href="#windows-environment-setup" title="Link to this heading">#</a></h3>
+<h3>Windows environment setup<a class="headerlink" href="#windows-environment-setup" title="Link to this heading"></a></h3>
 <p>The best option on Windows is to use
 <a class="reference external" href="https://www.cygwin.com">Cygwin</a>. When installing it, select the
 <code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> packages. You should do changes to your <strong>.bashrc</strong> in a
@@ -380,7 +380,7 @@ similar manner to the Linux environment.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>A very good alternative to Cygwin is
@@ -389,7 +389,7 @@ manual changes to your <strong>.bashrc</strong> should look like:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>If you do not want to install Cygwin, there might still be some
@@ -402,7 +402,7 @@ usually at <code class="docutils literal notranslate"><span class="pre">C:\Xilin
 </section>
 </section>
 <section id="opening-a-testbench">
-<h2>Opening a testbench<a class="headerlink" href="#opening-a-testbench" title="Link to this heading">#</a></h2>
+<h2>Opening a testbench<a class="headerlink" href="#opening-a-testbench" title="Link to this heading"></a></h2>
 <p>If you want to open the testbench and check the block design and/or the
 waveform, there are two options:</p>
 <ul class="simple">
@@ -412,13 +412,13 @@ mode right after it builds the block design.</p></li>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><ul class="simple">
@@ -432,25 +432,25 @@ that can be opened.</p></li>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ad7616
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>runs/cfg_si
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>runs/cfg_si
 </pre></div>
 </div>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/ad7616/runs/cfg_si$
 </pre></div>
 </div>
-<div class="bold highlight-bash notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>./cfg_si.xpr
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>./cfg_si.xpr
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>

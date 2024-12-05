@@ -7,14 +7,14 @@
 
     <title>Watchdog &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/style.min.css?v=95305861" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/style.min.css?v=ab97267f" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
     <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="https://wavedrom.com/skins/default.js"></script>
     <script src="https://wavedrom.com/wavedrom.min.js"></script>
-    <script defer="" src="../../../../_static/app.umd.js?v=c93eadd1"></script>
+    <script defer="" src="../../../../_static/app.umd.js?v=689b8755"></script>
     <link rel="icon" href="../../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -96,7 +96,7 @@
     <div class="localtoc">
       <div class="tocwrapper">
         <div>
-          <div class="localtoc-header">On this page</div>
+          <div class="localtoc-header"></div>
           <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
         </div>
         <nav>
@@ -229,9 +229,9 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="watchdog">
-<span id="id1"></span><h1>Watchdog<a class="headerlink" href="#watchdog" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1>Watchdog<a class="headerlink" href="#watchdog" title="Link to this heading"></a></h1>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>The purpose of this class is to provide an object that can stop a simulation
 run, most importantly to prevent system hangs, never ending simulation runs.
 The designer of the test stimulus needs to have a good understanding of the
@@ -241,30 +241,30 @@ cases, where there is a moderate chance that the system may hang, and to
 prevent such instances to happen.</p>
 </section>
 <section id="variables">
-<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h2>
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
 <p>None are available for direct external access.</p>
 </section>
 <section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
 <section id="function-new-bit-31-0-timer-string-message">
-<h3>function new(bit [31:0] timer, string message);<a class="headerlink" href="#function-new-bit-31-0-timer-string-message" title="Link to this heading">#</a></h3>
+<h3>function new(bit [31:0] timer, string message);<a class="headerlink" href="#function-new-bit-31-0-timer-string-message" title="Link to this heading"></a></h3>
 <p>Creates the watchdog object. The timer variable is used to set the default
 timer value after which the watchdog is triggered. This value must be set in
 nanoseconds. The message value sets the default output message when the
 watchdog is triggered.</p>
 </section>
 <section id="function-void-update-message-string-message">
-<h3>function void update_message(string message);<a class="headerlink" href="#function-void-update-message-string-message" title="Link to this heading">#</a></h3>
+<h3>function void update_message(string message);<a class="headerlink" href="#function-void-update-message-string-message" title="Link to this heading"></a></h3>
 <p>Used to update the timer value. The timer variable is used to set the new timer
 value after which the watchdog is triggered.</p>
 </section>
 <section id="function-void-update-timer-bit-31-0-timer">
-<h3>function void update_timer(bit [31:0] timer);<a class="headerlink" href="#function-void-update-timer-bit-31-0-timer" title="Link to this heading">#</a></h3>
+<h3>function void update_timer(bit [31:0] timer);<a class="headerlink" href="#function-void-update-timer-bit-31-0-timer" title="Link to this heading"></a></h3>
 <p>Used to update the watchdog message. The message value sets the watchdog output
 message when this is triggered. This value must be set in nanoseconds.</p>
 </section>
 <section id="task-start">
-<h3>task start();<a class="headerlink" href="#task-start" title="Link to this heading">#</a></h3>
+<h3>task start();<a class="headerlink" href="#task-start" title="Link to this heading"></a></h3>
 <p>Starts the watchdog timer in a separate thread. This allows other code to be
 run in parallel with it. When the watchdog timer reaches the wait time that was
 set prior to starting of the watchdog, either with a default value or an
@@ -274,18 +274,18 @@ killed and the counting stops. This means that the watchdog will not trigger in
 this instance and the simulation will not be halted.</p>
 </section>
 <section id="task-stop">
-<h3>task stop();<a class="headerlink" href="#task-stop" title="Link to this heading">#</a></h3>
+<h3>task stop();<a class="headerlink" href="#task-stop" title="Link to this heading"></a></h3>
 <p>Stops the watchdog timer when called. Used when the designer wants to stop the
 watchdog timer.</p>
 </section>
 <section id="task-reset">
-<h3>task reset();<a class="headerlink" href="#task-reset" title="Link to this heading">#</a></h3>
+<h3>task reset();<a class="headerlink" href="#task-reset" title="Link to this heading"></a></h3>
 <p>Stops and then starts again the watchdog timer using the start and stop
 functions.</p>
 </section>
 </section>
 <section id="usage-and-recommendations">
-<h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading">#</a></h2>
+<h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading"></a></h2>
 <p>Basic usage of the watchdog timer:</p>
 <ul class="simple">
 <li><p>Declare the watchdog timer, give an initial value for the timer and the
@@ -327,7 +327,7 @@ simulation sooner without waiting for the whole process to finish.</p></li>
 </ul>
 </section>
 <section id="support">
-<h2>Support<a class="headerlink" href="#support" title="Link to this heading">#</a></h2>
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
 <p><a class="reference external" href="https://www.analog.com/en/index.html">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
 using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/">reference design</a> with <a class="reference external" href="https://www.analog.com/en/index.html">ADI</a> components via
 the <a class="icon ez reference external" href="https://ez.analog.com/fpga">EngineerZone</a> FPGA reference designs forum.</p>

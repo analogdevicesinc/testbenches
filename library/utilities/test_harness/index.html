@@ -7,14 +7,14 @@
 
     <title>Test Harness &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=95305861" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=ab97267f" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="https://wavedrom.com/skins/default.js"></script>
     <script src="https://wavedrom.com/wavedrom.min.js"></script>
-    <script defer="" src="../../../_static/app.umd.js?v=c93eadd1"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=689b8755"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -96,7 +96,7 @@
     <div class="localtoc">
       <div class="tocwrapper">
         <div>
-          <div class="localtoc-header">On this page</div>
+          <div class="localtoc-header"></div>
           <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
         </div>
         <nav>
@@ -237,9 +237,9 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="test-harness">
-<span id="id1"></span><h1>Test Harness<a class="headerlink" href="#test-harness" title="Link to this heading">#</a></h1>
+<span id="id1"></span><h1>Test Harness<a class="headerlink" href="#test-harness" title="Link to this heading"></a></h1>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>The purpose of the test harness is to create a base environment that is used by
 most of our testbenches. The test harness structure is like that of UVM
 environment, where it has instantiated agents alongside other simulation
@@ -250,7 +250,7 @@ associated with the test harness are used for creating and driving the
 environment.</p>
 </section>
 <section id="structure">
-<h2>Structure<a class="headerlink" href="#structure" title="Link to this heading">#</a></h2>
+<h2>Structure<a class="headerlink" href="#structure" title="Link to this heading"></a></h2>
 <p>The base environment design is built using the <code class="docutils literal notranslate"><span class="pre">test_harness_system_bd.tcl</span></code>
 script when a project build is started. For the base environment, we’re using 2
 AXI VIPs. One is used to simulate a Processing System, while the other one is
@@ -272,7 +272,7 @@ Interconnect IP from AMD is added to handle interrupt requests coming from
 different IPs. The interrupt handling function is not yet implemented in our
 base design.</p>
 <section id="additional-notes">
-<h3>Additional notes<a class="headerlink" href="#additional-notes" title="Link to this heading">#</a></h3>
+<h3>Additional notes<a class="headerlink" href="#additional-notes" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>The structure used for the testbenches allows quick prototyping for our
 existing projects on a block design level.</p></li>
@@ -304,13 +304,13 @@ represent legacy testbenches that are still used for verifying our designs.</p><
 </section>
 </section>
 <section id="simulation-environment">
-<h2>Simulation environment<a class="headerlink" href="#simulation-environment" title="Link to this heading">#</a></h2>
+<h2>Simulation environment<a class="headerlink" href="#simulation-environment" title="Link to this heading"></a></h2>
 <p>The simulation environment is defined in <code class="docutils literal notranslate"><span class="pre">test_harness_env.sv</span></code> packaged in
 <code class="docutils literal notranslate"><span class="pre">test_harness_env_pkg</span></code>. The <code class="docutils literal notranslate"><span class="pre">test_harness_env</span></code> class is defined here, which
 has a basic set of instructions for environment bring up.</p>
 </section>
 <section id="variables">
-<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h2>
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
 <p>The base environment imports packages for the VIPs that are used in the base
 design using PKGIFY macro. Each VIP has a separate package created upon
 instantiation and this allows these to be imported by name. The
@@ -327,46 +327,46 @@ clocking and reset VIPs are also instantiated, so these can be accessed later
 in the simulation.</p>
 </section>
 <section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
 <p>These are functions provided by the test harness environment for an easy and
 fast bring up. These functions are scheduled to be updated or removed.</p>
 <section id="function-new">
-<h3>function new(…);<a class="headerlink" href="#function-new" title="Link to this heading">#</a></h3>
+<h3>function new(…);<a class="headerlink" href="#function-new" title="Link to this heading"></a></h3>
 <p>Created the environment object. Virtual interfaces are specified to link the
 block design interfaces with their respective simulation interface. The new
 function stores clocking and reset interfaces in local variables. It also
 instantiates the agents and sequencers for the PS and DDR memory VIPs.</p>
 </section>
 <section id="task-start">
-<h3>task start();<a class="headerlink" href="#task-start" title="Link to this heading">#</a></h3>
+<h3>task start();<a class="headerlink" href="#task-start" title="Link to this heading"></a></h3>
 <p>Used to activate the VIP agents and start the clocks.</p>
 </section>
 <section id="task-test">
-<h3>task test();<a class="headerlink" href="#task-test" title="Link to this heading">#</a></h3>
+<h3>task test();<a class="headerlink" href="#task-test" title="Link to this heading"></a></h3>
 <p>Empty by default. Add test stimulus here if the environment class is inherited.</p>
 </section>
 <section id="task-post-test">
-<h3>task post_test();<a class="headerlink" href="#task-post-test" title="Link to this heading">#</a></h3>
+<h3>task post_test();<a class="headerlink" href="#task-post-test" title="Link to this heading"></a></h3>
 <p>Function called after the test stimulus is completed.</p>
 </section>
 <section id="task-run">
-<h3>task run();<a class="headerlink" href="#task-run" title="Link to this heading">#</a></h3>
+<h3>task run();<a class="headerlink" href="#task-run" title="Link to this heading"></a></h3>
 <p>Used for calling test and post_test functions.</p>
 </section>
 <section id="task-stop">
-<h3>task stop();<a class="headerlink" href="#task-stop" title="Link to this heading">#</a></h3>
+<h3>task stop();<a class="headerlink" href="#task-stop" title="Link to this heading"></a></h3>
 <p>Used for stopping the VIP agents and stop the clocks.</p>
 </section>
 <section id="task-wait-done">
-<h3>task wait_done();<a class="headerlink" href="#task-wait-done" title="Link to this heading">#</a></h3>
+<h3>task wait_done();<a class="headerlink" href="#task-wait-done" title="Link to this heading"></a></h3>
 <p>Function called after the simulation is started, waiting for it to finish.</p>
 </section>
 <section id="task-test-c-run">
-<h3>task test_c_run();<a class="headerlink" href="#task-test-c-run" title="Link to this heading">#</a></h3>
+<h3>task test_c_run();<a class="headerlink" href="#task-test-c-run" title="Link to this heading"></a></h3>
 <p>Set done variable to 1, indicating the end of test stimulus.</p>
 </section>
 <section id="task-sys-reset">
-<h3>task sys_reset();<a class="headerlink" href="#task-sys-reset" title="Link to this heading">#</a></h3>
+<h3>task sys_reset();<a class="headerlink" href="#task-sys-reset" title="Link to this heading"></a></h3>
 <p>Used to assert reset for 200 ns, after which there is an 800 ns wait time.
 These timings are used in accordance with the clock frequency values. The 200
 ns gives enough time for each Processing System Reset IP to clock the reset
@@ -376,7 +376,7 @@ state before starting the test.</p>
 </section>
 </section>
 <section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Declare the test harness inside the test program</p></li>
 <li><p>Instantiate the test harness with new, with the arguments being virtual
@@ -388,7 +388,7 @@ interfaces that connect the block design with the test harness class</p></li>
 </ul>
 </section>
 <section id="support">
-<h2>Support<a class="headerlink" href="#support" title="Link to this heading">#</a></h2>
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
 <p><a class="reference external" href="https://www.analog.com/en/index.html">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
 using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/">reference design</a> with <a class="reference external" href="https://www.analog.com/en/index.html">ADI</a> components via
 the <a class="icon ez reference external" href="https://ez.analog.com/fpga">EngineerZone</a> FPGA reference designs forum.</p>

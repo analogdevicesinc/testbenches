@@ -60,9 +60,6 @@ module system_tb();
 
     wire [4:0] num_chs;
 
-    parameter ADC_N_BITS = 16;
-    localparam NEG_EDGE = 1;
-
     `TEST_PROGRAM test(
       .adc_config_mode (adc_config_mode),
       .rx_cnvst_n (rx_cnvst_n),
@@ -113,14 +110,14 @@ module system_tb();
   end
   else //serial interface
   begin
-      wire                   ad7606_spi_sclk;
-      wire                   ad7606_spi_sdo;
-      wire [`NUM_OF_SDI-1:0] ad7606_spi_sdi;
-      wire                   ad7606_spi_cs;
-      wire                   spi_clk;
-      wire                   adc_busy;
-      wire                   adc_cnvst_n;
-      wire                   ad7606_irq;
+    wire                   ad7606_spi_sclk;
+    wire                   ad7606_spi_sdo;
+    wire [`NUM_OF_SDI-1:0] ad7606_spi_sdi;
+    wire                   ad7606_spi_cs;
+    wire                   spi_clk;
+    wire                   adc_busy;
+    wire                   adc_cnvst_n;
+    wire                   ad7606_irq;
 
     `TEST_PROGRAM test(
       .spi_clk (spi_clk),
@@ -141,6 +138,6 @@ module system_tb();
 
       assign adc_busy = adc_cnvst_n;
     end
-    endgenerate
+  endgenerate
 
 endmodule

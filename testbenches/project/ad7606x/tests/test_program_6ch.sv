@@ -47,14 +47,14 @@ import adi_regmap_common_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 
-parameter SIMPLE_STATUS_CRC = 0;
+localparam SIMPLE_STATUS_CRC = 0;
 
-parameter CH0 = 8'h00 * 4;
-parameter CH1 = 8'h10 * 4;
-parameter CH2 = 8'h20 * 4;
-parameter CH3 = 8'h30 * 4;
-parameter CH4 = 8'h40 * 4;
-parameter CH5 = 8'h50 * 4;
+localparam CH0 = 8'h00 * 4;
+localparam CH1 = 8'h10 * 4;
+localparam CH2 = 8'h20 * 4;
+localparam CH3 = 8'h30 * 4;
+localparam CH4 = 8'h40 * 4;
+localparam CH5 = 8'h50 * 4;
 
 program test_program_6ch (
   input         rx_cnvst_n,
@@ -69,81 +69,76 @@ program test_program_6ch (
   input  [15:0] rx_db_o,
   input         sys_clk,
   output        rx_busy,
-  output bit [2:0] adc_config_mode);
+  output logic [2:0] adc_config_mode);
 
-test_harness_env env;
+  test_harness_env env;
 
-// --------------------------
-// Wrapper function for AXI read verif
-// --------------------------
-task axi_read_v(
+  // --------------------------
+  // Wrapper function for AXI read verif
+  // --------------------------
+  task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-  env.mng.RegReadVerify32(raddr,vdata);
-endtask
+    env.mng.RegReadVerify32(raddr,vdata);
+  endtask
 
-task axi_read(
+  task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-  env.mng.RegRead32(raddr,data);
-endtask
+    env.mng.RegRead32(raddr,data);
+  endtask
 
-// --------------------------
-// Wrapper function for AXI write
-// --------------------------
-task axi_write(
-  input [31:0]  waddr,
-  input [31:0]  wdata);
+  // --------------------------
+  // Wrapper function for AXI write
+  // --------------------------
+  task axi_write(
+    input [31:0]  waddr,
+    input [31:0]  wdata);
 
-  env.mng.RegWrite32(waddr,wdata);
-endtask
+    env.mng.RegWrite32(waddr,wdata);
+  endtask
 
-// --------------------------
-// Main procedure
-// --------------------------
-initial begin
+  // --------------------------
+  // Main procedure
+  // --------------------------
+  initial begin
 
-  //creating environment
-  env = new("AD7616 Environment",
-            `TH.`SYS_CLK.inst.IF,
-            `TH.`DMA_CLK.inst.IF,
-            `TH.`DDR_CLK.inst.IF,
-            `TH.`SYS_RST.inst.IF,
-            `TH.`MNG_AXI.inst.IF,
-            `TH.`DDR_AXI.inst.IF);
+    //creating environment
+    env = new("AD7606X Environment",
+              `TH.`SYS_CLK.inst.IF,
+              `TH.`DMA_CLK.inst.IF,
+              `TH.`DDR_CLK.inst.IF,
+              `TH.`SYS_RST.inst.IF,
+              `TH.`MNG_AXI.inst.IF,
+              `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(6);
-  env.start();
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-  //asserts all the resets for 100 ns
-  `TH.`SYS_RST.inst.IF.assert_reset;
-  #100
-  `TH.`SYS_RST.inst.IF.deassert_reset;
-  #100
+    env.start();
+    env.sys_reset();
 
-  sanity_test();
+    sanity_test();
 
-  #100 adc_config_number_of_channels();
+    #100 adc_config_number_of_channels();
 
-  #100 adc_config_SIMPLE_test();
+    #100 adc_config_SIMPLE_test();
 
-  #200 adc_config_CRC_test();
+    #200 adc_config_CRC_test();
 
-  #200 adc_config_STATUS_test();
+    #200 adc_config_STATUS_test();
 
-  #200 adc_config_STATUS_CRC_test();
+    #200 adc_config_STATUS_CRC_test();
 
-  #200 adc_config_SIMPLE_test();
+    #200 adc_config_SIMPLE_test();
 
-  #100 db_transmission_test();
+    #100 db_transmission_test();
 
-  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
 
-  $finish;
-
-end
+  end
 
   // fixed data for channels
   bit [(`ADC_N_BITS == 18 ? 17 : 15):0]  tx_ch1 = (`ADC_N_BITS == 18) ? 18'hAB322 : 16'hACCA;
@@ -170,152 +165,150 @@ end
   wire [4:0] num_of_transfers;
   assign num_of_transfers = (`ADC_N_BITS == 16) ? ((adc_config_mode == 0 ? 8 : (adc_config_mode == 1 ? 9 : (adc_config_mode == 2 ? 16 : 17)))) : ((adc_config_mode == 0 || adc_config_mode == 2) ? 16 : 17);
 
-//---------------------------------------------------------------------------
-// Sanity test reg interface
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Sanity test reg interface
+  //---------------------------------------------------------------------------
 
-task sanity_test();
-    // check ADC VERSION
-    axi_read_v (`AXI_AD7606X_BA + GetAddrs(COMMON_REG_VERSION),
-                    `SET_COMMON_REG_VERSION_VERSION('h000a0300));
-    `INFO(("Sanity Test Done."), ADI_VERBOSITY_LOW);
-endtask
+  task sanity_test();
+      // check ADC VERSION
+      axi_read_v (`AXI_AD7606X_BA + GetAddrs(COMMON_REG_VERSION),
+                      `SET_COMMON_REG_VERSION_VERSION('h000a0300));
+      `INFO(("Sanity Test Done."), ADI_VERBOSITY_LOW);
+  endtask
 
-//---------------------------------------------------------------------------
-// Transfer Counter
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Transfer Counter
+  //---------------------------------------------------------------------------
 
-bit [31:0] transfer_cnt;
-assign transfer_cnt = rx_ch_count;
+  bit [31:0] transfer_cnt;
+  assign transfer_cnt = rx_ch_count;
 
-initial begin
-  while (1) begin
-    @(negedge rx_data_ready);
-    case (transfer_cnt)
-      32'h00000000: tx_data_buf = 16'h0;
-      32'h00000001: begin
-                      if (`ADC_N_BITS == 16) begin
-                        tx_data_buf = tx_ch1;
-                      end else if (`ADC_N_BITS == 18) begin
-                        tx_data_buf = tx_ch1[17:2];
-                      end
-                    end
-      32'h00000002: begin
-                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_1};
-                      end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
-                        tx_data_buf = tx_ch2;
-                      end
-                      if (`ADC_N_BITS == 18) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+  initial begin
+    forever begin
+      @(negedge rx_data_ready);
+      case (transfer_cnt)
+        32'h00000000: tx_data_buf = 16'h0;
+        32'h00000001: begin
+                        if (`ADC_N_BITS == 16) begin
+                          tx_data_buf = tx_ch1;
+                        end else if (`ADC_N_BITS == 18) begin
+                          tx_data_buf = tx_ch1[17:2];
                         end
                       end
-                    end
-      32'h00000003: begin
-                      tx_data_buf = tx_ch3;
-                      if (`ADC_N_BITS == 18) begin
-                        tx_data_buf = tx_ch2[17:2];
-                      end
-                    end
-      32'h00000004: begin
-                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_2};
-                      end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
-                        tx_data_buf = tx_ch4;
-                      end
-                      if (`ADC_N_BITS == 18) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+        32'h00000002: begin
+                        if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                          tx_data_buf = {8'b0,tx_status_1};
+                        end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
+                          tx_data_buf = tx_ch2;
+                        end
+                        if (`ADC_N_BITS == 18) begin
+                          if (adc_config_mode == 0 || adc_config_mode == 1) begin
+                            tx_data_buf = {tx_ch1[1:0],14'b0};
+                          end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
+                            tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+                          end
                         end
                       end
-                    end
-      32'h00000005: begin
-                      tx_data_buf = tx_ch5;
-                      if (`ADC_N_BITS == 18) begin
-                        tx_data_buf = tx_ch3[17:2];
-                      end
-                    end
-      32'h00000006: begin
-                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_3};
-                      end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
-                        tx_data_buf = tx_ch6;
-                      end
-                      if (`ADC_N_BITS == 18) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+        32'h00000003: begin
+                        tx_data_buf = tx_ch3;
+                        if (`ADC_N_BITS == 18) begin
+                          tx_data_buf = tx_ch2[17:2];
                         end
                       end
-                    end
-
-
-      32'h00000009: begin
-                      if (`ADC_N_BITS == 18) begin
-                        tx_data_buf = tx_ch5[17:2];
-                      end else begin
-                        tx_data_buf = tx_crc;
-                      end
-                    end
-      32'h0000000A: begin
-                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_5};
-                      end
-                      if (`ADC_N_BITS == 18) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+        32'h00000004: begin
+                        if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                          tx_data_buf = {8'b0,tx_status_2};
+                        end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
+                          tx_data_buf = tx_ch4;
+                        end
+                        if (`ADC_N_BITS == 18) begin
+                          if (adc_config_mode == 0 || adc_config_mode == 1) begin
+                            tx_data_buf = {tx_ch1[1:0],14'b0};
+                          end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
+                            tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+                          end
                         end
                       end
-                    end
-      32'h0000000B: begin
-                      if (`ADC_N_BITS == 18) begin
-                        tx_data_buf = tx_ch6[17:2];
-                      end
-                    end
-      32'h0000000C: begin
-                      if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
-                        tx_data_buf = {8'b0,tx_status_6};
-                      end
-                      if (`ADC_N_BITS == 18) begin
-                        if (adc_config_mode == 0 || adc_config_mode == 1) begin
-                          tx_data_buf = {tx_ch1[1:0],14'b0};
-                        end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
-                          tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+        32'h00000005: begin
+                        tx_data_buf = tx_ch5;
+                        if (`ADC_N_BITS == 18) begin
+                          tx_data_buf = tx_ch3[17:2];
                         end
                       end
-                    end
-
-    endcase
+        32'h00000006: begin
+                        if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                          tx_data_buf = {8'b0,tx_status_3};
+                        end else if ((`ADC_N_BITS == 16) && (adc_config_mode == 0 || adc_config_mode == 1)) begin
+                          tx_data_buf = tx_ch6;
+                        end
+                        if (`ADC_N_BITS == 18) begin
+                          if (adc_config_mode == 0 || adc_config_mode == 1) begin
+                            tx_data_buf = {tx_ch1[1:0],14'b0};
+                          end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
+                            tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+                          end
+                        end
+                      end
+        32'h00000009: begin
+                        if (`ADC_N_BITS == 18) begin
+                          tx_data_buf = tx_ch5[17:2];
+                        end else begin
+                          tx_data_buf = tx_crc;
+                        end
+                      end
+        32'h0000000A: begin
+                        if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                          tx_data_buf = {8'b0,tx_status_5};
+                        end
+                        if (`ADC_N_BITS == 18) begin
+                          if (adc_config_mode == 0 || adc_config_mode == 1) begin
+                            tx_data_buf = {tx_ch1[1:0],14'b0};
+                          end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
+                            tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+                          end
+                        end
+                      end
+        32'h0000000B: begin
+                        if (`ADC_N_BITS == 18) begin
+                          tx_data_buf = tx_ch6[17:2];
+                        end
+                      end
+        32'h0000000C: begin
+                        if ((`ADC_N_BITS == 16) && (adc_config_mode == 2 || adc_config_mode == 3)) begin
+                          tx_data_buf = {8'b0,tx_status_6};
+                        end
+                        if (`ADC_N_BITS == 18) begin
+                          if (adc_config_mode == 0 || adc_config_mode == 1) begin
+                            tx_data_buf = {tx_ch1[1:0],14'b0};
+                          end else if (adc_config_mode == 2 || adc_config_mode == 3) begin
+                            tx_data_buf = {tx_ch1[1:0],5'b0,tx_status_1};
+                          end
+                        end
+                      end
+        default: ;
+      endcase
+    end
   end
-end
 
-//---------------------------------------------------------------------------
-// Configuration Test
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Configuration Test
+  //---------------------------------------------------------------------------
 
-bit transfer_status = 0;
-bit [31:0] config_CRC = 'h0; // CRC with channel static data setup
-bit [31:0] config_SIMPLE = 'h0; // channel static data setup
-bit [31:0] config_STATUS = 'h0; // channel static data setup + Status header
-bit [31:0] config_STATUS_CRC = 'h0; // CRC with channel static data setup + Status header
-bit [31:0] config_wr_CRC = 'h0; // write request sent result
-bit [31:0] config_wr_SIMPLE = 'h0; // write request sent result
-bit [31:0] config_wr_STATUS = 'h0; // write request sent result
-bit [31:0] config_wr_STATUS_CRC = 'h0; // write request sent result
-bit        ctrl_status_CRC = 'h0; // ctrl_status bit from ADC common core
-bit        ctrl_status_SIMPLE = 'h0; // ctrl_status bit from ADC common core
-bit        ctrl_status_STATUS = 'h0; // ctrl_status bit from ADC common core
-bit        ctrl_status_STATUS_CRC = 'h0; // ctrl_status bit from ADC common core
+  bit transfer_status = 0;
+  bit [31:0] config_CRC = 'h0; // CRC with channel static data setup
+  bit [31:0] config_SIMPLE = 'h0; // channel static data setup
+  bit [31:0] config_STATUS = 'h0; // channel static data setup + Status header
+  bit [31:0] config_STATUS_CRC = 'h0; // CRC with channel static data setup + Status header
+  bit [31:0] config_wr_CRC = 'h0; // write request sent result
+  bit [31:0] config_wr_SIMPLE = 'h0; // write request sent result
+  bit [31:0] config_wr_STATUS = 'h0; // write request sent result
+  bit [31:0] config_wr_STATUS_CRC = 'h0; // write request sent result
+  bit        ctrl_status_CRC = 'h0; // ctrl_status bit from ADC common core
+  bit        ctrl_status_SIMPLE = 'h0; // ctrl_status bit from ADC common core
+  bit        ctrl_status_STATUS = 'h0; // ctrl_status bit from ADC common core
+  bit        ctrl_status_STATUS_CRC = 'h0; // ctrl_status bit from ADC common core
 
-task adc_config_SIMPLE_test();
+  task adc_config_SIMPLE_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // set static data setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_SIMPLE); // read last config result
@@ -338,9 +331,9 @@ task adc_config_SIMPLE_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h100); // set default
 
     adc_config_mode = 3'h0;
-endtask
+  endtask
 
-task adc_config_CRC_test();
+  task adc_config_CRC_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002185)); // set CRC and static data setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_CRC); // read last config result
@@ -363,9 +356,9 @@ task adc_config_CRC_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h101); // set default
 
     adc_config_mode = 3'h1;
-endtask
+  endtask
 
-task adc_config_STATUS_test();
+  task adc_config_STATUS_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // static data setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
@@ -401,9 +394,9 @@ task adc_config_STATUS_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h102); // set default
 
     adc_config_mode = 3'h2;
-endtask
+  endtask
 
-task adc_config_STATUS_CRC_test();
+  task adc_config_STATUS_CRC_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002185)); // static data and CRC setup in device's reg 0x21
     axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
@@ -439,10 +432,9 @@ task adc_config_STATUS_CRC_test();
     axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h103); // set default
 
     adc_config_mode = 3'h3;
-endtask
+  endtask
 
-task adc_config_number_of_channels();
-    
+  task adc_config_number_of_channels();
     axi_write (`AXI_AD7606X_BA + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     axi_write (`AXI_AD7606X_BA + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     axi_write (`AXI_AD7606X_BA + CH2 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
@@ -450,18 +442,18 @@ task adc_config_number_of_channels();
     axi_write (`AXI_AD7606X_BA + CH4 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     axi_write (`AXI_AD7606X_BA + CH5 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
 
-   //set HDL config mode
-   // axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h103); // set default
+    //set HDL config mode
+    // axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h103); // set default
 
     adc_config_mode = 3'h4;
-endtask
+  endtask
 
-//---------------------------------------------------------------------------
-// DB transmission test
-//---------------------------------------------------------------------------
-bit [31:0] capp_word;
-task db_transmission_test();
-    #100 transfer_status = 1;
+  //---------------------------------------------------------------------------
+  // DB transmission test
+  //---------------------------------------------------------------------------
+  bit [31:0] capp_word;
+  task db_transmission_test();
+    transfer_status = 1;
 
     // Generate cnvst_n pulse using AXI_PWM_GEN
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
@@ -476,6 +468,6 @@ task db_transmission_test();
     // Stop pwm gen
     axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
     `INFO(("axi_pwm_gen stopped."), ADI_VERBOSITY_LOW);
-endtask
+  endtask
 
 endprogram

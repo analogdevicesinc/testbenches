@@ -100,93 +100,88 @@ program test_program_si (
   input         rx_busy,
   output        rx_cnvst_n);
 
-test_harness_env env;
+  test_harness_env env;
 
-// --------------------------
-// Wrapper function for AXI read verify
-// --------------------------
-task axi_read_v(
+  // --------------------------
+  // Wrapper function for AXI read verify
+  // --------------------------
+  task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-  env.mng.RegReadVerify32(raddr,vdata);
-endtask
+    env.mng.RegReadVerify32(raddr,vdata);
+  endtask
 
-task axi_read(
+  task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-  env.mng.RegRead32(raddr,data);
-endtask
+    env.mng.RegRead32(raddr,data);
+  endtask
 
-// --------------------------
-// Wrapper function for AXI write
-// --------------------------
-task axi_write(
-  input [31:0]  waddr,
-  input [31:0]  wdata);
+  // --------------------------
+  // Wrapper function for AXI write
+  // --------------------------
+  task axi_write(
+    input [31:0]  waddr,
+    input [31:0]  wdata);
 
-  env.mng.RegWrite32(waddr,wdata);
-endtask
+    env.mng.RegWrite32(waddr,wdata);
+  endtask
 
-// --------------------------
-// Main procedure
-// --------------------------
-initial begin
+  // --------------------------
+  // Main procedure
+  // --------------------------
+  initial begin
 
-  //creating environment
-  env = new("AD7616 Environment",
-            `TH.`SYS_CLK.inst.IF,
-            `TH.`DMA_CLK.inst.IF,
-            `TH.`DDR_CLK.inst.IF,
-            `TH.`SYS_RST.inst.IF,
-            `TH.`MNG_AXI.inst.IF,
-            `TH.`DDR_AXI.inst.IF);
+    //creating environment
+    env = new("AD7606X Environment",
+              `TH.`SYS_CLK.inst.IF,
+              `TH.`DMA_CLK.inst.IF,
+              `TH.`DDR_CLK.inst.IF,
+              `TH.`SYS_RST.inst.IF,
+              `TH.`MNG_AXI.inst.IF,
+              `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(6);
-  env.start();
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-  //asserts all the resets for 100 ns
-  `TH.`SYS_RST.inst.IF.assert_reset;
-  #100
-  `TH.`SYS_RST.inst.IF.deassert_reset;
-  #100
+    env.start();
+    env.sys_reset();
 
-  sanity_test();
+    sanity_test();
 
-  #100
+    #100
 
-  fifo_spi_test();
+    fifo_spi_test();
 
-  #100
+    #100
 
-  offload_spi_test();
+    offload_spi_test();
 
-  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish;
 
-  $finish;
+  end
 
-end
+  //---------------------------------------------------------------------------
+  // Sanity test reg interface
+  //---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-// Sanity test reg interface
-//---------------------------------------------------------------------------
+  task sanity_test();
+    bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
+                            | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
+                            | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
+    axi_read_v (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
+    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+    axi_read_v (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+    `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
+  endtask
 
-task sanity_test();
-  bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
-                          | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
-                          | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
-  axi_read_v (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
-  axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  axi_read_v (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
-endtask
+  //---------------------------------------------------------------------------
+  // SPI Engine generate transfer
+  //---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-// SPI Engine generate transfer
-//---------------------------------------------------------------------------
-
-task generate_transfer_cmd(
+  task generate_transfer_cmd(
    input [7:0] sync_id);
 
     // assert CSN
@@ -198,50 +193,50 @@ task generate_transfer_cmd(
     // SYNC command to generate interrupt
     axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
     `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
-endtask
+  endtask
 
-//---------------------------------------------------------------------------
-// IRQ callback
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // IRQ callback
+  //---------------------------------------------------------------------------
 
-reg [4:0] irq_pending = 0;
-reg [7:0] sync_id = 0;
+  reg [4:0] irq_pending = 0;
+  reg [7:0] sync_id = 0;
 
-initial begin
-  while (1) begin
-    @(posedge ad7606_irq);
-    // read pending IRQs
-    axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
-    // IRQ launched by Offload SYNC command
-    if (irq_pending & 5'b10000) begin
-      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
+  initial begin
+    forever begin
+      @(posedge ad7606_irq);
+      // read pending IRQs
+      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+      // IRQ launched by Offload SYNC command
+      if (irq_pending & 5'b10000) begin
+        axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+        `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SYNC command
+      if (irq_pending & 5'b01000) begin
+        axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+        `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SDI FIFO
+      if (irq_pending & 5'b00100) begin
+        `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SDO FIFO
+      if (irq_pending & 5'b00010) begin
+        `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SDO FIFO
+      if (irq_pending & 5'b00001) begin
+        `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // Clear all pending IRQs
+      axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
     end
-    // IRQ launched by SYNC command
-    if (irq_pending & 5'b01000) begin
-      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDI FIFO
-    if (irq_pending & 5'b00100) begin
-      `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDO FIFO
-    if (irq_pending & 5'b00010) begin
-      `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDO FIFO
-    if (irq_pending & 5'b00001) begin
-      `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
-    end
-    // Clear all pending IRQs
-    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
   end
-end
 
-//---------------------------------------------------------------------------
-// Echo SCLK generation - we need this only if ECHO_SCLK is enabled
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
+  //---------------------------------------------------------------------------
 
   reg     [SDI_PHY_DELAY:0] echo_delay_sclk = {SDI_PHY_DELAY{1'b0}};
   reg     delay_clk = 0;
@@ -251,7 +246,7 @@ end
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
-    while(1) begin
+    forever begin
       @(posedge delay_clk) begin
         echo_delay_sclk <= {echo_delay_sclk, m_rx_sclk};
        end
@@ -259,182 +254,181 @@ end
   end
   assign ad7606_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
-initial begin
-  while(1) begin
-    #0.5   delay_clk = ~delay_clk;
-  end
-end
-
-//---------------------------------------------------------------------------
-// SDI data generator
-//---------------------------------------------------------------------------
-
-wire          end_of_word;
-wire          rx_sclk_bfm = ad7606_echo_sclk;
-wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = &ad7606_spi_cs;
-bit           m_spi_csn_int_d = 0;
-bit   [31:0]  sdi_shiftreg;
-wire  [31:0]  sdi_shiftreg2;
-bit   [7:0]   rx_sclk_pos_counter = 0;
-bit   [7:0]   rx_sclk_neg_counter = 0;
-bit   [31:0]  sdi_preg[$];
-bit   [31:0]  sdi_nreg[$];
-
-initial begin
-  while(1) begin
-    @(posedge spi_clk);
-      m_spi_csn_int_d <= m_spi_csn_int_s;
-  end
-end
-
-assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
-
-genvar i;
-for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign ad7606_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
-end
-
-assign end_of_word = (CPOL ^ CPHA) ?
-                     (rx_sclk_pos_counter == 32) :
-                     (rx_sclk_neg_counter == 32);
-
-initial begin
-  while(1) begin
-    @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if (m_spi_csn_negedge_s) begin
-      rx_sclk_pos_counter <= 8'b0;
-    end else begin
-      rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH) ? 0 : rx_sclk_pos_counter+1;
+  initial begin
+    forever begin
+      #0.5   delay_clk = ~delay_clk;
     end
   end
-end
 
-initial begin
-  while(1) begin
-    @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if (m_spi_csn_negedge_s) begin
-      rx_sclk_neg_counter <= 8'b0;
-    end else begin
-      rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH) ? 0 : rx_sclk_neg_counter+1;
+  //---------------------------------------------------------------------------
+  // SDI data generator
+  //---------------------------------------------------------------------------
+
+  wire          end_of_word;
+  wire          rx_sclk_bfm = ad7606_echo_sclk;
+  wire          m_spi_csn_negedge_s;
+  wire          m_spi_csn_int_s = &ad7606_spi_cs;
+  bit           m_spi_csn_int_d = 0;
+  bit   [31:0]  sdi_shiftreg;
+  wire  [31:0]  sdi_shiftreg2;
+  bit   [7:0]   rx_sclk_pos_counter = 0;
+  bit   [7:0]   rx_sclk_neg_counter = 0;
+  bit   [31:0]  sdi_preg[$];
+  bit   [31:0]  sdi_nreg[$];
+
+  initial begin
+    forever begin
+      @(posedge spi_clk);
+        m_spi_csn_int_d <= m_spi_csn_int_s;
     end
   end
-end
 
-// SDI shift register
-initial begin
-  while(1) begin
-    // synchronization
-    if (CPHA ^ CPOL)
+  assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
+
+  genvar i;
+  for (i = 0; i < `NUM_OF_SDI; i++) begin
+    assign ad7606_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
+  end
+
+  assign end_of_word = (CPOL ^ CPHA) ?
+                      (rx_sclk_pos_counter == 32) :
+                      (rx_sclk_neg_counter == 32);
+
+  initial begin
+    forever begin
       @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
-    else
-      @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if ((m_spi_csn_negedge_s) || (end_of_word)) begin
-      // delete the last word at end_of_word
-      if (end_of_word) begin
-        sdi_preg.pop_back();
-        sdi_nreg.pop_back();
-      end
       if (m_spi_csn_negedge_s) begin
-        // NOTE: assuming queue is empty
-        repeat (NUM_OF_WORDS) begin
-          sdi_preg.push_front($urandom);
-          sdi_nreg.push_front($urandom);
+        rx_sclk_pos_counter <= 8'b0;
+      end else begin
+        rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH) ? 0 : rx_sclk_pos_counter+1;
+      end
+    end
+  end
+
+  initial begin
+    forever begin
+      @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
+      if (m_spi_csn_negedge_s) begin
+        rx_sclk_neg_counter <= 8'b0;
+      end else begin
+        rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH) ? 0 : rx_sclk_neg_counter+1;
+      end
+    end
+  end
+
+  // SDI shift register
+  initial begin
+    forever begin
+      // synchronization
+      if (CPHA ^ CPOL)
+        @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
+      else
+        @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
+      if ((m_spi_csn_negedge_s) || (end_of_word)) begin
+        // delete the last word at end_of_word
+        if (end_of_word) begin
+          sdi_preg.pop_back();
+          sdi_nreg.pop_back();
         end
-        #1; // prevent race condition
-        sdi_shiftreg <= (CPOL ^ CPHA) ?
-                        sdi_preg[$] :
-                        sdi_nreg[$];
-        `INFO(("SR 1"), ADI_VERBOSITY_LOW);
-      end else begin
-        sdi_shiftreg <= (CPOL ^ CPHA) ?
-                        sdi_preg[$] :
-                        sdi_nreg[$];
-        `INFO(("SR 2"), ADI_VERBOSITY_LOW);
-      end
-      if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
-    end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdi_shiftreg <= {sdi_shiftreg[30:0], 1'b0};
-    end
-  end
-end
-
-//---------------------------------------------------------------------------
-// Storing SDI Data for later comparison
-//---------------------------------------------------------------------------
-
-bit         offload_status = 0;
-bit         shiftreg_sampled = 0;
-bit [15:0]  sdi_store_cnt = 'h0;
-bit [31:0]  offload_sdi_data_store_arr [(`NUM_OF_SDI * NUM_OF_TRANSFERS)-1:0];
-bit [31:0]  sdi_fifo_data_store;
-bit [31:0]  sdi_data_store;
-bit [31:0]  sdi_shiftreg2;
-bit [31:0]  sdi_shiftreg_aux;
-bit [31:0]  sdi_shiftreg_aux_old;
-
-assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
-
-initial begin
-  while(1) begin
-    @(posedge ad7606_echo_sclk);
-    sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
-    if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
-      shiftreg_sampled <= 'h0;
-      if (offload_status) begin
-          sdi_store_cnt <= sdi_store_cnt + 1;
-      end
-    end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
-      if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
-                offload_sdi_data_store_arr[sdi_store_cnt] = sdi_shiftreg;
-        end else if (`NUM_OF_SDI == 2) begin
-                offload_sdi_data_store_arr[0+(2*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[1+(2*sdi_store_cnt)] = sdi_shiftreg;
-        end else if (`NUM_OF_SDI == 4) begin
-                offload_sdi_data_store_arr[0+(4*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[1+(4*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[2+(4*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[3+(4*sdi_store_cnt)] = sdi_shiftreg;
-        end else if (`NUM_OF_SDI == 8) begin
-                offload_sdi_data_store_arr[0+(8*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[1+(8*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[2+(8*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[3+(8*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[4+(8*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[5+(8*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[6+(8*sdi_store_cnt)] = sdi_shiftreg;
-                offload_sdi_data_store_arr[7+(8*sdi_store_cnt)] = sdi_shiftreg;
+        if (m_spi_csn_negedge_s) begin
+          // NOTE: assuming queue is empty
+          repeat (NUM_OF_WORDS) begin
+            sdi_preg.push_front($urandom);
+            sdi_nreg.push_front($urandom);
           end
-      end else begin
-        sdi_fifo_data_store = sdi_shiftreg;
+          #1; // prevent race condition
+          sdi_shiftreg <= (CPOL ^ CPHA) ?
+                          sdi_preg[$] :
+                          sdi_nreg[$];
+          `INFO(("SR 1"), ADI_VERBOSITY_LOW);
+        end else begin
+          sdi_shiftreg <= (CPOL ^ CPHA) ?
+                          sdi_preg[$] :
+                          sdi_nreg[$];
+          `INFO(("SR 2"), ADI_VERBOSITY_LOW);
+        end
+        if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
+      end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
+        sdi_shiftreg <= {sdi_shiftreg[30:0], 1'b0};
       end
-      shiftreg_sampled <= 'h1;
     end
   end
-end
 
-//---------------------------------------------------------------------------
-// Offload Transfer Counter
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Storing SDI Data for later comparison
+  //---------------------------------------------------------------------------
 
-bit [31:0] offload_transfer_cnt;
+  bit         offload_status = 0;
+  bit         shiftreg_sampled = 0;
+  bit [15:0]  sdi_store_cnt = 'h0;
+  bit [31:0]  offload_sdi_data_store_arr [(`NUM_OF_SDI * NUM_OF_TRANSFERS)-1:0];
+  bit [31:0]  sdi_fifo_data_store;
+  bit [31:0]  sdi_data_store;
+  bit [31:0]  sdi_shiftreg2;
+  bit [31:0]  sdi_shiftreg_aux;
+  bit [31:0]  sdi_shiftreg_aux_old;
 
-initial begin
-  while(1) begin
-    @(posedge shiftreg_sampled && offload_status);
-      offload_transfer_cnt <= offload_transfer_cnt + 'h1;
+  assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
+
+  initial begin
+    forever begin
+      @(posedge ad7606_echo_sclk);
+      sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
+      if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
+        shiftreg_sampled <= 'h0;
+        if (offload_status) begin
+            sdi_store_cnt <= sdi_store_cnt + 1;
+        end
+      end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
+        if (offload_status) begin
+          if (`NUM_OF_SDI == 1) begin
+                  offload_sdi_data_store_arr[sdi_store_cnt] = sdi_shiftreg;
+          end else if (`NUM_OF_SDI == 2) begin
+                  offload_sdi_data_store_arr[0+(2*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[1+(2*sdi_store_cnt)] = sdi_shiftreg;
+          end else if (`NUM_OF_SDI == 4) begin
+                  offload_sdi_data_store_arr[0+(4*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[1+(4*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[2+(4*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[3+(4*sdi_store_cnt)] = sdi_shiftreg;
+          end else if (`NUM_OF_SDI == 8) begin
+                  offload_sdi_data_store_arr[0+(8*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[1+(8*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[2+(8*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[3+(8*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[4+(8*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[5+(8*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[6+(8*sdi_store_cnt)] = sdi_shiftreg;
+                  offload_sdi_data_store_arr[7+(8*sdi_store_cnt)] = sdi_shiftreg;
+            end
+        end else begin
+          sdi_fifo_data_store = sdi_shiftreg;
+        end
+        shiftreg_sampled <= 'h1;
+      end
+    end
   end
-end
 
-//---------------------------------------------------------------------------
-// Offload SPI Test
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Offload Transfer Counter
+  //---------------------------------------------------------------------------
 
-bit [31:0] offload_captured_word_arr [(`NUM_OF_SDI * NUM_OF_TRANSFERS) -1 :0];
+  bit [31:0] offload_transfer_cnt;
 
-task offload_spi_test();
+  initial begin
+    forever begin
+      @(posedge shiftreg_sampled && offload_status);
+        offload_transfer_cnt <= offload_transfer_cnt + 'h1;
+    end
+  end
 
+  //---------------------------------------------------------------------------
+  // Offload SPI Test
+  //---------------------------------------------------------------------------
+
+  bit [31:0] offload_captured_word_arr [(`NUM_OF_SDI * NUM_OF_TRANSFERS) -1 :0];
+
+  task offload_spi_test();
     //Configure DMA
     env.mng.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
     env.mng.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_FLAGS),
@@ -479,67 +473,67 @@ task offload_spi_test();
     end else begin
       `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
     end
-endtask
+  endtask
 
-//---------------------------------------------------------------------------
-// FIFO SPI Test
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // FIFO SPI Test
+  //---------------------------------------------------------------------------
 
-bit   [31:0]  sdi_fifo_data = 0;
+  bit   [31:0]  sdi_fifo_data = 0;
 
-task fifo_spi_test();
+  task fifo_spi_test();
 
-`ifdef AD7606X_AXI_CLKGEN_BA
-  // Start spi clk generator
-  axi_write (`AD7606X_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-    );
-`endif
+  `ifdef AD7606X_AXI_CLKGEN_BA
+    // Start spi clk generator
+    axi_write (`AD7606X_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+      `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+      `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
+      );
+  `endif
 
-  // Configure pwm
-  axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
-  axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-  `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
+    // Configure pwm
+    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
+    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
 
-  // Enable SPI Engine
-  axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+    // Enable SPI Engine
+    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
-  // Configure the execution module
-  axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
-  axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_PRESCALE);
-  axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
+    // Configure the execution module
+    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
+    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_PRESCALE);
+    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
 
-  // Set up the interrupts
-  axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
-    `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
-    `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
-    );
+    // Set up the interrupts
+    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+      `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
+      `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
+      );
 
-  #100
-  // Generate a FIFO transaction, write SDO first
-  repeat (NUM_OF_WORDS) begin
-    axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
-  end
+    #100
+    // Generate a FIFO transaction, write SDO first
+    repeat (NUM_OF_WORDS) begin
+      axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
+    end
 
-  generate_transfer_cmd(1);
+    generate_transfer_cmd(1);
 
-  #100
-  wait(sync_id == 1);
-  #100
+    #100
+    wait(sync_id == 1);
+    #100
 
-  repeat (NUM_OF_WORDS) begin
-    axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK) , sdi_fifo_data);
-  end
+    repeat (NUM_OF_WORDS) begin
+      axi_read (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK) , sdi_fifo_data);
+    end
 
-  `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
+    `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
 
-  if (sdi_fifo_data != sdi_fifo_data_store) begin
-    `ERROR(("Fifo Read Test FAILED"));
-  end else begin
-    `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
-  end
-endtask
+    if (sdi_fifo_data != sdi_fifo_data_store) begin
+      `ERROR(("Fifo Read Test FAILED"));
+    end else begin
+      `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
+    end
+  endtask
 
 endprogram

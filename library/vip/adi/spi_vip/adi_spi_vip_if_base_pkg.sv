@@ -32,127 +32,86 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`include "utils.svh"
+package adi_spi_vip_if_base_pkg;
 
-interface spi_vip_if #(
-  int MODE              = 0,
-      CPOL              = 0,
-      CPHA              = 0,
-      INV_CS            = 0,
-      DATA_DLENGTH      = 16,
-      SLAVE_TIN         = 0,
-      SLAVE_TOUT        = 0,
-      MASTER_TIN        = 0,
-      MASTER_TOUT       = 0,
-      CS_TO_MISO        = 0,
-      DEFAULT_MISO_DATA = 'hCAFE
-) ();
-  import adi_spi_vip_if_base_pkg::*;
-
-  logic sclk;
-  wire  miso; // need net types here in case tb wants to tristate this
-  wire  mosi; // need net types here in case tb wants to tristate this
-  logic cs;
-
-  // internal
-  logic intf_slave_mode;
-  logic intf_master_mode;
-  logic intf_monitor_mode;
-  logic miso_oen;
-  logic miso_drive;
-  logic cs_active;
-  logic mosi_delayed;
-  localparam CS_ACTIVE_LEVEL = (INV_CS) ? 1'b1 : 1'b0;
-
-  // hack for parameterized edge. TODO: improve this
-  logic sample_edge, drive_edge;
-  assign sample_edge  = (CPOL^CPHA) ? !sclk : sclk;
-  assign drive_edge   = (CPOL^CPHA) ? sclk : !sclk;
-  assign cs_active = (cs == CS_ACTIVE_LEVEL);
-
-  // miso tri-state handling
-  assign miso = (!intf_slave_mode)  ? 'z
-              : (miso_oen)          ? miso_drive
-                /*default*/         : 'z;
-
-  // mosi delay
-  assign #(SLAVE_TIN*1ns) mosi_delayed =  mosi;
-
-  class adi_spi_vip_if #(int dummy = 10) extends adi_spi_vip_if_base;
+  class adi_spi_vip_if_base;
 
     function new();
     endfunction
 
     virtual function int get_param_MODE();
-      return MODE;
     endfunction
 
     virtual function int get_param_CPOL();
-      return CPOL;
     endfunction
 
     virtual function int get_param_CPHA();
-      return CPHA;
     endfunction
 
     virtual function int get_param_INV_CS();
-      return INV_CS;
     endfunction
 
     virtual function int get_param_DATA_DLENGTH();
-      return DATA_DLENGTH;
     endfunction
 
     virtual function int get_param_SLAVE_TIN();
-      return SLAVE_TIN;
     endfunction
 
     virtual function int get_param_SLAVE_TOUT();
-      return SLAVE_TOUT;
     endfunction
 
     virtual function int get_param_MASTER_TIN();
-      return MASTER_TIN;
     endfunction
 
     virtual function int get_param_MASTER_TOUT();
-      return MASTER_TOUT;
     endfunction
 
     virtual function int get_param_CS_TO_MISO();
-      return CS_TO_MISO;
     endfunction
 
     virtual function int get_param_DEFAULT_MISO_DATA();
-      return DEFAULT_MISO_DATA;
     endfunction
 
+    virtual function int get_master_mode();
+      $fatal(1, $sformatf("Function not implemented!"));
+    endfunction
+    
     virtual function int get_slave_mode();
-      return intf_slave_mode;
+      $fatal(1, $sformatf("Function not implemented!"));
     endfunction
+    
+    virtual function int get_cs_active();
+      $fatal(1, $sformatf("Function not implemented!"));
+    endfunction
+    
+    virtual task wait_cs_active();
+      $fatal(1, $sformatf("Task not implemented!"));
+    endtask
+    
+    virtual task wait_posedge_sample_edge();
+      $fatal(1, $sformatf("Task not implemented!"));
+    endtask
+    
+    virtual function int get_mosi_delayed();
+      $fatal(1, $sformatf("Function not implemented!"));
+    endfunction
+    
+    virtual function void set_miso_drive();
+      $fatal(1, $sformatf("Function not implemented!"));
+    endfunction
+    
+    virtual task wait_posedge_drive_edge();
+      $fatal(1, $sformatf("Task not implemented!"));
+    endtask
+    
+    virtual task wait_cs();
+      $fatal(1, $sformatf("Task not implemented!"));
+    endtask
+    
+    virtual function void set_miso_oen();
+      $fatal(1, $sformatf("Function not implemented!"));
+    endfunction
+    
+  endclass
 
-  endclass: adi_spi_vip_if
-
-  adi_spi_vip_if vif = new();
-
-  function void set_slave_mode();
-    intf_slave_mode   = 1;
-    intf_master_mode  = 0;
-    intf_monitor_mode = 0;
-  endfunction : set_slave_mode
-
-  function void set_master_mode();
-    intf_slave_mode   = 0;
-    intf_master_mode  = 1;
-    intf_monitor_mode = 0;
-    `ERRORV(("Unsupported mode master")); //TODO
-  endfunction : set_master_mode
-
-  function void set_monitor_mode();
-    intf_slave_mode   = 0;
-    intf_master_mode  = 0;
-    intf_monitor_mode = 1;
-    `ERRORV(("Unsupported mode monitor")); //TODO
-  endfunction : set_monitor_mode
-
-endinterface
+endpackage

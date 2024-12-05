@@ -38,6 +38,8 @@
 package adi_spi_vip_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
+  import adi_spi_vip_if_base_pkg::*;
 
   `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
                                     SPI_VIP_CPOL              ,\
@@ -63,29 +65,30 @@ package adi_spi_vip_pkg;
                                     th``_``vip``_0_VIP_CS_TO_MISO,\
                                     th``_``vip``_0_VIP_DEFAULT_MISO_DATA
 
-  class adi_spi_driver #(int `SPI_VIP_PARAM_ORDER) extends adi_component;
+  class adi_spi_driver extends adi_driver;
 
-    typedef mailbox #(logic [SPI_VIP_DATA_DLENGTH-1:0]) spi_mbx_t;
+    typedef mailbox #(logic [vif.get_param_DATA_DLENGTH()-1:0]) spi_mbx_t;
     protected spi_mbx_t mosi_mbx;
     spi_mbx_t miso_mbx;
     protected bit active;
     protected bit stop_flag;
-    protected bit [SPI_VIP_DATA_DLENGTH-1:0] miso_reg;
-    protected bit [SPI_VIP_DATA_DLENGTH-1:0] default_miso_data;
+    protected bit [vif.get_param_DATA_DLENGTH()-1:0] miso_reg;
+    protected bit [vif.get_param_DATA_DLENGTH()-1:0] default_miso_data;
     protected event tx_mbx_updated;
-    virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) vif;
+
+    adi_spi_vip_if_base vif;
 
     function new(
       input string name,
-      virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf,
-      input adi_component parent = null);
+      input adi_spi_vip_if_base intf,
+      input adi_agent parent = null);
 
       super.new(name, parent);
       
       this.vif = intf;
       this.active = 0;
       this.stop_flag = 0;
-      this.default_miso_data = SPI_VIP_DEFAULT_MISO_DATA;
+      this.default_miso_data = vif.get_param_DEFAULT_MISO_DATA();
       this.miso_mbx = new();
       this.mosi_mbx = new();
     endfunction
@@ -104,17 +107,17 @@ package adi_spi_vip_pkg;
     endfunction : clear_active
 
     protected task rx_mosi();
-      static logic [SPI_VIP_DATA_DLENGTH-1:0] mosi_data;
+      static logic [vif.get_param_DATA_DLENGTH()-1:0] mosi_data;
       forever begin
         if (vif.intf_slave_mode) begin
           wait (vif.cs_active);
           while (vif.cs_active) begin
-            for (int i = 0; i<SPI_VIP_DATA_DLENGTH; i++) begin
+            for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               if (!vif.cs_active) begin
                 break;
               end
               @(posedge vif.sample_edge)
-              mosi_data = {mosi_data[SPI_VIP_DATA_DLENGTH-2:0], vif.mosi_delayed};
+              mosi_data = {mosi_data[vif.get_param_DATA_DLENGTH()-2:0], vif.mosi_delayed};
             end
             mosi_mbx.put(mosi_data);
           end
@@ -138,11 +141,11 @@ package adi_spi_vip_pkg;
             end
             pending_mbx = 1'b0;
             // early drive and shift if CPHA=0
-            if (SPI_VIP_CPHA == 0) begin
-              vif.miso_drive <= miso_reg[SPI_VIP_DATA_DLENGTH-1];
-              miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+            if (vif.get_param_CPHA() == 0) begin
+              vif.miso_drive <= miso_reg[vif.get_param_DATA_DLENGTH()-1];
+              miso_reg = {miso_reg[vif.get_param_DATA_DLENGTH()-2:0], 1'b0};
             end
-            for (int i = 0; i<SPI_VIP_DATA_DLENGTH; i++) begin
+            for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               fork
                 begin
                   fork
@@ -174,11 +177,11 @@ package adi_spi_vip_pkg;
               end else begin
                 // vif.drive_edge has arrived
                 // don't shift at last edge if CPHA=0
-                if (!(SPI_VIP_CPHA == 0 && i == SPI_VIP_DATA_DLENGTH-1)) begin
-                  vif.miso_drive <= #(SPI_VIP_SLAVE_TOUT) miso_reg[SPI_VIP_DATA_DLENGTH-1];
-                  miso_reg = {miso_reg[SPI_VIP_DATA_DLENGTH-2:0], 1'b0};
+                if (!(vif.get_param_CPHA() == 0 && i == vif.get_param_DATA_DLENGTH()-1)) begin
+                  vif.miso_drive <= #(vif.get_param_SLAVE_TOUT()) miso_reg[vif.get_param_DATA_DLENGTH()-1];
+                  miso_reg = {miso_reg[vif.get_param_DATA_DLENGTH()-2:0], 1'b0};
                 end
-                if (i == SPI_VIP_DATA_DLENGTH-1) begin
+                if (i == vif.get_param_DATA_DLENGTH()-1) begin
                   this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
@@ -197,9 +200,9 @@ package adi_spi_vip_pkg;
         @(vif.cs)
         if (vif.intf_slave_mode) begin
           if (!vif.cs_active) begin
-            vif.miso_oen <= #(SPI_VIP_CS_TO_MISO*1ns) 1'b0;
+            vif.miso_oen <= #(vif.get_param_CS_TO_MISO()*1ns) 1'b0;
           end else begin
-            vif.miso_oen <= #(SPI_VIP_CS_TO_MISO*1ns) 1'b1;
+            vif.miso_oen <= #(vif.get_param_CS_TO_MISO()*1ns) 1'b1;
           end
         end
       end
@@ -220,14 +223,14 @@ package adi_spi_vip_pkg;
     endtask : run
 
     function void set_default_miso_data(
-      input bit [SPI_VIP_DATA_DLENGTH-1:0] default_data
+      input bit [vif.get_param_DATA_DLENGTH()-1:0] default_data
     );
       this.default_miso_data = default_data;
     endfunction : set_default_miso_data
 
     task put_tx_data(
       input int unsigned data);
-      bit [SPI_VIP_DATA_DLENGTH-1:0] txdata;
+      bit [vif.get_param_DATA_DLENGTH()-1:0] txdata;
       txdata = data;
       miso_mbx.put(txdata);
       ->tx_mbx_updated;
@@ -235,7 +238,7 @@ package adi_spi_vip_pkg;
 
     task get_rx_data(
       output int unsigned data);
-      bit [SPI_VIP_DATA_DLENGTH-1:0] rxdata;
+      bit [vif.get_param_DATA_DLENGTH()-1:0] rxdata;
       mosi_mbx.get(rxdata);
       data = rxdata;
     endtask
@@ -278,31 +281,61 @@ package adi_spi_vip_pkg;
 
   endclass
 
-  class adi_spi_agent #(int `SPI_VIP_PARAM_ORDER) extends adi_component;
+  class adi_spi_sequencer extends adi_sequencer;
 
-    protected adi_spi_driver #(`SPI_VIP_PARAM_ORDER) driver;
+    protected adi_spi_driver driver;
 
     function new(
       input string name,
-      virtual spi_vip_if #(`SPI_VIP_PARAM_ORDER) intf,
-      input adi_component parent = null);
+      input adi_spi_driver driver,
+      input adi_agent parent = null);
 
       super.new(name, parent);
 
-      this.driver = new("Driver", intf, this);
-    endfunction
+      this.driver = driver;
+    endfunction: new
 
-    virtual task send_data(input int unsigned data);
+    virtual task automatic send_data(input int unsigned data);
       this.driver.put_tx_data(data);
     endtask : send_data
 
-    virtual task receive_data(output int unsigned data);
+    virtual task automatic receive_data(output int unsigned data);
       this.driver.get_rx_data(data);
     endtask : receive_data
+
+    virtual task automatic receive_data_verify(input int unsigned expected);
+      int unsigned received;
+      this.driver.get_rx_data(received);
+      if (received !== expected) begin
+        this.error($sformatf("Data mismatch. Received : %h; expected %h", received, expected));
+      end
+    endtask : receive_data_verify
 
     virtual task flush_send();
       this.driver.flush_tx();
     endtask : flush_send
+
+    virtual function void set_default_miso_data(input int unsigned data);
+      this.driver.set_default_miso_data(data);
+    endfunction : set_default_miso_data
+
+  endclass
+
+  class adi_spi_agent extends adi_agent;
+
+    protected adi_spi_driver driver;
+    protected adi_spi_sequencer sequencer;
+
+    function new(
+      input string name,
+      input adi_spi_vip_if_base intf,
+      input adi_environment parent = null);
+
+      super.new(name, parent);
+
+      this.driver = new("Driver", intf, this);
+      this.sequencer = new("Sequencer", this.driver, this);
+    endfunction
 
     virtual task start();
       fork
@@ -313,10 +346,6 @@ package adi_spi_vip_pkg;
     virtual task stop();
       this.driver.stop();
     endtask : stop
-
-    virtual function void set_default_miso_data(input int unsigned data);
-      this.driver.set_default_miso_data(data);
-    endfunction : set_default_miso_data
 
   endclass
 

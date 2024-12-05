@@ -38,16 +38,17 @@
 package s_spi_sequencer_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
   import adi_spi_vip_pkg::*;
 
-  class s_spi_sequencer #(`SPI_VIP_PARAM_ORDER) extends adi_component;
+  class adi_spi_sequencer #(`SPI_VIP_PARAM_ORDER) extends adi_sequencer;
 
     protected adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent;
 
     function new(
       input string name,
       input adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent,
-      input adi_component parent = null);
+      input adi_agent parent = null);
 
       super.new(name, parent);
 
@@ -78,6 +79,6 @@ package s_spi_sequencer_pkg;
       this.agent.set_default_miso_data(data);
     endfunction : set_default_miso_data
 
-
   endclass
+  
 endpackage

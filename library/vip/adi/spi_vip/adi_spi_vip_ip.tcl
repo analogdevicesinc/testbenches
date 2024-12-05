@@ -3,7 +3,7 @@
 ### SPDX short identifier: ADIBSD
 ###############################################################################
 
-source ../../../../../scripts/adi_env.tcl
+source ../../../../scripts/adi_tb_env.tcl
 source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 
 adi_ip_create adi_spi_vip
@@ -14,6 +14,8 @@ adi_ip_files adi_spi_vip [list \
     "adi_spi_vip_pkg.ttcl" \
     "$ad_hdl_dir/testbenches/library/utilities/utils.svh" \
     "$ad_hdl_dir/testbenches/library/utilities/logger_pkg.sv" \
+    "$ad_hdl_dir/testbenches/library/utilities/adi_common_pkg.sv" \
+    "adi_spi_vip_if_base_pkg.sv" \
 ]
 
 adi_ip_properties_lite adi_spi_vip

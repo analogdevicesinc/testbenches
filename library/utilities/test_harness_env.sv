@@ -40,11 +40,9 @@ package test_harness_env_pkg;
   import logger_pkg::*;
   import adi_common_pkg::*;
   import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
   import adi_axi_agent_pkg::*;
-  import adi_axis_agent_pkg::*;
 
 
   class test_harness_env #(int `AXI_VIP_PARAM_ORDER(mng), int `AXI_VIP_PARAM_ORDER(ddr)) extends adi_environment;

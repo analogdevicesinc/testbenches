@@ -51,7 +51,7 @@ class abs_sub #(type data_type = int);
   function new();
   endfunction: new
 
-  virtual function void update(input data_type data);
+  virtual function void update(input data_type data [$]);
   endfunction: update
 endclass: abs_sub
 
@@ -77,7 +77,7 @@ class pub #(type data_type = int);
       this.subscriber_list.delete(subscriber.id);
   endfunction: unsubscribe
 
-  function void notify(input data_type data);
+  function void notify(input data_type data [$]);
     foreach (this.subscriber_list[i])
       this.subscriber_list[i].update(data);
   endfunction: notify
@@ -92,13 +92,18 @@ class axis;
     this.publisher = new();
   endfunction: new
 
-  function void subscribe(input abs_sub #(logic [7:0]) subscriber);
-    this.publisher.subscribe(subscriber);
-  endfunction: subscribe
+  // function void subscribe(input abs_sub #(logic [7:0]) subscriber);
+  //   this.publisher.subscribe(subscriber);
+  // endfunction: subscribe
 
   task job();
-    this.publisher.notify('hA);
-    this.publisher.notify('h5);
+    logic [7:0] data [$];
+    data.push_front('hA);
+    this.publisher.notify(data);
+    data.delete();
+
+    data.push_front('h5);
+    this.publisher.notify(data);
   endtask: job
 endclass: axis
 
@@ -115,8 +120,8 @@ class scoreboard;
       this.id = this.last_id;
     endfunction: new
 
-    virtual function void update(input data_type data);
-      `INFO(("Data received: %h", data), ADI_VERBOSITY_NONE);
+    virtual function void update(input data_type data [$]);
+      `INFO(("Data received: %h", data.pop_back()), ADI_VERBOSITY_NONE);
     endfunction: update
   endclass: sub
 
@@ -176,8 +181,8 @@ program test_program;
     
     scb = new();
 
-    axis1.subscribe(scb.subscriber_tx);
-    axis2.subscribe(scb.subscriber_rx);
+    axis1.publisher.subscribe(scb.subscriber_tx);
+    axis2.publisher.subscribe(scb.subscriber_rx);
 
     scb.run();
 

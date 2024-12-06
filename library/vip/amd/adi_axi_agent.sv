@@ -49,8 +49,7 @@ package adi_axi_agent_pkg;
 
     axi_mst_agent #(`AXI_VIP_PARAM_ORDER(master)) agent;
     m_axi_sequencer #(`AXI_VIP_PARAM_ORDER(master)) sequencer;
-    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(master), WRITE_OP) monitor_tx;
-    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(master), READ_OP) monitor_rx;
+    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(master)) monitor;
 
     function new(
       input string name,
@@ -61,8 +60,7 @@ package adi_axi_agent_pkg;
 
       this.agent = new("Agent", master_vip_if);
       this.sequencer = new("Sequencer", this.agent, this);
-      this.monitor_tx = new("Monitor TX", this.agent.monitor, this);
-      this.monitor_rx = new("Monitor RX", this.agent.monitor, this);
+      this.monitor = new("Monitor TX", this.agent.monitor, this);
     endfunction: new
 
   endclass: adi_axi_master_agent
@@ -72,8 +70,7 @@ package adi_axi_agent_pkg;
 
     axi_slv_mem_agent #(`AXI_VIP_PARAM_ORDER(slave)) agent;
     s_axi_sequencer #(`AXI_VIP_PARAM_ORDER(slave)) sequencer;
-    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(slave), WRITE_OP) monitor_tx;
-    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(slave), READ_OP) monitor_rx;
+    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(slave)) monitor;
 
     function new(
       input string name,
@@ -84,8 +81,7 @@ package adi_axi_agent_pkg;
 
       this.agent = new("Agent", slave_vip_if);
       this.sequencer = new("Sequencer", this.agent.mem_model, this);
-      this.monitor_tx = new("Monitor TX", this.agent.monitor, this);
-      this.monitor_rx = new("Monitor RX", this.agent.monitor, this);
+      this.monitor = new("Monitor TX", this.agent.monitor, this);
     endfunction: new
 
   endclass: adi_axi_slave_mem_agent
@@ -94,8 +90,7 @@ package adi_axi_agent_pkg;
   class adi_axi_passthrough_mem_agent #(int `AXI_VIP_PARAM_ORDER(passthrough)) extends adi_agent;
 
     axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(passthrough)) agent;
-    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(passthrough), WRITE_OP) monitor_tx;
-    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(passthrough), READ_OP) monitor_rx;
+    x_axi_monitor #(`AXI_VIP_PARAM_ORDER(passthrough)) monitor;
 
     function new(
       input string name,
@@ -105,8 +100,7 @@ package adi_axi_agent_pkg;
       super.new(name, parent);
 
       this.agent = new("Agent", passthrough_vip_if);
-      this.monitor_tx = new("Monitor TX", this.agent.monitor, this);
-      this.monitor_rx = new("Monitor RX", this.agent.monitor, this);
+      this.monitor = new("Monitor TX", this.agent.monitor, this);
     endfunction: new
 
   endclass: adi_axi_passthrough_mem_agent

@@ -90,7 +90,7 @@ package adi_axis_agent_pkg;
   class adi_axis_passthrough_mem_agent #(int `AXIS_VIP_PARAM_ORDER(passthrough)) extends adi_agent;
 
     axi4stream_passthrough_agent #(`AXIS_VIP_IF_PARAMS(passthrough)) agent;
-    x_axis_monitor #(`AXIS_VIP_PARAM_ORDER(passthrough), WRITE_OP) monitor;
+    x_axis_monitor #(`AXIS_VIP_PARAM_ORDER(passthrough)) monitor;
 
     function new(
       input string name,

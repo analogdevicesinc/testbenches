@@ -116,7 +116,7 @@ program test_program;
 
     //=========================================================================
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_MEDIUM);
     
     base_env.start();
     scb_env_0.start();

@@ -39,6 +39,6 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/amd/m_axi_sequencer.sv" \
   "$ad_tb_dir/library/vip/amd/s_axi_sequencer.sv" \
   "$ad_tb_dir/library/drivers/common/x_monitor.sv" \
-  "$ad_tb_dir/library/drivers/common/mailbox.sv" \
+  "$ad_tb_dir/library/vip/adi/base/pub_sub_pkg.sv" \
   "$ad_tb_dir/library/regmaps/reg_accessor.sv" \
 ]

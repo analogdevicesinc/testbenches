@@ -74,11 +74,11 @@ package environment_pkg;
       this.adc_dst_axi_pt_agent.agent.start_monitor();
       this.dac_src_axi_pt_agent.agent.start_monitor();
 
-      this.scoreboard_tx.set_source_stream(dac_src_axi_pt_agent.monitor_rx);
-      this.scoreboard_tx.set_sink_stream(dac_dst_axis_agent.monitor);
+      this.dac_src_axi_pt_agent.monitor.publisher_rx.subscribe(this.scoreboard_tx.subscriber_source);
+      this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
-      this.scoreboard_rx.set_source_stream(adc_src_axis_agent.monitor);
-      this.scoreboard_rx.set_sink_stream(adc_dst_axi_pt_agent.monitor_tx);
+      this.adc_src_axis_agent.monitor.publisher.subscribe(this.scoreboard_rx.subscriber_source);
+      this.adc_dst_axi_pt_agent.monitor.publisher_tx.subscribe(this.scoreboard_rx.subscriber_sink);
     endtask
 
     //============================================================================
@@ -91,10 +91,8 @@ package environment_pkg;
 
         this.adc_src_axis_agent.monitor.run();
         this.dac_dst_axis_agent.monitor.run();
-        this.adc_dst_axi_pt_agent.monitor_tx.run();
-        this.dac_src_axi_pt_agent.monitor_tx.run();
-        this.adc_dst_axi_pt_agent.monitor_rx.run();
-        this.dac_src_axi_pt_agent.monitor_rx.run();
+        this.adc_dst_axi_pt_agent.monitor.run();
+        this.dac_src_axi_pt_agent.monitor.run();
 
         this.scoreboard_tx.run();
         this.scoreboard_rx.run();

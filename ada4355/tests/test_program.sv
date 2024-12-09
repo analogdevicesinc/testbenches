@@ -145,7 +145,7 @@ program test_program;
   begin
     //check ADC VERSION
     axi_read_v (RX1_COMMON + GetAddrs(REG_VERSION),
-               `SET_REG_VERSION_VERSION('h000a0162));
+               `SET_REG_VERSION_VERSION('h000a0300));
   end
   endtask
 
@@ -240,7 +240,7 @@ endtask
                `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BASE+32'h00002000));
     axi_write (`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-    
+
     enable_pattern;
 
 //    check_captured_data(

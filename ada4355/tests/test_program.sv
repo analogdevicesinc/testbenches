@@ -146,6 +146,8 @@ program test_program;
     //check ADC VERSION
     axi_read_v (RX1_COMMON + GetAddrs(REG_VERSION),
                `SET_REG_VERSION_VERSION('h000a0300));
+
+    `INFO(("Sanity Test Done"));
   end
   endtask
 
@@ -201,15 +203,17 @@ begin
     int sdr_ddr_n = 0;
     bit [31:0] sync_status = 32'b0;
   force system_tb.enable_pattern = 1'b1;
+  `INFO(("Force enable_pattern = 1"));
   axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL_3), 31'h2);
   axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL), 1<<3 | num_lanes<<8 | sdr_ddr_n<<16);
 
   axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status);
-
+  `INFO(("Before while sync_status == 0"));
   while(sync_status == 31'b0)
     axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status);
 
   force system_tb.enable_pattern = 1'b0;
+  `INFO(("Force enable_pattern = 0"));
 
 end
 endtask
@@ -227,6 +231,8 @@ endtask
 
     link_setup;
 
+    `INFO(("Link Setup Done"));
+
     #1us;
 
     // Configure RX DMA
@@ -241,7 +247,11 @@ endtask
     axi_write (`RX_DMA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
+    `INFO(("Configure RX DMA Done"));
+
     enable_pattern;
+
+    `INFO(("Enable Pattern Done"));
 
 //    check_captured_data(
 //      .address (`DDR_BASE+'h00002000),

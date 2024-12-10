@@ -42,14 +42,18 @@ package scoreboard_pkg;
   import axi_vip_pkg::*;
   import logger_pkg::*;
 
-  class scoreboard;
+  class scoreboard extends adi_component;
     // List of analysis ports from the monitors
     xil_analysis_port #(axi4stream_monitor_transaction) src_axis_ap;
     xil_analysis_port #(axi4stream_monitor_transaction) dst_axis_ap;
 
     protected event shutdown_event;
 
-    function new();
+    function new(
+      input string name,
+      input adi_component parent = null);
+
+      super.new(name, parent);
     endfunction: new
 
     function void connect(
@@ -99,9 +103,9 @@ package scoreboard_pkg;
         if (received_tuser == 1) begin
           frame_count = data_beat[7:0];
           if (frame_count < prev_frame_count)
-            `ERROR(("Frame count out of order. Expected at least: 0x%h ; Found : 0x%h", prev_frame_count, frame_count));
+            this.error($sformatf("Frame count out of order. Expected at least: 0x%h ; Found : 0x%h", prev_frame_count, frame_count));
           else
-            `INFO(("Received frame 0x%0h ", frame_count));
+            this.info($sformatf("Received frame 0x%0h ", frame_count), ADI_VERBOSITY_MEDIUM);
           prev_frame_count = frame_count;
         end
         // Compare data against the frame counter; all pixels from frame
@@ -110,9 +114,9 @@ package scoreboard_pkg;
           expected_byte = frame_count;
           received_byte = data_beat[i*8+:8];
           if (expected_byte !== received_byte)
-            `ERROR(("Data mismatch. Expected : 0x%h ; Found : 0x%h", expected_byte, received_byte));
+            this.error($sformatf("Data mismatch. Expected : 0x%h ; Found : 0x%h", expected_byte, received_byte));
           else
-            `INFOV(("Received byte 0x%h ", received_byte), 99);
+            this.info($sformatf("Received byte 0x%h ", received_byte), ADI_VERBOSITY_MEDIUM);
         end
       end
     endtask : run_dst

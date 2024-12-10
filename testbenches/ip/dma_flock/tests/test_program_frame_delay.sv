@@ -60,7 +60,8 @@ program test_program_frame_delay;
 
   initial begin
     //creating environment
-    env = new(`TH.`SYS_CLK.inst.IF,
+    env = new("DMA Flock environment",
+              `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
@@ -77,7 +78,7 @@ program test_program_frame_delay;
     has_m_autorun = `M_DMA_CFG_AUTORUN;
     has_s_autorun = `S_DMA_CFG_AUTORUN;
 
-    setLoggerVerbosity(6);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     env.start();
     start_clocks();
     env.sys_reset();
@@ -146,7 +147,7 @@ program test_program_frame_delay;
     stop_clocks();
     env.stop();
 
-    `INFO(("Testbench done!"));
+    `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end

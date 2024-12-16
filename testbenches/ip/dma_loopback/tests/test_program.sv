@@ -44,6 +44,7 @@ import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import dmac_api_pkg::*;
 import dma_trans_pkg::*;
+import axi_vip_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -85,7 +86,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 16) | i ,'hF);
+      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,'hF);
     end
 
     do_transfer(

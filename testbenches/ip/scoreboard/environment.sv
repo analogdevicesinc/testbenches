@@ -26,8 +26,8 @@ package environment_pkg;
     adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(adc_dst_pt)) adc_dst_axi_pt_agent;
     adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(dac_src_pt)) dac_src_axi_pt_agent;
 
-    scoreboard scoreboard_tx;
-    scoreboard scoreboard_rx;
+    scoreboard #(logic [7:0]) scoreboard_tx;
+    scoreboard #(logic [7:0]) scoreboard_rx;
 
     //============================================================================
     // Constructor

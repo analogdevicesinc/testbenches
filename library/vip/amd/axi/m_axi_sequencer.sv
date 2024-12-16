@@ -34,6 +34,7 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axi_definitions.svh"
 
 package m_axi_sequencer_pkg;
 

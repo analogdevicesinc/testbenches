@@ -36,9 +36,9 @@
 //
 //
 `include "utils.svh"
+`include "axi_definitions.svh"
+`include "axis_definitions.svh"
 
-import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import environment_pkg::*;
 import test_harness_env_pkg::*;

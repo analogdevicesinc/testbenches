@@ -34,6 +34,7 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axis_definitions.svh"
 
 package m_axis_sequencer_pkg;
 

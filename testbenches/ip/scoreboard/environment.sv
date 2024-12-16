@@ -1,4 +1,6 @@
 `include "utils.svh"
+`include "axi_definitions.svh"
+`include "axis_definitions.svh"
 
 package environment_pkg;
 

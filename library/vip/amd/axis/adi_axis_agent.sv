@@ -34,6 +34,7 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axis_definitions.svh"
 
 package adi_axis_agent_pkg;
 
@@ -42,14 +43,14 @@ package adi_axis_agent_pkg;
   import axi4stream_vip_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
-  import x_monitor_pkg::*;
+  import adi_axis_monitor_pkg::*;
 
 
   class adi_axis_master_agent #(int `AXIS_VIP_PARAM_ORDER(master)) extends adi_agent;
 
     axi4stream_mst_agent #(`AXIS_VIP_IF_PARAMS(master)) agent;
     m_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(master)) sequencer;
-    x_axis_monitor #(`AXIS_VIP_PARAM_ORDER(master)) monitor;
+    adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(master)) monitor;
 
     function new(
       input string name,
@@ -70,7 +71,7 @@ package adi_axis_agent_pkg;
 
     axi4stream_slv_agent #(`AXIS_VIP_IF_PARAMS(slave)) agent;
     s_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(slave)) sequencer;
-    x_axis_monitor #(`AXIS_VIP_PARAM_ORDER(slave)) monitor;
+    adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(slave)) monitor;
 
     function new(
       input string name,
@@ -90,7 +91,7 @@ package adi_axis_agent_pkg;
   class adi_axis_passthrough_mem_agent #(int `AXIS_VIP_PARAM_ORDER(passthrough)) extends adi_agent;
 
     axi4stream_passthrough_agent #(`AXIS_VIP_IF_PARAMS(passthrough)) agent;
-    x_axis_monitor #(`AXIS_VIP_PARAM_ORDER(passthrough)) monitor;
+    adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(passthrough)) monitor;
 
     function new(
       input string name,

@@ -34,6 +34,7 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axi_definitions.svh"
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;

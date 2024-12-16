@@ -9,17 +9,17 @@ package scoreboard_pkg;
   import adi_common_pkg::*;
   import pub_sub_pkg::*;
 
-  class scoreboard extends adi_component;
+  class scoreboard #(type data_type = int) extends adi_component;
 
-    class subscriber_class extends adi_subscriber #(logic [7:0]);
+    class subscriber_class extends adi_subscriber #(data_type);
 
-      protected scoreboard scoreboard_ref;
+      protected scoreboard #(data_type) scoreboard_ref;
       
-      protected logic [7:0] byte_stream [$];
+      protected data_type byte_stream [$];
 
       function new(
         input string name,
-        input scoreboard scoreboard_ref,
+        input scoreboard #(data_type) scoreboard_ref,
         input adi_component parent = null);
 
         super.new(name, parent);
@@ -30,19 +30,19 @@ package scoreboard_pkg;
       virtual function void update(input data_type data [$]);
         this.info($sformatf("Data received: %d", data.size()), ADI_VERBOSITY_MEDIUM);
         while (data.size()) begin
-          this.byte_stream.push_back(data.pop_front);
+          this.byte_stream.push_back(data.pop_front());
         end
         
-        if (this.scoreboard_ref.enabled) begin
+        if (this.scoreboard_ref.get_enabled()) begin
           this.scoreboard_ref.compare_transaction();
         end
       endfunction: update
 
-      function logic [7:0] get_data();
+      function data_type get_data();
         return this.byte_stream.pop_front();
       endfunction: get_data
 
-      function void put_data(logic [7:0] data);
+      function void put_data(data_type data);
         this.byte_stream.push_back(data);
       endfunction: put_data
 
@@ -100,6 +100,10 @@ package scoreboard_pkg;
       this.byte_streams_empty_sig = 1;
     endtask: stop
 
+    function bit get_enabled();
+      return this.enabled;
+    endfunction: get_enabled
+
     // set sink type
     function void set_sink_type(input bit sink_type);
       if (!this.enabled) begin
@@ -129,8 +133,8 @@ package scoreboard_pkg;
 
     // compare the collected data
     virtual function void compare_transaction();
-      logic [7:0] source_byte;
-      logic [7:0] sink_byte;
+      data_type source_byte;
+      data_type sink_byte;
 
       if (this.enabled == 0)
         return;

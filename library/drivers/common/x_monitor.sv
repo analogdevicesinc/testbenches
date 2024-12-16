@@ -6,202 +6,138 @@ package x_monitor_pkg;
   import axi4stream_vip_pkg::*;
   import axi_vip_pkg::*;
   import logger_pkg::*;
-  import mailbox_pkg::*;
+  import adi_common_pkg::*;
+  import pub_sub_pkg::*;
 
-  class x_monitor extends adi_component;
-
-    mailbox_c #(logic [7:0]) mailbox;
-    protected semaphore semaphore_key;
-    protected event transaction_event;
+  class x_monitor extends adi_monitor;
 
     protected bit enabled;
 
     // constructor
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_agent parent = null);
       
       super.new(name, parent);
 
-      this.mailbox = new("Mailbox", 0, this);
-      this.semaphore_key = new(1);
+      this.enabled = 0;
     endfunction
 
-    // semaphore functions
-    task get_key();
-      this.semaphore_key.get();
-    endtask
-
-    task put_key();
-      this.semaphore_key.put();
-    endtask
-
-    // event functions
-    task transaction_captured();
-      ->>this.transaction_event;
-    endtask
-
-    task wait_for_transaction_event();
-      @this.transaction_event;
-    endtask
-
-    // run task
     task run();
+      if (this.enabled) begin
+        this.error($sformatf("Monitor is already running!"));
+        return;
+      end
 
       fork
-        this.enabled = 1;
-        get_transaction();
+        this.get_transaction();
       join_none
 
-    endtask /* run */
+      this.enabled = 1;
+      this.info($sformatf("Monitor enabled"), ADI_VERBOSITY_MEDIUM);
+    endtask: run
 
     // virtual functions
-    virtual function void set_sink_type(input bit sink_type);
-    endfunction
-
-    virtual function bit get_sink_type();
-    endfunction
-
     virtual task get_transaction();
     endtask
 
   endclass
 
-  typedef enum bit {
-    READ_OP = 1'b0,
-    WRITE_OP = 1'b1
-  } operation_type_t;
   
-  class x_axi_monitor #( type T, operation_type_t operation_type ) extends x_monitor;
-    // operation type: 1 - write
-    //                 0 - read
+  class x_axi_monitor #(int `AXI_VIP_PARAM_ORDER(axi)) extends x_monitor;
 
     // analysis port from the monitor
+    protected axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor;
     protected xil_analysis_port #(axi_monitor_transaction) axi_ap;
 
-    protected T agent;
-
-    protected int axi_byte_stream_size;
+    adi_publisher #(logic [7:0]) publisher_tx;
+    adi_publisher #(logic [7:0]) publisher_rx;
 
     // constructor
     function new(
       input string name,
-      input T agent,
-      input adi_component parent = null);
+      input axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor,
+      input adi_agent parent = null);
 
       super.new(name, parent);
 
-      this.enabled = 0;
+      this.monitor = monitor;
+      this.axi_ap = monitor.item_collected_port;
 
-      this.agent = agent;
-      this.axi_ap = this.agent.monitor.item_collected_port;
-
-      this.axi_byte_stream_size = 0;
-
-    endfunction /* new */
+      this.publisher_tx = new("Publisher TX", this);
+      this.publisher_rx = new("Publisher RX", this);
+    endfunction
 
     // collect data from the DDR interface, all WRITE transaction are coming
     // from the ADC and all READ transactions are going to the DAC
     virtual task get_transaction();
-
       axi_monitor_transaction transaction;
       xil_axi_data_beat data_beat;
       xil_axi_strb_beat strb_beat;
       int num_bytes;
       logic [7:0] axi_byte;
+      logic [7:0] data_queue [$];
 
       forever begin
-        this.get_key();
         this.axi_ap.get(transaction);
-        if (bit'(transaction.get_cmd_type()) == operation_type) begin
-          this.put_key();
-          num_bytes = transaction.get_data_width()/8;
-          for (int i=0; i<(transaction.get_len()+1); i++) begin
-            data_beat = transaction.get_data_beat(i);
-            strb_beat = transaction.get_strb_beat(i);
-            for (int j=0; j<num_bytes; j++) begin
-              axi_byte = data_beat[j*8+:8];
-              // put each beat into byte queues
-              if (operation_type == READ_OP) begin
-                this.mailbox.put(axi_byte);
-                this.axi_byte_stream_size++;
-              end else if (strb_beat[j] || !this.agent.vif_proxy.C_AXI_HAS_WSTRB) begin
-                this.mailbox.put(axi_byte);
-                this.axi_byte_stream_size++;
-              end
+        num_bytes = transaction.get_data_width()/8;
+        for (int i=0; i<(transaction.get_len()+1); i++) begin
+          data_beat = transaction.get_data_beat(i);
+          strb_beat = transaction.get_strb_beat(i);
+          for (int j=0; j<num_bytes; j++) begin
+            axi_byte = data_beat[j*8+:8];
+            // put each beat into byte queues
+            if (bit'(transaction.get_cmd_type()) == 1'b0) begin // READ
+              data_queue.push_back(axi_byte);
+            end else if (strb_beat[j] || !this.monitor.vif_proxy.C_AXI_HAS_WSTRB) begin // WRITE
+              data_queue.push_back(axi_byte);
             end
-            this.info($sformatf("Caught an AXI4 transaction: %d", this.axi_byte_stream_size), ADI_VERBOSITY_MEDIUM);
-            this.transaction_captured();
-            #1step;
-            #1step;
-            this.mailbox.flush();
-            this.axi_byte_stream_size = 0;
           end
-        end else begin
-          this.axi_ap.write(transaction);
-          this.put_key();
-          #1step;
+          this.info($sformatf("Caught an AXI4 transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
         end
+        if (bit'(transaction.get_cmd_type()) == 1'b0) begin
+          this.publisher_rx.notify(data_queue);
+        end else begin
+          this.publisher_tx.notify(data_queue);
+        end
+        data_queue.delete();
       end
-
-    endtask /* get_transaction */
+    endtask: get_transaction
 
   endclass
 
 
-  class x_axis_monitor #( type T) extends x_monitor;
-
-    typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
-    protected sink_type_t tx_sink_type;
+  class x_axis_monitor #(int `AXIS_VIP_PARAM_ORDER(axis)) extends x_monitor;
 
     // analysis port from the monitor
+    protected axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(axis)) monitor;
     protected xil_analysis_port #(axi4stream_monitor_transaction) axis_ap;
 
-    protected T agent;
+    adi_publisher #(logic [7:0]) publisher;
 
     // constructor
     function new(
       input string name,
-      input T agent,
-      input adi_component parent = null);
+      input axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(axis)) monitor,
+      input adi_agent parent = null);
 
       super.new(name, parent);
 
-      this.enabled = 0;
-      this.tx_sink_type = CYCLIC;
+      this.monitor = monitor;
+      this.axis_ap = monitor.item_collected_port;
 
-      this.agent = agent;
-      this.axis_ap = this.agent.monitor.item_collected_port;
-
-    endfunction /* new */
-
-    // set sink type
-    virtual function void set_sink_type(input bit sink_type);
-
-      if (!this.enabled) begin
-        this.tx_sink_type = sink_type_t'(sink_type);
-      end else begin
-        this.error($sformatf("ERROR Scoreboard: Can not configure sink_type while scoreboard is running."));
-      end
-
-    endfunction
-
-    // get sink type
-    virtual function bit get_sink_type();
-
-      return this.tx_sink_type;
-
+      this.publisher = new("Publisher", this);
     endfunction
 
     // collect data from the AXI4Strean interface of the stub, this task
     // handles both ONESHOT and CYCLIC scenarios
     virtual task get_transaction();
-
       axi4stream_transaction transaction;
       xil_axi4stream_data_beat data_beat;
       xil_axi4stream_strb_beat keep_beat;
       int num_bytes;
       logic [7:0] axi_byte;
+      logic [7:0] data_queue [$];
 
       forever begin
         this.axis_ap.get(transaction);
@@ -211,16 +147,14 @@ package x_monitor_pkg;
         keep_beat = transaction.get_keep_beat();
         for (int j=0; j<num_bytes; j++) begin
           axi_byte = data_beat[j*8+:8];
-          if (keep_beat[j+:1] || !this.agent.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
-            this.mailbox.put(axi_byte);
+          if (keep_beat[j+:1] || !this.monitor.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
+            data_queue.push_back(axi_byte);
         end
-        this.info($sformatf("Caught an AXI4 stream transaction: %d", this.mailbox.num()), ADI_VERBOSITY_MEDIUM);
-        this.transaction_captured();
-        #1step;
-        this.mailbox.flush();
+        this.info($sformatf("Caught an AXI4 stream transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
+        this.publisher.notify(data_queue);
+        data_queue.delete();
       end
-
-    endtask /* get_transaction */
+    endtask: get_transaction
 
   endclass
 

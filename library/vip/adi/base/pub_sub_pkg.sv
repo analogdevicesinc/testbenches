@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -32,83 +32,66 @@
 //
 // ***************************************************************************
 // ***************************************************************************
+
 `include "utils.svh"
 
-package adi_peripheral_pkg;
+package pub_sub_pkg;
 
   import logger_pkg::*;
   import adi_common_pkg::*;
-  import reg_accessor_pkg::*;
 
-   //============================================================================
-  // Base peripheral class
-  //============================================================================
-  class adi_peripheral extends adi_component;
-    reg_accessor bus;
-    bit [31:0] base_address;
+  class adi_subscriber #(type data_type = int) extends adi_component;
 
-    // Semantic versioning
-    bit [7:0] ver_major;
-    bit [7:0] ver_minor;
-    bit [7:0] ver_patch;
+    protected static bit [15:0] last_id = 'd0;
+    bit [15:0] id;
 
-    string name;
-
-    // -----------------
-    //
-    // -----------------
     function new(
       input string name,
-      input reg_accessor bus,
-      input bit [31:0] base_address,
       input adi_component parent = null);
 
       super.new(name, parent);
-      
-      this.bus = bus;
-      this.base_address = base_address;
-    endfunction
 
-    // -----------------
-    //
-    // -----------------
-    virtual task probe();
-      bit [31:0] val;
-      this.bus.RegRead32(this.base_address + 'h0, val);
-      {ver_major, ver_minor, ver_patch} = val;
-      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
-    endtask
+      this.last_id++;
+      this.id = this.last_id;
+    endfunction: new
 
-    // -----------------
-    // 
-    // -----------------
-    task axi_read(
-      input  [31:0] addr,
-      output [31:0] data);
+    virtual function void update(input data_type data [$]);
+      this.fatal($sformatf("This function is not implemented!"));
+    endfunction: update
 
-      this.bus.RegRead32(this.base_address + addr, data);
-    endtask: axi_read
+  endclass: adi_subscriber
 
-    // -----------------
-    //
-    // -----------------
-    task axi_write(
-      input [31:0] addr,
-      input [31:0] data);
 
-      this.bus.RegWrite32(this.base_address + addr, data);
-    endtask: axi_write
+  class adi_publisher #(type data_type = int) extends adi_component;
 
-    // -----------------
-    //
-    // -----------------
-    task axi_verify(
-      input [31:0] addr,
-      input [31:0] data);
+    protected adi_subscriber #(data_type) subscriber_list[bit[15:0]];
 
-      this.bus.RegReadVerify32(this.base_address + addr, data);
-    endtask: axi_verify
+    function new(
+      input string name,
+      input adi_component parent = null);
 
-  endclass
+      super.new(name, parent);
+    endfunction: new
+
+    function void subscribe(input adi_subscriber #(data_type) subscriber);
+      if (this.subscriber_list.exists(subscriber.id))
+        this.error($sformatf("Subscriber already on the list!"));
+      else
+        this.subscriber_list[subscriber.id] = subscriber;
+    endfunction: subscribe
+
+    function void unsubscribe(input adi_subscriber #(data_type) subscriber);
+      if (!this.subscriber_list.exists(subscriber.id))
+        this.error($sformatf("Subscriber does not exist on list!"));
+      else
+        this.subscriber_list.delete(subscriber.id);
+    endfunction: unsubscribe
+
+    function void notify(input data_type data [$]);
+      foreach (this.subscriber_list[i])
+        this.subscriber_list[i].update(data);
+    endfunction: notify
+
+  endclass: adi_publisher
 
 endpackage

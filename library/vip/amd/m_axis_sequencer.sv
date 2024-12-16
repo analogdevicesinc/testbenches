@@ -38,6 +38,7 @@
 package m_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
+  import adi_common_pkg::*;
   import logger_pkg::*;
 
   typedef enum {
@@ -97,7 +98,7 @@ package m_axis_sequencer_pkg;
     // new
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_agent parent = null);
       
       super.new(name, parent);
 
@@ -310,20 +311,21 @@ package m_axis_sequencer_pkg;
   endclass: m_axis_sequencer_base
 
 
-  class m_axis_sequencer #( type T, `AXIS_VIP_PARAM_DECL) extends m_axis_sequencer_base;
+  class m_axis_sequencer #(int `AXIS_VIP_PARAM_ORDER(AXIS)) extends m_axis_sequencer_base;
 
-    protected T agent;
+    protected axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver;
 
 
     function new(
       input string name,
-      input T agent,
-      input adi_component parent = null);
+      input axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
+      input adi_agent parent = null);
 
       super.new(name, parent);
 
-      this.agent = agent;
-      this.agent.vif_proxy.set_no_insert_x_when_keep_low(1);
+      this.driver = driver;
+
+      this.driver.vif_proxy.set_no_insert_x_when_keep_low(1);
     endfunction: new
 
 
@@ -338,19 +340,19 @@ package m_axis_sequencer_pkg;
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
-      agent.vif_proxy.set_dummy_drive_type(XIL_AXI4STREAM_VIF_DRIVE_NONE);
+      this.driver.vif_proxy.set_dummy_drive_type(XIL_AXI4STREAM_VIF_DRIVE_NONE);
 
       this.wait_clk_count(2);
     endtask: set_inactive_drive_output_0
 
     // check if ready is asserted
     virtual function bit check_ready_asserted();
-      return agent.vif_proxy.is_ready_asserted();
+      return this.driver.vif_proxy.is_ready_asserted();
     endfunction: check_ready_asserted
 
     // wait for set amount of clock cycles
     virtual task wait_clk_count(input int wait_clocks);
-      agent.vif_proxy.wait_aclks(wait_clocks);
+      this.driver.vif_proxy.wait_aclks(wait_clocks);
     endtask: wait_clk_count
 
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
@@ -421,7 +423,7 @@ package m_axis_sequencer_pkg;
         end
 
         this.info($sformatf("generating axis transaction"), ADI_VERBOSITY_HIGH);
-        trans = agent.driver.create_transaction();
+        trans = this.driver.create_transaction();
         trans.set_data(data);
         trans.set_id('h0);
         trans.set_dest('h0);
@@ -465,7 +467,7 @@ package m_axis_sequencer_pkg;
             forever begin
               @data_av_ev;
               this.info($sformatf("sending axis transaction"), ADI_VERBOSITY_HIGH);
-              agent.driver.send(trans);
+              this.driver.send(trans);
               ->> beat_done;
             end
           join_any

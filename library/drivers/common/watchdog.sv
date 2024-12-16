@@ -37,6 +37,7 @@
 package watchdog_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
 
   class watchdog extends adi_component;
     

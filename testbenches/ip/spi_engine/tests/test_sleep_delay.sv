@@ -47,6 +47,13 @@ import spi_environment_pkg::*;
 import spi_engine_instr_pkg::*;
 import adi_spi_vip_pkg::*;
 
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+import `PKGIFY(test_harness, spi_s_vip)::*;
+`ifdef DEF_SDO_STREAMING
+  import `PKGIFY(test_harness, sdo_src)::*;
+`endif
+
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
@@ -64,7 +71,11 @@ program test_sleep_delay (
 timeunit 1ns;
 timeprecision 100ps;
 
-spi_environment env;
+`ifdef DEF_SDO_STREAMING
+  spi_environment #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip), `AXIS_VIP_PARAMS(test_harness, sdo_src)) env;
+`else
+  spi_environment #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) env;
+`endif
 
 // --------------------------
 // Wrapper function for AXI read verify
@@ -72,13 +83,13 @@ spi_environment env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-  env.mng.RegReadVerify32(raddr,vdata);
+  env.mng.sequencer.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-  env.mng.RegRead32(raddr,data);
+  env.mng.sequencer.RegRead32(raddr,data);
 endtask
 
 // --------------------------
@@ -87,7 +98,7 @@ endtask
 task axi_write(
     input [31:0]  waddr,
     input [31:0]  wdata);
-  env.mng.RegWrite32(waddr,wdata);
+  env.mng.sequencer.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
@@ -95,7 +106,7 @@ endtask
 // --------------------------
 task spi_receive(
     output [`DATA_DLENGTH:0]  data);
-  env.spi_seq.receive_data(data);
+  env.spi_agent.sequencer.receive_data(data);
 endtask
 
 // --------------------------
@@ -103,14 +114,14 @@ endtask
 // --------------------------
 task spi_send(
     input [`DATA_DLENGTH:0]  data);
-  env.spi_seq.send_data(data);
+  env.spi_agent.sequencer.send_data(data);
 endtask
 
 // --------------------------
 // Wrapper function for waiting for all SPI
 // --------------------------
 task spi_wait_send();
-  env.spi_seq.flush_send();
+  env.spi_agent.sequencer.flush_send();
 endtask
 
 // --------------------------
@@ -129,22 +140,20 @@ initial begin
             `endif
             `TH.`MNG_AXI.inst.IF,
             `TH.`DDR_AXI.inst.IF,
-            `TH.`SPI_S.inst.IF
+            `TH.`SPI_S.inst.IF.vif
             );
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
   env.start();
   env.configure();
-
   env.sys_reset();
-
   env.run();
-
-  env.spi_seq.set_default_miso_data('h2AA55);
+  env.spi_agent.sequencer.set_default_miso_data('h2AA55);
 
   // start sdo source (will wait for data enqueued)
   `ifdef DEF_SDO_STREAMING
-  env.sdo_src_seq.start();
+  env.sdo_src_agent.sequencer.start();
   `endif
 
   sanity_test();
@@ -373,14 +382,14 @@ task cs_delay_test(
   `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
 
   //Configure DMA
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
+  env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+  env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
     `SET_DMAC_FLAGS_TLAST(1) |
     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
     ); // Use TLAST
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
+  env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
+  env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   // Enable SPI Engine
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
@@ -429,7 +438,7 @@ task cs_delay_test(
   #2000ns
 
   for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr.agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
   end
 
   if (irq_pending == 'h0) begin
@@ -439,7 +448,7 @@ task cs_delay_test(
   end
 
   if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-    `ERROR(("CS Delay Test FAILED: bad data"));
+    `FATAL(("CS Delay Test FAILED: bad data"));
   end
 
   repeat (`NUM_OF_TRANSFERS) begin
@@ -455,7 +464,7 @@ task cs_delay_test(
   `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
 
   #2000ns
-  env.mng.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(1));
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(0));
@@ -489,7 +498,7 @@ task cs_delay_test(
   #2000ns
 
   for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = env.ddr.agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
   end
 
   if (irq_pending == 'h0) begin

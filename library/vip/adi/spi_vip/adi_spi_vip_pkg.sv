@@ -67,13 +67,12 @@ package adi_spi_vip_pkg;
 
   class adi_spi_driver extends adi_driver;
 
-    typedef mailbox #(logic [vif.get_param_DATA_DLENGTH()-1:0]) spi_mbx_t;
-    protected spi_mbx_t mosi_mbx;
-    spi_mbx_t miso_mbx;
+    typedef bit bitqueue_t [$];
+    protected mailbox mosi_mbx;
+    mailbox miso_mbx;
     protected bit active;
     protected bit stop_flag;
-    protected bit [vif.get_param_DATA_DLENGTH()-1:0] miso_reg;
-    protected bit [vif.get_param_DATA_DLENGTH()-1:0] default_miso_data;
+    protected int default_miso_data;
     protected event tx_mbx_updated;
 
     adi_spi_vip_if_base vif;
@@ -84,7 +83,7 @@ package adi_spi_vip_pkg;
       input adi_agent parent = null);
 
       super.new(name, parent);
-      
+
       this.vif = intf;
       this.active = 0;
       this.stop_flag = 0;
@@ -107,19 +106,27 @@ package adi_spi_vip_pkg;
     endfunction : clear_active
 
     protected task rx_mosi();
-      static logic [vif.get_param_DATA_DLENGTH()-1:0] mosi_data;
+      bitqueue_t mosi_bits;
+      logic mosi_logic;
+      bit mosi_bit;
       forever begin
-        if (vif.intf_slave_mode) begin
-          wait (vif.cs_active);
-          while (vif.cs_active) begin
+        if (vif.get_mode() == SPI_MODE_SLAVE) begin
+          vif.wait_cs_active();
+          while (vif.get_cs_active()) begin
             for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
-              if (!vif.cs_active) begin
+              if (!vif.get_cs_active()) begin
                 break;
+                mosi_bits.delete();
               end
-              @(posedge vif.sample_edge)
-              mosi_data = {mosi_data[vif.get_param_DATA_DLENGTH()-2:0], vif.mosi_delayed};
+              vif.wait_for_sample_edge();
+              mosi_logic = vif.get_mosi_delayed();
+              assert(!$isunknown(mosi_logic))
+              else this.error($sformatf("[SPI VIP] MOSI Rx: unknown mosi bit at sample edge!"));
+              mosi_bit = bit'(mosi_logic);
+              bitqueue_push_lsb(mosi_bits, mosi_bit);
             end
-            mosi_mbx.put(mosi_data);
+            mosi_mbx.put(bitqueue_to_int(mosi_bits));
+            mosi_bits.delete();
           end
         end
       end
@@ -128,32 +135,34 @@ package adi_spi_vip_pkg;
     protected task tx_miso();
         bit using_default;
         bit pending_mbx;
+        int miso_data;
+        bitqueue_t miso_bits;
       forever begin
-        if (vif.intf_slave_mode) begin
-          wait (vif.cs_active);
-          while (vif.cs_active) begin
+        if (vif.get_mode() == SPI_MODE_SLAVE) begin
+          vif.wait_cs_active();
+          while (vif.get_cs_active()) begin
             // try to get an item from the mailbox, without popping it
-            if (!miso_mbx.try_peek(miso_reg)) begin
-              miso_reg = default_miso_data;
+            if (!miso_mbx.try_peek(miso_data)) begin
+              miso_data = default_miso_data;
               using_default = 1'b1;
             end else begin
               using_default = 1'b0;
             end
+            miso_bits = int_to_bitqueue(miso_data,vif.get_param_DATA_DLENGTH());
             pending_mbx = 1'b0;
             // early drive and shift if CPHA=0
             if (vif.get_param_CPHA() == 0) begin
-              vif.miso_drive <= miso_reg[vif.get_param_DATA_DLENGTH()-1];
-              miso_reg = {miso_reg[vif.get_param_DATA_DLENGTH()-2:0], 1'b0};
+              vif.set_miso_drive_instantaneous(bitqueue_pop_msb(miso_bits));
             end
             for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               fork
                 begin
                   fork
                     begin
-                      wait (!vif.cs_active);
+                      vif.wait_cs_inactive();
                     end
                     begin
-                      @(posedge vif.drive_edge);
+                      vif.wait_for_drive_edge();
                     end
                     begin
                       wait (tx_mbx_updated.triggered && i==0 && using_default);
@@ -163,29 +172,30 @@ package adi_spi_vip_pkg;
                   disable fork;
                 end
               join
-              if (!vif.cs_active) begin
+              if (!vif.get_cs_active()) begin
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
-                  this.fatal($sformatf("tx_miso: early exit due to unexpected CS inactive!"));
+                  this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
                 end
+                miso_bits.delete();
                 break;
               end else if (pending_mbx) begin
                 // we were going to transmit default data, but new data arrived between the cs edge and vif.drive_edge
                 using_default = 1'b0;
                 pending_mbx = 1'b0;
+                miso_bits.delete();
                 break;
               end else begin
                 // vif.drive_edge has arrived
                 // don't shift at last edge if CPHA=0
                 if (!(vif.get_param_CPHA() == 0 && i == vif.get_param_DATA_DLENGTH()-1)) begin
-                  vif.miso_drive <= #(vif.get_param_SLAVE_TOUT()) miso_reg[vif.get_param_DATA_DLENGTH()-1];
-                  miso_reg = {miso_reg[vif.get_param_DATA_DLENGTH()-2:0], 1'b0};
+                  vif.set_miso_drive(bitqueue_pop_msb(miso_bits));
                 end
                 if (i == vif.get_param_DATA_DLENGTH()-1) begin
                   this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
                   if (!using_default) begin
                     // finally pop an item from the mailbox after a complete transfer
-                    miso_mbx.get(miso_reg);
+                    miso_mbx.get(miso_data);
                   end
                 end
               end
@@ -197,12 +207,12 @@ package adi_spi_vip_pkg;
 
     protected task cs_tristate();
       forever begin
-        @(vif.cs)
-        if (vif.intf_slave_mode) begin
-          if (!vif.cs_active) begin
-            vif.miso_oen <= #(vif.get_param_CS_TO_MISO()*1ns) 1'b0;
+        vif.wait_cs();
+        if (vif.get_mode() == SPI_MODE_SLAVE) begin
+          if (!vif.get_cs_active()) begin
+            vif.set_miso_oen(1'b0);
           end else begin
-            vif.miso_oen <= #(vif.get_param_CS_TO_MISO()*1ns) 1'b1;
+            vif.set_miso_oen(1'b1);
           end
         end
       end
@@ -230,17 +240,13 @@ package adi_spi_vip_pkg;
 
     task put_tx_data(
       input int unsigned data);
-      bit [vif.get_param_DATA_DLENGTH()-1:0] txdata;
-      txdata = data;
-      miso_mbx.put(txdata);
+      miso_mbx.put(data);
       ->tx_mbx_updated;
     endtask
 
     task get_rx_data(
       output int unsigned data);
-      bit [vif.get_param_DATA_DLENGTH()-1:0] rxdata;
-      mosi_mbx.get(rxdata);
-      data = rxdata;
+      mosi_mbx.get(data);
     endtask
 
     task flush_tx();
@@ -279,6 +285,33 @@ package adi_spi_vip_pkg;
       end
     endtask
 
+    automatic function int bitqueue_to_int(bitqueue_t bitq);
+      int idx = 0;
+      int data = 0;
+      while (bitq.size() != 0) begin
+        data |= (bitq.pop_front() << idx);
+        idx++;
+      end
+      return data;
+    endfunction
+
+    automatic function bitqueue_t int_to_bitqueue(int data, int n_bits);
+      bitqueue_t bitq;
+      for (int i =0; i<n_bits; i++) begin
+        bitq.push_back((data>>i) & 1'b1);
+      end
+      return bitq;
+    endfunction
+
+    automatic function bit bitqueue_pop_msb(ref bitqueue_t bitq);
+      bit data;
+      data = bitq.pop_back();
+      return data;
+    endfunction
+
+    automatic function void bitqueue_push_lsb(ref bitqueue_t bitq, bit lsb);
+      bitq.push_front(lsb);
+    endfunction
   endclass
 
   class adi_spi_sequencer extends adi_sequencer;
@@ -324,7 +357,7 @@ package adi_spi_vip_pkg;
   class adi_spi_agent extends adi_agent;
 
     protected adi_spi_driver driver;
-    protected adi_spi_sequencer sequencer;
+    adi_spi_sequencer sequencer;
 
     function new(
       input string name,

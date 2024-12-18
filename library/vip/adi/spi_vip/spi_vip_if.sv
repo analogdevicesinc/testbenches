@@ -55,9 +55,7 @@ interface spi_vip_if #(
   logic cs;
 
   // internal
-  logic intf_slave_mode;
-  logic intf_master_mode;
-  logic intf_monitor_mode;
+  spi_mode_t spi_mode;
   logic miso_oen;
   logic miso_drive;
   logic cs_active;
@@ -71,7 +69,7 @@ interface spi_vip_if #(
   assign cs_active = (cs == CS_ACTIVE_LEVEL);
 
   // miso tri-state handling
-  assign miso = (!intf_slave_mode)  ? 'z
+  assign miso = (spi_mode != SPI_MODE_SLAVE)  ? 'z
               : (miso_oen)          ? miso_drive
                 /*default*/         : 'z;
 
@@ -127,31 +125,65 @@ interface spi_vip_if #(
       return DEFAULT_MISO_DATA;
     endfunction
 
-    virtual function int get_slave_mode();
-      return intf_slave_mode;
+    virtual function spi_mode_t get_mode();
+      return spi_mode;
     endfunction
+
+    virtual function logic get_mosi_delayed();
+      return mosi_delayed;
+    endfunction
+
+    virtual function logic get_cs_active();
+      return cs_active;
+    endfunction
+
+    virtual task set_miso_drive(bit val);
+      miso_drive <= #(SLAVE_TOUT) val;
+    endtask
+
+    virtual task set_miso_drive_instantaneous(bit val);
+      miso_drive <= val;
+    endtask
+
+    virtual task wait_cs_active();
+      wait(cs_active);
+    endtask
+
+    virtual task wait_cs_inactive();
+      wait(!cs_active);
+    endtask
+
+    virtual task wait_for_sample_edge();
+      @(posedge sample_edge);
+    endtask
+
+    virtual task wait_for_drive_edge();
+      @(posedge drive_edge);
+    endtask
+
+    virtual task wait_cs();
+      @(cs);
+    endtask
+
+    virtual task set_miso_oen(bit val);
+      miso_oen <= #(CS_TO_MISO*1ns) val;
+    endtask
 
   endclass: adi_spi_vip_if
 
   adi_spi_vip_if vif = new();
 
   function void set_slave_mode();
-    intf_slave_mode   = 1;
-    intf_master_mode  = 0;
-    intf_monitor_mode = 0;
+    spi_mode = SPI_MODE_SLAVE;
   endfunction : set_slave_mode
 
   function void set_master_mode();
-    intf_slave_mode   = 0;
-    intf_master_mode  = 1;
-    intf_monitor_mode = 0;
+    spi_mode = SPI_MODE_MASTER;
     `ERRORV(("Unsupported mode master")); //TODO
   endfunction : set_master_mode
 
   function void set_monitor_mode();
-    intf_slave_mode   = 0;
-    intf_master_mode  = 0;
-    intf_monitor_mode = 1;
+    spi_mode = SPI_MODE_MONITOR;
     `ERRORV(("Unsupported mode monitor")); //TODO
   endfunction : set_monitor_mode
 

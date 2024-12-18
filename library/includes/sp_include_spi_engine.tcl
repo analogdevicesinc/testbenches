@@ -38,7 +38,6 @@ source $ad_tb_dir/library/includes/sp_include_regmap.tcl
 # Add test files to the project
 adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/adi/spi_vip/adi_spi_vip_pkg.sv" \
-  "$ad_tb_dir/library/vip/adi/spi_vip/s_spi_sequencer.sv" \
   "$ad_tb_dir/library/drivers/spi_engine/spi_engine_instr_pkg.sv" \
   "$ad_tb_dir/library/regmaps/adi_regmap_spi_engine_pkg.sv" \
 ]

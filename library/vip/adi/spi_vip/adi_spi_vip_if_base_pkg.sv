@@ -34,84 +34,59 @@
 
 package adi_spi_vip_if_base_pkg;
 
-  class adi_spi_vip_if_base;
+  typedef enum {SPI_MODE_SLAVE, SPI_MODE_MASTER, SPI_MODE_MONITOR} spi_mode_t;
+
+  virtual class adi_spi_vip_if_base;
 
     function new();
     endfunction
 
-    virtual function int get_param_MODE();
-    endfunction
+    pure virtual function int get_param_MODE();
 
-    virtual function int get_param_CPOL();
-    endfunction
+    pure virtual function int get_param_CPOL();
 
-    virtual function int get_param_CPHA();
-    endfunction
+    pure virtual function int get_param_CPHA();
 
-    virtual function int get_param_INV_CS();
-    endfunction
+    pure virtual function int get_param_INV_CS();
 
-    virtual function int get_param_DATA_DLENGTH();
-    endfunction
+    pure virtual function int get_param_DATA_DLENGTH();
 
-    virtual function int get_param_SLAVE_TIN();
-    endfunction
+    pure virtual function int get_param_SLAVE_TIN();
 
-    virtual function int get_param_SLAVE_TOUT();
-    endfunction
+    pure virtual function int get_param_SLAVE_TOUT();
 
-    virtual function int get_param_MASTER_TIN();
-    endfunction
+    pure virtual function int get_param_MASTER_TIN();
 
-    virtual function int get_param_MASTER_TOUT();
-    endfunction
+    pure virtual function int get_param_MASTER_TOUT();
 
-    virtual function int get_param_CS_TO_MISO();
-    endfunction
+    pure virtual function int get_param_CS_TO_MISO();
 
-    virtual function int get_param_DEFAULT_MISO_DATA();
-    endfunction
+    pure virtual function int get_param_DEFAULT_MISO_DATA();
 
-    virtual function int get_master_mode();
-      $fatal(1, $sformatf("Function not implemented!"));
-    endfunction
-    
-    virtual function int get_slave_mode();
-      $fatal(1, $sformatf("Function not implemented!"));
-    endfunction
-    
-    virtual function int get_cs_active();
-      $fatal(1, $sformatf("Function not implemented!"));
-    endfunction
-    
-    virtual task wait_cs_active();
-      $fatal(1, $sformatf("Task not implemented!"));
-    endtask
-    
-    virtual task wait_posedge_sample_edge();
-      $fatal(1, $sformatf("Task not implemented!"));
-    endtask
-    
-    virtual function int get_mosi_delayed();
-      $fatal(1, $sformatf("Function not implemented!"));
-    endfunction
-    
-    virtual function void set_miso_drive();
-      $fatal(1, $sformatf("Function not implemented!"));
-    endfunction
-    
-    virtual task wait_posedge_drive_edge();
-      $fatal(1, $sformatf("Task not implemented!"));
-    endtask
-    
-    virtual task wait_cs();
-      $fatal(1, $sformatf("Task not implemented!"));
-    endtask
-    
-    virtual function void set_miso_oen();
-      $fatal(1, $sformatf("Function not implemented!"));
-    endfunction
-    
+    pure virtual function spi_mode_t get_mode();
+
+    pure virtual function logic get_cs_active();
+
+    pure virtual task wait_cs_active();
+
+    pure virtual task wait_cs_inactive();
+
+    pure virtual task wait_for_sample_edge();
+
+    pure virtual function logic get_mosi_delayed();
+
+    pure virtual task set_miso_drive(bit val);
+
+    pure virtual task set_miso_drive_instantaneous(bit val);
+
+    pure virtual task wait_for_drive_edge();
+
+    pure virtual task wait_cs();
+
+    pure virtual task set_miso_oen(bit val);
+
+
+
   endclass
 
 endpackage

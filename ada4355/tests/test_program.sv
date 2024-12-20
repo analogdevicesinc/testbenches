@@ -157,9 +157,7 @@ program test_program;
   task link_setup;
   begin
 
-    //int num_lanes = (`SINGLE_LANE==1) ? 1 : 2;
     int num_lanes = 2;
-    //int sdr_ddr_n = `SDR_DDR_N;
     int sdr_ddr_n = 0;
 
     // Configure Rx interface
@@ -168,8 +166,7 @@ program test_program;
               sdr_ddr_n<<16);
 
     // pull out RX of reset
-    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
-              `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
     force system_tb.sync_n = 1'b1;
     #10;
@@ -197,9 +194,7 @@ program test_program;
 // --------------------------
 task enable_pattern;
 begin
-   //int num_lanes = (`SINGLE_LANE==1) ? 1 : 2;
     int num_lanes = 2;
-    // int sdr_ddr_n = `SDR_DDR_N;
     int sdr_ddr_n = 0;
     bit [31:0] sync_status = 32'b0;
   force system_tb.enable_pattern = 1'b1;

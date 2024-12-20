@@ -41,6 +41,4 @@ global ad_project_params
 #  Block design under test
 #
 #
-source $ad_hdl_dir/projects/ada4355/common/ada4355_fmc_bd.tcl
-
-
+source $ad_hdl_dir/projects/ada4355_fmc/common/ada4355_fmc_bd.tcl

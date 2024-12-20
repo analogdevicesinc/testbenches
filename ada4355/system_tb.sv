@@ -44,23 +44,22 @@
 module system_tb #(
 ) ();
 
-  localparam DCO_HALF_PERIOD = 2.5;
-  //localparam BITS_PER_CYCLE = (`SINGLE_LANE ? 1 : 2) * (`SDR_DDR_N==1 ? 1 : 2);
+  localparam DCO_HALF_PERIOD = 1; // Period 2 ns -> 500 MHz DCO
+  localparam FRAME_HALF_PERIOD = 4; // Period 8 ns -> 125 MHz Frame
   localparam BITS_PER_CYCLE = 2 * 2;
   localparam CNV_HALF_PERIOD_COR = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
   localparam CNV_HALF_PERIOD = `EN_UNCOR ? 4 * CNV_HALF_PERIOD_COR : CNV_HALF_PERIOD_COR;
-  /*localparam LATENCY = `SDR_DDR_N ? `SINGLE_LANE ? 6 : 5
-                                  : `SINGLE_LANE ? 8 : 3; */
   localparam LATENCY = 3;                              
 
   reg sync_n = 1'b0;
   reg ssi_clk = 1'b0;
-  //reg cnv_clk = 1'b0;
+  reg frame_clk = 1'b0;
+  reg div_clock = 1'b0;
   reg enable_pattern = 1'b0;
   reg dco_p = 1'b0;
   reg dco_n = 1'b1;
-  //reg data_frame_p = 1'b1;
- // reg data_frame_n = 1'b1;
+  reg frame_clock_p = 1'b0;
+  reg frame_clock_n = 1'b0;
 
   `TEST_PROGRAM test();
 
@@ -72,12 +71,9 @@ module system_tb #(
     .da_n (da_n),
     .db_p (db_p),
     .db_n (db_n),
-    .sync_n (sync_n)
-    //.cnv_in_p(cnv_clk),
-    //.cnv_in_n(~cnv_clk)
-    //.data_frame_p (data_frame_p),
-    //.data_frame_n (data_frame_n)
-
+    .sync_n (sync_n),
+    .frame_clock_p(frame_clock_p),
+    .frame_clock_n(frame_clock_n)
   );
 
   reg sync_n_d = 1'b0;
@@ -88,6 +84,9 @@ module system_tb #(
   // the clock path inside the FPGA
   always @(*) dco_p <=  #3 ssi_clk;
   always @(*) dco_n <=  #3 ~ssi_clk;
+
+  always @(*) frame_clock_p <=  frame_clk;
+  always @(*) frame_clock_n <= ~frame_clk;
 
   //
   // Clock generation
@@ -103,18 +102,27 @@ module system_tb #(
     ssi_clk <= 1'b0;
   end
 
-  /*initial begin
-    while (1) begin
-      #1;
-      @(posedge sync_n_d);
-      while (sync_n_d) begin
-         cnv_clk <= ~cnv_clk;
-         #CNV_HALF_PERIOD;
-      end
-      cnv_clk <= 1'b0;
+  // Starts frame clock
+
+  initial begin
+    #1;
+    @(posedge sync_n_d);
+    while (sync_n_d) begin
+      frame_clk <= ~frame_clk;
+      #FRAME_HALF_PERIOD;
     end
   end
-  */
+
+
+  initial begin
+    #1;
+    @(posedge sync_n_d);
+    while (sync_n_d) begin
+      div_clock <= ~div_clock;
+      #FRAME_HALF_PERIOD;
+    end
+  end
+
   //
   // Data generation
   //
@@ -124,13 +132,8 @@ module system_tb #(
   reg db_p = 1'b0;
   reg db_n = 1'b1;
   wire [19:0] final_sample;
-  assign final_sample = (enable_pattern) ? 20'hac5d6 : sample;
-  //`ifdef M1
-  //always @(negedge cnv_clk) begin
-  //`else
-  //always @(posedge cnv_clk) begin
-  //`endif
-  always @(*) begin
+  assign final_sample = (enable_pattern) ? 8'hF0 : sample;
+  always @(posedge frame_clock_p) begin
     repeat (LATENCY) @(posedge ssi_clk);
     fork
       begin
@@ -150,35 +153,22 @@ module system_tb #(
   end
 
   task automatic drive_sample(bit [19:0] sample_t);
-   // int num_lanes = (`SINGLE_LANE==1) ? 1 : 2;
     int num_lanes = 2;
-   // int bits_per_cycle = num_lanes * (`SDR_DDR_N==1 ? 1 : 2);
     int bits_per_cycle = num_lanes * 2;
-    for (int i = 19; i >= 0; i=i-bits_per_cycle) begin
+    for (int i = 15; i >= 0; i=i-bits_per_cycle) begin // for (int i = 19; i >= 0;)
       @(negedge ssi_clk);
       #1;
       da_p <= sample_t[i];
       da_n <= ~sample_t[i];
-      //if (`SINGLE_LANE == 0) begin
       db_p <= sample_t[i-1];
       db_n <= ~sample_t[i-1];
-      //end 
-      //if (`SDR_DDR_N == 0) begin
-        @(posedge ssi_clk);
-        #1;
-      /*  if (`SINGLE_LANE == 1) begin
-          da_p <= sample_t[i-1];
-          da_n <= ~sample_t[i-1];
-          db_p <= 1'b0;
-          db_n <= 1'b0;
-        end else begin */
-          da_p <= sample_t[i-2];
-          da_n <= ~sample_t[i-2];
-          db_p <= sample_t[i-3];
-          db_n <= ~sample_t[i-3];
-        end
-      //end
-    //end
+      @(posedge ssi_clk);
+      #1;
+      da_p <= sample_t[i-2];
+      da_n <= ~sample_t[i-2];
+      db_p <= sample_t[i-3];
+      db_n <= ~sample_t[i-3];
+    end
   endtask
 
 endmodule

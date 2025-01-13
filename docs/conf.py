@@ -9,7 +9,6 @@ author = 'Analog Devices, Inc.'
 
 extensions = [
     "sphinx.ext.todo",
-    "sphinxcontrib.wavedrom",
     "adi_doctools"
 ]
 

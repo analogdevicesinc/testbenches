@@ -194,7 +194,7 @@ Then asserts if all bytes in the frame are equal to the first byte.
 
 .. note::
 
-   The test bench may end before the last frame is fully transferred at the
+   The testbench may end before the last frame is fully transferred at the
    reader stream interface.
 
 .. warning::
@@ -205,7 +205,7 @@ Then asserts if all bytes in the frame are equal to the first byte.
    accessed by the writer if the number of frames and distance are close enough
    to cause the reader to be the total number of frames behind.
 
-Building the test bench
+Building the testbench
 -------------------------------------------------------------------------------
 
 The testbench is built upon ADI's generic HDL reference design framework.
@@ -270,6 +270,19 @@ Testbenches related dependencies
 
 .. include:: ../../common/dependency_common.rst
 
+HDL dependencies:
+
+.. list-table::
+   :widths: 30 45 25
+   :header-rows: 1
+
+   * - IP name
+     - Source code link
+     - Documentation link
+   * - AXI_DMAC
+     - :git-hdl:`library/axi_dmac`
+     - :external+hdl:ref:`axi_dmac`
+
 Testbench specific dependencies:
 
 .. list-table::
@@ -294,19 +307,6 @@ Testbench specific dependencies:
    * - ADI_REGMAP_DMAC_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
      - ---
-
-HDL dependencies:
-
-.. list-table::
-   :widths: 30 45 25
-   :header-rows: 1
-
-   * - IP name
-     - Source code link
-     - Documentation link
-   * - AXI_DMAC
-     - :git-hdl:`library/axi_dmac`
-     - :external+hdl:ref:`axi_dmac`
 
 .. include:: ../../../common/more_information.rst
 

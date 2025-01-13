@@ -102,7 +102,7 @@ Test stimulus
 
 The test program provides the instructions, test data
 and I3C Bus stimulus directly.
-There is no I3C Bus VIP or I3C API in the test bench.
+There is no I3C Bus VIP or I3C API in the testbench.
 
 Environment Bring up
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -134,7 +134,7 @@ I3C Controller testing
 Due to the lack of an I3C Controller VIP, the bus functions are implemented in
 the ``test_program.sv``.
 
-Building the test bench
+Building the testbench
 -------------------------------------------------------------------------------
 
 The testbench is built upon ADI's generic HDL reference design framework.

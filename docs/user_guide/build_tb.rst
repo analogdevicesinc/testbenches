@@ -1,6 +1,6 @@
 .. _build_tb:
 
-Build a test bench
+Build a testbench
 ===============================================================================
 
 **Please note that ADI only provides the source files necessary to create and
@@ -55,27 +55,27 @@ want to switch to any other branch you need to checkout that branch:
    $git branch
    $git checkout 2022_r2
 
-Building a test bench
+Building a testbench
 -------------------------------------------------------------------------------
 
 .. caution::
 
-   Before building any test bench, you must have the environment prepared each
+   Before building any testbench, you must have the environment prepared each
    time a new terminal session is started:
 
    #. Set the HDL repository path with ``export ADI_HDL_DIR=<path to dir>``.
 
    #. Set the Testbenches repository path with ``export ADI_TB_DIR=<path to dir>``.
 
-The way of building a test bench in Cygwin and WSL is almost the same.
-In this example, it is building the **AD7616** test bench.
+The way of building a testbench in Cygwin and WSL is almost the same.
+In this example, it is building the **AD7616** testbench.
 
 .. shell::
 
    $cd ad7616
    $make
 
-The ``make`` builds all the libraries first and then builds the test bench.
+The ``make`` builds all the libraries first and then builds the testbench.
 This assumes that you have the tools and licenses set up correctly. If
 you don't get to the last line, the make failed to build one or more
 targets: it could be a library component or the project itself. There is
@@ -193,5 +193,94 @@ waveform, there are two options:
    $make
    $cd runs/cfg_si
    $vivado ./cfg_si.xpr
+
+Edit a testbench efficiently
+-------------------------------------------------------------------------------
+
+When designing a testbench, it's crucial to comprehend the steps involved
+to ensure the testbench runs swiftly and exhibits predictable behavior.
+
+By default, we link the original source file in the project, with exceptions
+for VIPs and IPs source files, which are copied over to the ``cfg*.ip_user_files``
+and ``cfg*.gen/sources`` paths under the testbench project directory.
+
+A grey area exists regarding the VIP ``*_pkg.sv`` files because they are not
+referenced by any VIP module but serve as auxiliary files to interact with them.
+As such, they are not compiled in the IP Packager project by default, resulting
+in linting not being performed because they are not listed in ``*_vlog.prj``.
+
+Compile VIP files within the VIP project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is possible to force Vivado to compile ``*_pkg.sv`` files by setting the
+compilation order to manual (and specifying the top module since it will no
+longer be discovered):
+
+.. code:: tcl
+
+   set_property source_mgmt_mode DisplayOnly [current_project]
+   set_property top my_vip [get_filesets sim_1]
+   launch_simulation -scripts_only
+
+Change from ``DisplayOnly`` to ``None`` to revert.
+
+After this change, ``xvlog`` will start linting the ``*_pkg.sv`` files.
+
+If you prefer not to use the Vivado GUI, you can call ``xvlog`` directly:
+
+.. shell::
+
+   /path/testbenches/library/vip/adi/my_vip
+   $xvlog -prj ./*.sim/sim_1/behav/xsim/*_vlog.prj \
+   $    -i ../../../utilities/
+
+And for a specific file:
+
+.. shell::
+
+   /path/testbenches/library/vip/adi/my_vip
+   $xvlog -work xil_defaultlib --sv -i ../../../utilities \
+   $    -i ../../../utilities/ \
+   $    my_vip_pkg.sv
+
+.. note::
+
+   Ensure to call xvlog in the correct compilation order,
+   to add them to ``xil_defaultlib``, otherwise call ``*_vlog.prj`` first.
+
+Update VIP files of an open simulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When launching a simulation, Vivado always recompiles all files.
+However, VIP source files are not automatically updated, but trigger the
+"Upgrade IP" mechanism, which is slow (or if using ``make``, will rebuild the
+entire testbench project).
+
+A technique to significantly speed up testing is to exploit that Vivado always
+recompiles all files by patching the ``cfg*.ip_user_files`` and
+``cfg*.gen/sources`` paths with the edited sources.
+
+The following bash script demonstrates how this can be achieved, for a VIP
+called `my_vip` and testbench called `my_ip_testbench`:
+
+.. code:: bash
+
+   # Patch VIP source files of an open simulation
+   #./patch_tb.sh ; make
+
+   my_vip_path=$ADI_TB_DIR/library/vip/adi/my_vip
+   tb_path=$ADI_TB_DIR/testbenches/ip/my_ip_testbench
+
+   my_vip_files=$(command cd $my_vip_path ; find . -maxdepth 1 -name "*.v" -or -name "*.vh" -or -name "*.sv")
+
+   for f in $my_vip_files
+   do
+	f=$(basename $f)
+	tee $(find $tb_path -wholename "$tb_path/runs/cfg*/cfg*.ip_user_files/bd/test_harness/ipshared/*/$f") < $my_vip_path/$f > /dev/null
+	tee $(find $tb_path -wholename "$tb_path/runs/cfg*/cfg*.gen/sources_1/bd/test_harness/ipshared/*/$f") < $my_vip_path/$f > /dev/null
+   done
+
+Then, simply relaunch the simulation.
+The snippet above also works with IP projects, just modify the paths.
 
 .. _AMD Xilinx Vivado: https://www.xilinx.com/support/download.html

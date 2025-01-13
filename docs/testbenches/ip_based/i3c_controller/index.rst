@@ -102,7 +102,7 @@ Test stimulus
 
 The test program provides the instructions, test data
 and I3C Bus stimulus directly.
-There is no I3C Bus VIP or I3C API on the test bench.
+There is no I3C Bus VIP or I3C API in the test bench.
 
 Environment Bring up
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,7 +118,7 @@ I3C Controller testing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Initializes the sequencers, monitors and scoreboards.
-* Do sanity test on I3C Controller's version, id, and scratch register.
+* Do sanity test on I3C Controller's version, ID, and scratch register.
 * Enable I3C Controller.
 * Write device characteristics to the I3C Controller memory
   (in hardware handled by the software driver).
@@ -131,10 +131,8 @@ I3C Controller testing
   - Offload operation (SDI data is streamed to the DMA).
   - In-band interrupt (IBI)
 
-* Stops the watchdog
-
-Due to the lack of a I3C Controller VIP, the monitoring and mocking and generate
-by the `test_program.sv` itself.
+Due to the lack of an I3C Controller VIP, the bus functions are implemented in
+the ``test_program.sv``.
 
 Building the test bench
 -------------------------------------------------------------------------------
@@ -202,6 +200,22 @@ Testbenches related dependencies
 .. include:: ../../common/dependency_common.rst
 
 There are no testbench specific dependencies.
+
+HDL dependencies:
+
+.. list-table::
+   :widths: 30 45 25
+   :header-rows: 1
+
+   * - IP name
+     - Source code link
+     - Documentation link
+   * - I3C Host Interface
+     - :git-hdl:`library/i3c_controller/i3c_controller_host_interface`
+     - :external+hdl:ref:`i3c_controller host_interface`
+   * - I3C Core
+     - :git-hdl:`library/i3c_controller/i3c_controller_core`
+     - :external+hdl:ref:`i3c_controller core`
 
 .. include:: ../../../common/more_information.rst
 

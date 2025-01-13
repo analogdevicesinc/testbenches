@@ -199,8 +199,6 @@ Testbenches related dependencies
 
 .. include:: ../../common/dependency_common.rst
 
-There are no testbench specific dependencies.
-
 HDL dependencies:
 
 .. list-table::
@@ -216,6 +214,8 @@ HDL dependencies:
    * - I3C Core
      - :git-hdl:`library/i3c_controller/i3c_controller_core`
      - :external+hdl:ref:`i3c_controller core`
+
+There are no testbench specific dependencies.
 
 .. include:: ../../../common/more_information.rst
 

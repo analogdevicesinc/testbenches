@@ -268,8 +268,6 @@ Resources
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. include:: ../../common/dependency_common.rst
-
 HDL dependencies:
 
 .. list-table::
@@ -282,6 +280,8 @@ HDL dependencies:
    * - AXI_DMAC
      - :git-hdl:`library/axi_dmac`
      - :external+hdl:ref:`axi_dmac`
+
+.. include:: ../../common/dependency_common.rst
 
 Testbench specific dependencies:
 

@@ -25,7 +25,6 @@ The block design is based on the test harness with the addition of:
 * Two DMAs, one with the role of writer (stream to memory-mapped)
   and the other with the role of reader (memory-mapped to stream).
 * Two AXI4Stream VIPs, to produce and consume the generated test pattern.
-* One AXI VIP, to emulate a DDR memory between the DMAs.
 
 A known test pattern is provided to the writer and propagated to the reader,
 and is monitored to check if the output matches the expected output.
@@ -68,29 +67,33 @@ Configuration files
 The following are the available configuration files along with their
 corresponding parameter values:
 
-* cfg1
+.. list-table::
+   :header-rows: 1
 
-  - MAX\_NUM\_FRAMES\_WIDTH: 4
-  - AUTORUN: 0
-  - M\_USE\_EXT\_SYNC: 0
-  - S\_USE\_EXT\_SYNC: 0
-  - TDATA\_NUM\_BYTES: 8
-
-* cfg2\_fsync
-
-  - MAX\_NUM\_FRAMES\_WIDTH: 4
-  - AUTORUN: 0
-  - M\_USE\_EXT\_SYNC: 0
-  - S\_USE\_EXT\_SYNC: 1
-  - TDATA\_NUM\_BYTES: 8
-
-* cfg3\_fsync\_autorun
-
-  - MAX\_NUM\_FRAMES\_WIDTH: 4
-  - AUTORUN: 1
-  - M\_USE\_EXT\_SYNC: 0
-  - S\_USE\_EXT\_SYNC: 1
-  - TDATA\_NUM\_BYTES: 8
+   * - Parameter
+     - cfg1
+     - cfg2\_fsync
+     - cfg3\_fsync\_autorun
+   * - MAX\_NUM\_FRAMES\_WIDTH
+     - 4
+     - 4
+     - 4
+   * - AUTORUN
+     - 0
+     - 0
+     - 1
+   * - M\_USE\_EXT\_SYNC
+     - 0
+     - 0
+     - 0
+   * - S\_USE\_EXT\_SYNC
+     - 0
+     - 1
+     - 1
+   * - TDATA\_NUM\_BYTES
+     - 8
+     - 8
+     - 8
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -102,14 +105,29 @@ Test program             Usage
 ======================== ========================================================
 test_program             Test the framelock without external synchronization.
 ------------------------ --------------------------------------------------------
-test_program_frame_delay Test the framelock with syncronization stimulus delayed.
+test_program_frame_delay Test the framelock with synchronization stimulus delayed.
 ======================== ========================================================
 
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The cfg1 is compatbile with test_program and cfg2_fsync and cfg3_fsync_autorun
-are compatible with test_program_frame_delay.
+The configuration files are compatible with the following test programs:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Test program
+     - cfg1
+     - cfg2\_fsync
+     - cfg3\_fsync\_autorun
+   * - test_program
+     - ✓
+     - ✗
+     - ✗
+   * - test_program_frame_delay
+     - ✗
+     - ✓
+     - ✓
 
 CPU/Memory interconnects addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,14 +178,12 @@ DMA testing
 * Do single tests on variant number of frames, distance and clock frequencies:
 
   - Remove backpressure at AXIS destination and DDR.
-  - Obtain randomized DMA sequencers.
+  - Obtain randomized DMA sequence.
   - Enable sequencer test data generation.
   - Configure control and flags of the DMA.
-  - Submit the DMA sequencers.
+  - Submit the DMA sequence.
   - Generate synchronisation stimulus (if enabled).
   - Wait the number of frames are generated.
-
-* Stops the watchdog
 
 The transmitted data is the frame number, occupying a single byte and repeated
 on all other bytes of the frame.
@@ -176,8 +192,10 @@ previous frame number, since the framelock shall repeat or skip frames
 depending on the clock ratios between the writer and reader.
 Then asserts if all bytes in the frame are equal to the first byte.
 
-The test bench may end before the last frame is fully transferred at the
-reader stream interface.
+.. note::
+
+   The test bench may end before the last frame is fully transferred at the
+   reader stream interface.
 
 .. warning::
 
@@ -276,6 +294,19 @@ Testbench specific dependencies:
    * - ADI_REGMAP_DMAC_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
      - ---
+
+HDL dependencies:
+
+.. list-table::
+   :widths: 30 45 25
+   :header-rows: 1
+
+   * - IP name
+     - Source code link
+     - Documentation link
+   * - AXI_DMAC
+     - :git-hdl:`library/axi_dmac`
+     - :external+hdl:ref:`axi_dmac`
 
 .. include:: ../../../common/more_information.rst
 

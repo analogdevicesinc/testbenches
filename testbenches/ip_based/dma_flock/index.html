@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>AXIS Sequencers &#8212; Testbenches  documentation</title>
+    <title>DMA Framelock &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/style.min.css?v=7f94efc5" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -16,8 +16,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Base" href="../base/index.html" />
-    <link rel="prev" title="IP Based" href="../index.html" />
+    <link rel="next" title="Util Pack" href="../util_pack/index.html" />
+    <link rel="prev" title="Base" href="../base/index.html" />
    
   
   <meta name="global_root" content="../../../../">
@@ -99,7 +99,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">AXIS Sequencers</a><ul>
+<li><a class="reference internal" href="#">DMA Framelock</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -115,11 +115,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
-<li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
-<li><a class="reference internal" href="#sequencer-testing">Sequencer testing</a></li>
+<li><a class="reference internal" href="#environment-bring-up">Environment Bring up</a></li>
+<li><a class="reference internal" href="#dma-testing">DMA testing</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
+<li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
 <li><a class="reference internal" href="#resources">Resources</a><ul>
 <li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
 </ul>
@@ -212,9 +212,9 @@ Content on this topic
 </li>
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
 <li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axis_sequencers/index.html">AXIS Sequencers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DMA Framelock</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../util_pack/index.html">Util Pack</a></li>
 </ul>
 </li>
@@ -240,46 +240,45 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="axis-sequencers">
-<span id="id1"></span><h1>AXIS Sequencers<a class="headerlink" href="#axis-sequencers" title="Link to this heading"></a></h1>
+  <section id="dma-framelock">
+<span id="dma-flock"></span><h1>DMA Framelock<a class="headerlink" href="#dma-framelock" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The purpose of this testbench is to give engineers a sandbox testbench, where
-they can test different configuration parameters for the AXI4 Stream VIPs and
-sequencers.</p>
+<p>The purpose of this testbench is to test the framelock synchronisation feature
+of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac">library/axi_dmac</a>.</p>
+<p>This feature adds support for multiple 2D frame buffers, which are used in a
+cyclic way. On the same set of buffers, a second DMAC core can operate.
+The “Framelock” mechanism ensures no buffer is accessed by two DMACs at the same
+time.</p>
+<p>The entire HDL documentation can be found at
+<a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" title="(in HDL)"><span>AXI DMAC</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The block design is based on the test harness with the addition of two AXI4
-Stream VIPs from AMD. This testbench does not require the presence of the test
-harness, as it can work without it, but since it was created based on the base
-design, this was inherited. One of the VIPs is configured as master, while the
-other one is configured as slave. The TLAST and TREADY signals are set to be
-enabled for the VIPs. TKEEP support for this testbench will be added later. If
-your desire is to enable/disable other signals in this testbench, you’ll have
-to modify the block design. Dynamic configuration of these parameters will be
-added later in the configuration file.</p>
+<p>The block design is based on the test harness with the addition of:</p>
+<ul class="simple">
+<li><p>Two DMAs, one with the role of writer (stream to memory-mapped)
+and the other with the role of reader (memory-mapped to stream).</p></li>
+<li><p>Two AXI4Stream VIPs, to produce and consume the generated test pattern.</p></li>
+</ul>
+<p>A known test pattern is provided to the writer and propagated to the reader,
+and is monitored to check if the output matches the expected output.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
-<a class="reference internal image-reference" href="../../../_images/axis_sequencers_tb.svg"><img alt="AXIS_Sequencers/Testbench block diagram" class="align-center" src="../../../_images/axis_sequencers_tb.svg" style="width: 800px;" />
+<a class="reference internal image-reference" href="../../../_images/block_diagram.svg"><img alt="DMAC Framelock/Testbench block diagram" class="align-center" src="../../../_images/block_diagram.svg" style="width: 500px;" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
 <p>The following parameters of this project that can be configured:</p>
 <ul class="simple">
-<li><p>SRC_DESCRIPTORS: defines the data generation mode:
-Options: 1 - single packet, 2 - multiple packets, 3 - repeating packets</p></li>
-<li><p>SRC_BEAT_DELAY: defines the valid delays between data beats:
-Integer value</p></li>
-<li><p>SRC_DESCRIPTOR_DELAY: defines the valid delays between packets:
-Integer value</p></li>
-<li><p>DEST_BACKPRESSURE: defines the backpressure type for the slave interface:
-Options: 1 - backpressure enabled, 2 - no backpressure</p></li>
-<li><p>DEST_BEAT_DELAY_HIGH: defines the high time of the ready signal:
-Integer, non-0 value</p></li>
-<li><p>DEST_BEAT_DELAY_LOW: defines the low time of the ready signal:
-Integer, non-0 value</p></li>
+<li><p>M_DMA_CFG_MAX_NUM_FRAMES_WIDTH: defines the max number of buffer as a power of two.
+Valid values are between 2 (4 buffers) and 5 (32 buffers).</p></li>
+<li><p>M/S_DMA_CFG_AUTORUN: enables autorun mode to initiate transfers without software intervention.</p></li>
+<li><p>M_DMA_CFG_USE_EXT_SYNC: enables external synchronization support for the writer.</p></li>
+<li><p>S_DMA_CFG_USE_EXT_SYMC: enables external synchronization support for the reader.</p></li>
+<li><p>SRC/DST_AXIS_VIP_CFG_TDATA_NUM_BYTES: defines the <code class="docutils literal notranslate"><span class="pre">axi4stream_vip</span></code> TDATA_NUM_BYTES
+and is also used to compute the time in cycles for a frame duration.</p></li>
 </ul>
 <section id="build-parameters">
 <h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading"></a></h4>
@@ -288,14 +287,52 @@ in the following example:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">SRC_DESCRIPTORS</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">SRC_BEAT_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">SRC_DESCRIPTOR_DELAY</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">DEST_BACKPRESSURE</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_HIGH</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">DEST_BEAT_DELAY_LOW</span><span class="o">=</span><span class="m">5</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">M_DMA_CFG_USE_EXT_SYNC</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">M_DMA_CFG_MAX_NUM_FRAMES</span><span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
-<p>As this is a sandbox testbench, engineers are encouraged to change parameters
-and see what happens in the simulation.</p>
+<p>The following are the available configuration files along with their
+corresponding parameter values:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>cfg1</p></th>
+<th class="head"><p>cfg2_fsync</p></th>
+<th class="head"><p>cfg3_fsync_autorun</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MAX_NUM_FRAMES_WIDTH</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>AUTORUN</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>M_USE_EXT_SYNC</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>S_USE_EXT_SYNC</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>TDATA_NUM_BYTES</p></td>
+<td><p>8</p></td>
+<td><p>8</p></td>
+<td><p>8</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
@@ -309,7 +346,10 @@ and see what happens in the simulation.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Creates a basic test stimulus.</p></td>
+<td><p>Test the framelock without external synchronization.</p></td>
+</tr>
+<tr class="row-odd"><td><p>test_program_frame_delay</p></td>
+<td><p>Test the framelock with synchronization stimulus delayed.</p></td>
 </tr>
 </tbody>
 </table>
@@ -317,60 +357,135 @@ and see what happens in the simulation.</p>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
-<p>The test program is compatible with the configuration.</p>
+<p>The configuration files are compatible with the following test programs:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test program</p></th>
+<th class="head"><p>cfg1</p></th>
+<th class="head"><p>cfg2_fsync</p></th>
+<th class="head"><p>cfg3_fsync_autorun</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>test_program</p></td>
+<td><p>✓</p></td>
+<td><p>✗</p></td>
+<td><p>✗</p></td>
+</tr>
+<tr class="row-odd"><td><p>test_program_frame_delay</p></td>
+<td><p>✗</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 </section>
 <section id="cpu-memory-interconnects-addresses">
 <h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading"></a></h3>
-<p>Irrelevant for this testbench.</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance</p></th>
+<th class="head"><p>Address</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>dut_rx_dmac</p></td>
+<td><p>0x7C42_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>dut_tx_dmac</p></td>
+<td><p>0x7C43_0000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 <section id="interrupts">
 <h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
-<p>Irrelevant for this testbench.</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance name</p></th>
+<th class="head"><p>HDL</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dut_tx_dma</p></td>
+<td><p>13</p></td>
+</tr>
+<tr class="row-odd"><td><p>dut_rx_dma</p></td>
+<td><p>12</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 </section>
 <section id="test-stimulus">
 <h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
-<p>The test program is responsible for configuring and running the sequencers.</p>
-<section id="environment-bringup">
-<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
-<p>The steps of the environment bringup are:</p>
+<p>The AXI4Stream Manager provides a test pattern that is propagated to the
+AXI4Stream Subordinate.</p>
+<p>The test program prepares the environment and the DMAs under test.</p>
+<section id="environment-bring-up">
+<h3>Environment Bring up<a class="headerlink" href="#environment-bring-up" title="Link to this heading"></a></h3>
+<p>The steps of the environment bring up are:</p>
 <ul class="simple">
-<li><p>Create the environment</p></li>
-<li><p>Start the environment</p></li>
-<li><p>Start the clocks</p></li>
-<li><p>Assert the resets</p></li>
+<li><p>Create the environment.</p></li>
+<li><p>Start the environment.</p></li>
+<li><p>Start the clocks.</p></li>
+<li><p>Assert the resets.</p></li>
 </ul>
 </section>
-<section id="sequencer-testing">
-<h3>Sequencer testing<a class="headerlink" href="#sequencer-testing" title="Link to this heading"></a></h3>
+<section id="dma-testing">
+<h3>DMA testing<a class="headerlink" href="#dma-testing" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Configures the source and destination sequencers’ ready and valid signals
-uptime and downtime with the parameters set in the configuration file</p></li>
-<li><p>Configures the data generation part, where the parameters are also read from
-the same file</p></li>
-<li><p>A watchdog is initialized, which ensures that the simulation doesn’t run off
-into infinity</p></li>
-<li><p>Some of the parameters for the packet sizes are hardcoded, these can be
-changed to test some more specific use-cases</p></li>
-<li><p>The watchdog and the sequencers are started at the same time</p></li>
-<li><p>Simulation waits for the stop condition, depending on the packet generation
-mode</p></li>
-<li><p>Stops watchdog</p></li>
+<li><p>Initializes the sequencers, monitors and scoreboards.</p></li>
+<li><p>Initiate DMA APIs for writer and reader.</p></li>
+<li><p>Do sanity test on DMA’s scratch and ID register.</p></li>
+<li><p>Do single tests on variant number of frames, distance and clock frequencies:</p>
+<ul>
+<li><p>Remove backpressure at AXIS destination and DDR.</p></li>
+<li><p>Obtain randomized DMA sequence.</p></li>
+<li><p>Enable sequencer test data generation.</p></li>
+<li><p>Configure control and flags of the DMA.</p></li>
+<li><p>Submit the DMA sequence.</p></li>
+<li><p>Generate synchronisation stimulus (if enabled).</p></li>
+<li><p>Wait the number of frames are generated.</p></li>
 </ul>
+</li>
+</ul>
+<p>The transmitted data is the frame number, occupying a single byte and repeated
+on all other bytes of the frame.
+The scoreboard asserts if the first data beat is equal or higher than the
+previous frame number, since the framelock shall repeat or skip frames
+depending on the clock ratios between the writer and reader.
+Then asserts if all bytes in the frame are equal to the first byte.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The testbench may end before the last frame is fully transferred at the
+reader stream interface.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Depending on the configuration parameters and/or changed hardcoded values,
-the watchdog may trigger prematurely!</p>
+<p>Not all values yield valid configuration.</p>
+<p>In particular, in dynamic mode, the reader may read a buffer being currently
+accessed by the writer if the number of frames and distance are close enough
+to cause the reader to be the total number of frames behind.</p>
 </div>
 </section>
 </section>
-<section id="building-the-test-bench">
-<h2>Building the test bench<a class="headerlink" href="#building-the-test-bench" title="Link to this heading"></a></h2>
+<section id="building-the-testbench">
+<h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
 <p>The testbench is built upon ADI’s generic HDL reference design framework.
 ADI does not distribute compiled files of these projects so they must be built
 from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">here</a>,
-with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
+with the specified hierarchy described at <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
 To get the source you must
 <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository">clone</a>
 the HDL repository, and then build the project as follows:</p>
@@ -380,10 +495,10 @@ the HDL repository, and then build the project as follows:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/dma_flock
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/dma_flock$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
@@ -395,10 +510,10 @@ launch Vivado, will run the simulation and display the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/dma_flock
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/dma_flock$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -411,10 +526,10 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axis_sequencers
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/dma_flock
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axis_sequencers$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/dma_flock$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
@@ -432,6 +547,28 @@ clean folder (no runs folder available):</p>
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
 <section id="testbenches-related-dependencies">
 <h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
+<p>HDL dependencies:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IP name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AXI_DMAC</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac">library/axi_dmac</a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p>Common with most testbenches:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
@@ -501,6 +638,18 @@ clean folder (no runs folder available):</p>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axis_sequencer.sv">library/vip/amd/s_axis_sequencer.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
+<tr class="row-even"><td><p>DMA_TRANS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv">library/drivers/dmac/dma_trans.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>DMAC_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv">library/drivers/dmac/dmac_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -526,8 +675,8 @@ are, the lower the chances to receive support from <a class="reference external"
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">IP Based</a>
-    <a href="../base/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Base</a>
+    <a href="../base/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Base</a>
+    <a href="../util_pack/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Util Pack</a>
               </div>
           
         </div>

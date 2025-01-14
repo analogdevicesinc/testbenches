@@ -15,6 +15,7 @@ try to push all related PRs at the same time.
 - [ ] New feature (change that adds new functionality)
 - [ ] New test (change that adds new test program and/or testbench)
 - [ ] Breaking change (has dependencies in other repositories/testbenches)
+- [ ] Documentation (change that adds or modifies documentation)
 
 ## PR Checklist
 - [ ] I have followed the code style guidelines

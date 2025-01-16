@@ -49,18 +49,32 @@ interface spi_vip_if #(
 ) ();
   import adi_spi_vip_if_base_pkg::*;
 
-  logic sclk;
-  wire  miso; // need net types here in case tb wants to tristate this
-  wire  mosi; // need net types here in case tb wants to tristate this
-  logic cs;
+  logic s_sclk;
+  wire  s_miso; // need net types here in case tb wants to tristate this
+  logic s_mosi;
+  logic s_cs;
+
+  logic m_sclk;
+  wire  m_miso; // need net types here in case tb wants to tristate this
+  logic m_mosi;
+  logic m_cs;
 
   // internal
   spi_mode_t spi_mode;
   logic miso_oen;
   logic miso_drive;
+  logic mosi_drive = 1'b0;
+  logic cs_drive = 1'b0;
+  logic sclk_drive = 1'b0;
   logic cs_active;
-  logic mosi_delayed;
+  logic s_mosi_delayed;
+  wire sclk;
+  wire cs;
   localparam CS_ACTIVE_LEVEL = (INV_CS) ? 1'b1 : 1'b0;
+
+  // cs, sclk sources
+  assign cs = (spi_mode != SPI_MODE_SLAVE)  ? m_cs : s_cs;
+  assign sclk = (spi_mode != SPI_MODE_SLAVE)  ? m_sclk : s_sclk;
 
   // hack for parameterized edge. TODO: improve this
   logic sample_edge, drive_edge;
@@ -68,13 +82,22 @@ interface spi_vip_if #(
   assign drive_edge   = (CPOL^CPHA) ? sclk : !sclk;
   assign cs_active = (cs == CS_ACTIVE_LEVEL);
 
-  // miso tri-state handling
-  assign miso = (spi_mode != SPI_MODE_SLAVE)  ? 'z
-              : (miso_oen)          ? miso_drive
+  // miso drive handling
+  assign s_miso = (spi_mode != SPI_MODE_SLAVE)  ? m_miso
+                : (miso_oen)          ? miso_drive
                 /*default*/         : 'z;
 
+  // mosi drive handling
+  assign m_mosi = (spi_mode != SPI_MODE_MASTER)  ? s_mosi : mosi_drive;
+
+  // cs drive handling
+  assign m_cs   = (spi_mode != SPI_MODE_MASTER)  ? s_cs : cs_drive;
+
+  // sclk drive handling
+  assign m_sclk = (spi_mode != SPI_MODE_MASTER)  ? s_sclk : sclk_drive;
+
   // mosi delay
-  assign #(SLAVE_TIN*1ns) mosi_delayed =  mosi;
+  assign #(SLAVE_TIN*1ns) s_mosi_delayed =  s_mosi;
 
   class adi_spi_vip_if #(int dummy = 10) extends adi_spi_vip_if_base;
 
@@ -130,7 +153,7 @@ interface spi_vip_if #(
     endfunction
 
     virtual function logic get_mosi_delayed();
-      return mosi_delayed;
+      return s_mosi_delayed;
     endfunction
 
     virtual function logic get_cs_active();

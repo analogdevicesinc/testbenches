@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -40,30 +40,6 @@ package adi_spi_vip_pkg;
   import logger_pkg::*;
   import adi_common_pkg::*;
   import adi_spi_vip_if_base_pkg::*;
-
-  `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
-                                    SPI_VIP_CPOL              ,\
-                                    SPI_VIP_CPHA              ,\
-                                    SPI_VIP_INV_CS            ,\
-                                    SPI_VIP_DATA_DLENGTH      ,\
-                                    SPI_VIP_SLAVE_TIN         ,\
-                                    SPI_VIP_SLAVE_TOUT        ,\
-                                    SPI_VIP_MASTER_TIN        ,\
-                                    SPI_VIP_MASTER_TOUT       ,\
-                                    SPI_VIP_CS_TO_MISO        ,\
-                                    SPI_VIP_DEFAULT_MISO_DATA
-
-  `define SPI_VIP_PARAMS(th,vip)    th``_``vip``_0_VIP_MODE,\
-                                    th``_``vip``_0_VIP_CPOL,\
-                                    th``_``vip``_0_VIP_CPHA,\
-                                    th``_``vip``_0_VIP_INV_CS,\
-                                    th``_``vip``_0_VIP_DATA_DLENGTH,\
-                                    th``_``vip``_0_VIP_SLAVE_TIN,\
-                                    th``_``vip``_0_VIP_SLAVE_TOUT,\
-                                    th``_``vip``_0_VIP_MASTER_TIN,\
-                                    th``_``vip``_0_VIP_MASTER_TOUT,\
-                                    th``_``vip``_0_VIP_CS_TO_MISO,\
-                                    th``_``vip``_0_VIP_DEFAULT_MISO_DATA
 
   class adi_spi_driver extends adi_driver;
 

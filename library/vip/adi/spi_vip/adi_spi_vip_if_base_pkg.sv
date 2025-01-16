@@ -1,5 +1,5 @@
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -84,8 +84,6 @@ package adi_spi_vip_if_base_pkg;
     pure virtual task wait_cs();
 
     pure virtual task set_miso_oen(bit val);
-
-
 
   endclass
 

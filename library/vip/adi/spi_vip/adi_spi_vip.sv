@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -49,11 +49,11 @@ module adi_spi_vip #(
   parameter DEFAULT_MISO_DATA = 'hCAFE
 )  (
   input   logic s_spi_sclk,
-  input   wire  s_spi_mosi,
+  input   logic s_spi_mosi,
   output  wire  s_spi_miso,
   input   logic s_spi_cs,
   output  logic m_spi_sclk,
-  output  wire  m_spi_mosi,
+  output  logic m_spi_mosi,
   input   wire  m_spi_miso,
   output  logic m_spi_cs
 );
@@ -81,31 +81,26 @@ module adi_spi_vip #(
   end
 
   generate
+
+    assign s_spi_miso = IF.s_miso;
+    assign IF.s_mosi = s_spi_mosi;
+    assign IF.s_cs   = s_spi_cs;
+    assign IF.s_sclk = s_spi_sclk;
+
+    assign IF.m_miso  = m_spi_miso;
+    assign m_spi_mosi = IF.m_mosi;
+    assign m_spi_sclk = IF.m_sclk;
+    assign m_spi_cs   = IF.m_cs;
+
     if (MODE == MODE_SLAVE) begin
-      assign s_spi_miso = IF.miso;
-      assign IF.mosi = s_spi_mosi;
-      assign IF.sclk = s_spi_sclk;
-      assign IF.cs = s_spi_cs;
       initial begin
         IF.set_slave_mode();
       end
     end else if (MODE == MODE_MASTER) begin
-      assign IF.miso = m_spi_miso;
-      assign m_spi_mosi = IF.mosi;
-      assign m_spi_sclk = IF.sclk;
-      assign m_spi_cs = IF.cs;
       initial begin
         IF.set_master_mode();
       end
     end else if (MODE == MODE_MONITOR) begin
-      assign IF.miso = m_spi_miso;
-      assign IF.mosi = s_spi_mosi;
-      assign IF.miso = s_spi_miso;
-      assign IF.cs   = s_spi_cs;
-      assign s_spi_miso = m_spi_miso;
-      assign m_spi_mosi = s_spi_mosi;
-      assign m_spi_sclk = s_spi_sclk;
-      assign m_spi_cs   = s_spi_cs;
       initial begin
         IF.set_monitor_mode();
       end

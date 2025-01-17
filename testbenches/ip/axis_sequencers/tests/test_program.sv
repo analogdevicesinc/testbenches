@@ -37,80 +37,86 @@
 //
 `include "utils.svh"
 
-import axi_vip_pkg::*;
+import logger_pkg::*;
+import test_harness_env_pkg::*;
+import environment_pkg::*;
+import watchdog_pkg::*;
 import axi4stream_vip_pkg::*;
 import m_axis_sequencer_pkg::*;
 import s_axis_sequencer_pkg::*;
-import logger_pkg::*;
-import environment_pkg::*;
-import watchdog_pkg::*;
 
-//=============================================================================
-// Register Maps
-//=============================================================================
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+import `PKGIFY(test_harness, src_axis)::*;
+import `PKGIFY(test_harness, dst_axis)::*;
 
 program test_program;
 
   // declare the class instances
-  environment env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  axis_sequencer_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis), `AXIS_VIP_PARAMS(test_harness, dst_axis)) axis_seq_env;
 
   watchdog send_data_wd;
 
   initial begin
 
     // create environment
-    env = new("Axis Sequencers Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF,
-              `TH.`SRC_AXIS.inst.IF,
-              `TH.`DST_AXIS.inst.IF
-             );
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
+
+    axis_seq_env = new("Axis Sequencers Environment",
+                        `TH.`SRC_AXIS.inst.IF,
+                        `TH.`DST_AXIS.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
     
-    env.start();
-    env.sys_reset();
+    base_env.start();
+    axis_seq_env.start();
 
-    env.configure();
+    base_env.sys_reset();
 
-    env.run();
+    axis_seq_env.configure();
 
-    env.src_axis_seq.set_data_beat_delay(`SRC_BEAT_DELAY);
-    env.src_axis_seq.set_descriptor_delay(`SRC_DESCRIPTOR_DELAY);
+    axis_seq_env.run();
 
-    env.dst_axis_seq.set_high_time(`DEST_BEAT_DELAY_HIGH);
-    env.dst_axis_seq.set_low_time(`DEST_BEAT_DELAY_LOW);
+    axis_seq_env.src_axis_agent.sequencer.set_data_beat_delay(`SRC_BEAT_DELAY);
+    axis_seq_env.src_axis_agent.sequencer.set_descriptor_delay(`SRC_DESCRIPTOR_DELAY);
+
+    axis_seq_env.dst_axis_agent.sequencer.set_high_time(`DEST_BEAT_DELAY_HIGH);
+    axis_seq_env.dst_axis_agent.sequencer.set_low_time(`DEST_BEAT_DELAY_LOW);
 
     case (`DEST_BACKPRESSURE)
-      1: env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
-      2: env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      1: axis_seq_env.dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
+      2: axis_seq_env.dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
       default: `FATAL(("Destination backpressure mode parameter incorrect!"));
     endcase
 
     case (`SRC_DESCRIPTORS)
       1: begin
-        env.src_axis_seq.set_descriptor_gen_mode(0);
-        env.src_axis_seq.set_stop_policy(STOP_POLICY_DATA_BEAT);
-        // env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
-        env.src_axis_seq.add_xfer_descriptor_packet_size(32'd10, 1, 0);
+        axis_seq_env.src_axis_agent.sequencer.set_descriptor_gen_mode(0);
+        axis_seq_env.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_DATA_BEAT);
+        // axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor(32'h600, 1, 0);
+        axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor_packet_size(32'd10, 1, 0);
 
         send_data_wd = new("Axis Sequencer Watchdog", 1000, "Send data");
       end
       2: begin
-        env.src_axis_seq.set_descriptor_gen_mode(0);
-        env.src_axis_seq.set_stop_policy(STOP_POLICY_DESCRIPTOR_QUEUE);
-        repeat (10) env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
+        axis_seq_env.src_axis_agent.sequencer.set_descriptor_gen_mode(0);
+        axis_seq_env.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_DESCRIPTOR_QUEUE);
+        repeat (10) axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor(32'h600, 1, 0);
 
         send_data_wd = new("Axis Sequencer Watchdog", 30000, "Send data");
       end
       3: begin
-        env.src_axis_seq.set_descriptor_gen_mode(1);
-        env.src_axis_seq.set_stop_policy(STOP_POLICY_PACKET);
-        env.src_axis_seq.add_xfer_descriptor(32'h600, 1, 0);
+        axis_seq_env.src_axis_agent.sequencer.set_descriptor_gen_mode(1);
+        axis_seq_env.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
+        axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor(32'h600, 1, 0);
 
         send_data_wd = new("Axis Sequencer Watchdog", 20000, "Send data");
       end
@@ -119,27 +125,27 @@ program test_program;
 
     send_data_wd.start();
 
-    env.src_axis_seq.start();
+    axis_seq_env.src_axis_agent.sequencer.start();
 
     #1step;
 
     case (`SRC_DESCRIPTORS)
-      1: //env.src_axis_seq.beat_sent();
-        env.src_axis_seq.packet_sent();
-      2: env.src_axis_seq.wait_empty_descriptor_queue();
+      1: //axis_seq_env.src_axis_agent.sequencer.beat_sent();
+        axis_seq_env.src_axis_agent.sequencer.packet_sent();
+      2: axis_seq_env.src_axis_agent.sequencer.wait_empty_descriptor_queue();
       3: begin
         #10us;
 
-        env.src_axis_seq.stop();
+        axis_seq_env.src_axis_agent.sequencer.stop();
 
-        env.src_axis_seq.packet_sent();
+        axis_seq_env.src_axis_agent.sequencer.packet_sent();
       end
       default: ;
     endcase
 
     send_data_wd.stop();
 
-    env.stop();
+    base_env.stop();
     
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();

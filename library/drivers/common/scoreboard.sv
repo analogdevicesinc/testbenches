@@ -2,9 +2,6 @@
 
 package scoreboard_pkg;
 
-  import xil_common_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import axi_vip_pkg::*;
   import logger_pkg::*;
   import adi_common_pkg::*;
   import pub_sub_pkg::*;

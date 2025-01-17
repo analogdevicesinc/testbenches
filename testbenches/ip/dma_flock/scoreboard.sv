@@ -120,7 +120,8 @@ package scoreboard_pkg;
         end
       end
     endtask : run_dst
-    task shutdown;
+
+    task shutdown();
       -> shutdown_event;
     endtask: shutdown
 

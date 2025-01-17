@@ -37,29 +37,27 @@
 
 package spi_environment_pkg;
 
-  import axi_vip_pkg::*;
+  import logger_pkg::*;
+  import adi_common_pkg::*;
+
   import axi4stream_vip_pkg::*;
-  import m_axi_sequencer_pkg::*;
   import m_axis_sequencer_pkg::*;
-  import s_axi_sequencer_pkg::*;
   import s_spi_sequencer_pkg::*;
   import adi_spi_vip_pkg::*;
-  import test_harness_env_pkg::*;
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
   import `PKGIFY(test_harness, spi_s_vip)::*;
+  
   `ifdef DEF_SDO_STREAMING
     import `PKGIFY(test_harness, sdo_src)::*;
   `endif
 
-  class spi_environment extends test_harness_env;
+  class spi_environment extends adi_environment;
 
     // Agents
     adi_spi_agent #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_agent;
     `ifdef DEF_SDO_STREAMING
     `AGENT(test_harness, sdo_src, mst_t)    sdo_src_agent;
     `endif
-
 
     // Sequencers
     s_spi_sequencer #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_seq;
@@ -75,27 +73,12 @@ package spi_environment_pkg;
     function new(
       input string name,
 
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
-
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
       `ifdef DEF_SDO_STREAMING
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, sdo_src)) sdo_src_axis_vip_if,
       `endif
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
-    );
+      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if);
 
-      super.new(name,
-                sys_clk_vip_if,
-                dma_clk_vip_if,
-                ddr_clk_vip_if,
-                sys_rst_vip_if,
-                mng_vip_if,
-                ddr_vip_if);
+      super.new(name);
 
       // Creating the agents
       spi_agent = new("SPI VIP Agent", spi_s_vip_if, this);
@@ -134,7 +117,6 @@ package spi_environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      super.start();
       spi_agent.start();
       `ifdef DEF_SDO_STREAMING
       sdo_src_agent.start_master();
@@ -147,7 +129,6 @@ package spi_environment_pkg;
     //   - start the sequencers
     //============================================================================
     task test();
-      super.test();
       fork
         `ifdef DEF_SDO_STREAMING
         sdo_src_seq.run();
@@ -159,22 +140,20 @@ package spi_environment_pkg;
     // Post test subroutine
     //============================================================================
     task post_test();
-      super.post_test();
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
-    task run;
+    task run();
       test();
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
+    task stop();
       spi_agent.stop();
-      super.stop();
       `ifdef DEF_SDO_STREAMING
       sdo_src_seq.stop();
       sdo_src_agent.stop_master();

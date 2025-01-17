@@ -9,13 +9,11 @@ include ../../../scripts/make_tb_path.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
 
 # Remaining test-bench dependencies except test programs
-ENV_DEPS += $(HDL_LIBRARY_PATH)/util_cdc/sync_bits.v
-ENV_DEPS += $(HDL_LIBRARY_PATH)/common/ad_edge_detect.v
+ENV_DEPS += $(HDL_LIBRARY_PATH)/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh
+ENV_DEPS += $(HDL_LIBRARY_PATH)/i3c_controller/i3c_controller_core/i3c_controller_word.vh
 
-LIB_DEPS += axi_sysid
 LIB_DEPS += i3c_controller/i3c_controller_host_interface
 LIB_DEPS += i3c_controller/i3c_controller_core
-LIB_DEPS += sysid_rom
 
 # default test program
 TP := test_program

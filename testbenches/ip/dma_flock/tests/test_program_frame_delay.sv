@@ -35,18 +35,28 @@
 
 `include "utils.svh"
 
-import environment_pkg::*;
-import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import environment_pkg::*;
+import test_harness_env_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import dmac_api_pkg::*;
 import dma_trans_pkg::*;
+import axi_vip_pkg::*;
+import axi4stream_vip_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+import `PKGIFY(test_harness, src_axis_vip)::*;
+import `PKGIFY(test_harness, dst_axis_vip)::*;
 
 program test_program_frame_delay;
 
-  environment env;
+  // declare the class instances
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  dma_flock_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis_vip), `AXIS_VIP_PARAMS(test_harness, dst_axis_vip)) dma_flock_env;
+
   // Register accessors
   dmac_api m_dmac_api;
   dmac_api s_dmac_api;
@@ -59,19 +69,19 @@ program test_program_frame_delay;
   int sync_gen_en;
 
   initial begin
-    //creating environment
-    env = new("DMA Flock environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF,
-              `TH.`SRC_AXIS.inst.IF,
-              `TH.`DST_AXIS.inst.IF
-    );
 
-    #2ps;
+    //creating environment
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
+
+    dma_flock_env = new("DMA Flock Environment",
+                        `TH.`SRC_AXIS.inst.IF,
+                        `TH.`DST_AXIS.inst.IF);
 
     has_sfsync = `M_DMA_CFG_USE_EXT_SYNC;
     has_dfsync = `S_DMA_CFG_USE_EXT_SYNC;
@@ -79,15 +89,20 @@ program test_program_frame_delay;
     has_s_autorun = `S_DMA_CFG_AUTORUN;
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    env.start();
-    start_clocks();
-    env.sys_reset();
-    env.run();
 
-    m_dmac_api = new("TX_DMA_BA", env.mng, `TX_DMA_BA);
+    base_env.start();
+    dma_flock_env.start();
+
+    start_clocks();
+
+    base_env.sys_reset();
+
+    dma_flock_env.run();
+
+    m_dmac_api = new("TX_DMA_BA", base_env.mng.sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA_BA", env.mng, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA_BA", base_env.mng.sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
 
 
@@ -145,7 +160,7 @@ program test_program_frame_delay;
     end
 
     stop_clocks();
-    env.stop();
+    base_env.stop();
 
     `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);
     $finish();
@@ -169,13 +184,13 @@ program test_program_frame_delay;
     axi_ready_gen  wready_gen;
 
     // Set no backpressure from AXIS destination
-    env.dst_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-    env.dst_axis_seq.user_gen_tready();
+    dma_flock_env.dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    dma_flock_env.dst_axis_agent.sequencer.user_gen_tready();
 
     // Set no backpressure from DDR
-    wready_gen = env.ddr_axi_agent.wr_driver.create_ready("wready");
+    wready_gen = base_env.ddr.agent.wr_driver.create_ready("wready");
     wready_gen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
-    env.ddr_axi_agent.wr_driver.send_wready(wready_gen);
+    base_env.ddr.agent.wr_driver.send_wready(wready_gen);
 
     m_seg = new(m_dmac_api.p);
 
@@ -202,9 +217,9 @@ program test_program_frame_delay;
 
     s_seg = m_seg.toSlaveSeg();
 
-    env.src_axis_seq.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_DESCRIPTOR_QUEUE);
-    env.src_axis_seq.set_data_gen_mode(m_axis_sequencer_pkg::DATA_GEN_MODE_TEST_DATA);
-    env.src_axis_seq.start();
+    dma_flock_env.src_axis_agent.sequencer.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_DESCRIPTOR_QUEUE);
+    dma_flock_env.src_axis_agent.sequencer.set_data_gen_mode(m_axis_sequencer_pkg::DATA_GEN_MODE_TEST_DATA);
+    dma_flock_env.src_axis_agent.sequencer.start();
 
     if (has_autorun == 0) begin
       m_dmac_api.set_control('b1001);
@@ -238,7 +253,7 @@ program test_program_frame_delay;
               begin
                 for (int l = 0; l < m_seg.ylength; l++) begin
                   // update the AXIS generator command
-                  env.src_axis_seq.add_xfer_descriptor(.bytes_to_generate(m_seg.length),
+                  dma_flock_env.src_axis_agent.sequencer.add_xfer_descriptor(.bytes_to_generate(m_seg.length),
                                                        .gen_last(1),
                                                        .gen_sync(l==0));
                 end
@@ -246,7 +261,7 @@ program test_program_frame_delay;
                 // update the AXIS generator data
                 for (int j = 0; j < m_seg.get_bytes_in_transfer; j++) begin
                   // ADI DMA frames start from offset 0x00
-                  env.src_axis_seq.push_byte_for_stream(frame_count);
+                  dma_flock_env.src_axis_agent.sequencer.push_byte_for_stream(frame_count);
                 end
               end
             join
@@ -269,7 +284,7 @@ program test_program_frame_delay;
     sync_gen_en = 0;
 
     // Stop triggers wait stop policy
-    env.src_axis_seq.stop();
+    dma_flock_env.src_axis_agent.sequencer.stop();
 
     // Shutdown DMACs
     if (!has_m_autorun) begin
@@ -288,16 +303,16 @@ program test_program_frame_delay;
     bit [63:0]    mtestWData; // Write Data
     bit [31:0]    rdData;
 
-    env.mng.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
+    base_env.mng.sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
 
     mtestWData = 0;
     repeat (10) begin
-      env.mng.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
-      env.mng.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
+      base_env.mng.sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
+      base_env.mng.sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
       mtestWData += 4;
     end
 
-    env.mng.RegReadVerify32(`RX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
+    base_env.mng.sequencer.RegReadVerify32(`RX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
 
   endtask
 

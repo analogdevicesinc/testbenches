@@ -34,37 +34,24 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axis_definitions.svh"
 
 package environment_pkg;
 
-  import axi_vip_pkg::*;
+  import logger_pkg::*;
+  import adi_common_pkg::*;
+
   import scoreboard_pkg::*;
   import axi4stream_vip_pkg::*;
-  import m_axi_sequencer_pkg::*;
-  import s_axi_sequencer_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
-  import test_harness_env_pkg::*;
-  import dma_trans_pkg::*;
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
-  import `PKGIFY(test_harness, src_axis_vip)::*;
-  import `PKGIFY(test_harness, dst_axis_vip)::*;
+  import adi_axis_agent_pkg::*;
 
-  class environment extends test_harness_env;
+  class dma_flock_environment #(int `AXIS_VIP_PARAM_ORDER(src_axis), int `AXIS_VIP_PARAM_ORDER(dst_axis)) extends adi_environment;
 
     // Agents
-    `AGENT(test_harness, src_axis_vip, mst_t) src_axis_agent;
-    `AGENT(test_harness, dst_axis_vip, slv_t) dst_axis_agent;
-
-    // Sequencers
-    m_axis_sequencer #(`AGENT(test_harness, src_axis_vip, mst_t),
-                       `AXIS_VIP_PARAMS(test_harness, src_axis_vip)
-                      ) src_axis_seq;
-    s_axis_sequencer #(`AGENT(test_harness, dst_axis_vip, slv_t)) dst_axis_seq;
-    // Register accessors
-
-    dma_transfer_group trans_q[$];
+    adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(src_axis)) src_axis_agent;
+    adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(dst_axis)) dst_axis_agent;
 
     scoreboard scrb;
 
@@ -74,34 +61,16 @@ package environment_pkg;
     function new(
       input string name,
 
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(src_axis)) src_axis_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(dst_axis)) dst_axis_vip_if);
 
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, src_axis_vip)) src_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dst_axis_vip)) dst_axis_vip_if
-    );
-      super.new(name,
-                sys_clk_vip_if,
-                dma_clk_vip_if,
-                ddr_clk_vip_if,
-                sys_rst_vip_if,
-                mng_vip_if,
-                ddr_vip_if);
+      super.new(name);
 
       // Creating the agents
-      src_axis_agent = new("Src AXI stream agent", src_axis_vip_if);
-      dst_axis_agent = new("Dest AXI stream agent", dst_axis_vip_if);
+      this.src_axis_agent = new("Src AXI stream agent", src_axis_vip_if, this);
+      this.dst_axis_agent = new("Dest AXI stream agent", dst_axis_vip_if, this);
 
-      // Creating the sequencers
-      src_axis_seq = new("Src AXI stream sequencer", src_axis_agent, this);
-      dst_axis_seq = new("Dest AXI stream sequencer", dst_axis_agent, this);
-
-    scrb = new("Scoreboard", this);
+      this.scrb = new();
 
     endfunction
 
@@ -111,15 +80,12 @@ package environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      super.start();
-      scrb.connect(
-        src_axis_agent.monitor.item_collected_port,
-        dst_axis_agent.monitor.item_collected_port
-      );
+      this.scrb.connect(
+        this.src_axis_agent.agent.monitor.item_collected_port,
+        this.dst_axis_agent.agent.monitor.item_collected_port);
 
-      src_axis_agent.start_master();
-      dst_axis_agent.start_slave();
-
+      this.src_axis_agent.agent.start_master();
+      this.dst_axis_agent.agent.start_slave();
     endtask
 
     //============================================================================
@@ -128,27 +94,24 @@ package environment_pkg;
     //   - start the sequencers
     //============================================================================
     task test();
-      super.test();
-      src_axis_seq.run();
+      this.src_axis_agent.sequencer.run();
       // DEST AXIS does not have to run, scoreboard connects and
       // gathers packets from the agent
-      scrb.run();
-      test_c_run();
+      this.scrb.run();
     endtask
 
     //============================================================================
     // Post test subroutine
     //============================================================================
     task post_test();
-      super.post_test();
       // wait until done
-      scrb.shutdown();
+      this.scrb.shutdown();
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
-    task run;
+    task run();
       test();
       post_test();
     endtask
@@ -156,10 +119,9 @@ package environment_pkg;
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
-      super.stop();
-      src_axis_agent.stop_master();
-      dst_axis_agent.stop_slave();
+    task stop();
+      this.src_axis_agent.agent.stop_master();
+      this.dst_axis_agent.agent.stop_slave();
     endtask
 
   endclass

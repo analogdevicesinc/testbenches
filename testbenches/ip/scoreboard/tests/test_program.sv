@@ -40,8 +40,8 @@
 `include "axis_definitions.svh"
 
 import logger_pkg::*;
-import environment_pkg::*;
 import test_harness_env_pkg::*;
+import environment_pkg::*;
 import dmac_api_pkg::*;
 import data_offload_api_pkg::*;
 

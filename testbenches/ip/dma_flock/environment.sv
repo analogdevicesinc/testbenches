@@ -70,7 +70,7 @@ package environment_pkg;
       this.src_axis_agent = new("Src AXI stream agent", src_axis_vip_if, this);
       this.dst_axis_agent = new("Dest AXI stream agent", dst_axis_vip_if, this);
 
-      this.scrb = new();
+      this.scrb = new("Scoreboard", this);
 
     endfunction
 

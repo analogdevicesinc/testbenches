@@ -7,10 +7,10 @@ package adi_axis_monitor_pkg;
   import adi_common_pkg::*;
   import pub_sub_pkg::*;
 
-  class adi_axis_monitor #(int `AXIS_VIP_PARAM_ORDER(axis)) extends adi_monitor;
+  class adi_axis_monitor #(`AXIS_VIP_PARAM_DECL(AXIS)) extends adi_monitor;
 
     // analysis port from the monitor
-    protected axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(axis)) monitor;
+    protected axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(AXIS)) monitor;
 
     adi_publisher #(logic [7:0]) publisher;
 
@@ -19,7 +19,7 @@ package adi_axis_monitor_pkg;
     // constructor
     function new(
       input string name,
-      input axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(axis)) monitor,
+      input axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(AXIS)) monitor,
       input adi_agent parent = null);
 
       super.new(name, parent);

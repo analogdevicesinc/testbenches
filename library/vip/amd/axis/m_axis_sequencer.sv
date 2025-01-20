@@ -312,7 +312,7 @@ package m_axis_sequencer_pkg;
   endclass: m_axis_sequencer_base
 
 
-  class m_axis_sequencer #(int `AXIS_VIP_PARAM_ORDER(AXIS)) extends m_axis_sequencer_base;
+  class m_axis_sequencer #(`AXIS_VIP_PARAM_DECL(AXIS)) extends m_axis_sequencer_base;
 
     protected axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver;
 

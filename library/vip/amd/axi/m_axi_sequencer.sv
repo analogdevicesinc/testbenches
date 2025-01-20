@@ -43,16 +43,16 @@ package m_axi_sequencer_pkg;
   import adi_common_pkg::*;
   import reg_accessor_pkg::*;
 
-  class m_axi_sequencer #(int `AXI_VIP_PARAM_ORDER(m)) extends reg_accessor;
+  class m_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends reg_accessor;
 
-    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(m)) agent;
+    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(AXI)) agent;
 
     semaphore reader_s;
     semaphore writer_s;
 
     function new(
       input string name,
-      input axi_mst_agent #(`AXI_VIP_PARAM_ORDER(m)) agent,
+      input axi_mst_agent #(`AXI_VIP_PARAM_ORDER(AXI)) agent,
       input adi_agent parent = null);
 
       super.new(name, parent);

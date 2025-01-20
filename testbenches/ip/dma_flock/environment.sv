@@ -47,7 +47,7 @@ package environment_pkg;
   import s_axis_sequencer_pkg::*;
   import adi_axis_agent_pkg::*;
 
-  class dma_flock_environment #(int `AXIS_VIP_PARAM_ORDER(src_axis), int `AXIS_VIP_PARAM_ORDER(dst_axis)) extends adi_environment;
+  class dma_flock_environment #(`AXIS_VIP_PARAM_DECL(src_axis), `AXIS_VIP_PARAM_DECL(dst_axis)) extends adi_environment;
 
     // Agents
     adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(src_axis)) src_axis_agent;

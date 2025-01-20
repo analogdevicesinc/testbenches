@@ -42,13 +42,13 @@ package s_axi_sequencer_pkg;
   import adi_common_pkg::*;
   import logger_pkg::*;
 
-  class s_axi_sequencer #(int `AXI_VIP_PARAM_ORDER(s)) extends adi_component;
+  class s_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends adi_component;
 
-    xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(s)) mem_model;
+    xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(AXI)) mem_model;
 
     function new(
       input string name,
-      input xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(s)) mem_model,
+      input xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(AXI)) mem_model,
       input adi_agent parent = null);
 
       super.new(name, parent);

@@ -196,12 +196,6 @@ bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
 
 task data_acquisition_test();
-    // Start spi clk generator
-    axi_write (`AD7616_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-      `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-      `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-      );
-
     // Configure pwm gen
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
     axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
@@ -253,10 +247,12 @@ task data_acquisition_test();
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+      captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
-    if (captured_word_arr  != dma_data_store_arr) begin
+    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
+
+    if (captured_word_arr != dma_data_store_arr) begin
       `ERROR(("Data Acquisition Test FAILED"));
     end else begin
       `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_LOW);

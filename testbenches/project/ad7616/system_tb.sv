@@ -39,7 +39,7 @@
 
 module system_tb();
     generate
-    if (`SER_PAR_N == 1) begin //serial interface
+    if (`INTF == 1) begin //serial interface
       wire       ad7616_spi_sclk;
       wire       ad7616_spi_sdo;
       wire [1:0] ad7616_spi_sdi;

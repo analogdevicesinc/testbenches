@@ -18,7 +18,7 @@ package environment_pkg;
   import scoreboard_pkg::*;
 
 
-  class scoreboard_environment #(int `AXIS_VIP_PARAM_ORDER(adc_src), int `AXIS_VIP_PARAM_ORDER(dac_dst), int `AXI_VIP_PARAM_ORDER(adc_dst_pt), int `AXI_VIP_PARAM_ORDER(dac_src_pt)) extends adi_environment;
+  class scoreboard_environment #(`AXIS_VIP_PARAM_DECL(adc_src), `AXIS_VIP_PARAM_DECL(dac_dst), `AXIS_VIP_PARAM_DECL(adc_dst_pt), `AXIS_VIP_PARAM_DECL(dac_src_pt)) extends adi_environment;
 
     // Agents
     adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(adc_src)) adc_src_axis_agent;

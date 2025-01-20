@@ -158,7 +158,7 @@ package s_axis_sequencer_pkg;
   endclass: s_axis_sequencer_base
 
 
-  class s_axis_sequencer #(int `AXIS_VIP_PARAM_ORDER(AXIS)) extends s_axis_sequencer_base;
+  class s_axis_sequencer #(`AXIS_VIP_PARAM_DECL(AXIS)) extends s_axis_sequencer_base;
 
     protected axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver;
 

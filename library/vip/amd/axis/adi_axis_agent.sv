@@ -46,7 +46,7 @@ package adi_axis_agent_pkg;
   import adi_axis_monitor_pkg::*;
 
 
-  class adi_axis_master_agent #(int `AXIS_VIP_PARAM_ORDER(master)) extends adi_agent;
+  class adi_axis_master_agent #(`AXIS_VIP_PARAM_DECL(master)) extends adi_agent;
 
     axi4stream_mst_agent #(`AXIS_VIP_IF_PARAMS(master)) agent;
     m_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(master)) sequencer;
@@ -67,7 +67,7 @@ package adi_axis_agent_pkg;
   endclass: adi_axis_master_agent
 
 
-  class adi_axis_slave_agent #(int `AXIS_VIP_PARAM_ORDER(slave)) extends adi_agent;
+  class adi_axis_slave_agent #(`AXIS_VIP_PARAM_DECL(slave)) extends adi_agent;
 
     axi4stream_slv_agent #(`AXIS_VIP_IF_PARAMS(slave)) agent;
     s_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(slave)) sequencer;
@@ -88,7 +88,7 @@ package adi_axis_agent_pkg;
   endclass: adi_axis_slave_agent
 
 
-  class adi_axis_passthrough_mem_agent #(int `AXIS_VIP_PARAM_ORDER(passthrough)) extends adi_agent;
+  class adi_axis_passthrough_mem_agent #(`AXIS_VIP_PARAM_DECL(passthrough)) extends adi_agent;
 
     axi4stream_passthrough_agent #(`AXIS_VIP_IF_PARAMS(passthrough)) agent;
     adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(passthrough)) monitor;

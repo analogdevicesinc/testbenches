@@ -11,7 +11,7 @@ package environment_pkg;
   import adi_axis_agent_pkg::*;
   import scoreboard_pack_pkg::*;
 
-  class util_pack_environment #(int `AXIS_VIP_PARAM_ORDER(tx_src_axis), int `AXIS_VIP_PARAM_ORDER(tx_dst_axis), int `AXIS_VIP_PARAM_ORDER(rx_src_axis), int `AXIS_VIP_PARAM_ORDER(rx_dst_axis)) extends adi_environment;
+  class util_pack_environment #(`AXIS_VIP_PARAM_DECL(tx_src_axis), `AXIS_VIP_PARAM_DECL(tx_dst_axis), `AXIS_VIP_PARAM_DECL(rx_src_axis), `AXIS_VIP_PARAM_DECL(rx_dst_axis)) extends adi_environment;
 
     // agents and sequencers
     adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(tx_src_axis)) tx_src_axis_agent;

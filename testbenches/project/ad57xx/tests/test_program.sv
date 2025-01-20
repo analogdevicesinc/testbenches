@@ -278,7 +278,7 @@ task offload_spi_test(
     temp_data = {4'b0001,dac_word,2'b00};
     sdo_write_data_store [i] = temp_data;
 
-    base_env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(.addr(`DDR_BA + 4*i),
+    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(.addr(`DDR_BA + 4*i),
                                                   .payload(temp_data),
                                                   .strb('1));
     spi_send('0);

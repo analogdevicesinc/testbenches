@@ -257,9 +257,9 @@ program test_program;
       // .max_sample(2048)
       for (int i=0;i<2048*2 ;i=i+2) begin
         if (`TX_JESD_NP == 12) begin
-          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 20) | (i << 4) ,15);
+          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 20) | (i << 4) ,15);
         end else begin
-          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 16) | i ,15);
+          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
         end
       end
       // Configure TX DMA
@@ -439,9 +439,9 @@ program test_program;
       // .max_sample(2048)
       for (int i=0;i<2048*2 ;i=i+2) begin
         if (`TX_JESD_NP == 12) begin
-          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 20) | (i << 4) ,15);
+          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 20) | (i << 4) ,15);
         end else begin
-          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 16) | i ,15);
+          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
         end
       end
 

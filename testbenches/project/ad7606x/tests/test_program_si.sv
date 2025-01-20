@@ -47,6 +47,9 @@ import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
@@ -100,7 +103,7 @@ program test_program_si (
   input         rx_busy,
   output        rx_cnvst_n);
 
-  test_harness_env env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
   // --------------------------
   // Wrapper function for AXI read verify
@@ -109,14 +112,14 @@ program test_program_si (
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-    env.mng.RegReadVerify32(raddr,vdata);
+    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-    env.mng.RegRead32(raddr,data);
+    base_env.mng.sequencer.RegRead32(raddr,data);
   endtask
 
   // --------------------------
@@ -126,7 +129,7 @@ program test_program_si (
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    env.mng.RegWrite32(waddr,wdata);
+    base_env.mng.sequencer.RegWrite32(waddr,wdata);
   endtask
 
   // --------------------------
@@ -134,19 +137,19 @@ program test_program_si (
   // --------------------------
   initial begin
 
-    //creating environment
-    env = new("AD7606X Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
+  //creating environment
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-    env.start();
-    env.sys_reset();
+    base_env.start();
+    base_env.sys_reset();
 
     sanity_test();
 
@@ -159,7 +162,7 @@ program test_program_si (
     offload_spi_test();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-    $finish;
+    $finish();
 
   end
 
@@ -430,14 +433,14 @@ program test_program_si (
 
   task offload_spi_test();
     //Configure DMA
-    env.mng.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    env.mng.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_FLAGS),
+    base_env.mng.sequencer.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    base_env.mng.sequencer.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    env.mng.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*`NUM_OF_SDI)-1)); // X_LENGHTH
-    env.mng.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
-    env.mng.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    base_env.mng.sequencer.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*`NUM_OF_SDI)-1)); // X_LENGHTH
+    base_env.mng.sequencer.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
+    base_env.mng.sequencer.RegWrite32(`AD7606X_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Configure the Offload module
     axi_write (`SPI_AD7606_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
@@ -466,7 +469,7 @@ program test_program_si (
 
     for (int i=0; i<=((`NUM_OF_SDI * NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
     end
     if (offload_captured_word_arr != offload_sdi_data_store_arr) begin
       `ERROR(("Offload Test FAILED"));

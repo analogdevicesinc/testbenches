@@ -47,7 +47,10 @@ import adi_regmap_common_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 
-localparam SIMPLE_STATUS_CRC = 0;
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+parameter SIMPLE_STATUS_CRC = 0;
 
 localparam CH0 = 8'h00 * 4;
 localparam CH1 = 8'h10 * 4;
@@ -71,7 +74,7 @@ program test_program_6ch (
   output        rx_busy,
   output logic [2:0] adc_config_mode);
 
-  test_harness_env env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
   // --------------------------
   // Wrapper function for AXI read verif
@@ -80,14 +83,14 @@ program test_program_6ch (
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-    env.mng.RegReadVerify32(raddr,vdata);
+    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-    env.mng.RegRead32(raddr,data);
+    base_env.mng.sequencer.RegRead32(raddr,data);
   endtask
 
   // --------------------------
@@ -97,7 +100,7 @@ program test_program_6ch (
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    env.mng.RegWrite32(waddr,wdata);
+    base_env.mng.sequencer.RegWrite32(waddr,wdata);
   endtask
 
   // --------------------------
@@ -105,19 +108,19 @@ program test_program_6ch (
   // --------------------------
   initial begin
 
-    //creating environment
-    env = new("AD7606X Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
+  //creating environment
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-    env.start();
-    env.sys_reset();
+    base_env.start();
+    base_env.sys_reset();
 
     sanity_test();
 
@@ -136,7 +139,7 @@ program test_program_6ch (
     #100 db_transmission_test();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-    $finish;
+    $finish();
 
   end
 

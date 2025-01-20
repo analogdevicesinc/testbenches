@@ -48,6 +48,9 @@ import adi_regmap_adc_pkg::*;
 import adi_regmap_common_pkg::*;
 import adi_regmap_tdd_gen_pkg::*;
 
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
 program test_program;
 
   localparam CH0 = 8'h00;
@@ -61,7 +64,8 @@ program test_program;
   localparam TX1_CHANNEL = `AXI_AD9361_BA + 'h4000;
   localparam TDD1        = `AXI_AD9361_BA + 'h8000;
 
-  test_harness_env env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+
   bit [31:0] val = 32'h0;
   int r1_mode, rate;
 
@@ -72,7 +76,7 @@ program test_program;
     input   [31:0]  raddr,
     output  [31:0]  rdata);
 
-    env.mng.RegRead32(raddr,rdata);
+    base_env.mng.sequencer.RegRead32(raddr,rdata);
   endtask
 
   // --------------------------
@@ -82,7 +86,7 @@ program test_program;
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-    env.mng.RegReadVerify32(raddr,vdata);
+    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   // --------------------------
@@ -92,7 +96,7 @@ program test_program;
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    env.mng.RegWrite32(waddr,wdata);
+    base_env.mng.sequencer.RegWrite32(waddr,wdata);
   endtask
 
   // --------------------------
@@ -101,25 +105,23 @@ program test_program;
   initial begin
 
     // Creating environment
-    env = new("Pluto Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
-
-    #2ps;
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    env.start();
+    base_env.start();
 
     // Set source synchronous interface clock frequency
     `TH.`SSI_CLK.inst.IF.set_clk_frq(.user_frequency(61440000));
     `TH.`SSI_CLK.inst.IF.start_clock;
 
     // Initial system reset
-    env.sys_reset();
+    base_env.sys_reset();
 
     // This is required since the AD9361 interface always requires to receive
     // something first before transmitting. This is not possible in loopback mode.
@@ -147,10 +149,10 @@ program test_program;
 
     tdd_test();
 
-    env.stop();
+    base_env.stop();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-    $finish;
+    $finish();
 
   end
 
@@ -375,7 +377,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
+      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
     end
 
     // Configure TX DMA
@@ -484,7 +486,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
+      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
     end
 
     link_setup();
@@ -640,7 +642,7 @@ program test_program;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
-      captured_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_address);
+      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_address);
       if (i==0) begin
         first = captured_word[15:0];
       end else begin

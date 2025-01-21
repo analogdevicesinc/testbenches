@@ -147,6 +147,12 @@ Correct:
 
    localparam VAL = 3;
 
+**B8**
+
+Use the proper equation type for various comparisons
+ * == for logical equality (1 and 0 comparison only)
+ * === for case equality (1, 0, x and z comparison)
+
 C. Design Under Test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -203,6 +209,23 @@ All configuration parameters must be defined in the ad_project_params associativ
    global ad_project_params
    
    set ad_project_params(DATA_WIDTH) 16
+
+   set rx_dma_cfg [list \
+     DMA_TYPE_SRC 1 \
+     DMA_TYPE_DEST 0 \
+     ID 0 \
+     AXI_SLICE_SRC 1 \
+     AXI_SLICE_DEST 1 \
+     SYNC_TRANSFER_START 0 \
+     DMA_LENGTH_WIDTH 24 \
+     DMA_2D_TRANSFER 0 \
+     MAX_BYTES_PER_BURST 4096 \
+     CYCLIC 0 \
+     DMA_DATA_WIDTH_SRC 32 \
+     DMA_DATA_WIDTH_DEST 32 \
+   ]
+
+   set ad_project_params(rx_dma_cfg) $rx_dma_cfg
 
 **C5**
 

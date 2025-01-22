@@ -139,7 +139,6 @@ package adi_axi_agent_pkg;
     endtask: start
 
     task run();
-      this.slave_sequencer.run();
       this.monitor.run();
     endtask: run
 

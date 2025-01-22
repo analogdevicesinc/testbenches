@@ -82,7 +82,7 @@ package watchdog_pkg;
           fork
             begin
               #(this.timer*1ns);
-              this.error($sformatf("Watchdog timer timed out! %s", this.message));
+              this.fatal($sformatf("Watchdog timer timed out! %s", this.message));
             end
             @this.stop_event;
           join_any

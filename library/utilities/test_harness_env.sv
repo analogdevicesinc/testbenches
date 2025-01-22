@@ -91,9 +91,9 @@ package test_harness_env_pkg;
       this.mng.agent.start_master();
       this.ddr.agent.start_slave();
 
-      this.sys_clk_vip_if.start_clock;
-      this.dma_clk_vip_if.start_clock;
-      this.ddr_clk_vip_if.start_clock;
+      this.sys_clk_vip_if.start_clock();
+      this.dma_clk_vip_if.start_clock();
+      this.ddr_clk_vip_if.start_clock();
     endtask
 
     //============================================================================
@@ -103,9 +103,9 @@ package test_harness_env_pkg;
       this.mng.agent.stop_master();
       this.ddr.agent.stop_slave();
 
-      this.sys_clk_vip_if.stop_clock;
-      this.dma_clk_vip_if.stop_clock;
-      this.ddr_clk_vip_if.stop_clock;
+      this.sys_clk_vip_if.stop_clock();
+      this.dma_clk_vip_if.stop_clock();
+      this.ddr_clk_vip_if.stop_clock();
     endtask
 
     //============================================================================
@@ -113,9 +113,9 @@ package test_harness_env_pkg;
     //============================================================================
     task sys_reset();
       //asserts all the resets for 100 ns
-      this.sys_rst_vip_if.assert_reset;
+      this.sys_rst_vip_if.assert_reset();
       #200;
-      this.sys_rst_vip_if.deassert_reset;
+      this.sys_rst_vip_if.deassert_reset();
       #800;
     endtask
 

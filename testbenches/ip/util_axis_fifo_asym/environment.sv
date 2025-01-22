@@ -78,8 +78,8 @@ package environment_pkg;
       this.input_clk_vip_if.start_clock();
       this.output_clk_vip_if.start_clock();
 
-      this.input_axis_agent.agent.start_master();
-      this.output_axis_agent.agent.start_slave();
+      this.input_axis_agent.start();
+      this.output_axis_agent.start();
 
       this.input_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_source);
       this.output_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_sink);
@@ -90,11 +90,8 @@ package environment_pkg;
     //============================================================================
     task run();
       fork
-        this.input_axis_agent.sequencer.run();
-        this.output_axis_agent.sequencer.run();
-
-        this.input_axis_agent.monitor.run();
-        this.output_axis_agent.monitor.run();
+        this.input_axis_agent.run();
+        this.output_axis_agent.run();
 
         this.scoreboard_inst.run();
       join_none
@@ -104,9 +101,8 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.input_axis_agent.sequencer.stop();
-      this.input_axis_agent.agent.stop_master();
-      this.output_axis_agent.agent.stop_slave();
+      this.input_axis_agent.stop();
+      this.output_axis_agent.stop();
     endtask
 
   endclass

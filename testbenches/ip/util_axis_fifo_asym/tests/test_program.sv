@@ -109,8 +109,7 @@ program test_program ();
       #($urandom_range(1,10)*1us);
 
       uaf_env.input_axis_agent.sequencer.clear_descriptor_queue();
-
-      #1us;
+      uaf_env.input_axis_agent.sequencer.wait_empty_descriptor_queue();
 
       uaf_env.scoreboard_inst.wait_until_complete();
 

@@ -16,6 +16,7 @@ package adi_axi_monitor_pkg;
     adi_publisher #(logic [7:0]) publisher_rx;
 
     protected bit enabled;
+    protected event enable_ev;
 
     // constructor
     function new(
@@ -39,13 +40,26 @@ package adi_axi_monitor_pkg;
         return;
       end
 
-      fork
-        this.get_transaction();
-      join_none
-
       this.enabled = 1;
       this.info($sformatf("Monitor enabled"), ADI_VERBOSITY_MEDIUM);
+
+      fork
+        begin
+          this.get_transaction();
+        end
+        begin
+          if (this.enabled == 1) begin
+            @enable_ev;
+          end
+          disable fork;
+        end
+      join_none
     endtask: run
+
+    function void stop();
+      this.enabled = 0;
+      -> enable_ev;
+    endfunction: stop
 
     // collect data from the DDR interface, all WRITE transaction are coming
     // from the ADC and all READ transactions are going to the DAC

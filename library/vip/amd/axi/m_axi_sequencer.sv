@@ -45,19 +45,22 @@ package m_axi_sequencer_pkg;
 
   class m_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends reg_accessor;
 
-    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(AXI)) agent;
+    axi_mst_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver;
+    axi_mst_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver;
 
     semaphore reader_s;
     semaphore writer_s;
 
     function new(
       input string name,
-      input axi_mst_agent #(`AXI_VIP_PARAM_ORDER(AXI)) agent,
+      input axi_mst_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver,
+      input axi_mst_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver,
       input adi_agent parent = null);
 
       super.new(name, parent);
 
-      this.agent = agent;
+      this.wr_driver = wr_driver;
+      this.rd_driver = rd_driver;
       
       reader_s = new(1);
       writer_s = new(1);
@@ -137,7 +140,7 @@ package m_axi_sequencer_pkg;
                                   input bit [63:0]        data =0);
 
       axi_transaction  wr_trans;
-      wr_trans = agent.wr_driver.create_transaction(name);
+      wr_trans = wr_driver.create_transaction(name);
       wr_trans.set_write_cmd(addr, burst, id, len, size);
       wr_trans.set_prot(prot);
       wr_trans.set_lock(lock);
@@ -145,7 +148,7 @@ package m_axi_sequencer_pkg;
       wr_trans.set_region(region);
       wr_trans.set_qos(qos);
       wr_trans.set_data_block(data);
-      agent.wr_driver.send(wr_trans);
+      wr_driver.send(wr_trans);
 
     endtask : single_write_transaction_api
 
@@ -164,7 +167,7 @@ package m_axi_sequencer_pkg;
       input bit [63:0]        data =0);
 
       axi_transaction  wr_trans;
-      wr_trans = agent.wr_driver.create_transaction(name);
+      wr_trans = wr_driver.create_transaction(name);
       wr_trans.set_write_cmd(addr, burst, id, len, size);
       wr_trans.set_prot(prot);
       wr_trans.set_lock(lock);
@@ -173,8 +176,8 @@ package m_axi_sequencer_pkg;
       wr_trans.set_qos(qos);
       wr_trans.set_data_block(data);
       wr_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
-      agent.wr_driver.send(wr_trans);
-      agent.wr_driver.wait_rsp(wr_trans);
+      wr_driver.send(wr_trans);
+      wr_driver.wait_rsp(wr_trans);
 
     endtask : single_write_transaction_readback_api
 
@@ -193,14 +196,14 @@ package m_axi_sequencer_pkg;
       input xil_axi_data_beat  aruser =0);
 
       axi_transaction   rd_trans;
-      rd_trans = agent.rd_driver.create_transaction(name);
+      rd_trans = rd_driver.create_transaction(name);
       rd_trans.set_read_cmd(addr, burst, id, len, size);
       rd_trans.set_prot(prot);
       rd_trans.set_lock(lock);
       rd_trans.set_cache(cache);
       rd_trans.set_region(region);
       rd_trans.set_qos(qos);
-      agent.rd_driver.send(rd_trans);
+      rd_driver.send(rd_trans);
     endtask : single_read_transaction_api
 
     task automatic single_read_transaction_readback_api (
@@ -219,7 +222,7 @@ package m_axi_sequencer_pkg;
       output xil_axi_data_beat Rdatabeat[]);
 
       axi_transaction   rd_trans;
-      rd_trans = agent.rd_driver.create_transaction(name);
+      rd_trans = rd_driver.create_transaction(name);
       rd_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
       rd_trans.set_read_cmd(addr, burst, id, len, size);
       rd_trans.set_prot(prot);
@@ -227,8 +230,8 @@ package m_axi_sequencer_pkg;
       rd_trans.set_cache(cache);
       rd_trans.set_region(region);
       rd_trans.set_qos(qos);
-      agent.rd_driver.send(rd_trans);
-      agent.rd_driver.wait_rsp(rd_trans);
+      rd_driver.send(rd_trans);
+      rd_driver.wait_rsp(rd_trans);
       Rdatabeat = new[rd_trans.get_len()+1];
       for( xil_axi_uint beat=0; beat<rd_trans.get_len()+1; beat++) begin
         Rdatabeat[beat] = rd_trans.get_data_beat(beat);

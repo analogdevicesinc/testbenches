@@ -36,79 +36,95 @@
 //
 //
 `include "utils.svh"
+`include "axis_definitions.svh"
 
-import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import test_harness_env_pkg::*;
 import environment_pkg::*;
-import m_axis_sequencer_pkg::*;
-import s_axis_sequencer_pkg::*;
 import watchdog_pkg::*;
 
-program test_program (
-  clk_if input_clk_if,
-  clk_if output_clk_if);
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+import `PKGIFY(test_harness, input_axis)::*;
+import `PKGIFY(test_harness, output_axis)::*;
+
+program test_program ();
 
   // declare the class instances
-  environment env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  util_axis_fifo_environment #(`AXIS_VIP_PARAMS(test_harness, input_axis), `AXIS_VIP_PARAMS(test_harness, output_axis), `INPUT_CLK, `OUTPUT_CLK) uaf_env;
 
   watchdog send_data_wd;
 
   initial begin
 
     // create environment
-    env = new(`TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF,
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
 
-              input_clk_if,
-              output_clk_if,
+    uaf_env = new("Util AXIS FIFO Environment",
+                  `TH.`INPUT_CLK_VIP.inst.IF,
+                  `TH.`OUTPUT_CLK_VIP.inst.IF,
+                  `TH.`INPUT_AXIS.inst.IF,
+                  `TH.`OUTPUT_AXIS.inst.IF);
 
-              `TH.`INPUT_AXIS.inst.IF,
-              `TH.`OUTPUT_AXIS.inst.IF
-             );
-
-    setLoggerVerbosity(5);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
     
-    env.start();
-    env.sys_reset();
+    base_env.start();
+    uaf_env.start();
 
-    env.configure();
+    base_env.sys_reset();
 
-    env.run();
+    uaf_env.configure();
+    uaf_env.input_axis_agent.sequencer.set_keep_some();
 
-    send_data_wd = new(500000, "Send data");
+    uaf_env.run();
+
+    send_data_wd = new("Util AXIS FIFO Watchdog", 500000, "Send data");
 
     send_data_wd.start();
 
-    env.input_axis_seq.start();
+    uaf_env.input_axis_agent.sequencer.start();
 
     // stimulus
-    repeat($urandom_range(5,13)) begin
+    repeat($urandom_range(5,10)) begin
       send_data_wd.reset();
       
-      repeat($urandom_range(1,5))
-        env.input_axis_seq.add_xfer_descriptor($urandom_range(1,1000), 1, 0);
+      if ((!`TKEEP_EN || !`TLAST_EN) && `INPUT_WIDTH < `OUTPUT_WIDTH) begin
+        repeat($urandom_range(1,5)) begin
+          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_packet_size($urandom_range(1,128)*`OUTPUT_WIDTH/`INPUT_WIDTH, `TLAST_EN, 0);
+        end
+      end else begin
+        repeat($urandom_range(1,5)) begin
+          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor($urandom_range(1,1024), `TLAST_EN, 0);
+        end
+      end
       
       #($urandom_range(1,10)*1us);
 
-      env.input_axis_seq.clear_descriptor_queue();
+      uaf_env.input_axis_agent.sequencer.clear_descriptor_queue();
 
       #1us;
 
-      env.scoreboard_inst.wait_until_complete();
+      uaf_env.scoreboard_inst.wait_until_complete();
 
-      `INFOV(("Packet finished."), 5);
+      `INFO(("Packet finished."), ADI_VERBOSITY_LOW);
     end
 
     send_data_wd.stop();
-        
-    env.stop();
+
+    #100ns;
+
+    uaf_env.stop();
+    base_env.stop();
     
-    `INFO(("Test bench done!"));
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end

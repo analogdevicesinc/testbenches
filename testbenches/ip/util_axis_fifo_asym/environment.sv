@@ -1,112 +1,72 @@
 `include "utils.svh"
+`include "axis_definitions.svh"
 
 package environment_pkg;
 
-  import m_axi_sequencer_pkg::*;
-  import s_axi_sequencer_pkg::*;
+  import logger_pkg::*;
+  import adi_common_pkg::*;
+  import axi4stream_vip_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
-  import logger_pkg::*;
-
-  import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import test_harness_env_pkg::*;
+  import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
-  import x_monitor_pkg::*;
 
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
+  class util_axis_fifo_environment #(`AXIS_VIP_PARAM_DECL(input_axis), `AXIS_VIP_PARAM_DECL(output_axis), int INPUT_CLK, int OUTPUT_CLK) extends adi_environment;
 
-  import `PKGIFY(test_harness, input_axis)::*;
-  import `PKGIFY(test_harness, output_axis)::*;
+    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(INPUT_CLK)) input_clk_vip_if;
+    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(OUTPUT_CLK)) output_clk_vip_if;
 
-  class environment extends test_harness_env;
+    adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(input_axis)) input_axis_agent;
+    adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(output_axis)) output_axis_agent;
 
-    virtual interface clk_if input_clk_if;
-    virtual interface clk_if output_clk_if;
-
-    // agents and sequencers
-    `AGENT(test_harness, input_axis, mst_t) input_axis_agent;
-    `AGENT(test_harness, output_axis, slv_t) output_axis_agent;
-
-    m_axis_sequencer #(`AGENT(test_harness, input_axis, mst_t),
-                      `AXIS_VIP_PARAMS(test_harness, input_axis)
-                      ) input_axis_seq;
-    s_axis_sequencer #(`AGENT(test_harness, output_axis, slv_t)) output_axis_seq;
-
-    x_axis_monitor #(`AGENT(test_harness, input_axis, mst_t)) input_axis_mon;
-    x_axis_monitor #(`AGENT(test_harness, output_axis, slv_t)) output_axis_mon;
-
-    scoreboard scoreboard_inst;
+    scoreboard #(logic [7:0]) scoreboard_inst;
 
     //============================================================================
     // Constructor
     //============================================================================
     function new (
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
+      input string name,
 
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
+      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(INPUT_CLK)) input_clk_vip_if,
+      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(OUTPUT_CLK)) output_clk_vip_if,
 
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-
-      virtual interface clk_if input_clk_if,
-      virtual interface clk_if output_clk_if,
-
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, input_axis)) input_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, output_axis)) output_axis_vip_if
-    );
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(input_axis)) input_axis_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(output_axis)) output_axis_vip_if);
 
       // creating the agents
-      super.new(sys_clk_vip_if, 
-                dma_clk_vip_if, 
-                ddr_clk_vip_if, 
-                sys_rst_vip_if, 
-                mng_vip_if, 
-                ddr_vip_if);
+      super.new(name);
 
-      this.input_clk_if = input_clk_if;
-      this.output_clk_if = output_clk_if;
+      this.input_clk_vip_if = input_clk_vip_if;
+      this.output_clk_vip_if = output_clk_vip_if;
 
-      input_axis_agent = new("Input AXI Stream Agent", input_axis_vip_if);
-      output_axis_agent = new("Output AXI Stream Agent", output_axis_vip_if);
+      this.input_axis_agent = new("Input AXI Stream Agent", input_axis_vip_if, this);
+      this.output_axis_agent = new("Output AXI Stream Agent", output_axis_vip_if, this);
 
-      input_axis_seq = new(input_axis_agent);
-      output_axis_seq = new(output_axis_agent);
-
-      input_axis_mon = new("Input AXIS Transaction Monitor", input_axis_agent);
-      output_axis_mon = new("Output AXIS Transaction Monitor", output_axis_agent);
-
-      scoreboard_inst = new("Verification Environment Scoreboard");
-
+      this.scoreboard_inst = new("Util AXIS FIFO Scoreboard", this);
     endfunction
 
     //============================================================================
     // Configure environment
     //============================================================================
     task configure();
-
       // configuration for input
-      this.input_axis_seq.set_stop_policy(STOP_POLICY_PACKET);
-      this.input_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.input_axis_seq.set_descriptor_gen_mode(1);
-      this.input_axis_seq.set_data_beat_delay(0);
-      this.input_axis_seq.set_descriptor_delay(0);
-      this.input_axis_seq.set_inactive_drive_output_0();
+      this.input_axis_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
+      this.input_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.input_axis_agent.sequencer.set_descriptor_gen_mode(1);
+      this.input_axis_agent.sequencer.set_data_beat_delay(0);
+      this.input_axis_agent.sequencer.set_descriptor_delay(0);
+      this.input_axis_agent.sequencer.set_inactive_drive_output_0();
 
       // configuration for output
-      this.output_axis_seq.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      this.output_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
 
-      // this.output_axis_seq.set_use_variable_ranges();
-      // this.output_axis_seq.set_high_time_range(1,1);
-      // this.output_axis_seq.set_low_time_range(0,0);
+      // this.output_axis_agent.sequencer.set_use_variable_ranges();
+      // this.output_axis_agent.sequencer.set_high_time_range(1,1);
+      // this.output_axis_agent.sequencer.set_low_time_range(0,0);
 
-      // this.output_axis_seq.clr_use_variable_ranges();
-      // this.output_axis_seq.set_high_time(1);
-      // this.output_axis_seq.set_low_time(1);
-
+      // this.output_axis_agent.sequencer.clr_use_variable_ranges();
+      // this.output_axis_agent.sequencer.set_high_time(1);
+      // this.output_axis_agent.sequencer.set_low_time(1);
     endtask
 
     //============================================================================
@@ -115,72 +75,38 @@ package environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
+      this.input_clk_vip_if.start_clock();
+      this.output_clk_vip_if.start_clock();
 
-      super.start();
+      this.input_axis_agent.agent.start_master();
+      this.output_axis_agent.agent.start_slave();
 
-      input_clk_if.start_clock(`INPUT_CLK);
-      output_clk_if.start_clock(`OUTPUT_CLK);
-
-      input_axis_agent.start_master();
-      output_axis_agent.start_slave();
-
-      scoreboard_inst.set_source_stream(input_axis_mon);
-      scoreboard_inst.set_sink_stream(output_axis_mon);
-
-    endtask
-
-    //============================================================================
-    // Start the test
-    //   - start the RX scoreboard and sequencer
-    //   - start the TX scoreboard and sequencer
-    //   - setup the RX DMA
-    //   - setup the TX DMA
-    //============================================================================
-    task test();
-
-      fork
-        input_axis_seq.run();
-        output_axis_seq.run();
-
-        input_axis_mon.run();
-        output_axis_mon.run();
-
-        scoreboard_inst.run();
-      join_none
-
-    endtask
-
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // Evaluate the scoreboard's results
+      this.input_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_source);
+      this.output_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_sink);
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
-    task run;
+    task run();
+      fork
+        this.input_axis_agent.sequencer.run();
+        this.output_axis_agent.sequencer.run();
 
-      //pre_test();
-      test();
+        this.input_axis_agent.monitor.run();
+        this.output_axis_agent.monitor.run();
 
+        this.scoreboard_inst.run();
+      join_none
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
-
-      super.stop();
-
-      input_axis_seq.stop();
-      input_axis_agent.stop_master();
-      output_axis_agent.stop_slave();
-
-      post_test();
-
+    task stop();
+      this.input_axis_agent.sequencer.stop();
+      this.input_axis_agent.agent.stop_master();
+      this.output_axis_agent.agent.stop_slave();
     endtask
 
   endclass

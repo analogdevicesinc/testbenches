@@ -36,21 +36,11 @@
 `timescale 1ns/1ps
 
 `include "utils.svh"
-`include "interfaces.svh"
 
 module system_tb();
 
-  clk_if input_clk_if();
-  clk_if output_clk_if();
+  `TEST_PROGRAM test();
 
-  `TEST_PROGRAM test(
-    .input_clk_if(input_clk_if),
-    .output_clk_if(output_clk_if)
-  );
-
-  test_harness `TH (
-    .input_clk (input_clk_if.clk),
-    .output_clk (output_clk_if.clk)
-  );
+  test_harness `TH ();
 
 endmodule

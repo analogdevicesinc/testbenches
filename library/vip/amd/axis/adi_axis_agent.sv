@@ -132,6 +132,8 @@ package adi_axis_agent_pkg;
       super.new(name, parent);
 
       this.agent = new("Agent", passthrough_vip_if);
+      this.master_sequencer = new("Master Sequencer", this.agent.mst_driver, this);
+      this.slave_sequencer = new("Slave Sequencer", this.agent.slv_driver, this);
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 

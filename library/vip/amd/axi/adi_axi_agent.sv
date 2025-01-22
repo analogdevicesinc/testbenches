@@ -60,9 +60,22 @@ package adi_axi_agent_pkg;
       super.new(name, parent);
 
       this.agent = new("Agent", master_vip_if);
-      this.sequencer = new("Sequencer", this.agent, this);
+      this.sequencer = new("Sequencer", this.agent.wr_driver, this.agent.rd_driver, this);
       this.monitor = new("Monitor TX", this.agent.monitor, this);
     endfunction: new
+
+    task start();
+      this.agent.start_master();
+    endtask: start
+
+    task run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.agent.stop_master();
+    endtask: stop
 
   endclass: adi_axi_master_agent
 
@@ -85,12 +98,27 @@ package adi_axi_agent_pkg;
       this.monitor = new("Monitor TX", this.agent.monitor, this);
     endfunction: new
 
+    task start();
+      this.agent.start_slave();
+    endtask: start
+
+    task run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.agent.stop_slave();
+    endtask: stop
+
   endclass: adi_axi_slave_mem_agent
 
 
   class adi_axi_passthrough_mem_agent #(int `AXI_VIP_PARAM_ORDER(passthrough)) extends adi_agent;
 
     axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(passthrough)) agent;
+    m_axi_sequencer #(`AXI_VIP_PARAM_ORDER(passthrough)) master_sequencer;
+    s_axi_sequencer #(`AXI_VIP_PARAM_ORDER(passthrough)) slave_sequencer;
     adi_axi_monitor #(`AXI_VIP_PARAM_ORDER(passthrough)) monitor;
 
     function new(
@@ -101,8 +129,25 @@ package adi_axi_agent_pkg;
       super.new(name, parent);
 
       this.agent = new("Agent", passthrough_vip_if);
+      this.master_sequencer = new("Slave Sequencer", this.agent.mst_wr_driver, this.agent.mst_rd_driver, this);
+      this.slave_sequencer = new("Slave Sequencer", this.agent.mem_model, this);
       this.monitor = new("Monitor TX", this.agent.monitor, this);
     endfunction: new
+
+    task start();
+      this.warning($sformatf("Start must called manually in the test program or environment"));
+    endtask: start
+
+    task run();
+      this.slave_sequencer.run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.agent.stop_slave();
+      this.agent.stop_master();
+    endtask: stop
 
   endclass: adi_axi_passthrough_mem_agent
 

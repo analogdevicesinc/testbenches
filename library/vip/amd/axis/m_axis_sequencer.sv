@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -39,7 +39,7 @@
 package m_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
-  import adi_common_pkg::*;
+  import adi_vip_pkg::*;
   import logger_pkg::*;
 
   typedef enum {
@@ -55,7 +55,7 @@ package m_axis_sequencer_pkg;
   } stop_policy_t;
 
 
-  class m_axis_sequencer_base extends adi_component;
+  class m_axis_sequencer_base extends adi_sequencer;
 
     protected bit enabled;
     protected bit queue_empty_sig;
@@ -116,45 +116,45 @@ package m_axis_sequencer_pkg;
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: set_inactive_drive_output_0
 
     // check if ready is asserted
     virtual function bit check_ready_asserted();
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endfunction: check_ready_asserted
 
     // wait for set amount of clock cycles
     virtual task wait_clk_count(input int wait_clocks);
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: wait_clk_count
 
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
     virtual protected task packetize();
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: packetize
 
     virtual protected task sender();
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: sender
 
     // create transfer based on data beats per packet
-    virtual function void add_xfer_descriptor_packet_size(
+    virtual function void add_xfer_descriptor_sample_count(
       input int data_beats_per_packet,
       input int gen_tlast = 1,
       input int gen_sync = 1);
 
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
-    endfunction: add_xfer_descriptor_packet_size
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endfunction: add_xfer_descriptor_sample_count
 
     // wait until data beat is sent
     virtual task beat_sent();
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: beat_sent
 
     // wait until packet is sent
     virtual task packet_sent();
-      this.fatal($sformatf("Base class was instantiated instead of the inherited class!"));
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: packet_sent
 
 
@@ -209,7 +209,7 @@ package m_axis_sequencer_pkg;
     endfunction: set_keep_some
 
     // create transfer descriptor
-    function void add_xfer_descriptor(
+    function void add_xfer_descriptor_byte_count(
       input int bytes_to_generate,
       input int gen_last = 1,
       input int gen_sync = 1);
@@ -224,7 +224,7 @@ package m_axis_sequencer_pkg;
       descriptor_q.push_back(descriptor);
       this.queue_empty_sig = 0;
       ->>queue_ev;
-    endfunction: add_xfer_descriptor
+    endfunction: add_xfer_descriptor_byte_count
 
     // descriptor delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
@@ -351,13 +351,13 @@ package m_axis_sequencer_pkg;
     endtask: packet_sent
 
     // create transfer based on data beats per packet
-    virtual function void add_xfer_descriptor_packet_size(
+    virtual function void add_xfer_descriptor_sample_count(
       input int data_beats_per_packet,
       input int gen_tlast = 1,
       input int gen_sync = 1);
       
-      add_xfer_descriptor(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
-    endfunction: add_xfer_descriptor_packet_size
+      add_xfer_descriptor_byte_count(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
+    endfunction: add_xfer_descriptor_sample_count
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
@@ -497,6 +497,6 @@ package m_axis_sequencer_pkg;
       end
     endtask: sender
 
-  endclass
+  endclass: m_axis_sequencer
 
-endpackage
+endpackage: m_axis_sequencer_pkg

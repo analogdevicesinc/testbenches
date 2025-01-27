@@ -1,5 +1,5 @@
 ####################################################################################
-## Copyright (c) 2024 Analog Devices, Inc.
+## Copyright (C) 2024 Analog Devices, Inc.
 ### SPDX short identifier: BSD-1-Clause
 ## Auto-generated, do not modify!
 ####################################################################################

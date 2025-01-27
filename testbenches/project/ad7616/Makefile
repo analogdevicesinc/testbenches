@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2022 (c) Analog Devices, Inc.
+## Copyright (C) 2022 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -22,12 +22,10 @@ LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_ad7616
 LIB_DEPS += axi_pwm_gen
 LIB_DEPS += axi_dmac
-LIB_DEPS += axi_sysid
 LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
-LIB_DEPS += sysid_rom
 
 # default test program
 TP := test_program_si

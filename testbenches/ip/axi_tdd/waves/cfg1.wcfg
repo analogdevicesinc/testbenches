@@ -14,7 +14,6 @@
             <top_module name="ipif_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
-            <top_module name="reg_accessor_pkg" />
             <top_module name="s_axi_sequencer_pkg" />
             <top_module name="std" />
             <top_module name="system_tb" />

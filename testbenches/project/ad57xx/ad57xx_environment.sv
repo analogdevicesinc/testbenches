@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,7 +38,7 @@
 package ad57xx_environment_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_environment_pkg::*;
 
   import s_spi_sequencer_pkg::*;
   import adi_spi_vip_pkg::*;

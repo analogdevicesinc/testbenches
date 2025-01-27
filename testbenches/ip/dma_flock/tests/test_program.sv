@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -205,7 +205,7 @@ program test_program;
               begin
                 for (int l = 0; l < m_seg.ylength; l++) begin
                   // update the AXIS generator command
-                  dma_flock_env.src_axis_agent.sequencer.add_xfer_descriptor(.bytes_to_generate(m_seg.length),
+                  dma_flock_env.src_axis_agent.sequencer.add_xfer_descriptor_byte_count(.bytes_to_generate(m_seg.length),
                                                        .gen_last(1),
                                                        .gen_sync(l==0));
                 end

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import logger_pkg::*;
@@ -101,22 +99,22 @@ program test_program;
       1: begin
         axis_seq_env.src_axis_agent.sequencer.set_descriptor_gen_mode(0);
         axis_seq_env.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_DATA_BEAT);
-        // axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor(32'h600, 1, 0);
-        axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor_packet_size(32'd10, 1, 0);
+        // axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor_byte_count(32'h600, 1, 0);
+        axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor_sample_count(32'd10, 1, 0);
 
         send_data_wd = new("Axis Sequencer Watchdog", 1000, "Send data");
       end
       2: begin
         axis_seq_env.src_axis_agent.sequencer.set_descriptor_gen_mode(0);
         axis_seq_env.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_DESCRIPTOR_QUEUE);
-        repeat (10) axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor(32'h600, 1, 0);
+        repeat (10) axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor_byte_count(32'h600, 1, 0);
 
         send_data_wd = new("Axis Sequencer Watchdog", 30000, "Send data");
       end
       3: begin
         axis_seq_env.src_axis_agent.sequencer.set_descriptor_gen_mode(1);
         axis_seq_env.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
-        axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor(32'h600, 1, 0);
+        axis_seq_env.src_axis_agent.sequencer.add_xfer_descriptor_byte_count(32'h600, 1, 0);
 
         send_data_wd = new("Axis Sequencer Watchdog", 20000, "Send data");
       end

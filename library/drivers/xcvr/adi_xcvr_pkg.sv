@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,22 +26,23 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on_line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
+
 `include "utils.svh"
 
 package adi_xcvr_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
-  import reg_accessor_pkg::*;
+  import adi_common_pkg::*;
+  import adi_api_pkg::*;
+  import m_axi_sequencer_pkg::*;
   import adi_regmap_pkg::*;
   import adi_regmap_xcvr_pkg::*;
-  import adi_jesd204_pkg::*;
 
   typedef enum bit [2:0] {
     OUTCLKPCS = 1,
@@ -285,7 +286,7 @@ package adi_xcvr_pkg;
   //============================================================================
   // Xilinx XCVR class
   //============================================================================
-  class xcvr extends adi_peripheral;
+  class xcvr extends adi_api;
 
     // Capabilities
     bit qpll_enable;
@@ -299,7 +300,7 @@ package adi_xcvr_pkg;
     // -----------------
     //
     // -----------------
-    function new (string name, reg_accessor bus, bit [31:0] base_address);
+    function new (string name, m_axi_sequencer_base bus, bit [31:0] base_address);
       super.new(name, bus, base_address);
     endfunction
 

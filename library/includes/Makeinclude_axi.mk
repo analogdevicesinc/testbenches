@@ -1,4 +1,4 @@
-## Copyright 2024(c) Analog Devices, Inc.
+## Copyright (C) 2024 - 2025 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -9,4 +9,3 @@ SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axi/s_axi_sequencer.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axi/adi_axi_monitor.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axi/axi_definitions.svh
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/pub_sub_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/reg_accessor.sv

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,39 +26,28 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
 
-package reg_accessor_pkg;
+`include "utils.svh"
 
-  import axi_vip_pkg::*;
+package adi_environment_pkg;
+
+  import logger_pkg::*;
   import adi_common_pkg::*;
+  import adi_environment_pkg::*;
 
-  class reg_accessor extends adi_component;
-
+  class adi_environment extends adi_component;
     function new(
       input string name,
-      input adi_component parent = null);
-      
+      input adi_environment parent = null);
+
       super.new(name, parent);
-    endfunction
+    endfunction: new
+  endclass: adi_environment
 
-    virtual task automatic RegWrite32(input xil_axi_ulong addr =0,
-                                           input bit [31:0]    data);
-    endtask: RegWrite32
-
-    virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
-                                          output bit [31:0]    data);
-    endtask: RegRead32
-
-    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
-                                                input bit [31:0]     data);
-    endtask: RegReadVerify32
-
-  endclass
-
-endpackage
+endpackage: adi_environment_pkg

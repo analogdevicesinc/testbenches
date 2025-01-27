@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,28 +26,58 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
 
-`ifndef _INTERFACES_SVH_
-`define _INTERFACES_SVH_
+`include "utils.svh"
 
-interface clk_if ();
-  logic clk;
+package adi_vip_pkg;
 
-  task start_clock(int clk_period);
-    clk = 1'b1;
-    fork
-      forever begin
-        #((clk_period / 2)*1ps);
-        clk = ~clk;
-      end
-    join_none
-  endtask: start_clock
-endinterface: clk_if
+  import logger_pkg::*;
+  import adi_common_pkg::*;
+  import adi_environment_pkg::*;
+  
+  class adi_agent extends adi_component;
+    function new(
+      input string name,
+      input adi_environment parent = null);
 
-`endif
+      super.new(name, parent);
+    endfunction: new
+  endclass: adi_agent
+
+  
+  class adi_driver extends adi_component;
+    function new(
+      input string name,
+      input adi_agent parent = null);
+
+      super.new(name, parent);
+    endfunction: new
+  endclass: adi_driver
+
+  
+  class adi_sequencer extends adi_component;
+    function new(
+      input string name,
+      input adi_agent parent = null);
+
+      super.new(name, parent);
+    endfunction: new
+  endclass: adi_sequencer
+
+
+  class adi_monitor extends adi_component;
+    function new(
+      input string name,
+      input adi_agent parent = null);
+
+      super.new(name, parent);
+    endfunction: new
+  endclass: adi_monitor
+
+endpackage: adi_vip_pkg

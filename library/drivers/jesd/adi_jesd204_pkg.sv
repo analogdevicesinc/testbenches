@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,19 +26,21 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
+
 `include "utils.svh"
 
 package adi_jesd204_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
-  import reg_accessor_pkg::*;
+  import adi_common_pkg::*;
+  import adi_api_pkg::*;
+  import m_axi_sequencer_pkg::*;
   import adi_regmap_pkg::*;
   import adi_regmap_jesd_tx_pkg::*;
   import adi_regmap_jesd_rx_pkg::*;
@@ -181,7 +183,7 @@ package adi_jesd204_pkg;
   //============================================================================
   // Base Link layer class
   //============================================================================
-  class link_layer extends adi_peripheral;
+  class link_layer extends adi_api;
 
     jesd_link link;
     int dp_width = 4;  // Data width towards Phy
@@ -196,7 +198,7 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    function new (string name, reg_accessor bus, bit [31:0] base_address, jesd_link link);
+    function new (string name, m_axi_sequencer_base bus, bit [31:0] base_address, jesd_link link);
 
       super.new(name, bus, base_address);
       this.link = link;
@@ -273,7 +275,7 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    function new (string name, reg_accessor bus, bit [31:0] base_address, jesd_link link);
+    function new (string name, m_axi_sequencer_base bus, bit [31:0] base_address, jesd_link link);
       super.new(name, bus, base_address, link);
     endfunction
 
@@ -433,7 +435,7 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
-    function new (string name, reg_accessor bus, bit [31:0] base_address, jesd_link link);
+    function new (string name, m_axi_sequencer_base bus, bit [31:0] base_address, jesd_link link);
       super.new(name, bus, base_address, link);
     endfunction
 

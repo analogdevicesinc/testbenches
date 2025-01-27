@@ -38,7 +38,7 @@
 package spi_environment_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_environment_pkg::*;
 
   import axi4stream_vip_pkg::*;
   import m_axis_sequencer_pkg::*;

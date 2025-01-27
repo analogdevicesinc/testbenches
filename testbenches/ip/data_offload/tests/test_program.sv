@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,15 +26,12 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
 `include "utils.svh"
 `include "axi_definitions.svh"
 `include "axis_definitions.svh"
@@ -90,6 +87,17 @@ program test_program;
     // Setup generator/monitor stubs
     //=========================================================================
 
+<<<<<<< HEAD
+=======
+    // ADC stub
+    env.adc_src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+    env.adc_src_axis_seq.add_xfer_descriptor_byte_count(`ADC_TRANSFER_LENGTH, 0, 0);
+
+    // DAC stub
+    dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
+    env.dac_dst_axis_seq.set_mode(dac_mode);
+
+>>>>>>> 8ee0dee (General updates:)
     //=========================================================================
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);

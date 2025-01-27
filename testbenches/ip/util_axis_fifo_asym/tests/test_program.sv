@@ -32,19 +32,10 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-<<<<<<< HEAD
 
 `include "utils.svh"
 `include "axis_definitions.svh"
 
-=======
-//
-//
-//
-`include "utils.svh"
-`include "axis_definitions.svh"
-
->>>>>>> cc748dc (util_axis_fifo_asym: Updated after rebase)
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 import environment_pkg::*;

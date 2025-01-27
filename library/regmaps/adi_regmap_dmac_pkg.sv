@@ -39,8 +39,9 @@ package adi_regmap_dmac_pkg;
 
   import logger_pkg::*;
   import adi_regmap_pkg::*;
+  import adi_common_pkg::*;
 
-  class adi_regmap_dmac #(int AXI_AXCACHE, int AXI_AXPROT, int BYTES_PER_BURST_WIDTH, int CACHE_COHERENT, int CYCLIC, int DMA_DATA_WIDTH_DEST, int DMA_DATA_WIDTH_SRC, int DMA_TYPE_DEST, int DMA_TYPE_SRC, int ID) extends adi_component;
+  class adi_regmap_dmac extends adi_component;
 
     /* DMA Controller (axi_dmac) */
     class VERSION_CLASS extends register_base;
@@ -63,12 +64,13 @@ package adi_regmap_dmac_pkg;
       endfunction: new
     endclass
 
-    class PERIPHERAL_ID_CLASS #(int ID) extends register_base;
+    class PERIPHERAL_ID_CLASS extends register_base;
       field_base PERIPHERAL_ID_F;
 
       function new(
         input string name,
         input int address,
+        input int ID,
         input adi_component parent = null);
 
         super.new(name, address, parent);
@@ -111,7 +113,7 @@ package adi_regmap_dmac_pkg;
       endfunction: new
     endclass
 
-    class INTERFACE_DESCRIPTION_1_CLASS #(int BYTES_PER_BURST_WIDTH, int DMA_DATA_WIDTH_DEST, int DMA_DATA_WIDTH_SRC, int DMA_TYPE_DEST, int DMA_TYPE_SRC) extends register_base;
+    class INTERFACE_DESCRIPTION_1_CLASS extends register_base;
       field_base BYTES_PER_BEAT_DEST_LOG2_F;
       field_base DMA_TYPE_DEST_F;
       field_base BYTES_PER_BEAT_SRC_LOG2_F;
@@ -121,6 +123,11 @@ package adi_regmap_dmac_pkg;
       function new(
         input string name,
         input int address,
+        input int BYTES_PER_BURST_WIDTH,
+        input int DMA_DATA_WIDTH_DEST,
+        input int DMA_DATA_WIDTH_SRC,
+        input int DMA_TYPE_DEST,
+        input int DMA_TYPE_SRC,
         input adi_component parent = null);
 
         super.new(name, address, parent);
@@ -135,7 +142,7 @@ package adi_regmap_dmac_pkg;
       endfunction: new
     endclass
 
-    class INTERFACE_DESCRIPTION_2_CLASS #(int AXI_AXCACHE, int AXI_AXPROT, int CACHE_COHERENT) extends register_base;
+    class INTERFACE_DESCRIPTION_2_CLASS extends register_base;
       field_base CACHE_COHERENT_F;
       field_base AXI_AXCACHE_F;
       field_base AXI_AXPROT_F;
@@ -143,6 +150,9 @@ package adi_regmap_dmac_pkg;
       function new(
         input string name,
         input int address,
+        input int AXI_AXCACHE,
+        input int AXI_AXPROT,
+        input int CACHE_COHERENT,
         input adi_component parent = null);
 
         super.new(name, address, parent);
@@ -261,7 +271,7 @@ package adi_regmap_dmac_pkg;
       endfunction: new
     endclass
 
-    class FLAGS_CLASS #(int CYCLIC) extends register_base;
+    class FLAGS_CLASS extends register_base;
       field_base CYCLIC_F;
       field_base TLAST_F;
       field_base PARTIAL_REPORTING_EN_F;
@@ -269,6 +279,7 @@ package adi_regmap_dmac_pkg;
       function new(
         input string name,
         input int address,
+        input int CYCLIC,
         input adi_component parent = null);
 
         super.new(name, address, parent);
@@ -313,12 +324,14 @@ package adi_regmap_dmac_pkg;
       endfunction: new
     endclass
 
-    class X_LENGTH_CLASS #(int DMA_DATA_WIDTH_DEST, int DMA_DATA_WIDTH_SRC) extends register_base;
+    class X_LENGTH_CLASS extends register_base;
       field_base X_LENGTH_F;
 
       function new(
         input string name,
         input int address,
+        input int DMA_DATA_WIDTH_DEST,
+        input int DMA_DATA_WIDTH_SRC,
         input adi_component parent = null);
 
         super.new(name, address, parent);
@@ -624,21 +637,21 @@ package adi_regmap_dmac_pkg;
     endclass
 
     VERSION_CLASS VERSION_R;
-    PERIPHERAL_ID_CLASS #(ID) PERIPHERAL_ID_R;
+    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
     SCRATCH_CLASS SCRATCH_R;
     IDENTIFICATION_CLASS IDENTIFICATION_R;
-    INTERFACE_DESCRIPTION_1_CLASS #(BYTES_PER_BURST_WIDTH, DMA_DATA_WIDTH_DEST, DMA_DATA_WIDTH_SRC, DMA_TYPE_DEST, DMA_TYPE_SRC) INTERFACE_DESCRIPTION_1_R;
-    INTERFACE_DESCRIPTION_2_CLASS #(AXI_AXCACHE, AXI_AXPROT, CACHE_COHERENT) INTERFACE_DESCRIPTION_2_R;
+    INTERFACE_DESCRIPTION_1_CLASS INTERFACE_DESCRIPTION_1_R;
+    INTERFACE_DESCRIPTION_2_CLASS INTERFACE_DESCRIPTION_2_R;
     IRQ_MASK_CLASS IRQ_MASK_R;
     IRQ_PENDING_CLASS IRQ_PENDING_R;
     IRQ_SOURCE_CLASS IRQ_SOURCE_R;
     CONTROL_CLASS CONTROL_R;
     TRANSFER_ID_CLASS TRANSFER_ID_R;
     TRANSFER_SUBMIT_CLASS TRANSFER_SUBMIT_R;
-    FLAGS_CLASS #(CYCLIC) FLAGS_R;
+    FLAGS_CLASS FLAGS_R;
     DEST_ADDRESS_CLASS DEST_ADDRESS_R;
     SRC_ADDRESS_CLASS SRC_ADDRESS_R;
-    X_LENGTH_CLASS #(DMA_DATA_WIDTH_DEST, DMA_DATA_WIDTH_SRC) X_LENGTH_R;
+    X_LENGTH_CLASS X_LENGTH_R;
     Y_LENGTH_CLASS Y_LENGTH_R;
     DEST_STRIDE_CLASS DEST_STRIDE_R;
     SRC_STRIDE_CLASS SRC_STRIDE_R;
@@ -660,26 +673,36 @@ package adi_regmap_dmac_pkg;
 
     function new(
       input string name,
+      input int AXI_AXCACHE,
+      input int AXI_AXPROT,
+      input int BYTES_PER_BURST_WIDTH,
+      input int CACHE_COHERENT,
+      input int CYCLIC,
+      input int DMA_DATA_WIDTH_DEST,
+      input int DMA_DATA_WIDTH_SRC,
+      input int DMA_TYPE_DEST,
+      input int DMA_TYPE_SRC,
+      input int ID,
       input adi_component parent = null);
 
       super.new(name, parent);
 
       this.VERSION_R = new("VERSION", 'h0, this);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, ID, this);
       this.SCRATCH_R = new("SCRATCH", 'h8, this);
       this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
-      this.INTERFACE_DESCRIPTION_1_R = new("INTERFACE_DESCRIPTION_1", 'h10, this);
-      this.INTERFACE_DESCRIPTION_2_R = new("INTERFACE_DESCRIPTION_2", 'h14, this);
+      this.INTERFACE_DESCRIPTION_1_R = new("INTERFACE_DESCRIPTION_1", 'h10, BYTES_PER_BURST_WIDTH, DMA_DATA_WIDTH_DEST, DMA_DATA_WIDTH_SRC, DMA_TYPE_DEST, DMA_TYPE_SRC, this);
+      this.INTERFACE_DESCRIPTION_2_R = new("INTERFACE_DESCRIPTION_2", 'h14, AXI_AXCACHE, AXI_AXPROT, CACHE_COHERENT, this);
       this.IRQ_MASK_R = new("IRQ_MASK", 'h80, this);
       this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84, this);
       this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88, this);
       this.CONTROL_R = new("CONTROL", 'h400, this);
       this.TRANSFER_ID_R = new("TRANSFER_ID", 'h404, this);
       this.TRANSFER_SUBMIT_R = new("TRANSFER_SUBMIT", 'h408, this);
-      this.FLAGS_R = new("FLAGS", 'h40c, this);
+      this.FLAGS_R = new("FLAGS", 'h40c, CYCLIC, this);
       this.DEST_ADDRESS_R = new("DEST_ADDRESS", 'h410, this);
       this.SRC_ADDRESS_R = new("SRC_ADDRESS", 'h414, this);
-      this.X_LENGTH_R = new("X_LENGTH", 'h418, this);
+      this.X_LENGTH_R = new("X_LENGTH", 'h418, DMA_DATA_WIDTH_DEST, DMA_DATA_WIDTH_SRC, this);
       this.Y_LENGTH_R = new("Y_LENGTH", 'h41c, this);
       this.DEST_STRIDE_R = new("DEST_STRIDE", 'h420, this);
       this.SRC_STRIDE_R = new("SRC_STRIDE", 'h424, this);

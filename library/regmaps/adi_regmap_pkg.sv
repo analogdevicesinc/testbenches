@@ -38,6 +38,7 @@
 package adi_regmap_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
 
   typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S, WO} acc_t;
 

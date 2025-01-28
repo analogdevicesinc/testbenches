@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,15 +33,15 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_adc_pkg;
+package adi_regmap_axi_adc_template_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_adc extends adi_regmap;
+  class adi_regmap_axi_adc_template extends adi_regmap;
 
-    /* ADC Common (axi_ad*) */
+    /* AXI TEMPLATE ADC Common (axi_template) */
     class RSTN_CLASS extends register_base;
       field_base CE_N_F;
       field_base MMCM_RSTN_F;
@@ -185,48 +185,6 @@ package adi_regmap_adc_pkg;
         this.initialization_done = 1;
       endfunction: new
     endclass: STATUS_CLASS
-
-    class DELAY_CNTRL_CLASS extends register_base;
-      field_base DELAY_SEL_F;
-      field_base DELAY_RWN_F;
-      field_base DELAY_ADDRESS_F;
-      field_base DELAY_WDATA_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DELAY_SEL_F = new("DELAY_SEL", 17, 17, RW, 'h0, this);
-        this.DELAY_RWN_F = new("DELAY_RWN", 16, 16, RW, 'h0, this);
-        this.DELAY_ADDRESS_F = new("DELAY_ADDRESS", 15, 8, RW, 'h0, this);
-        this.DELAY_WDATA_F = new("DELAY_WDATA", 4, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: DELAY_CNTRL_CLASS
-
-    class DELAY_STATUS_CLASS extends register_base;
-      field_base DELAY_LOCKED_F;
-      field_base DELAY_STATUS_F;
-      field_base DELAY_RDATA_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DELAY_LOCKED_F = new("DELAY_LOCKED", 9, 9, RO, 'h0, this);
-        this.DELAY_STATUS_F = new("DELAY_STATUS", 8, 8, RO, 'h0, this);
-        this.DELAY_RDATA_F = new("DELAY_RDATA", 4, 0, RO, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: DELAY_STATUS_CLASS
 
     class SYNC_STATUS_CLASS extends register_base;
       field_base ADC_SYNC_F;
@@ -476,7 +434,7 @@ package adi_regmap_adc_pkg;
       endfunction: new
     endclass: PPS_STATUS_CLASS
 
-    /* ADC Channel (axi_ad*) */
+    /* AXI TEMPLATE ADC Channel (axi_template_adc_channel) */
     class CHAN_CNTRLn_CLASS extends register_base;
       field_base ADC_LB_OWR_F;
       field_base ADC_PN_SEL_OWR_F;
@@ -668,8 +626,6 @@ package adi_regmap_adc_pkg;
     CLK_FREQ_CLASS CLK_FREQ_R;
     CLK_RATIO_CLASS CLK_RATIO_R;
     STATUS_CLASS STATUS_R;
-    DELAY_CNTRL_CLASS DELAY_CNTRL_R;
-    DELAY_STATUS_CLASS DELAY_STATUS_R;
     SYNC_STATUS_CLASS SYNC_STATUS_R;
     DRP_CNTRL_CLASS DRP_CNTRL_R;
     DRP_STATUS_CLASS DRP_STATUS_R;
@@ -844,8 +800,6 @@ package adi_regmap_adc_pkg;
       this.CLK_FREQ_R = new("CLK_FREQ", 'h54, this);
       this.CLK_RATIO_R = new("CLK_RATIO", 'h58, this);
       this.STATUS_R = new("STATUS", 'h5c, this);
-      this.DELAY_CNTRL_R = new("DELAY_CNTRL", 'h60, this);
-      this.DELAY_STATUS_R = new("DELAY_STATUS", 'h64, this);
       this.SYNC_STATUS_R = new("SYNC_STATUS", 'h68, this);
       this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70, this);
       this.DRP_STATUS_R = new("DRP_STATUS", 'h74, this);
@@ -1009,6 +963,6 @@ package adi_regmap_adc_pkg;
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_adc
+  endclass: adi_regmap_axi_adc_template
 
-endpackage: adi_regmap_adc_pkg
+endpackage: adi_regmap_axi_adc_template_pkg

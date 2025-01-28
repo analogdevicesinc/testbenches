@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,35 +33,17 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_clkgen_pkg;
+package adi_regmap_axi_ad3552r_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_clkgen extends adi_regmap;
+  class adi_regmap_axi_ad3552r extends adi_regmap;
 
-    /* Clock Generator (axi_clkgen) */
-    class RSTN_CLASS extends register_base;
-      field_base MMCM_RSTN_F;
-      field_base RSTN_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.MMCM_RSTN_F = new("MMCM_RSTN", 1, 1, RW, 'h0, this);
-        this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: RSTN_CLASS
-
-    class CLK_SEL_CLASS extends register_base;
-      field_base CLK_SEL_F;
+    /* AXI AD3552R DAC Common (axi_ad3552r_dac_common) */
+    class CNTRL_1_CLASS extends register_base;
+      field_base EXT_SYNC_ARM_F;
 
       function new(
         input string name,
@@ -70,14 +52,15 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.CLK_SEL_F = new("CLK_SEL", 0, 0, RW, 'h0, this);
+        this.EXT_SYNC_ARM_F = new("EXT_SYNC_ARM", 1, 1, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: CLK_SEL_CLASS
+    endclass: CNTRL_1_CLASS
 
-    class MMCM_STATUS_CLASS extends register_base;
-      field_base MMCM_LOCKED_F;
+    class CNTRL_2_CLASS extends register_base;
+      field_base SDR_DDR_N_F;
+      field_base SYMB_8_16B_F;
 
       function new(
         input string name,
@@ -86,16 +69,15 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 0, 0, RO, 'h0, this);
+        this.SDR_DDR_N_F = new("SDR_DDR_N", 16, 16, RW, 'h0, this);
+        this.SYMB_8_16B_F = new("SYMB_8_16B", 14, 14, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: MMCM_STATUS_CLASS
+    endclass: CNTRL_2_CLASS
 
-    class DRP_CNTRL_CLASS extends register_base;
-      field_base DRP_RWN_F;
-      field_base DRP_ADDRESS_F;
-      field_base DRP_WDATA_F;
+    class DAC_CUSTOM_WR_CLASS extends register_base;
+      field_base DATA_WRITE_F;
 
       function new(
         input string name,
@@ -104,18 +86,14 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.DRP_RWN_F = new("DRP_RWN", 28, 28, RW, 'h0, this);
-        this.DRP_ADDRESS_F = new("DRP_ADDRESS", 27, 16, RW, 'h0, this);
-        this.DRP_WDATA_F = new("DRP_WDATA", 15, 0, RW, 'h0, this);
+        this.DATA_WRITE_F = new("DATA_WRITE", 23, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DRP_CNTRL_CLASS
+    endclass: DAC_CUSTOM_WR_CLASS
 
-    class DRP_STATUS_CLASS extends register_base;
-      field_base MMCM_LOCKED_F;
-      field_base DRP_STATUS_F;
-      field_base DRP_RDATA_F;
+    class UI_STATUS_CLASS extends register_base;
+      field_base IF_BUSY_F;
 
       function new(
         input string name,
@@ -124,16 +102,16 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 17, 17, RO, 'h0, this);
-        this.DRP_STATUS_F = new("DRP_STATUS", 16, 16, RO, 'h0, this);
-        this.DRP_RDATA_F = new("DRP_RDATA", 15, 0, RO, 'h0, this);
+        this.IF_BUSY_F = new("IF_BUSY", 4, 4, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DRP_STATUS_CLASS
+    endclass: UI_STATUS_CLASS
 
-    class FPGA_VOLTAGE_CLASS extends register_base;
-      field_base FPGA_VOLTAGE_F;
+    class DAC_CUSTOM_CTRL_CLASS extends register_base;
+      field_base ADDRESS_F;
+      field_base STREAM_F;
+      field_base TRANSFER_DATA_F;
 
       function new(
         input string name,
@@ -142,18 +120,54 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'h0, this);
+        this.ADDRESS_F = new("ADDRESS", 31, 24, RW, 'h0, this);
+        this.STREAM_F = new("STREAM", 1, 1, RW, 'h0, this);
+        this.TRANSFER_DATA_F = new("TRANSFER_DATA", 0, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: FPGA_VOLTAGE_CLASS
+    endclass: DAC_CUSTOM_CTRL_CLASS
 
-    RSTN_CLASS RSTN_R;
-    CLK_SEL_CLASS CLK_SEL_R;
-    MMCM_STATUS_CLASS MMCM_STATUS_R;
-    DRP_CNTRL_CLASS DRP_CNTRL_R;
-    DRP_STATUS_CLASS DRP_STATUS_R;
-    FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
+    /* AXI AD3552R DAC Channel (axi_ad3552r_dac_channel) */
+    class CHAN_CNTRL0_7_CLASS extends register_base;
+      field_base DAC_DDS_SEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DAC_DDS_SEL_F = new("DAC_DDS_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_CNTRL0_7_CLASS
+
+    class CHAN_CNTRL1_7_CLASS extends register_base;
+      field_base DAC_DDS_SEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DAC_DDS_SEL_F = new("DAC_DDS_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_CNTRL1_7_CLASS
+
+    CNTRL_1_CLASS CNTRL_1_R;
+    CNTRL_2_CLASS CNTRL_2_R;
+    DAC_CUSTOM_WR_CLASS DAC_CUSTOM_WR_R;
+    UI_STATUS_CLASS UI_STATUS_R;
+    DAC_CUSTOM_CTRL_CLASS DAC_CUSTOM_CTRL_R;
+    CHAN_CNTRL0_7_CLASS CHAN_CNTRL0_7_R;
+    CHAN_CNTRL1_7_CLASS CHAN_CNTRL1_7_R;
 
     function new(
       input string name,
@@ -162,16 +176,17 @@ package adi_regmap_clkgen_pkg;
 
       super.new(name, address, parent);
 
-      this.RSTN_R = new("RSTN", 'h40, this);
-      this.CLK_SEL_R = new("CLK_SEL", 'h44, this);
-      this.MMCM_STATUS_R = new("MMCM_STATUS", 'h5c, this);
-      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70, this);
-      this.DRP_STATUS_R = new("DRP_STATUS", 'h74, this);
-      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
+      this.CNTRL_1_R = new("CNTRL_1", 'h44, this);
+      this.CNTRL_2_R = new("CNTRL_2", 'h48, this);
+      this.DAC_CUSTOM_WR_R = new("DAC_CUSTOM_WR", 'h84, this);
+      this.UI_STATUS_R = new("UI_STATUS", 'h88, this);
+      this.DAC_CUSTOM_CTRL_R = new("DAC_CUSTOM_CTRL", 'h8c, this);
+      this.CHAN_CNTRL0_7_R = new("CHAN_CNTRL0_7", 'h400, this);
+      this.CHAN_CNTRL1_7_R = new("CHAN_CNTRL1_7", 'h458, this);
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_clkgen
+  endclass: adi_regmap_axi_ad3552r
 
-endpackage: adi_regmap_clkgen_pkg
+endpackage: adi_regmap_axi_ad3552r_pkg

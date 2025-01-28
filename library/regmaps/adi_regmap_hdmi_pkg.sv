@@ -33,298 +33,536 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
 package adi_regmap_hdmi_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_hdmi extends adi_regmap;
 
-/* HDMI Transmit (axi_hdmi_tx) */
+    /* HDMI Transmit (axi_hdmi_tx) */
+    class RSTN_TX_CLASS extends register_base;
+      field_base RSTN_F;
 
-  const reg_t HDMI_TX_REG_RSTN = '{ 'h0040, "REG_RSTN" , '{
-    "RSTN": '{ 0, 0, RW, 'h0 }}};
-  `define SET_HDMI_TX_REG_RSTN_RSTN(x) SetField(HDMI_TX_REG_RSTN,"RSTN",x)
-  `define GET_HDMI_TX_REG_RSTN_RSTN(x) GetField(HDMI_TX_REG_RSTN,"RSTN",x)
-  `define DEFAULT_HDMI_TX_REG_RSTN_RSTN GetResetValue(HDMI_TX_REG_RSTN,"RSTN")
-  `define UPDATE_HDMI_TX_REG_RSTN_RSTN(x,y) UpdateField(HDMI_TX_REG_RSTN,"RSTN",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t HDMI_TX_REG_CNTRL1 = '{ 'h0044, "REG_CNTRL1" , '{
-    "SS_BYPASS": '{ 2, 2, RW, 'h0 },
-    "CSC_BYPASS": '{ 0, 0, RW, 'h0 }}};
-  `define SET_HDMI_TX_REG_CNTRL1_SS_BYPASS(x) SetField(HDMI_TX_REG_CNTRL1,"SS_BYPASS",x)
-  `define GET_HDMI_TX_REG_CNTRL1_SS_BYPASS(x) GetField(HDMI_TX_REG_CNTRL1,"SS_BYPASS",x)
-  `define DEFAULT_HDMI_TX_REG_CNTRL1_SS_BYPASS GetResetValue(HDMI_TX_REG_CNTRL1,"SS_BYPASS")
-  `define UPDATE_HDMI_TX_REG_CNTRL1_SS_BYPASS(x,y) UpdateField(HDMI_TX_REG_CNTRL1,"SS_BYPASS",x,y)
-  `define SET_HDMI_TX_REG_CNTRL1_CSC_BYPASS(x) SetField(HDMI_TX_REG_CNTRL1,"CSC_BYPASS",x)
-  `define GET_HDMI_TX_REG_CNTRL1_CSC_BYPASS(x) GetField(HDMI_TX_REG_CNTRL1,"CSC_BYPASS",x)
-  `define DEFAULT_HDMI_TX_REG_CNTRL1_CSC_BYPASS GetResetValue(HDMI_TX_REG_CNTRL1,"CSC_BYPASS")
-  `define UPDATE_HDMI_TX_REG_CNTRL1_CSC_BYPASS(x,y) UpdateField(HDMI_TX_REG_CNTRL1,"CSC_BYPASS",x,y)
+        super.new(name, address, parent);
 
-  const reg_t HDMI_TX_REG_CNTRL2 = '{ 'h0048, "REG_CNTRL2" , '{
-    "SOURCE_SEL": '{ 1, 0, RW, 'h0 }}};
-  `define SET_HDMI_TX_REG_CNTRL2_SOURCE_SEL(x) SetField(HDMI_TX_REG_CNTRL2,"SOURCE_SEL",x)
-  `define GET_HDMI_TX_REG_CNTRL2_SOURCE_SEL(x) GetField(HDMI_TX_REG_CNTRL2,"SOURCE_SEL",x)
-  `define DEFAULT_HDMI_TX_REG_CNTRL2_SOURCE_SEL GetResetValue(HDMI_TX_REG_CNTRL2,"SOURCE_SEL")
-  `define UPDATE_HDMI_TX_REG_CNTRL2_SOURCE_SEL(x,y) UpdateField(HDMI_TX_REG_CNTRL2,"SOURCE_SEL",x,y)
+        this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
 
-  const reg_t HDMI_TX_REG_CNTRL3 = '{ 'h004c, "REG_CNTRL3" , '{
-    "CONST_RGB": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_HDMI_TX_REG_CNTRL3_CONST_RGB(x) SetField(HDMI_TX_REG_CNTRL3,"CONST_RGB",x)
-  `define GET_HDMI_TX_REG_CNTRL3_CONST_RGB(x) GetField(HDMI_TX_REG_CNTRL3,"CONST_RGB",x)
-  `define DEFAULT_HDMI_TX_REG_CNTRL3_CONST_RGB GetResetValue(HDMI_TX_REG_CNTRL3,"CONST_RGB")
-  `define UPDATE_HDMI_TX_REG_CNTRL3_CONST_RGB(x,y) UpdateField(HDMI_TX_REG_CNTRL3,"CONST_RGB",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: RSTN_TX_CLASS
 
-  const reg_t HDMI_TX_REG_CLK_FREQ = '{ 'h0054, "REG_CLK_FREQ" , '{
-    "CLK_FREQ": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_HDMI_TX_REG_CLK_FREQ_CLK_FREQ(x) SetField(HDMI_TX_REG_CLK_FREQ,"CLK_FREQ",x)
-  `define GET_HDMI_TX_REG_CLK_FREQ_CLK_FREQ(x) GetField(HDMI_TX_REG_CLK_FREQ,"CLK_FREQ",x)
-  `define DEFAULT_HDMI_TX_REG_CLK_FREQ_CLK_FREQ GetResetValue(HDMI_TX_REG_CLK_FREQ,"CLK_FREQ")
-  `define UPDATE_HDMI_TX_REG_CLK_FREQ_CLK_FREQ(x,y) UpdateField(HDMI_TX_REG_CLK_FREQ,"CLK_FREQ",x,y)
+    class CNTRL1_CLASS extends register_base;
+      field_base SS_BYPASS_F;
+      field_base CSC_BYPASS_F;
 
-  const reg_t HDMI_TX_REG_CLK_RATIO = '{ 'h0058, "REG_CLK_RATIO" , '{
-    "CLK_RATIO": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_HDMI_TX_REG_CLK_RATIO_CLK_RATIO(x) SetField(HDMI_TX_REG_CLK_RATIO,"CLK_RATIO",x)
-  `define GET_HDMI_TX_REG_CLK_RATIO_CLK_RATIO(x) GetField(HDMI_TX_REG_CLK_RATIO,"CLK_RATIO",x)
-  `define DEFAULT_HDMI_TX_REG_CLK_RATIO_CLK_RATIO GetResetValue(HDMI_TX_REG_CLK_RATIO,"CLK_RATIO")
-  `define UPDATE_HDMI_TX_REG_CLK_RATIO_CLK_RATIO(x,y) UpdateField(HDMI_TX_REG_CLK_RATIO,"CLK_RATIO",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t HDMI_TX_REG_STATUS = '{ 'h005c, "REG_STATUS" , '{
-    "STATUS": '{ 0, 0, RO, 'h0 }}};
-  `define SET_HDMI_TX_REG_STATUS_STATUS(x) SetField(HDMI_TX_REG_STATUS,"STATUS",x)
-  `define GET_HDMI_TX_REG_STATUS_STATUS(x) GetField(HDMI_TX_REG_STATUS,"STATUS",x)
-  `define DEFAULT_HDMI_TX_REG_STATUS_STATUS GetResetValue(HDMI_TX_REG_STATUS,"STATUS")
-  `define UPDATE_HDMI_TX_REG_STATUS_STATUS(x,y) UpdateField(HDMI_TX_REG_STATUS,"STATUS",x,y)
+        super.new(name, address, parent);
 
-  const reg_t HDMI_TX_REG_VDMA_STATUS = '{ 'h0060, "REG_VDMA_STATUS" , '{
-    "VDMA_OVF": '{ 1, 1, RW1C, 'h0 },
-    "VDMA_UNF": '{ 0, 0, RW1C, 'h0 }}};
-  `define SET_HDMI_TX_REG_VDMA_STATUS_VDMA_OVF(x) SetField(HDMI_TX_REG_VDMA_STATUS,"VDMA_OVF",x)
-  `define GET_HDMI_TX_REG_VDMA_STATUS_VDMA_OVF(x) GetField(HDMI_TX_REG_VDMA_STATUS,"VDMA_OVF",x)
-  `define DEFAULT_HDMI_TX_REG_VDMA_STATUS_VDMA_OVF GetResetValue(HDMI_TX_REG_VDMA_STATUS,"VDMA_OVF")
-  `define UPDATE_HDMI_TX_REG_VDMA_STATUS_VDMA_OVF(x,y) UpdateField(HDMI_TX_REG_VDMA_STATUS,"VDMA_OVF",x,y)
-  `define SET_HDMI_TX_REG_VDMA_STATUS_VDMA_UNF(x) SetField(HDMI_TX_REG_VDMA_STATUS,"VDMA_UNF",x)
-  `define GET_HDMI_TX_REG_VDMA_STATUS_VDMA_UNF(x) GetField(HDMI_TX_REG_VDMA_STATUS,"VDMA_UNF",x)
-  `define DEFAULT_HDMI_TX_REG_VDMA_STATUS_VDMA_UNF GetResetValue(HDMI_TX_REG_VDMA_STATUS,"VDMA_UNF")
-  `define UPDATE_HDMI_TX_REG_VDMA_STATUS_VDMA_UNF(x,y) UpdateField(HDMI_TX_REG_VDMA_STATUS,"VDMA_UNF",x,y)
+        this.SS_BYPASS_F = new("SS_BYPASS", 2, 2, RW, 'h0, this);
+        this.CSC_BYPASS_F = new("CSC_BYPASS", 0, 0, RW, 'h0, this);
 
-  const reg_t HDMI_TX_REG_TPM_STATUS = '{ 'h0064, "REG_TPM_STATUS" , '{
-    "HDMI_TPM_OOS": '{ 1, 1, RW1C, 'h0 },
-    "VDMA_TPM_OOS": '{ 0, 0, RW1C, 'h0 }}};
-  `define SET_HDMI_TX_REG_TPM_STATUS_HDMI_TPM_OOS(x) SetField(HDMI_TX_REG_TPM_STATUS,"HDMI_TPM_OOS",x)
-  `define GET_HDMI_TX_REG_TPM_STATUS_HDMI_TPM_OOS(x) GetField(HDMI_TX_REG_TPM_STATUS,"HDMI_TPM_OOS",x)
-  `define DEFAULT_HDMI_TX_REG_TPM_STATUS_HDMI_TPM_OOS GetResetValue(HDMI_TX_REG_TPM_STATUS,"HDMI_TPM_OOS")
-  `define UPDATE_HDMI_TX_REG_TPM_STATUS_HDMI_TPM_OOS(x,y) UpdateField(HDMI_TX_REG_TPM_STATUS,"HDMI_TPM_OOS",x,y)
-  `define SET_HDMI_TX_REG_TPM_STATUS_VDMA_TPM_OOS(x) SetField(HDMI_TX_REG_TPM_STATUS,"VDMA_TPM_OOS",x)
-  `define GET_HDMI_TX_REG_TPM_STATUS_VDMA_TPM_OOS(x) GetField(HDMI_TX_REG_TPM_STATUS,"VDMA_TPM_OOS",x)
-  `define DEFAULT_HDMI_TX_REG_TPM_STATUS_VDMA_TPM_OOS GetResetValue(HDMI_TX_REG_TPM_STATUS,"VDMA_TPM_OOS")
-  `define UPDATE_HDMI_TX_REG_TPM_STATUS_VDMA_TPM_OOS(x,y) UpdateField(HDMI_TX_REG_TPM_STATUS,"VDMA_TPM_OOS",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CNTRL1_CLASS
 
-  const reg_t HDMI_TX_REG_CLIPP_MAX = '{ 'h0068, "REG_CLIPP_MAX" , '{
-    "R_MAX/Cr_MAX": '{ 23, 16, RW, 'hF0 },
-    "G_MAX/Y_MAX": '{ 16, 8, RW, 'hEB },
-    "B_MAX/Cb_MAX": '{ 7, 0, RW, 'hF0 }}};
-  `define SET_HDMI_TX_REG_CLIPP_MAX_R_MAX/Cr_MAX(x) SetField(HDMI_TX_REG_CLIPP_MAX,"R_MAX/Cr_MAX",x)
-  `define GET_HDMI_TX_REG_CLIPP_MAX_R_MAX/Cr_MAX(x) GetField(HDMI_TX_REG_CLIPP_MAX,"R_MAX/Cr_MAX",x)
-  `define DEFAULT_HDMI_TX_REG_CLIPP_MAX_R_MAX/Cr_MAX GetResetValue(HDMI_TX_REG_CLIPP_MAX,"R_MAX/Cr_MAX")
-  `define UPDATE_HDMI_TX_REG_CLIPP_MAX_R_MAX/Cr_MAX(x,y) UpdateField(HDMI_TX_REG_CLIPP_MAX,"R_MAX/Cr_MAX",x,y)
-  `define SET_HDMI_TX_REG_CLIPP_MAX_G_MAX/Y_MAX(x) SetField(HDMI_TX_REG_CLIPP_MAX,"G_MAX/Y_MAX",x)
-  `define GET_HDMI_TX_REG_CLIPP_MAX_G_MAX/Y_MAX(x) GetField(HDMI_TX_REG_CLIPP_MAX,"G_MAX/Y_MAX",x)
-  `define DEFAULT_HDMI_TX_REG_CLIPP_MAX_G_MAX/Y_MAX GetResetValue(HDMI_TX_REG_CLIPP_MAX,"G_MAX/Y_MAX")
-  `define UPDATE_HDMI_TX_REG_CLIPP_MAX_G_MAX/Y_MAX(x,y) UpdateField(HDMI_TX_REG_CLIPP_MAX,"G_MAX/Y_MAX",x,y)
-  `define SET_HDMI_TX_REG_CLIPP_MAX_B_MAX/Cb_MAX(x) SetField(HDMI_TX_REG_CLIPP_MAX,"B_MAX/Cb_MAX",x)
-  `define GET_HDMI_TX_REG_CLIPP_MAX_B_MAX/Cb_MAX(x) GetField(HDMI_TX_REG_CLIPP_MAX,"B_MAX/Cb_MAX",x)
-  `define DEFAULT_HDMI_TX_REG_CLIPP_MAX_B_MAX/Cb_MAX GetResetValue(HDMI_TX_REG_CLIPP_MAX,"B_MAX/Cb_MAX")
-  `define UPDATE_HDMI_TX_REG_CLIPP_MAX_B_MAX/Cb_MAX(x,y) UpdateField(HDMI_TX_REG_CLIPP_MAX,"B_MAX/Cb_MAX",x,y)
+    class CNTRL2_CLASS extends register_base;
+      field_base SOURCE_SEL_F;
 
-  const reg_t HDMI_TX_REG_CLIPP_MIN = '{ 'h006c, "REG_CLIPP_MIN" , '{
-    "R_MIN/Cr_MIN": '{ 23, 16, RW, 'h10 },
-    "G_MIN/Y_MIN": '{ 16, 8, RW, 'h10 },
-    "B_MIN/Cb_MIN": '{ 7, 0, RW, 'h10 }}};
-  `define SET_HDMI_TX_REG_CLIPP_MIN_R_MIN/Cr_MIN(x) SetField(HDMI_TX_REG_CLIPP_MIN,"R_MIN/Cr_MIN",x)
-  `define GET_HDMI_TX_REG_CLIPP_MIN_R_MIN/Cr_MIN(x) GetField(HDMI_TX_REG_CLIPP_MIN,"R_MIN/Cr_MIN",x)
-  `define DEFAULT_HDMI_TX_REG_CLIPP_MIN_R_MIN/Cr_MIN GetResetValue(HDMI_TX_REG_CLIPP_MIN,"R_MIN/Cr_MIN")
-  `define UPDATE_HDMI_TX_REG_CLIPP_MIN_R_MIN/Cr_MIN(x,y) UpdateField(HDMI_TX_REG_CLIPP_MIN,"R_MIN/Cr_MIN",x,y)
-  `define SET_HDMI_TX_REG_CLIPP_MIN_G_MIN/Y_MIN(x) SetField(HDMI_TX_REG_CLIPP_MIN,"G_MIN/Y_MIN",x)
-  `define GET_HDMI_TX_REG_CLIPP_MIN_G_MIN/Y_MIN(x) GetField(HDMI_TX_REG_CLIPP_MIN,"G_MIN/Y_MIN",x)
-  `define DEFAULT_HDMI_TX_REG_CLIPP_MIN_G_MIN/Y_MIN GetResetValue(HDMI_TX_REG_CLIPP_MIN,"G_MIN/Y_MIN")
-  `define UPDATE_HDMI_TX_REG_CLIPP_MIN_G_MIN/Y_MIN(x,y) UpdateField(HDMI_TX_REG_CLIPP_MIN,"G_MIN/Y_MIN",x,y)
-  `define SET_HDMI_TX_REG_CLIPP_MIN_B_MIN/Cb_MIN(x) SetField(HDMI_TX_REG_CLIPP_MIN,"B_MIN/Cb_MIN",x)
-  `define GET_HDMI_TX_REG_CLIPP_MIN_B_MIN/Cb_MIN(x) GetField(HDMI_TX_REG_CLIPP_MIN,"B_MIN/Cb_MIN",x)
-  `define DEFAULT_HDMI_TX_REG_CLIPP_MIN_B_MIN/Cb_MIN GetResetValue(HDMI_TX_REG_CLIPP_MIN,"B_MIN/Cb_MIN")
-  `define UPDATE_HDMI_TX_REG_CLIPP_MIN_B_MIN/Cb_MIN(x,y) UpdateField(HDMI_TX_REG_CLIPP_MIN,"B_MIN/Cb_MIN",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t HDMI_TX_REG_HSYNC_1 = '{ 'h0400, "REG_HSYNC_1" , '{
-    "H_LINE_ACTIVE": '{ 31, 16, RW, 'h0000 },
-    "H_LINE_WIDTH": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_HDMI_TX_REG_HSYNC_1_H_LINE_ACTIVE(x) SetField(HDMI_TX_REG_HSYNC_1,"H_LINE_ACTIVE",x)
-  `define GET_HDMI_TX_REG_HSYNC_1_H_LINE_ACTIVE(x) GetField(HDMI_TX_REG_HSYNC_1,"H_LINE_ACTIVE",x)
-  `define DEFAULT_HDMI_TX_REG_HSYNC_1_H_LINE_ACTIVE GetResetValue(HDMI_TX_REG_HSYNC_1,"H_LINE_ACTIVE")
-  `define UPDATE_HDMI_TX_REG_HSYNC_1_H_LINE_ACTIVE(x,y) UpdateField(HDMI_TX_REG_HSYNC_1,"H_LINE_ACTIVE",x,y)
-  `define SET_HDMI_TX_REG_HSYNC_1_H_LINE_WIDTH(x) SetField(HDMI_TX_REG_HSYNC_1,"H_LINE_WIDTH",x)
-  `define GET_HDMI_TX_REG_HSYNC_1_H_LINE_WIDTH(x) GetField(HDMI_TX_REG_HSYNC_1,"H_LINE_WIDTH",x)
-  `define DEFAULT_HDMI_TX_REG_HSYNC_1_H_LINE_WIDTH GetResetValue(HDMI_TX_REG_HSYNC_1,"H_LINE_WIDTH")
-  `define UPDATE_HDMI_TX_REG_HSYNC_1_H_LINE_WIDTH(x,y) UpdateField(HDMI_TX_REG_HSYNC_1,"H_LINE_WIDTH",x,y)
+        super.new(name, address, parent);
 
-  const reg_t HDMI_TX_REG_HSYNC_2 = '{ 'h0404, "REG_HSYNC_2" , '{
-    "H_SYNC_WIDTH": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_HDMI_TX_REG_HSYNC_2_H_SYNC_WIDTH(x) SetField(HDMI_TX_REG_HSYNC_2,"H_SYNC_WIDTH",x)
-  `define GET_HDMI_TX_REG_HSYNC_2_H_SYNC_WIDTH(x) GetField(HDMI_TX_REG_HSYNC_2,"H_SYNC_WIDTH",x)
-  `define DEFAULT_HDMI_TX_REG_HSYNC_2_H_SYNC_WIDTH GetResetValue(HDMI_TX_REG_HSYNC_2,"H_SYNC_WIDTH")
-  `define UPDATE_HDMI_TX_REG_HSYNC_2_H_SYNC_WIDTH(x,y) UpdateField(HDMI_TX_REG_HSYNC_2,"H_SYNC_WIDTH",x,y)
+        this.SOURCE_SEL_F = new("SOURCE_SEL", 1, 0, RW, 'h0, this);
 
-  const reg_t HDMI_TX_REG_HSYNC_3 = '{ 'h0408, "REG_HSYNC_3" , '{
-    "H_ENABLE_MAX": '{ 31, 16, RW, 'h0000 },
-    "H_ENABLE_MIN": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_HDMI_TX_REG_HSYNC_3_H_ENABLE_MAX(x) SetField(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MAX",x)
-  `define GET_HDMI_TX_REG_HSYNC_3_H_ENABLE_MAX(x) GetField(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MAX",x)
-  `define DEFAULT_HDMI_TX_REG_HSYNC_3_H_ENABLE_MAX GetResetValue(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MAX")
-  `define UPDATE_HDMI_TX_REG_HSYNC_3_H_ENABLE_MAX(x,y) UpdateField(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MAX",x,y)
-  `define SET_HDMI_TX_REG_HSYNC_3_H_ENABLE_MIN(x) SetField(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MIN",x)
-  `define GET_HDMI_TX_REG_HSYNC_3_H_ENABLE_MIN(x) GetField(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MIN",x)
-  `define DEFAULT_HDMI_TX_REG_HSYNC_3_H_ENABLE_MIN GetResetValue(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MIN")
-  `define UPDATE_HDMI_TX_REG_HSYNC_3_H_ENABLE_MIN(x,y) UpdateField(HDMI_TX_REG_HSYNC_3,"H_ENABLE_MIN",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CNTRL2_CLASS
 
-  const reg_t HDMI_TX_REG_VSYNC_1 = '{ 'h0440, "REG_VSYNC_1" , '{
-    "V_FRAME_ACTIVE": '{ 31, 16, RW, 'h0000 },
-    "V_FRAME_WIDTH": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_HDMI_TX_REG_VSYNC_1_V_FRAME_ACTIVE(x) SetField(HDMI_TX_REG_VSYNC_1,"V_FRAME_ACTIVE",x)
-  `define GET_HDMI_TX_REG_VSYNC_1_V_FRAME_ACTIVE(x) GetField(HDMI_TX_REG_VSYNC_1,"V_FRAME_ACTIVE",x)
-  `define DEFAULT_HDMI_TX_REG_VSYNC_1_V_FRAME_ACTIVE GetResetValue(HDMI_TX_REG_VSYNC_1,"V_FRAME_ACTIVE")
-  `define UPDATE_HDMI_TX_REG_VSYNC_1_V_FRAME_ACTIVE(x,y) UpdateField(HDMI_TX_REG_VSYNC_1,"V_FRAME_ACTIVE",x,y)
-  `define SET_HDMI_TX_REG_VSYNC_1_V_FRAME_WIDTH(x) SetField(HDMI_TX_REG_VSYNC_1,"V_FRAME_WIDTH",x)
-  `define GET_HDMI_TX_REG_VSYNC_1_V_FRAME_WIDTH(x) GetField(HDMI_TX_REG_VSYNC_1,"V_FRAME_WIDTH",x)
-  `define DEFAULT_HDMI_TX_REG_VSYNC_1_V_FRAME_WIDTH GetResetValue(HDMI_TX_REG_VSYNC_1,"V_FRAME_WIDTH")
-  `define UPDATE_HDMI_TX_REG_VSYNC_1_V_FRAME_WIDTH(x,y) UpdateField(HDMI_TX_REG_VSYNC_1,"V_FRAME_WIDTH",x,y)
+    class CNTRL3_CLASS extends register_base;
+      field_base CONST_RGB_F;
 
-  const reg_t HDMI_TX_REG_VSYNC_2 = '{ 'h0444, "REG_VSYNC_2" , '{
-    "V_SYNC_WIDTH": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_HDMI_TX_REG_VSYNC_2_V_SYNC_WIDTH(x) SetField(HDMI_TX_REG_VSYNC_2,"V_SYNC_WIDTH",x)
-  `define GET_HDMI_TX_REG_VSYNC_2_V_SYNC_WIDTH(x) GetField(HDMI_TX_REG_VSYNC_2,"V_SYNC_WIDTH",x)
-  `define DEFAULT_HDMI_TX_REG_VSYNC_2_V_SYNC_WIDTH GetResetValue(HDMI_TX_REG_VSYNC_2,"V_SYNC_WIDTH")
-  `define UPDATE_HDMI_TX_REG_VSYNC_2_V_SYNC_WIDTH(x,y) UpdateField(HDMI_TX_REG_VSYNC_2,"V_SYNC_WIDTH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t HDMI_TX_REG_VSYNC_3 = '{ 'h0448, "REG_VSYNC_3" , '{
-    "V_ENABLE_MAX": '{ 31, 16, RW, 'h0000 },
-    "V_ENABLE_MIN": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_HDMI_TX_REG_VSYNC_3_V_ENABLE_MAX(x) SetField(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MAX",x)
-  `define GET_HDMI_TX_REG_VSYNC_3_V_ENABLE_MAX(x) GetField(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MAX",x)
-  `define DEFAULT_HDMI_TX_REG_VSYNC_3_V_ENABLE_MAX GetResetValue(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MAX")
-  `define UPDATE_HDMI_TX_REG_VSYNC_3_V_ENABLE_MAX(x,y) UpdateField(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MAX",x,y)
-  `define SET_HDMI_TX_REG_VSYNC_3_V_ENABLE_MIN(x) SetField(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MIN",x)
-  `define GET_HDMI_TX_REG_VSYNC_3_V_ENABLE_MIN(x) GetField(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MIN",x)
-  `define DEFAULT_HDMI_TX_REG_VSYNC_3_V_ENABLE_MIN GetResetValue(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MIN")
-  `define UPDATE_HDMI_TX_REG_VSYNC_3_V_ENABLE_MIN(x,y) UpdateField(HDMI_TX_REG_VSYNC_3,"V_ENABLE_MIN",x,y)
+        super.new(name, address, parent);
 
+        this.CONST_RGB_F = new("CONST_RGB", 23, 0, RW, 'h0, this);
 
-/* HDMI Receive (axi_hdmi_rx) */
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CNTRL3_CLASS
 
-  const reg_t hdmi_rx_REG_RSTN = '{ 'h0040, "REG_RSTN" , '{
-    "RSTN": '{ 0, 0, RW, 'h0 }}};
-  `define SET_hdmi_rx_REG_RSTN_RSTN(x) SetField(hdmi_rx_REG_RSTN,"RSTN",x)
-  `define GET_hdmi_rx_REG_RSTN_RSTN(x) GetField(hdmi_rx_REG_RSTN,"RSTN",x)
-  `define DEFAULT_hdmi_rx_REG_RSTN_RSTN GetResetValue(hdmi_rx_REG_RSTN,"RSTN")
-  `define UPDATE_hdmi_rx_REG_RSTN_RSTN(x,y) UpdateField(hdmi_rx_REG_RSTN,"RSTN",x,y)
+    class CLK_FREQ_TX_CLASS extends register_base;
+      field_base CLK_FREQ_F;
 
-  const reg_t hdmi_rx_REG_CNTRL = '{ 'h0044, "REG_CNTRL" , '{
-    "EDGE_SEL": '{ 3, 3, RW, 'h0 },
-    "BGR": '{ 2, 2, RW, 'h0 },
-    "PACKED": '{ 1, 1, RW, 'h0 },
-    "CSC_BYPASS": '{ 0, 0, RW, 'h0 }}};
-  `define SET_hdmi_rx_REG_CNTRL_EDGE_SEL(x) SetField(hdmi_rx_REG_CNTRL,"EDGE_SEL",x)
-  `define GET_hdmi_rx_REG_CNTRL_EDGE_SEL(x) GetField(hdmi_rx_REG_CNTRL,"EDGE_SEL",x)
-  `define DEFAULT_hdmi_rx_REG_CNTRL_EDGE_SEL GetResetValue(hdmi_rx_REG_CNTRL,"EDGE_SEL")
-  `define UPDATE_hdmi_rx_REG_CNTRL_EDGE_SEL(x,y) UpdateField(hdmi_rx_REG_CNTRL,"EDGE_SEL",x,y)
-  `define SET_hdmi_rx_REG_CNTRL_BGR(x) SetField(hdmi_rx_REG_CNTRL,"BGR",x)
-  `define GET_hdmi_rx_REG_CNTRL_BGR(x) GetField(hdmi_rx_REG_CNTRL,"BGR",x)
-  `define DEFAULT_hdmi_rx_REG_CNTRL_BGR GetResetValue(hdmi_rx_REG_CNTRL,"BGR")
-  `define UPDATE_hdmi_rx_REG_CNTRL_BGR(x,y) UpdateField(hdmi_rx_REG_CNTRL,"BGR",x,y)
-  `define SET_hdmi_rx_REG_CNTRL_PACKED(x) SetField(hdmi_rx_REG_CNTRL,"PACKED",x)
-  `define GET_hdmi_rx_REG_CNTRL_PACKED(x) GetField(hdmi_rx_REG_CNTRL,"PACKED",x)
-  `define DEFAULT_hdmi_rx_REG_CNTRL_PACKED GetResetValue(hdmi_rx_REG_CNTRL,"PACKED")
-  `define UPDATE_hdmi_rx_REG_CNTRL_PACKED(x,y) UpdateField(hdmi_rx_REG_CNTRL,"PACKED",x,y)
-  `define SET_hdmi_rx_REG_CNTRL_CSC_BYPASS(x) SetField(hdmi_rx_REG_CNTRL,"CSC_BYPASS",x)
-  `define GET_hdmi_rx_REG_CNTRL_CSC_BYPASS(x) GetField(hdmi_rx_REG_CNTRL,"CSC_BYPASS",x)
-  `define DEFAULT_hdmi_rx_REG_CNTRL_CSC_BYPASS GetResetValue(hdmi_rx_REG_CNTRL,"CSC_BYPASS")
-  `define UPDATE_hdmi_rx_REG_CNTRL_CSC_BYPASS(x,y) UpdateField(hdmi_rx_REG_CNTRL,"CSC_BYPASS",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t hdmi_rx_REG_CLK_FREQ = '{ 'h0054, "REG_CLK_FREQ" , '{
-    "CLK_FREQ": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_hdmi_rx_REG_CLK_FREQ_CLK_FREQ(x) SetField(hdmi_rx_REG_CLK_FREQ,"CLK_FREQ",x)
-  `define GET_hdmi_rx_REG_CLK_FREQ_CLK_FREQ(x) GetField(hdmi_rx_REG_CLK_FREQ,"CLK_FREQ",x)
-  `define DEFAULT_hdmi_rx_REG_CLK_FREQ_CLK_FREQ GetResetValue(hdmi_rx_REG_CLK_FREQ,"CLK_FREQ")
-  `define UPDATE_hdmi_rx_REG_CLK_FREQ_CLK_FREQ(x,y) UpdateField(hdmi_rx_REG_CLK_FREQ,"CLK_FREQ",x,y)
+        super.new(name, address, parent);
 
-  const reg_t hdmi_rx_REG_CLK_RATIO = '{ 'h0058, "REG_CLK_RATIO" , '{
-    "CLK_RATIO": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_hdmi_rx_REG_CLK_RATIO_CLK_RATIO(x) SetField(hdmi_rx_REG_CLK_RATIO,"CLK_RATIO",x)
-  `define GET_hdmi_rx_REG_CLK_RATIO_CLK_RATIO(x) GetField(hdmi_rx_REG_CLK_RATIO,"CLK_RATIO",x)
-  `define DEFAULT_hdmi_rx_REG_CLK_RATIO_CLK_RATIO GetResetValue(hdmi_rx_REG_CLK_RATIO,"CLK_RATIO")
-  `define UPDATE_hdmi_rx_REG_CLK_RATIO_CLK_RATIO(x,y) UpdateField(hdmi_rx_REG_CLK_RATIO,"CLK_RATIO",x,y)
+        this.CLK_FREQ_F = new("CLK_FREQ", 31, 0, RO, 'h0, this);
 
-  const reg_t hdmi_rx_REG_VDMA_STATUS = '{ 'h0060, "REG_VDMA_STATUS" , '{
-    "VDMA_OVF": '{ 1, 1, RW1C, 'h0 },
-    "VDMA_UNF": '{ 0, 0, RW1C, 'h0 }}};
-  `define SET_hdmi_rx_REG_VDMA_STATUS_VDMA_OVF(x) SetField(hdmi_rx_REG_VDMA_STATUS,"VDMA_OVF",x)
-  `define GET_hdmi_rx_REG_VDMA_STATUS_VDMA_OVF(x) GetField(hdmi_rx_REG_VDMA_STATUS,"VDMA_OVF",x)
-  `define DEFAULT_hdmi_rx_REG_VDMA_STATUS_VDMA_OVF GetResetValue(hdmi_rx_REG_VDMA_STATUS,"VDMA_OVF")
-  `define UPDATE_hdmi_rx_REG_VDMA_STATUS_VDMA_OVF(x,y) UpdateField(hdmi_rx_REG_VDMA_STATUS,"VDMA_OVF",x,y)
-  `define SET_hdmi_rx_REG_VDMA_STATUS_VDMA_UNF(x) SetField(hdmi_rx_REG_VDMA_STATUS,"VDMA_UNF",x)
-  `define GET_hdmi_rx_REG_VDMA_STATUS_VDMA_UNF(x) GetField(hdmi_rx_REG_VDMA_STATUS,"VDMA_UNF",x)
-  `define DEFAULT_hdmi_rx_REG_VDMA_STATUS_VDMA_UNF GetResetValue(hdmi_rx_REG_VDMA_STATUS,"VDMA_UNF")
-  `define UPDATE_hdmi_rx_REG_VDMA_STATUS_VDMA_UNF(x,y) UpdateField(hdmi_rx_REG_VDMA_STATUS,"VDMA_UNF",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CLK_FREQ_TX_CLASS
 
-  const reg_t hdmi_rx_REG_TPM_STATUS1 = '{ 'h0064, "REG_TPM_STATUS1" , '{
-    "HDMI_TPM_OOS": '{ 1, 1, RW1C, 'h0 }}};
-  `define SET_hdmi_rx_REG_TPM_STATUS1_HDMI_TPM_OOS(x) SetField(hdmi_rx_REG_TPM_STATUS1,"HDMI_TPM_OOS",x)
-  `define GET_hdmi_rx_REG_TPM_STATUS1_HDMI_TPM_OOS(x) GetField(hdmi_rx_REG_TPM_STATUS1,"HDMI_TPM_OOS",x)
-  `define DEFAULT_hdmi_rx_REG_TPM_STATUS1_HDMI_TPM_OOS GetResetValue(hdmi_rx_REG_TPM_STATUS1,"HDMI_TPM_OOS")
-  `define UPDATE_hdmi_rx_REG_TPM_STATUS1_HDMI_TPM_OOS(x,y) UpdateField(hdmi_rx_REG_TPM_STATUS1,"HDMI_TPM_OOS",x,y)
+    class CLK_RATIO_TX_CLASS extends register_base;
+      field_base CLK_RATIO_F;
 
-  const reg_t hdmi_rx_REG_TPM_STATUS2 = '{ 'h0080, "REG_TPM_STATUS2" , '{
-    "VS_OOS": '{ 3, 3, RW1C, 'h0 },
-    "HS_OOS": '{ 2, 2, RW1C, 'h0 },
-    "VS_MISMATCH": '{ 1, 1, RW1C, 'h0 },
-    "HS_MISMATCH": '{ 0, 0, RW1C, 'h0 }}};
-  `define SET_hdmi_rx_REG_TPM_STATUS2_VS_OOS(x) SetField(hdmi_rx_REG_TPM_STATUS2,"VS_OOS",x)
-  `define GET_hdmi_rx_REG_TPM_STATUS2_VS_OOS(x) GetField(hdmi_rx_REG_TPM_STATUS2,"VS_OOS",x)
-  `define DEFAULT_hdmi_rx_REG_TPM_STATUS2_VS_OOS GetResetValue(hdmi_rx_REG_TPM_STATUS2,"VS_OOS")
-  `define UPDATE_hdmi_rx_REG_TPM_STATUS2_VS_OOS(x,y) UpdateField(hdmi_rx_REG_TPM_STATUS2,"VS_OOS",x,y)
-  `define SET_hdmi_rx_REG_TPM_STATUS2_HS_OOS(x) SetField(hdmi_rx_REG_TPM_STATUS2,"HS_OOS",x)
-  `define GET_hdmi_rx_REG_TPM_STATUS2_HS_OOS(x) GetField(hdmi_rx_REG_TPM_STATUS2,"HS_OOS",x)
-  `define DEFAULT_hdmi_rx_REG_TPM_STATUS2_HS_OOS GetResetValue(hdmi_rx_REG_TPM_STATUS2,"HS_OOS")
-  `define UPDATE_hdmi_rx_REG_TPM_STATUS2_HS_OOS(x,y) UpdateField(hdmi_rx_REG_TPM_STATUS2,"HS_OOS",x,y)
-  `define SET_hdmi_rx_REG_TPM_STATUS2_VS_MISMATCH(x) SetField(hdmi_rx_REG_TPM_STATUS2,"VS_MISMATCH",x)
-  `define GET_hdmi_rx_REG_TPM_STATUS2_VS_MISMATCH(x) GetField(hdmi_rx_REG_TPM_STATUS2,"VS_MISMATCH",x)
-  `define DEFAULT_hdmi_rx_REG_TPM_STATUS2_VS_MISMATCH GetResetValue(hdmi_rx_REG_TPM_STATUS2,"VS_MISMATCH")
-  `define UPDATE_hdmi_rx_REG_TPM_STATUS2_VS_MISMATCH(x,y) UpdateField(hdmi_rx_REG_TPM_STATUS2,"VS_MISMATCH",x,y)
-  `define SET_hdmi_rx_REG_TPM_STATUS2_HS_MISMATCH(x) SetField(hdmi_rx_REG_TPM_STATUS2,"HS_MISMATCH",x)
-  `define GET_hdmi_rx_REG_TPM_STATUS2_HS_MISMATCH(x) GetField(hdmi_rx_REG_TPM_STATUS2,"HS_MISMATCH",x)
-  `define DEFAULT_hdmi_rx_REG_TPM_STATUS2_HS_MISMATCH GetResetValue(hdmi_rx_REG_TPM_STATUS2,"HS_MISMATCH")
-  `define UPDATE_hdmi_rx_REG_TPM_STATUS2_HS_MISMATCH(x,y) UpdateField(hdmi_rx_REG_TPM_STATUS2,"HS_MISMATCH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t hdmi_rx_REG_HVCOUNTS1 = '{ 'h0400, "REG_HVCOUNTS1" , '{
-    "VS_COUNT": '{ 31, 16, RW, 'h0000 },
-    "HS_COUNT": '{ 15, 0, RW, 'h0000 }}};
-  `define SET_hdmi_rx_REG_HVCOUNTS1_VS_COUNT(x) SetField(hdmi_rx_REG_HVCOUNTS1,"VS_COUNT",x)
-  `define GET_hdmi_rx_REG_HVCOUNTS1_VS_COUNT(x) GetField(hdmi_rx_REG_HVCOUNTS1,"VS_COUNT",x)
-  `define DEFAULT_hdmi_rx_REG_HVCOUNTS1_VS_COUNT GetResetValue(hdmi_rx_REG_HVCOUNTS1,"VS_COUNT")
-  `define UPDATE_hdmi_rx_REG_HVCOUNTS1_VS_COUNT(x,y) UpdateField(hdmi_rx_REG_HVCOUNTS1,"VS_COUNT",x,y)
-  `define SET_hdmi_rx_REG_HVCOUNTS1_HS_COUNT(x) SetField(hdmi_rx_REG_HVCOUNTS1,"HS_COUNT",x)
-  `define GET_hdmi_rx_REG_HVCOUNTS1_HS_COUNT(x) GetField(hdmi_rx_REG_HVCOUNTS1,"HS_COUNT",x)
-  `define DEFAULT_hdmi_rx_REG_HVCOUNTS1_HS_COUNT GetResetValue(hdmi_rx_REG_HVCOUNTS1,"HS_COUNT")
-  `define UPDATE_hdmi_rx_REG_HVCOUNTS1_HS_COUNT(x,y) UpdateField(hdmi_rx_REG_HVCOUNTS1,"HS_COUNT",x,y)
+        super.new(name, address, parent);
 
-  const reg_t hdmi_rx_REG_HVCOUNTS2 = '{ 'h0404, "REG_HVCOUNTS2" , '{
-    "VS_COUNT": '{ 31, 16, RO, 'h0000 },
-    "HS_COUNT": '{ 15, 0, RO, 'h0000 }}};
-  `define SET_hdmi_rx_REG_HVCOUNTS2_VS_COUNT(x) SetField(hdmi_rx_REG_HVCOUNTS2,"VS_COUNT",x)
-  `define GET_hdmi_rx_REG_HVCOUNTS2_VS_COUNT(x) GetField(hdmi_rx_REG_HVCOUNTS2,"VS_COUNT",x)
-  `define DEFAULT_hdmi_rx_REG_HVCOUNTS2_VS_COUNT GetResetValue(hdmi_rx_REG_HVCOUNTS2,"VS_COUNT")
-  `define UPDATE_hdmi_rx_REG_HVCOUNTS2_VS_COUNT(x,y) UpdateField(hdmi_rx_REG_HVCOUNTS2,"VS_COUNT",x,y)
-  `define SET_hdmi_rx_REG_HVCOUNTS2_HS_COUNT(x) SetField(hdmi_rx_REG_HVCOUNTS2,"HS_COUNT",x)
-  `define GET_hdmi_rx_REG_HVCOUNTS2_HS_COUNT(x) GetField(hdmi_rx_REG_HVCOUNTS2,"HS_COUNT",x)
-  `define DEFAULT_hdmi_rx_REG_HVCOUNTS2_HS_COUNT GetResetValue(hdmi_rx_REG_HVCOUNTS2,"HS_COUNT")
-  `define UPDATE_hdmi_rx_REG_HVCOUNTS2_HS_COUNT(x,y) UpdateField(hdmi_rx_REG_HVCOUNTS2,"HS_COUNT",x,y)
+        this.CLK_RATIO_F = new("CLK_RATIO", 31, 0, RO, 'h0, this);
 
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CLK_RATIO_TX_CLASS
 
-endpackage
+    class STATUS_CLASS extends register_base;
+      field_base STATUS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.STATUS_F = new("STATUS", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: STATUS_CLASS
+
+    class VDMA_STATUS_TX_CLASS extends register_base;
+      field_base VDMA_OVF_F;
+      field_base VDMA_UNF_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.VDMA_OVF_F = new("VDMA_OVF", 1, 1, RW1C, 'h0, this);
+        this.VDMA_UNF_F = new("VDMA_UNF", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VDMA_STATUS_TX_CLASS
+
+    class TPM_STATUS_CLASS extends register_base;
+      field_base HDMI_TPM_OOS_F;
+      field_base VDMA_TPM_OOS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.HDMI_TPM_OOS_F = new("HDMI_TPM_OOS", 1, 1, RW1C, 'h0, this);
+        this.VDMA_TPM_OOS_F = new("VDMA_TPM_OOS", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TPM_STATUS_CLASS
+
+    class CLIPP_MAX_CLASS extends register_base;
+      field_base R_MAXorCR_MAX_F;
+      field_base G_MAXorY_MAX_F;
+      field_base B_MAXorCB_MAX_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.R_MAXorCR_MAX_F = new("R_MAXorCR_MAX", 23, 16, RW, 'hf0, this);
+        this.G_MAXorY_MAX_F = new("G_MAXorY_MAX", 16, 8, RW, 'heb, this);
+        this.B_MAXorCB_MAX_F = new("B_MAXorCB_MAX", 7, 0, RW, 'hf0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CLIPP_MAX_CLASS
+
+    class CLIPP_MIN_CLASS extends register_base;
+      field_base R_MINorCR_MIN_F;
+      field_base G_MINorY_MIN_F;
+      field_base B_MINorCB_MIN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.R_MINorCR_MIN_F = new("R_MINorCR_MIN", 23, 16, RW, 'h10, this);
+        this.G_MINorY_MIN_F = new("G_MINorY_MIN", 16, 8, RW, 'h10, this);
+        this.B_MINorCB_MIN_F = new("B_MINorCB_MIN", 7, 0, RW, 'h10, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CLIPP_MIN_CLASS
+
+    class HSYNC_1_CLASS extends register_base;
+      field_base H_LINE_ACTIVE_F;
+      field_base H_LINE_WIDTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.H_LINE_ACTIVE_F = new("H_LINE_ACTIVE", 31, 16, RW, 'h0, this);
+        this.H_LINE_WIDTH_F = new("H_LINE_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: HSYNC_1_CLASS
+
+    class HSYNC_2_CLASS extends register_base;
+      field_base H_SYNC_WIDTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.H_SYNC_WIDTH_F = new("H_SYNC_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: HSYNC_2_CLASS
+
+    class HSYNC_3_CLASS extends register_base;
+      field_base H_ENABLE_MAX_F;
+      field_base H_ENABLE_MIN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.H_ENABLE_MAX_F = new("H_ENABLE_MAX", 31, 16, RW, 'h0, this);
+        this.H_ENABLE_MIN_F = new("H_ENABLE_MIN", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: HSYNC_3_CLASS
+
+    class VSYNC_1_CLASS extends register_base;
+      field_base V_FRAME_ACTIVE_F;
+      field_base V_FRAME_WIDTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.V_FRAME_ACTIVE_F = new("V_FRAME_ACTIVE", 31, 16, RW, 'h0, this);
+        this.V_FRAME_WIDTH_F = new("V_FRAME_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VSYNC_1_CLASS
+
+    class VSYNC_2_CLASS extends register_base;
+      field_base V_SYNC_WIDTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.V_SYNC_WIDTH_F = new("V_SYNC_WIDTH", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VSYNC_2_CLASS
+
+    class VSYNC_3_CLASS extends register_base;
+      field_base V_ENABLE_MAX_F;
+      field_base V_ENABLE_MIN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.V_ENABLE_MAX_F = new("V_ENABLE_MAX", 31, 16, RW, 'h0, this);
+        this.V_ENABLE_MIN_F = new("V_ENABLE_MIN", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VSYNC_3_CLASS
+
+    /* HDMI Receive (axi_hdmi_rx) */
+    class RSTN_RX_CLASS extends register_base;
+      field_base RSTN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: RSTN_RX_CLASS
+
+    class CNTRL_CLASS extends register_base;
+      field_base EDGE_SEL_F;
+      field_base BGR_F;
+      field_base PACKED_F;
+      field_base CSC_BYPASS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.EDGE_SEL_F = new("EDGE_SEL", 3, 3, RW, 'h0, this);
+        this.BGR_F = new("BGR", 2, 2, RW, 'h0, this);
+        this.PACKED_F = new("PACKED", 1, 1, RW, 'h0, this);
+        this.CSC_BYPASS_F = new("CSC_BYPASS", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CNTRL_CLASS
+
+    class CLK_FREQ_RX_CLASS extends register_base;
+      field_base CLK_FREQ_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CLK_FREQ_F = new("CLK_FREQ", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CLK_FREQ_RX_CLASS
+
+    class CLK_RATIO_RX_CLASS extends register_base;
+      field_base CLK_RATIO_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CLK_RATIO_F = new("CLK_RATIO", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CLK_RATIO_RX_CLASS
+
+    class VDMA_STATUS_RX_CLASS extends register_base;
+      field_base VDMA_OVF_F;
+      field_base VDMA_UNF_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.VDMA_OVF_F = new("VDMA_OVF", 1, 1, RW1C, 'h0, this);
+        this.VDMA_UNF_F = new("VDMA_UNF", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VDMA_STATUS_RX_CLASS
+
+    class TPM_STATUS1_CLASS extends register_base;
+      field_base HDMI_TPM_OOS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.HDMI_TPM_OOS_F = new("HDMI_TPM_OOS", 1, 1, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TPM_STATUS1_CLASS
+
+    class TPM_STATUS2_CLASS extends register_base;
+      field_base VS_OOS_F;
+      field_base HS_OOS_F;
+      field_base VS_MISMATCH_F;
+      field_base HS_MISMATCH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.VS_OOS_F = new("VS_OOS", 3, 3, RW1C, 'h0, this);
+        this.HS_OOS_F = new("HS_OOS", 2, 2, RW1C, 'h0, this);
+        this.VS_MISMATCH_F = new("VS_MISMATCH", 1, 1, RW1C, 'h0, this);
+        this.HS_MISMATCH_F = new("HS_MISMATCH", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TPM_STATUS2_CLASS
+
+    class HVCOUNTS1_CLASS extends register_base;
+      field_base VS_COUNT_F;
+      field_base HS_COUNT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.VS_COUNT_F = new("VS_COUNT", 31, 16, RW, 'h0, this);
+        this.HS_COUNT_F = new("HS_COUNT", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: HVCOUNTS1_CLASS
+
+    class HVCOUNTS2_CLASS extends register_base;
+      field_base VS_COUNT_F;
+      field_base HS_COUNT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.VS_COUNT_F = new("VS_COUNT", 31, 16, RO, 'h0, this);
+        this.HS_COUNT_F = new("HS_COUNT", 15, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: HVCOUNTS2_CLASS
+
+    RSTN_TX_CLASS RSTN_TX_R;
+    CNTRL1_CLASS CNTRL1_R;
+    CNTRL2_CLASS CNTRL2_R;
+    CNTRL3_CLASS CNTRL3_R;
+    CLK_FREQ_TX_CLASS CLK_FREQ_TX_R;
+    CLK_RATIO_TX_CLASS CLK_RATIO_TX_R;
+    STATUS_CLASS STATUS_R;
+    VDMA_STATUS_TX_CLASS VDMA_STATUS_TX_R;
+    TPM_STATUS_CLASS TPM_STATUS_R;
+    CLIPP_MAX_CLASS CLIPP_MAX_R;
+    CLIPP_MIN_CLASS CLIPP_MIN_R;
+    HSYNC_1_CLASS HSYNC_1_R;
+    HSYNC_2_CLASS HSYNC_2_R;
+    HSYNC_3_CLASS HSYNC_3_R;
+    VSYNC_1_CLASS VSYNC_1_R;
+    VSYNC_2_CLASS VSYNC_2_R;
+    VSYNC_3_CLASS VSYNC_3_R;
+    RSTN_RX_CLASS RSTN_RX_R;
+    CNTRL_CLASS CNTRL_R;
+    CLK_FREQ_RX_CLASS CLK_FREQ_RX_R;
+    CLK_RATIO_RX_CLASS CLK_RATIO_RX_R;
+    VDMA_STATUS_RX_CLASS VDMA_STATUS_RX_R;
+    TPM_STATUS1_CLASS TPM_STATUS1_R;
+    TPM_STATUS2_CLASS TPM_STATUS2_R;
+    HVCOUNTS1_CLASS HVCOUNTS1_R;
+    HVCOUNTS2_CLASS HVCOUNTS2_R;
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.RSTN_TX_R = new("RSTN_TX", 'h40, this);
+      this.CNTRL1_R = new("CNTRL1", 'h44, this);
+      this.CNTRL2_R = new("CNTRL2", 'h48, this);
+      this.CNTRL3_R = new("CNTRL3", 'h4c, this);
+      this.CLK_FREQ_TX_R = new("CLK_FREQ_TX", 'h54, this);
+      this.CLK_RATIO_TX_R = new("CLK_RATIO_TX", 'h58, this);
+      this.STATUS_R = new("STATUS", 'h5c, this);
+      this.VDMA_STATUS_TX_R = new("VDMA_STATUS_TX", 'h60, this);
+      this.TPM_STATUS_R = new("TPM_STATUS", 'h64, this);
+      this.CLIPP_MAX_R = new("CLIPP_MAX", 'h68, this);
+      this.CLIPP_MIN_R = new("CLIPP_MIN", 'h6c, this);
+      this.HSYNC_1_R = new("HSYNC_1", 'h400, this);
+      this.HSYNC_2_R = new("HSYNC_2", 'h404, this);
+      this.HSYNC_3_R = new("HSYNC_3", 'h408, this);
+      this.VSYNC_1_R = new("VSYNC_1", 'h440, this);
+      this.VSYNC_2_R = new("VSYNC_2", 'h444, this);
+      this.VSYNC_3_R = new("VSYNC_3", 'h448, this);
+      this.RSTN_RX_R = new("RSTN_RX", 'h40, this);
+      this.CNTRL_R = new("CNTRL", 'h44, this);
+      this.CLK_FREQ_RX_R = new("CLK_FREQ_RX", 'h54, this);
+      this.CLK_RATIO_RX_R = new("CLK_RATIO_RX", 'h58, this);
+      this.VDMA_STATUS_RX_R = new("VDMA_STATUS_RX", 'h60, this);
+      this.TPM_STATUS1_R = new("TPM_STATUS1", 'h64, this);
+      this.TPM_STATUS2_R = new("TPM_STATUS2", 'h80, this);
+      this.HVCOUNTS1_R = new("HVCOUNTS1", 'h400, this);
+      this.HVCOUNTS2_R = new("HVCOUNTS2", 'h404, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_hdmi
+
+endpackage: adi_regmap_hdmi_pkg

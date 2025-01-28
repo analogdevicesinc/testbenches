@@ -33,349 +33,573 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Sat Apr 20 14:16:29 2024 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
 package adi_regmap_i3c_controller_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_i3c_controller extends adi_regmap;
 
-/* I3C Controller (i3c_controller_host_interface) */
+    /* I3C Controller (i3c_controller_host_interface) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_MAJOR_F;
+      field_base VERSION_MINOR_F;
+      field_base VERSION_PATCH_F;
 
-  const reg_t i3c_controller_host_interface_VERSION = '{ 'h0000, "VERSION" , '{
-    "VERSION_MAJOR": '{ 31, 16, RO, 'h00 },
-    "VERSION_MINOR": '{ 15, 8, RO, 'h01 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h00 }}};
-  `define SET_i3c_controller_host_interface_VERSION_VERSION_MAJOR(x) SetField(i3c_controller_host_interface_VERSION,"VERSION_MAJOR",x)
-  `define GET_i3c_controller_host_interface_VERSION_VERSION_MAJOR(x) GetField(i3c_controller_host_interface_VERSION,"VERSION_MAJOR",x)
-  `define DEFAULT_i3c_controller_host_interface_VERSION_VERSION_MAJOR GetResetValue(i3c_controller_host_interface_VERSION,"VERSION_MAJOR")
-  `define UPDATE_i3c_controller_host_interface_VERSION_VERSION_MAJOR(x,y) UpdateField(i3c_controller_host_interface_VERSION,"VERSION_MAJOR",x,y)
-  `define SET_i3c_controller_host_interface_VERSION_VERSION_MINOR(x) SetField(i3c_controller_host_interface_VERSION,"VERSION_MINOR",x)
-  `define GET_i3c_controller_host_interface_VERSION_VERSION_MINOR(x) GetField(i3c_controller_host_interface_VERSION,"VERSION_MINOR",x)
-  `define DEFAULT_i3c_controller_host_interface_VERSION_VERSION_MINOR GetResetValue(i3c_controller_host_interface_VERSION,"VERSION_MINOR")
-  `define UPDATE_i3c_controller_host_interface_VERSION_VERSION_MINOR(x,y) UpdateField(i3c_controller_host_interface_VERSION,"VERSION_MINOR",x,y)
-  `define SET_i3c_controller_host_interface_VERSION_VERSION_PATCH(x) SetField(i3c_controller_host_interface_VERSION,"VERSION_PATCH",x)
-  `define GET_i3c_controller_host_interface_VERSION_VERSION_PATCH(x) GetField(i3c_controller_host_interface_VERSION,"VERSION_PATCH",x)
-  `define DEFAULT_i3c_controller_host_interface_VERSION_VERSION_PATCH GetResetValue(i3c_controller_host_interface_VERSION,"VERSION_PATCH")
-  `define UPDATE_i3c_controller_host_interface_VERSION_VERSION_PATCH(x,y) UpdateField(i3c_controller_host_interface_VERSION,"VERSION_PATCH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t i3c_controller_host_interface_DEVICE_ID = '{ 'h0004, "DEVICE_ID" , '{
-    "DEVICE_ID": '{ 31, 0, RO, 0 }}};
-  `define SET_i3c_controller_host_interface_DEVICE_ID_DEVICE_ID(x) SetField(i3c_controller_host_interface_DEVICE_ID,"DEVICE_ID",x)
-  `define GET_i3c_controller_host_interface_DEVICE_ID_DEVICE_ID(x) GetField(i3c_controller_host_interface_DEVICE_ID,"DEVICE_ID",x)
-  `define DEFAULT_i3c_controller_host_interface_DEVICE_ID_DEVICE_ID GetResetValue(i3c_controller_host_interface_DEVICE_ID,"DEVICE_ID")
-  `define UPDATE_i3c_controller_host_interface_DEVICE_ID_DEVICE_ID(x,y) UpdateField(i3c_controller_host_interface_DEVICE_ID,"DEVICE_ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t i3c_controller_host_interface_SCRATCH = '{ 'h0008, "SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_i3c_controller_host_interface_SCRATCH_SCRATCH(x) SetField(i3c_controller_host_interface_SCRATCH,"SCRATCH",x)
-  `define GET_i3c_controller_host_interface_SCRATCH_SCRATCH(x) GetField(i3c_controller_host_interface_SCRATCH,"SCRATCH",x)
-  `define DEFAULT_i3c_controller_host_interface_SCRATCH_SCRATCH GetResetValue(i3c_controller_host_interface_SCRATCH,"SCRATCH")
-  `define UPDATE_i3c_controller_host_interface_SCRATCH_SCRATCH(x,y) UpdateField(i3c_controller_host_interface_SCRATCH,"SCRATCH",x,y)
+        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h0, this);
+        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h1, this);
+        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
 
-  const reg_t i3c_controller_host_interface_ENABLE = '{ 'h0040, "ENABLE" , '{
-    "ENABLE": '{ 0, 0, RW, 'h1 }}};
-  `define SET_i3c_controller_host_interface_ENABLE_ENABLE(x) SetField(i3c_controller_host_interface_ENABLE,"ENABLE",x)
-  `define GET_i3c_controller_host_interface_ENABLE_ENABLE(x) GetField(i3c_controller_host_interface_ENABLE,"ENABLE",x)
-  `define DEFAULT_i3c_controller_host_interface_ENABLE_ENABLE GetResetValue(i3c_controller_host_interface_ENABLE,"ENABLE")
-  `define UPDATE_i3c_controller_host_interface_ENABLE_ENABLE(x,y) UpdateField(i3c_controller_host_interface_ENABLE,"ENABLE",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
 
-  const reg_t i3c_controller_host_interface_IRQ_MASK = '{ 'h0080, "IRQ_MASK" , '{
-    "DAA_PENDING": '{ 7, 7, RW, 'h0 },
-    "IBI_PENDING": '{ 6, 6, RW, 'h0 },
-    "CMDR_PENDING": '{ 5, 5, RW, 'h0 },
-    "IBI_ALMOST_FULL": '{ 4, 4, RW, 'h0 },
-    "SDI_ALMOST_FULL": '{ 3, 3, RW, 'h0 },
-    "SDO_ALMOST_EMPTY": '{ 2, 2, RW, 'h0 },
-    "CMDR_ALMOST_FULL": '{ 1, 1, RW, 'h0 },
-    "CMD_ALMOST_EMPTY": '{ 0, 0, RW, 'h0 }}};
-  `define SET_i3c_controller_host_interface_IRQ_MASK_DAA_PENDING(x) SetField(i3c_controller_host_interface_IRQ_MASK,"DAA_PENDING",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_DAA_PENDING(x) GetField(i3c_controller_host_interface_IRQ_MASK,"DAA_PENDING",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_DAA_PENDING GetResetValue(i3c_controller_host_interface_IRQ_MASK,"DAA_PENDING")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_DAA_PENDING(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"DAA_PENDING",x,y)
-  `define SET_i3c_controller_host_interface_IRQ_MASK_IBI_PENDING(x) SetField(i3c_controller_host_interface_IRQ_MASK,"IBI_PENDING",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_IBI_PENDING(x) GetField(i3c_controller_host_interface_IRQ_MASK,"IBI_PENDING",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_IBI_PENDING GetResetValue(i3c_controller_host_interface_IRQ_MASK,"IBI_PENDING")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_IBI_PENDING(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"IBI_PENDING",x,y)
-  `define SET_i3c_controller_host_interface_IRQ_MASK_CMDR_PENDING(x) SetField(i3c_controller_host_interface_IRQ_MASK,"CMDR_PENDING",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_CMDR_PENDING(x) GetField(i3c_controller_host_interface_IRQ_MASK,"CMDR_PENDING",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_CMDR_PENDING GetResetValue(i3c_controller_host_interface_IRQ_MASK,"CMDR_PENDING")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_CMDR_PENDING(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"CMDR_PENDING",x,y)
-  `define SET_i3c_controller_host_interface_IRQ_MASK_IBI_ALMOST_FULL(x) SetField(i3c_controller_host_interface_IRQ_MASK,"IBI_ALMOST_FULL",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_IBI_ALMOST_FULL(x) GetField(i3c_controller_host_interface_IRQ_MASK,"IBI_ALMOST_FULL",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_IBI_ALMOST_FULL GetResetValue(i3c_controller_host_interface_IRQ_MASK,"IBI_ALMOST_FULL")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_IBI_ALMOST_FULL(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"IBI_ALMOST_FULL",x,y)
-  `define SET_i3c_controller_host_interface_IRQ_MASK_SDI_ALMOST_FULL(x) SetField(i3c_controller_host_interface_IRQ_MASK,"SDI_ALMOST_FULL",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_SDI_ALMOST_FULL(x) GetField(i3c_controller_host_interface_IRQ_MASK,"SDI_ALMOST_FULL",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_SDI_ALMOST_FULL GetResetValue(i3c_controller_host_interface_IRQ_MASK,"SDI_ALMOST_FULL")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_SDI_ALMOST_FULL(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"SDI_ALMOST_FULL",x,y)
-  `define SET_i3c_controller_host_interface_IRQ_MASK_SDO_ALMOST_EMPTY(x) SetField(i3c_controller_host_interface_IRQ_MASK,"SDO_ALMOST_EMPTY",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_SDO_ALMOST_EMPTY(x) GetField(i3c_controller_host_interface_IRQ_MASK,"SDO_ALMOST_EMPTY",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_SDO_ALMOST_EMPTY GetResetValue(i3c_controller_host_interface_IRQ_MASK,"SDO_ALMOST_EMPTY")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_SDO_ALMOST_EMPTY(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"SDO_ALMOST_EMPTY",x,y)
-  `define SET_i3c_controller_host_interface_IRQ_MASK_CMDR_ALMOST_FULL(x) SetField(i3c_controller_host_interface_IRQ_MASK,"CMDR_ALMOST_FULL",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_CMDR_ALMOST_FULL(x) GetField(i3c_controller_host_interface_IRQ_MASK,"CMDR_ALMOST_FULL",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_CMDR_ALMOST_FULL GetResetValue(i3c_controller_host_interface_IRQ_MASK,"CMDR_ALMOST_FULL")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_CMDR_ALMOST_FULL(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"CMDR_ALMOST_FULL",x,y)
-  `define SET_i3c_controller_host_interface_IRQ_MASK_CMD_ALMOST_EMPTY(x) SetField(i3c_controller_host_interface_IRQ_MASK,"CMD_ALMOST_EMPTY",x)
-  `define GET_i3c_controller_host_interface_IRQ_MASK_CMD_ALMOST_EMPTY(x) GetField(i3c_controller_host_interface_IRQ_MASK,"CMD_ALMOST_EMPTY",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_MASK_CMD_ALMOST_EMPTY GetResetValue(i3c_controller_host_interface_IRQ_MASK,"CMD_ALMOST_EMPTY")
-  `define UPDATE_i3c_controller_host_interface_IRQ_MASK_CMD_ALMOST_EMPTY(x,y) UpdateField(i3c_controller_host_interface_IRQ_MASK,"CMD_ALMOST_EMPTY",x,y)
+    class DEVICE_ID_CLASS extends register_base;
+      field_base DEVICE_ID_F;
 
-  const reg_t i3c_controller_host_interface_IRQ_PENDING = '{ 'h0084, "IRQ_PENDING" , '{
-    "IRQ_PENDING": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_i3c_controller_host_interface_IRQ_PENDING_IRQ_PENDING(x) SetField(i3c_controller_host_interface_IRQ_PENDING,"IRQ_PENDING",x)
-  `define GET_i3c_controller_host_interface_IRQ_PENDING_IRQ_PENDING(x) GetField(i3c_controller_host_interface_IRQ_PENDING,"IRQ_PENDING",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_PENDING_IRQ_PENDING GetResetValue(i3c_controller_host_interface_IRQ_PENDING,"IRQ_PENDING")
-  `define UPDATE_i3c_controller_host_interface_IRQ_PENDING_IRQ_PENDING(x,y) UpdateField(i3c_controller_host_interface_IRQ_PENDING,"IRQ_PENDING",x,y)
+      function new(
+        input string name,
+        input int address,
+        input int ID,
+        input adi_regmap parent = null);
 
-  const reg_t i3c_controller_host_interface_IRQ_SOURCE = '{ 'h0088, "IRQ_SOURCE" , '{
-    "IRQ_SOURCE": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_i3c_controller_host_interface_IRQ_SOURCE_IRQ_SOURCE(x) SetField(i3c_controller_host_interface_IRQ_SOURCE,"IRQ_SOURCE",x)
-  `define GET_i3c_controller_host_interface_IRQ_SOURCE_IRQ_SOURCE(x) GetField(i3c_controller_host_interface_IRQ_SOURCE,"IRQ_SOURCE",x)
-  `define DEFAULT_i3c_controller_host_interface_IRQ_SOURCE_IRQ_SOURCE GetResetValue(i3c_controller_host_interface_IRQ_SOURCE,"IRQ_SOURCE")
-  `define UPDATE_i3c_controller_host_interface_IRQ_SOURCE_IRQ_SOURCE(x,y) UpdateField(i3c_controller_host_interface_IRQ_SOURCE,"IRQ_SOURCE",x,y)
+        super.new(name, address, parent);
 
-  const reg_t i3c_controller_host_interface_CMD_FIFO_ROOM = '{ 'h00c0, "CMD_FIFO_ROOM" , '{
-    "CMD_FIFO_ROOM": '{ 31, 0, RO, 'hXXXXXXXX }}};
-  `define SET_i3c_controller_host_interface_CMD_FIFO_ROOM_CMD_FIFO_ROOM(x) SetField(i3c_controller_host_interface_CMD_FIFO_ROOM,"CMD_FIFO_ROOM",x)
-  `define GET_i3c_controller_host_interface_CMD_FIFO_ROOM_CMD_FIFO_ROOM(x) GetField(i3c_controller_host_interface_CMD_FIFO_ROOM,"CMD_FIFO_ROOM",x)
-  `define DEFAULT_i3c_controller_host_interface_CMD_FIFO_ROOM_CMD_FIFO_ROOM GetResetValue(i3c_controller_host_interface_CMD_FIFO_ROOM,"CMD_FIFO_ROOM")
-  `define UPDATE_i3c_controller_host_interface_CMD_FIFO_ROOM_CMD_FIFO_ROOM(x,y) UpdateField(i3c_controller_host_interface_CMD_FIFO_ROOM,"CMD_FIFO_ROOM",x,y)
+        this.DEVICE_ID_F = new("DEVICE_ID", 31, 0, RO, ID, this);
 
-  const reg_t i3c_controller_host_interface_CMDR_FIFO_LEVEL = '{ 'h00c4, "CMDR_FIFO_LEVEL" , '{
-    "CMDR_FIFO_LEVEL": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_i3c_controller_host_interface_CMDR_FIFO_LEVEL_CMDR_FIFO_LEVEL(x) SetField(i3c_controller_host_interface_CMDR_FIFO_LEVEL,"CMDR_FIFO_LEVEL",x)
-  `define GET_i3c_controller_host_interface_CMDR_FIFO_LEVEL_CMDR_FIFO_LEVEL(x) GetField(i3c_controller_host_interface_CMDR_FIFO_LEVEL,"CMDR_FIFO_LEVEL",x)
-  `define DEFAULT_i3c_controller_host_interface_CMDR_FIFO_LEVEL_CMDR_FIFO_LEVEL GetResetValue(i3c_controller_host_interface_CMDR_FIFO_LEVEL,"CMDR_FIFO_LEVEL")
-  `define UPDATE_i3c_controller_host_interface_CMDR_FIFO_LEVEL_CMDR_FIFO_LEVEL(x,y) UpdateField(i3c_controller_host_interface_CMDR_FIFO_LEVEL,"CMDR_FIFO_LEVEL",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DEVICE_ID_CLASS
 
-  const reg_t i3c_controller_host_interface_SDO_FIFO_ROOM = '{ 'h00c8, "SDO_FIFO_ROOM" , '{
-    "SDO_FIFO_ROOM": '{ 31, 0, RO, 'hXXXXXXXX }}};
-  `define SET_i3c_controller_host_interface_SDO_FIFO_ROOM_SDO_FIFO_ROOM(x) SetField(i3c_controller_host_interface_SDO_FIFO_ROOM,"SDO_FIFO_ROOM",x)
-  `define GET_i3c_controller_host_interface_SDO_FIFO_ROOM_SDO_FIFO_ROOM(x) GetField(i3c_controller_host_interface_SDO_FIFO_ROOM,"SDO_FIFO_ROOM",x)
-  `define DEFAULT_i3c_controller_host_interface_SDO_FIFO_ROOM_SDO_FIFO_ROOM GetResetValue(i3c_controller_host_interface_SDO_FIFO_ROOM,"SDO_FIFO_ROOM")
-  `define UPDATE_i3c_controller_host_interface_SDO_FIFO_ROOM_SDO_FIFO_ROOM(x,y) UpdateField(i3c_controller_host_interface_SDO_FIFO_ROOM,"SDO_FIFO_ROOM",x,y)
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
 
-  const reg_t i3c_controller_host_interface_SDI_FIFO_LEVEL = '{ 'h00cc, "SDI_FIFO_LEVEL" , '{
-    "SDI_FIFO_LEVEL": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_i3c_controller_host_interface_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL(x) SetField(i3c_controller_host_interface_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL",x)
-  `define GET_i3c_controller_host_interface_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL(x) GetField(i3c_controller_host_interface_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL",x)
-  `define DEFAULT_i3c_controller_host_interface_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL GetResetValue(i3c_controller_host_interface_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL")
-  `define UPDATE_i3c_controller_host_interface_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL(x,y) UpdateField(i3c_controller_host_interface_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t i3c_controller_host_interface_IBI_FIFO_LEVEL = '{ 'h00d0, "IBI_FIFO_LEVEL" , '{
-    "IBI_FIFO_LEVEL": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_i3c_controller_host_interface_IBI_FIFO_LEVEL_IBI_FIFO_LEVEL(x) SetField(i3c_controller_host_interface_IBI_FIFO_LEVEL,"IBI_FIFO_LEVEL",x)
-  `define GET_i3c_controller_host_interface_IBI_FIFO_LEVEL_IBI_FIFO_LEVEL(x) GetField(i3c_controller_host_interface_IBI_FIFO_LEVEL,"IBI_FIFO_LEVEL",x)
-  `define DEFAULT_i3c_controller_host_interface_IBI_FIFO_LEVEL_IBI_FIFO_LEVEL GetResetValue(i3c_controller_host_interface_IBI_FIFO_LEVEL,"IBI_FIFO_LEVEL")
-  `define UPDATE_i3c_controller_host_interface_IBI_FIFO_LEVEL_IBI_FIFO_LEVEL(x,y) UpdateField(i3c_controller_host_interface_IBI_FIFO_LEVEL,"IBI_FIFO_LEVEL",x,y)
+        super.new(name, address, parent);
 
-  const reg_t i3c_controller_host_interface_CMD_FIFO = '{ 'h00d4, "CMD_FIFO" , '{
-    "CMD_IS_CCC": '{ 22, 22, WO, 'hX },
-    "CMD_BCAST_HEADER": '{ 21, 21, WO, 'hX },
-    "CMD_SR": '{ 20, 20, WO, 'hX },
-    "CMD_BUFFER_LENGHT": '{ 19, 8, WO, 'hXXX },
-    "CMD_DA": '{ 7, 1, WO, 'hXX },
-    "CMD_RNW": '{ 0, 0, WO, 'hX }}};
-  `define SET_i3c_controller_host_interface_CMD_FIFO_CMD_IS_CCC(x) SetField(i3c_controller_host_interface_CMD_FIFO,"CMD_IS_CCC",x)
-  `define GET_i3c_controller_host_interface_CMD_FIFO_CMD_IS_CCC(x) GetField(i3c_controller_host_interface_CMD_FIFO,"CMD_IS_CCC",x)
-  `define DEFAULT_i3c_controller_host_interface_CMD_FIFO_CMD_IS_CCC GetResetValue(i3c_controller_host_interface_CMD_FIFO,"CMD_IS_CCC")
-  `define UPDATE_i3c_controller_host_interface_CMD_FIFO_CMD_IS_CCC(x,y) UpdateField(i3c_controller_host_interface_CMD_FIFO,"CMD_IS_CCC",x,y)
-  `define SET_i3c_controller_host_interface_CMD_FIFO_CMD_BCAST_HEADER(x) SetField(i3c_controller_host_interface_CMD_FIFO,"CMD_BCAST_HEADER",x)
-  `define GET_i3c_controller_host_interface_CMD_FIFO_CMD_BCAST_HEADER(x) GetField(i3c_controller_host_interface_CMD_FIFO,"CMD_BCAST_HEADER",x)
-  `define DEFAULT_i3c_controller_host_interface_CMD_FIFO_CMD_BCAST_HEADER GetResetValue(i3c_controller_host_interface_CMD_FIFO,"CMD_BCAST_HEADER")
-  `define UPDATE_i3c_controller_host_interface_CMD_FIFO_CMD_BCAST_HEADER(x,y) UpdateField(i3c_controller_host_interface_CMD_FIFO,"CMD_BCAST_HEADER",x,y)
-  `define SET_i3c_controller_host_interface_CMD_FIFO_CMD_SR(x) SetField(i3c_controller_host_interface_CMD_FIFO,"CMD_SR",x)
-  `define GET_i3c_controller_host_interface_CMD_FIFO_CMD_SR(x) GetField(i3c_controller_host_interface_CMD_FIFO,"CMD_SR",x)
-  `define DEFAULT_i3c_controller_host_interface_CMD_FIFO_CMD_SR GetResetValue(i3c_controller_host_interface_CMD_FIFO,"CMD_SR")
-  `define UPDATE_i3c_controller_host_interface_CMD_FIFO_CMD_SR(x,y) UpdateField(i3c_controller_host_interface_CMD_FIFO,"CMD_SR",x,y)
-  `define SET_i3c_controller_host_interface_CMD_FIFO_CMD_BUFFER_LENGHT(x) SetField(i3c_controller_host_interface_CMD_FIFO,"CMD_BUFFER_LENGHT",x)
-  `define GET_i3c_controller_host_interface_CMD_FIFO_CMD_BUFFER_LENGHT(x) GetField(i3c_controller_host_interface_CMD_FIFO,"CMD_BUFFER_LENGHT",x)
-  `define DEFAULT_i3c_controller_host_interface_CMD_FIFO_CMD_BUFFER_LENGHT GetResetValue(i3c_controller_host_interface_CMD_FIFO,"CMD_BUFFER_LENGHT")
-  `define UPDATE_i3c_controller_host_interface_CMD_FIFO_CMD_BUFFER_LENGHT(x,y) UpdateField(i3c_controller_host_interface_CMD_FIFO,"CMD_BUFFER_LENGHT",x,y)
-  `define SET_i3c_controller_host_interface_CMD_FIFO_CMD_DA(x) SetField(i3c_controller_host_interface_CMD_FIFO,"CMD_DA",x)
-  `define GET_i3c_controller_host_interface_CMD_FIFO_CMD_DA(x) GetField(i3c_controller_host_interface_CMD_FIFO,"CMD_DA",x)
-  `define DEFAULT_i3c_controller_host_interface_CMD_FIFO_CMD_DA GetResetValue(i3c_controller_host_interface_CMD_FIFO,"CMD_DA")
-  `define UPDATE_i3c_controller_host_interface_CMD_FIFO_CMD_DA(x,y) UpdateField(i3c_controller_host_interface_CMD_FIFO,"CMD_DA",x,y)
-  `define SET_i3c_controller_host_interface_CMD_FIFO_CMD_RNW(x) SetField(i3c_controller_host_interface_CMD_FIFO,"CMD_RNW",x)
-  `define GET_i3c_controller_host_interface_CMD_FIFO_CMD_RNW(x) GetField(i3c_controller_host_interface_CMD_FIFO,"CMD_RNW",x)
-  `define DEFAULT_i3c_controller_host_interface_CMD_FIFO_CMD_RNW GetResetValue(i3c_controller_host_interface_CMD_FIFO,"CMD_RNW")
-  `define UPDATE_i3c_controller_host_interface_CMD_FIFO_CMD_RNW(x,y) UpdateField(i3c_controller_host_interface_CMD_FIFO,"CMD_RNW",x,y)
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
 
-  const reg_t i3c_controller_host_interface_CMDR_FIFO = '{ 'h00d8, "CMDR_FIFO" , '{
-    "CMDR_FIFO_ERROR": '{ 23, 0, RO, 'h?? },
-    "CMDR_FIFO_BUFFER_LENGTH": '{ 19, 8, RO, 'h?? },
-    "CMDR_FIFO_SYNC": '{ 7, 0, RO, 'h?? }}};
-  `define SET_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_ERROR(x) SetField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_ERROR",x)
-  `define GET_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_ERROR(x) GetField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_ERROR",x)
-  `define DEFAULT_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_ERROR GetResetValue(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_ERROR")
-  `define UPDATE_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_ERROR(x,y) UpdateField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_ERROR",x,y)
-  `define SET_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_BUFFER_LENGTH(x) SetField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_BUFFER_LENGTH",x)
-  `define GET_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_BUFFER_LENGTH(x) GetField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_BUFFER_LENGTH",x)
-  `define DEFAULT_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_BUFFER_LENGTH GetResetValue(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_BUFFER_LENGTH")
-  `define UPDATE_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_BUFFER_LENGTH(x,y) UpdateField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_BUFFER_LENGTH",x,y)
-  `define SET_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_SYNC(x) SetField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_SYNC",x)
-  `define GET_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_SYNC(x) GetField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_SYNC",x)
-  `define DEFAULT_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_SYNC GetResetValue(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_SYNC")
-  `define UPDATE_i3c_controller_host_interface_CMDR_FIFO_CMDR_FIFO_SYNC(x,y) UpdateField(i3c_controller_host_interface_CMDR_FIFO,"CMDR_FIFO_SYNC",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
 
-  const reg_t i3c_controller_host_interface_SDO_FIFO = '{ 'h00dc, "SDO_FIFO" , '{
-    "SDO_FIFO_BYTE_3": '{ 31, 24, RO, 'hXX },
-    "SDO_FIFO_BYTE_2": '{ 23, 16, RO, 'hXX },
-    "SDO_FIFO_BYTE_1": '{ 15, 8, RO, 'hXX },
-    "SDO_FIFO_BYTE_0": '{ 7, 0, RO, 'hXX }}};
-  `define SET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_3(x) SetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_3",x)
-  `define GET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_3(x) GetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_3",x)
-  `define DEFAULT_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_3 GetResetValue(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_3")
-  `define UPDATE_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_3(x,y) UpdateField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_3",x,y)
-  `define SET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_2(x) SetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_2",x)
-  `define GET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_2(x) GetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_2",x)
-  `define DEFAULT_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_2 GetResetValue(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_2")
-  `define UPDATE_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_2(x,y) UpdateField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_2",x,y)
-  `define SET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_1(x) SetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_1",x)
-  `define GET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_1(x) GetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_1",x)
-  `define DEFAULT_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_1 GetResetValue(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_1")
-  `define UPDATE_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_1(x,y) UpdateField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_1",x,y)
-  `define SET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_0(x) SetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_0",x)
-  `define GET_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_0(x) GetField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_0",x)
-  `define DEFAULT_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_0 GetResetValue(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_0")
-  `define UPDATE_i3c_controller_host_interface_SDO_FIFO_SDO_FIFO_BYTE_0(x,y) UpdateField(i3c_controller_host_interface_SDO_FIFO,"SDO_FIFO_BYTE_0",x,y)
+    class ENABLE_CLASS extends register_base;
+      field_base ENABLE_F;
 
-  const reg_t i3c_controller_host_interface_SDI_FIFO = '{ 'h00e0, "SDI_FIFO" , '{
-    "SDI_FIFO": '{ 31, 0, RO, 'hXXXXXXXX }}};
-  `define SET_i3c_controller_host_interface_SDI_FIFO_SDI_FIFO(x) SetField(i3c_controller_host_interface_SDI_FIFO,"SDI_FIFO",x)
-  `define GET_i3c_controller_host_interface_SDI_FIFO_SDI_FIFO(x) GetField(i3c_controller_host_interface_SDI_FIFO,"SDI_FIFO",x)
-  `define DEFAULT_i3c_controller_host_interface_SDI_FIFO_SDI_FIFO GetResetValue(i3c_controller_host_interface_SDI_FIFO,"SDI_FIFO")
-  `define UPDATE_i3c_controller_host_interface_SDI_FIFO_SDI_FIFO(x,y) UpdateField(i3c_controller_host_interface_SDI_FIFO,"SDI_FIFO",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t i3c_controller_host_interface_IBI_FIFO = '{ 'h00e4, "IBI_FIFO" , '{
-    "IBI_FIFO_DA": '{ 23, 17, RO, 'hXX },
-    "IBI_FIFO_MDB": '{ 15, 8, RO, 'hXX },
-    "IBI_FIFO_SYNC": '{ 7, 0, RO, 'hXX }}};
-  `define SET_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_DA(x) SetField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_DA",x)
-  `define GET_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_DA(x) GetField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_DA",x)
-  `define DEFAULT_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_DA GetResetValue(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_DA")
-  `define UPDATE_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_DA(x,y) UpdateField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_DA",x,y)
-  `define SET_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_MDB(x) SetField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_MDB",x)
-  `define GET_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_MDB(x) GetField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_MDB",x)
-  `define DEFAULT_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_MDB GetResetValue(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_MDB")
-  `define UPDATE_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_MDB(x,y) UpdateField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_MDB",x,y)
-  `define SET_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_SYNC(x) SetField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_SYNC",x)
-  `define GET_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_SYNC(x) GetField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_SYNC",x)
-  `define DEFAULT_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_SYNC GetResetValue(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_SYNC")
-  `define UPDATE_i3c_controller_host_interface_IBI_FIFO_IBI_FIFO_SYNC(x,y) UpdateField(i3c_controller_host_interface_IBI_FIFO,"IBI_FIFO_SYNC",x,y)
+        super.new(name, address, parent);
 
-  const reg_t i3c_controller_host_interface_FIFO_STATUS = '{ 'h00e8, "FIFO_STATUS" , '{
-    "SDI_EMPTY": '{ 2, 2, RO, 'h1 },
-    "IBI_EMPTY": '{ 1, 1, RO, 'h1 },
-    "CMDR_EMPTY": '{ 0, 0, RO, 'h1 }}};
-  `define SET_i3c_controller_host_interface_FIFO_STATUS_SDI_EMPTY(x) SetField(i3c_controller_host_interface_FIFO_STATUS,"SDI_EMPTY",x)
-  `define GET_i3c_controller_host_interface_FIFO_STATUS_SDI_EMPTY(x) GetField(i3c_controller_host_interface_FIFO_STATUS,"SDI_EMPTY",x)
-  `define DEFAULT_i3c_controller_host_interface_FIFO_STATUS_SDI_EMPTY GetResetValue(i3c_controller_host_interface_FIFO_STATUS,"SDI_EMPTY")
-  `define UPDATE_i3c_controller_host_interface_FIFO_STATUS_SDI_EMPTY(x,y) UpdateField(i3c_controller_host_interface_FIFO_STATUS,"SDI_EMPTY",x,y)
-  `define SET_i3c_controller_host_interface_FIFO_STATUS_IBI_EMPTY(x) SetField(i3c_controller_host_interface_FIFO_STATUS,"IBI_EMPTY",x)
-  `define GET_i3c_controller_host_interface_FIFO_STATUS_IBI_EMPTY(x) GetField(i3c_controller_host_interface_FIFO_STATUS,"IBI_EMPTY",x)
-  `define DEFAULT_i3c_controller_host_interface_FIFO_STATUS_IBI_EMPTY GetResetValue(i3c_controller_host_interface_FIFO_STATUS,"IBI_EMPTY")
-  `define UPDATE_i3c_controller_host_interface_FIFO_STATUS_IBI_EMPTY(x,y) UpdateField(i3c_controller_host_interface_FIFO_STATUS,"IBI_EMPTY",x,y)
-  `define SET_i3c_controller_host_interface_FIFO_STATUS_CMDR_EMPTY(x) SetField(i3c_controller_host_interface_FIFO_STATUS,"CMDR_EMPTY",x)
-  `define GET_i3c_controller_host_interface_FIFO_STATUS_CMDR_EMPTY(x) GetField(i3c_controller_host_interface_FIFO_STATUS,"CMDR_EMPTY",x)
-  `define DEFAULT_i3c_controller_host_interface_FIFO_STATUS_CMDR_EMPTY GetResetValue(i3c_controller_host_interface_FIFO_STATUS,"CMDR_EMPTY")
-  `define UPDATE_i3c_controller_host_interface_FIFO_STATUS_CMDR_EMPTY(x,y) UpdateField(i3c_controller_host_interface_FIFO_STATUS,"CMDR_EMPTY",x,y)
+        this.ENABLE_F = new("ENABLE", 0, 0, RW, 'h1, this);
 
-  const reg_t i3c_controller_host_interface_OPS = '{ 'h0100, "OPS" , '{
-    "OPS_STATUS_NOP": '{ 7, 7, RO, 'h0 },
-    "OPS_SPEED_GRADE": '{ 6, 5, RW, 'h0 },
-    "OPS_OFFLOAD_LENGTH": '{ 4, 1, RW, 'h0 },
-    "OPS_MODE": '{ 0, 0, RW, 'h0 }}};
-  `define SET_i3c_controller_host_interface_OPS_OPS_STATUS_NOP(x) SetField(i3c_controller_host_interface_OPS,"OPS_STATUS_NOP",x)
-  `define GET_i3c_controller_host_interface_OPS_OPS_STATUS_NOP(x) GetField(i3c_controller_host_interface_OPS,"OPS_STATUS_NOP",x)
-  `define DEFAULT_i3c_controller_host_interface_OPS_OPS_STATUS_NOP GetResetValue(i3c_controller_host_interface_OPS,"OPS_STATUS_NOP")
-  `define UPDATE_i3c_controller_host_interface_OPS_OPS_STATUS_NOP(x,y) UpdateField(i3c_controller_host_interface_OPS,"OPS_STATUS_NOP",x,y)
-  `define SET_i3c_controller_host_interface_OPS_OPS_SPEED_GRADE(x) SetField(i3c_controller_host_interface_OPS,"OPS_SPEED_GRADE",x)
-  `define GET_i3c_controller_host_interface_OPS_OPS_SPEED_GRADE(x) GetField(i3c_controller_host_interface_OPS,"OPS_SPEED_GRADE",x)
-  `define DEFAULT_i3c_controller_host_interface_OPS_OPS_SPEED_GRADE GetResetValue(i3c_controller_host_interface_OPS,"OPS_SPEED_GRADE")
-  `define UPDATE_i3c_controller_host_interface_OPS_OPS_SPEED_GRADE(x,y) UpdateField(i3c_controller_host_interface_OPS,"OPS_SPEED_GRADE",x,y)
-  `define SET_i3c_controller_host_interface_OPS_OPS_OFFLOAD_LENGTH(x) SetField(i3c_controller_host_interface_OPS,"OPS_OFFLOAD_LENGTH",x)
-  `define GET_i3c_controller_host_interface_OPS_OPS_OFFLOAD_LENGTH(x) GetField(i3c_controller_host_interface_OPS,"OPS_OFFLOAD_LENGTH",x)
-  `define DEFAULT_i3c_controller_host_interface_OPS_OPS_OFFLOAD_LENGTH GetResetValue(i3c_controller_host_interface_OPS,"OPS_OFFLOAD_LENGTH")
-  `define UPDATE_i3c_controller_host_interface_OPS_OPS_OFFLOAD_LENGTH(x,y) UpdateField(i3c_controller_host_interface_OPS,"OPS_OFFLOAD_LENGTH",x,y)
-  `define SET_i3c_controller_host_interface_OPS_OPS_MODE(x) SetField(i3c_controller_host_interface_OPS,"OPS_MODE",x)
-  `define GET_i3c_controller_host_interface_OPS_OPS_MODE(x) GetField(i3c_controller_host_interface_OPS,"OPS_MODE",x)
-  `define DEFAULT_i3c_controller_host_interface_OPS_OPS_MODE GetResetValue(i3c_controller_host_interface_OPS,"OPS_MODE")
-  `define UPDATE_i3c_controller_host_interface_OPS_OPS_MODE(x,y) UpdateField(i3c_controller_host_interface_OPS,"OPS_MODE",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ENABLE_CLASS
 
-  const reg_t i3c_controller_host_interface_IBI_CONFIG = '{ 'h0140, "IBI_CONFIG" , '{
-    "IBI_CONFIG_LISTEN": '{ 1, 1, WO, 'h0 },
-    "IBI_CONFIG_ENABLE": '{ 0, 0, WO, 'h0 }}};
-  `define SET_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_LISTEN(x) SetField(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_LISTEN",x)
-  `define GET_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_LISTEN(x) GetField(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_LISTEN",x)
-  `define DEFAULT_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_LISTEN GetResetValue(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_LISTEN")
-  `define UPDATE_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_LISTEN(x,y) UpdateField(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_LISTEN",x,y)
-  `define SET_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_ENABLE(x) SetField(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_ENABLE",x)
-  `define GET_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_ENABLE(x) GetField(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_ENABLE",x)
-  `define DEFAULT_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_ENABLE GetResetValue(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_ENABLE")
-  `define UPDATE_i3c_controller_host_interface_IBI_CONFIG_IBI_CONFIG_ENABLE(x,y) UpdateField(i3c_controller_host_interface_IBI_CONFIG,"IBI_CONFIG_ENABLE",x,y)
+    class IRQ_MASK_CLASS extends register_base;
+      field_base DAA_PENDING_F;
+      field_base IBI_PENDING_F;
+      field_base CMDR_PENDING_F;
+      field_base IBI_ALMOST_FULL_F;
+      field_base SDI_ALMOST_FULL_F;
+      field_base SDO_ALMOST_EMPTY_F;
+      field_base CMDR_ALMOST_FULL_F;
+      field_base CMD_ALMOST_EMPTY_F;
 
-  const reg_t i3c_controller_host_interface_DEV_CHAR = '{ 'h0180, "DEV_CHAR" , '{
-    "DEV_CHAR_ADDR": '{ 15, 9, RW, 'h00 },
-    "DEV_CHAR_WEN": '{ 8, 8, W, 'hX },
-    "DEV_CHAR_HAS_IBI_MDB": '{ 3, 3, RW, 'h0 },
-    "DEV_CHAR_IS_IBI_CAPABLE": '{ 2, 2, RW, 'h0 },
-    "DEV_CHAR_IS_ATTACHED": '{ 1, 1, RW, 'h0 },
-    "DEV_CHAR_IS_ATTACHED": '{ 1, 1, RW, 'h0 }}};
-  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_ADDR(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_ADDR",x)
-  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_ADDR(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_ADDR",x)
-  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_ADDR GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_ADDR")
-  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_ADDR(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_ADDR",x,y)
-  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_WEN(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_WEN",x)
-  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_WEN(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_WEN",x)
-  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_WEN GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_WEN")
-  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_WEN(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_WEN",x,y)
-  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_HAS_IBI_MDB(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_HAS_IBI_MDB",x)
-  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_HAS_IBI_MDB(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_HAS_IBI_MDB",x)
-  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_HAS_IBI_MDB GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_HAS_IBI_MDB")
-  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_HAS_IBI_MDB(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_HAS_IBI_MDB",x,y)
-  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_IBI_CAPABLE(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_IBI_CAPABLE",x)
-  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_IBI_CAPABLE(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_IBI_CAPABLE",x)
-  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_IBI_CAPABLE GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_IBI_CAPABLE")
-  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_IBI_CAPABLE(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_IBI_CAPABLE",x,y)
-  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x)
-  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x)
-  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED")
-  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x,y)
-  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x)
-  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x)
-  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED")
-  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t i3c_controller_host_interface_OFFLOAD_CMD_n = '{ 'h02c0 + 'h04*n, "OFFLOAD_CMD_n" , '{
-    "OFFLOAD_CMD": '{ 31, 0, RW, 'h00 }}};
-  `define SET_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD(x) SetField(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD",x)
-  `define GET_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD(x) GetField(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD",x)
-  `define DEFAULT_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD GetResetValue(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD")
-  `define UPDATE_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD(x,y) UpdateField(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD",x,y)
+        super.new(name, address, parent);
 
-  const reg_t i3c_controller_host_interface_OFFLOAD_SDO_n = '{ 'h0300 + 'h04*n, "OFFLOAD_SDO_n" , '{
-    "OFFLOAD_SDO_BYTE_3": '{ 31, 24, RO, 'h00 },
-    "OFFLOAD_SDO_BYTE_2": '{ 23, 16, RO, 'h00 },
-    "OFFLOAD_SDO_BYTE_1": '{ 15, 8, RO, 'h00 },
-    "OFFLOAD_SDO_BYTE_0": '{ 7, 0, RO, 'h00 }}};
-  `define SET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_3(x) SetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_3",x)
-  `define GET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_3(x) GetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_3",x)
-  `define DEFAULT_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_3 GetResetValue(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_3")
-  `define UPDATE_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_3(x,y) UpdateField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_3",x,y)
-  `define SET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_2(x) SetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_2",x)
-  `define GET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_2(x) GetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_2",x)
-  `define DEFAULT_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_2 GetResetValue(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_2")
-  `define UPDATE_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_2(x,y) UpdateField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_2",x,y)
-  `define SET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_1(x) SetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_1",x)
-  `define GET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_1(x) GetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_1",x)
-  `define DEFAULT_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_1 GetResetValue(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_1")
-  `define UPDATE_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_1(x,y) UpdateField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_1",x,y)
-  `define SET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_0(x) SetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_0",x)
-  `define GET_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_0(x) GetField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_0",x)
-  `define DEFAULT_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_0 GetResetValue(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_0")
-  `define UPDATE_i3c_controller_host_interface_OFFLOAD_SDO_n_OFFLOAD_SDO_BYTE_0(x,y) UpdateField(i3c_controller_host_interface_OFFLOAD_SDO_n,"OFFLOAD_SDO_BYTE_0",x,y)
+        this.DAA_PENDING_F = new("DAA_PENDING", 7, 7, RW, 'h0, this);
+        this.IBI_PENDING_F = new("IBI_PENDING", 6, 6, RW, 'h0, this);
+        this.CMDR_PENDING_F = new("CMDR_PENDING", 5, 5, RW, 'h0, this);
+        this.IBI_ALMOST_FULL_F = new("IBI_ALMOST_FULL", 4, 4, RW, 'h0, this);
+        this.SDI_ALMOST_FULL_F = new("SDI_ALMOST_FULL", 3, 3, RW, 'h0, this);
+        this.SDO_ALMOST_EMPTY_F = new("SDO_ALMOST_EMPTY", 2, 2, RW, 'h0, this);
+        this.CMDR_ALMOST_FULL_F = new("CMDR_ALMOST_FULL", 1, 1, RW, 'h0, this);
+        this.CMD_ALMOST_EMPTY_F = new("CMD_ALMOST_EMPTY", 0, 0, RW, 'h0, this);
 
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_MASK_CLASS
 
-endpackage
+    class IRQ_PENDING_CLASS extends register_base;
+      field_base IRQ_PENDING_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IRQ_PENDING_F = new("IRQ_PENDING", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_PENDING_CLASS
+
+    class IRQ_SOURCE_CLASS extends register_base;
+      field_base IRQ_SOURCE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IRQ_SOURCE_F = new("IRQ_SOURCE", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_SOURCE_CLASS
+
+    class CMD_FIFO_ROOM_CLASS extends register_base;
+      field_base CMD_FIFO_ROOM_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CMD_FIFO_ROOM_F = new("CMD_FIFO_ROOM", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CMD_FIFO_ROOM_CLASS
+
+    class CMDR_FIFO_LEVEL_CLASS extends register_base;
+      field_base CMDR_FIFO_LEVEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CMDR_FIFO_LEVEL_F = new("CMDR_FIFO_LEVEL", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CMDR_FIFO_LEVEL_CLASS
+
+    class SDO_FIFO_ROOM_CLASS extends register_base;
+      field_base SDO_FIFO_ROOM_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDO_FIFO_ROOM_F = new("SDO_FIFO_ROOM", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDO_FIFO_ROOM_CLASS
+
+    class SDI_FIFO_LEVEL_CLASS extends register_base;
+      field_base SDI_FIFO_LEVEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDI_FIFO_LEVEL_F = new("SDI_FIFO_LEVEL", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDI_FIFO_LEVEL_CLASS
+
+    class IBI_FIFO_LEVEL_CLASS extends register_base;
+      field_base IBI_FIFO_LEVEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IBI_FIFO_LEVEL_F = new("IBI_FIFO_LEVEL", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IBI_FIFO_LEVEL_CLASS
+
+    class CMD_FIFO_CLASS extends register_base;
+      field_base CMD_IS_CCC_F;
+      field_base CMD_BCAST_HEADER_F;
+      field_base CMD_SR_F;
+      field_base CMD_BUFFER_LENGHT_F;
+      field_base CMD_DA_F;
+      field_base CMD_RNW_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CMD_IS_CCC_F = new("CMD_IS_CCC", 22, 22, WO, 'hXXXXXXXX, this);
+        this.CMD_BCAST_HEADER_F = new("CMD_BCAST_HEADER", 21, 21, WO, 'hXXXXXXXX, this);
+        this.CMD_SR_F = new("CMD_SR", 20, 20, WO, 'hXXXXXXXX, this);
+        this.CMD_BUFFER_LENGHT_F = new("CMD_BUFFER_LENGHT", 19, 8, WO, 'hXXXXXXXX, this);
+        this.CMD_DA_F = new("CMD_DA", 7, 1, WO, 'hXXXXXXXX, this);
+        this.CMD_RNW_F = new("CMD_RNW", 0, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CMD_FIFO_CLASS
+
+    class CMDR_FIFO_CLASS extends register_base;
+      field_base CMDR_FIFO_ERROR_F;
+      field_base CMDR_FIFO_BUFFER_LENGTH_F;
+      field_base CMDR_FIFO_SYNC_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CMDR_FIFO_ERROR_F = new("CMDR_FIFO_ERROR", 23, 0, RO, 'hXXXXXXXX, this);
+        this.CMDR_FIFO_BUFFER_LENGTH_F = new("CMDR_FIFO_BUFFER_LENGTH", 19, 8, RO, 'hXXXXXXXX, this);
+        this.CMDR_FIFO_SYNC_F = new("CMDR_FIFO_SYNC", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CMDR_FIFO_CLASS
+
+    class SDO_FIFO_CLASS extends register_base;
+      field_base SDO_FIFO_BYTE_3_F;
+      field_base SDO_FIFO_BYTE_2_F;
+      field_base SDO_FIFO_BYTE_1_F;
+      field_base SDO_FIFO_BYTE_0_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDO_FIFO_BYTE_3_F = new("SDO_FIFO_BYTE_3", 31, 24, RO, 'hXXXXXXXX, this);
+        this.SDO_FIFO_BYTE_2_F = new("SDO_FIFO_BYTE_2", 23, 16, RO, 'hXXXXXXXX, this);
+        this.SDO_FIFO_BYTE_1_F = new("SDO_FIFO_BYTE_1", 15, 8, RO, 'hXXXXXXXX, this);
+        this.SDO_FIFO_BYTE_0_F = new("SDO_FIFO_BYTE_0", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDO_FIFO_CLASS
+
+    class SDI_FIFO_CLASS extends register_base;
+      field_base SDI_FIFO_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDI_FIFO_F = new("SDI_FIFO", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDI_FIFO_CLASS
+
+    class IBI_FIFO_CLASS extends register_base;
+      field_base IBI_FIFO_DA_F;
+      field_base IBI_FIFO_MDB_F;
+      field_base IBI_FIFO_SYNC_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IBI_FIFO_DA_F = new("IBI_FIFO_DA", 23, 17, RO, 'hXXXXXXXX, this);
+        this.IBI_FIFO_MDB_F = new("IBI_FIFO_MDB", 15, 8, RO, 'hXXXXXXXX, this);
+        this.IBI_FIFO_SYNC_F = new("IBI_FIFO_SYNC", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IBI_FIFO_CLASS
+
+    class FIFO_STATUS_CLASS extends register_base;
+      field_base SDI_EMPTY_F;
+      field_base IBI_EMPTY_F;
+      field_base CMDR_EMPTY_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDI_EMPTY_F = new("SDI_EMPTY", 2, 2, RO, 'h1, this);
+        this.IBI_EMPTY_F = new("IBI_EMPTY", 1, 1, RO, 'h1, this);
+        this.CMDR_EMPTY_F = new("CMDR_EMPTY", 0, 0, RO, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FIFO_STATUS_CLASS
+
+    class OPS_CLASS extends register_base;
+      field_base OPS_STATUS_NOP_F;
+      field_base OPS_SPEED_GRADE_F;
+      field_base OPS_OFFLOAD_LENGTH_F;
+      field_base OPS_MODE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OPS_STATUS_NOP_F = new("OPS_STATUS_NOP", 7, 7, RO, 'h0, this);
+        this.OPS_SPEED_GRADE_F = new("OPS_SPEED_GRADE", 6, 5, RW, 'h0, this);
+        this.OPS_OFFLOAD_LENGTH_F = new("OPS_OFFLOAD_LENGTH", 4, 1, RW, 'h0, this);
+        this.OPS_MODE_F = new("OPS_MODE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OPS_CLASS
+
+    class IBI_CONFIG_CLASS extends register_base;
+      field_base IBI_CONFIG_LISTEN_F;
+      field_base IBI_CONFIG_ENABLE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IBI_CONFIG_LISTEN_F = new("IBI_CONFIG_LISTEN", 1, 1, WO, 'h0, this);
+        this.IBI_CONFIG_ENABLE_F = new("IBI_CONFIG_ENABLE", 0, 0, WO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IBI_CONFIG_CLASS
+
+    class DEV_CHAR_CLASS extends register_base;
+      field_base DEV_CHAR_ADDR_F;
+      field_base DEV_CHAR_WEN_F;
+      field_base DEV_CHAR_HAS_IBI_PAYLOAD_F;
+      field_base DEV_CHAR_IS_IBI_CAPABLE_F;
+      field_base DEV_CHAR_IS_ATTACHED_F;
+      field_base DEV_CHAR_IS_I2C_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DEV_CHAR_ADDR_F = new("DEV_CHAR_ADDR", 15, 9, RW, 'h0, this);
+        this.DEV_CHAR_WEN_F = new("DEV_CHAR_WEN", 8, 8, WO, 'hXXXXXXXX, this);
+        this.DEV_CHAR_HAS_IBI_PAYLOAD_F = new("DEV_CHAR_HAS_IBI_PAYLOAD", 3, 3, RW, 'h0, this);
+        this.DEV_CHAR_IS_IBI_CAPABLE_F = new("DEV_CHAR_IS_IBI_CAPABLE", 2, 2, RW, 'h0, this);
+        this.DEV_CHAR_IS_ATTACHED_F = new("DEV_CHAR_IS_ATTACHED", 1, 1, RW, 'h0, this);
+        this.DEV_CHAR_IS_I2C_F = new("DEV_CHAR_IS_I2C", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DEV_CHAR_CLASS
+
+    class OFFLOAD_CMD_n_CLASS extends register_base;
+      field_base OFFLOAD_CMD_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD_CMD_F = new("OFFLOAD_CMD", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD_CMD_n_CLASS
+
+    class OFFLOAD_SDO_n_CLASS extends register_base;
+      field_base OFFLOAD_SDO_BYTE_3_F;
+      field_base OFFLOAD_SDO_BYTE_2_F;
+      field_base OFFLOAD_SDO_BYTE_1_F;
+      field_base OFFLOAD_SDO_BYTE_0_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD_SDO_BYTE_3_F = new("OFFLOAD_SDO_BYTE_3", 31, 24, RO, 'h0, this);
+        this.OFFLOAD_SDO_BYTE_2_F = new("OFFLOAD_SDO_BYTE_2", 23, 16, RO, 'h0, this);
+        this.OFFLOAD_SDO_BYTE_1_F = new("OFFLOAD_SDO_BYTE_1", 15, 8, RO, 'h0, this);
+        this.OFFLOAD_SDO_BYTE_0_F = new("OFFLOAD_SDO_BYTE_0", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD_SDO_n_CLASS
+
+    VERSION_CLASS VERSION_R;
+    DEVICE_ID_CLASS DEVICE_ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    ENABLE_CLASS ENABLE_R;
+    IRQ_MASK_CLASS IRQ_MASK_R;
+    IRQ_PENDING_CLASS IRQ_PENDING_R;
+    IRQ_SOURCE_CLASS IRQ_SOURCE_R;
+    CMD_FIFO_ROOM_CLASS CMD_FIFO_ROOM_R;
+    CMDR_FIFO_LEVEL_CLASS CMDR_FIFO_LEVEL_R;
+    SDO_FIFO_ROOM_CLASS SDO_FIFO_ROOM_R;
+    SDI_FIFO_LEVEL_CLASS SDI_FIFO_LEVEL_R;
+    IBI_FIFO_LEVEL_CLASS IBI_FIFO_LEVEL_R;
+    CMD_FIFO_CLASS CMD_FIFO_R;
+    CMDR_FIFO_CLASS CMDR_FIFO_R;
+    SDO_FIFO_CLASS SDO_FIFO_R;
+    SDI_FIFO_CLASS SDI_FIFO_R;
+    IBI_FIFO_CLASS IBI_FIFO_R;
+    FIFO_STATUS_CLASS FIFO_STATUS_R;
+    OPS_CLASS OPS_R;
+    IBI_CONFIG_CLASS IBI_CONFIG_R;
+    DEV_CHAR_CLASS DEV_CHAR_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_0_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_1_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_2_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_3_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_4_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_5_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_6_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_7_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_8_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_9_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_10_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_11_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_12_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_13_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_14_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_15_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_0_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_1_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_2_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_3_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_4_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_5_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_6_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_7_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_8_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_9_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_10_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_11_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_12_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_13_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_14_R;
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_15_R;
+
+    function new(
+      input string name,
+      input int address,
+      input int ID,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.DEVICE_ID_R = new("DEVICE_ID", 'h4, ID, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.ENABLE_R = new("ENABLE", 'h40, this);
+      this.IRQ_MASK_R = new("IRQ_MASK", 'h80, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88, this);
+      this.CMD_FIFO_ROOM_R = new("CMD_FIFO_ROOM", 'hc0, this);
+      this.CMDR_FIFO_LEVEL_R = new("CMDR_FIFO_LEVEL", 'hc4, this);
+      this.SDO_FIFO_ROOM_R = new("SDO_FIFO_ROOM", 'hc8, this);
+      this.SDI_FIFO_LEVEL_R = new("SDI_FIFO_LEVEL", 'hcc, this);
+      this.IBI_FIFO_LEVEL_R = new("IBI_FIFO_LEVEL", 'hd0, this);
+      this.CMD_FIFO_R = new("CMD_FIFO", 'hd4, this);
+      this.CMDR_FIFO_R = new("CMDR_FIFO", 'hd8, this);
+      this.SDO_FIFO_R = new("SDO_FIFO", 'hdc, this);
+      this.SDI_FIFO_R = new("SDI_FIFO", 'he0, this);
+      this.IBI_FIFO_R = new("IBI_FIFO", 'he4, this);
+      this.FIFO_STATUS_R = new("FIFO_STATUS", 'he8, this);
+      this.OPS_R = new("OPS", 'h100, this);
+      this.IBI_CONFIG_R = new("IBI_CONFIG", 'h140, this);
+      this.DEV_CHAR_R = new("DEV_CHAR", 'h180, this);
+      this.OFFLOAD_CMD_0_R = new("OFFLOAD_CMD_0", 'h2c0, this);
+      this.OFFLOAD_CMD_1_R = new("OFFLOAD_CMD_1", 'h2c4, this);
+      this.OFFLOAD_CMD_2_R = new("OFFLOAD_CMD_2", 'h2c8, this);
+      this.OFFLOAD_CMD_3_R = new("OFFLOAD_CMD_3", 'h2cc, this);
+      this.OFFLOAD_CMD_4_R = new("OFFLOAD_CMD_4", 'h2d0, this);
+      this.OFFLOAD_CMD_5_R = new("OFFLOAD_CMD_5", 'h2d4, this);
+      this.OFFLOAD_CMD_6_R = new("OFFLOAD_CMD_6", 'h2d8, this);
+      this.OFFLOAD_CMD_7_R = new("OFFLOAD_CMD_7", 'h2dc, this);
+      this.OFFLOAD_CMD_8_R = new("OFFLOAD_CMD_8", 'h2e0, this);
+      this.OFFLOAD_CMD_9_R = new("OFFLOAD_CMD_9", 'h2e4, this);
+      this.OFFLOAD_CMD_10_R = new("OFFLOAD_CMD_10", 'h2e8, this);
+      this.OFFLOAD_CMD_11_R = new("OFFLOAD_CMD_11", 'h2ec, this);
+      this.OFFLOAD_CMD_12_R = new("OFFLOAD_CMD_12", 'h2f0, this);
+      this.OFFLOAD_CMD_13_R = new("OFFLOAD_CMD_13", 'h2f4, this);
+      this.OFFLOAD_CMD_14_R = new("OFFLOAD_CMD_14", 'h2f8, this);
+      this.OFFLOAD_CMD_15_R = new("OFFLOAD_CMD_15", 'h2fc, this);
+      this.OFFLOAD_SDO_0_R = new("OFFLOAD_SDO_0", 'h300, this);
+      this.OFFLOAD_SDO_1_R = new("OFFLOAD_SDO_1", 'h304, this);
+      this.OFFLOAD_SDO_2_R = new("OFFLOAD_SDO_2", 'h308, this);
+      this.OFFLOAD_SDO_3_R = new("OFFLOAD_SDO_3", 'h30c, this);
+      this.OFFLOAD_SDO_4_R = new("OFFLOAD_SDO_4", 'h310, this);
+      this.OFFLOAD_SDO_5_R = new("OFFLOAD_SDO_5", 'h314, this);
+      this.OFFLOAD_SDO_6_R = new("OFFLOAD_SDO_6", 'h318, this);
+      this.OFFLOAD_SDO_7_R = new("OFFLOAD_SDO_7", 'h31c, this);
+      this.OFFLOAD_SDO_8_R = new("OFFLOAD_SDO_8", 'h320, this);
+      this.OFFLOAD_SDO_9_R = new("OFFLOAD_SDO_9", 'h324, this);
+      this.OFFLOAD_SDO_10_R = new("OFFLOAD_SDO_10", 'h328, this);
+      this.OFFLOAD_SDO_11_R = new("OFFLOAD_SDO_11", 'h32c, this);
+      this.OFFLOAD_SDO_12_R = new("OFFLOAD_SDO_12", 'h330, this);
+      this.OFFLOAD_SDO_13_R = new("OFFLOAD_SDO_13", 'h334, this);
+      this.OFFLOAD_SDO_14_R = new("OFFLOAD_SDO_14", 'h338, this);
+      this.OFFLOAD_SDO_15_R = new("OFFLOAD_SDO_15", 'h33c, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_i3c_controller
+
+endpackage: adi_regmap_i3c_controller_pkg

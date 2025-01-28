@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,15 +33,15 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_common_pkg;
+package adi_regmap_common_template_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_common extends adi_regmap;
+  class adi_regmap_common_template extends adi_regmap;
 
-    /* Base (common to all cores) */
+    /* Base */
     class VERSION_CLASS extends register_base;
       field_base VERSION_F;
 
@@ -190,6 +190,6 @@ package adi_regmap_common_pkg;
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_common
+  endclass: adi_regmap_common_template
 
-endpackage: adi_regmap_common_pkg
+endpackage: adi_regmap_common_template_pkg

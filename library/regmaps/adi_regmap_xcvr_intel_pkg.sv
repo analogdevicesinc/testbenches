@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,15 +33,15 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_common_pkg;
+package adi_regmap_xcvr_intel_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_common extends adi_regmap;
+  class adi_regmap_xcvr_intel extends adi_regmap;
 
-    /* Base (common to all cores) */
+    /* Intel XCVR (axi_xcvr) */
     class VERSION_CLASS extends register_base;
       field_base VERSION_F;
 
@@ -52,7 +52,7 @@ package adi_regmap_common_pkg;
 
         super.new(name, address, parent);
 
-        this.VERSION_F = new("VERSION", 31, 0, RO, 'h0, this);
+        this.VERSION_F = new("VERSION", 31, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
@@ -68,7 +68,7 @@ package adi_regmap_common_pkg;
 
         super.new(name, address, parent);
 
-        this.ID_F = new("ID", 31, 0, RO, 'h0, this);
+        this.ID_F = new("ID", 31, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
@@ -84,25 +84,14 @@ package adi_regmap_common_pkg;
 
         super.new(name, address, parent);
 
-        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: SCRATCH_CLASS
 
-    class CONFIG_CLASS extends register_base;
-      field_base IQCORRECTION_DISABLE_F;
-      field_base DCFILTER_DISABLE_F;
-      field_base DATAFORMAT_DISABLE_F;
-      field_base USERPORTS_DISABLE_F;
-      field_base MODE_1R1T_F;
-      field_base DELAY_CONTROL_DISABLE_F;
-      field_base DDS_DISABLE_F;
-      field_base CMOS_OR_LVDS_N_F;
-      field_base PPS_RECEIVER_ENABLE_F;
-      field_base SCALECORRECTION_ONLY_F;
-      field_base EXT_SYNC_F;
-      field_base RD_RAW_DATA_F;
+    class RESETN_CLASS extends register_base;
+      field_base RESETN_F;
 
       function new(
         input string name,
@@ -111,25 +100,14 @@ package adi_regmap_common_pkg;
 
         super.new(name, address, parent);
 
-        this.IQCORRECTION_DISABLE_F = new("IQCORRECTION_DISABLE", 0, 0, RO, 'h0, this);
-        this.DCFILTER_DISABLE_F = new("DCFILTER_DISABLE", 1, 1, RO, 'h0, this);
-        this.DATAFORMAT_DISABLE_F = new("DATAFORMAT_DISABLE", 2, 2, RO, 'h0, this);
-        this.USERPORTS_DISABLE_F = new("USERPORTS_DISABLE", 3, 3, RO, 'h0, this);
-        this.MODE_1R1T_F = new("MODE_1R1T", 4, 4, RO, 'h0, this);
-        this.DELAY_CONTROL_DISABLE_F = new("DELAY_CONTROL_DISABLE", 5, 5, RO, 'h0, this);
-        this.DDS_DISABLE_F = new("DDS_DISABLE", 6, 6, RO, 'h0, this);
-        this.CMOS_OR_LVDS_N_F = new("CMOS_OR_LVDS_N", 7, 7, RO, 'h0, this);
-        this.PPS_RECEIVER_ENABLE_F = new("PPS_RECEIVER_ENABLE", 8, 8, RO, 'h0, this);
-        this.SCALECORRECTION_ONLY_F = new("SCALECORRECTION_ONLY", 9, 9, RO, 'h0, this);
-        this.EXT_SYNC_F = new("EXT_SYNC", 12, 12, RO, 'h0, this);
-        this.RD_RAW_DATA_F = new("RD_RAW_DATA", 13, 13, RO, 'h0, this);
+        this.RESETN_F = new("RESETN", 0, 0, RW, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: CONFIG_CLASS
+    endclass: RESETN_CLASS
 
-    class PPS_IRQ_MASK_CLASS extends register_base;
-      field_base PPS_IRQ_MASK_F;
+    class STATUS_CLASS extends register_base;
+      field_base STATUS_F;
 
       function new(
         input string name,
@@ -138,11 +116,30 @@ package adi_regmap_common_pkg;
 
         super.new(name, address, parent);
 
-        this.PPS_IRQ_MASK_F = new("PPS_IRQ_MASK", 0, 0, RW, 'h1, this);
+        this.STATUS_F = new("STATUS", 0, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: PPS_IRQ_MASK_CLASS
+    endclass: STATUS_CLASS
+
+    class STATUS_32_CLASS extends register_base;
+      field_base UP_PLL_LOCKED_F;
+      field_base CHANNEL_N_READY_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int NUM_OF_LANES,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.UP_PLL_LOCKED_F = new("UP_PLL_LOCKED", NUM_OF_LANES, NUM_OF_LANES, RO, 'hXXXXXXXX, this);
+        this.CHANNEL_N_READY_F = new("CHANNEL_N_READY", NUM_OF_LANES-1, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: STATUS_32_CLASS
 
     class FPGA_INFO_CLASS extends register_base;
       field_base FPGA_TECHNOLOGY_F;
@@ -157,25 +154,65 @@ package adi_regmap_common_pkg;
 
         super.new(name, address, parent);
 
-        this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'h0, this);
-        this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'h0, this);
-        this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'h0, this);
-        this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'h0, this);
+        this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'hXXXXXXXX, this);
+        this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'hXXXXXXXX, this);
+        this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'hXXXXXXXX, this);
+        this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: FPGA_INFO_CLASS
 
+    class GENERIC_INFO_CLASS extends register_base;
+      field_base XCVR_TYPE_F;
+      field_base TX_OR_RX_N_F;
+      field_base NUM_OF_LANES_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.XCVR_TYPE_F = new("XCVR_TYPE", 27, 24, RO, 'hXXXXXXXX, this);
+        this.TX_OR_RX_N_F = new("TX_OR_RX_N", 8, 8, RO, 'hXXXXXXXX, this);
+        this.NUM_OF_LANES_F = new("NUM_OF_LANES", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: GENERIC_INFO_CLASS
+
+    class FPGA_VOLTAGE_CLASS extends register_base;
+      field_base FPGA_VOLTAGE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FPGA_VOLTAGE_CLASS
+
     VERSION_CLASS VERSION_R;
     ID_CLASS ID_R;
     SCRATCH_CLASS SCRATCH_R;
-    CONFIG_CLASS CONFIG_R;
-    PPS_IRQ_MASK_CLASS PPS_IRQ_MASK_R;
+    RESETN_CLASS RESETN_R;
+    STATUS_CLASS STATUS_R;
+    STATUS_32_CLASS STATUS_32_R;
     FPGA_INFO_CLASS FPGA_INFO_R;
+    GENERIC_INFO_CLASS GENERIC_INFO_R;
+    FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
 
     function new(
       input string name,
       input int address,
+      input int NUM_OF_LANES,
       input adi_api parent = null);
 
       super.new(name, address, parent);
@@ -183,13 +220,16 @@ package adi_regmap_common_pkg;
       this.VERSION_R = new("VERSION", 'h0, this);
       this.ID_R = new("ID", 'h4, this);
       this.SCRATCH_R = new("SCRATCH", 'h8, this);
-      this.CONFIG_R = new("CONFIG", 'hc, this);
-      this.PPS_IRQ_MASK_R = new("PPS_IRQ_MASK", 'h10, this);
+      this.RESETN_R = new("RESETN", 'h10, this);
+      this.STATUS_R = new("STATUS", 'h14, this);
+      this.STATUS_32_R = new("STATUS_32", 'h18, NUM_OF_LANES, this);
       this.FPGA_INFO_R = new("FPGA_INFO", 'h1c, this);
+      this.GENERIC_INFO_R = new("GENERIC_INFO", 'h24, this);
+      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_common
+  endclass: adi_regmap_xcvr_intel
 
-endpackage: adi_regmap_common_pkg
+endpackage: adi_regmap_xcvr_intel_pkg

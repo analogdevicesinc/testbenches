@@ -35,17 +35,15 @@
 /* Auto generated Register Map */
 /* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_system_id_pkg;
+package adi_regmap_xcvr_intel_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_system_id extends adi_regmap;
+  class adi_regmap_xcvr_intel extends adi_regmap;
 
-    /* System ID (axi_system_id) */
+    /* Intel XCVR (axi_xcvr) */
     class VERSION_CLASS extends register_base;
-      field_base VERSION_MAJOR_F;
-      field_base VERSION_MINOR_F;
-      field_base VERSION_PATCH_F;
+      field_base VERSION_F;
 
       function new(
         input string name,
@@ -54,30 +52,27 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
-        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
-        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
+        this.VERSION_F = new("VERSION", 31, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: VERSION_CLASS
 
-    class PERIPHERAL_ID_CLASS extends register_base;
-      field_base PERIPHERAL_ID_F;
+    class ID_CLASS extends register_base;
+      field_base ID_F;
 
       function new(
         input string name,
         input int address,
-        input int ID,
         input adi_regmap parent = null);
 
         super.new(name, address, parent);
 
-        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+        this.ID_F = new("ID", 31, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: PERIPHERAL_ID_CLASS
+    endclass: ID_CLASS
 
     class SCRATCH_CLASS extends register_base;
       field_base SCRATCH_F;
@@ -89,14 +84,14 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: SCRATCH_CLASS
 
-    class IDENTIFICATION_CLASS extends register_base;
-      field_base IDENTIFICATION_F;
+    class RESETN_CLASS extends register_base;
+      field_base RESETN_F;
 
       function new(
         input string name,
@@ -105,14 +100,14 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h53594944, this);
+        this.RESETN_F = new("RESETN", 0, 0, RW, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: IDENTIFICATION_CLASS
+    endclass: RESETN_CLASS
 
-    class SYSROM_START_CLASS extends register_base;
-      field_base SYSROM_START_F;
+    class STATUS_CLASS extends register_base;
+      field_base STATUS_F;
 
       function new(
         input string name,
@@ -121,14 +116,36 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+        this.STATUS_F = new("STATUS", 0, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: SYSROM_START_CLASS
+    endclass: STATUS_CLASS
 
-    class PRROM_START_CLASS extends register_base;
-      field_base SYSROM_START_F;
+    class STATUS_32_CLASS extends register_base;
+      field_base UP_PLL_LOCKED_F;
+      field_base CHANNEL_N_READY_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int NUM_OF_LANES,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.UP_PLL_LOCKED_F = new("UP_PLL_LOCKED", NUM_OF_LANES, NUM_OF_LANES, RO, 'hXXXXXXXX, this);
+        this.CHANNEL_N_READY_F = new("CHANNEL_N_READY", NUM_OF_LANES-1, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: STATUS_32_CLASS
+
+    class FPGA_INFO_CLASS extends register_base;
+      field_base FPGA_TECHNOLOGY_F;
+      field_base FPGA_FAMILY_F;
+      field_base SPEED_GRADE_F;
+      field_base DEV_PACKAGE_F;
 
       function new(
         input string name,
@@ -137,37 +154,82 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+        this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'hXXXXXXXX, this);
+        this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'hXXXXXXXX, this);
+        this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'hXXXXXXXX, this);
+        this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'hXXXXXXXX, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: PRROM_START_CLASS
+    endclass: FPGA_INFO_CLASS
+
+    class GENERIC_INFO_CLASS extends register_base;
+      field_base XCVR_TYPE_F;
+      field_base TX_OR_RX_N_F;
+      field_base NUM_OF_LANES_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.XCVR_TYPE_F = new("XCVR_TYPE", 27, 24, RO, 'hXXXXXXXX, this);
+        this.TX_OR_RX_N_F = new("TX_OR_RX_N", 8, 8, RO, 'hXXXXXXXX, this);
+        this.NUM_OF_LANES_F = new("NUM_OF_LANES", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: GENERIC_INFO_CLASS
+
+    class FPGA_VOLTAGE_CLASS extends register_base;
+      field_base FPGA_VOLTAGE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FPGA_VOLTAGE_CLASS
 
     VERSION_CLASS VERSION_R;
-    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
+    ID_CLASS ID_R;
     SCRATCH_CLASS SCRATCH_R;
-    IDENTIFICATION_CLASS IDENTIFICATION_R;
-    SYSROM_START_CLASS SYSROM_START_R;
-    PRROM_START_CLASS PRROM_START_R;
+    RESETN_CLASS RESETN_R;
+    STATUS_CLASS STATUS_R;
+    STATUS_32_CLASS STATUS_32_R;
+    FPGA_INFO_CLASS FPGA_INFO_R;
+    GENERIC_INFO_CLASS GENERIC_INFO_R;
+    FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
 
     function new(
       input string name,
       input int address,
-      input int ID,
+      input int NUM_OF_LANES,
       input adi_api parent = null);
 
       super.new(name, address, parent);
 
       this.VERSION_R = new("VERSION", 'h0, this);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, ID, this);
+      this.ID_R = new("ID", 'h4, this);
       this.SCRATCH_R = new("SCRATCH", 'h8, this);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
-      this.SYSROM_START_R = new("SYSROM_START", 'h800, this);
-      this.PRROM_START_R = new("PRROM_START", 'h1000, this);
+      this.RESETN_R = new("RESETN", 'h10, this);
+      this.STATUS_R = new("STATUS", 'h14, this);
+      this.STATUS_32_R = new("STATUS_32", 'h18, NUM_OF_LANES, this);
+      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c, this);
+      this.GENERIC_INFO_R = new("GENERIC_INFO", 'h24, this);
+      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_system_id
+  endclass: adi_regmap_xcvr_intel
 
-endpackage: adi_regmap_system_id_pkg
+endpackage: adi_regmap_xcvr_intel_pkg

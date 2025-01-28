@@ -33,35 +33,17 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_clkgen_pkg;
+package adi_regmap_common_template_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_clkgen extends adi_regmap;
+  class adi_regmap_common_template extends adi_regmap;
 
-    /* Clock Generator (axi_clkgen) */
-    class RSTN_CLASS extends register_base;
-      field_base MMCM_RSTN_F;
-      field_base RSTN_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.MMCM_RSTN_F = new("MMCM_RSTN", 1, 1, RW, 'h0, this);
-        this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: RSTN_CLASS
-
-    class CLK_SEL_CLASS extends register_base;
-      field_base CLK_SEL_F;
+    /* Base */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_F;
 
       function new(
         input string name,
@@ -70,14 +52,14 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.CLK_SEL_F = new("CLK_SEL", 0, 0, RW, 'h0, this);
+        this.VERSION_F = new("VERSION", 31, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: CLK_SEL_CLASS
+    endclass: VERSION_CLASS
 
-    class MMCM_STATUS_CLASS extends register_base;
-      field_base MMCM_LOCKED_F;
+    class ID_CLASS extends register_base;
+      field_base ID_F;
 
       function new(
         input string name,
@@ -86,16 +68,14 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 0, 0, RO, 'h0, this);
+        this.ID_F = new("ID", 31, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: MMCM_STATUS_CLASS
+    endclass: ID_CLASS
 
-    class DRP_CNTRL_CLASS extends register_base;
-      field_base DRP_RWN_F;
-      field_base DRP_ADDRESS_F;
-      field_base DRP_WDATA_F;
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
 
       function new(
         input string name,
@@ -104,18 +84,25 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.DRP_RWN_F = new("DRP_RWN", 28, 28, RW, 'h0, this);
-        this.DRP_ADDRESS_F = new("DRP_ADDRESS", 27, 16, RW, 'h0, this);
-        this.DRP_WDATA_F = new("DRP_WDATA", 15, 0, RW, 'h0, this);
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DRP_CNTRL_CLASS
+    endclass: SCRATCH_CLASS
 
-    class DRP_STATUS_CLASS extends register_base;
-      field_base MMCM_LOCKED_F;
-      field_base DRP_STATUS_F;
-      field_base DRP_RDATA_F;
+    class CONFIG_CLASS extends register_base;
+      field_base IQCORRECTION_DISABLE_F;
+      field_base DCFILTER_DISABLE_F;
+      field_base DATAFORMAT_DISABLE_F;
+      field_base USERPORTS_DISABLE_F;
+      field_base MODE_1R1T_F;
+      field_base DELAY_CONTROL_DISABLE_F;
+      field_base DDS_DISABLE_F;
+      field_base CMOS_OR_LVDS_N_F;
+      field_base PPS_RECEIVER_ENABLE_F;
+      field_base SCALECORRECTION_ONLY_F;
+      field_base EXT_SYNC_F;
+      field_base RD_RAW_DATA_F;
 
       function new(
         input string name,
@@ -124,16 +111,25 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 17, 17, RO, 'h0, this);
-        this.DRP_STATUS_F = new("DRP_STATUS", 16, 16, RO, 'h0, this);
-        this.DRP_RDATA_F = new("DRP_RDATA", 15, 0, RO, 'h0, this);
+        this.IQCORRECTION_DISABLE_F = new("IQCORRECTION_DISABLE", 0, 0, RO, 'h0, this);
+        this.DCFILTER_DISABLE_F = new("DCFILTER_DISABLE", 1, 1, RO, 'h0, this);
+        this.DATAFORMAT_DISABLE_F = new("DATAFORMAT_DISABLE", 2, 2, RO, 'h0, this);
+        this.USERPORTS_DISABLE_F = new("USERPORTS_DISABLE", 3, 3, RO, 'h0, this);
+        this.MODE_1R1T_F = new("MODE_1R1T", 4, 4, RO, 'h0, this);
+        this.DELAY_CONTROL_DISABLE_F = new("DELAY_CONTROL_DISABLE", 5, 5, RO, 'h0, this);
+        this.DDS_DISABLE_F = new("DDS_DISABLE", 6, 6, RO, 'h0, this);
+        this.CMOS_OR_LVDS_N_F = new("CMOS_OR_LVDS_N", 7, 7, RO, 'h0, this);
+        this.PPS_RECEIVER_ENABLE_F = new("PPS_RECEIVER_ENABLE", 8, 8, RO, 'h0, this);
+        this.SCALECORRECTION_ONLY_F = new("SCALECORRECTION_ONLY", 9, 9, RO, 'h0, this);
+        this.EXT_SYNC_F = new("EXT_SYNC", 12, 12, RO, 'h0, this);
+        this.RD_RAW_DATA_F = new("RD_RAW_DATA", 13, 13, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DRP_STATUS_CLASS
+    endclass: CONFIG_CLASS
 
-    class FPGA_VOLTAGE_CLASS extends register_base;
-      field_base FPGA_VOLTAGE_F;
+    class PPS_IRQ_MASK_CLASS extends register_base;
+      field_base PPS_IRQ_MASK_F;
 
       function new(
         input string name,
@@ -142,18 +138,40 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'h0, this);
+        this.PPS_IRQ_MASK_F = new("PPS_IRQ_MASK", 0, 0, RW, 'h1, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: FPGA_VOLTAGE_CLASS
+    endclass: PPS_IRQ_MASK_CLASS
 
-    RSTN_CLASS RSTN_R;
-    CLK_SEL_CLASS CLK_SEL_R;
-    MMCM_STATUS_CLASS MMCM_STATUS_R;
-    DRP_CNTRL_CLASS DRP_CNTRL_R;
-    DRP_STATUS_CLASS DRP_STATUS_R;
-    FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
+    class FPGA_INFO_CLASS extends register_base;
+      field_base FPGA_TECHNOLOGY_F;
+      field_base FPGA_FAMILY_F;
+      field_base SPEED_GRADE_F;
+      field_base DEV_PACKAGE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'h0, this);
+        this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'h0, this);
+        this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'h0, this);
+        this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FPGA_INFO_CLASS
+
+    VERSION_CLASS VERSION_R;
+    ID_CLASS ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    CONFIG_CLASS CONFIG_R;
+    PPS_IRQ_MASK_CLASS PPS_IRQ_MASK_R;
+    FPGA_INFO_CLASS FPGA_INFO_R;
 
     function new(
       input string name,
@@ -162,16 +180,16 @@ package adi_regmap_clkgen_pkg;
 
       super.new(name, address, parent);
 
-      this.RSTN_R = new("RSTN", 'h40, this);
-      this.CLK_SEL_R = new("CLK_SEL", 'h44, this);
-      this.MMCM_STATUS_R = new("MMCM_STATUS", 'h5c, this);
-      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70, this);
-      this.DRP_STATUS_R = new("DRP_STATUS", 'h74, this);
-      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.CONFIG_R = new("CONFIG", 'hc, this);
+      this.PPS_IRQ_MASK_R = new("PPS_IRQ_MASK", 'h10, this);
+      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c, this);
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_clkgen
+  endclass: adi_regmap_common_template
 
-endpackage: adi_regmap_clkgen_pkg
+endpackage: adi_regmap_common_template_pkg

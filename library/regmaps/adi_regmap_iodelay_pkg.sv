@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014 - 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,34 +33,75 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
 package adi_regmap_iodelay_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_iodelay extends adi_regmap;
 
-/* IO Delay Control (axi_ad*) */
+    /* IO Delay Control (axi_ad*) */
+    class DELAY_CONTROL_n_CLASS extends register_base;
+      field_base DELAY_CONTROL_IO_n_F;
 
-  const reg_t IO_DELAY_CNTRL_REG_DELAY_CONTROL_0 = '{ 'h0000, "REG_DELAY_CONTROL_0" , '{
-    "DELAY_CONTROL_IO_0": '{ 4, 0, RW, 'h00 }}};
-  `define SET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0(x) SetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0",x)
-  `define GET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0(x) GetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0",x)
-  `define DEFAULT_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0 GetResetValue(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0")
-  `define UPDATE_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0(x,y) UpdateField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t IO_DELAY_CNTRL_REG_DELAY_CONTROL_1 = '{ 'h0004, "REG_DELAY_CONTROL_1" , '{
-    "DELAY_CONTROL_IO_1": '{ 4, 0, RW, 'h00 }}};
-  `define SET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1(x) SetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1",x)
-  `define GET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1(x) GetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1",x)
-  `define DEFAULT_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1 GetResetValue(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1")
-  `define UPDATE_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1(x,y) UpdateField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1",x,y)
+        super.new(name, address, parent);
 
-  const reg_t IO_DELAY_CNTRL_REG_DELAY_CONTROL_F = '{ 'h003c, "REG_DELAY_CONTROL_F" , '{
-    "DELAY_CONTROL_IO_F": '{ 4, 0, RW, 'h00 }}};
-  `define SET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F(x) SetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F",x)
-  `define GET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F(x) GetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F",x)
-  `define DEFAULT_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F GetResetValue(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F")
-  `define UPDATE_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F(x,y) UpdateField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F",x,y)
+        this.DELAY_CONTROL_IO_n_F = new("DELAY_CONTROL_IO_n", 4, 0, RW, 'h0, this);
 
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DELAY_CONTROL_n_CLASS
 
-endpackage
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_0_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_1_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_2_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_3_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_4_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_5_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_6_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_7_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_8_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_9_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_10_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_11_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_12_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_13_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_14_R;
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_15_R;
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.DELAY_CONTROL_0_R = new("DELAY_CONTROL_0", 'h0, this);
+      this.DELAY_CONTROL_1_R = new("DELAY_CONTROL_1", 'h4, this);
+      this.DELAY_CONTROL_2_R = new("DELAY_CONTROL_2", 'h8, this);
+      this.DELAY_CONTROL_3_R = new("DELAY_CONTROL_3", 'hc, this);
+      this.DELAY_CONTROL_4_R = new("DELAY_CONTROL_4", 'h10, this);
+      this.DELAY_CONTROL_5_R = new("DELAY_CONTROL_5", 'h14, this);
+      this.DELAY_CONTROL_6_R = new("DELAY_CONTROL_6", 'h18, this);
+      this.DELAY_CONTROL_7_R = new("DELAY_CONTROL_7", 'h1c, this);
+      this.DELAY_CONTROL_8_R = new("DELAY_CONTROL_8", 'h20, this);
+      this.DELAY_CONTROL_9_R = new("DELAY_CONTROL_9", 'h24, this);
+      this.DELAY_CONTROL_10_R = new("DELAY_CONTROL_10", 'h28, this);
+      this.DELAY_CONTROL_11_R = new("DELAY_CONTROL_11", 'h2c, this);
+      this.DELAY_CONTROL_12_R = new("DELAY_CONTROL_12", 'h30, this);
+      this.DELAY_CONTROL_13_R = new("DELAY_CONTROL_13", 'h34, this);
+      this.DELAY_CONTROL_14_R = new("DELAY_CONTROL_14", 'h38, this);
+      this.DELAY_CONTROL_15_R = new("DELAY_CONTROL_15", 'h3c, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_iodelay
+
+endpackage: adi_regmap_iodelay_pkg

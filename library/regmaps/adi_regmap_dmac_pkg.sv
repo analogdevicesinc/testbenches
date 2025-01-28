@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014 - 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,400 +33,757 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu May  9 16:11:55 2024 */
+/* Jan 28 13:30:16 2025 v0.3.55 */
 
 package adi_regmap_dmac_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
+
+  class adi_regmap_dmac extends adi_regmap;
+
+    /* DMA Controller (axi_dmac) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_MAJOR_F;
+      field_base VERSION_MINOR_F;
+      field_base VERSION_PATCH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h4, this);
+        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h5, this);
+        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h64, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
+
+    class PERIPHERAL_ID_CLASS extends register_base;
+      field_base PERIPHERAL_ID_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int ID,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PERIPHERAL_ID_CLASS
+
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
+
+    class IDENTIFICATION_CLASS extends register_base;
+      field_base IDENTIFICATION_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h444d4143, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IDENTIFICATION_CLASS
+
+    class INTERFACE_DESCRIPTION_1_CLASS extends register_base;
+      field_base BYTES_PER_BEAT_DEST_LOG2_F;
+      field_base DMA_TYPE_DEST_F;
+      field_base BYTES_PER_BEAT_SRC_LOG2_F;
+      field_base DMA_TYPE_SRC_F;
+      field_base BYTES_PER_BURST_WIDTH_F;
+      field_base AUTORUN_F;
+      field_base USE_EXT_SYNC_F;
+      field_base DMA_2D_TLAST_MODE_F;
+      field_base MAX_NUM_FRAMES_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int AUTORUN,
+        input int BYTES_PER_BURST_WIDTH,
+        input int DMA_2D_TLAST_MODE,
+        input int DMA_DATA_WIDTH_DEST,
+        input int DMA_DATA_WIDTH_SRC,
+        input int DMA_TYPE_DEST,
+        input int DMA_TYPE_SRC,
+        input int MAX_NUM_FRAMES,
+        input int USE_EXT_SYNC,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.BYTES_PER_BEAT_DEST_LOG2_F = new("BYTES_PER_BEAT_DEST_LOG2", 3, 0, RO, $clog2(DMA_DATA_WIDTH_DEST/8), this);
+        this.DMA_TYPE_DEST_F = new("DMA_TYPE_DEST", 5, 4, RO, DMA_TYPE_DEST, this);
+        this.BYTES_PER_BEAT_SRC_LOG2_F = new("BYTES_PER_BEAT_SRC_LOG2", 11, 8, RO, $clog2(DMA_DATA_WIDTH_SRC/8), this);
+        this.DMA_TYPE_SRC_F = new("DMA_TYPE_SRC", 13, 12, RO, DMA_TYPE_SRC, this);
+        this.BYTES_PER_BURST_WIDTH_F = new("BYTES_PER_BURST_WIDTH", 19, 16, RO, BYTES_PER_BURST_WIDTH, this);
+        this.AUTORUN_F = new("AUTORUN", 24, 24, RO, AUTORUN, this);
+        this.USE_EXT_SYNC_F = new("USE_EXT_SYNC", 25, 25, RO, USE_EXT_SYNC, this);
+        this.DMA_2D_TLAST_MODE_F = new("DMA_2D_TLAST_MODE", 26, 26, RO, DMA_2D_TLAST_MODE, this);
+        this.MAX_NUM_FRAMES_F = new("MAX_NUM_FRAMES", 31, 27, RO, MAX_NUM_FRAMES, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: INTERFACE_DESCRIPTION_1_CLASS
+
+    class INTERFACE_DESCRIPTION_2_CLASS extends register_base;
+      field_base CACHE_COHERENT_F;
+      field_base AXI_AXCACHE_F;
+      field_base AXI_AXPROT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int AXI_AXCACHE,
+        input int AXI_AXPROT,
+        input int CACHE_COHERENT,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CACHE_COHERENT_F = new("CACHE_COHERENT", 0, 0, RO, CACHE_COHERENT, this);
+        this.AXI_AXCACHE_F = new("AXI_AXCACHE", 7, 4, RO, AXI_AXCACHE, this);
+        this.AXI_AXPROT_F = new("AXI_AXPROT", 10, 8, RO, AXI_AXPROT, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: INTERFACE_DESCRIPTION_2_CLASS
+
+    class IRQ_MASK_CLASS extends register_base;
+      field_base TRANSFER_COMPLETED_F;
+      field_base TRANSFER_QUEUED_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TRANSFER_COMPLETED_F = new("TRANSFER_COMPLETED", 1, 1, RW, 'h1, this);
+        this.TRANSFER_QUEUED_F = new("TRANSFER_QUEUED", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_MASK_CLASS
+
+    class IRQ_PENDING_CLASS extends register_base;
+      field_base TRANSFER_COMPLETED_F;
+      field_base TRANSFER_QUEUED_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TRANSFER_COMPLETED_F = new("TRANSFER_COMPLETED", 1, 1, RW1C, 'h0, this);
+        this.TRANSFER_QUEUED_F = new("TRANSFER_QUEUED", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_PENDING_CLASS
+
+    class IRQ_SOURCE_CLASS extends register_base;
+      field_base TRANSFER_COMPLETED_F;
+      field_base TRANSFER_QUEUED_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TRANSFER_COMPLETED_F = new("TRANSFER_COMPLETED", 1, 1, RO, 'h0, this);
+        this.TRANSFER_QUEUED_F = new("TRANSFER_QUEUED", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_SOURCE_CLASS
+
+    class CONTROL_CLASS extends register_base;
+      field_base FRAMELOCK_F;
+      field_base HWDESC_F;
+      field_base PAUSE_F;
+      field_base ENABLE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.FRAMELOCK_F = new("FRAMELOCK", 3, 3, RW, 'h0, this);
+        this.HWDESC_F = new("HWDESC", 2, 2, RW, 'h0, this);
+        this.PAUSE_F = new("PAUSE", 1, 1, RW, 'h0, this);
+        this.ENABLE_F = new("ENABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CONTROL_CLASS
+
+    class TRANSFER_ID_CLASS extends register_base;
+      field_base TRANSFER_ID_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TRANSFER_ID_F = new("TRANSFER_ID", 1, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TRANSFER_ID_CLASS
+
+    class TRANSFER_SUBMIT_CLASS extends register_base;
+      field_base TRANSFER_SUBMIT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TRANSFER_SUBMIT_F = new("TRANSFER_SUBMIT", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TRANSFER_SUBMIT_CLASS
+
+    class FLAGS_CLASS extends register_base;
+      field_base CYCLIC_F;
+      field_base TLAST_F;
+      field_base PARTIAL_REPORTING_EN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int CYCLIC,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CYCLIC_F = new("CYCLIC", 0, 0, RW, CYCLIC, this);
+        this.TLAST_F = new("TLAST", 1, 1, RW, 'h1, this);
+        this.PARTIAL_REPORTING_EN_F = new("PARTIAL_REPORTING_EN", 2, 2, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FLAGS_CLASS
+
+    class DEST_ADDRESS_CLASS extends register_base;
+      field_base DEST_ADDRESS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DEST_ADDRESS_F = new("DEST_ADDRESS", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DEST_ADDRESS_CLASS
+
+    class SRC_ADDRESS_CLASS extends register_base;
+      field_base SRC_ADDRESS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SRC_ADDRESS_F = new("SRC_ADDRESS", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SRC_ADDRESS_CLASS
+
+    class X_LENGTH_CLASS extends register_base;
+      field_base X_LENGTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int DMA_DATA_WIDTH_DEST,
+        input int DMA_DATA_WIDTH_SRC,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.X_LENGTH_F = new("X_LENGTH", 31, 0, RW, 2**$clog2(`MAX(DMA_DATA_WIDTH_SRC, DMA_DATA_WIDTH_DEST)/8)-1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: X_LENGTH_CLASS
+
+    class Y_LENGTH_CLASS extends register_base;
+      field_base Y_LENGTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.Y_LENGTH_F = new("Y_LENGTH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: Y_LENGTH_CLASS
+
+    class DEST_STRIDE_CLASS extends register_base;
+      field_base DEST_STRIDE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DEST_STRIDE_F = new("DEST_STRIDE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DEST_STRIDE_CLASS
+
+    class SRC_STRIDE_CLASS extends register_base;
+      field_base SRC_STRIDE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SRC_STRIDE_F = new("SRC_STRIDE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SRC_STRIDE_CLASS
+
+    class TRANSFER_DONE_CLASS extends register_base;
+      field_base TRANSFER_0_DONE_F;
+      field_base TRANSFER_1_DONE_F;
+      field_base TRANSFER_2_DONE_F;
+      field_base TRANSFER_3_DONE_F;
+      field_base PARTIAL_TRANSFER_DONE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TRANSFER_0_DONE_F = new("TRANSFER_0_DONE", 0, 0, RO, 'h0, this);
+        this.TRANSFER_1_DONE_F = new("TRANSFER_1_DONE", 1, 1, RO, 'h0, this);
+        this.TRANSFER_2_DONE_F = new("TRANSFER_2_DONE", 2, 2, RO, 'h0, this);
+        this.TRANSFER_3_DONE_F = new("TRANSFER_3_DONE", 3, 3, RO, 'h0, this);
+        this.PARTIAL_TRANSFER_DONE_F = new("PARTIAL_TRANSFER_DONE", 31, 31, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TRANSFER_DONE_CLASS
+
+    class ACTIVE_TRANSFER_ID_CLASS extends register_base;
+      field_base ACTIVE_TRANSFER_ID_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.ACTIVE_TRANSFER_ID_F = new("ACTIVE_TRANSFER_ID", 4, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ACTIVE_TRANSFER_ID_CLASS
+
+    class STATUS_CLASS extends register_base;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
 
 
-/* DMA Controller (axi_dmac) */
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: STATUS_CLASS
 
-  const reg_t DMAC_VERSION = '{ 'h0000, "VERSION" , '{
-    "VERSION_MAJOR": '{ 31, 16, RO, 'h04 },
-    "VERSION_MINOR": '{ 15, 8, RO, 'h05 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h64 }}};
-  `define SET_DMAC_VERSION_VERSION_MAJOR(x) SetField(DMAC_VERSION,"VERSION_MAJOR",x)
-  `define GET_DMAC_VERSION_VERSION_MAJOR(x) GetField(DMAC_VERSION,"VERSION_MAJOR",x)
-  `define DEFAULT_DMAC_VERSION_VERSION_MAJOR GetResetValue(DMAC_VERSION,"VERSION_MAJOR")
-  `define UPDATE_DMAC_VERSION_VERSION_MAJOR(x,y) UpdateField(DMAC_VERSION,"VERSION_MAJOR",x,y)
-  `define SET_DMAC_VERSION_VERSION_MINOR(x) SetField(DMAC_VERSION,"VERSION_MINOR",x)
-  `define GET_DMAC_VERSION_VERSION_MINOR(x) GetField(DMAC_VERSION,"VERSION_MINOR",x)
-  `define DEFAULT_DMAC_VERSION_VERSION_MINOR GetResetValue(DMAC_VERSION,"VERSION_MINOR")
-  `define UPDATE_DMAC_VERSION_VERSION_MINOR(x,y) UpdateField(DMAC_VERSION,"VERSION_MINOR",x,y)
-  `define SET_DMAC_VERSION_VERSION_PATCH(x) SetField(DMAC_VERSION,"VERSION_PATCH",x)
-  `define GET_DMAC_VERSION_VERSION_PATCH(x) GetField(DMAC_VERSION,"VERSION_PATCH",x)
-  `define DEFAULT_DMAC_VERSION_VERSION_PATCH GetResetValue(DMAC_VERSION,"VERSION_PATCH")
-  `define UPDATE_DMAC_VERSION_VERSION_PATCH(x,y) UpdateField(DMAC_VERSION,"VERSION_PATCH",x,y)
+    class CURRENT_DEST_ADDRESS_CLASS extends register_base;
+      field_base CURRENT_DEST_ADDRESS_F;
 
-  const reg_t DMAC_PERIPHERAL_ID = '{ 'h0004, "PERIPHERAL_ID" , '{
-    "PERIPHERAL_ID": '{ 31, 0, RO, 0 }}};
-  `define SET_DMAC_PERIPHERAL_ID_PERIPHERAL_ID(x) SetField(DMAC_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define GET_DMAC_PERIPHERAL_ID_PERIPHERAL_ID(x) GetField(DMAC_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define DEFAULT_DMAC_PERIPHERAL_ID_PERIPHERAL_ID GetResetValue(DMAC_PERIPHERAL_ID,"PERIPHERAL_ID")
-  `define UPDATE_DMAC_PERIPHERAL_ID_PERIPHERAL_ID(x,y) UpdateField(DMAC_PERIPHERAL_ID,"PERIPHERAL_ID",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t DMAC_SCRATCH = '{ 'h0008, "SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_DMAC_SCRATCH_SCRATCH(x) SetField(DMAC_SCRATCH,"SCRATCH",x)
-  `define GET_DMAC_SCRATCH_SCRATCH(x) GetField(DMAC_SCRATCH,"SCRATCH",x)
-  `define DEFAULT_DMAC_SCRATCH_SCRATCH GetResetValue(DMAC_SCRATCH,"SCRATCH")
-  `define UPDATE_DMAC_SCRATCH_SCRATCH(x,y) UpdateField(DMAC_SCRATCH,"SCRATCH",x,y)
+        super.new(name, address, parent);
 
-  const reg_t DMAC_IDENTIFICATION = '{ 'h000c, "IDENTIFICATION" , '{
-    "IDENTIFICATION": '{ 31, 0, RO, 'h444D4143 }}};
-  `define SET_DMAC_IDENTIFICATION_IDENTIFICATION(x) SetField(DMAC_IDENTIFICATION,"IDENTIFICATION",x)
-  `define GET_DMAC_IDENTIFICATION_IDENTIFICATION(x) GetField(DMAC_IDENTIFICATION,"IDENTIFICATION",x)
-  `define DEFAULT_DMAC_IDENTIFICATION_IDENTIFICATION GetResetValue(DMAC_IDENTIFICATION,"IDENTIFICATION")
-  `define UPDATE_DMAC_IDENTIFICATION_IDENTIFICATION(x,y) UpdateField(DMAC_IDENTIFICATION,"IDENTIFICATION",x,y)
+        this.CURRENT_DEST_ADDRESS_F = new("CURRENT_DEST_ADDRESS", 31, 0, RO, 'h0, this);
 
-  const reg_t DMAC_INTERFACE_DESCRIPTION_1 = '{ 'h0010, "INTERFACE_DESCRIPTION_1" , '{
-    "MAX_NUM_FRAMES": '{ 31, 27, R, 0 },
-    "DMA_2D_TLAST_MODE": '{ 26, 26, R, 0 },
-    "USE_EXT_SYNC": '{ 25, 25, R, 0 },
-    "HAS_AUTORUN": '{ 24, 24, R, 0 },
-    "BYTES_PER_BURST_WIDTH": '{ 19, 16, R, 0 },
-    "DMA_TYPE_SRC": '{ 13, 12, R, 0 },
-    "BYTES_PER_BEAT_SRC_LOG2": '{ 11, 8, R, 0 },
-    "DMA_TYPE_DEST": '{ 5, 4, R, 0 },
-    "BYTES_PER_BEAT_DEST_LOG2": '{ 3, 0, R, 0 }}};
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_MAX_NUM_FRAMES(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"MAX_NUM_FRAMES",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_MAX_NUM_FRAMES(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"MAX_NUM_FRAMES",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_MAX_NUM_FRAMES GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"MAX_NUM_FRAMES")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_MAX_NUM_FRAMES(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"MAX_NUM_FRAMES",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_DMA_2D_TLAST_MODE(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_2D_TLAST_MODE",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_DMA_2D_TLAST_MODE(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_2D_TLAST_MODE",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_DMA_2D_TLAST_MODE GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"DMA_2D_TLAST_MODE")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_DMA_2D_TLAST_MODE(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_2D_TLAST_MODE",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_USE_EXT_SYNC(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"USE_EXT_SYNC",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_USE_EXT_SYNC(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"USE_EXT_SYNC",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_USE_EXT_SYNC GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"USE_EXT_SYNC")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_USE_EXT_SYNC(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"USE_EXT_SYNC",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_HAS_AUTORUN(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"HAS_AUTORUN",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_HAS_AUTORUN(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"HAS_AUTORUN",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_HAS_AUTORUN GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"HAS_AUTORUN")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_HAS_AUTORUN(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"HAS_AUTORUN",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BURST_WIDTH(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BURST_WIDTH",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BURST_WIDTH(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BURST_WIDTH",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BURST_WIDTH GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BURST_WIDTH")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BURST_WIDTH(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BURST_WIDTH",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_SRC(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_SRC",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_SRC(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_SRC",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_SRC GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_SRC")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_SRC(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_SRC",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_SRC_LOG2(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_SRC_LOG2",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_SRC_LOG2(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_SRC_LOG2",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_SRC_LOG2 GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_SRC_LOG2")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_SRC_LOG2(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_SRC_LOG2",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_DEST(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_DEST",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_DEST(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_DEST",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_DEST GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_DEST")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_DMA_TYPE_DEST(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"DMA_TYPE_DEST",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_DEST_LOG2(x) SetField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_DEST_LOG2",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_DEST_LOG2(x) GetField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_DEST_LOG2",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_DEST_LOG2 GetResetValue(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_DEST_LOG2")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_1_BYTES_PER_BEAT_DEST_LOG2(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_1,"BYTES_PER_BEAT_DEST_LOG2",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CURRENT_DEST_ADDRESS_CLASS
 
-  const reg_t DMAC_INTERFACE_DESCRIPTION_2 = '{ 'h0014, "INTERFACE_DESCRIPTION_2" , '{
-    "CACHE_COHERENT": '{ 0, 0, R, 0 },
-    "AXI_AXCACHE": '{ 7, 4, R, 0 },
-    "AXI_AXPROT": '{ 10, 8, R, 0 }}};
-  `define SET_DMAC_INTERFACE_DESCRIPTION_2_CACHE_COHERENT(x) SetField(DMAC_INTERFACE_DESCRIPTION_2,"CACHE_COHERENT",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_2_CACHE_COHERENT(x) GetField(DMAC_INTERFACE_DESCRIPTION_2,"CACHE_COHERENT",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_2_CACHE_COHERENT GetResetValue(DMAC_INTERFACE_DESCRIPTION_2,"CACHE_COHERENT")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_2_CACHE_COHERENT(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_2,"CACHE_COHERENT",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXCACHE(x) SetField(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXCACHE",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXCACHE(x) GetField(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXCACHE",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXCACHE GetResetValue(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXCACHE")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXCACHE(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXCACHE",x,y)
-  `define SET_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXPROT(x) SetField(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXPROT",x)
-  `define GET_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXPROT(x) GetField(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXPROT",x)
-  `define DEFAULT_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXPROT GetResetValue(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXPROT")
-  `define UPDATE_DMAC_INTERFACE_DESCRIPTION_2_AXI_AXPROT(x,y) UpdateField(DMAC_INTERFACE_DESCRIPTION_2,"AXI_AXPROT",x,y)
+    class CURRENT_SRC_ADDRESS_CLASS extends register_base;
+      field_base CURRENT_SRC_ADDRESS_F;
 
-  const reg_t DMAC_IRQ_MASK = '{ 'h0080, "IRQ_MASK" , '{
-    "TRANSFER_COMPLETED": '{ 1, 1, RW, 'h1 },
-    "TRANSFER_QUEUED": '{ 0, 0, RW, 'h1 }}};
-  `define SET_DMAC_IRQ_MASK_TRANSFER_COMPLETED(x) SetField(DMAC_IRQ_MASK,"TRANSFER_COMPLETED",x)
-  `define GET_DMAC_IRQ_MASK_TRANSFER_COMPLETED(x) GetField(DMAC_IRQ_MASK,"TRANSFER_COMPLETED",x)
-  `define DEFAULT_DMAC_IRQ_MASK_TRANSFER_COMPLETED GetResetValue(DMAC_IRQ_MASK,"TRANSFER_COMPLETED")
-  `define UPDATE_DMAC_IRQ_MASK_TRANSFER_COMPLETED(x,y) UpdateField(DMAC_IRQ_MASK,"TRANSFER_COMPLETED",x,y)
-  `define SET_DMAC_IRQ_MASK_TRANSFER_QUEUED(x) SetField(DMAC_IRQ_MASK,"TRANSFER_QUEUED",x)
-  `define GET_DMAC_IRQ_MASK_TRANSFER_QUEUED(x) GetField(DMAC_IRQ_MASK,"TRANSFER_QUEUED",x)
-  `define DEFAULT_DMAC_IRQ_MASK_TRANSFER_QUEUED GetResetValue(DMAC_IRQ_MASK,"TRANSFER_QUEUED")
-  `define UPDATE_DMAC_IRQ_MASK_TRANSFER_QUEUED(x,y) UpdateField(DMAC_IRQ_MASK,"TRANSFER_QUEUED",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t DMAC_IRQ_PENDING = '{ 'h0084, "IRQ_PENDING" , '{
-    "TRANSFER_COMPLETED": '{ 1, 1, RW1C, 'h0 },
-    "TRANSFER_QUEUED": '{ 0, 0, RW1C, 'h0 }}};
-  `define SET_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(x) SetField(DMAC_IRQ_PENDING,"TRANSFER_COMPLETED",x)
-  `define GET_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(x) GetField(DMAC_IRQ_PENDING,"TRANSFER_COMPLETED",x)
-  `define DEFAULT_DMAC_IRQ_PENDING_TRANSFER_COMPLETED GetResetValue(DMAC_IRQ_PENDING,"TRANSFER_COMPLETED")
-  `define UPDATE_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(x,y) UpdateField(DMAC_IRQ_PENDING,"TRANSFER_COMPLETED",x,y)
-  `define SET_DMAC_IRQ_PENDING_TRANSFER_QUEUED(x) SetField(DMAC_IRQ_PENDING,"TRANSFER_QUEUED",x)
-  `define GET_DMAC_IRQ_PENDING_TRANSFER_QUEUED(x) GetField(DMAC_IRQ_PENDING,"TRANSFER_QUEUED",x)
-  `define DEFAULT_DMAC_IRQ_PENDING_TRANSFER_QUEUED GetResetValue(DMAC_IRQ_PENDING,"TRANSFER_QUEUED")
-  `define UPDATE_DMAC_IRQ_PENDING_TRANSFER_QUEUED(x,y) UpdateField(DMAC_IRQ_PENDING,"TRANSFER_QUEUED",x,y)
+        super.new(name, address, parent);
 
-  const reg_t DMAC_IRQ_SOURCE = '{ 'h0088, "IRQ_SOURCE" , '{
-    "TRANSFER_COMPLETED": '{ 1, 1, RO, 'h0 },
-    "TRANSFER_QUEUED": '{ 0, 0, RO, 'h0 }}};
-  `define SET_DMAC_IRQ_SOURCE_TRANSFER_COMPLETED(x) SetField(DMAC_IRQ_SOURCE,"TRANSFER_COMPLETED",x)
-  `define GET_DMAC_IRQ_SOURCE_TRANSFER_COMPLETED(x) GetField(DMAC_IRQ_SOURCE,"TRANSFER_COMPLETED",x)
-  `define DEFAULT_DMAC_IRQ_SOURCE_TRANSFER_COMPLETED GetResetValue(DMAC_IRQ_SOURCE,"TRANSFER_COMPLETED")
-  `define UPDATE_DMAC_IRQ_SOURCE_TRANSFER_COMPLETED(x,y) UpdateField(DMAC_IRQ_SOURCE,"TRANSFER_COMPLETED",x,y)
-  `define SET_DMAC_IRQ_SOURCE_TRANSFER_QUEUED(x) SetField(DMAC_IRQ_SOURCE,"TRANSFER_QUEUED",x)
-  `define GET_DMAC_IRQ_SOURCE_TRANSFER_QUEUED(x) GetField(DMAC_IRQ_SOURCE,"TRANSFER_QUEUED",x)
-  `define DEFAULT_DMAC_IRQ_SOURCE_TRANSFER_QUEUED GetResetValue(DMAC_IRQ_SOURCE,"TRANSFER_QUEUED")
-  `define UPDATE_DMAC_IRQ_SOURCE_TRANSFER_QUEUED(x,y) UpdateField(DMAC_IRQ_SOURCE,"TRANSFER_QUEUED",x,y)
+        this.CURRENT_SRC_ADDRESS_F = new("CURRENT_SRC_ADDRESS", 31, 0, RO, 'h0, this);
 
-  const reg_t DMAC_CONTROL = '{ 'h0400, "CONTROL" , '{
-    "FRAMELOCK": '{ 3, 3, RW, 'h0 },
-    "HWDESC": '{ 2, 2, RW, 'h0 },
-    "PAUSE": '{ 1, 1, RW, 'h0 },
-    "ENABLE": '{ 0, 0, RW, 'h0 }}};
-  `define SET_DMAC_CONTROL_FRAMELOCK(x) SetField(DMAC_CONTROL,"FRAMELOCK",x)
-  `define GET_DMAC_CONTROL_FRAMELOCK(x) GetField(DMAC_CONTROL,"FRAMELOCK",x)
-  `define DEFAULT_DMAC_CONTROL_FRAMELOCK GetResetValue(DMAC_CONTROL,"FRAMELOCK")
-  `define UPDATE_DMAC_CONTROL_FRAMELOCK(x,y) UpdateField(DMAC_CONTROL,"FRAMELOCK",x,y)
-  `define SET_DMAC_CONTROL_HWDESC(x) SetField(DMAC_CONTROL,"HWDESC",x)
-  `define GET_DMAC_CONTROL_HWDESC(x) GetField(DMAC_CONTROL,"HWDESC",x)
-  `define DEFAULT_DMAC_CONTROL_HWDESC GetResetValue(DMAC_CONTROL,"HWDESC")
-  `define UPDATE_DMAC_CONTROL_HWDESC(x,y) UpdateField(DMAC_CONTROL,"HWDESC",x,y)
-  `define SET_DMAC_CONTROL_PAUSE(x) SetField(DMAC_CONTROL,"PAUSE",x)
-  `define GET_DMAC_CONTROL_PAUSE(x) GetField(DMAC_CONTROL,"PAUSE",x)
-  `define DEFAULT_DMAC_CONTROL_PAUSE GetResetValue(DMAC_CONTROL,"PAUSE")
-  `define UPDATE_DMAC_CONTROL_PAUSE(x,y) UpdateField(DMAC_CONTROL,"PAUSE",x,y)
-  `define SET_DMAC_CONTROL_ENABLE(x) SetField(DMAC_CONTROL,"ENABLE",x)
-  `define GET_DMAC_CONTROL_ENABLE(x) GetField(DMAC_CONTROL,"ENABLE",x)
-  `define DEFAULT_DMAC_CONTROL_ENABLE GetResetValue(DMAC_CONTROL,"ENABLE")
-  `define UPDATE_DMAC_CONTROL_ENABLE(x,y) UpdateField(DMAC_CONTROL,"ENABLE",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CURRENT_SRC_ADDRESS_CLASS
 
-  const reg_t DMAC_TRANSFER_ID = '{ 'h0404, "TRANSFER_ID" , '{
-    "TRANSFER_ID": '{ 1, 0, RO, 'h00 }}};
-  `define SET_DMAC_TRANSFER_ID_TRANSFER_ID(x) SetField(DMAC_TRANSFER_ID,"TRANSFER_ID",x)
-  `define GET_DMAC_TRANSFER_ID_TRANSFER_ID(x) GetField(DMAC_TRANSFER_ID,"TRANSFER_ID",x)
-  `define DEFAULT_DMAC_TRANSFER_ID_TRANSFER_ID GetResetValue(DMAC_TRANSFER_ID,"TRANSFER_ID")
-  `define UPDATE_DMAC_TRANSFER_ID_TRANSFER_ID(x,y) UpdateField(DMAC_TRANSFER_ID,"TRANSFER_ID",x,y)
+    class TRANSFER_PROGRESS_CLASS extends register_base;
+      field_base TRANSFER_PROGRESS_F;
 
-  const reg_t DMAC_TRANSFER_SUBMIT = '{ 'h0408, "TRANSFER_SUBMIT" , '{
-    "TRANSFER_SUBMIT": '{ 0, 0, RW, 'h0 }}};
-  `define SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(x) SetField(DMAC_TRANSFER_SUBMIT,"TRANSFER_SUBMIT",x)
-  `define GET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(x) GetField(DMAC_TRANSFER_SUBMIT,"TRANSFER_SUBMIT",x)
-  `define DEFAULT_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT GetResetValue(DMAC_TRANSFER_SUBMIT,"TRANSFER_SUBMIT")
-  `define UPDATE_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(x,y) UpdateField(DMAC_TRANSFER_SUBMIT,"TRANSFER_SUBMIT",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t DMAC_FLAGS = '{ 'h040c, "FLAGS" , '{
-    "PARTIAL_REPORTING_EN": '{ 2, 2, RW, 0 },
-    "TLAST": '{ 1, 1, RW, 0 },
-    "CYCLIC": '{ 0, 0, RW, 0 }}};
-  `define SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(x) SetField(DMAC_FLAGS,"PARTIAL_REPORTING_EN",x)
-  `define GET_DMAC_FLAGS_PARTIAL_REPORTING_EN(x) GetField(DMAC_FLAGS,"PARTIAL_REPORTING_EN",x)
-  `define DEFAULT_DMAC_FLAGS_PARTIAL_REPORTING_EN GetResetValue(DMAC_FLAGS,"PARTIAL_REPORTING_EN")
-  `define UPDATE_DMAC_FLAGS_PARTIAL_REPORTING_EN(x,y) UpdateField(DMAC_FLAGS,"PARTIAL_REPORTING_EN",x,y)
-  `define SET_DMAC_FLAGS_TLAST(x) SetField(DMAC_FLAGS,"TLAST",x)
-  `define GET_DMAC_FLAGS_TLAST(x) GetField(DMAC_FLAGS,"TLAST",x)
-  `define DEFAULT_DMAC_FLAGS_TLAST GetResetValue(DMAC_FLAGS,"TLAST")
-  `define UPDATE_DMAC_FLAGS_TLAST(x,y) UpdateField(DMAC_FLAGS,"TLAST",x,y)
-  `define SET_DMAC_FLAGS_CYCLIC(x) SetField(DMAC_FLAGS,"CYCLIC",x)
-  `define GET_DMAC_FLAGS_CYCLIC(x) GetField(DMAC_FLAGS,"CYCLIC",x)
-  `define DEFAULT_DMAC_FLAGS_CYCLIC GetResetValue(DMAC_FLAGS,"CYCLIC")
-  `define UPDATE_DMAC_FLAGS_CYCLIC(x,y) UpdateField(DMAC_FLAGS,"CYCLIC",x,y)
+        super.new(name, address, parent);
 
-  const reg_t DMAC_DEST_ADDRESS = '{ 'h0410, "DEST_ADDRESS" , '{
-    "DEST_ADDRESS": '{ 31, 0, RW, 0 }}};
-  `define SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(x) SetField(DMAC_DEST_ADDRESS,"DEST_ADDRESS",x)
-  `define GET_DMAC_DEST_ADDRESS_DEST_ADDRESS(x) GetField(DMAC_DEST_ADDRESS,"DEST_ADDRESS",x)
-  `define DEFAULT_DMAC_DEST_ADDRESS_DEST_ADDRESS GetResetValue(DMAC_DEST_ADDRESS,"DEST_ADDRESS")
-  `define UPDATE_DMAC_DEST_ADDRESS_DEST_ADDRESS(x,y) UpdateField(DMAC_DEST_ADDRESS,"DEST_ADDRESS",x,y)
+        this.TRANSFER_PROGRESS_F = new("TRANSFER_PROGRESS", 31, 0, RO, 'h0, this);
 
-  const reg_t DMAC_SRC_ADDRESS = '{ 'h0414, "SRC_ADDRESS" , '{
-    "SRC_ADDRESS": '{ 31, 0, RW, 0 }}};
-  `define SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(x) SetField(DMAC_SRC_ADDRESS,"SRC_ADDRESS",x)
-  `define GET_DMAC_SRC_ADDRESS_SRC_ADDRESS(x) GetField(DMAC_SRC_ADDRESS,"SRC_ADDRESS",x)
-  `define DEFAULT_DMAC_SRC_ADDRESS_SRC_ADDRESS GetResetValue(DMAC_SRC_ADDRESS,"SRC_ADDRESS")
-  `define UPDATE_DMAC_SRC_ADDRESS_SRC_ADDRESS(x,y) UpdateField(DMAC_SRC_ADDRESS,"SRC_ADDRESS",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TRANSFER_PROGRESS_CLASS
 
-  const reg_t DMAC_X_LENGTH = '{ 'h0418, "X_LENGTH" , '{
-    "X_LENGTH": '{ 23, 0, RW, 0 }}};
-  `define SET_DMAC_X_LENGTH_X_LENGTH(x) SetField(DMAC_X_LENGTH,"X_LENGTH",x)
-  `define GET_DMAC_X_LENGTH_X_LENGTH(x) GetField(DMAC_X_LENGTH,"X_LENGTH",x)
-  `define DEFAULT_DMAC_X_LENGTH_X_LENGTH GetResetValue(DMAC_X_LENGTH,"X_LENGTH")
-  `define UPDATE_DMAC_X_LENGTH_X_LENGTH(x,y) UpdateField(DMAC_X_LENGTH,"X_LENGTH",x,y)
+    class PARTIAL_TRANSFER_LENGTH_CLASS extends register_base;
+      field_base PARTIAL_LENGTH_F;
 
-  const reg_t DMAC_Y_LENGTH = '{ 'h041c, "Y_LENGTH" , '{
-    "Y_LENGTH": '{ 23, 0, RW, 0 }}};
-  `define SET_DMAC_Y_LENGTH_Y_LENGTH(x) SetField(DMAC_Y_LENGTH,"Y_LENGTH",x)
-  `define GET_DMAC_Y_LENGTH_Y_LENGTH(x) GetField(DMAC_Y_LENGTH,"Y_LENGTH",x)
-  `define DEFAULT_DMAC_Y_LENGTH_Y_LENGTH GetResetValue(DMAC_Y_LENGTH,"Y_LENGTH")
-  `define UPDATE_DMAC_Y_LENGTH_Y_LENGTH(x,y) UpdateField(DMAC_Y_LENGTH,"Y_LENGTH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t DMAC_DEST_STRIDE = '{ 'h0420, "DEST_STRIDE" , '{
-    "DEST_STRIDE": '{ 23, 0, RW, 0 }}};
-  `define SET_DMAC_DEST_STRIDE_DEST_STRIDE(x) SetField(DMAC_DEST_STRIDE,"DEST_STRIDE",x)
-  `define GET_DMAC_DEST_STRIDE_DEST_STRIDE(x) GetField(DMAC_DEST_STRIDE,"DEST_STRIDE",x)
-  `define DEFAULT_DMAC_DEST_STRIDE_DEST_STRIDE GetResetValue(DMAC_DEST_STRIDE,"DEST_STRIDE")
-  `define UPDATE_DMAC_DEST_STRIDE_DEST_STRIDE(x,y) UpdateField(DMAC_DEST_STRIDE,"DEST_STRIDE",x,y)
+        super.new(name, address, parent);
 
-  const reg_t DMAC_SRC_STRIDE = '{ 'h0424, "SRC_STRIDE" , '{
-    "SRC_STRIDE": '{ 23, 0, RW, 0 }}};
-  `define SET_DMAC_SRC_STRIDE_SRC_STRIDE(x) SetField(DMAC_SRC_STRIDE,"SRC_STRIDE",x)
-  `define GET_DMAC_SRC_STRIDE_SRC_STRIDE(x) GetField(DMAC_SRC_STRIDE,"SRC_STRIDE",x)
-  `define DEFAULT_DMAC_SRC_STRIDE_SRC_STRIDE GetResetValue(DMAC_SRC_STRIDE,"SRC_STRIDE")
-  `define UPDATE_DMAC_SRC_STRIDE_SRC_STRIDE(x,y) UpdateField(DMAC_SRC_STRIDE,"SRC_STRIDE",x,y)
+        this.PARTIAL_LENGTH_F = new("PARTIAL_LENGTH", 31, 0, RO, 'h0, this);
 
-  const reg_t DMAC_TRANSFER_DONE = '{ 'h0428, "TRANSFER_DONE" , '{
-    "TRANSFER_0_DONE": '{ 0, 0, RO, 'h0 },
-    "TRANSFER_1_DONE": '{ 1, 1, RO, 'h0 },
-    "TRANSFER_2_DONE": '{ 2, 2, RO, 'h0 },
-    "TRANSFER_3_DONE": '{ 3, 3, RO, 'h0 },
-    "PARTIAL_TRANSFER_DONE": '{ 31, 31, RO, 'h0 }}};
-  `define SET_DMAC_TRANSFER_DONE_TRANSFER_0_DONE(x) SetField(DMAC_TRANSFER_DONE,"TRANSFER_0_DONE",x)
-  `define GET_DMAC_TRANSFER_DONE_TRANSFER_0_DONE(x) GetField(DMAC_TRANSFER_DONE,"TRANSFER_0_DONE",x)
-  `define DEFAULT_DMAC_TRANSFER_DONE_TRANSFER_0_DONE GetResetValue(DMAC_TRANSFER_DONE,"TRANSFER_0_DONE")
-  `define UPDATE_DMAC_TRANSFER_DONE_TRANSFER_0_DONE(x,y) UpdateField(DMAC_TRANSFER_DONE,"TRANSFER_0_DONE",x,y)
-  `define SET_DMAC_TRANSFER_DONE_TRANSFER_1_DONE(x) SetField(DMAC_TRANSFER_DONE,"TRANSFER_1_DONE",x)
-  `define GET_DMAC_TRANSFER_DONE_TRANSFER_1_DONE(x) GetField(DMAC_TRANSFER_DONE,"TRANSFER_1_DONE",x)
-  `define DEFAULT_DMAC_TRANSFER_DONE_TRANSFER_1_DONE GetResetValue(DMAC_TRANSFER_DONE,"TRANSFER_1_DONE")
-  `define UPDATE_DMAC_TRANSFER_DONE_TRANSFER_1_DONE(x,y) UpdateField(DMAC_TRANSFER_DONE,"TRANSFER_1_DONE",x,y)
-  `define SET_DMAC_TRANSFER_DONE_TRANSFER_2_DONE(x) SetField(DMAC_TRANSFER_DONE,"TRANSFER_2_DONE",x)
-  `define GET_DMAC_TRANSFER_DONE_TRANSFER_2_DONE(x) GetField(DMAC_TRANSFER_DONE,"TRANSFER_2_DONE",x)
-  `define DEFAULT_DMAC_TRANSFER_DONE_TRANSFER_2_DONE GetResetValue(DMAC_TRANSFER_DONE,"TRANSFER_2_DONE")
-  `define UPDATE_DMAC_TRANSFER_DONE_TRANSFER_2_DONE(x,y) UpdateField(DMAC_TRANSFER_DONE,"TRANSFER_2_DONE",x,y)
-  `define SET_DMAC_TRANSFER_DONE_TRANSFER_3_DONE(x) SetField(DMAC_TRANSFER_DONE,"TRANSFER_3_DONE",x)
-  `define GET_DMAC_TRANSFER_DONE_TRANSFER_3_DONE(x) GetField(DMAC_TRANSFER_DONE,"TRANSFER_3_DONE",x)
-  `define DEFAULT_DMAC_TRANSFER_DONE_TRANSFER_3_DONE GetResetValue(DMAC_TRANSFER_DONE,"TRANSFER_3_DONE")
-  `define UPDATE_DMAC_TRANSFER_DONE_TRANSFER_3_DONE(x,y) UpdateField(DMAC_TRANSFER_DONE,"TRANSFER_3_DONE",x,y)
-  `define SET_DMAC_TRANSFER_DONE_PARTIAL_TRANSFER_DONE(x) SetField(DMAC_TRANSFER_DONE,"PARTIAL_TRANSFER_DONE",x)
-  `define GET_DMAC_TRANSFER_DONE_PARTIAL_TRANSFER_DONE(x) GetField(DMAC_TRANSFER_DONE,"PARTIAL_TRANSFER_DONE",x)
-  `define DEFAULT_DMAC_TRANSFER_DONE_PARTIAL_TRANSFER_DONE GetResetValue(DMAC_TRANSFER_DONE,"PARTIAL_TRANSFER_DONE")
-  `define UPDATE_DMAC_TRANSFER_DONE_PARTIAL_TRANSFER_DONE(x,y) UpdateField(DMAC_TRANSFER_DONE,"PARTIAL_TRANSFER_DONE",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PARTIAL_TRANSFER_LENGTH_CLASS
 
-  const reg_t DMAC_ACTIVE_TRANSFER_ID = '{ 'h042c, "ACTIVE_TRANSFER_ID" , '{
-    "ACTIVE_TRANSFER_ID": '{ 4, 0, RO, 'h00 }}};
-  `define SET_DMAC_ACTIVE_TRANSFER_ID_ACTIVE_TRANSFER_ID(x) SetField(DMAC_ACTIVE_TRANSFER_ID,"ACTIVE_TRANSFER_ID",x)
-  `define GET_DMAC_ACTIVE_TRANSFER_ID_ACTIVE_TRANSFER_ID(x) GetField(DMAC_ACTIVE_TRANSFER_ID,"ACTIVE_TRANSFER_ID",x)
-  `define DEFAULT_DMAC_ACTIVE_TRANSFER_ID_ACTIVE_TRANSFER_ID GetResetValue(DMAC_ACTIVE_TRANSFER_ID,"ACTIVE_TRANSFER_ID")
-  `define UPDATE_DMAC_ACTIVE_TRANSFER_ID_ACTIVE_TRANSFER_ID(x,y) UpdateField(DMAC_ACTIVE_TRANSFER_ID,"ACTIVE_TRANSFER_ID",x,y)
+    class PARTIAL_TRANSFER_ID_CLASS extends register_base;
+      field_base PARTIAL_TRANSFER_ID_F;
 
-  const reg_t DMAC_STATUS = '{ 'h0430, "STATUS" , '{
-    "RESERVED": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_DMAC_STATUS_RESERVED(x) SetField(DMAC_STATUS,"RESERVED",x)
-  `define GET_DMAC_STATUS_RESERVED(x) GetField(DMAC_STATUS,"RESERVED",x)
-  `define DEFAULT_DMAC_STATUS_RESERVED GetResetValue(DMAC_STATUS,"RESERVED")
-  `define UPDATE_DMAC_STATUS_RESERVED(x,y) UpdateField(DMAC_STATUS,"RESERVED",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t DMAC_CURRENT_DEST_ADDRESS = '{ 'h0434, "CURRENT_DEST_ADDRESS" , '{
-    "CURRENT_DEST_ADDRESS": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_DMAC_CURRENT_DEST_ADDRESS_CURRENT_DEST_ADDRESS(x) SetField(DMAC_CURRENT_DEST_ADDRESS,"CURRENT_DEST_ADDRESS",x)
-  `define GET_DMAC_CURRENT_DEST_ADDRESS_CURRENT_DEST_ADDRESS(x) GetField(DMAC_CURRENT_DEST_ADDRESS,"CURRENT_DEST_ADDRESS",x)
-  `define DEFAULT_DMAC_CURRENT_DEST_ADDRESS_CURRENT_DEST_ADDRESS GetResetValue(DMAC_CURRENT_DEST_ADDRESS,"CURRENT_DEST_ADDRESS")
-  `define UPDATE_DMAC_CURRENT_DEST_ADDRESS_CURRENT_DEST_ADDRESS(x,y) UpdateField(DMAC_CURRENT_DEST_ADDRESS,"CURRENT_DEST_ADDRESS",x,y)
+        super.new(name, address, parent);
 
-  const reg_t DMAC_CURRENT_SRC_ADDRESS = '{ 'h0438, "CURRENT_SRC_ADDRESS" , '{
-    "CURRENT_SRC_ADDRESS": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_DMAC_CURRENT_SRC_ADDRESS_CURRENT_SRC_ADDRESS(x) SetField(DMAC_CURRENT_SRC_ADDRESS,"CURRENT_SRC_ADDRESS",x)
-  `define GET_DMAC_CURRENT_SRC_ADDRESS_CURRENT_SRC_ADDRESS(x) GetField(DMAC_CURRENT_SRC_ADDRESS,"CURRENT_SRC_ADDRESS",x)
-  `define DEFAULT_DMAC_CURRENT_SRC_ADDRESS_CURRENT_SRC_ADDRESS GetResetValue(DMAC_CURRENT_SRC_ADDRESS,"CURRENT_SRC_ADDRESS")
-  `define UPDATE_DMAC_CURRENT_SRC_ADDRESS_CURRENT_SRC_ADDRESS(x,y) UpdateField(DMAC_CURRENT_SRC_ADDRESS,"CURRENT_SRC_ADDRESS",x,y)
+        this.PARTIAL_TRANSFER_ID_F = new("PARTIAL_TRANSFER_ID", 1, 0, RO, 'h0, this);
 
-  const reg_t DMAC_TRANSFER_PROGRESS = '{ 'h0448, "TRANSFER_PROGRESS" , '{
-    "TRANSFER_PROGRESS": '{ 23, 0, RO, 'h000000 }}};
-  `define SET_DMAC_TRANSFER_PROGRESS_TRANSFER_PROGRESS(x) SetField(DMAC_TRANSFER_PROGRESS,"TRANSFER_PROGRESS",x)
-  `define GET_DMAC_TRANSFER_PROGRESS_TRANSFER_PROGRESS(x) GetField(DMAC_TRANSFER_PROGRESS,"TRANSFER_PROGRESS",x)
-  `define DEFAULT_DMAC_TRANSFER_PROGRESS_TRANSFER_PROGRESS GetResetValue(DMAC_TRANSFER_PROGRESS,"TRANSFER_PROGRESS")
-  `define UPDATE_DMAC_TRANSFER_PROGRESS_TRANSFER_PROGRESS(x,y) UpdateField(DMAC_TRANSFER_PROGRESS,"TRANSFER_PROGRESS",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PARTIAL_TRANSFER_ID_CLASS
 
-  const reg_t DMAC_PARTIAL_TRANSFER_LENGTH = '{ 'h044c, "PARTIAL_TRANSFER_LENGTH" , '{
-    "PARTIAL_LENGTH": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_DMAC_PARTIAL_TRANSFER_LENGTH_PARTIAL_LENGTH(x) SetField(DMAC_PARTIAL_TRANSFER_LENGTH,"PARTIAL_LENGTH",x)
-  `define GET_DMAC_PARTIAL_TRANSFER_LENGTH_PARTIAL_LENGTH(x) GetField(DMAC_PARTIAL_TRANSFER_LENGTH,"PARTIAL_LENGTH",x)
-  `define DEFAULT_DMAC_PARTIAL_TRANSFER_LENGTH_PARTIAL_LENGTH GetResetValue(DMAC_PARTIAL_TRANSFER_LENGTH,"PARTIAL_LENGTH")
-  `define UPDATE_DMAC_PARTIAL_TRANSFER_LENGTH_PARTIAL_LENGTH(x,y) UpdateField(DMAC_PARTIAL_TRANSFER_LENGTH,"PARTIAL_LENGTH",x,y)
+    class DESCRIPTOR_ID_CLASS extends register_base;
+      field_base DESCRIPTOR_ID_F;
 
-  const reg_t DMAC_PARTIAL_TRANSFER_ID = '{ 'h0450, "PARTIAL_TRANSFER_ID" , '{
-    "PARTIAL_TRANSFER_ID": '{ 1, 0, RO, 'h0 }}};
-  `define SET_DMAC_PARTIAL_TRANSFER_ID_PARTIAL_TRANSFER_ID(x) SetField(DMAC_PARTIAL_TRANSFER_ID,"PARTIAL_TRANSFER_ID",x)
-  `define GET_DMAC_PARTIAL_TRANSFER_ID_PARTIAL_TRANSFER_ID(x) GetField(DMAC_PARTIAL_TRANSFER_ID,"PARTIAL_TRANSFER_ID",x)
-  `define DEFAULT_DMAC_PARTIAL_TRANSFER_ID_PARTIAL_TRANSFER_ID GetResetValue(DMAC_PARTIAL_TRANSFER_ID,"PARTIAL_TRANSFER_ID")
-  `define UPDATE_DMAC_PARTIAL_TRANSFER_ID_PARTIAL_TRANSFER_ID(x,y) UpdateField(DMAC_PARTIAL_TRANSFER_ID,"PARTIAL_TRANSFER_ID",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t DMAC_DESCRIPTOR_ID = '{ 'h0454, "DESCRIPTOR_ID" , '{
-    "DESCRIPTOR_ID": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_DMAC_DESCRIPTOR_ID_DESCRIPTOR_ID(x) SetField(DMAC_DESCRIPTOR_ID,"DESCRIPTOR_ID",x)
-  `define GET_DMAC_DESCRIPTOR_ID_DESCRIPTOR_ID(x) GetField(DMAC_DESCRIPTOR_ID,"DESCRIPTOR_ID",x)
-  `define DEFAULT_DMAC_DESCRIPTOR_ID_DESCRIPTOR_ID GetResetValue(DMAC_DESCRIPTOR_ID,"DESCRIPTOR_ID")
-  `define UPDATE_DMAC_DESCRIPTOR_ID_DESCRIPTOR_ID(x,y) UpdateField(DMAC_DESCRIPTOR_ID,"DESCRIPTOR_ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t DMAC_FRAMELOCK_CONFIG = '{ 'h0458, "FRAMELOCK_CONFIG" , '{
-    "DISTANCE": '{ 23, 16, RW, 0 },
-    "FRAMENUM": '{ 15, 8, RW, 0 },
-    "WAIT_WRITER": '{ 1, 1, RW, 0 },
-    "MODE": '{ 0, 0, RW, 0 }}};
-  `define SET_DMAC_FRAMELOCK_CONFIG_DISTANCE(x) SetField(DMAC_FRAMELOCK_CONFIG,"DISTANCE",x)
-  `define GET_DMAC_FRAMELOCK_CONFIG_DISTANCE(x) GetField(DMAC_FRAMELOCK_CONFIG,"DISTANCE",x)
-  `define DEFAULT_DMAC_FRAMELOCK_CONFIG_DISTANCE GetResetValue(DMAC_FRAMELOCK_CONFIG,"DISTANCE")
-  `define UPDATE_DMAC_FRAMELOCK_CONFIG_DISTANCE(x,y) UpdateField(DMAC_FRAMELOCK_CONFIG,"DISTANCE",x,y)
-  `define SET_DMAC_FRAMELOCK_CONFIG_FRAMENUM(x) SetField(DMAC_FRAMELOCK_CONFIG,"FRAMENUM",x)
-  `define GET_DMAC_FRAMELOCK_CONFIG_FRAMENUM(x) GetField(DMAC_FRAMELOCK_CONFIG,"FRAMENUM",x)
-  `define DEFAULT_DMAC_FRAMELOCK_CONFIG_FRAMENUM GetResetValue(DMAC_FRAMELOCK_CONFIG,"FRAMENUM")
-  `define UPDATE_DMAC_FRAMELOCK_CONFIG_FRAMENUM(x,y) UpdateField(DMAC_FRAMELOCK_CONFIG,"FRAMENUM",x,y)
-  `define SET_DMAC_FRAMELOCK_CONFIG_WAIT_WRITER(x) SetField(DMAC_FRAMELOCK_CONFIG,"WAIT_WRITER",x)
-  `define GET_DMAC_FRAMELOCK_CONFIG_WAIT_WRITER(x) GetField(DMAC_FRAMELOCK_CONFIG,"WAIT_WRITER",x)
-  `define DEFAULT_DMAC_FRAMELOCK_CONFIG_WAIT_WRITER GetResetValue(DMAC_FRAMELOCK_CONFIG,"WAIT_WRITER")
-  `define UPDATE_DMAC_FRAMELOCK_CONFIG_WAIT_WRITER(x,y) UpdateField(DMAC_FRAMELOCK_CONFIG,"WAIT_WRITER",x,y)
-  `define SET_DMAC_FRAMELOCK_CONFIG_MODE(x) SetField(DMAC_FRAMELOCK_CONFIG,"MODE",x)
-  `define GET_DMAC_FRAMELOCK_CONFIG_MODE(x) GetField(DMAC_FRAMELOCK_CONFIG,"MODE",x)
-  `define DEFAULT_DMAC_FRAMELOCK_CONFIG_MODE GetResetValue(DMAC_FRAMELOCK_CONFIG,"MODE")
-  `define UPDATE_DMAC_FRAMELOCK_CONFIG_MODE(x,y) UpdateField(DMAC_FRAMELOCK_CONFIG,"MODE",x,y)
+        this.DESCRIPTOR_ID_F = new("DESCRIPTOR_ID", 31, 0, RO, 'h0, this);
 
-  const reg_t DMAC_FRAMELOCK_STRIDE = '{ 'h045c, "FRAMELOCK_STRIDE" , '{
-    "STRIDE": '{ 31, 0, RW, 0 }}};
-  `define SET_DMAC_FRAMELOCK_STRIDE_STRIDE(x) SetField(DMAC_FRAMELOCK_STRIDE,"STRIDE",x)
-  `define GET_DMAC_FRAMELOCK_STRIDE_STRIDE(x) GetField(DMAC_FRAMELOCK_STRIDE,"STRIDE",x)
-  `define DEFAULT_DMAC_FRAMELOCK_STRIDE_STRIDE GetResetValue(DMAC_FRAMELOCK_STRIDE,"STRIDE")
-  `define UPDATE_DMAC_FRAMELOCK_STRIDE_STRIDE(x,y) UpdateField(DMAC_FRAMELOCK_STRIDE,"STRIDE",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DESCRIPTOR_ID_CLASS
 
-  const reg_t DMAC_SG_ADDRESS = '{ 'h047c, "SG_ADDRESS" , '{
-    "SG_ADDRESS": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_DMAC_SG_ADDRESS_SG_ADDRESS(x) SetField(DMAC_SG_ADDRESS,"SG_ADDRESS",x)
-  `define GET_DMAC_SG_ADDRESS_SG_ADDRESS(x) GetField(DMAC_SG_ADDRESS,"SG_ADDRESS",x)
-  `define DEFAULT_DMAC_SG_ADDRESS_SG_ADDRESS GetResetValue(DMAC_SG_ADDRESS,"SG_ADDRESS")
-  `define UPDATE_DMAC_SG_ADDRESS_SG_ADDRESS(x,y) UpdateField(DMAC_SG_ADDRESS,"SG_ADDRESS",x,y)
+    class FRAMELOCK_CONFIG_CLASS extends register_base;
+      field_base DISTANCE_F;
+      field_base FRAMENUM_F;
+      field_base WAIT_WRITER_F;
+      field_base MODE_F;
 
-  const reg_t DMAC_DEST_ADDRESS_HIGH = '{ 'h0490, "DEST_ADDRESS_HIGH" , '{
-    "DEST_ADDRESS_HIGH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_DMAC_DEST_ADDRESS_HIGH_DEST_ADDRESS_HIGH(x) SetField(DMAC_DEST_ADDRESS_HIGH,"DEST_ADDRESS_HIGH",x)
-  `define GET_DMAC_DEST_ADDRESS_HIGH_DEST_ADDRESS_HIGH(x) GetField(DMAC_DEST_ADDRESS_HIGH,"DEST_ADDRESS_HIGH",x)
-  `define DEFAULT_DMAC_DEST_ADDRESS_HIGH_DEST_ADDRESS_HIGH GetResetValue(DMAC_DEST_ADDRESS_HIGH,"DEST_ADDRESS_HIGH")
-  `define UPDATE_DMAC_DEST_ADDRESS_HIGH_DEST_ADDRESS_HIGH(x,y) UpdateField(DMAC_DEST_ADDRESS_HIGH,"DEST_ADDRESS_HIGH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t DMAC_SRC_ADDRESS_HIGH = '{ 'h0494, "SRC_ADDRESS_HIGH" , '{
-    "SRC_ADDRESS_HIGH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_DMAC_SRC_ADDRESS_HIGH_SRC_ADDRESS_HIGH(x) SetField(DMAC_SRC_ADDRESS_HIGH,"SRC_ADDRESS_HIGH",x)
-  `define GET_DMAC_SRC_ADDRESS_HIGH_SRC_ADDRESS_HIGH(x) GetField(DMAC_SRC_ADDRESS_HIGH,"SRC_ADDRESS_HIGH",x)
-  `define DEFAULT_DMAC_SRC_ADDRESS_HIGH_SRC_ADDRESS_HIGH GetResetValue(DMAC_SRC_ADDRESS_HIGH,"SRC_ADDRESS_HIGH")
-  `define UPDATE_DMAC_SRC_ADDRESS_HIGH_SRC_ADDRESS_HIGH(x,y) UpdateField(DMAC_SRC_ADDRESS_HIGH,"SRC_ADDRESS_HIGH",x,y)
+        super.new(name, address, parent);
 
-  const reg_t DMAC_CURRENT_DEST_ADDRESS_HIGH = '{ 'h0498, "CURRENT_DEST_ADDRESS_HIGH" , '{
-    "CURRENT_DEST_ADDRESS_HIGH": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_DMAC_CURRENT_DEST_ADDRESS_HIGH_CURRENT_DEST_ADDRESS_HIGH(x) SetField(DMAC_CURRENT_DEST_ADDRESS_HIGH,"CURRENT_DEST_ADDRESS_HIGH",x)
-  `define GET_DMAC_CURRENT_DEST_ADDRESS_HIGH_CURRENT_DEST_ADDRESS_HIGH(x) GetField(DMAC_CURRENT_DEST_ADDRESS_HIGH,"CURRENT_DEST_ADDRESS_HIGH",x)
-  `define DEFAULT_DMAC_CURRENT_DEST_ADDRESS_HIGH_CURRENT_DEST_ADDRESS_HIGH GetResetValue(DMAC_CURRENT_DEST_ADDRESS_HIGH,"CURRENT_DEST_ADDRESS_HIGH")
-  `define UPDATE_DMAC_CURRENT_DEST_ADDRESS_HIGH_CURRENT_DEST_ADDRESS_HIGH(x,y) UpdateField(DMAC_CURRENT_DEST_ADDRESS_HIGH,"CURRENT_DEST_ADDRESS_HIGH",x,y)
+        this.DISTANCE_F = new("DISTANCE", 23, 16, RW, 'h0, this);
+        this.FRAMENUM_F = new("FRAMENUM", 15, 8, RW, 'h0, this);
+        this.WAIT_WRITER_F = new("WAIT_WRITER", 1, 1, RW, 'h0, this);
+        this.MODE_F = new("MODE", 0, 0, RW, 'h0, this);
 
-  const reg_t DMAC_CURRENT_SRC_ADDRESS_HIGH = '{ 'h049c, "CURRENT_SRC_ADDRESS_HIGH" , '{
-    "CURRENT_SRC_ADDRESS_HIGH": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_DMAC_CURRENT_SRC_ADDRESS_HIGH_CURRENT_SRC_ADDRESS_HIGH(x) SetField(DMAC_CURRENT_SRC_ADDRESS_HIGH,"CURRENT_SRC_ADDRESS_HIGH",x)
-  `define GET_DMAC_CURRENT_SRC_ADDRESS_HIGH_CURRENT_SRC_ADDRESS_HIGH(x) GetField(DMAC_CURRENT_SRC_ADDRESS_HIGH,"CURRENT_SRC_ADDRESS_HIGH",x)
-  `define DEFAULT_DMAC_CURRENT_SRC_ADDRESS_HIGH_CURRENT_SRC_ADDRESS_HIGH GetResetValue(DMAC_CURRENT_SRC_ADDRESS_HIGH,"CURRENT_SRC_ADDRESS_HIGH")
-  `define UPDATE_DMAC_CURRENT_SRC_ADDRESS_HIGH_CURRENT_SRC_ADDRESS_HIGH(x,y) UpdateField(DMAC_CURRENT_SRC_ADDRESS_HIGH,"CURRENT_SRC_ADDRESS_HIGH",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FRAMELOCK_CONFIG_CLASS
 
-  const reg_t DMAC_SG_ADDRESS_HIGH = '{ 'h04bc, "SG_ADDRESS_HIGH" , '{
-    "SG_ADDRESS_HIGH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_DMAC_SG_ADDRESS_HIGH_SG_ADDRESS_HIGH(x) SetField(DMAC_SG_ADDRESS_HIGH,"SG_ADDRESS_HIGH",x)
-  `define GET_DMAC_SG_ADDRESS_HIGH_SG_ADDRESS_HIGH(x) GetField(DMAC_SG_ADDRESS_HIGH,"SG_ADDRESS_HIGH",x)
-  `define DEFAULT_DMAC_SG_ADDRESS_HIGH_SG_ADDRESS_HIGH GetResetValue(DMAC_SG_ADDRESS_HIGH,"SG_ADDRESS_HIGH")
-  `define UPDATE_DMAC_SG_ADDRESS_HIGH_SG_ADDRESS_HIGH(x,y) UpdateField(DMAC_SG_ADDRESS_HIGH,"SG_ADDRESS_HIGH",x,y)
+    class FRAMELOCK_STRIDE_CLASS extends register_base;
+      field_base STRIDE_F;
 
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-endpackage
+        super.new(name, address, parent);
+
+        this.STRIDE_F = new("STRIDE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FRAMELOCK_STRIDE_CLASS
+
+    class SG_ADDRESS_CLASS extends register_base;
+      field_base SG_ADDRESS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SG_ADDRESS_F = new("SG_ADDRESS", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SG_ADDRESS_CLASS
+
+    class DEST_ADDRESS_HIGH_CLASS extends register_base;
+      field_base DEST_ADDRESS_HIGH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DEST_ADDRESS_HIGH_F = new("DEST_ADDRESS_HIGH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DEST_ADDRESS_HIGH_CLASS
+
+    class SRC_ADDRESS_HIGH_CLASS extends register_base;
+      field_base SRC_ADDRESS_HIGH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SRC_ADDRESS_HIGH_F = new("SRC_ADDRESS_HIGH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SRC_ADDRESS_HIGH_CLASS
+
+    class CURRENT_DEST_ADDRESS_HIGH_CLASS extends register_base;
+      field_base CURRENT_DEST_ADDRESS_HIGH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CURRENT_DEST_ADDRESS_HIGH_F = new("CURRENT_DEST_ADDRESS_HIGH", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CURRENT_DEST_ADDRESS_HIGH_CLASS
+
+    class CURRENT_SRC_ADDRESS_HIGH_CLASS extends register_base;
+      field_base CURRENT_SRC_ADDRESS_HIGH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CURRENT_SRC_ADDRESS_HIGH_F = new("CURRENT_SRC_ADDRESS_HIGH", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CURRENT_SRC_ADDRESS_HIGH_CLASS
+
+    class SG_ADDRESS_HIGH_CLASS extends register_base;
+      field_base SG_ADDRESS_HIGH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SG_ADDRESS_HIGH_F = new("SG_ADDRESS_HIGH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SG_ADDRESS_HIGH_CLASS
+
+    VERSION_CLASS VERSION_R;
+    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    IDENTIFICATION_CLASS IDENTIFICATION_R;
+    INTERFACE_DESCRIPTION_1_CLASS INTERFACE_DESCRIPTION_1_R;
+    INTERFACE_DESCRIPTION_2_CLASS INTERFACE_DESCRIPTION_2_R;
+    IRQ_MASK_CLASS IRQ_MASK_R;
+    IRQ_PENDING_CLASS IRQ_PENDING_R;
+    IRQ_SOURCE_CLASS IRQ_SOURCE_R;
+    CONTROL_CLASS CONTROL_R;
+    TRANSFER_ID_CLASS TRANSFER_ID_R;
+    TRANSFER_SUBMIT_CLASS TRANSFER_SUBMIT_R;
+    FLAGS_CLASS FLAGS_R;
+    DEST_ADDRESS_CLASS DEST_ADDRESS_R;
+    SRC_ADDRESS_CLASS SRC_ADDRESS_R;
+    X_LENGTH_CLASS X_LENGTH_R;
+    Y_LENGTH_CLASS Y_LENGTH_R;
+    DEST_STRIDE_CLASS DEST_STRIDE_R;
+    SRC_STRIDE_CLASS SRC_STRIDE_R;
+    TRANSFER_DONE_CLASS TRANSFER_DONE_R;
+    ACTIVE_TRANSFER_ID_CLASS ACTIVE_TRANSFER_ID_R;
+    STATUS_CLASS STATUS_R;
+    CURRENT_DEST_ADDRESS_CLASS CURRENT_DEST_ADDRESS_R;
+    CURRENT_SRC_ADDRESS_CLASS CURRENT_SRC_ADDRESS_R;
+    TRANSFER_PROGRESS_CLASS TRANSFER_PROGRESS_R;
+    PARTIAL_TRANSFER_LENGTH_CLASS PARTIAL_TRANSFER_LENGTH_R;
+    PARTIAL_TRANSFER_ID_CLASS PARTIAL_TRANSFER_ID_R;
+    DESCRIPTOR_ID_CLASS DESCRIPTOR_ID_R;
+    FRAMELOCK_CONFIG_CLASS FRAMELOCK_CONFIG_R;
+    FRAMELOCK_STRIDE_CLASS FRAMELOCK_STRIDE_R;
+    SG_ADDRESS_CLASS SG_ADDRESS_R;
+    DEST_ADDRESS_HIGH_CLASS DEST_ADDRESS_HIGH_R;
+    SRC_ADDRESS_HIGH_CLASS SRC_ADDRESS_HIGH_R;
+    CURRENT_DEST_ADDRESS_HIGH_CLASS CURRENT_DEST_ADDRESS_HIGH_R;
+    CURRENT_SRC_ADDRESS_HIGH_CLASS CURRENT_SRC_ADDRESS_HIGH_R;
+    SG_ADDRESS_HIGH_CLASS SG_ADDRESS_HIGH_R;
+
+    function new(
+      input string name,
+      input int address,
+      input int AUTORUN,
+      input int AXI_AXCACHE,
+      input int AXI_AXPROT,
+      input int BYTES_PER_BURST_WIDTH,
+      input int CACHE_COHERENT,
+      input int CYCLIC,
+      input int DMA_2D_TLAST_MODE,
+      input int DMA_DATA_WIDTH_DEST,
+      input int DMA_DATA_WIDTH_SRC,
+      input int DMA_TYPE_DEST,
+      input int DMA_TYPE_SRC,
+      input int ID,
+      input int MAX_NUM_FRAMES,
+      input int USE_EXT_SYNC,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, ID, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
+      this.INTERFACE_DESCRIPTION_1_R = new("INTERFACE_DESCRIPTION_1", 'h10, AUTORUN, BYTES_PER_BURST_WIDTH, DMA_2D_TLAST_MODE, DMA_DATA_WIDTH_DEST, DMA_DATA_WIDTH_SRC, DMA_TYPE_DEST, DMA_TYPE_SRC, MAX_NUM_FRAMES, USE_EXT_SYNC, this);
+      this.INTERFACE_DESCRIPTION_2_R = new("INTERFACE_DESCRIPTION_2", 'h14, AXI_AXCACHE, AXI_AXPROT, CACHE_COHERENT, this);
+      this.IRQ_MASK_R = new("IRQ_MASK", 'h80, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88, this);
+      this.CONTROL_R = new("CONTROL", 'h400, this);
+      this.TRANSFER_ID_R = new("TRANSFER_ID", 'h404, this);
+      this.TRANSFER_SUBMIT_R = new("TRANSFER_SUBMIT", 'h408, this);
+      this.FLAGS_R = new("FLAGS", 'h40c, CYCLIC, this);
+      this.DEST_ADDRESS_R = new("DEST_ADDRESS", 'h410, this);
+      this.SRC_ADDRESS_R = new("SRC_ADDRESS", 'h414, this);
+      this.X_LENGTH_R = new("X_LENGTH", 'h418, DMA_DATA_WIDTH_DEST, DMA_DATA_WIDTH_SRC, this);
+      this.Y_LENGTH_R = new("Y_LENGTH", 'h41c, this);
+      this.DEST_STRIDE_R = new("DEST_STRIDE", 'h420, this);
+      this.SRC_STRIDE_R = new("SRC_STRIDE", 'h424, this);
+      this.TRANSFER_DONE_R = new("TRANSFER_DONE", 'h428, this);
+      this.ACTIVE_TRANSFER_ID_R = new("ACTIVE_TRANSFER_ID", 'h42c, this);
+      this.STATUS_R = new("STATUS", 'h430, this);
+      this.CURRENT_DEST_ADDRESS_R = new("CURRENT_DEST_ADDRESS", 'h434, this);
+      this.CURRENT_SRC_ADDRESS_R = new("CURRENT_SRC_ADDRESS", 'h438, this);
+      this.TRANSFER_PROGRESS_R = new("TRANSFER_PROGRESS", 'h448, this);
+      this.PARTIAL_TRANSFER_LENGTH_R = new("PARTIAL_TRANSFER_LENGTH", 'h44c, this);
+      this.PARTIAL_TRANSFER_ID_R = new("PARTIAL_TRANSFER_ID", 'h450, this);
+      this.DESCRIPTOR_ID_R = new("DESCRIPTOR_ID", 'h454, this);
+      this.FRAMELOCK_CONFIG_R = new("FRAMELOCK_CONFIG", 'h458, this);
+      this.FRAMELOCK_STRIDE_R = new("FRAMELOCK_STRIDE", 'h45c, this);
+      this.SG_ADDRESS_R = new("SG_ADDRESS", 'h47c, this);
+      this.DEST_ADDRESS_HIGH_R = new("DEST_ADDRESS_HIGH", 'h490, this);
+      this.SRC_ADDRESS_HIGH_R = new("SRC_ADDRESS_HIGH", 'h494, this);
+      this.CURRENT_DEST_ADDRESS_HIGH_R = new("CURRENT_DEST_ADDRESS_HIGH", 'h498, this);
+      this.CURRENT_SRC_ADDRESS_HIGH_R = new("CURRENT_SRC_ADDRESS_HIGH", 'h49c, this);
+      this.SG_ADDRESS_HIGH_R = new("SG_ADDRESS_HIGH", 'h4bc, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_dmac
+
+endpackage: adi_regmap_dmac_pkg

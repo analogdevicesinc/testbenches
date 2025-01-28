@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014 - 2023 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,56 +33,173 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:19:02 2024 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
 package adi_regmap_axi_ad7616_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_axi_ad7616 extends adi_regmap;
 
-/* AXI AD7616 (axi_ad7616) */
+    /* AXI AD7616 (axi_ad7616) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_F;
 
-  const reg_t AXI_AD7616_REG_VERSION = '{ 'h0000, "REG_VERSION" , '{
-    "VERSION": '{ 31, 0, RO, 'h00001002 }}};
-  `define SET_AXI_AD7616_REG_VERSION_VERSION(x) SetField(AXI_AD7616_REG_VERSION,"VERSION",x)
-  `define GET_AXI_AD7616_REG_VERSION_VERSION(x) GetField(AXI_AD7616_REG_VERSION,"VERSION",x)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_AD7616_REG_ID = '{ 'h0004, "REG_ID" , '{
-    "ID": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_AD7616_REG_ID_ID(x) SetField(AXI_AD7616_REG_ID,"ID",x)
-  `define GET_AXI_AD7616_REG_ID_ID(x) GetField(AXI_AD7616_REG_ID,"ID",x)
+        super.new(name, address, parent);
 
-  const reg_t AXI_AD7616_REG_SCRATCH = '{ 'h0008, "REG_SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_AD7616_REG_SCRATCH_SCRATCH(x) SetField(AXI_AD7616_REG_SCRATCH,"SCRATCH",x)
-  `define GET_AXI_AD7616_REG_SCRATCH_SCRATCH(x) GetField(AXI_AD7616_REG_SCRATCH,"SCRATCH",x)
+        this.VERSION_F = new("VERSION", 31, 0, RO, 'h1002, this);
 
-  const reg_t AXI_AD7616_REG_UP_CNTRL = '{ 'h0040, "REG_UP_CNTRL" , '{
-    "CNVST_EN": '{ 1, 1, RW, 'h0 },
-    "RESETN": '{ 0, 0, RW, 'h0 }}};
-  `define SET_AXI_AD7616_REG_UP_CNTRL_CNVST_EN(x) SetField(AXI_AD7616_REG_UP_CNTRL,"CNVST_EN",x)
-  `define GET_AXI_AD7616_REG_UP_CNTRL_CNVST_EN(x) GetField(AXI_AD7616_REG_UP_CNTRL,"CNVST_EN",x)
-  `define SET_AXI_AD7616_REG_UP_CNTRL_RESETN(x) SetField(AXI_AD7616_REG_UP_CNTRL,"RESETN",x)
-  `define GET_AXI_AD7616_REG_UP_CNTRL_RESETN(x) GetField(AXI_AD7616_REG_UP_CNTRL,"RESETN",x)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
 
-  const reg_t AXI_AD7616_REG_UP_CONV_RATE = '{ 'h0044, "REG_UP_CONV_RATE" , '{
-    "UP_CONV_RATE": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_AD7616_REG_UP_CONV_RATE_UP_CONV_RATE(x) SetField(AXI_AD7616_REG_UP_CONV_RATE,"UP_CONV_RATE",x)
-  `define GET_AXI_AD7616_REG_UP_CONV_RATE_UP_CONV_RATE(x) GetField(AXI_AD7616_REG_UP_CONV_RATE,"UP_CONV_RATE",x)
+    class ID_CLASS extends register_base;
+      field_base ID_F;
 
-  const reg_t AXI_AD7616_REG_UP_BURST_LENGTH = '{ 'h0048, "REG_UP_BURST_LENGTH" , '{
-    "UP_BURST_LENGTH": '{ 4, 0, RW, 'h000 }}};
-  `define SET_AXI_AD7616_REG_UP_BURST_LENGTH_UP_BURST_LENGTH(x) SetField(AXI_AD7616_REG_UP_BURST_LENGTH,"UP_BURST_LENGTH",x)
-  `define GET_AXI_AD7616_REG_UP_BURST_LENGTH_UP_BURST_LENGTH(x) GetField(AXI_AD7616_REG_UP_BURST_LENGTH,"UP_BURST_LENGTH",x)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_AD7616_REG_UP_READ_DATA = '{ 'h004c, "REG_UP_READ_DATA" , '{
-    "UP_READ_DATA": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_AD7616_REG_UP_READ_DATA_UP_READ_DATA(x) SetField(AXI_AD7616_REG_UP_READ_DATA,"UP_READ_DATA",x)
-  `define GET_AXI_AD7616_REG_UP_READ_DATA_UP_READ_DATA(x) GetField(AXI_AD7616_REG_UP_READ_DATA,"UP_READ_DATA",x)
+        super.new(name, address, parent);
 
-  const reg_t AXI_AD7616_REG_UP_WRITE_DATA = '{ 'h0050, "REG_UP_WRITE_DATA" , '{
-    "UP_WRITE_DATA": '{ 31, 0, WO, 'h00000000 }}};
-  `define SET_AXI_AD7616_REG_UP_WRITE_DATA_UP_WRITE_DATA(x) SetField(AXI_AD7616_REG_UP_WRITE_DATA,"UP_WRITE_DATA",x)
-  `define GET_AXI_AD7616_REG_UP_WRITE_DATA_UP_WRITE_DATA(x) GetField(AXI_AD7616_REG_UP_WRITE_DATA,"UP_WRITE_DATA",x)
+        this.ID_F = new("ID", 31, 0, RO, 'h0, this);
 
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ID_CLASS
 
-endpackage
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
+
+    class UP_CNTRL_CLASS extends register_base;
+      field_base CNVST_EN_F;
+      field_base RESETN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CNVST_EN_F = new("CNVST_EN", 1, 1, RW, 'h0, this);
+        this.RESETN_F = new("RESETN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: UP_CNTRL_CLASS
+
+    class UP_CONV_RATE_CLASS extends register_base;
+      field_base UP_CONV_RATE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.UP_CONV_RATE_F = new("UP_CONV_RATE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: UP_CONV_RATE_CLASS
+
+    class UP_BURST_LENGTH_CLASS extends register_base;
+      field_base UP_BURST_LENGTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.UP_BURST_LENGTH_F = new("UP_BURST_LENGTH", 4, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: UP_BURST_LENGTH_CLASS
+
+    class UP_READ_DATA_CLASS extends register_base;
+      field_base UP_READ_DATA_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.UP_READ_DATA_F = new("UP_READ_DATA", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: UP_READ_DATA_CLASS
+
+    class UP_WRITE_DATA_CLASS extends register_base;
+      field_base UP_WRITE_DATA_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.UP_WRITE_DATA_F = new("UP_WRITE_DATA", 31, 0, WO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: UP_WRITE_DATA_CLASS
+
+    VERSION_CLASS VERSION_R;
+    ID_CLASS ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    UP_CNTRL_CLASS UP_CNTRL_R;
+    UP_CONV_RATE_CLASS UP_CONV_RATE_R;
+    UP_BURST_LENGTH_CLASS UP_BURST_LENGTH_R;
+    UP_READ_DATA_CLASS UP_READ_DATA_R;
+    UP_WRITE_DATA_CLASS UP_WRITE_DATA_R;
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h400, this);
+      this.ID_R = new("ID", 'h404, this);
+      this.SCRATCH_R = new("SCRATCH", 'h408, this);
+      this.UP_CNTRL_R = new("UP_CNTRL", 'h440, this);
+      this.UP_CONV_RATE_R = new("UP_CONV_RATE", 'h444, this);
+      this.UP_BURST_LENGTH_R = new("UP_BURST_LENGTH", 'h448, this);
+      this.UP_READ_DATA_R = new("UP_READ_DATA", 'h44c, this);
+      this.UP_WRITE_DATA_R = new("UP_WRITE_DATA", 'h450, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_axi_ad7616
+
+endpackage: adi_regmap_axi_ad7616_pkg

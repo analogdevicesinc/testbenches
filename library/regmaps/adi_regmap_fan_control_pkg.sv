@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014 - 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,285 +33,646 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Jan 28 13:30:16 2025 v0.3.55 */
 
 package adi_regmap_fan_control_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_fan_control extends adi_regmap;
 
-/* Fan Controller (axi_fan_control) */
+    /* Fan Controller (axi_fan_control) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_MAJOR_F;
+      field_base VERSION_MINOR_F;
+      field_base VERSION_PATCH_F;
 
-  const reg_t AXI_FAN_CONTROL_VERSION = '{ 'h0000, "VERSION" , '{
-    "VERSION_MAJOR": '{ 31, 16, RO, 'h0001 },
-    "VERSION_MINOR": '{ 15, 8, RO, 'h00 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h61 }}};
-  `define SET_AXI_FAN_CONTROL_VERSION_VERSION_MAJOR(x) SetField(AXI_FAN_CONTROL_VERSION,"VERSION_MAJOR",x)
-  `define GET_AXI_FAN_CONTROL_VERSION_VERSION_MAJOR(x) GetField(AXI_FAN_CONTROL_VERSION,"VERSION_MAJOR",x)
-  `define DEFAULT_AXI_FAN_CONTROL_VERSION_VERSION_MAJOR GetResetValue(AXI_FAN_CONTROL_VERSION,"VERSION_MAJOR")
-  `define UPDATE_AXI_FAN_CONTROL_VERSION_VERSION_MAJOR(x,y) UpdateField(AXI_FAN_CONTROL_VERSION,"VERSION_MAJOR",x,y)
-  `define SET_AXI_FAN_CONTROL_VERSION_VERSION_MINOR(x) SetField(AXI_FAN_CONTROL_VERSION,"VERSION_MINOR",x)
-  `define GET_AXI_FAN_CONTROL_VERSION_VERSION_MINOR(x) GetField(AXI_FAN_CONTROL_VERSION,"VERSION_MINOR",x)
-  `define DEFAULT_AXI_FAN_CONTROL_VERSION_VERSION_MINOR GetResetValue(AXI_FAN_CONTROL_VERSION,"VERSION_MINOR")
-  `define UPDATE_AXI_FAN_CONTROL_VERSION_VERSION_MINOR(x,y) UpdateField(AXI_FAN_CONTROL_VERSION,"VERSION_MINOR",x,y)
-  `define SET_AXI_FAN_CONTROL_VERSION_VERSION_PATCH(x) SetField(AXI_FAN_CONTROL_VERSION,"VERSION_PATCH",x)
-  `define GET_AXI_FAN_CONTROL_VERSION_VERSION_PATCH(x) GetField(AXI_FAN_CONTROL_VERSION,"VERSION_PATCH",x)
-  `define DEFAULT_AXI_FAN_CONTROL_VERSION_VERSION_PATCH GetResetValue(AXI_FAN_CONTROL_VERSION,"VERSION_PATCH")
-  `define UPDATE_AXI_FAN_CONTROL_VERSION_VERSION_PATCH(x,y) UpdateField(AXI_FAN_CONTROL_VERSION,"VERSION_PATCH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_FAN_CONTROL_PERIPHERAL_ID = '{ 'h0004, "PERIPHERAL_ID" , '{
-    "PERIPHERAL_ID": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_FAN_CONTROL_PERIPHERAL_ID_PERIPHERAL_ID(x) SetField(AXI_FAN_CONTROL_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define GET_AXI_FAN_CONTROL_PERIPHERAL_ID_PERIPHERAL_ID(x) GetField(AXI_FAN_CONTROL_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define DEFAULT_AXI_FAN_CONTROL_PERIPHERAL_ID_PERIPHERAL_ID GetResetValue(AXI_FAN_CONTROL_PERIPHERAL_ID,"PERIPHERAL_ID")
-  `define UPDATE_AXI_FAN_CONTROL_PERIPHERAL_ID_PERIPHERAL_ID(x,y) UpdateField(AXI_FAN_CONTROL_PERIPHERAL_ID,"PERIPHERAL_ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_FAN_CONTROL_SCRATCH = '{ 'h0008, "SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_FAN_CONTROL_SCRATCH_SCRATCH(x) SetField(AXI_FAN_CONTROL_SCRATCH,"SCRATCH",x)
-  `define GET_AXI_FAN_CONTROL_SCRATCH_SCRATCH(x) GetField(AXI_FAN_CONTROL_SCRATCH,"SCRATCH",x)
-  `define DEFAULT_AXI_FAN_CONTROL_SCRATCH_SCRATCH GetResetValue(AXI_FAN_CONTROL_SCRATCH,"SCRATCH")
-  `define UPDATE_AXI_FAN_CONTROL_SCRATCH_SCRATCH(x,y) UpdateField(AXI_FAN_CONTROL_SCRATCH,"SCRATCH",x,y)
+        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
+        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
+        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
 
-  const reg_t AXI_FAN_CONTROL_IDENTIFICATION = '{ 'h000c, "IDENTIFICATION" , '{
-    "IDENTIFICATION": '{ 31, 0, RO, 'h46414E43 }}};
-  `define SET_AXI_FAN_CONTROL_IDENTIFICATION_IDENTIFICATION(x) SetField(AXI_FAN_CONTROL_IDENTIFICATION,"IDENTIFICATION",x)
-  `define GET_AXI_FAN_CONTROL_IDENTIFICATION_IDENTIFICATION(x) GetField(AXI_FAN_CONTROL_IDENTIFICATION,"IDENTIFICATION",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IDENTIFICATION_IDENTIFICATION GetResetValue(AXI_FAN_CONTROL_IDENTIFICATION,"IDENTIFICATION")
-  `define UPDATE_AXI_FAN_CONTROL_IDENTIFICATION_IDENTIFICATION(x,y) UpdateField(AXI_FAN_CONTROL_IDENTIFICATION,"IDENTIFICATION",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
 
-  const reg_t AXI_FAN_CONTROL_IRQ_MASK = '{ 'h0040, "IRQ_MASK" , '{
-    "NEW_TACHO_MEASUREMENT": '{ 3, 3, RW, 'h1 },
-    "TEMP_INCREASE": '{ 2, 2, RW, 'h1 },
-    "TACHO_ERR": '{ 1, 1, RW, 'h1 },
-    "PWM_CHANGED": '{ 0, 0, RW, 'h1 }}};
-  `define SET_AXI_FAN_CONTROL_IRQ_MASK_NEW_TACHO_MEASUREMENT(x) SetField(AXI_FAN_CONTROL_IRQ_MASK,"NEW_TACHO_MEASUREMENT",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_MASK_NEW_TACHO_MEASUREMENT(x) GetField(AXI_FAN_CONTROL_IRQ_MASK,"NEW_TACHO_MEASUREMENT",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_MASK_NEW_TACHO_MEASUREMENT GetResetValue(AXI_FAN_CONTROL_IRQ_MASK,"NEW_TACHO_MEASUREMENT")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_MASK_NEW_TACHO_MEASUREMENT(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_MASK,"NEW_TACHO_MEASUREMENT",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_MASK_TEMP_INCREASE(x) SetField(AXI_FAN_CONTROL_IRQ_MASK,"TEMP_INCREASE",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_MASK_TEMP_INCREASE(x) GetField(AXI_FAN_CONTROL_IRQ_MASK,"TEMP_INCREASE",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_MASK_TEMP_INCREASE GetResetValue(AXI_FAN_CONTROL_IRQ_MASK,"TEMP_INCREASE")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_MASK_TEMP_INCREASE(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_MASK,"TEMP_INCREASE",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_MASK_TACHO_ERR(x) SetField(AXI_FAN_CONTROL_IRQ_MASK,"TACHO_ERR",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_MASK_TACHO_ERR(x) GetField(AXI_FAN_CONTROL_IRQ_MASK,"TACHO_ERR",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_MASK_TACHO_ERR GetResetValue(AXI_FAN_CONTROL_IRQ_MASK,"TACHO_ERR")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_MASK_TACHO_ERR(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_MASK,"TACHO_ERR",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_MASK_PWM_CHANGED(x) SetField(AXI_FAN_CONTROL_IRQ_MASK,"PWM_CHANGED",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_MASK_PWM_CHANGED(x) GetField(AXI_FAN_CONTROL_IRQ_MASK,"PWM_CHANGED",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_MASK_PWM_CHANGED GetResetValue(AXI_FAN_CONTROL_IRQ_MASK,"PWM_CHANGED")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_MASK_PWM_CHANGED(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_MASK,"PWM_CHANGED",x,y)
+    class PERIPHERAL_ID_CLASS extends register_base;
+      field_base PERIPHERAL_ID_F;
 
-  const reg_t AXI_FAN_CONTROL_IRQ_PENDING = '{ 'h0044, "IRQ_PENDING" , '{
-    "NEW_TACHO_MEASUREMENT": '{ 3, 3, RW1C, 'h0 },
-    "TEMP_INCREASE": '{ 2, 2, RW1C, 'h0 },
-    "TACHO_ERR": '{ 1, 1, RW1C, 'h0 },
-    "PWM_CHANGED": '{ 0, 0, RW1C, 'h0 }}};
-  `define SET_AXI_FAN_CONTROL_IRQ_PENDING_NEW_TACHO_MEASUREMENT(x) SetField(AXI_FAN_CONTROL_IRQ_PENDING,"NEW_TACHO_MEASUREMENT",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_PENDING_NEW_TACHO_MEASUREMENT(x) GetField(AXI_FAN_CONTROL_IRQ_PENDING,"NEW_TACHO_MEASUREMENT",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_PENDING_NEW_TACHO_MEASUREMENT GetResetValue(AXI_FAN_CONTROL_IRQ_PENDING,"NEW_TACHO_MEASUREMENT")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_PENDING_NEW_TACHO_MEASUREMENT(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_PENDING,"NEW_TACHO_MEASUREMENT",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_PENDING_TEMP_INCREASE(x) SetField(AXI_FAN_CONTROL_IRQ_PENDING,"TEMP_INCREASE",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_PENDING_TEMP_INCREASE(x) GetField(AXI_FAN_CONTROL_IRQ_PENDING,"TEMP_INCREASE",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_PENDING_TEMP_INCREASE GetResetValue(AXI_FAN_CONTROL_IRQ_PENDING,"TEMP_INCREASE")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_PENDING_TEMP_INCREASE(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_PENDING,"TEMP_INCREASE",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_PENDING_TACHO_ERR(x) SetField(AXI_FAN_CONTROL_IRQ_PENDING,"TACHO_ERR",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_PENDING_TACHO_ERR(x) GetField(AXI_FAN_CONTROL_IRQ_PENDING,"TACHO_ERR",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_PENDING_TACHO_ERR GetResetValue(AXI_FAN_CONTROL_IRQ_PENDING,"TACHO_ERR")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_PENDING_TACHO_ERR(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_PENDING,"TACHO_ERR",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_PENDING_PWM_CHANGED(x) SetField(AXI_FAN_CONTROL_IRQ_PENDING,"PWM_CHANGED",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_PENDING_PWM_CHANGED(x) GetField(AXI_FAN_CONTROL_IRQ_PENDING,"PWM_CHANGED",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_PENDING_PWM_CHANGED GetResetValue(AXI_FAN_CONTROL_IRQ_PENDING,"PWM_CHANGED")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_PENDING_PWM_CHANGED(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_PENDING,"PWM_CHANGED",x,y)
+      function new(
+        input string name,
+        input int address,
+        input int ID,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_FAN_CONTROL_IRQ_SOURCE = '{ 'h0048, "IRQ_SOURCE" , '{
-    "NEW_TACHO_MEASUREMENT": '{ 3, 3, RO, 'h0 },
-    "TEMP_INCREASE": '{ 2, 2, RO, 'h0 },
-    "TACHO_ERR": '{ 1, 1, RO, 'h0 },
-    "PWM_CHANGED": '{ 0, 0, RO, 'h0 }}};
-  `define SET_AXI_FAN_CONTROL_IRQ_SOURCE_NEW_TACHO_MEASUREMENT(x) SetField(AXI_FAN_CONTROL_IRQ_SOURCE,"NEW_TACHO_MEASUREMENT",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_SOURCE_NEW_TACHO_MEASUREMENT(x) GetField(AXI_FAN_CONTROL_IRQ_SOURCE,"NEW_TACHO_MEASUREMENT",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_SOURCE_NEW_TACHO_MEASUREMENT GetResetValue(AXI_FAN_CONTROL_IRQ_SOURCE,"NEW_TACHO_MEASUREMENT")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_SOURCE_NEW_TACHO_MEASUREMENT(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_SOURCE,"NEW_TACHO_MEASUREMENT",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_SOURCE_TEMP_INCREASE(x) SetField(AXI_FAN_CONTROL_IRQ_SOURCE,"TEMP_INCREASE",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_SOURCE_TEMP_INCREASE(x) GetField(AXI_FAN_CONTROL_IRQ_SOURCE,"TEMP_INCREASE",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_SOURCE_TEMP_INCREASE GetResetValue(AXI_FAN_CONTROL_IRQ_SOURCE,"TEMP_INCREASE")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_SOURCE_TEMP_INCREASE(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_SOURCE,"TEMP_INCREASE",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_SOURCE_TACHO_ERR(x) SetField(AXI_FAN_CONTROL_IRQ_SOURCE,"TACHO_ERR",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_SOURCE_TACHO_ERR(x) GetField(AXI_FAN_CONTROL_IRQ_SOURCE,"TACHO_ERR",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_SOURCE_TACHO_ERR GetResetValue(AXI_FAN_CONTROL_IRQ_SOURCE,"TACHO_ERR")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_SOURCE_TACHO_ERR(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_SOURCE,"TACHO_ERR",x,y)
-  `define SET_AXI_FAN_CONTROL_IRQ_SOURCE_PWM_CHANGED(x) SetField(AXI_FAN_CONTROL_IRQ_SOURCE,"PWM_CHANGED",x)
-  `define GET_AXI_FAN_CONTROL_IRQ_SOURCE_PWM_CHANGED(x) GetField(AXI_FAN_CONTROL_IRQ_SOURCE,"PWM_CHANGED",x)
-  `define DEFAULT_AXI_FAN_CONTROL_IRQ_SOURCE_PWM_CHANGED GetResetValue(AXI_FAN_CONTROL_IRQ_SOURCE,"PWM_CHANGED")
-  `define UPDATE_AXI_FAN_CONTROL_IRQ_SOURCE_PWM_CHANGED(x,y) UpdateField(AXI_FAN_CONTROL_IRQ_SOURCE,"PWM_CHANGED",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_FAN_CONTROL_REG_RSTN = '{ 'h0080, "REG_RSTN" , '{
-    "RSTN": '{ 0, 0, RW, 'h0 }}};
-  `define SET_AXI_FAN_CONTROL_REG_RSTN_RSTN(x) SetField(AXI_FAN_CONTROL_REG_RSTN,"RSTN",x)
-  `define GET_AXI_FAN_CONTROL_REG_RSTN_RSTN(x) GetField(AXI_FAN_CONTROL_REG_RSTN,"RSTN",x)
-  `define DEFAULT_AXI_FAN_CONTROL_REG_RSTN_RSTN GetResetValue(AXI_FAN_CONTROL_REG_RSTN,"RSTN")
-  `define UPDATE_AXI_FAN_CONTROL_REG_RSTN_RSTN(x,y) UpdateField(AXI_FAN_CONTROL_REG_RSTN,"RSTN",x,y)
+        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
 
-  const reg_t AXI_FAN_CONTROL_PWM_WIDTH = '{ 'h0084, "PWM_WIDTH" , '{
-    "PWM_WIDTH": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_PWM_WIDTH_PWM_WIDTH(x) SetField(AXI_FAN_CONTROL_PWM_WIDTH,"PWM_WIDTH",x)
-  `define GET_AXI_FAN_CONTROL_PWM_WIDTH_PWM_WIDTH(x) GetField(AXI_FAN_CONTROL_PWM_WIDTH,"PWM_WIDTH",x)
-  `define DEFAULT_AXI_FAN_CONTROL_PWM_WIDTH_PWM_WIDTH GetResetValue(AXI_FAN_CONTROL_PWM_WIDTH,"PWM_WIDTH")
-  `define UPDATE_AXI_FAN_CONTROL_PWM_WIDTH_PWM_WIDTH(x,y) UpdateField(AXI_FAN_CONTROL_PWM_WIDTH,"PWM_WIDTH",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PERIPHERAL_ID_CLASS
 
-  const reg_t AXI_FAN_CONTROL_TACHO_PERIOD = '{ 'h0088, "TACHO_PERIOD" , '{
-    "TACHO_PERIOD": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_PERIOD_TACHO_PERIOD(x) SetField(AXI_FAN_CONTROL_TACHO_PERIOD,"TACHO_PERIOD",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_PERIOD_TACHO_PERIOD(x) GetField(AXI_FAN_CONTROL_TACHO_PERIOD,"TACHO_PERIOD",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_PERIOD_TACHO_PERIOD GetResetValue(AXI_FAN_CONTROL_TACHO_PERIOD,"TACHO_PERIOD")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_PERIOD_TACHO_PERIOD(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_PERIOD,"TACHO_PERIOD",x,y)
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
 
-  const reg_t AXI_FAN_CONTROL_TACHO_TOLERANCE = '{ 'h008c, "TACHO_TOLERANCE" , '{
-    "TACHO_TOLERANCE": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_TOLERANCE_TACHO_TOLERANCE(x) SetField(AXI_FAN_CONTROL_TACHO_TOLERANCE,"TACHO_TOLERANCE",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_TOLERANCE_TACHO_TOLERANCE(x) GetField(AXI_FAN_CONTROL_TACHO_TOLERANCE,"TACHO_TOLERANCE",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_TOLERANCE_TACHO_TOLERANCE GetResetValue(AXI_FAN_CONTROL_TACHO_TOLERANCE,"TACHO_TOLERANCE")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_TOLERANCE_TACHO_TOLERANCE(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_TOLERANCE,"TACHO_TOLERANCE",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_FAN_CONTROL_TEMP_DATA_SOURCE = '{ 'h0090, "TEMP_DATA_SOURCE" , '{
-    "TEMP_DATA_SOURCE": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_DATA_SOURCE_TEMP_DATA_SOURCE(x) SetField(AXI_FAN_CONTROL_TEMP_DATA_SOURCE,"TEMP_DATA_SOURCE",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_DATA_SOURCE_TEMP_DATA_SOURCE(x) GetField(AXI_FAN_CONTROL_TEMP_DATA_SOURCE,"TEMP_DATA_SOURCE",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_DATA_SOURCE_TEMP_DATA_SOURCE GetResetValue(AXI_FAN_CONTROL_TEMP_DATA_SOURCE,"TEMP_DATA_SOURCE")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_DATA_SOURCE_TEMP_DATA_SOURCE(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_DATA_SOURCE,"TEMP_DATA_SOURCE",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_FAN_CONTROL_PWM_PERIOD = '{ 'h00c0, "PWM_PERIOD" , '{
-    "PWM_PERIOD": '{ 31, 0, RO, 'h4E20 }}};
-  `define SET_AXI_FAN_CONTROL_PWM_PERIOD_PWM_PERIOD(x) SetField(AXI_FAN_CONTROL_PWM_PERIOD,"PWM_PERIOD",x)
-  `define GET_AXI_FAN_CONTROL_PWM_PERIOD_PWM_PERIOD(x) GetField(AXI_FAN_CONTROL_PWM_PERIOD,"PWM_PERIOD",x)
-  `define DEFAULT_AXI_FAN_CONTROL_PWM_PERIOD_PWM_PERIOD GetResetValue(AXI_FAN_CONTROL_PWM_PERIOD,"PWM_PERIOD")
-  `define UPDATE_AXI_FAN_CONTROL_PWM_PERIOD_PWM_PERIOD(x,y) UpdateField(AXI_FAN_CONTROL_PWM_PERIOD,"PWM_PERIOD",x,y)
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
 
-  const reg_t AXI_FAN_CONTROL_TACHO_MEASUREMENT = '{ 'h00c4, "TACHO_MEASUREMENT" , '{
-    "TACHO_MEASUREMENT": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_MEASUREMENT_TACHO_MEASUREMENT(x) SetField(AXI_FAN_CONTROL_TACHO_MEASUREMENT,"TACHO_MEASUREMENT",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_MEASUREMENT_TACHO_MEASUREMENT(x) GetField(AXI_FAN_CONTROL_TACHO_MEASUREMENT,"TACHO_MEASUREMENT",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_MEASUREMENT_TACHO_MEASUREMENT GetResetValue(AXI_FAN_CONTROL_TACHO_MEASUREMENT,"TACHO_MEASUREMENT")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_MEASUREMENT_TACHO_MEASUREMENT(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_MEASUREMENT,"TACHO_MEASUREMENT",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
 
-  const reg_t AXI_FAN_CONTROL_TEMPERATURE = '{ 'h00c8, "TEMPERATURE" , '{
-    "TEMPERATURE": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_FAN_CONTROL_TEMPERATURE_TEMPERATURE(x) SetField(AXI_FAN_CONTROL_TEMPERATURE,"TEMPERATURE",x)
-  `define GET_AXI_FAN_CONTROL_TEMPERATURE_TEMPERATURE(x) GetField(AXI_FAN_CONTROL_TEMPERATURE,"TEMPERATURE",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMPERATURE_TEMPERATURE GetResetValue(AXI_FAN_CONTROL_TEMPERATURE,"TEMPERATURE")
-  `define UPDATE_AXI_FAN_CONTROL_TEMPERATURE_TEMPERATURE(x,y) UpdateField(AXI_FAN_CONTROL_TEMPERATURE,"TEMPERATURE",x,y)
+    class IDENTIFICATION_CLASS extends register_base;
+      field_base IDENTIFICATION_F;
 
-  const reg_t AXI_FAN_CONTROL_TEMP_00_H = '{ 'h0100, "TEMP_00_H" , '{
-    "TEMP_00_H": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_00_H_TEMP_00_H(x) SetField(AXI_FAN_CONTROL_TEMP_00_H,"TEMP_00_H",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_00_H_TEMP_00_H(x) GetField(AXI_FAN_CONTROL_TEMP_00_H,"TEMP_00_H",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_00_H_TEMP_00_H GetResetValue(AXI_FAN_CONTROL_TEMP_00_H,"TEMP_00_H")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_00_H_TEMP_00_H(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_00_H,"TEMP_00_H",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_FAN_CONTROL_TEMP_25_L = '{ 'h0104, "TEMP_25_L" , '{
-    "TEMP_25_L": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_25_L_TEMP_25_L(x) SetField(AXI_FAN_CONTROL_TEMP_25_L,"TEMP_25_L",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_25_L_TEMP_25_L(x) GetField(AXI_FAN_CONTROL_TEMP_25_L,"TEMP_25_L",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_25_L_TEMP_25_L GetResetValue(AXI_FAN_CONTROL_TEMP_25_L,"TEMP_25_L")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_25_L_TEMP_25_L(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_25_L,"TEMP_25_L",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_FAN_CONTROL_TEMP_25_H = '{ 'h0108, "TEMP_25_H" , '{
-    "TEMP_25_H": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_25_H_TEMP_25_H(x) SetField(AXI_FAN_CONTROL_TEMP_25_H,"TEMP_25_H",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_25_H_TEMP_25_H(x) GetField(AXI_FAN_CONTROL_TEMP_25_H,"TEMP_25_H",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_25_H_TEMP_25_H GetResetValue(AXI_FAN_CONTROL_TEMP_25_H,"TEMP_25_H")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_25_H_TEMP_25_H(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_25_H,"TEMP_25_H",x,y)
+        this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h46414e43, this);
 
-  const reg_t AXI_FAN_CONTROL_TEMP_50_L = '{ 'h010c, "TEMP_50_L" , '{
-    "TEMP_50_L": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_50_L_TEMP_50_L(x) SetField(AXI_FAN_CONTROL_TEMP_50_L,"TEMP_50_L",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_50_L_TEMP_50_L(x) GetField(AXI_FAN_CONTROL_TEMP_50_L,"TEMP_50_L",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_50_L_TEMP_50_L GetResetValue(AXI_FAN_CONTROL_TEMP_50_L,"TEMP_50_L")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_50_L_TEMP_50_L(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_50_L,"TEMP_50_L",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IDENTIFICATION_CLASS
 
-  const reg_t AXI_FAN_CONTROL_TEMP_50_H = '{ 'h0110, "TEMP_50_H" , '{
-    "TEMP_50_H": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_50_H_TEMP_50_H(x) SetField(AXI_FAN_CONTROL_TEMP_50_H,"TEMP_50_H",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_50_H_TEMP_50_H(x) GetField(AXI_FAN_CONTROL_TEMP_50_H,"TEMP_50_H",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_50_H_TEMP_50_H GetResetValue(AXI_FAN_CONTROL_TEMP_50_H,"TEMP_50_H")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_50_H_TEMP_50_H(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_50_H,"TEMP_50_H",x,y)
+    class IRQ_MASK_CLASS extends register_base;
+      field_base NEW_TACHO_MEASUREMENT_F;
+      field_base TEMP_INCREASE_F;
+      field_base TACHO_ERR_F;
+      field_base PWM_CHANGED_F;
 
-  const reg_t AXI_FAN_CONTROL_TEMP_75_L = '{ 'h0114, "TEMP_75_L" , '{
-    "TEMP_75_L": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_75_L_TEMP_75_L(x) SetField(AXI_FAN_CONTROL_TEMP_75_L,"TEMP_75_L",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_75_L_TEMP_75_L(x) GetField(AXI_FAN_CONTROL_TEMP_75_L,"TEMP_75_L",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_75_L_TEMP_75_L GetResetValue(AXI_FAN_CONTROL_TEMP_75_L,"TEMP_75_L")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_75_L_TEMP_75_L(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_75_L,"TEMP_75_L",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_FAN_CONTROL_TEMP_75_H = '{ 'h0118, "TEMP_75_H" , '{
-    "TEMP_75_H": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_75_H_TEMP_75_H(x) SetField(AXI_FAN_CONTROL_TEMP_75_H,"TEMP_75_H",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_75_H_TEMP_75_H(x) GetField(AXI_FAN_CONTROL_TEMP_75_H,"TEMP_75_H",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_75_H_TEMP_75_H GetResetValue(AXI_FAN_CONTROL_TEMP_75_H,"TEMP_75_H")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_75_H_TEMP_75_H(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_75_H,"TEMP_75_H",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_FAN_CONTROL_TEMP_100_L = '{ 'h011c, "TEMP_100_L" , '{
-    "TEMP_100_L": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TEMP_100_L_TEMP_100_L(x) SetField(AXI_FAN_CONTROL_TEMP_100_L,"TEMP_100_L",x)
-  `define GET_AXI_FAN_CONTROL_TEMP_100_L_TEMP_100_L(x) GetField(AXI_FAN_CONTROL_TEMP_100_L,"TEMP_100_L",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TEMP_100_L_TEMP_100_L GetResetValue(AXI_FAN_CONTROL_TEMP_100_L,"TEMP_100_L")
-  `define UPDATE_AXI_FAN_CONTROL_TEMP_100_L_TEMP_100_L(x,y) UpdateField(AXI_FAN_CONTROL_TEMP_100_L,"TEMP_100_L",x,y)
+        this.NEW_TACHO_MEASUREMENT_F = new("NEW_TACHO_MEASUREMENT", 3, 3, RW, 'h1, this);
+        this.TEMP_INCREASE_F = new("TEMP_INCREASE", 2, 2, RW, 'h1, this);
+        this.TACHO_ERR_F = new("TACHO_ERR", 1, 1, RW, 'h1, this);
+        this.PWM_CHANGED_F = new("PWM_CHANGED", 0, 0, RW, 'h1, this);
 
-  const reg_t AXI_FAN_CONTROL_TACHO_25 = '{ 'h0140, "TACHO_25" , '{
-    "TACHO_25": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_25_TACHO_25(x) SetField(AXI_FAN_CONTROL_TACHO_25,"TACHO_25",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_25_TACHO_25(x) GetField(AXI_FAN_CONTROL_TACHO_25,"TACHO_25",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_25_TACHO_25 GetResetValue(AXI_FAN_CONTROL_TACHO_25,"TACHO_25")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_25_TACHO_25(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_25,"TACHO_25",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_MASK_CLASS
 
-  const reg_t AXI_FAN_CONTROL_TACHO_50 = '{ 'h0144, "TACHO_50" , '{
-    "TACHO_50": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_50_TACHO_50(x) SetField(AXI_FAN_CONTROL_TACHO_50,"TACHO_50",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_50_TACHO_50(x) GetField(AXI_FAN_CONTROL_TACHO_50,"TACHO_50",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_50_TACHO_50 GetResetValue(AXI_FAN_CONTROL_TACHO_50,"TACHO_50")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_50_TACHO_50(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_50,"TACHO_50",x,y)
+    class IRQ_PENDING_CLASS extends register_base;
+      field_base NEW_TACHO_MEASUREMENT_F;
+      field_base TEMP_INCREASE_F;
+      field_base TACHO_ERR_F;
+      field_base PWM_CHANGED_F;
 
-  const reg_t AXI_FAN_CONTROL_TACHO_75 = '{ 'h0148, "TACHO_75" , '{
-    "TACHO_75": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_75_TACHO_75(x) SetField(AXI_FAN_CONTROL_TACHO_75,"TACHO_75",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_75_TACHO_75(x) GetField(AXI_FAN_CONTROL_TACHO_75,"TACHO_75",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_75_TACHO_75 GetResetValue(AXI_FAN_CONTROL_TACHO_75,"TACHO_75")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_75_TACHO_75(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_75,"TACHO_75",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_FAN_CONTROL_TACHO_100 = '{ 'h014c, "TACHO_100" , '{
-    "TACHO_100": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_100_TACHO_100(x) SetField(AXI_FAN_CONTROL_TACHO_100,"TACHO_100",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_100_TACHO_100(x) GetField(AXI_FAN_CONTROL_TACHO_100,"TACHO_100",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_100_TACHO_100 GetResetValue(AXI_FAN_CONTROL_TACHO_100,"TACHO_100")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_100_TACHO_100(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_100,"TACHO_100",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_FAN_CONTROL_TACHO_25_TOL = '{ 'h0150, "TACHO_25_TOL" , '{
-    "TACHO_25_TOL": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_25_TOL_TACHO_25_TOL(x) SetField(AXI_FAN_CONTROL_TACHO_25_TOL,"TACHO_25_TOL",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_25_TOL_TACHO_25_TOL(x) GetField(AXI_FAN_CONTROL_TACHO_25_TOL,"TACHO_25_TOL",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_25_TOL_TACHO_25_TOL GetResetValue(AXI_FAN_CONTROL_TACHO_25_TOL,"TACHO_25_TOL")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_25_TOL_TACHO_25_TOL(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_25_TOL,"TACHO_25_TOL",x,y)
+        this.NEW_TACHO_MEASUREMENT_F = new("NEW_TACHO_MEASUREMENT", 3, 3, RW1C, 'h0, this);
+        this.TEMP_INCREASE_F = new("TEMP_INCREASE", 2, 2, RW1C, 'h0, this);
+        this.TACHO_ERR_F = new("TACHO_ERR", 1, 1, RW1C, 'h0, this);
+        this.PWM_CHANGED_F = new("PWM_CHANGED", 0, 0, RW1C, 'h0, this);
 
-  const reg_t AXI_FAN_CONTROL_TACHO_50_TOL = '{ 'h0154, "TACHO_50_TOL" , '{
-    "TACHO_50_TOL": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_50_TOL_TACHO_50_TOL(x) SetField(AXI_FAN_CONTROL_TACHO_50_TOL,"TACHO_50_TOL",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_50_TOL_TACHO_50_TOL(x) GetField(AXI_FAN_CONTROL_TACHO_50_TOL,"TACHO_50_TOL",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_50_TOL_TACHO_50_TOL GetResetValue(AXI_FAN_CONTROL_TACHO_50_TOL,"TACHO_50_TOL")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_50_TOL_TACHO_50_TOL(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_50_TOL,"TACHO_50_TOL",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_PENDING_CLASS
 
-  const reg_t AXI_FAN_CONTROL_TACHO_75_TOL = '{ 'h0158, "TACHO_75_TOL" , '{
-    "TACHO_75_TOL": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_75_TOL_TACHO_75_TOL(x) SetField(AXI_FAN_CONTROL_TACHO_75_TOL,"TACHO_75_TOL",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_75_TOL_TACHO_75_TOL(x) GetField(AXI_FAN_CONTROL_TACHO_75_TOL,"TACHO_75_TOL",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_75_TOL_TACHO_75_TOL GetResetValue(AXI_FAN_CONTROL_TACHO_75_TOL,"TACHO_75_TOL")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_75_TOL_TACHO_75_TOL(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_75_TOL,"TACHO_75_TOL",x,y)
+    class IRQ_SOURCE_CLASS extends register_base;
+      field_base NEW_TACHO_MEASUREMENT_F;
+      field_base TEMP_INCREASE_F;
+      field_base TACHO_ERR_F;
+      field_base PWM_CHANGED_F;
 
-  const reg_t AXI_FAN_CONTROL_TACHO_100_TOL = '{ 'h015c, "TACHO_100_TOL" , '{
-    "TACHO_100_TOL": '{ 31, 0, RW, 0 }}};
-  `define SET_AXI_FAN_CONTROL_TACHO_100_TOL_TACHO_100_TOL(x) SetField(AXI_FAN_CONTROL_TACHO_100_TOL,"TACHO_100_TOL",x)
-  `define GET_AXI_FAN_CONTROL_TACHO_100_TOL_TACHO_100_TOL(x) GetField(AXI_FAN_CONTROL_TACHO_100_TOL,"TACHO_100_TOL",x)
-  `define DEFAULT_AXI_FAN_CONTROL_TACHO_100_TOL_TACHO_100_TOL GetResetValue(AXI_FAN_CONTROL_TACHO_100_TOL,"TACHO_100_TOL")
-  `define UPDATE_AXI_FAN_CONTROL_TACHO_100_TOL_TACHO_100_TOL(x,y) UpdateField(AXI_FAN_CONTROL_TACHO_100_TOL,"TACHO_100_TOL",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
+        super.new(name, address, parent);
 
-endpackage
+        this.NEW_TACHO_MEASUREMENT_F = new("NEW_TACHO_MEASUREMENT", 3, 3, RO, 'h0, this);
+        this.TEMP_INCREASE_F = new("TEMP_INCREASE", 2, 2, RO, 'h0, this);
+        this.TACHO_ERR_F = new("TACHO_ERR", 1, 1, RO, 'h0, this);
+        this.PWM_CHANGED_F = new("PWM_CHANGED", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_SOURCE_CLASS
+
+    class RSTN_CLASS extends register_base;
+      field_base RSTN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: RSTN_CLASS
+
+    class PWM_WIDTH_CLASS extends register_base;
+      field_base PWM_WIDTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int PWM_PERIOD,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PWM_WIDTH_F = new("PWM_WIDTH", 31, 0, RW, PWM_PERIOD, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PWM_WIDTH_CLASS
+
+    class TACHO_PERIOD_CLASS extends register_base;
+      field_base TACHO_PERIOD_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_PERIOD_F = new("TACHO_PERIOD", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_PERIOD_CLASS
+
+    class TACHO_TOLERANCE_CLASS extends register_base;
+      field_base TACHO_TOLERANCE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_TOLERANCE_F = new("TACHO_TOLERANCE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_TOLERANCE_CLASS
+
+    class TEMP_DATA_SOURCE_CLASS extends register_base;
+      field_base TEMP_DATA_SOURCE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int INTERNAL_SYSMONE,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_DATA_SOURCE_F = new("TEMP_DATA_SOURCE", 31, 0, RO, INTERNAL_SYSMONE, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_DATA_SOURCE_CLASS
+
+    class PWM_PERIOD_CLASS extends register_base;
+      field_base PWM_PERIOD_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PWM_PERIOD_F = new("PWM_PERIOD", 31, 0, RO, 'h4e20, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PWM_PERIOD_CLASS
+
+    class TACHO_MEASUREMENT_CLASS extends register_base;
+      field_base TACHO_MEASUREMENT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_MEASUREMENT_F = new("TACHO_MEASUREMENT", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_MEASUREMENT_CLASS
+
+    class TEMPERATURE_CLASS extends register_base;
+      field_base TEMPERATURE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMPERATURE_F = new("TEMPERATURE", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMPERATURE_CLASS
+
+    class TEMP_00_H_CLASS extends register_base;
+      field_base TEMP_00_H_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_00_H,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_00_H_F = new("TEMP_00_H", 31, 0, RW, TEMP_00_H, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_00_H_CLASS
+
+    class TEMP_25_L_CLASS extends register_base;
+      field_base TEMP_25_L_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_25_L,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_25_L_F = new("TEMP_25_L", 31, 0, RW, TEMP_25_L, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_25_L_CLASS
+
+    class TEMP_25_H_CLASS extends register_base;
+      field_base TEMP_25_H_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_25_H,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_25_H_F = new("TEMP_25_H", 31, 0, RW, TEMP_25_H, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_25_H_CLASS
+
+    class TEMP_50_L_CLASS extends register_base;
+      field_base TEMP_50_L_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_50_L,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_50_L_F = new("TEMP_50_L", 31, 0, RW, TEMP_50_L, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_50_L_CLASS
+
+    class TEMP_50_H_CLASS extends register_base;
+      field_base TEMP_50_H_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_50_H,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_50_H_F = new("TEMP_50_H", 31, 0, RW, TEMP_50_H, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_50_H_CLASS
+
+    class TEMP_75_L_CLASS extends register_base;
+      field_base TEMP_75_L_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_75_L,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_75_L_F = new("TEMP_75_L", 31, 0, RW, TEMP_75_L, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_75_L_CLASS
+
+    class TEMP_75_H_CLASS extends register_base;
+      field_base TEMP_75_H_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_75_H,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_75_H_F = new("TEMP_75_H", 31, 0, RW, TEMP_75_H, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_75_H_CLASS
+
+    class TEMP_100_L_CLASS extends register_base;
+      field_base TEMP_100_L_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TEMP_100_L,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TEMP_100_L_F = new("TEMP_100_L", 31, 0, RW, TEMP_100_L, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TEMP_100_L_CLASS
+
+    class TACHO_25_CLASS extends register_base;
+      field_base TACHO_25_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T25,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_25_F = new("TACHO_25", 31, 0, RW, TACHO_T25, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_25_CLASS
+
+    class TACHO_50_CLASS extends register_base;
+      field_base TACHO_50_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T50,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_50_F = new("TACHO_50", 31, 0, RW, TACHO_T50, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_50_CLASS
+
+    class TACHO_75_CLASS extends register_base;
+      field_base TACHO_75_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T75,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_75_F = new("TACHO_75", 31, 0, RW, TACHO_T75, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_75_CLASS
+
+    class TACHO_100_CLASS extends register_base;
+      field_base TACHO_100_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T100,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_100_F = new("TACHO_100", 31, 0, RW, TACHO_T100, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_100_CLASS
+
+    class TACHO_25_TOL_CLASS extends register_base;
+      field_base TACHO_25_TOL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T25,
+        input int TACHO_TOL_PERCENT,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_25_TOL_F = new("TACHO_25_TOL", 31, 0, RW, TACHO_T25*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_25_TOL_CLASS
+
+    class TACHO_50_TOL_CLASS extends register_base;
+      field_base TACHO_50_TOL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T50,
+        input int TACHO_TOL_PERCENT,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_50_TOL_F = new("TACHO_50_TOL", 31, 0, RW, TACHO_T50*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_50_TOL_CLASS
+
+    class TACHO_75_TOL_CLASS extends register_base;
+      field_base TACHO_75_TOL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T75,
+        input int TACHO_TOL_PERCENT,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_75_TOL_F = new("TACHO_75_TOL", 31, 0, RW, TACHO_T75*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_75_TOL_CLASS
+
+    class TACHO_100_TOL_CLASS extends register_base;
+      field_base TACHO_100_TOL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int TACHO_T100,
+        input int TACHO_TOL_PERCENT,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TACHO_100_TOL_F = new("TACHO_100_TOL", 31, 0, RW, TACHO_T100*TACHO_TOL_PERCENT/100, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TACHO_100_TOL_CLASS
+
+    VERSION_CLASS VERSION_R;
+    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    IDENTIFICATION_CLASS IDENTIFICATION_R;
+    IRQ_MASK_CLASS IRQ_MASK_R;
+    IRQ_PENDING_CLASS IRQ_PENDING_R;
+    IRQ_SOURCE_CLASS IRQ_SOURCE_R;
+    RSTN_CLASS RSTN_R;
+    PWM_WIDTH_CLASS PWM_WIDTH_R;
+    TACHO_PERIOD_CLASS TACHO_PERIOD_R;
+    TACHO_TOLERANCE_CLASS TACHO_TOLERANCE_R;
+    TEMP_DATA_SOURCE_CLASS TEMP_DATA_SOURCE_R;
+    PWM_PERIOD_CLASS PWM_PERIOD_R;
+    TACHO_MEASUREMENT_CLASS TACHO_MEASUREMENT_R;
+    TEMPERATURE_CLASS TEMPERATURE_R;
+    TEMP_00_H_CLASS TEMP_00_H_R;
+    TEMP_25_L_CLASS TEMP_25_L_R;
+    TEMP_25_H_CLASS TEMP_25_H_R;
+    TEMP_50_L_CLASS TEMP_50_L_R;
+    TEMP_50_H_CLASS TEMP_50_H_R;
+    TEMP_75_L_CLASS TEMP_75_L_R;
+    TEMP_75_H_CLASS TEMP_75_H_R;
+    TEMP_100_L_CLASS TEMP_100_L_R;
+    TACHO_25_CLASS TACHO_25_R;
+    TACHO_50_CLASS TACHO_50_R;
+    TACHO_75_CLASS TACHO_75_R;
+    TACHO_100_CLASS TACHO_100_R;
+    TACHO_25_TOL_CLASS TACHO_25_TOL_R;
+    TACHO_50_TOL_CLASS TACHO_50_TOL_R;
+    TACHO_75_TOL_CLASS TACHO_75_TOL_R;
+    TACHO_100_TOL_CLASS TACHO_100_TOL_R;
+
+    function new(
+      input string name,
+      input int address,
+      input int ID,
+      input int INTERNAL_SYSMONE,
+      input int PWM_PERIOD,
+      input int TACHO_T100,
+      input int TACHO_T25,
+      input int TACHO_T50,
+      input int TACHO_T75,
+      input int TACHO_TOL_PERCENT,
+      input int TEMP_00_H,
+      input int TEMP_100_L,
+      input int TEMP_25_H,
+      input int TEMP_25_L,
+      input int TEMP_50_H,
+      input int TEMP_50_L,
+      input int TEMP_75_H,
+      input int TEMP_75_L,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, ID, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
+      this.IRQ_MASK_R = new("IRQ_MASK", 'h40, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h44, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h48, this);
+      this.RSTN_R = new("RSTN", 'h80, this);
+      this.PWM_WIDTH_R = new("PWM_WIDTH", 'h84, PWM_PERIOD, this);
+      this.TACHO_PERIOD_R = new("TACHO_PERIOD", 'h88, this);
+      this.TACHO_TOLERANCE_R = new("TACHO_TOLERANCE", 'h8c, this);
+      this.TEMP_DATA_SOURCE_R = new("TEMP_DATA_SOURCE", 'h90, INTERNAL_SYSMONE, this);
+      this.PWM_PERIOD_R = new("PWM_PERIOD", 'hc0, this);
+      this.TACHO_MEASUREMENT_R = new("TACHO_MEASUREMENT", 'hc4, this);
+      this.TEMPERATURE_R = new("TEMPERATURE", 'hc8, this);
+      this.TEMP_00_H_R = new("TEMP_00_H", 'h100, TEMP_00_H, this);
+      this.TEMP_25_L_R = new("TEMP_25_L", 'h104, TEMP_25_L, this);
+      this.TEMP_25_H_R = new("TEMP_25_H", 'h108, TEMP_25_H, this);
+      this.TEMP_50_L_R = new("TEMP_50_L", 'h10c, TEMP_50_L, this);
+      this.TEMP_50_H_R = new("TEMP_50_H", 'h110, TEMP_50_H, this);
+      this.TEMP_75_L_R = new("TEMP_75_L", 'h114, TEMP_75_L, this);
+      this.TEMP_75_H_R = new("TEMP_75_H", 'h118, TEMP_75_H, this);
+      this.TEMP_100_L_R = new("TEMP_100_L", 'h11c, TEMP_100_L, this);
+      this.TACHO_25_R = new("TACHO_25", 'h140, TACHO_T25, this);
+      this.TACHO_50_R = new("TACHO_50", 'h144, TACHO_T50, this);
+      this.TACHO_75_R = new("TACHO_75", 'h148, TACHO_T75, this);
+      this.TACHO_100_R = new("TACHO_100", 'h14c, TACHO_T100, this);
+      this.TACHO_25_TOL_R = new("TACHO_25_TOL", 'h150, TACHO_T25, TACHO_TOL_PERCENT, this);
+      this.TACHO_50_TOL_R = new("TACHO_50_TOL", 'h154, TACHO_T50, TACHO_TOL_PERCENT, this);
+      this.TACHO_75_TOL_R = new("TACHO_75_TOL", 'h158, TACHO_T75, TACHO_TOL_PERCENT, this);
+      this.TACHO_100_TOL_R = new("TACHO_100_TOL", 'h15c, TACHO_T100, TACHO_TOL_PERCENT, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_fan_control
+
+endpackage: adi_regmap_fan_control_pkg

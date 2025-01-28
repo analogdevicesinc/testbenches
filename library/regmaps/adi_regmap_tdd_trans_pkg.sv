@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014 - 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,253 +33,579 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
 package adi_regmap_tdd_trans_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_tdd_trans extends adi_regmap;
 
-/* Transceiver TDD Control (axi_ad*) */
+    /* Transceiver TDD Control (axi_ad*) */
+    class TDD_CONTROL_0_CLASS extends register_base;
+      field_base TDD_GATED_TX_DMAPATH_F;
+      field_base TDD_GATED_RX_DMAPATH_F;
+      field_base TDD_TXONLY_F;
+      field_base TDD_RXONLY_F;
+      field_base TDD_SECONDARY_F;
+      field_base TDD_ENABLE_F;
 
-  const reg_t TDD_CNTRL_REG_TDD_CONTROL_0 = '{ 'h0040, "REG_TDD_CONTROL_0" , '{
-    "TDD_GATED_TX_DMAPATH": '{ 5, 5, RW, 'h0 },
-    "TDD_GATED_RX_DMAPATH": '{ 4, 4, RW, 'h0 },
-    "TDD_TXONLY": '{ 3, 3, RW, 'h0 },
-    "TDD_RXONLY": '{ 2, 2, RW, 'h0 },
-    "TDD_SECONDARY": '{ 1, 1, RW, 'h0 },
-    "TDD_ENABLE": '{ 0, 0, RW, 'h0 }}};
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_TX_DMAPATH(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_TX_DMAPATH",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_TX_DMAPATH(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_TX_DMAPATH",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_TX_DMAPATH GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_TX_DMAPATH")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_TX_DMAPATH(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_TX_DMAPATH",x,y)
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_RX_DMAPATH(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_RX_DMAPATH",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_RX_DMAPATH(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_RX_DMAPATH",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_RX_DMAPATH GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_RX_DMAPATH")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_GATED_RX_DMAPATH(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_GATED_RX_DMAPATH",x,y)
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_TXONLY(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_TXONLY",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_TXONLY(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_TXONLY",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_TXONLY GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_TXONLY")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_TXONLY(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_TXONLY",x,y)
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_RXONLY(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_RXONLY",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_RXONLY(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_RXONLY",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_RXONLY GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_RXONLY")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_RXONLY(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_RXONLY",x,y)
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_SECONDARY(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_SECONDARY",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_SECONDARY(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_SECONDARY",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_SECONDARY GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_SECONDARY")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_SECONDARY(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_SECONDARY",x,y)
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_ENABLE(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_ENABLE",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_ENABLE(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_ENABLE",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_ENABLE GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_ENABLE")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_0_TDD_ENABLE(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_0,"TDD_ENABLE",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t TDD_CNTRL_REG_TDD_CONTROL_1 = '{ 'h0044, "REG_TDD_CONTROL_1" , '{
-    "TDD_BURST_COUNT": '{ 7, 0, RW, 'h00 }}};
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_1_TDD_BURST_COUNT(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_1,"TDD_BURST_COUNT",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_1_TDD_BURST_COUNT(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_1,"TDD_BURST_COUNT",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_1_TDD_BURST_COUNT GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_1,"TDD_BURST_COUNT")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_1_TDD_BURST_COUNT(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_1,"TDD_BURST_COUNT",x,y)
+        super.new(name, address, parent);
 
-  const reg_t TDD_CNTRL_REG_TDD_CONTROL_2 = '{ 'h0048, "REG_TDD_CONTROL_2" , '{
-    "TDD_COUNTER_INIT": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_CONTROL_2_TDD_COUNTER_INIT(x) SetField(TDD_CNTRL_REG_TDD_CONTROL_2,"TDD_COUNTER_INIT",x)
-  `define GET_TDD_CNTRL_REG_TDD_CONTROL_2_TDD_COUNTER_INIT(x) GetField(TDD_CNTRL_REG_TDD_CONTROL_2,"TDD_COUNTER_INIT",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_CONTROL_2_TDD_COUNTER_INIT GetResetValue(TDD_CNTRL_REG_TDD_CONTROL_2,"TDD_COUNTER_INIT")
-  `define UPDATE_TDD_CNTRL_REG_TDD_CONTROL_2_TDD_COUNTER_INIT(x,y) UpdateField(TDD_CNTRL_REG_TDD_CONTROL_2,"TDD_COUNTER_INIT",x,y)
+        this.TDD_GATED_TX_DMAPATH_F = new("TDD_GATED_TX_DMAPATH", 5, 5, RW, 'h0, this);
+        this.TDD_GATED_RX_DMAPATH_F = new("TDD_GATED_RX_DMAPATH", 4, 4, RW, 'h0, this);
+        this.TDD_TXONLY_F = new("TDD_TXONLY", 3, 3, RW, 'h0, this);
+        this.TDD_RXONLY_F = new("TDD_RXONLY", 2, 2, RW, 'h0, this);
+        this.TDD_SECONDARY_F = new("TDD_SECONDARY", 1, 1, RW, 'h0, this);
+        this.TDD_ENABLE_F = new("TDD_ENABLE", 0, 0, RW, 'h0, this);
 
-  const reg_t TDD_CNTRL_REG_TDD_FRAME_LENGTH = '{ 'h004c, "REG_TDD_FRAME_LENGTH" , '{
-    "TDD_FRAME_LENGTH": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_FRAME_LENGTH_TDD_FRAME_LENGTH(x) SetField(TDD_CNTRL_REG_TDD_FRAME_LENGTH,"TDD_FRAME_LENGTH",x)
-  `define GET_TDD_CNTRL_REG_TDD_FRAME_LENGTH_TDD_FRAME_LENGTH(x) GetField(TDD_CNTRL_REG_TDD_FRAME_LENGTH,"TDD_FRAME_LENGTH",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_FRAME_LENGTH_TDD_FRAME_LENGTH GetResetValue(TDD_CNTRL_REG_TDD_FRAME_LENGTH,"TDD_FRAME_LENGTH")
-  `define UPDATE_TDD_CNTRL_REG_TDD_FRAME_LENGTH_TDD_FRAME_LENGTH(x,y) UpdateField(TDD_CNTRL_REG_TDD_FRAME_LENGTH,"TDD_FRAME_LENGTH",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_CONTROL_0_CLASS
 
-  const reg_t TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE = '{ 'h0050, "REG_TDD_SYNC_TERMINAL_TYPE" , '{
-    "TDD_SYNC_TERMINAL_TYPE": '{ 0, 0, RW, 'h0 }}};
-  `define SET_TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE_TDD_SYNC_TERMINAL_TYPE(x) SetField(TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE,"TDD_SYNC_TERMINAL_TYPE",x)
-  `define GET_TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE_TDD_SYNC_TERMINAL_TYPE(x) GetField(TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE,"TDD_SYNC_TERMINAL_TYPE",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE_TDD_SYNC_TERMINAL_TYPE GetResetValue(TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE,"TDD_SYNC_TERMINAL_TYPE")
-  `define UPDATE_TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE_TDD_SYNC_TERMINAL_TYPE(x,y) UpdateField(TDD_CNTRL_REG_TDD_SYNC_TERMINAL_TYPE,"TDD_SYNC_TERMINAL_TYPE",x,y)
+    class TDD_CONTROL_1_CLASS extends register_base;
+      field_base TDD_BURST_COUNT_F;
 
-  const reg_t TDD_CNTRL_REG_TDD_STATUS = '{ 'h0060, "REG_TDD_STATUS" , '{
-    "TDD_RXTX_VCO_OVERLAP": '{ 0, 0, RO, 'h0 },
-    "TDD_RXTX_RF_OVERLAP": '{ 1, 1, RO, 'h0 }}};
-  `define SET_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_VCO_OVERLAP(x) SetField(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_VCO_OVERLAP",x)
-  `define GET_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_VCO_OVERLAP(x) GetField(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_VCO_OVERLAP",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_VCO_OVERLAP GetResetValue(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_VCO_OVERLAP")
-  `define UPDATE_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_VCO_OVERLAP(x,y) UpdateField(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_VCO_OVERLAP",x,y)
-  `define SET_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_RF_OVERLAP(x) SetField(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_RF_OVERLAP",x)
-  `define GET_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_RF_OVERLAP(x) GetField(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_RF_OVERLAP",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_RF_OVERLAP GetResetValue(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_RF_OVERLAP")
-  `define UPDATE_TDD_CNTRL_REG_TDD_STATUS_TDD_RXTX_RF_OVERLAP(x,y) UpdateField(TDD_CNTRL_REG_TDD_STATUS,"TDD_RXTX_RF_OVERLAP",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_RX_ON_1 = '{ 'h0080, "REG_TDD_VCO_RX_ON_1" , '{
-    "TDD_VCO_RX_ON_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_RX_ON_1_TDD_VCO_RX_ON_1(x) SetField(TDD_CNTRL_REG_TDD_VCO_RX_ON_1,"TDD_VCO_RX_ON_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_RX_ON_1_TDD_VCO_RX_ON_1(x) GetField(TDD_CNTRL_REG_TDD_VCO_RX_ON_1,"TDD_VCO_RX_ON_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_RX_ON_1_TDD_VCO_RX_ON_1 GetResetValue(TDD_CNTRL_REG_TDD_VCO_RX_ON_1,"TDD_VCO_RX_ON_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_RX_ON_1_TDD_VCO_RX_ON_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_RX_ON_1,"TDD_VCO_RX_ON_1",x,y)
+        super.new(name, address, parent);
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_RX_OFF_1 = '{ 'h0084, "REG_TDD_VCO_RX_OFF_1" , '{
-    "TDD_VCO_RX_OFF_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_RX_OFF_1_TDD_VCO_RX_OFF_1(x) SetField(TDD_CNTRL_REG_TDD_VCO_RX_OFF_1,"TDD_VCO_RX_OFF_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_RX_OFF_1_TDD_VCO_RX_OFF_1(x) GetField(TDD_CNTRL_REG_TDD_VCO_RX_OFF_1,"TDD_VCO_RX_OFF_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_RX_OFF_1_TDD_VCO_RX_OFF_1 GetResetValue(TDD_CNTRL_REG_TDD_VCO_RX_OFF_1,"TDD_VCO_RX_OFF_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_RX_OFF_1_TDD_VCO_RX_OFF_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_RX_OFF_1,"TDD_VCO_RX_OFF_1",x,y)
+        this.TDD_BURST_COUNT_F = new("TDD_BURST_COUNT", 7, 0, RW, 'h0, this);
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_TX_ON_1 = '{ 'h0088, "REG_TDD_VCO_TX_ON_1" , '{
-    "TDD_VCO_TX_ON_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_TX_ON_1_TDD_VCO_TX_ON_1(x) SetField(TDD_CNTRL_REG_TDD_VCO_TX_ON_1,"TDD_VCO_TX_ON_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_TX_ON_1_TDD_VCO_TX_ON_1(x) GetField(TDD_CNTRL_REG_TDD_VCO_TX_ON_1,"TDD_VCO_TX_ON_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_TX_ON_1_TDD_VCO_TX_ON_1 GetResetValue(TDD_CNTRL_REG_TDD_VCO_TX_ON_1,"TDD_VCO_TX_ON_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_TX_ON_1_TDD_VCO_TX_ON_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_TX_ON_1,"TDD_VCO_TX_ON_1",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_CONTROL_1_CLASS
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_TX_OFF_1 = '{ 'h008c, "REG_TDD_VCO_TX_OFF_1" , '{
-    "TDD_VCO_TX_OFF_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_TX_OFF_1_TDD_VCO_TX_OFF_1(x) SetField(TDD_CNTRL_REG_TDD_VCO_TX_OFF_1,"TDD_VCO_TX_OFF_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_TX_OFF_1_TDD_VCO_TX_OFF_1(x) GetField(TDD_CNTRL_REG_TDD_VCO_TX_OFF_1,"TDD_VCO_TX_OFF_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_TX_OFF_1_TDD_VCO_TX_OFF_1 GetResetValue(TDD_CNTRL_REG_TDD_VCO_TX_OFF_1,"TDD_VCO_TX_OFF_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_TX_OFF_1_TDD_VCO_TX_OFF_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_TX_OFF_1,"TDD_VCO_TX_OFF_1",x,y)
+    class TDD_CONTROL_2_CLASS extends register_base;
+      field_base TDD_COUNTER_INIT_F;
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_ON_1 = '{ 'h0090, "REG_TDD_RX_ON_1" , '{
-    "TDD_RX_ON_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_ON_1_TDD_RX_ON_1(x) SetField(TDD_CNTRL_REG_TDD_RX_ON_1,"TDD_RX_ON_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_ON_1_TDD_RX_ON_1(x) GetField(TDD_CNTRL_REG_TDD_RX_ON_1,"TDD_RX_ON_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_ON_1_TDD_RX_ON_1 GetResetValue(TDD_CNTRL_REG_TDD_RX_ON_1,"TDD_RX_ON_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_ON_1_TDD_RX_ON_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_ON_1,"TDD_RX_ON_1",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_OFF_1 = '{ 'h0094, "REG_TDD_RX_OFF_1" , '{
-    "TDD_RX_OFF_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_OFF_1_TDD_RX_OFF_1(x) SetField(TDD_CNTRL_REG_TDD_RX_OFF_1,"TDD_RX_OFF_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_OFF_1_TDD_RX_OFF_1(x) GetField(TDD_CNTRL_REG_TDD_RX_OFF_1,"TDD_RX_OFF_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_OFF_1_TDD_RX_OFF_1 GetResetValue(TDD_CNTRL_REG_TDD_RX_OFF_1,"TDD_RX_OFF_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_OFF_1_TDD_RX_OFF_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_OFF_1,"TDD_RX_OFF_1",x,y)
+        super.new(name, address, parent);
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_ON_1 = '{ 'h0098, "REG_TDD_TX_ON_1" , '{
-    "TDD_TX_ON_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_ON_1_TDD_TX_ON_1(x) SetField(TDD_CNTRL_REG_TDD_TX_ON_1,"TDD_TX_ON_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_ON_1_TDD_TX_ON_1(x) GetField(TDD_CNTRL_REG_TDD_TX_ON_1,"TDD_TX_ON_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_ON_1_TDD_TX_ON_1 GetResetValue(TDD_CNTRL_REG_TDD_TX_ON_1,"TDD_TX_ON_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_ON_1_TDD_TX_ON_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_ON_1,"TDD_TX_ON_1",x,y)
+        this.TDD_COUNTER_INIT_F = new("TDD_COUNTER_INIT", 23, 0, RW, 'h0, this);
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_OFF_1 = '{ 'h009c, "REG_TDD_TX_OFF_1" , '{
-    "TDD_TX_OFF_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_OFF_1_TDD_TX_OFF_1(x) SetField(TDD_CNTRL_REG_TDD_TX_OFF_1,"TDD_TX_OFF_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_OFF_1_TDD_TX_OFF_1(x) GetField(TDD_CNTRL_REG_TDD_TX_OFF_1,"TDD_TX_OFF_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_OFF_1_TDD_TX_OFF_1 GetResetValue(TDD_CNTRL_REG_TDD_TX_OFF_1,"TDD_TX_OFF_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_OFF_1_TDD_TX_OFF_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_OFF_1,"TDD_TX_OFF_1",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_CONTROL_2_CLASS
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_DP_ON_1 = '{ 'h00a0, "REG_TDD_RX_DP_ON_1" , '{
-    "TDD_RX_DP_ON_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_DP_ON_1_TDD_RX_DP_ON_1(x) SetField(TDD_CNTRL_REG_TDD_RX_DP_ON_1,"TDD_RX_DP_ON_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_DP_ON_1_TDD_RX_DP_ON_1(x) GetField(TDD_CNTRL_REG_TDD_RX_DP_ON_1,"TDD_RX_DP_ON_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_DP_ON_1_TDD_RX_DP_ON_1 GetResetValue(TDD_CNTRL_REG_TDD_RX_DP_ON_1,"TDD_RX_DP_ON_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_DP_ON_1_TDD_RX_DP_ON_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_DP_ON_1,"TDD_RX_DP_ON_1",x,y)
+    class TDD_FRAME_LENGTH_CLASS extends register_base;
+      field_base TDD_FRAME_LENGTH_F;
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_DP_OFF_1 = '{ 'h00a4, "REG_TDD_RX_DP_OFF_1" , '{
-    "TDD_RX_DP_OFF_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_DP_OFF_1_TDD_RX_DP_OFF_1(x) SetField(TDD_CNTRL_REG_TDD_RX_DP_OFF_1,"TDD_RX_DP_OFF_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_DP_OFF_1_TDD_RX_DP_OFF_1(x) GetField(TDD_CNTRL_REG_TDD_RX_DP_OFF_1,"TDD_RX_DP_OFF_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_DP_OFF_1_TDD_RX_DP_OFF_1 GetResetValue(TDD_CNTRL_REG_TDD_RX_DP_OFF_1,"TDD_RX_DP_OFF_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_DP_OFF_1_TDD_RX_DP_OFF_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_DP_OFF_1,"TDD_RX_DP_OFF_1",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_DP_ON_1 = '{ 'h00a8, "REG_TDD_TX_DP_ON_1" , '{
-    "TDD_TX_DP_ON_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_DP_ON_1_TDD_TX_DP_ON_1(x) SetField(TDD_CNTRL_REG_TDD_TX_DP_ON_1,"TDD_TX_DP_ON_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_DP_ON_1_TDD_TX_DP_ON_1(x) GetField(TDD_CNTRL_REG_TDD_TX_DP_ON_1,"TDD_TX_DP_ON_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_DP_ON_1_TDD_TX_DP_ON_1 GetResetValue(TDD_CNTRL_REG_TDD_TX_DP_ON_1,"TDD_TX_DP_ON_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_DP_ON_1_TDD_TX_DP_ON_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_DP_ON_1,"TDD_TX_DP_ON_1",x,y)
+        super.new(name, address, parent);
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_DP_OFF_1 = '{ 'h00ac, "REG_TDD_TX_DP_OFF_1" , '{
-    "TDD_TX_DP_OFF_1": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_DP_OFF_1_TDD_TX_DP_OFF_1(x) SetField(TDD_CNTRL_REG_TDD_TX_DP_OFF_1,"TDD_TX_DP_OFF_1",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_DP_OFF_1_TDD_TX_DP_OFF_1(x) GetField(TDD_CNTRL_REG_TDD_TX_DP_OFF_1,"TDD_TX_DP_OFF_1",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_DP_OFF_1_TDD_TX_DP_OFF_1 GetResetValue(TDD_CNTRL_REG_TDD_TX_DP_OFF_1,"TDD_TX_DP_OFF_1")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_DP_OFF_1_TDD_TX_DP_OFF_1(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_DP_OFF_1,"TDD_TX_DP_OFF_1",x,y)
+        this.TDD_FRAME_LENGTH_F = new("TDD_FRAME_LENGTH", 23, 0, RW, 'h0, this);
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_RX_ON_2 = '{ 'h00c0, "REG_TDD_VCO_RX_ON_2" , '{
-    "TDD_VCO_RX_ON_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_RX_ON_2_TDD_VCO_RX_ON_2(x) SetField(TDD_CNTRL_REG_TDD_VCO_RX_ON_2,"TDD_VCO_RX_ON_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_RX_ON_2_TDD_VCO_RX_ON_2(x) GetField(TDD_CNTRL_REG_TDD_VCO_RX_ON_2,"TDD_VCO_RX_ON_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_RX_ON_2_TDD_VCO_RX_ON_2 GetResetValue(TDD_CNTRL_REG_TDD_VCO_RX_ON_2,"TDD_VCO_RX_ON_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_RX_ON_2_TDD_VCO_RX_ON_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_RX_ON_2,"TDD_VCO_RX_ON_2",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_FRAME_LENGTH_CLASS
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_RX_OFF_2 = '{ 'h00c4, "REG_TDD_VCO_RX_OFF_2" , '{
-    "TDD_VCO_RX_OFF_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_RX_OFF_2_TDD_VCO_RX_OFF_2(x) SetField(TDD_CNTRL_REG_TDD_VCO_RX_OFF_2,"TDD_VCO_RX_OFF_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_RX_OFF_2_TDD_VCO_RX_OFF_2(x) GetField(TDD_CNTRL_REG_TDD_VCO_RX_OFF_2,"TDD_VCO_RX_OFF_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_RX_OFF_2_TDD_VCO_RX_OFF_2 GetResetValue(TDD_CNTRL_REG_TDD_VCO_RX_OFF_2,"TDD_VCO_RX_OFF_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_RX_OFF_2_TDD_VCO_RX_OFF_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_RX_OFF_2,"TDD_VCO_RX_OFF_2",x,y)
+    class TDD_SYNC_TERMINAL_TYPE_CLASS extends register_base;
+      field_base TDD_SYNC_TERMINAL_TYPE_F;
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_TX_ON_2 = '{ 'h00c8, "REG_TDD_VCO_TX_ON_2" , '{
-    "TDD_VCO_TX_ON_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_TX_ON_2_TDD_VCO_TX_ON_2(x) SetField(TDD_CNTRL_REG_TDD_VCO_TX_ON_2,"TDD_VCO_TX_ON_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_TX_ON_2_TDD_VCO_TX_ON_2(x) GetField(TDD_CNTRL_REG_TDD_VCO_TX_ON_2,"TDD_VCO_TX_ON_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_TX_ON_2_TDD_VCO_TX_ON_2 GetResetValue(TDD_CNTRL_REG_TDD_VCO_TX_ON_2,"TDD_VCO_TX_ON_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_TX_ON_2_TDD_VCO_TX_ON_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_TX_ON_2,"TDD_VCO_TX_ON_2",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t TDD_CNTRL_REG_TDD_VCO_TX_OFF_2 = '{ 'h00cc, "REG_TDD_VCO_TX_OFF_2" , '{
-    "TDD_VCO_TX_OFF_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_VCO_TX_OFF_2_TDD_VCO_TX_OFF_2(x) SetField(TDD_CNTRL_REG_TDD_VCO_TX_OFF_2,"TDD_VCO_TX_OFF_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_VCO_TX_OFF_2_TDD_VCO_TX_OFF_2(x) GetField(TDD_CNTRL_REG_TDD_VCO_TX_OFF_2,"TDD_VCO_TX_OFF_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_VCO_TX_OFF_2_TDD_VCO_TX_OFF_2 GetResetValue(TDD_CNTRL_REG_TDD_VCO_TX_OFF_2,"TDD_VCO_TX_OFF_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_VCO_TX_OFF_2_TDD_VCO_TX_OFF_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_VCO_TX_OFF_2,"TDD_VCO_TX_OFF_2",x,y)
+        super.new(name, address, parent);
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_ON_2 = '{ 'h00d0, "REG_TDD_RX_ON_2" , '{
-    "TDD_RX_ON_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_ON_2_TDD_RX_ON_2(x) SetField(TDD_CNTRL_REG_TDD_RX_ON_2,"TDD_RX_ON_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_ON_2_TDD_RX_ON_2(x) GetField(TDD_CNTRL_REG_TDD_RX_ON_2,"TDD_RX_ON_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_ON_2_TDD_RX_ON_2 GetResetValue(TDD_CNTRL_REG_TDD_RX_ON_2,"TDD_RX_ON_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_ON_2_TDD_RX_ON_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_ON_2,"TDD_RX_ON_2",x,y)
+        this.TDD_SYNC_TERMINAL_TYPE_F = new("TDD_SYNC_TERMINAL_TYPE", 0, 0, RW, 'h0, this);
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_OFF_2 = '{ 'h00d4, "REG_TDD_RX_OFF_2" , '{
-    "TDD_RX_OFF_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_OFF_2_TDD_RX_OFF_2(x) SetField(TDD_CNTRL_REG_TDD_RX_OFF_2,"TDD_RX_OFF_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_OFF_2_TDD_RX_OFF_2(x) GetField(TDD_CNTRL_REG_TDD_RX_OFF_2,"TDD_RX_OFF_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_OFF_2_TDD_RX_OFF_2 GetResetValue(TDD_CNTRL_REG_TDD_RX_OFF_2,"TDD_RX_OFF_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_OFF_2_TDD_RX_OFF_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_OFF_2,"TDD_RX_OFF_2",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_SYNC_TERMINAL_TYPE_CLASS
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_ON_2 = '{ 'h00d8, "REG_TDD_TX_ON_2" , '{
-    "TDD_TX_ON_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_ON_2_TDD_TX_ON_2(x) SetField(TDD_CNTRL_REG_TDD_TX_ON_2,"TDD_TX_ON_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_ON_2_TDD_TX_ON_2(x) GetField(TDD_CNTRL_REG_TDD_TX_ON_2,"TDD_TX_ON_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_ON_2_TDD_TX_ON_2 GetResetValue(TDD_CNTRL_REG_TDD_TX_ON_2,"TDD_TX_ON_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_ON_2_TDD_TX_ON_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_ON_2,"TDD_TX_ON_2",x,y)
+    class TDD_STATUS_CLASS extends register_base;
+      field_base TDD_RXTX_VCO_OVERLAP_F;
+      field_base TDD_RXTX_RF_OVERLAP_F;
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_OFF_2 = '{ 'h00dc, "REG_TDD_TX_OFF_2" , '{
-    "TDD_TX_OFF_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_OFF_2_TDD_TX_OFF_2(x) SetField(TDD_CNTRL_REG_TDD_TX_OFF_2,"TDD_TX_OFF_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_OFF_2_TDD_TX_OFF_2(x) GetField(TDD_CNTRL_REG_TDD_TX_OFF_2,"TDD_TX_OFF_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_OFF_2_TDD_TX_OFF_2 GetResetValue(TDD_CNTRL_REG_TDD_TX_OFF_2,"TDD_TX_OFF_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_OFF_2_TDD_TX_OFF_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_OFF_2,"TDD_TX_OFF_2",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_DP_ON_2 = '{ 'h00e0, "REG_TDD_RX_DP_ON_2" , '{
-    "TDD_RX_DP_ON_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_DP_ON_2_TDD_RX_DP_ON_2(x) SetField(TDD_CNTRL_REG_TDD_RX_DP_ON_2,"TDD_RX_DP_ON_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_DP_ON_2_TDD_RX_DP_ON_2(x) GetField(TDD_CNTRL_REG_TDD_RX_DP_ON_2,"TDD_RX_DP_ON_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_DP_ON_2_TDD_RX_DP_ON_2 GetResetValue(TDD_CNTRL_REG_TDD_RX_DP_ON_2,"TDD_RX_DP_ON_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_DP_ON_2_TDD_RX_DP_ON_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_DP_ON_2,"TDD_RX_DP_ON_2",x,y)
+        super.new(name, address, parent);
 
-  const reg_t TDD_CNTRL_REG_TDD_RX_DP_OFF_2 = '{ 'h00e4, "REG_TDD_RX_DP_OFF_2" , '{
-    "TDD_RX_DP_OFF_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_RX_DP_OFF_2_TDD_RX_DP_OFF_2(x) SetField(TDD_CNTRL_REG_TDD_RX_DP_OFF_2,"TDD_RX_DP_OFF_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_RX_DP_OFF_2_TDD_RX_DP_OFF_2(x) GetField(TDD_CNTRL_REG_TDD_RX_DP_OFF_2,"TDD_RX_DP_OFF_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_RX_DP_OFF_2_TDD_RX_DP_OFF_2 GetResetValue(TDD_CNTRL_REG_TDD_RX_DP_OFF_2,"TDD_RX_DP_OFF_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_RX_DP_OFF_2_TDD_RX_DP_OFF_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_RX_DP_OFF_2,"TDD_RX_DP_OFF_2",x,y)
+        this.TDD_RXTX_VCO_OVERLAP_F = new("TDD_RXTX_VCO_OVERLAP", 0, 0, RO, 'h0, this);
+        this.TDD_RXTX_RF_OVERLAP_F = new("TDD_RXTX_RF_OVERLAP", 1, 1, RO, 'h0, this);
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_DP_ON_2 = '{ 'h00e8, "REG_TDD_TX_DP_ON_2" , '{
-    "TDD_TX_DP_ON_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_DP_ON_2_TDD_TX_DP_ON_2(x) SetField(TDD_CNTRL_REG_TDD_TX_DP_ON_2,"TDD_TX_DP_ON_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_DP_ON_2_TDD_TX_DP_ON_2(x) GetField(TDD_CNTRL_REG_TDD_TX_DP_ON_2,"TDD_TX_DP_ON_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_DP_ON_2_TDD_TX_DP_ON_2 GetResetValue(TDD_CNTRL_REG_TDD_TX_DP_ON_2,"TDD_TX_DP_ON_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_DP_ON_2_TDD_TX_DP_ON_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_DP_ON_2,"TDD_TX_DP_ON_2",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_STATUS_CLASS
 
-  const reg_t TDD_CNTRL_REG_TDD_TX_DP_OFF_2 = '{ 'h00ec, "REG_TDD_TX_DP_OFF_2" , '{
-    "TDD_TX_DP_OFF_2": '{ 23, 0, RW, 'h000000 }}};
-  `define SET_TDD_CNTRL_REG_TDD_TX_DP_OFF_2_TDD_TX_DP_OFF_2(x) SetField(TDD_CNTRL_REG_TDD_TX_DP_OFF_2,"TDD_TX_DP_OFF_2",x)
-  `define GET_TDD_CNTRL_REG_TDD_TX_DP_OFF_2_TDD_TX_DP_OFF_2(x) GetField(TDD_CNTRL_REG_TDD_TX_DP_OFF_2,"TDD_TX_DP_OFF_2",x)
-  `define DEFAULT_TDD_CNTRL_REG_TDD_TX_DP_OFF_2_TDD_TX_DP_OFF_2 GetResetValue(TDD_CNTRL_REG_TDD_TX_DP_OFF_2,"TDD_TX_DP_OFF_2")
-  `define UPDATE_TDD_CNTRL_REG_TDD_TX_DP_OFF_2_TDD_TX_DP_OFF_2(x,y) UpdateField(TDD_CNTRL_REG_TDD_TX_DP_OFF_2,"TDD_TX_DP_OFF_2",x,y)
+    class TDD_VCO_RX_ON_1_CLASS extends register_base;
+      field_base TDD_VCO_RX_ON_1_F;
 
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-endpackage
+        super.new(name, address, parent);
+
+        this.TDD_VCO_RX_ON_1_F = new("TDD_VCO_RX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_RX_ON_1_CLASS
+
+    class TDD_VCO_RX_OFF_1_CLASS extends register_base;
+      field_base TDD_VCO_RX_OFF_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_VCO_RX_OFF_1_F = new("TDD_VCO_RX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_RX_OFF_1_CLASS
+
+    class TDD_VCO_TX_ON_1_CLASS extends register_base;
+      field_base TDD_VCO_TX_ON_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_VCO_TX_ON_1_F = new("TDD_VCO_TX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_TX_ON_1_CLASS
+
+    class TDD_VCO_TX_OFF_1_CLASS extends register_base;
+      field_base TDD_VCO_TX_OFF_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_VCO_TX_OFF_1_F = new("TDD_VCO_TX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_TX_OFF_1_CLASS
+
+    class TDD_RX_ON_1_CLASS extends register_base;
+      field_base TDD_RX_ON_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_ON_1_F = new("TDD_RX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_ON_1_CLASS
+
+    class TDD_RX_OFF_1_CLASS extends register_base;
+      field_base TDD_RX_OFF_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_OFF_1_F = new("TDD_RX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_OFF_1_CLASS
+
+    class TDD_TX_ON_1_CLASS extends register_base;
+      field_base TDD_TX_ON_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_ON_1_F = new("TDD_TX_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_ON_1_CLASS
+
+    class TDD_TX_OFF_1_CLASS extends register_base;
+      field_base TDD_TX_OFF_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_OFF_1_F = new("TDD_TX_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_OFF_1_CLASS
+
+    class TDD_RX_DP_ON_1_CLASS extends register_base;
+      field_base TDD_RX_DP_ON_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_DP_ON_1_F = new("TDD_RX_DP_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_DP_ON_1_CLASS
+
+    class TDD_RX_DP_OFF_1_CLASS extends register_base;
+      field_base TDD_RX_DP_OFF_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_DP_OFF_1_F = new("TDD_RX_DP_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_DP_OFF_1_CLASS
+
+    class TDD_TX_DP_ON_1_CLASS extends register_base;
+      field_base TDD_TX_DP_ON_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_DP_ON_1_F = new("TDD_TX_DP_ON_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_DP_ON_1_CLASS
+
+    class TDD_TX_DP_OFF_1_CLASS extends register_base;
+      field_base TDD_TX_DP_OFF_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_DP_OFF_1_F = new("TDD_TX_DP_OFF_1", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_DP_OFF_1_CLASS
+
+    class TDD_VCO_RX_ON_2_CLASS extends register_base;
+      field_base TDD_VCO_RX_ON_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_VCO_RX_ON_2_F = new("TDD_VCO_RX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_RX_ON_2_CLASS
+
+    class TDD_VCO_RX_OFF_2_CLASS extends register_base;
+      field_base TDD_VCO_RX_OFF_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_VCO_RX_OFF_2_F = new("TDD_VCO_RX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_RX_OFF_2_CLASS
+
+    class TDD_VCO_TX_ON_2_CLASS extends register_base;
+      field_base TDD_VCO_TX_ON_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_VCO_TX_ON_2_F = new("TDD_VCO_TX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_TX_ON_2_CLASS
+
+    class TDD_VCO_TX_OFF_2_CLASS extends register_base;
+      field_base TDD_VCO_TX_OFF_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_VCO_TX_OFF_2_F = new("TDD_VCO_TX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_VCO_TX_OFF_2_CLASS
+
+    class TDD_RX_ON_2_CLASS extends register_base;
+      field_base TDD_RX_ON_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_ON_2_F = new("TDD_RX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_ON_2_CLASS
+
+    class TDD_RX_OFF_2_CLASS extends register_base;
+      field_base TDD_RX_OFF_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_OFF_2_F = new("TDD_RX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_OFF_2_CLASS
+
+    class TDD_TX_ON_2_CLASS extends register_base;
+      field_base TDD_TX_ON_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_ON_2_F = new("TDD_TX_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_ON_2_CLASS
+
+    class TDD_TX_OFF_2_CLASS extends register_base;
+      field_base TDD_TX_OFF_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_OFF_2_F = new("TDD_TX_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_OFF_2_CLASS
+
+    class TDD_RX_DP_ON_2_CLASS extends register_base;
+      field_base TDD_RX_DP_ON_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_DP_ON_2_F = new("TDD_RX_DP_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_DP_ON_2_CLASS
+
+    class TDD_RX_DP_OFF_2_CLASS extends register_base;
+      field_base TDD_RX_DP_OFF_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_RX_DP_OFF_2_F = new("TDD_RX_DP_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_RX_DP_OFF_2_CLASS
+
+    class TDD_TX_DP_ON_2_CLASS extends register_base;
+      field_base TDD_TX_DP_ON_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_DP_ON_2_F = new("TDD_TX_DP_ON_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_DP_ON_2_CLASS
+
+    class TDD_TX_DP_OFF_2_CLASS extends register_base;
+      field_base TDD_TX_DP_OFF_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TDD_TX_DP_OFF_2_F = new("TDD_TX_DP_OFF_2", 23, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TDD_TX_DP_OFF_2_CLASS
+
+    TDD_CONTROL_0_CLASS TDD_CONTROL_0_R;
+    TDD_CONTROL_1_CLASS TDD_CONTROL_1_R;
+    TDD_CONTROL_2_CLASS TDD_CONTROL_2_R;
+    TDD_FRAME_LENGTH_CLASS TDD_FRAME_LENGTH_R;
+    TDD_SYNC_TERMINAL_TYPE_CLASS TDD_SYNC_TERMINAL_TYPE_R;
+    TDD_STATUS_CLASS TDD_STATUS_R;
+    TDD_VCO_RX_ON_1_CLASS TDD_VCO_RX_ON_1_R;
+    TDD_VCO_RX_OFF_1_CLASS TDD_VCO_RX_OFF_1_R;
+    TDD_VCO_TX_ON_1_CLASS TDD_VCO_TX_ON_1_R;
+    TDD_VCO_TX_OFF_1_CLASS TDD_VCO_TX_OFF_1_R;
+    TDD_RX_ON_1_CLASS TDD_RX_ON_1_R;
+    TDD_RX_OFF_1_CLASS TDD_RX_OFF_1_R;
+    TDD_TX_ON_1_CLASS TDD_TX_ON_1_R;
+    TDD_TX_OFF_1_CLASS TDD_TX_OFF_1_R;
+    TDD_RX_DP_ON_1_CLASS TDD_RX_DP_ON_1_R;
+    TDD_RX_DP_OFF_1_CLASS TDD_RX_DP_OFF_1_R;
+    TDD_TX_DP_ON_1_CLASS TDD_TX_DP_ON_1_R;
+    TDD_TX_DP_OFF_1_CLASS TDD_TX_DP_OFF_1_R;
+    TDD_VCO_RX_ON_2_CLASS TDD_VCO_RX_ON_2_R;
+    TDD_VCO_RX_OFF_2_CLASS TDD_VCO_RX_OFF_2_R;
+    TDD_VCO_TX_ON_2_CLASS TDD_VCO_TX_ON_2_R;
+    TDD_VCO_TX_OFF_2_CLASS TDD_VCO_TX_OFF_2_R;
+    TDD_RX_ON_2_CLASS TDD_RX_ON_2_R;
+    TDD_RX_OFF_2_CLASS TDD_RX_OFF_2_R;
+    TDD_TX_ON_2_CLASS TDD_TX_ON_2_R;
+    TDD_TX_OFF_2_CLASS TDD_TX_OFF_2_R;
+    TDD_RX_DP_ON_2_CLASS TDD_RX_DP_ON_2_R;
+    TDD_RX_DP_OFF_2_CLASS TDD_RX_DP_OFF_2_R;
+    TDD_TX_DP_ON_2_CLASS TDD_TX_DP_ON_2_R;
+    TDD_TX_DP_OFF_2_CLASS TDD_TX_DP_OFF_2_R;
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.TDD_CONTROL_0_R = new("TDD_CONTROL_0", 'h40, this);
+      this.TDD_CONTROL_1_R = new("TDD_CONTROL_1", 'h44, this);
+      this.TDD_CONTROL_2_R = new("TDD_CONTROL_2", 'h48, this);
+      this.TDD_FRAME_LENGTH_R = new("TDD_FRAME_LENGTH", 'h4c, this);
+      this.TDD_SYNC_TERMINAL_TYPE_R = new("TDD_SYNC_TERMINAL_TYPE", 'h50, this);
+      this.TDD_STATUS_R = new("TDD_STATUS", 'h60, this);
+      this.TDD_VCO_RX_ON_1_R = new("TDD_VCO_RX_ON_1", 'h80, this);
+      this.TDD_VCO_RX_OFF_1_R = new("TDD_VCO_RX_OFF_1", 'h84, this);
+      this.TDD_VCO_TX_ON_1_R = new("TDD_VCO_TX_ON_1", 'h88, this);
+      this.TDD_VCO_TX_OFF_1_R = new("TDD_VCO_TX_OFF_1", 'h8c, this);
+      this.TDD_RX_ON_1_R = new("TDD_RX_ON_1", 'h90, this);
+      this.TDD_RX_OFF_1_R = new("TDD_RX_OFF_1", 'h94, this);
+      this.TDD_TX_ON_1_R = new("TDD_TX_ON_1", 'h98, this);
+      this.TDD_TX_OFF_1_R = new("TDD_TX_OFF_1", 'h9c, this);
+      this.TDD_RX_DP_ON_1_R = new("TDD_RX_DP_ON_1", 'ha0, this);
+      this.TDD_RX_DP_OFF_1_R = new("TDD_RX_DP_OFF_1", 'ha4, this);
+      this.TDD_TX_DP_ON_1_R = new("TDD_TX_DP_ON_1", 'ha8, this);
+      this.TDD_TX_DP_OFF_1_R = new("TDD_TX_DP_OFF_1", 'hac, this);
+      this.TDD_VCO_RX_ON_2_R = new("TDD_VCO_RX_ON_2", 'hc0, this);
+      this.TDD_VCO_RX_OFF_2_R = new("TDD_VCO_RX_OFF_2", 'hc4, this);
+      this.TDD_VCO_TX_ON_2_R = new("TDD_VCO_TX_ON_2", 'hc8, this);
+      this.TDD_VCO_TX_OFF_2_R = new("TDD_VCO_TX_OFF_2", 'hcc, this);
+      this.TDD_RX_ON_2_R = new("TDD_RX_ON_2", 'hd0, this);
+      this.TDD_RX_OFF_2_R = new("TDD_RX_OFF_2", 'hd4, this);
+      this.TDD_TX_ON_2_R = new("TDD_TX_ON_2", 'hd8, this);
+      this.TDD_TX_OFF_2_R = new("TDD_TX_OFF_2", 'hdc, this);
+      this.TDD_RX_DP_ON_2_R = new("TDD_RX_DP_ON_2", 'he0, this);
+      this.TDD_RX_DP_OFF_2_R = new("TDD_RX_DP_OFF_2", 'he4, this);
+      this.TDD_TX_DP_ON_2_R = new("TDD_TX_DP_ON_2", 'he8, this);
+      this.TDD_TX_DP_OFF_2_R = new("TDD_TX_DP_OFF_2", 'hec, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_tdd_trans
+
+endpackage: adi_regmap_tdd_trans_pkg

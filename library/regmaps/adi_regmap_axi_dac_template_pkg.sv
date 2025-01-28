@@ -33,15 +33,15 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_dac_pkg;
+package adi_regmap_axi_dac_template_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_dac extends adi_regmap;
+  class adi_regmap_axi_dac_template extends adi_regmap;
 
-    /* DAC Common (axi_ad) */
+    /* AXI TEMPLATE DAC Common (axi_template) */
     class RSTN_CLASS extends register_base;
       field_base CE_N_F;
       field_base MMCM_RSTN_F;
@@ -410,7 +410,7 @@ package adi_regmap_dac_pkg;
       endfunction: new
     endclass: DAC_GPIO_OUT_CLASS
 
-    /* DAC Channel (axi_ad*) */
+    /* AXI TEMPLATE DAC Channel (axi_template_dac_channel) */
     class CHAN_CNTRLn_1_CLASS extends register_base;
       field_base DDS_PHASE_DW_F;
       field_base DDS_SCALE_1_F;
@@ -1119,6 +1119,6 @@ package adi_regmap_dac_pkg;
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_dac
+  endclass: adi_regmap_axi_dac_template
 
-endpackage: adi_regmap_dac_pkg
+endpackage: adi_regmap_axi_dac_template_pkg

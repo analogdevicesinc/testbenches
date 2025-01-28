@@ -35,13 +35,13 @@
 /* Auto generated Register Map */
 /* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_data_offload_pkg;
+package adi_regmap_axi_laser_driver_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_data_offload extends adi_regmap;
+  class adi_regmap_axi_laser_driver extends adi_regmap;
 
-    /* Data Offload Engine (data_offload) */
+    /* AXI Laser Driver (axi_laser_driver) */
     class VERSION_CLASS extends register_base;
       field_base VERSION_MAJOR_F;
       field_base VERSION_MINOR_F;
@@ -55,15 +55,15 @@ package adi_regmap_data_offload_pkg;
         super.new(name, address, parent);
 
         this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
-        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
+        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h1, this);
         this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: VERSION_CLASS
 
-    class PERIPHERAL_ID_CLASS extends register_base;
-      field_base PERIPHERAL_ID_F;
+    class ID_CLASS extends register_base;
+      field_base ID_F;
 
       function new(
         input string name,
@@ -73,11 +73,11 @@ package adi_regmap_data_offload_pkg;
 
         super.new(name, address, parent);
 
-        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
+        this.ID_F = new("ID", 31, 0, RO, ID, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: PERIPHERAL_ID_CLASS
+    endclass: ID_CLASS
 
     class SCRATCH_CLASS extends register_base;
       field_base SCRATCH_F;
@@ -95,8 +95,8 @@ package adi_regmap_data_offload_pkg;
       endfunction: new
     endclass: SCRATCH_CLASS
 
-    class IDENTIFICATION_CLASS extends register_base;
-      field_base IDENTIFICATION_F;
+    class CONFIG_PWM_CLASS extends register_base;
+      field_base RESET_F;
 
       function new(
         input string name,
@@ -105,90 +105,48 @@ package adi_regmap_data_offload_pkg;
 
         super.new(name, address, parent);
 
-        this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h44414f46, this);
+        this.RESET_F = new("RESET", 0, 0, RW, 'h1, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: IDENTIFICATION_CLASS
+    endclass: CONFIG_PWM_CLASS
 
-    class SYNTHESIS_CONFIG_1_CLASS extends register_base;
-      field_base HAS_BYPASS_F;
-      field_base TX_OR_RXN_PATH_F;
-      field_base MEMORY_TYPE_F;
+    class CONFIG_PERIOD_CLASS extends register_base;
+      field_base PWM_PERIOD_F;
 
       function new(
         input string name,
         input int address,
-        input int HAS_BYPASS,
-        input int MEM_TYPE,
-        input int TX_OR_RXN_PATH,
+        input int PULSE_PERIOD,
         input adi_regmap parent = null);
 
         super.new(name, address, parent);
 
-        this.HAS_BYPASS_F = new("HAS_BYPASS", 2, 2, RO, HAS_BYPASS, this);
-        this.TX_OR_RXN_PATH_F = new("TX_OR_RXN_PATH", 1, 1, RO, TX_OR_RXN_PATH, this);
-        this.MEMORY_TYPE_F = new("MEMORY_TYPE", 0, 0, RO, MEM_TYPE, this);
+        this.PWM_PERIOD_F = new("PWM_PERIOD", 31, 0, RW, PULSE_PERIOD, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: SYNTHESIS_CONFIG_1_CLASS
+    endclass: CONFIG_PERIOD_CLASS
 
-    class SYNTHESIS_CONFIG_2_CLASS extends register_base;
-      field_base MEM_SIZE_LSB_F;
+    class CONFIG_WIDTH_CLASS extends register_base;
+      field_base PWM_WIDTH_F;
 
       function new(
         input string name,
         input int address,
-        input int MEM_SIZE_LOG2,
+        input int PULSE_WIDTH,
         input adi_regmap parent = null);
 
         super.new(name, address, parent);
 
-        this.MEM_SIZE_LSB_F = new("MEM_SIZE_LSB", 31, 0, RO, 1<<MEM_SIZE_LOG2, this);
+        this.PWM_WIDTH_F = new("PWM_WIDTH", 31, 0, RW, PULSE_WIDTH, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: SYNTHESIS_CONFIG_2_CLASS
+    endclass: CONFIG_WIDTH_CLASS
 
-    class SYNTHESIS_CONFIG_3_CLASS extends register_base;
-      field_base MEM_SIZE_MSB_F;
-
-      function new(
-        input string name,
-        input int address,
-        input int MEM_SIZE_LOG2,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.MEM_SIZE_MSB_F = new("MEM_SIZE_MSB", 1, 0, RO, (1<<MEM_SIZE_LOG2)>>32, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: SYNTHESIS_CONFIG_3_CLASS
-
-    class TRANSFER_LENGTH_CLASS extends register_base;
-      field_base TRANSFER_LENGTH_F;
-
-      function new(
-        input string name,
-        input int address,
-        input int MEM_SIZE_LOG2,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.TRANSFER_LENGTH_F = new("TRANSFER_LENGTH", 31, 0, RW, (2**MEM_SIZE_LOG2-1)>>6, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: TRANSFER_LENGTH_CLASS
-
-    class MEM_PHY_STATE_CLASS extends register_base;
-      field_base UNDERFLOW_F;
-      field_base OVERFLOW_F;
-      field_base CALIB_COMPLETE_F;
+    class STATUS_LDRIVER_CLASS extends register_base;
+      field_base DRIVER_OTW_F;
 
       function new(
         input string name,
@@ -197,52 +155,14 @@ package adi_regmap_data_offload_pkg;
 
         super.new(name, address, parent);
 
-        this.UNDERFLOW_F = new("UNDERFLOW", 5, 5, RW1C, 'h0, this);
-        this.OVERFLOW_F = new("OVERFLOW", 4, 4, RW1C, 'h0, this);
-        this.CALIB_COMPLETE_F = new("CALIB_COMPLETE", 0, 0, RO, 'h0, this);
+        this.DRIVER_OTW_F = new("DRIVER_OTW", 0, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: MEM_PHY_STATE_CLASS
+    endclass: STATUS_LDRIVER_CLASS
 
-    class RESET_OFFLOAD_CLASS extends register_base;
-      field_base RESETN_F;
-
-      function new(
-        input string name,
-        input int address,
-        input int AUTO_BRINGUP,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.RESETN_F = new("RESETN", 0, 0, RW, AUTO_BRINGUP, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: RESET_OFFLOAD_CLASS
-
-    class CONTROL_CLASS extends register_base;
-      field_base ONESHOT_EN_F;
-      field_base OFFLOAD_BYPASS_F;
-
-      function new(
-        input string name,
-        input int address,
-        input int TX_OR_RXN_PATH,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.ONESHOT_EN_F = new("ONESHOT_EN", 1, 1, RW, ~TX_OR_RXN_PATH, this);
-        this.OFFLOAD_BYPASS_F = new("OFFLOAD_BYPASS", 0, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CONTROL_CLASS
-
-    class SYNC_TRIGGER_CLASS extends register_base;
-      field_base SYNC_TRIGGER_F;
+    class EXT_CLK_MONITOR_CLASS extends register_base;
+      field_base EXT_CLK_FREQ_F;
 
       function new(
         input string name,
@@ -251,14 +171,16 @@ package adi_regmap_data_offload_pkg;
 
         super.new(name, address, parent);
 
-        this.SYNC_TRIGGER_F = new("SYNC_TRIGGER", 0, 0, RW1C, 'h0, this);
+        this.EXT_CLK_FREQ_F = new("EXT_CLK_FREQ", 31, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: SYNC_TRIGGER_CLASS
+    endclass: EXT_CLK_MONITOR_CLASS
 
-    class SYNC_CONFIG_CLASS extends register_base;
-      field_base SYNC_CONFIG_F;
+    class IRQ_PENDING_CLASS extends register_base;
+      field_base IRQ_PULSE_PENDING_F;
+      field_base IRQ_OTW_ENTER_PENDING_F;
+      field_base IRQ_OTW_EXIT_PENDING_F;
 
       function new(
         input string name,
@@ -267,15 +189,18 @@ package adi_regmap_data_offload_pkg;
 
         super.new(name, address, parent);
 
-        this.SYNC_CONFIG_F = new("SYNC_CONFIG", 1, 0, RW, 'h0, this);
+        this.IRQ_PULSE_PENDING_F = new("IRQ_PULSE_PENDING", 0, 0, RW1C, 'h0, this);
+        this.IRQ_OTW_ENTER_PENDING_F = new("IRQ_OTW_ENTER_PENDING", 1, 1, RW1C, 'h0, this);
+        this.IRQ_OTW_EXIT_PENDING_F = new("IRQ_OTW_EXIT_PENDING", 2, 2, RW1C, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: SYNC_CONFIG_CLASS
+    endclass: IRQ_PENDING_CLASS
 
-    class FSM_BDG_CLASS extends register_base;
-      field_base FSM_STATE_READ_F;
-      field_base FSM_STATE_WRITE_F;
+    class IRQ_SOURCE_CLASS extends register_base;
+      field_base IRQ_PULSE_SOURCE_F;
+      field_base IRQ_OTW_ENTER_SOURCE_F;
+      field_base IRQ_OTW_EXIT_SOURCE_F;
 
       function new(
         input string name,
@@ -284,59 +209,135 @@ package adi_regmap_data_offload_pkg;
 
         super.new(name, address, parent);
 
-        this.FSM_STATE_READ_F = new("FSM_STATE_READ", 11, 8, RO, 'hXXXXXXXX, this);
-        this.FSM_STATE_WRITE_F = new("FSM_STATE_WRITE", 4, 0, RO, 'hXXXXXXXX, this);
+        this.IRQ_PULSE_SOURCE_F = new("IRQ_PULSE_SOURCE", 0, 0, RO, 'h0, this);
+        this.IRQ_OTW_ENTER_SOURCE_F = new("IRQ_OTW_ENTER_SOURCE", 1, 1, RO, 'h0, this);
+        this.IRQ_OTW_EXIT_SOURCE_F = new("IRQ_OTW_EXIT_SOURCE", 2, 2, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: FSM_BDG_CLASS
+    endclass: IRQ_SOURCE_CLASS
+
+    class SEQUENCER_CONTROL_CLASS extends register_base;
+      field_base SEQUENCER_ENABLE_F;
+      field_base AUTO_SEQUENCE_EN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SEQUENCER_ENABLE_F = new("SEQUENCER_ENABLE", 0, 0, RW, 'h0, this);
+        this.AUTO_SEQUENCE_EN_F = new("AUTO_SEQUENCE_EN", 1, 1, RW, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SEQUENCER_CONTROL_CLASS
+
+    class SEQUENCER_OFFSET_CLASS extends register_base;
+      field_base TIA_CHSEL_OFFSET_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TIA_CHSEL_OFFSET_F = new("TIA_CHSEL_OFFSET", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SEQUENCER_OFFSET_CLASS
+
+    class SEQUENCE_AUTO_CONFIG_CLASS extends register_base;
+      field_base SEQUENCE_VALUE0_F;
+      field_base SEQUENCE_VALUE1_F;
+      field_base SEQUENCE_VALUE2_F;
+      field_base SEQUENCE_VALUE3_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SEQUENCE_VALUE0_F = new("SEQUENCE_VALUE0", 1, 0, RW, 'h0, this);
+        this.SEQUENCE_VALUE1_F = new("SEQUENCE_VALUE1", 5, 4, RW, 'h1, this);
+        this.SEQUENCE_VALUE2_F = new("SEQUENCE_VALUE2", 9, 8, RW, 'h2, this);
+        this.SEQUENCE_VALUE3_F = new("SEQUENCE_VALUE3", 13, 12, RW, 'h3, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SEQUENCE_AUTO_CONFIG_CLASS
+
+    class TIA_MANUAL_CONFIG_CLASS extends register_base;
+      field_base TIA0_CHSEL_MANUAL_F;
+      field_base TIA1_CHSEL_MANUAL_F;
+      field_base TIA2_CHSEL_MANUAL_F;
+      field_base TIA3_CHSEL_MANUAL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TIA0_CHSEL_MANUAL_F = new("TIA0_CHSEL_MANUAL", 1, 0, RW, 'h0, this);
+        this.TIA1_CHSEL_MANUAL_F = new("TIA1_CHSEL_MANUAL", 5, 4, RW, 'h0, this);
+        this.TIA2_CHSEL_MANUAL_F = new("TIA2_CHSEL_MANUAL", 9, 8, RW, 'h0, this);
+        this.TIA3_CHSEL_MANUAL_F = new("TIA3_CHSEL_MANUAL", 13, 12, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TIA_MANUAL_CONFIG_CLASS
 
     VERSION_CLASS VERSION_R;
-    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
+    ID_CLASS ID_R;
     SCRATCH_CLASS SCRATCH_R;
-    IDENTIFICATION_CLASS IDENTIFICATION_R;
-    SYNTHESIS_CONFIG_1_CLASS SYNTHESIS_CONFIG_1_R;
-    SYNTHESIS_CONFIG_2_CLASS SYNTHESIS_CONFIG_2_R;
-    SYNTHESIS_CONFIG_3_CLASS SYNTHESIS_CONFIG_3_R;
-    TRANSFER_LENGTH_CLASS TRANSFER_LENGTH_R;
-    MEM_PHY_STATE_CLASS MEM_PHY_STATE_R;
-    RESET_OFFLOAD_CLASS RESET_OFFLOAD_R;
-    CONTROL_CLASS CONTROL_R;
-    SYNC_TRIGGER_CLASS SYNC_TRIGGER_R;
-    SYNC_CONFIG_CLASS SYNC_CONFIG_R;
-    FSM_BDG_CLASS FSM_BDG_R;
+    CONFIG_PWM_CLASS CONFIG_PWM_R;
+    CONFIG_PERIOD_CLASS CONFIG_PERIOD_R;
+    CONFIG_WIDTH_CLASS CONFIG_WIDTH_R;
+    STATUS_LDRIVER_CLASS STATUS_LDRIVER_R;
+    EXT_CLK_MONITOR_CLASS EXT_CLK_MONITOR_R;
+    IRQ_PENDING_CLASS IRQ_PENDING_R;
+    IRQ_SOURCE_CLASS IRQ_SOURCE_R;
+    SEQUENCER_CONTROL_CLASS SEQUENCER_CONTROL_R;
+    SEQUENCER_OFFSET_CLASS SEQUENCER_OFFSET_R;
+    SEQUENCE_AUTO_CONFIG_CLASS SEQUENCE_AUTO_CONFIG_R;
+    TIA_MANUAL_CONFIG_CLASS TIA_MANUAL_CONFIG_R;
 
     function new(
       input string name,
       input int address,
-      input int AUTO_BRINGUP,
-      input int HAS_BYPASS,
       input int ID,
-      input int MEM_SIZE_LOG2,
-      input int MEM_TYPE,
-      input int TX_OR_RXN_PATH,
+      input int PULSE_PERIOD,
+      input int PULSE_WIDTH,
       input adi_api parent = null);
 
       super.new(name, address, parent);
 
       this.VERSION_R = new("VERSION", 'h0, this);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, ID, this);
+      this.ID_R = new("ID", 'h4, ID, this);
       this.SCRATCH_R = new("SCRATCH", 'h8, this);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
-      this.SYNTHESIS_CONFIG_1_R = new("SYNTHESIS_CONFIG_1", 'h10, HAS_BYPASS, MEM_TYPE, TX_OR_RXN_PATH, this);
-      this.SYNTHESIS_CONFIG_2_R = new("SYNTHESIS_CONFIG_2", 'h14, MEM_SIZE_LOG2, this);
-      this.SYNTHESIS_CONFIG_3_R = new("SYNTHESIS_CONFIG_3", 'h18, MEM_SIZE_LOG2, this);
-      this.TRANSFER_LENGTH_R = new("TRANSFER_LENGTH", 'h1c, MEM_SIZE_LOG2, this);
-      this.MEM_PHY_STATE_R = new("MEM_PHY_STATE", 'h80, this);
-      this.RESET_OFFLOAD_R = new("RESET_OFFLOAD", 'h84, AUTO_BRINGUP, this);
-      this.CONTROL_R = new("CONTROL", 'h88, TX_OR_RXN_PATH, this);
-      this.SYNC_TRIGGER_R = new("SYNC_TRIGGER", 'h100, this);
-      this.SYNC_CONFIG_R = new("SYNC_CONFIG", 'h104, this);
-      this.FSM_BDG_R = new("FSM_BDG", 'h200, this);
+      this.CONFIG_PWM_R = new("CONFIG_PWM", 'h10, this);
+      this.CONFIG_PERIOD_R = new("CONFIG_PERIOD", 'h14, PULSE_PERIOD, this);
+      this.CONFIG_WIDTH_R = new("CONFIG_WIDTH", 'h18, PULSE_WIDTH, this);
+      this.STATUS_LDRIVER_R = new("STATUS_LDRIVER", 'h84, this);
+      this.EXT_CLK_MONITOR_R = new("EXT_CLK_MONITOR", 'h88, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'ha4, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'ha8, this);
+      this.SEQUENCER_CONTROL_R = new("SEQUENCER_CONTROL", 'hac, this);
+      this.SEQUENCER_OFFSET_R = new("SEQUENCER_OFFSET", 'hb0, this);
+      this.SEQUENCE_AUTO_CONFIG_R = new("SEQUENCE_AUTO_CONFIG", 'hb4, this);
+      this.TIA_MANUAL_CONFIG_R = new("TIA_MANUAL_CONFIG", 'hb8, this);
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_data_offload
+  endclass: adi_regmap_axi_laser_driver
 
-endpackage: adi_regmap_data_offload_pkg
+endpackage: adi_regmap_axi_laser_driver_pkg

@@ -33,35 +33,19 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Jan 28 13:30:17 2025 v0.3.55 */
 
-package adi_regmap_clkgen_pkg;
+package adi_regmap_axi_adc_decimate_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_clkgen extends adi_regmap;
+  class adi_regmap_axi_adc_decimate extends adi_regmap;
 
-    /* Clock Generator (axi_clkgen) */
-    class RSTN_CLASS extends register_base;
-      field_base MMCM_RSTN_F;
-      field_base RSTN_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.MMCM_RSTN_F = new("MMCM_RSTN", 1, 1, RW, 'h0, this);
-        this.RSTN_F = new("RSTN", 0, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: RSTN_CLASS
-
-    class CLK_SEL_CLASS extends register_base;
-      field_base CLK_SEL_F;
+    /* Analog Decimation (axi_adc_decimate) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_MAJOR_F;
+      field_base VERSION_MINOR_F;
+      field_base VERSION_PATCH_F;
 
       function new(
         input string name,
@@ -70,14 +54,16 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.CLK_SEL_F = new("CLK_SEL", 0, 0, RW, 'h0, this);
+        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
+        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
+        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: CLK_SEL_CLASS
+    endclass: VERSION_CLASS
 
-    class MMCM_STATUS_CLASS extends register_base;
-      field_base MMCM_LOCKED_F;
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
 
       function new(
         input string name,
@@ -86,16 +72,14 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 0, 0, RO, 'h0, this);
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: MMCM_STATUS_CLASS
+    endclass: SCRATCH_CLASS
 
-    class DRP_CNTRL_CLASS extends register_base;
-      field_base DRP_RWN_F;
-      field_base DRP_ADDRESS_F;
-      field_base DRP_WDATA_F;
+    class DECIMATION_RATIO_CLASS extends register_base;
+      field_base DECIMATION_RATIO_F;
 
       function new(
         input string name,
@@ -104,18 +88,14 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.DRP_RWN_F = new("DRP_RWN", 28, 28, RW, 'h0, this);
-        this.DRP_ADDRESS_F = new("DRP_ADDRESS", 27, 16, RW, 'h0, this);
-        this.DRP_WDATA_F = new("DRP_WDATA", 15, 0, RW, 'h0, this);
+        this.DECIMATION_RATIO_F = new("DECIMATION_RATIO", 31, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DRP_CNTRL_CLASS
+    endclass: DECIMATION_RATIO_CLASS
 
-    class DRP_STATUS_CLASS extends register_base;
-      field_base MMCM_LOCKED_F;
-      field_base DRP_STATUS_F;
-      field_base DRP_RDATA_F;
+    class DECIMATION_STAGE_ENABLE_CLASS extends register_base;
+      field_base FILTERED_DECIMATION_RATIO_F;
 
       function new(
         input string name,
@@ -124,16 +104,15 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.MMCM_LOCKED_F = new("MMCM_LOCKED", 17, 17, RO, 'h0, this);
-        this.DRP_STATUS_F = new("DRP_STATUS", 16, 16, RO, 'h0, this);
-        this.DRP_RDATA_F = new("DRP_RDATA", 15, 0, RO, 'h0, this);
+        this.FILTERED_DECIMATION_RATIO_F = new("FILTERED_DECIMATION_RATIO", 2, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DRP_STATUS_CLASS
+    endclass: DECIMATION_STAGE_ENABLE_CLASS
 
-    class FPGA_VOLTAGE_CLASS extends register_base;
-      field_base FPGA_VOLTAGE_F;
+    class CONFIG_CLASS extends register_base;
+      field_base CORRECTION_ENABLE_B_F;
+      field_base CORRECTION_ENABLE_A_F;
 
       function new(
         input string name,
@@ -142,18 +121,52 @@ package adi_regmap_clkgen_pkg;
 
         super.new(name, address, parent);
 
-        this.FPGA_VOLTAGE_F = new("FPGA_VOLTAGE", 15, 0, RO, 'h0, this);
+        this.CORRECTION_ENABLE_B_F = new("CORRECTION_ENABLE_B", 1, 1, RW, 'h0, this);
+        this.CORRECTION_ENABLE_A_F = new("CORRECTION_ENABLE_A", 0, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: FPGA_VOLTAGE_CLASS
+    endclass: CONFIG_CLASS
 
-    RSTN_CLASS RSTN_R;
-    CLK_SEL_CLASS CLK_SEL_R;
-    MMCM_STATUS_CLASS MMCM_STATUS_R;
-    DRP_CNTRL_CLASS DRP_CNTRL_R;
-    DRP_STATUS_CLASS DRP_STATUS_R;
-    FPGA_VOLTAGE_CLASS FPGA_VOLTAGE_R;
+    class CORRECTION_COEFFICIENT_A_CLASS extends register_base;
+      field_base CORRECTION_COEFFICIENT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CORRECTION_COEFFICIENT_A_CLASS
+
+    class CORRECTION_COEFFICIENT_B_CLASS extends register_base;
+      field_base CORRECTION_COEFFICIENT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CORRECTION_COEFFICIENT_F = new("CORRECTION_COEFFICIENT", 15, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CORRECTION_COEFFICIENT_B_CLASS
+
+    VERSION_CLASS VERSION_R;
+    SCRATCH_CLASS SCRATCH_R;
+    DECIMATION_RATIO_CLASS DECIMATION_RATIO_R;
+    DECIMATION_STAGE_ENABLE_CLASS DECIMATION_STAGE_ENABLE_R;
+    CONFIG_CLASS CONFIG_R;
+    CORRECTION_COEFFICIENT_A_CLASS CORRECTION_COEFFICIENT_A_R;
+    CORRECTION_COEFFICIENT_B_CLASS CORRECTION_COEFFICIENT_B_R;
 
     function new(
       input string name,
@@ -162,16 +175,17 @@ package adi_regmap_clkgen_pkg;
 
       super.new(name, address, parent);
 
-      this.RSTN_R = new("RSTN", 'h40, this);
-      this.CLK_SEL_R = new("CLK_SEL", 'h44, this);
-      this.MMCM_STATUS_R = new("MMCM_STATUS", 'h5c, this);
-      this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70, this);
-      this.DRP_STATUS_R = new("DRP_STATUS", 'h74, this);
-      this.FPGA_VOLTAGE_R = new("FPGA_VOLTAGE", 'h140, this);
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.SCRATCH_R = new("SCRATCH", 'h4, this);
+      this.DECIMATION_RATIO_R = new("DECIMATION_RATIO", 'h40, this);
+      this.DECIMATION_STAGE_ENABLE_R = new("DECIMATION_STAGE_ENABLE", 'h44, this);
+      this.CONFIG_R = new("CONFIG", 'h48, this);
+      this.CORRECTION_COEFFICIENT_A_R = new("CORRECTION_COEFFICIENT_A", 'h4c, this);
+      this.CORRECTION_COEFFICIENT_B_R = new("CORRECTION_COEFFICIENT_B", 'h50, this);
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_clkgen
+  endclass: adi_regmap_axi_adc_decimate
 
-endpackage: adi_regmap_clkgen_pkg
+endpackage: adi_regmap_axi_adc_decimate_pkg

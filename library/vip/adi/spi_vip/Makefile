@@ -9,13 +9,11 @@ include ../../../../scripts/make_tb_path.mk
 
 LIBRARY_NAME := adi_spi_vip
 
-GENERIC_DEPS += $(TB_LIBRARY_PATH)/utilities/utils.svh
 GENERIC_DEPS += adi_spi_vip_pkg.sv
 GENERIC_DEPS += spi_vip_if.sv
 GENERIC_DEPS += adi_spi_vip.sv
 
 XILINX_DEPS += adi_spi_vip_ip.tcl
-XILINX_DEPS += adi_spi_vip_pkg.ttcl
 
 #TODO: INTEL_DEPS += adi_spi_vip_hw.tcl
 

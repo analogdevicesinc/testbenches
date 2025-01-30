@@ -40,18 +40,13 @@ package ad57xx_environment_pkg;
   import logger_pkg::*;
   import adi_environment_pkg::*;
 
-  import s_spi_sequencer_pkg::*;
   import adi_spi_vip_pkg::*;
-  
-  import `PKGIFY(test_harness, spi_s_vip)::*;
+  import adi_spi_vip_if_base_pkg::*;
 
   class ad57xx_environment extends adi_environment;
 
     // Agents
-    adi_spi_agent #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_agent;
-
-    // Sequencers
-    s_spi_sequencer #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_seq;
+    adi_spi_agent spi_agent;
 
     //============================================================================
     // Constructor
@@ -59,15 +54,12 @@ package ad57xx_environment_pkg;
     function new(
       input string name,
 
-      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if);
+      adi_spi_vip_if_base spi_s_vip_if);
 
       super.new(name);
 
       // Creating the agents
       this.spi_agent = new("SPI VIP Agent", spi_s_vip_if, this);
-
-      // Creating the sequencers
-      this.spi_seq = new("SPI VIP Sequencer", this.spi_agent, this);
 
     endfunction
 

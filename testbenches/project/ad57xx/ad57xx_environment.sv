@@ -59,8 +59,9 @@ package ad57xx_environment_pkg;
     function new(
       input string name,
 
-      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
-    );
+      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if);
+
+      super.new(name);
 
       // Creating the agents
       this.spi_agent = new("SPI VIP Agent", spi_s_vip_if, this);
@@ -82,7 +83,7 @@ package ad57xx_environment_pkg;
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
+    task stop();
       this.spi_agent.stop();
     endtask
 

@@ -1,6 +1,5 @@
 // ***************************************************************************
-// ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,52 +32,59 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`include "utils.svh"
+package adi_spi_vip_if_base_pkg;
 
-package s_spi_sequencer_pkg;
+  typedef enum {SPI_MODE_SLAVE, SPI_MODE_MASTER, SPI_MODE_MONITOR} spi_mode_t;
 
-  import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_spi_vip_pkg::*;
+  virtual class adi_spi_vip_if_base;
 
-  class s_spi_sequencer #(`SPI_VIP_PARAM_ORDER) extends adi_component;
+    function new();
+    endfunction
 
-    protected adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent;
+    pure virtual function int get_param_MODE();
 
-    function new(
-      input string name,
-      input adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent,
-      input adi_component parent = null);
+    pure virtual function int get_param_CPOL();
 
-      super.new(name, parent);
+    pure virtual function int get_param_CPHA();
 
-      this.agent = agent;
-    endfunction: new
+    pure virtual function int get_param_INV_CS();
 
-    virtual task automatic send_data(input int unsigned data);
-      this.agent.send_data(data);
-    endtask : send_data
+    pure virtual function int get_param_DATA_DLENGTH();
 
-    virtual task automatic receive_data(output int unsigned data);
-      this.agent.receive_data(data);
-    endtask : receive_data
+    pure virtual function int get_param_SLAVE_TIN();
 
-    virtual task automatic receive_data_verify(input int unsigned expected);
-      int unsigned received;
-      this.agent.receive_data(received);
-      if (received !== expected) begin
-        this.error($sformatf("Data mismatch. Received : %h; expected %h", received, expected));
-      end
-    endtask : receive_data_verify
+    pure virtual function int get_param_SLAVE_TOUT();
 
-    virtual task flush_send();
-      this.agent.flush_send();
-    endtask : flush_send
+    pure virtual function int get_param_MASTER_TIN();
 
-    virtual function void set_default_miso_data(input int unsigned data);
-      this.agent.set_default_miso_data(data);
-    endfunction : set_default_miso_data
+    pure virtual function int get_param_MASTER_TOUT();
 
+    pure virtual function int get_param_CS_TO_MISO();
+
+    pure virtual function int get_param_DEFAULT_MISO_DATA();
+
+    pure virtual function spi_mode_t get_mode();
+
+    pure virtual function logic get_cs_active();
+
+    pure virtual task wait_cs_active();
+
+    pure virtual task wait_cs_inactive();
+
+    pure virtual task wait_for_sample_edge();
+
+    pure virtual function logic get_mosi_delayed();
+
+    pure virtual task set_miso_drive(bit val);
+
+    pure virtual task set_miso_drive_instantaneous(bit val);
+
+    pure virtual task wait_for_drive_edge();
+
+    pure virtual task wait_cs();
+
+    pure virtual task set_miso_oen(bit val);
 
   endclass
+
 endpackage

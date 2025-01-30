@@ -102,6 +102,8 @@ package m_axis_sequencer_pkg;
       
       super.new(name, parent);
 
+      this.trans = new();
+
       this.enabled = 1'b0;
       this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
       this.descriptor_gen_mode = 1'b0;

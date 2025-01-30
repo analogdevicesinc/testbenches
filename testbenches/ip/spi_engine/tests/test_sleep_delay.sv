@@ -35,6 +35,7 @@
 
 `include "utils.svh"
 `include "axi_definitions.svh"
+`include "axis_definitions.svh"
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
@@ -62,468 +63,469 @@ program test_sleep_delay (
   inout [(`NUM_OF_CS - 1):0] spi_engine_spi_cs,
   inout spi_engine_spi_clk,
   `ifdef DEF_ECHO_SCLK
-  inout spi_engine_echo_sclk,
+    inout spi_engine_echo_sclk,
   `endif
   inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
 
-timeunit 1ns;
-timeprecision 100ps;
+  timeunit 1ns;
+  timeprecision 100ps;
 
-// declare the class instances
-test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-spi_environment spi_env;
+  // declare the class instances
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  spi_environment spi_env;
 
-// --------------------------
-// Wrapper function for AXI read verify
-// --------------------------
-task axi_read_v(
-    input   [31:0]  raddr,
-    input   [31:0]  vdata);
-  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
-endtask
+  // --------------------------
+  // Wrapper function for AXI read verify
+  // --------------------------
+  task axi_read_v(
+      input   [31:0]  raddr,
+      input   [31:0]  vdata);
+    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+  endtask
 
-task axi_read(
-    input   [31:0]  raddr,
-    output  [31:0]  data);
-  base_env.mng.sequencer.RegRead32(raddr,data);
-endtask
+  task axi_read(
+      input   [31:0]  raddr,
+      output  [31:0]  data);
+    base_env.mng.sequencer.RegRead32(raddr,data);
+  endtask
 
-// --------------------------
-// Wrapper function for AXI write
-// --------------------------
-task axi_write(
-    input [31:0]  waddr,
-    input [31:0]  wdata);
-  base_env.mng.sequencer.RegWrite32(waddr,wdata);
-endtask
+  // --------------------------
+  // Wrapper function for AXI write
+  // --------------------------
+  task axi_write(
+      input [31:0]  waddr,
+      input [31:0]  wdata);
+    base_env.mng.sequencer.RegWrite32(waddr,wdata);
+  endtask
 
-// --------------------------
-// Wrapper function for SPI receive (from DUT)
-// --------------------------
-task spi_receive(
-    output [`DATA_DLENGTH:0]  data);
-  spi_env.spi_seq.receive_data(data);
-endtask
+  // --------------------------
+  // Wrapper function for SPI receive (from DUT)
+  // --------------------------
+  task spi_receive(
+      output [`DATA_DLENGTH:0]  data);
+    spi_env.spi_agent.sequencer.receive_data(data);
+  endtask
 
-// --------------------------
-// Wrapper function for SPI send (to DUT)
-// --------------------------
-task spi_send(
-    input [`DATA_DLENGTH:0]  data);
-  spi_env.spi_seq.send_data(data);
-endtask
+  // --------------------------
+  // Wrapper function for SPI send (to DUT)
+  // --------------------------
+  task spi_send(
+      input [`DATA_DLENGTH:0]  data);
+    spi_env.spi_agent.sequencer.send_data(data);
+  endtask
 
-// --------------------------
-// Wrapper function for waiting for all SPI
-// --------------------------
-task spi_wait_send();
-  spi_env.spi_seq.flush_send();
-endtask
+  // --------------------------
+  // Wrapper function for waiting for all SPI
+  // --------------------------
+  task spi_wait_send();
+    spi_env.spi_agent.sequencer.flush_send();
+  endtask
 
-// --------------------------
-// Main procedure
-// --------------------------
-initial begin
-
-  //creating environment
-  base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
   
-  spi_env = new("SPI Engine Environment",
-                `ifdef DEF_SDO_STREAMING
-                `TH.`SDO_SRC.inst.IF,
-                `endif
-                `TH.`SPI_S.inst.IF);
+  // --------------------------
+  // Main procedure
+  // --------------------------
+  initial begin
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    //creating environment
+    base_env = new("Base Environment",
+                      `TH.`SYS_CLK.inst.IF,
+                      `TH.`DMA_CLK.inst.IF,
+                      `TH.`DDR_CLK.inst.IF,
+                      `TH.`SYS_RST.inst.IF,
+                      `TH.`MNG_AXI.inst.IF,
+                      `TH.`DDR_AXI.inst.IF);
+    
+    spi_env = new("SPI Engine Environment",
+                  `ifdef DEF_SDO_STREAMING
+                    `TH.`SDO_SRC.inst.IF,
+                  `endif
+                  `TH.`SPI_S.inst.IF.vif);
 
-  base_env.start();
-  spi_env.start();
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-  base_env.sys_reset();
+    base_env.start();
+    spi_env.start();
 
-  spi_env.configure();
+    base_env.sys_reset();
 
-  spi_env.run();
+    spi_env.configure();
 
-  spi_env.spi_seq.set_default_miso_data('h2AA55);
+    spi_env.run();
 
-  // start sdo source (will wait for data enqueued)
-  `ifdef DEF_SDO_STREAMING
-  spi_env.sdo_src_seq.start();
+    spi_env.spi_agent.sequencer.set_default_miso_data('h2AA55);
+
+    // start sdo source (will wait for data enqueued)
+    `ifdef DEF_SDO_STREAMING
+      spi_env.sdo_src_agent.sequencer.start();
+    `endif
+
+    sanity_test();
+
+    #100ns
+
+    sleep_delay_test(7);
+
+    cs_delay_test(3,3);
+
+    spi_env.stop();
+    base_env.stop();
+
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+
+    $finish;
+
+  end
+
+  //---------------------------------------------------------------------------
+  // Sanity test reg interface
+  //---------------------------------------------------------------------------
+
+  task sanity_test();
+    bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
+                              | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
+                              | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
+    axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
+    axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+    axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+    `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
+  endtask
+
+  //---------------------------------------------------------------------------
+  // IRQ callback
+  //---------------------------------------------------------------------------
+
+  reg [4:0] irq_pending = 0;
+  reg [7:0] sync_id = 0;
+
+  initial begin
+    forever begin
+      @(posedge spi_engine_irq);
+      // read pending IRQs
+      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+      // IRQ launched by Offload SYNC command
+      if (irq_pending & 5'b10000) begin
+        axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID), sync_id);
+        `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SYNC command
+      if (irq_pending & 5'b01000) begin
+        axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+        `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SDI FIFO
+      if (irq_pending & 5'b00100) begin
+        `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SDO FIFO
+      if (irq_pending & 5'b00010) begin
+        `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SDO FIFO
+      if (irq_pending & 5'b00001) begin
+        `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // Clear all pending IRQs
+      axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    end
+  end
+
+  //---------------------------------------------------------------------------
+  // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
+  //---------------------------------------------------------------------------
+  `ifdef DEF_ECHO_SCLK
+    assign #(`ECHO_SCLK_DELAY * 1ns) spi_engine_echo_sclk = spi_engine_spi_sclk;
   `endif
 
-  sanity_test();
+  //---------------------------------------------------------------------------
+  // Sleep and Chip Select Instruction time counter
+  //---------------------------------------------------------------------------
 
-  #100ns
+  int sleep_instr_time[$];
+  int sleep_duration;
+  int sleep_current_duration;
+  bit sleeping;
+  int cs_instr_time[$];
+  int cs_current_duration;
+  int cs_duration;
+  bit cs_sleeping;
+  wire [15:0] cmd, cmd_d1;
+  wire cmd_valid, cmd_ready;
+  wire idle;
 
-  sleep_delay_test(7);
+  assign cmd          = `TH.spi_engine.spi_engine_execution.inst.cmd;
+  assign cmd_d1       = `TH.spi_engine.spi_engine_execution.inst.cmd_d1;
+  assign cmd_valid    = `TH.spi_engine.spi_engine_execution.inst.cmd_valid;
+  assign cmd_ready    = `TH.spi_engine.spi_engine_execution.inst.cmd_ready;
+  assign idle         = `TH.spi_engine.spi_engine_execution.inst.idle;
 
-  cs_delay_test(3,3);
-
-  spi_env.stop();
-  base_env.stop();
-
-  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-
-  $finish;
-
-end
-
-//---------------------------------------------------------------------------
-// Sanity test reg interface
-//---------------------------------------------------------------------------
-
-task sanity_test();
-  bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
-                            | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
-                            | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
-  axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
-  axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
-endtask
-
-//---------------------------------------------------------------------------
-// IRQ callback
-//---------------------------------------------------------------------------
-
-reg [4:0] irq_pending = 0;
-reg [7:0] sync_id = 0;
-
-initial begin
-  forever begin
-    @(posedge spi_engine_irq);
-    // read pending IRQs
-    axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
-    // IRQ launched by Offload SYNC command
-    if (irq_pending & 5'b10000) begin
-      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID), sync_id);
-      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
+  initial begin
+    sleep_current_duration = 0;
+    sleep_duration = 0;
+    sleeping = 1'b0;
+    cs_current_duration = 0;
+    cs_duration = 0;
+    cs_sleeping = 1'b0;
+    forever begin
+      @(posedge spi_engine_spi_clk);
+        if (idle && (cmd_d1[15:8] == 8'h31) && sleeping) begin
+          sleeping <= 1'b0;
+          sleep_duration = sleep_current_duration+1;
+          sleep_instr_time.push_front(sleep_current_duration+1); // add one to account for this cycle
+        end
+        if (cmd_valid && cmd_ready && (cmd[15:8] == 8'h31)) begin
+          sleep_current_duration <= 0;
+          sleeping <= 1'b1;
+        end else begin
+          sleep_current_duration <= sleep_current_duration+1;
+        end
+        if (idle && (cmd_d1[15:10] == 6'h4) && cs_sleeping) begin
+          cs_sleeping = 1'b0;
+          cs_duration = cs_current_duration+1;
+          cs_instr_time.push_front(cs_current_duration+1); // add one to account for this cycle
+        end
+        if (cmd_valid && cmd_ready && (cmd[15:10] == 6'h4)) begin
+          cs_current_duration <= 0;
+          cs_sleeping <= 1'b1;
+        end else begin
+          cs_current_duration <= cs_current_duration+1;
+        end
     end
-    // IRQ launched by SYNC command
-    if (irq_pending & 5'b01000) begin
-      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDI FIFO
-    if (irq_pending & 5'b00100) begin
-      `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDO FIFO
-    if (irq_pending & 5'b00010) begin
-      `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDO FIFO
-    if (irq_pending & 5'b00001) begin
-      `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
-    end
-    // Clear all pending IRQs
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
   end
-end
 
-//---------------------------------------------------------------------------
-// Echo SCLK generation - we need this only if ECHO_SCLK is enabled
-//---------------------------------------------------------------------------
-`ifdef DEF_ECHO_SCLK
-  assign #(`ECHO_SCLK_DELAY * 1ns) spi_engine_echo_sclk = spi_engine_spi_sclk;
-`endif
+  //---------------------------------------------------------------------------
+  // Sleep delay Test
+  //---------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-// Sleep and Chip Select Instruction time counter
-//---------------------------------------------------------------------------
+  int sleep_time;
+  int expected_sleep_time;
 
-int sleep_instr_time[$];
-int sleep_duration;
-int sleep_current_duration;
-bit sleeping;
-int cs_instr_time[$];
-int cs_current_duration;
-int cs_duration;
-bit cs_sleeping;
-wire [15:0] cmd, cmd_d1;
-wire cmd_valid, cmd_ready;
-wire idle;
+  task sleep_delay_test(
+      input [7:0] sleep_param);
+    // Start spi clk generator
+    axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+      `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+      `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
+      );
 
-assign cmd          = `TH.spi_engine.spi_engine_execution.inst.cmd;
-assign cmd_d1       = `TH.spi_engine.spi_engine_execution.inst.cmd_d1;
-assign cmd_valid    = `TH.spi_engine.spi_engine_execution.inst.cmd_valid;
-assign cmd_ready    = `TH.spi_engine.spi_engine_execution.inst.cmd_ready;
-assign idle         = `TH.spi_engine.spi_engine_execution.inst.idle;
+    // Config pwm
+    axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d1000)); // set PWM period
+    axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
 
-initial begin
-  sleep_current_duration = 0;
-  sleep_duration = 0;
-  sleeping = 1'b0;
-  cs_current_duration = 0;
-  cs_duration = 0;
-  cs_sleeping = 1'b0;
-  forever begin
-    @(posedge spi_engine_spi_clk);
-      if (idle && (cmd_d1[15:8] == 8'h31) && sleeping) begin
-        sleeping <= 1'b0;
-        sleep_duration = sleep_current_duration+1;
-        sleep_instr_time.push_front(sleep_current_duration+1); // add one to account for this cycle
-      end
-      if (cmd_valid && cmd_ready && (cmd[15:8] == 8'h31)) begin
-        sleep_current_duration <= 0;
-        sleeping <= 1'b1;
-      end else begin
-        sleep_current_duration <= sleep_current_duration+1;
-      end
-      if (idle && (cmd_d1[15:10] == 6'h4) && cs_sleeping) begin
-        cs_sleeping = 1'b0;
-        cs_duration = cs_current_duration+1;
-        cs_instr_time.push_front(cs_current_duration+1); // add one to account for this cycle
-      end
-      if (cmd_valid && cmd_ready && (cmd[15:10] == 6'h4)) begin
-        cs_current_duration <= 0;
-        cs_sleeping <= 1'b1;
-      end else begin
-        cs_current_duration <= cs_current_duration+1;
-      end
-  end
-end
+    // Enable SPI Engine
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
-//---------------------------------------------------------------------------
-// Sleep delay Test
-//---------------------------------------------------------------------------
+    // Set up the interrupts
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+      `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
+      `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
+      );
 
-int sleep_time;
-int expected_sleep_time;
+    // Write commands
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_DLENGTH(`DATA_WIDTH - `DATA_DLENGTH));
+    if (`CS_ACTIVE_HIGH) begin
+      axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
+    end
 
-task sleep_delay_test(
-    input [7:0] sleep_param);
-  // Start spi clk generator
-  axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-    );
+    expected_sleep_time = 2+(sleep_param+1)*((`CLOCK_DIVIDER+1)*2);
+    // Start the test
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`SLEEP(sleep_param)));
 
-  // Config pwm
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d1000)); // set PWM period
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-  `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
+    #2000ns
+    sleep_time = sleep_instr_time.pop_back();
+    if ((sleep_time != expected_sleep_time)) begin
+        `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
+    end else begin
+        `INFO(("Sleep Test PASSED"), ADI_VERBOSITY_LOW);
+    end
 
-  // Enable SPI Engine
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+    // change the SPI word size (this should not affect sleep delay)
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`SLEEP(sleep_param)));
+    #2000ns
+    sleep_time = sleep_instr_time.pop_back();
+    #100ns
+    if ((sleep_time != expected_sleep_time)) begin
+        `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
+    end else begin
+        `INFO(("Sleep Test PASSED"), ADI_VERBOSITY_LOW);
+    end
 
-  // Set up the interrupts
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+    // Disable SPI Engine
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), 1);
+  endtask
+
+  //---------------------------------------------------------------------------
+  // CS delay Test
+  //---------------------------------------------------------------------------
+
+  bit [`DATA_DLENGTH:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
+  bit [`DATA_DLENGTH:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
+  int cs_activate_time;
+  int expected_cs_activate_time;
+  int cs_deactivate_time;
+  int expected_cs_deactivate_time;
+  bit [`DATA_DLENGTH-1:0] temp_data;
+
+  task cs_delay_test(
+      input [1:0] cs_activate_delay,
+      input [1:0] cs_deactivate_delay);
+    // Start spi clk generator
+    axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+      `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+      `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
+      );
+
+    // Config cnv
+    axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
+    axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d1000)); // set PWM period
+    axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
+    `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
+
+    //Configure DMA
+    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
+      `SET_DMAC_FLAGS_TLAST(1) |
+      `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
+      ); // Use TLAST
+    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
+    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
+    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+
+    // Enable SPI Engine
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+
+    // Set up the interrupts
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
     `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );
 
-  // Write commands
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_DLENGTH(`DATA_WIDTH - `DATA_DLENGTH));
-  if (`CS_ACTIVE_HIGH) begin
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
-  end
+    // Configure the Offload module
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(1));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(0));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+    if (`CS_ACTIVE_HIGH) begin
+      axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+    end
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 1);
 
-  expected_sleep_time = 2+(sleep_param+1)*((`CLOCK_DIVIDER+1)*2);
-  // Start the test
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`SLEEP(sleep_param)));
+    expected_cs_activate_time = 2;
+    expected_cs_deactivate_time = 2;
 
-  #2000ns
-  sleep_time = sleep_instr_time.pop_back();
-  if ((sleep_time != expected_sleep_time)) begin
-      `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
-  end else begin
-      `INFO(("Sleep Test PASSED"), ADI_VERBOSITY_LOW);
-  end
+    // Enqueue transfers to DUT
+    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
+      temp_data = $urandom;
+      spi_send(temp_data);
+      offload_sdi_data_store_arr[i] = temp_data;
+    end
 
-  // change the SPI word size (this should not affect sleep delay)
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`SLEEP(sleep_param)));
-  #2000ns
-  sleep_time = sleep_instr_time.pop_back();
-  #100ns
-  if ((sleep_time != expected_sleep_time)) begin
-      `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
-  end else begin
-      `INFO(("Sleep Test PASSED"), ADI_VERBOSITY_LOW);
-  end
+    // Start the offload
+    #100ns
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+    `INFO(("Offload started (no delay on CS change)."), ADI_VERBOSITY_LOW);
 
-  // Disable SPI Engine
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), 1);
-endtask
+    spi_wait_send();
 
-//---------------------------------------------------------------------------
-// CS delay Test
-//---------------------------------------------------------------------------
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
-bit [`DATA_DLENGTH:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
-bit [`DATA_DLENGTH:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
-int cs_activate_time;
-int expected_cs_activate_time;
-int cs_deactivate_time;
-int expected_cs_deactivate_time;
-bit [`DATA_DLENGTH-1:0] temp_data;
+    `INFO(("Offload stopped (no delay on CS change)."), ADI_VERBOSITY_LOW);
 
-task cs_delay_test(
-    input [1:0] cs_activate_delay,
-    input [1:0] cs_deactivate_delay);
-  // Start spi clk generator
-  axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-    );
+    #2000ns
 
-  // Config cnv
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d1000)); // set PWM period
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
-  `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
+    for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
+      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+    end
 
-  //Configure DMA
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
-    `SET_DMAC_FLAGS_TLAST(1) |
-    `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
-    ); // Use TLAST
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+    if (irq_pending == 'h0) begin
+      `FATAL(("IRQ Test FAILED"));
+    end else begin
+      `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
+    end
 
-  // Enable SPI Engine
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+    if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
+      `FATAL(("CS Delay Test FAILED: bad data"));
+    end
 
-  // Set up the interrupts
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
-  `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
-  `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
-  );
+    repeat (`NUM_OF_TRANSFERS) begin
+      cs_activate_time = cs_instr_time.pop_back();
+      cs_deactivate_time = cs_instr_time.pop_back();
+    end
+    if ((cs_activate_time != expected_cs_activate_time)) begin
+      `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
+    end
+    if (cs_deactivate_time != expected_cs_deactivate_time) begin
+      `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
+    end
+    `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
 
-  // Configure the Offload module
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(1));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(0));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-  if (`CS_ACTIVE_HIGH) begin
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
-  end
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 1);
+    #2000ns
+    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
-  expected_cs_activate_time = 2;
-  expected_cs_deactivate_time = 2;
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(1));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(0));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_DELAY(8'hFE,cs_activate_delay));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_DELAY(8'hFF,cs_deactivate_delay));
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
-  // Enqueue transfers to DUT
-  for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    temp_data = $urandom;
-    spi_send(temp_data);
-    offload_sdi_data_store_arr[i] = temp_data;
-  end
+    // breakdown: cs_activate_delay*(1+`CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
+    expected_cs_activate_time = 2+2*cs_activate_delay*(1+`CLOCK_DIVIDER)*2;
+    expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+`CLOCK_DIVIDER)*2;
 
-  // Start the offload
-  #100ns
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-  `INFO(("Offload started (no delay on CS change)."), ADI_VERBOSITY_LOW);
+    // Enqueue transfers to DUT
+    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
+      temp_data = $urandom;
+      spi_send(temp_data);
+      offload_sdi_data_store_arr[i] = temp_data;
+    end
 
-  spi_wait_send();
+    // Start the offload
+    #100ns
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+    `INFO(("Offload started (with delay on CS change)."), ADI_VERBOSITY_LOW);
 
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
+    spi_wait_send();
 
-  `INFO(("Offload stopped (no delay on CS change)."), ADI_VERBOSITY_LOW);
+    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
-  #2000ns
+    `INFO(("Offload stopped (with delay on CS change)."), ADI_VERBOSITY_LOW);
 
-  for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-  end
+    #2000ns
 
-  if (irq_pending == 'h0) begin
-    `FATAL(("IRQ Test FAILED"));
-  end else begin
-    `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
-  end
+    for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
+      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+    end
 
-  if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-    `ERROR(("CS Delay Test FAILED: bad data"));
-  end
+    if (irq_pending == 'h0) begin
+      `FATAL(("IRQ Test FAILED"));
+    end else begin
+      `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
+    end
 
-  repeat (`NUM_OF_TRANSFERS) begin
-    cs_activate_time = cs_instr_time.pop_back();
-    cs_deactivate_time = cs_instr_time.pop_back();
-  end
-  if ((cs_activate_time != expected_cs_activate_time)) begin
-    `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
-  end
-  if (cs_deactivate_time != expected_cs_deactivate_time) begin
-    `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
-  end
-  `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
-
-  #2000ns
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(1));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(0));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_DELAY(8'hFE,cs_activate_delay));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_RD);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_DELAY(8'hFF,cs_deactivate_delay));
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
-
-  // breakdown: cs_activate_delay*(1+`CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
-  expected_cs_activate_time = 2+2*cs_activate_delay*(1+`CLOCK_DIVIDER)*2;
-  expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+`CLOCK_DIVIDER)*2;
-
-  // Enqueue transfers to DUT
-  for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    temp_data = $urandom;
-    spi_send(temp_data);
-    offload_sdi_data_store_arr[i] = temp_data;
-  end
-
-  // Start the offload
-  #100ns
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-  `INFO(("Offload started (with delay on CS change)."), ADI_VERBOSITY_LOW);
-
-  spi_wait_send();
-
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-
-  `INFO(("Offload stopped (with delay on CS change)."), ADI_VERBOSITY_LOW);
-
-  #2000ns
-
-  for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-    offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-  end
-
-  if (irq_pending == 'h0) begin
-    `FATAL(("IRQ Test FAILED"));
-  end else begin
-    `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
-  end
-
-  if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-    `ERROR(("CS Delay Test FAILED: bad data"));
-  end
-  repeat (`NUM_OF_TRANSFERS) begin
-    cs_activate_time = cs_instr_time.pop_back();
-    cs_deactivate_time = cs_instr_time.pop_back();
-  end
-  if ((cs_activate_time != expected_cs_activate_time)) begin
-    `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
-  end
-  if (cs_deactivate_time != expected_cs_deactivate_time) begin
-    `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
-  end
-  `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
-endtask
+    if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
+      `FATAL(("CS Delay Test FAILED: bad data"));
+    end
+    repeat (`NUM_OF_TRANSFERS) begin
+      cs_activate_time = cs_instr_time.pop_back();
+      cs_deactivate_time = cs_instr_time.pop_back();
+    end
+    if ((cs_activate_time != expected_cs_activate_time)) begin
+      `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
+    end
+    if (cs_deactivate_time != expected_cs_deactivate_time) begin
+      `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
+    end
+    `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
+  endtask
 
 endprogram

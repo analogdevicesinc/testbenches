@@ -47,8 +47,8 @@ module system_tb #(
   localparam DCO_HALF_PERIOD = 1; // Period 2 ns -> 500 MHz DCO
   localparam FRAME_HALF_PERIOD = 4; // Period 8 ns -> 125 MHz Frame
   localparam BITS_PER_CYCLE = 2 * 2;
-  localparam CNV_HALF_PERIOD_COR = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
-  localparam CNV_HALF_PERIOD = `EN_UNCOR ? 4 * CNV_HALF_PERIOD_COR : CNV_HALF_PERIOD_COR;
+  //localparam CNV_HALF_PERIOD_COR = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
+  //localparam CNV_HALF_PERIOD = `EN_UNCOR ? 4 * CNV_HALF_PERIOD_COR : CNV_HALF_PERIOD_COR;
   localparam LATENCY = 3;                              
 
   reg sync_n = 1'b0;
@@ -126,33 +126,45 @@ module system_tb #(
   //
   // Data generation
   //
-  reg [19:0] sample = 'h000001;
+  reg [15:0] sample = 16'h0;
+//  reg [15:0] sample = 16'haaa8;
+
   reg da_p = 1'b0;
   reg da_n = 1'b1;
   reg db_p = 1'b0;
   reg db_n = 1'b1;
-  wire [19:0] final_sample;
-  assign final_sample = (enable_pattern) ? 8'hF0 : sample;
+  wire [15:0] final_sample;
+  assign final_sample = /*(enable_pattern) ? 8'hF0 :*/ sample;
   always @(posedge frame_clock_p) begin
     repeat (LATENCY) @(posedge ssi_clk);
     fork
       begin
-        if (`EN_UNCOR) begin
+        /*if (`EN_UNCOR) begin
           // Drive uncorrected data
           drive_sample({20{1'b1}});
           drive_sample(~sample);
           drive_sample({20{1'b0}});
-        end
+        end*/
          drive_sample(final_sample);
       end
     join_none
     #1;
-    sample = sample + 1;
-
+    
+//    if (sample [15]==1) begin
+//        sample = sample >> 1;
+//    end else begin
+//        sample =16'haaa8;
+//    end
+    
+    
+    
+    sample = ~sample;
+    
+    
    // sample = {sample[18:0],sample[19]};
   end
 
-  task automatic drive_sample(bit [19:0] sample_t);
+  task automatic drive_sample(bit [15:0] sample_t);
     int num_lanes = 2;
     int bits_per_cycle = num_lanes * 2;
     for (int i = 15; i >= 0; i=i-bits_per_cycle) begin // for (int i = 19; i >= 0;)

@@ -130,6 +130,9 @@ program test_program;
 
     dma_test;
 
+    # 7000
+    resync;
+    
     // Tap value for lane 0
     axi_write (RX1_DLY + 'h0,15);
     axi_write (RX1_DLY + 'h4,10);
@@ -187,6 +190,19 @@ program test_program;
     #10;
   end
   endtask
+
+
+
+task resync;
+begin
+
+  bit [31:0] readback = 'h0;
+
+  axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_CNTRL), readback);
+  axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL), readback | 32'h8);
+
+end
+endtask
 
 
   // --------------------------

@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Wed Jan 29 16:40:28 2025 */
+/* Fri Jan 31 13:46:06 2025 */
 
 package adi_regmap_spi_engine_pkg;
   import adi_regmap_pkg::*;
@@ -44,7 +44,7 @@ package adi_regmap_spi_engine_pkg;
   const reg_t AXI_SPI_ENGINE_VERSION = '{ 'h0000, "VERSION" , '{
     "VERSION_MAJOR": '{ 31, 16, RO, 'h00000001 },
     "VERSION_MINOR": '{ 15, 8, RO, 'h00000004 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h00000000 }}};
+    "VERSION_PATCH": '{ 7, 0, RO, 'h00000001 }}};
   `define SET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) SetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
   `define GET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) GetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
   `define DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR GetResetValue(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR")

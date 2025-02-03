@@ -37,6 +37,7 @@
 package watchdog_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
 
   class watchdog extends adi_component;
     
@@ -81,7 +82,7 @@ package watchdog_pkg;
           fork
             begin
               #(this.timer*1ns);
-              this.error($sformatf("Watchdog timer timed out! %s", this.message));
+              this.fatal($sformatf("Watchdog timer timed out! %s", this.message));
             end
             @this.stop_event;
           join_any

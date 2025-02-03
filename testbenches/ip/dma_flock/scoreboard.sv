@@ -37,6 +37,7 @@
 
 package scoreboard_pkg;
 
+  import adi_common_pkg::*;
   import xil_common_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import axi_vip_pkg::*;
@@ -120,7 +121,8 @@ package scoreboard_pkg;
         end
       end
     endtask : run_dst
-    task shutdown;
+
+    task shutdown();
       -> shutdown_event;
     endtask: shutdown
 

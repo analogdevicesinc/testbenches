@@ -1,13 +1,44 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsabilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
 `include "utils.svh"
 
 package scoreboard_pack_pkg;
 
-  import xil_common_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import axi_vip_pkg::*;
   import logger_pkg::*;
-  import x_monitor_pkg::*;
-  import mailbox_pkg::*;
+  import adi_common_pkg::*;
   import scoreboard_pkg::*;
 
   typedef enum {
@@ -15,7 +46,7 @@ package scoreboard_pack_pkg;
     UPACK
   } pack_type;
 
-  class scoreboard_pack extends scoreboard;
+  class scoreboard_pack #(type data_type = int) extends scoreboard#(.data_type(data_type));
 
     protected int channels;
     protected int samples;
@@ -42,62 +73,46 @@ package scoreboard_pack_pkg;
     endfunction: new
 
     // compare the collected data
-    virtual task compare_transaction();
+    virtual function void compare_transaction();
 
       logic [7:0] source_byte;
       logic [7:0] sink_byte;
-      logic [7:0] sink_byte_stream_block [int];
+      data_type sink_byte_stream_block [int];
 
       int outer_loop = (this.mode == CPACK) ? this.channels : this.samples;
       int inner_loop = (this.mode == CPACK) ? this.samples : this.channels;
 
-      this.info($sformatf("Scoreboard started"), 100);
+      if (this.enabled == 0)
+        return;
 
-      forever begin : tx_path
-        if (this.enabled == 0)
-          break;
-        if ((this.source_byte_stream_size > 0) &&
-              (this.sink_byte_stream_size >= this.channels*this.samples*this.width/8)) begin
-          byte_streams_empty_sig = 0;
-          for (int i=0; i<this.channels*this.samples*this.width/8; i++) begin
-            sink_byte_stream_block[i] = this.sink_byte_stream.pop_back();
-            this.sink_byte_stream_size--;
-          end
-          for (int i=0; i<outer_loop; i++) begin
-            for (int j=0; j<inner_loop; j++) begin
-              for (int k=0; k<this.width/8; k++) begin
-                source_byte = this.source_byte_stream.pop_back();
-                if (this.sink_type == CYCLIC)
-                  this.source_byte_stream.push_front(source_byte);
-                else
-                  this.source_byte_stream_size--;
-                sink_byte = sink_byte_stream_block[(outer_loop*j+i)*this.width/8+k];
-                this.info($sformatf("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), 100);
-                if (source_byte != sink_byte) begin
-                  this.error($sformatf("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
-                end
+      while ((this.subscriber_source.get_size() > 0) &&
+            (this.subscriber_sink.get_size() >= this.channels*this.samples*this.width/8)) begin
+        byte_streams_empty_sig = 0;
+        for (int i=0; i<this.channels*this.samples*this.width/8; i++) begin
+          sink_byte_stream_block[i] = this.subscriber_sink.get_data();
+        end
+        for (int i=0; i<outer_loop; i++) begin
+          for (int j=0; j<inner_loop; j++) begin
+            for (int k=0; k<this.width/8; k++) begin
+              source_byte = this.subscriber_source.get_data();
+              if (this.sink_type == CYCLIC)
+                this.subscriber_source.put_data(source_byte);
+              sink_byte = sink_byte_stream_block[(outer_loop*j+i)*this.width/8+k];
+              this.info($sformatf("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_MEDIUM);
+              if (source_byte != sink_byte) begin
+                this.error($sformatf("Scoreboard failed at: exp %h - rcv %h", source_byte, sink_byte));
               end
             end
           end
-        end else begin
-          if ((this.source_byte_stream_size == 0) &&
-              (this.sink_byte_stream_size == 0)) begin
-            byte_streams_empty_sig = 1;
-            ->>byte_streams_empty;
-          end
-          fork begin
-            fork
-              @source_transaction_event;
-              @sink_transaction_event;
-              @stop_scoreboard;
-            join_any
-            byte_streams_empty_sig = 0;
-            disable fork;
-          end join
         end
-      end
+      end 
 
-    endtask /* compare_transaction */
+      if ((this.subscriber_source.get_size() == 0) &&
+          (this.subscriber_sink.get_size() == 0)) begin
+        this.byte_streams_empty_sig = 1;
+        ->this.byte_streams_empty;
+      end
+    endfunction: compare_transaction
 
   endclass
 

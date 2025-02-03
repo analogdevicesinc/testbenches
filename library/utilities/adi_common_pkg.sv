@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -35,62 +35,57 @@
 
 `include "utils.svh"
 
-package s_axi_sequencer_pkg;
+package adi_common_pkg;
 
-  import xil_common_vip_pkg::*;
-  import axi_vip_pkg::*;
   import logger_pkg::*;
 
-  class s_axi_sequencer #( type T ) extends adi_component;
-
-    T agent;
-
+  class adi_reporter;
+    string name;
+    adi_reporter parent;
+    
     function new(
       input string name,
-      input T agent,
+      input adi_reporter parent = null);
+
+      this.name = name;
+      this.parent = parent;
+    endfunction
+
+    function string get_path();
+      if (this.parent == null)
+        return this.name;
+      else
+        return $sformatf("%s.%s", this.parent.get_path(), this.name);
+    endfunction: get_path
+
+    function void info(
+      input string message,
+      input adi_verbosity_t verbosity);
+
+      `INFO(("[%s] %s", this.get_path(), message), verbosity);
+    endfunction: info
+
+    function void warning(input string message);
+      `WARNING(("[%s] %s", this.get_path(), message));
+    endfunction: warning
+
+    function void error(input string message);
+      `ERROR(("[%s] %s", this.get_path(), message));
+    endfunction: error
+
+    function void fatal(input string message);
+      `FATAL(("[%s] %s", this.get_path(), message));
+    endfunction: fatal
+  endclass: adi_reporter
+
+
+  class adi_component extends adi_reporter;
+    function new(
+      input string name,
       input adi_component parent = null);
 
       super.new(name, parent);
-      
-      this.agent = agent;
-    endfunction
+    endfunction: new
+  endclass: adi_component
 
-    task get_byte_from_mem(input xil_axi_ulong addr,
-                           output bit [7:0] data);
-      bit [31:0] four_bytes;
-      four_bytes = agent.mem_model.backdoor_memory_read_4byte(addr);
-      case (addr[1:0])
-        2'b00: data = four_bytes[0+:8];
-        2'b01: data = four_bytes[8+:8];
-        2'b10: data = four_bytes[16+:8];
-        2'b11: data = four_bytes[24+:8];
-      endcase
-    endtask
-
-    task set_byte_in_mem(input xil_axi_ulong addr,
-                         input bit [7:0] data);
-      bit [3:0] strb;
-      case (addr[1:0])
-        2'b00: strb = 'b0001;
-        2'b01: strb = 'b0010;
-        2'b10: strb = 'b0100;
-        2'b11: strb = 'b1000;
-      endcase
-      agent.mem_model.backdoor_memory_write_4byte(.addr(addr),
-                                                  .payload({4{data}}),
-                                                  .strb(strb));
-    endtask
-
-    task verify_byte(input xil_axi_ulong addr,
-                     input bit [7:0] refdata);
-      bit [7:0] data;
-
-      get_byte_from_mem (addr, data);
-      if (data !== refdata) begin
-        this.error($sformatf("Unexpected value at address %0h . Expected: %0h Found: %0h", addr, refdata, data));
-      end
-    endtask
-
-  endclass
-
-endpackage
+endpackage: adi_common_pkg

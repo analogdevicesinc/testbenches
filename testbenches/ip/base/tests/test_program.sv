@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -34,15 +34,18 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axi_definitions.svh"
 
-import axi_vip_pkg::*;
 import logger_pkg::*;
-import environment_pkg::*;
+import test_harness_env_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program;
 
   // Declare the class instances
-  environment env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) env;
 
   // Process variables
   process current_process;
@@ -64,15 +67,10 @@ program test_program;
               `TH.`DDR_CLK.inst.IF,
               `TH.`SYS_RST.inst.IF,
               `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF
-             );
+              `TH.`DDR_AXI.inst.IF);
 
     env.start();
     env.sys_reset();
-
-    /* Add other configurations if necessary before calling run */
-
-    env.run();
 
     /* Add stimulus tasks */
         

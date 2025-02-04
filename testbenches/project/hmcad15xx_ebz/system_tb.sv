@@ -64,10 +64,12 @@ module system_tb();
 
   // Add transport delay to the DCO clock to simulate longer internal delay of
   // the clock path inside the FPGA
-  always @(*) clk_p <=  #3  ssi_clk;
-  always @(*) clk_n <=  #3 ~ssi_clk;
-  always @(*) fclk_in_p <=  #3  cnv_clk;
-  always @(*) fclk_in_n <=  #3 ~cnv_clk;
+  always @(*) clk_p     <=    ssi_clk;
+  always @(*) clk_n     <=   ~ssi_clk;
+  always @(*) fclk_in_p <=  #0.5   cnv_clk;
+  always @(*) fclk_in_n <=  #0.5  ~cnv_clk;
+
+
 
   //
   // Clock generation
@@ -81,17 +83,17 @@ module system_tb();
     ssi_clk <= 1'b0;
   end
 
+  initial begin
+    while (1) begin
+       cnv_clk <= ~cnv_clk;
+       #CNV_HALF_PERIOD;
+    end
+    cnv_clk <= 1'b0;
+  end
+
 //
 // FClock generation
 //
-
-initial begin
-  while (1) begin
-     cnv_clk <= ~cnv_clk;
-     #CNV_HALF_PERIOD;
-  end
-  cnv_clk <= 1'b0;
-end
 
 reg [7:0] sample = 'h33;
 
@@ -112,6 +114,7 @@ task automatic drive_sample(bit [7:0] sample_t);
 
      @(negedge ssi_clk);
      #0.5;
+
       adc_data_in_p[0] <=  sample_t[i];
       adc_data_in_n[0] <= ~sample_t[i];
       adc_data_in_p[1] <=  sample_t[i];

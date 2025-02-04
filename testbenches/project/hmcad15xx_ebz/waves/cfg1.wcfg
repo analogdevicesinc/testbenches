@@ -28,213 +28,141 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1,978.100 ns"></ZoomStartTime>
-      <ZoomEndTime time="2,107.501 ns"></ZoomEndTime>
-      <Cursor1Time time="2,013.100 ns"></Cursor1Time>
+      <ZoomStartTime time="149.949 ns"></ZoomStartTime>
+      <ZoomEndTime time="284.150 ns"></ZoomEndTime>
+      <Cursor1Time time="208.500 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="271"></NameColumnWidth>
-      <ValueColumnWidth column_width="81"></ValueColumnWidth>
+      <NameColumnWidth column_width="262"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="50" />
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/data_in_p">
-      <obj_property name="ElementShortName">data_in_p[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_in_p[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/data_in_n">
-      <obj_property name="ElementShortName">data_in_n[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_in_n[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/ssi_clk">
-      <obj_property name="ElementShortName">ssi_clk</obj_property>
-      <obj_property name="ObjectShortName">ssi_clk</obj_property>
-   </wvobject>
+   <WVObjectSize size="32" />
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/adc_clk_in_fast">
       <obj_property name="ElementShortName">adc_clk_in_fast</obj_property>
       <obj_property name="ObjectShortName">adc_clk_in_fast</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/data_in_p[0]">
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/adc_clk_div">
+      <obj_property name="ElementShortName">adc_clk_div</obj_property>
+      <obj_property name="ObjectShortName">adc_clk_div</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/adc_data_in_p[0]">
       <obj_property name="ElementShortName">[0]</obj_property>
       <obj_property name="ObjectShortName">[0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_7">
-      <obj_property name="ElementShortName">serdes_data_7[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_7[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/adc_data_in_n[0]">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_6">
-      <obj_property name="ElementShortName">serdes_data_6[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_6[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_in_p[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_5">
-      <obj_property name="ElementShortName">serdes_data_5[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_5[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s0[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_4">
-      <obj_property name="ElementShortName">serdes_data_4[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_4[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s1[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_3">
-      <obj_property name="ElementShortName">serdes_data_3[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_3[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s2[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_2">
-      <obj_property name="ElementShortName">serdes_data_2[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_2[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s3[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_1">
-      <obj_property name="ElementShortName">serdes_data_1[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_1[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s4[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data_0">
-      <obj_property name="ElementShortName">serdes_data_0[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_0[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s5[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/data_out">
-      <obj_property name="ElementShortName">data_out[15:0]</obj_property>
-      <obj_property name="ObjectShortName">data_out[15:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s6[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/data_en">
-      <obj_property name="ElementShortName">data_en</obj_property>
-      <obj_property name="ObjectShortName">data_en</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s7[8]">
+      <obj_property name="ElementShortName">[8]</obj_property>
+      <obj_property name="ObjectShortName">[8]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/sample_assembly_inst/frame">
-      <obj_property name="ElementShortName">frame[7:0]</obj_property>
-      <obj_property name="ObjectShortName">frame[7:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\g_io[8].genblk1.i_ibuf /I">
+      <obj_property name="ElementShortName">I</obj_property>
+      <obj_property name="ObjectShortName">I</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s0">
-      <obj_property name="ElementShortName">data_s0[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s0[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s1">
-      <obj_property name="ElementShortName">data_s1[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s1[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s2">
-      <obj_property name="ElementShortName">data_s2[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s2[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s3">
-      <obj_property name="ElementShortName">data_s3[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s3[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s4">
-      <obj_property name="ElementShortName">data_s4[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s4[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s5">
-      <obj_property name="ElementShortName">data_s5[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s5[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s6">
-      <obj_property name="ElementShortName">data_s6[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s6[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s7">
-      <obj_property name="ElementShortName">data_s7[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s7[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_in_p">
-      <obj_property name="ElementShortName">data_in_p[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_in_p[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_in_n">
-      <obj_property name="ElementShortName">data_in_n[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_in_n[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/div_clk">
-      <obj_property name="ElementShortName">div_clk</obj_property>
-      <obj_property name="ObjectShortName">div_clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\g_io[8].genblk1.i_ibuf /IB">
+      <obj_property name="ElementShortName">IB</obj_property>
+      <obj_property name="ObjectShortName">IB</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/fclk_p">
       <obj_property name="ElementShortName">fclk_p</obj_property>
       <obj_property name="ObjectShortName">fclk_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\g_io[8].genblk1.i_ibuf /O">
+      <obj_property name="ElementShortName">O</obj_property>
+      <obj_property name="ObjectShortName">O</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/delay_locked">
-      <obj_property name="ElementShortName">delay_locked</obj_property>
-      <obj_property name="ObjectShortName">delay_locked</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q1">
+      <obj_property name="ElementShortName">Q1</obj_property>
+      <obj_property name="ObjectShortName">Q1</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/delay_rst">
-      <obj_property name="ElementShortName">delay_rst</obj_property>
-      <obj_property name="ObjectShortName">delay_rst</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q2">
+      <obj_property name="ElementShortName">Q2</obj_property>
+      <obj_property name="ObjectShortName">Q2</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/up_dwdata">
-      <obj_property name="ElementShortName">up_dwdata[4:0]</obj_property>
-      <obj_property name="ObjectShortName">up_dwdata[4:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q3">
+      <obj_property name="ElementShortName">Q3</obj_property>
+      <obj_property name="ObjectShortName">Q3</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/up_drdata">
-      <obj_property name="ElementShortName">up_drdata[4:0]</obj_property>
-      <obj_property name="ObjectShortName">up_drdata[4:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q4">
+      <obj_property name="ElementShortName">Q4</obj_property>
+      <obj_property name="ObjectShortName">Q4</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/up_dld">
-      <obj_property name="ElementShortName">up_dld[0:0]</obj_property>
-      <obj_property name="ObjectShortName">up_dld[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q5">
+      <obj_property name="ElementShortName">Q5</obj_property>
+      <obj_property name="ObjectShortName">Q5</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/up_clk">
-      <obj_property name="ElementShortName">up_clk</obj_property>
-      <obj_property name="ObjectShortName">up_clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q6">
+      <obj_property name="ElementShortName">Q6</obj_property>
+      <obj_property name="ObjectShortName">Q6</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s0">
-      <obj_property name="ElementShortName">data_s0[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s0[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q7">
+      <obj_property name="ElementShortName">Q7</obj_property>
+      <obj_property name="ObjectShortName">Q7</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s1">
-      <obj_property name="ElementShortName">data_s1[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s1[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q8">
+      <obj_property name="ElementShortName">Q8</obj_property>
+      <obj_property name="ObjectShortName">Q8</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s2">
-      <obj_property name="ElementShortName">data_s2[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s2[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/CLK">
+      <obj_property name="ElementShortName">CLK</obj_property>
+      <obj_property name="ObjectShortName">CLK</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s3">
-      <obj_property name="ElementShortName">data_s3[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s3[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/CLKDIV">
+      <obj_property name="ElementShortName">CLKDIV</obj_property>
+      <obj_property name="ObjectShortName">CLKDIV</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s4">
-      <obj_property name="ElementShortName">data_s4[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s4[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/D">
+      <obj_property name="ElementShortName">D</obj_property>
+      <obj_property name="ObjectShortName">D</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s5">
-      <obj_property name="ElementShortName">data_s5[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s5[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTOUT1">
+      <obj_property name="ElementShortName">SHIFTOUT1</obj_property>
+      <obj_property name="ObjectShortName">SHIFTOUT1</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s6">
-      <obj_property name="ElementShortName">data_s6[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s6[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTOUT2">
+      <obj_property name="ElementShortName">SHIFTOUT2</obj_property>
+      <obj_property name="ObjectShortName">SHIFTOUT2</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/data_s7">
-      <obj_property name="ElementShortName">data_s7[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s7[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTIN1">
+      <obj_property name="ElementShortName">SHIFTIN1</obj_property>
+      <obj_property name="ObjectShortName">SHIFTIN1</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/ext_serdes_rst">
-      <obj_property name="ElementShortName">ext_serdes_rst</obj_property>
-      <obj_property name="ObjectShortName">ext_serdes_rst</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/rst">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/div_clk">
-      <obj_property name="ElementShortName">div_clk</obj_property>
-      <obj_property name="ObjectShortName">div_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/serdes_rst">
-      <obj_property name="ElementShortName">serdes_rst</obj_property>
-      <obj_property name="ObjectShortName">serdes_rst</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/FPGA_TECHNOLOGY">
-      <obj_property name="ElementShortName">FPGA_TECHNOLOGY[31:0]</obj_property>
-      <obj_property name="ObjectShortName">FPGA_TECHNOLOGY[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/CMOS_LVDS_N">
-      <obj_property name="ElementShortName">CMOS_LVDS_N[31:0]</obj_property>
-      <obj_property name="ObjectShortName">CMOS_LVDS_N[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_frame_inst/SERDES_FACTOR">
-      <obj_property name="ElementShortName">SERDES_FACTOR[31:0]</obj_property>
-      <obj_property name="ObjectShortName">SERDES_FACTOR[31:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTIN2">
+      <obj_property name="ElementShortName">SHIFTIN2</obj_property>
+      <obj_property name="ObjectShortName">SHIFTIN2</obj_property>
    </wvobject>
 </wave_config>

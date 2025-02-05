@@ -94,62 +94,70 @@ module system_tb();
 //
 // FClock generation
 //
-
-reg [7:0] sample = 'h33;
+localparam LATENCY = 3;
+reg [7:0] sample = 'hbc;
 
 always @(posedge cnv_clk) begin
+  repeat (LATENCY) @(posedge ssi_clk);
     fork
       begin
-         drive_sample(sample);
+         drive_sample({sample,
+                       sample+1,
+                       sample+2,
+                       sample+3,
+                       sample+4,
+                       sample+5,
+                       sample+6,
+                       sample+7});
       end
     join_none
-    #1;
-    sample = sample + 1;
+
+    sample = sample+8;
   end
 
 
-task automatic drive_sample(bit [7:0] sample_t);
+task automatic drive_sample(bit [7:0] sample_t [0:7]) ;
 
-  for (int i = 7; i >= 0; i=i-2) begin
-
-     @(negedge ssi_clk);
-     #0.5;
-
-      adc_data_in_p[0] <=  sample_t[i];
-      adc_data_in_n[0] <= ~sample_t[i];
-      adc_data_in_p[1] <=  sample_t[i];
-      adc_data_in_n[1] <= ~sample_t[i];
-      adc_data_in_p[2] <=  sample_t[i];
-      adc_data_in_n[2] <= ~sample_t[i];
-      adc_data_in_p[3] <=  sample_t[i];
-      adc_data_in_n[3] <= ~sample_t[i];
-      adc_data_in_p[4] <=  sample_t[i];
-      adc_data_in_n[4] <= ~sample_t[i];
-      adc_data_in_p[5] <=  sample_t[i];
-      adc_data_in_n[5] <= ~sample_t[i];
-      adc_data_in_p[6] <=  sample_t[i];
-      adc_data_in_n[6] <= ~sample_t[i];
-      adc_data_in_p[7] <=  sample_t[i];
-      adc_data_in_n[7] <= ~sample_t[i];
+  for (int i = 0; i <=7; i=i+2) begin
 
      @(posedge ssi_clk);
      #0.5;
-     adc_data_in_p[0] <=  sample_t[i-1];
-     adc_data_in_n[0] <= ~sample_t[i-1];
-     adc_data_in_p[1] <=  sample_t[i-1];
-     adc_data_in_n[1] <= ~sample_t[i-1];
-     adc_data_in_p[2] <=  sample_t[i-1];
-     adc_data_in_n[2] <= ~sample_t[i-1];
-     adc_data_in_p[3] <=  sample_t[i-1];
-     adc_data_in_n[3] <= ~sample_t[i-1];
-     adc_data_in_p[4] <=  sample_t[i-1];
-     adc_data_in_n[4] <= ~sample_t[i-1];
-     adc_data_in_p[5] <=  sample_t[i-1];
-     adc_data_in_n[5] <= ~sample_t[i-1];
-     adc_data_in_p[6] <=  sample_t[i-1];
-     adc_data_in_n[6] <= ~sample_t[i-1];
-     adc_data_in_p[7] <=  sample_t[i-1];
-     adc_data_in_n[7] <= ~sample_t[i-1];
+
+      adc_data_in_p[0] <=  sample_t[0][i];
+      adc_data_in_n[0] <= ~sample_t[0][i];
+      adc_data_in_p[1] <=  sample_t[1][i];
+      adc_data_in_n[1] <= ~sample_t[1][i];
+      adc_data_in_p[2] <=  sample_t[2][i];
+      adc_data_in_n[2] <= ~sample_t[2][i];
+      adc_data_in_p[3] <=  sample_t[3][i];
+      adc_data_in_n[3] <= ~sample_t[3][i];
+      adc_data_in_p[4] <=  sample_t[4][i];
+      adc_data_in_n[4] <= ~sample_t[4][i];
+      adc_data_in_p[5] <=  sample_t[5][i];
+      adc_data_in_n[5] <= ~sample_t[5][i];
+      adc_data_in_p[6] <=  sample_t[6][i];
+      adc_data_in_n[6] <= ~sample_t[6][i];
+      adc_data_in_p[7] <=  sample_t[7][i];
+      adc_data_in_n[7] <= ~sample_t[7][i];
+
+     @(negedge ssi_clk);
+     #0.5;
+     adc_data_in_p[0] <=  sample_t[0][i+1];
+     adc_data_in_n[0] <= ~sample_t[0][i+1];
+     adc_data_in_p[1] <=  sample_t[1][i+1];
+     adc_data_in_n[1] <= ~sample_t[1][i+1];
+     adc_data_in_p[2] <=  sample_t[2][i+1];
+     adc_data_in_n[2] <= ~sample_t[2][i+1];
+     adc_data_in_p[3] <=  sample_t[3][i+1];
+     adc_data_in_n[3] <= ~sample_t[3][i+1];
+     adc_data_in_p[4] <=  sample_t[4][i+1];
+     adc_data_in_n[4] <= ~sample_t[4][i+1];
+     adc_data_in_p[5] <=  sample_t[5][i+1];
+     adc_data_in_n[5] <= ~sample_t[5][i+1];
+     adc_data_in_p[6] <=  sample_t[6][i+1];
+     adc_data_in_n[6] <= ~sample_t[6][i+1];
+     adc_data_in_p[7] <=  sample_t[7][i+1];
+     adc_data_in_n[7] <= ~sample_t[7][i+1];
   end
 
 endtask

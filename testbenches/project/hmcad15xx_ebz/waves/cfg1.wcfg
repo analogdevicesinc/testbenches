@@ -28,141 +28,726 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="149.949 ns"></ZoomStartTime>
-      <ZoomEndTime time="284.150 ns"></ZoomEndTime>
-      <Cursor1Time time="208.500 ns"></Cursor1Time>
+      <ZoomStartTime time="18,606.200 ns"></ZoomStartTime>
+      <ZoomEndTime time="18,620.601 ns"></ZoomEndTime>
+      <Cursor1Time time="18,612.100 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="262"></NameColumnWidth>
-      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+      <NameColumnWidth column_width="360"></NameColumnWidth>
+      <ValueColumnWidth column_width="351"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="32" />
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/adc_clk_in_fast">
-      <obj_property name="ElementShortName">adc_clk_in_fast</obj_property>
-      <obj_property name="ObjectShortName">adc_clk_in_fast</obj_property>
+   <WVObjectSize size="37" />
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /frame_in_reg">
+      <obj_property name="ElementShortName">frame_in_reg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">frame_in_reg[7:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/adc_clk_div">
-      <obj_property name="ElementShortName">adc_clk_div</obj_property>
-      <obj_property name="ObjectShortName">adc_clk_div</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/cnv_clk">
+      <obj_property name="ElementShortName">cnv_clk</obj_property>
+      <obj_property name="ObjectShortName">cnv_clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/adc_data_in_p[0]">
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/fclk_in_p">
+      <obj_property name="ElementShortName">fclk_in_p</obj_property>
+      <obj_property name="ObjectShortName">fclk_in_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/adc_data_in_n[0]">
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/clk_p">
+      <obj_property name="ElementShortName">clk_p</obj_property>
+      <obj_property name="ObjectShortName">clk_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_in_p[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/adc_data_in_p[7]">
+      <obj_property name="ElementShortName">[7]</obj_property>
+      <obj_property name="ObjectShortName">[7]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s0[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject fp_name="divider333" type="divider">
+      <obj_property name="label">input</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s1[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s2[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s3[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s4[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s5[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s6[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/data_s7[8]">
-      <obj_property name="ElementShortName">[8]</obj_property>
-      <obj_property name="ObjectShortName">[8]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\g_io[8].genblk1.i_ibuf /I">
-      <obj_property name="ElementShortName">I</obj_property>
-      <obj_property name="ObjectShortName">I</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_in">
+      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\g_io[8].genblk1.i_ibuf /IB">
-      <obj_property name="ElementShortName">IB</obj_property>
-      <obj_property name="ObjectShortName">IB</obj_property>
+   <wvobject fp_name="divider332" type="divider">
+      <obj_property name="label">output</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/fclk_p">
-      <obj_property name="ElementShortName">fclk_p</obj_property>
-      <obj_property name="ObjectShortName">fclk_p</obj_property>
+   <wvobject type="array" fp_name="/system_tb/sample">
+      <obj_property name="ElementShortName">sample[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sample[7:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\g_io[8].genblk1.i_ibuf /O">
-      <obj_property name="ElementShortName">O</obj_property>
-      <obj_property name="ObjectShortName">O</obj_property>
+   <wvobject type="vbus" fp_name="vbus375">
+      <obj_property name="label">lane1_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q1">
-      <obj_property name="ElementShortName">Q1</obj_property>
-      <obj_property name="ObjectShortName">Q1</obj_property>
+   <wvobject type="vbus" fp_name="vbus366">
+      <obj_property name="label">lane0_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q2">
-      <obj_property name="ElementShortName">Q2</obj_property>
-      <obj_property name="ObjectShortName">Q2</obj_property>
+   <wvobject type="vbus" fp_name="vbus393">
+      <obj_property name="label">lane3_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q3">
-      <obj_property name="ElementShortName">Q3</obj_property>
-      <obj_property name="ObjectShortName">Q3</obj_property>
+   <wvobject type="vbus" fp_name="vbus384">
+      <obj_property name="label">lane2_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q4">
-      <obj_property name="ElementShortName">Q4</obj_property>
-      <obj_property name="ObjectShortName">Q4</obj_property>
+   <wvobject type="vbus" fp_name="vbus411">
+      <obj_property name="label">lane5_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q5">
-      <obj_property name="ElementShortName">Q5</obj_property>
-      <obj_property name="ObjectShortName">Q5</obj_property>
+   <wvobject type="vbus" fp_name="vbus402">
+      <obj_property name="label">lane4_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q6">
-      <obj_property name="ElementShortName">Q6</obj_property>
-      <obj_property name="ObjectShortName">Q6</obj_property>
+   <wvobject type="vbus" fp_name="vbus429">
+      <obj_property name="label">lane7_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q7">
-      <obj_property name="ElementShortName">Q7</obj_property>
-      <obj_property name="ObjectShortName">Q7</obj_property>
+   <wvobject type="vbus" fp_name="vbus420">
+      <obj_property name="label">lane6_15_8</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /sample8_reg[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/Q8">
-      <obj_property name="ElementShortName">Q8</obj_property>
-      <obj_property name="ObjectShortName">Q8</obj_property>
+   <wvobject type="vbus" fp_name="vbus146">
+      <obj_property name="label">lane1_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[1].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/CLK">
-      <obj_property name="ElementShortName">CLK</obj_property>
-      <obj_property name="ObjectShortName">CLK</obj_property>
+   <wvobject type="vbus" fp_name="vbus121">
+      <obj_property name="label">lane0_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[0].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/CLKDIV">
-      <obj_property name="ElementShortName">CLKDIV</obj_property>
-      <obj_property name="ObjectShortName">CLKDIV</obj_property>
+   <wvobject type="vbus" fp_name="vbus196">
+      <obj_property name="label">lane3_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[3].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/D">
-      <obj_property name="ElementShortName">D</obj_property>
-      <obj_property name="ObjectShortName">D</obj_property>
+   <wvobject type="vbus" fp_name="vbus322">
+      <obj_property name="label">lane2_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[2].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTOUT1">
-      <obj_property name="ElementShortName">SHIFTOUT1</obj_property>
-      <obj_property name="ObjectShortName">SHIFTOUT1</obj_property>
+   <wvobject type="vbus" fp_name="vbus246">
+      <obj_property name="label">lane5_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[5].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTOUT2">
-      <obj_property name="ElementShortName">SHIFTOUT2</obj_property>
-      <obj_property name="ObjectShortName">SHIFTOUT2</obj_property>
+   <wvobject type="vbus" fp_name="vbus221">
+      <obj_property name="label">lane4_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[4].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTIN1">
-      <obj_property name="ElementShortName">SHIFTIN1</obj_property>
-      <obj_property name="ObjectShortName">SHIFTIN1</obj_property>
+   <wvobject type="vbus" fp_name="vbus296">
+      <obj_property name="label">lane7_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[7].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/ad_serdes_data_inst/\genblk4.g_data[8].i_iserdes /B_ISERDESE2_INST/SHIFTIN2">
-      <obj_property name="ElementShortName">SHIFTIN2</obj_property>
-      <obj_property name="ObjectShortName">SHIFTIN2</obj_property>
+   <wvobject type="vbus" fp_name="vbus271">
+      <obj_property name="label">lane6_0_7</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/\sample_assembly_lanes[6].sample_assembly_inst /data_out_reg[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/wr_en8_reg">
+      <obj_property name="ElementShortName">wr_en8_reg</obj_property>
+      <obj_property name="ObjectShortName">wr_en8_reg</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/wr_data_reg">
+      <obj_property name="ElementShortName">wr_data_reg[127:0]</obj_property>
+      <obj_property name="ObjectShortName">wr_data_reg[127:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/resolution">
+      <obj_property name="ElementShortName">resolution[1:0]</obj_property>
+      <obj_property name="ObjectShortName">resolution[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/mode">
+      <obj_property name="ElementShortName">mode[1:0]</obj_property>
+      <obj_property name="ObjectShortName">mode[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_hmcad15xx_adc/inst/i_axi_hmcad15xx_if/serdes_data">
+      <obj_property name="ElementShortName">serdes_data[0:7][7:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_data[0:7][7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
 </wave_config>

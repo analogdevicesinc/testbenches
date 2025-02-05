@@ -54,10 +54,10 @@ source $ad_hdl_dir/projects/hmcad15xx_ebz/common/hmcad15xx_ebz_bd.tcl
 ad_ip_parameter axi_hmcad15xx_adc CONFIG.DELAY_REFCLK_FREQUENCY 200
 
 
-set RX_DMA 0x7C400000
+set RX_DMA 0x44A30000
 set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_hmcad15xx_dma}]
 adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
 
-set AXI_HMCAD15XX 0x43c00000
+set AXI_HMCAD15XX 0x44A00000
 set_property offset $AXI_HMCAD15XX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_hmcad15xx_adc}]
 adi_sim_add_define "AXI_HMCAD15XX_BA=[format "%d" ${AXI_HMCAD15XX}]"

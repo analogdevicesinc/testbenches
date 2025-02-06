@@ -1,69 +1,69 @@
 `include "utils.svh"
+`include "axi_definitions.svh"
+`include "axis_definitions.svh"
 
 package environment_pkg;
 
+  import logger_pkg::*;
+  import adi_common_pkg::*;
+
+  import axi_vip_pkg::*;
+  import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
-  import do_scoreboard_pkg::*;
-  import logger_pkg::*;
+  import adi_axi_agent_pkg::*;
+  import adi_axis_agent_pkg::*;
+  import scoreboard_pkg::*;
 
-  import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import `PKGIFY(test_harness, mng_axi)::*;
-  import `PKGIFY(test_harness, ddr_axi)::*;
-  import `PKGIFY(test_harness, plddr_axi)::*;
-  import `PKGIFY(test_harness, adc_src_axis)::*;
-  import `PKGIFY(test_harness, dac_dst_axis)::*;
 
-  class environment;
+  class scoreboard_environment #(`AXIS_VIP_PARAM_DECL(adc_src), `AXIS_VIP_PARAM_DECL(dac_dst), `AXI_VIP_PARAM_DECL(adc_dst_pt), `AXI_VIP_PARAM_DECL(dac_src_pt)) extends adi_environment;
 
-    // agents and sequencers
-    `AGENT(test_harness, mng_axi, mst_t) mng_agent;
-    `AGENT(test_harness, ddr_axi, slv_mem_t) ddr_agent;
-    `AGENT(test_harness, plddr_axi, slv_mem_t) plddr_agent;
-    `AGENT(test_harness, adc_src_axis, mst_t) adc_src_axis_agent;
-    `AGENT(test_harness, dac_dst_axis, slv_t) dac_dst_axis_agent;
+    // Agents
+    adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(adc_src)) adc_src_axis_agent;
+    adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(dac_dst)) dac_dst_axis_agent;
+    adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(adc_dst_pt)) adc_dst_axi_pt_agent;
+    adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(dac_src_pt)) dac_src_axi_pt_agent;
 
-    m_axi_sequencer  #(`AGENT(test_harness, mng_axi, mst_t)) mng;
-    s_axi_sequencer  #(`AGENT(test_harness, ddr_axi, slv_mem_t)) ddr;
-    m_axis_sequencer #(`AGENT(test_harness, adc_src_axis, mst_t),
-                       `AXIS_VIP_PARAMS(test_harness, adc_src_axis)
-                      ) adc_src_axis_seq;
-    s_axis_sequencer #(`AGENT(test_harness, dac_dst_axis, slv_t)) dac_dst_axis_seq;
-
-    do_scoreboard scoreboard;
+    scoreboard #(logic [7:0]) scoreboard_tx;
+    scoreboard #(logic [7:0]) scoreboard_rx;
 
     //============================================================================
     // Constructor
     //============================================================================
     function new (
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi)) ddr_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, plddr_axi)) pl_ddr_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, adc_src_axis)) adc_src_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dac_dst_axis)) dac_dst_axis_vip_if
-    );
+      input string name,
+
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(adc_src)) adc_src_axis_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(dac_dst)) dac_dst_axis_vip_if,
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(adc_dst_pt)) adc_dst_axi_pt_vip_if,
+      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(dac_src_pt)) dac_src_axi_pt_vip_if);
 
       // creating the agents
-      mng_agent = new("AXI Manager Agent", mng_vip_if);
-      ddr_agent = new("System DDR Agent", ddr_vip_if);
-      plddr_agent = new("PL DDR Agent", pl_ddr_vip_if);
+      super.new(name);
 
-      adc_src_axis_agent = new("ADC Source AXI Stream Agent", adc_src_axis_vip_if);
-      dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", dac_dst_axis_vip_if);
+      this.adc_src_axis_agent = new("ADC Source AXI Stream Agent", adc_src_axis_vip_if, this);
+      this.dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", dac_dst_axis_vip_if, this);
+      this.adc_dst_axi_pt_agent = new("ADC Destination AXI Agent", adc_dst_axi_pt_vip_if, this);
+      this.dac_src_axi_pt_agent = new("DAC Source AXI Agent", dac_src_axi_pt_vip_if, this);
 
-      // create sequencers
-      mng = new("AXI Manager Seuencer", mng_agent);
-      ddr = new("System DDR Sequencer", ddr_agent);
-      adc_src_axis_seq = new("ADC Source AXI Stream Sequencer", adc_src_axis_agent);
-      dac_dst_axis_seq = new("DAC Destination AXI Stream Sequencer", dac_dst_axis_agent);
-
-      // create scoreboard
-      scoreboard = new("Data Offload Verification Environment Scoreboard");
-
+      this.scoreboard_tx = new("Data Offload TX Scoreboard", this);
+      this.scoreboard_rx = new("Data Offload RX Scoreboard", this);
     endfunction
+
+    //============================================================================
+    // Configure environment
+    //   - Configure the sequencer VIPs with an initial configuration before starting them
+    //============================================================================
+    task configure(int bytes_to_generate);
+      // ADC stub
+      this.adc_src_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.adc_src_axis_agent.sequencer.add_xfer_descriptor(bytes_to_generate, 0, 0);
+
+      // DAC stub
+      this.dac_dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    endtask
 
     //============================================================================
     // Start environment
@@ -71,97 +71,43 @@ package environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
+      this.adc_src_axis_agent.agent.start_master();
+      this.dac_dst_axis_agent.agent.start_slave();
+      this.adc_dst_axi_pt_agent.agent.start_monitor();
+      this.dac_src_axi_pt_agent.agent.start_monitor();
 
-      // start agents, one by one
-      mng_agent.start_master();
-      ddr_agent.start_slave();
-      plddr_agent.start_slave();
-      adc_src_axis_agent.start_master();
-      dac_dst_axis_agent.start_slave();
+      this.dac_src_axi_pt_agent.monitor.publisher_rx.subscribe(this.scoreboard_tx.subscriber_source);
+      this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
-      // connect agents to the scoreboard
-      scoreboard.set_ports(ddr_agent.monitor.item_collected_port,
-                           dac_dst_axis_agent.monitor.item_collected_port,
-                           adc_src_axis_agent.monitor.item_collected_port
-                           );
-
-    endtask
-
-    //============================================================================
-    // Start the test
-    //   - start the RX scoreboard and sequencer
-    //   - start the TX scoreboard and sequencer
-    //   - setup the RX DMA
-    //   - setup the TX DMA
-    //============================================================================
-    task test();
-      fork
-
-        adc_src_axis_seq.run();
-        dac_dst_axis_seq.run();
-        scoreboard.run();
-
-      join_none
-    endtask
-
-
-    //============================================================================
-    // Generate a data stream as an ADC
-    //
-    //   - clock to data rate ratio is 1
-    //
-    //============================================================================
-
-    axi4stream_transaction rx_transaction;
-    int adc_data_rate_ratio = 1;
-
-    task adc_stream_gen();
-
-      while(1) begin
-        if (adc_src_axis_agent.driver.is_driver_idle) begin
-          rx_transaction = adc_src_axis_agent.driver.create_transaction("");
-          ADC_TRANSACTION_FAIL: assert(rx_transaction.randomize());
-          rx_transaction.set_delay(adc_data_rate_ratio - 1);
-          adc_src_axis_agent.driver.send(rx_transaction);
-          `INFO(("Sent new transaction to ADC driver"), ADI_VERBOSITY_LOW);
-          #0;
-        end else begin
-          #1;
-        end
-      end
-
-    endtask
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // Evaluate the scoreboard's results
-      fork
-        scoreboard.post_rx_test();
-        scoreboard.post_tx_test();
-      join
+      this.adc_src_axis_agent.monitor.publisher.subscribe(this.scoreboard_rx.subscriber_source);
+      this.adc_dst_axi_pt_agent.monitor.publisher_tx.subscribe(this.scoreboard_rx.subscriber_sink);
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
-    task run;
-      //pre_test();
-      test();
+    task run();
+      fork
+        this.adc_src_axis_agent.sequencer.run();
+        this.dac_dst_axis_agent.sequencer.run();
+
+        this.adc_src_axis_agent.monitor.run();
+        this.dac_dst_axis_agent.monitor.run();
+        this.adc_dst_axi_pt_agent.monitor.run();
+        this.dac_src_axi_pt_agent.monitor.run();
+
+        this.scoreboard_tx.run();
+        this.scoreboard_rx.run();
+      join_none
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
-      adc_src_axis_seq.stop();
-      adc_src_axis_agent.stop_master();
-      dac_dst_axis_agent.stop_slave();
-      mng_agent.stop_master();
-      ddr_agent.stop_slave();
-      plddr_agent.stop_slave();
-      post_test();
+    task stop();
+      this.adc_src_axis_agent.sequencer.stop();
+      this.adc_src_axis_agent.agent.stop_master();
+      this.dac_dst_axis_agent.agent.stop_slave();
     endtask
 
   endclass

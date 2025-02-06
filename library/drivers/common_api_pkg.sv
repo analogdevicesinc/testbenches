@@ -45,7 +45,7 @@ package common_api_pkg;
 
   class common_api extends adi_peripheral;
 
-    bit reset_state;
+    protected logic [31:0] val;
 
     function new(
       input string name,

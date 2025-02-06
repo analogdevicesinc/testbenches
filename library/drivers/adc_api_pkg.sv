@@ -99,7 +99,7 @@ package adc_api_pkg;
         `SET_ADC_COMMON_REG_CNTRL_2_MANUAL_SYNC_REQUEST(manual_sync_request));
     endtask
 
-    task get_status(output logic status);
+    task get_sync_status(output logic status);
       this.axi_read(GetAddrs(ADC_COMMON_REG_SYNC_STATUS), val);
       status = `GET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(val);
     endtask

@@ -35,7 +35,7 @@
 
 `include "utils.svh"
 
-package clk_api_pkg;
+package clk_gen_api_pkg;
 
   import logger_pkg::*;
   import adi_peripheral_pkg::*;
@@ -43,7 +43,7 @@ package clk_api_pkg;
   import adi_regmap_pkg::*;
   import reg_accessor_pkg::*;
 
-  class clk_api extends adi_peripheral;
+  class clk_gen_api extends adi_peripheral;
 
     function new(
       input string name,
@@ -55,7 +55,7 @@ package clk_api_pkg;
     endfunction
 
 
-    task enable();
+    task enable_clkgen();
       this.axi_write(GetAddrs(AXI_CLKGEN_REG_RSTN),
         `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
         `SET_AXI_CLKGEN_REG_RSTN_RSTN(1));

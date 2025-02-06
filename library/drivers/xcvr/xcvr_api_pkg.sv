@@ -71,7 +71,7 @@ package xcvr_api_pkg;
       input logic bufstatus_rst,
       input logic resetn);
 
-      this.axi_read(GetAddrs(XCVR_RESETN),
+      this.axi_write(GetAddrs(XCVR_RESETN),
         `SET_XCVR_RESETN_BUFSTATUS_RST(bufstatus_rst) |
         `SET_XCVR_RESETN_RESETN(resetn));
     endtask
@@ -95,7 +95,7 @@ package xcvr_api_pkg;
       input logic [1:0] sysclk_sel,
       input logic [2:0] outclk_sel);
 
-      this.axi_read(GetAddrs(XCVR_CONTROL),
+      this.axi_write(GetAddrs(XCVR_CONTROL),
         `SET_XCVR_CONTROL_LPM_DFE_N(lpm_dfe_n) |
         `SET_XCVR_CONTROL_RATE(rate) |
         `SET_XCVR_CONTROL_SYSCLK_SEL(sysclk_sel) |

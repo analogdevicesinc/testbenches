@@ -45,6 +45,7 @@ package adi_regmap_axi_ad7616_pkg;
     "VERSION": '{ 31, 0, RO, 'h00001002 }}};
   `define SET_AXI_AD7616_REG_VERSION_VERSION(x) SetField(AXI_AD7616_REG_VERSION,"VERSION",x)
   `define GET_AXI_AD7616_REG_VERSION_VERSION(x) GetField(AXI_AD7616_REG_VERSION,"VERSION",x)
+  `define DEFAULT_AXI_AD7616_REG_VERSION_VERSION GetResetValue(AXI_AD7616_REG_VERSION,"VERSION")
 
   const reg_t AXI_AD7616_REG_ID = '{ 'h0404, "REG_ID" , '{
     "ID": '{ 31, 0, RO, 'h00000000 }}};

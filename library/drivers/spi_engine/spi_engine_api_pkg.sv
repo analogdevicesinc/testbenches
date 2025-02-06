@@ -70,7 +70,7 @@ package spi_engine_api_pkg;
       this.axi_verify(GetAddrs(AXI_SPI_ENGINE_SCRATCH), `GET_AXI_SPI_ENGINE_SCRATCH_SCRATCH(data));
     endtask
 
-    task enable();
+    task enable_spi_engine();
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
     endtask
 

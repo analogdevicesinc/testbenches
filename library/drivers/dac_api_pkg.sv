@@ -81,14 +81,14 @@ package dac_api_pkg;
     endtask
 
     task set_common_control_2(
-      input logic pin_mode,
-      input logic ddr_edgesel,
-      input logic r1_mode,
-      input logic sync,
+      input logic data_format,
       input logic [4:0] num_lanes,
+      input logic par_enb,
+      input logic par_type,
+      input logic r1_mode,
+      input logic sdr_ddr_n,
       input logic symb_8_16b,
-      input logic symb_op,
-      input logic sdr_ddr_n);
+      input logic symb_op);
 
       this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_2), 
         `SET_DAC_COMMON_REG_CNTRL_2_DATA_FORMAT(data_format) |
@@ -101,7 +101,7 @@ package dac_api_pkg;
         `SET_DAC_COMMON_REG_CNTRL_2_SYMB_OP(symb_op));
     endtask
 
-    task get_status(output logic status)
+    task get_status(output logic status);
       this.axi_read(GetAddrs(DAC_COMMON_REG_SYNC_STATUS), val);
       status = `GET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(val);
     endtask

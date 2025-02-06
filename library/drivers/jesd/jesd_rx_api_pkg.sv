@@ -104,22 +104,20 @@ package jesd_rx_api_pkg;
 
     task set_link_conf1(
       input logic char_replacement_disable,
-      input logic scrambler_disable);
+      input logic descrambler_disable);
 
       this.axi_write(GetAddrs(JESD_RX_LINK_CONF1),
         `SET_JESD_RX_LINK_CONF1_CHAR_REPLACEMENT_DISABLE(char_replacement_disable) |
-        `SET_JESD_RX_LINK_CONF1_SCRAMBLER_DISABLE(scrambler_disable));
+        `SET_JESD_RX_LINK_CONF1_DESCRAMBLER_DISABLE(descrambler_disable));
     endtask
 
     task set_link_conf2(
-      input logic skip_ilas,
-      input logic continuous_ilas,
-      input logic continuous_cgs);
+      input logic buffer_early_release,
+      input logic [9:0] buffer_delay);
 
       this.axi_write(GetAddrs(JESD_RX_LINK_CONF2),
-        `SET_JESD_RX_LINK_CONF2_SKIP_ILAS(skip_ilas) |
-        `SET_JESD_RX_LINK_CONF2_CONTINUOUS_ILAS(continuous_ilas) |
-        `SET_JESD_RX_LINK_CONF2_CONTINUOUS_CGS(continuous_cgs));
+        `SET_JESD_RX_LINK_CONF2_BUFFER_EARLY_RELEASE(buffer_early_release) |
+        `SET_JESD_RX_LINK_CONF2_BUFFER_DEALY(buffer_delay));
     endtask
 
     task set_link_conf4(input logic [7:0] tpl_beats_per_multiframe);

@@ -39,11 +39,13 @@ package ad7616_api_pkg;
 
   import logger_pkg::*;
   import adi_peripheral_pkg::*;
-  import adi_regmap_ad7616_pkg::*;
+  import adi_regmap_axi_ad7616_pkg::*;
   import adi_regmap_pkg::*;
   import reg_accessor_pkg::*;
 
   class ad7616_api extends adi_peripheral;
+
+    protected logic [31:0] val;
 
     function new(
       input string name,

@@ -72,7 +72,7 @@ package tdd_api_pkg;
       this.axi_verify(GetAddrs(TDDN_CNTRL_IDENTIFICATION), `DEFAULT_TDDN_CNTRL_IDENTIFICATION_IDENTIFICATION);
     endtask
 
-    task get_interface_description(output logic [31:0] enable);
+    task get_interface_description(output logic [31:0] description);
       this.axi_read(GetAddrs(TDDN_CNTRL_INTERFACE_DESCRIPTION), description);
     endtask
 
@@ -167,7 +167,7 @@ package tdd_api_pkg;
         `SET_TDDN_CNTRL_CONTROL_ENABLE(enable));
     endtask
 
-    task disable();
+    task disable_tdd();
       this.axi_write(GetAddrs(TDDN_CNTRL_CONTROL), `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
     endtask
 

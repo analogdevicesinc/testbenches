@@ -53,6 +53,8 @@ adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
 # Add test files to the project
 adi_sim_project_files [list \
+  "$ad_hdl_dir/library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh" \
+  "$ad_hdl_dir/library/i3c_controller/i3c_controller_core/i3c_controller_word.vh" \
   "tests/test_program.sv" \
 ]
 

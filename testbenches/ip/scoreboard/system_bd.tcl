@@ -56,10 +56,6 @@ set dac_offload_dst_dwidth $ad_project_params(DAC_OFFLOAD_DST_DWIDTH)
 
 set plddr_offload_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 
-set ddr_axi_pt_cfg [list \
- INTERFACE_MODE {PASS_THROUGH} \
-]
-
 ad_ip_instance xlconstant GND [list \
   CONST_VAL 0 \
 ]
@@ -149,13 +145,7 @@ for {set i 0} {$i < 2} {incr i} {
   ad_connect i_rx_dmac_${i}/s_axis_xfer_req RX_DUT_${i}/init_req
   ad_connect gnd RX_DUT_${i}/sync_ext
 
-  ad_ip_instance axi_vip adc_dst_axi_pt_${i} $ddr_axi_pt_cfg
-  adi_sim_add_define "ADC_DST_AXI_PT_${i}=adc_dst_axi_pt_${i}"
-
-  ad_connect i_rx_dmac_${i}/m_dest_axi adc_dst_axi_pt_${i}/S_AXI
-  
-  ad_mem_hp0_interconnect sys_mem_clk adc_dst_axi_pt_${i}/M_AXI
-  ad_connect sys_mem_resetn adc_dst_axi_pt_${i}/aresetn
+  ad_mem_hp0_interconnect sys_mem_clk i_rx_dmac_${i}/m_dest_axi
   
   ad_ip_instance axi4stream_vip dac_dst_axis_${i} [list \
     INTERFACE_MODE {SLAVE} \
@@ -183,11 +173,5 @@ for {set i 0} {$i < 2} {incr i} {
   ad_connect i_tx_dmac_${i}/m_axis_xfer_req TX_DUT_${i}/init_req
   ad_connect gnd TX_DUT_${i}/sync_ext
 
-  ad_ip_instance axi_vip dac_src_axi_pt_${i} $ddr_axi_pt_cfg
-  adi_sim_add_define "DAC_SRC_AXI_PT_${i}=dac_src_axi_pt_${i}"
-
-  ad_connect i_tx_dmac_${i}/m_src_axi dac_src_axi_pt_${i}/S_AXI
-  
-  ad_mem_hp0_interconnect sys_mem_clk dac_src_axi_pt_${i}/M_AXI
-  ad_connect sys_mem_resetn dac_src_axi_pt_${i}/aresetn
+  ad_mem_hp0_interconnect sys_mem_clk i_tx_dmac_${i}/m_src_axi
 }

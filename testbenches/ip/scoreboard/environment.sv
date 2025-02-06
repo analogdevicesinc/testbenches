@@ -18,13 +18,11 @@ package environment_pkg;
   import scoreboard_pkg::*;
 
 
-  class scoreboard_environment #(`AXIS_VIP_PARAM_DECL(adc_src), `AXIS_VIP_PARAM_DECL(dac_dst), `AXI_VIP_PARAM_DECL(adc_dst_pt), `AXI_VIP_PARAM_DECL(dac_src_pt)) extends adi_environment;
+  class scoreboard_environment #(`AXIS_VIP_PARAM_DECL(adc_src), `AXIS_VIP_PARAM_DECL(dac_dst)) extends adi_environment;
 
     // Agents
     adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(adc_src)) adc_src_axis_agent;
     adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(dac_dst)) dac_dst_axis_agent;
-    adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(adc_dst_pt)) adc_dst_axi_pt_agent;
-    adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAM_ORDER(dac_src_pt)) dac_src_axi_pt_agent;
 
     scoreboard #(logic [7:0]) scoreboard_tx;
     scoreboard #(logic [7:0]) scoreboard_rx;
@@ -36,17 +34,13 @@ package environment_pkg;
       input string name,
 
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(adc_src)) adc_src_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(dac_dst)) dac_dst_axis_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(adc_dst_pt)) adc_dst_axi_pt_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(dac_src_pt)) dac_src_axi_pt_vip_if);
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(dac_dst)) dac_dst_axis_vip_if);
 
       // creating the agents
       super.new(name);
 
       this.adc_src_axis_agent = new("ADC Source AXI Stream Agent", adc_src_axis_vip_if, this);
       this.dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", dac_dst_axis_vip_if, this);
-      this.adc_dst_axi_pt_agent = new("ADC Destination AXI Agent", adc_dst_axi_pt_vip_if, this);
-      this.dac_src_axi_pt_agent = new("DAC Source AXI Agent", dac_src_axi_pt_vip_if, this);
 
       this.scoreboard_tx = new("Data Offload TX Scoreboard", this);
       this.scoreboard_rx = new("Data Offload RX Scoreboard", this);
@@ -73,14 +67,10 @@ package environment_pkg;
     task start();
       this.adc_src_axis_agent.agent.start_master();
       this.dac_dst_axis_agent.agent.start_slave();
-      this.adc_dst_axi_pt_agent.agent.start_monitor();
-      this.dac_src_axi_pt_agent.agent.start_monitor();
 
-      this.dac_src_axi_pt_agent.monitor.publisher_rx.subscribe(this.scoreboard_tx.subscriber_source);
       this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
       this.adc_src_axis_agent.monitor.publisher.subscribe(this.scoreboard_rx.subscriber_source);
-      this.adc_dst_axi_pt_agent.monitor.publisher_tx.subscribe(this.scoreboard_rx.subscriber_sink);
     endtask
 
     //============================================================================
@@ -93,8 +83,6 @@ package environment_pkg;
 
         this.adc_src_axis_agent.monitor.run();
         this.dac_dst_axis_agent.monitor.run();
-        this.adc_dst_axi_pt_agent.monitor.run();
-        this.dac_src_axi_pt_agent.monitor.run();
 
         this.scoreboard_tx.run();
         this.scoreboard_rx.run();

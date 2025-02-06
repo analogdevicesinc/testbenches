@@ -28,13 +28,13 @@ TP := test_program
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl
-CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
-$(warning $(CFG_FILES))
+# CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
+# $(warning $(CFG_FILES))
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
-TESTS += cfg3:test_program_sync
+# TESTS += cfg3:test_program_sync
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 

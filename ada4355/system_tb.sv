@@ -49,7 +49,7 @@ module system_tb #(
   localparam BITS_PER_CYCLE = 2 * 2;
   //localparam CNV_HALF_PERIOD_COR = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
   //localparam CNV_HALF_PERIOD = `EN_UNCOR ? 4 * CNV_HALF_PERIOD_COR : CNV_HALF_PERIOD_COR;
-  localparam LATENCY = 3;                              
+  localparam LATENCY = 3;
 
   reg sync_n = 1'b0;
   reg ssi_clk = 1'b0;
@@ -58,8 +58,11 @@ module system_tb #(
   reg enable_pattern = 1'b0;
   reg dco_p = 1'b0;
   reg dco_n = 1'b1;
+  reg [7:0] frame_control = 8'b0;
   reg frame_clock_p = 1'b0;
   reg frame_clock_n = 1'b0;
+  reg late_signal_p = 1'b0;
+  reg late_signal_n = 1'b0;
 
   `TEST_PROGRAM test();
 
@@ -72,8 +75,9 @@ module system_tb #(
     .db_p (db_p),
     .db_n (db_n),
     .sync_n (sync_n),
-    .frame_clock_p(frame_clock_p),
-    .frame_clock_n(frame_clock_n)
+    .frame_control (frame_control),
+    .frame_clock_p (frame_clock_p),
+    .frame_clock_n (frame_clock_n)
   );
 
   reg sync_n_d = 1'b0;
@@ -85,8 +89,11 @@ module system_tb #(
   always @(*) dco_p <=  #3 ssi_clk;
   always @(*) dco_n <=  #3 ~ssi_clk;
 
-  always @(*) frame_clock_p <=  frame_clk;
-  always @(*) frame_clock_n <= ~frame_clk;
+ // always @(*) frame_clock_p <= (frame_control[1] == 1'b1) ? (frame_clk) : (late_signal_p);
+ // always @(*) frame_clock_n <= (frame_control[1] == 1'b1) ? (~frame_clk) :(late_signal_n);
+
+ always @(*) frame_clock_p <= frame_clk;
+ always @(*) frame_clock_n <= ~frame_clk;
 
   //
   // Clock generation
@@ -113,7 +120,6 @@ module system_tb #(
     end
   end
 
-
   initial begin
     #1;
     @(posedge sync_n_d);
@@ -123,6 +129,8 @@ module system_tb #(
     end
   end
 
+  always @(*) late_signal_p <= #3 div_clock;
+  always @(*) late_signal_n <= #3 ~div_clock;
   //
   // Data generation
   //
@@ -139,12 +147,6 @@ module system_tb #(
     repeat (LATENCY) @(posedge ssi_clk);
     fork
       begin
-        /*if (`EN_UNCOR) begin
-          // Drive uncorrected data
-          drive_sample({20{1'b1}});
-          drive_sample(~sample);
-          drive_sample({20{1'b0}});
-        end*/
          drive_sample(final_sample);
       end
     join_none
@@ -155,19 +157,21 @@ module system_tb #(
 //    end else begin
 //        sample =16'haaa8;
 //    end
-    
-    
-    
-    sample = ~sample;
-    
-    
+
+ if (sample == 16'hFFFF) begin
+        sample = 0;
+    end else begin
+        sample = sample + 2;
+    end
+
+   // sample = ~sample;
    // sample = {sample[18:0],sample[19]};
   end
 
   task automatic drive_sample(bit [15:0] sample_t);
     int num_lanes = 2;
     int bits_per_cycle = num_lanes * 2;
-    for (int i = 15; i >= 0; i=i-bits_per_cycle) begin // for (int i = 19; i >= 0;)
+    for (int i = 15; i >= 0; i=i-bits_per_cycle) begin
       @(negedge ssi_clk);
       #1;
       da_p <= sample_t[i];

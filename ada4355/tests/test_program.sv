@@ -130,9 +130,12 @@ program test_program;
 
     dma_test;
 
+    #7000
+    misaligned_frame;
+
     # 7000
     resync;
-    
+
     // Tap value for lane 0
     axi_write (RX1_DLY + 'h0,15);
     axi_write (RX1_DLY + 'h4,10);
@@ -191,8 +194,6 @@ program test_program;
   end
   endtask
 
-
-
 task resync;
 begin
 
@@ -204,6 +205,14 @@ begin
 end
 endtask
 
+task misaligned_frame;
+begin
+
+  //axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL_3),`SET_ADC_COMMON_REG_CNTRL_3_CUSTOM_CONTROL(1));
+  axi_write (RX1_COMMON+GetAddrs(ADC_COMMON_REG_CNTRL_3),31'h1);
+
+end
+endtask
 
   // --------------------------
 // Enable pattern

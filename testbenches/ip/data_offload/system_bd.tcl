@@ -56,10 +56,6 @@ set dac_offload_dst_dwidth $ad_project_params(DAC_OFFLOAD_DST_DWIDTH)
 
 set plddr_offload_data_width $ad_project_params(PLDDR_OFFLOAD_DATA_WIDTH)
 
-set ddr_axi_pt_cfg [list \
- INTERFACE_MODE {PASS_THROUGH} \
-]
-
 ad_ip_instance xlconstant GND [list \
   CONST_VAL 0 \
 ]
@@ -153,13 +149,7 @@ ad_connect sys_mem_resetn i_rx_dmac/m_dest_axi_aresetn
 ad_connect i_rx_dmac/s_axis_xfer_req RX_DUT/init_req
 ad_connect gnd RX_DUT/sync_ext
 
-ad_ip_instance axi_vip adc_dst_axi_pt $ddr_axi_pt_cfg
-adi_sim_add_define "ADC_DST_AXI_PT=adc_dst_axi_pt"
-
-ad_connect i_rx_dmac/m_dest_axi adc_dst_axi_pt/S_AXI
-
-ad_mem_hp0_interconnect sys_mem_clk adc_dst_axi_pt/M_AXI
-ad_connect sys_mem_resetn adc_dst_axi_pt/aresetn
+ad_mem_hp0_interconnect sys_mem_clk i_rx_dmac/m_dest_axi
 
 ad_ip_instance axi4stream_vip dac_dst_axis [list \
   INTERFACE_MODE {SLAVE} \
@@ -187,13 +177,7 @@ ad_connect TX_DUT/s_axis i_tx_dmac/m_axis
 ad_connect i_tx_dmac/m_axis_xfer_req TX_DUT/init_req
 ad_connect gnd TX_DUT/sync_ext
 
-ad_ip_instance axi_vip dac_src_axi_pt $ddr_axi_pt_cfg
-adi_sim_add_define "DAC_SRC_AXI_PT=dac_src_axi_pt"
-
-ad_connect i_tx_dmac/m_src_axi dac_src_axi_pt/S_AXI
-
-ad_mem_hp0_interconnect sys_mem_clk dac_src_axi_pt/M_AXI
-ad_connect sys_mem_resetn dac_src_axi_pt/aresetn
+ad_mem_hp0_interconnect sys_mem_clk i_tx_dmac/m_src_axi
 
 if {$adc_offload_mem_type} {
   set plddr_iname "RX_DUT"

@@ -50,8 +50,6 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 import `PKGIFY(test_harness, adc_src_axis)::*;
 import `PKGIFY(test_harness, dac_dst_axis)::*;
-import `PKGIFY(test_harness, adc_dst_axi_pt)::*;
-import `PKGIFY(test_harness, dac_src_axi_pt)::*;
 
 `define ADC_TRANSFER_LENGTH 32'h600
 
@@ -59,7 +57,7 @@ program test_program;
 
   // declare the class instances
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis), `AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt), `AXI_VIP_PARAMS(test_harness, dac_src_axi_pt)) scb_env;
+  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis)) scb_env;
 
   dmac_api dmac_tx;
   dmac_api dmac_rx;
@@ -80,9 +78,7 @@ program test_program;
 
     scb_env = new("Scoreboard Environment 0",
                   `TH.`ADC_SRC_AXIS.inst.IF,
-                  `TH.`DAC_DST_AXIS.inst.IF,
-                  `TH.`ADC_DST_AXI_PT.inst.IF,
-                  `TH.`DAC_SRC_AXI_PT.inst.IF);
+                  `TH.`DAC_DST_AXIS.inst.IF);
 
     dmac_tx = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA);
     dmac_rx = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA);
@@ -100,6 +96,9 @@ program test_program;
     
     base_env.start();
     scb_env.start();
+
+    base_env.ddr.monitor.publisher_rx.subscribe(scb_env.scoreboard_tx.subscriber_source);
+    base_env.ddr.monitor.publisher_tx.subscribe(scb_env.scoreboard_rx.subscriber_sink);
 
     base_env.sys_reset();
 

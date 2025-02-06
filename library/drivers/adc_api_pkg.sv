@@ -56,8 +56,15 @@ package adc_api_pkg;
       super.new(name, bus, base_address, parent);
     endfunction
 
-    task enable();
-      this.axi_write(GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    task reset(
+      input logic ce_n,
+      input logic mmcm_rstn,
+      input logic rstn);
+
+      this.axi_write(GetAddrs(ADC_COMMON_REG_RSTN),
+        `SET_ADC_COMMON_REG_RSTN_CE_N(ce_n) |
+        `SET_ADC_COMMON_REG_RSTN_MMCM_RSTN(mmcm_rstn) |
+        `SET_ADC_COMMON_REG_RSTN_RSTN(rstn));
     endtask
 
     task set_control_2(
@@ -101,6 +108,14 @@ package adc_api_pkg;
       this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL_3), 
         `SET_ADC_COMMON_REG_CNTRL_3_CRC_EN(crc_en) |
         `SET_ADC_COMMON_REG_CNTRL_3_CUSTOM_CONTROL(custom_control));
+    endtask
+
+    task enable_channel();
+      this.axi_write(GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+    endtask
+
+    task disable_channel();
+      this.axi_write(GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(0));
     endtask
 
   endclass

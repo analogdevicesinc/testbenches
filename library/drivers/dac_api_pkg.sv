@@ -78,6 +78,10 @@ package dac_api_pkg;
       status = `GET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(val);
     endtask
 
+    task set_control_7(input logic [3:0] dds_sel);
+      this.axi_write(GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7), `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(dds_sel));
+    endtask
+
   endclass
 
 endpackage

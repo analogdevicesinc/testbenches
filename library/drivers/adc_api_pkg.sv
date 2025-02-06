@@ -67,7 +67,28 @@ package adc_api_pkg;
         `SET_ADC_COMMON_REG_RSTN_RSTN(rstn));
     endtask
 
-    task set_control_2(
+    task set_common_control(
+      input logic pin_mode,
+      input logic ddr_edgesel,
+      input logic r1_mode,
+      input logic sync,
+      input logic [4:0] num_lanes,
+      input logic symb_8_16b,
+      input logic symb_op,
+      input logic sdr_ddr_n);
+
+      this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL), 
+        `SET_ADC_COMMON_REG_CNTRL_DDR_EDGESEL(ddr_edgesel) |
+        `SET_ADC_COMMON_REG_CNTRL_NUM_LANES(num_lanes) |
+        `SET_ADC_COMMON_REG_CNTRL_PIN_MODE(pin_mode) |
+        `SET_ADC_COMMON_REG_CNTRL_R1_MODE(r1_mode) |
+        `SET_ADC_COMMON_REG_CNTRL_SDR_DDR_N(sdr_ddr_n) |
+        `SET_ADC_COMMON_REG_CNTRL_SYMB_8_16B(symb_8_16b) |
+        `SET_ADC_COMMON_REG_CNTRL_SYMB_OP(symb_op) |
+        `SET_ADC_COMMON_REG_CNTRL_SYNC(sync));
+    endtask
+
+    task set_common_control_2(
       input logic ext_sync_arm,
       input logic ext_sync_disarm,
       input logic manual_sync_request);
@@ -101,7 +122,7 @@ package adc_api_pkg;
       cfg = `GET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(val);
     endtask
 
-    task set_control_3(
+    task set_common_control_3(
       input logic crc_en,
       input logic [7:0] custom_control);
 
@@ -116,6 +137,21 @@ package adc_api_pkg;
 
     task disable_channel();
       this.axi_write(GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(0));
+    endtask
+
+    task get_status(
+      output logic adc_ctrl_status,
+      output logic status,
+      output logic over_range,
+      output logic pn_oos,
+      output logic pn_err);
+
+      this.axi_read(GetAddrs(ADC_COMMON_REG_STATUS), val);
+      adc_ctrl_status = `GET_ADC_COMMON_REG_STATUS_ADC_CTRL_STATUS(val);
+      status = `GET_ADC_COMMON_REG_STATUS_PN_ERR(val);
+      over_range = `GET_ADC_COMMON_REG_STATUS_PN_OOS(val);
+      pn_oos = `GET_ADC_COMMON_REG_STATUS_OVER_RANGE(val);
+      pn_err = `GET_ADC_COMMON_REG_STATUS_STATUS(val);
     endtask
 
   endclass

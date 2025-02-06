@@ -67,6 +67,35 @@ package common_api_pkg;
       this.axi_verify(GetAddrs(COMMON_REG_SCRATCH), `GET_COMMON_REG_SCRATCH_SCRATCH(data));
     endtask
 
+    task set_config(
+      output logic rd_raw_data,
+      output logic ext_sync,
+      output logic scalecorrection_only,
+      output logic pps_receiver_enable,
+      output logic cmos_or_lvds_n,
+      output logic dds_disable,
+      output logic delay_control_disable,
+      output logic mode_1r1t,
+      output logic userports_disable,
+      output logic dataformat_disable,
+      output logic dcfilter_disable,
+      output logic iqcorrection_disable);
+
+      this.axi_read(GetAddrs(COMMON_REG_CONFIG), val);
+      cmos_or_lvds_n = `GET_COMMON_REG_CONFIG_CMOS_OR_LVDS_N(val);
+      dataformat_disable = `GET_COMMON_REG_CONFIG_DATAFORMAT_DISABLE(val);
+      dcfilter_disable = `GET_COMMON_REG_CONFIG_DCFILTER_DISABLE(val);
+      dds_disable = `GET_COMMON_REG_CONFIG_DDS_DISABLE(val);
+      delay_control_disable = `GET_COMMON_REG_CONFIG_DELAY_CONTROL_DISABLE(val);
+      ext_sync = `GET_COMMON_REG_CONFIG_EXT_SYNC(val);
+      iqcorrection_disable = `GET_COMMON_REG_CONFIG_IQCORRECTION_DISABLE(val);
+      mode_1r1t = `GET_COMMON_REG_CONFIG_MODE_1R1T(val);
+      pps_receiver_enable = `GET_COMMON_REG_CONFIG_PPS_RECEIVER_ENABLE(val);
+      rd_raw_data = `GET_COMMON_REG_CONFIG_RD_RAW_DATA(val);
+      scalecorrection_only = `GET_COMMON_REG_CONFIG_SCALECORRECTION_ONLY(val);
+      userports_disable = `GET_COMMON_REG_CONFIG_USERPORTS_DISABLE(val);
+    endtask
+
   endclass
 
 endpackage

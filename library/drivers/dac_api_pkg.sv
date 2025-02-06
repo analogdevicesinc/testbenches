@@ -56,11 +56,18 @@ package dac_api_pkg;
       super.new(name, bus, base_address, parent);
     endfunction
 
-    task enable();
-      this.axi_write(GetAddrs(DAC_COMMON_REG_RSTN), `SET_DAC_COMMON_REG_RSTN_RSTN(1));
+    task reset(
+      input logic ce_n,
+      input logic mmcm_rstn,
+      input logic rstn);
+
+      this.axi_write(GetAddrs(DAC_COMMON_REG_RSTN),
+        `SET_DAC_COMMON_REG_RSTN_CE_N(ce_n) |
+        `SET_DAC_COMMON_REG_RSTN_MMCM_RSTN(mmcm_rstn) |
+        `SET_DAC_COMMON_REG_RSTN_RSTN(rstn));
     endtask
 
-    task set_control_1(
+    task set_common_control_1(
       input logic sync,
       input logic ext_sync_arm,
       input logic ext_sync_disarm,
@@ -73,13 +80,56 @@ package dac_api_pkg;
         `SET_DAC_COMMON_REG_CNTRL_1_MANUAL_SYNC_REQUEST(manual_sync_request));
     endtask
 
+    task set_common_control_2(
+      input logic pin_mode,
+      input logic ddr_edgesel,
+      input logic r1_mode,
+      input logic sync,
+      input logic [4:0] num_lanes,
+      input logic symb_8_16b,
+      input logic symb_op,
+      input logic sdr_ddr_n);
+
+      this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_2), 
+        `SET_DAC_COMMON_REG_CNTRL_2_DATA_FORMAT(data_format) |
+        `SET_DAC_COMMON_REG_CNTRL_2_NUM_LANES(num_lanes) |
+        `SET_DAC_COMMON_REG_CNTRL_2_PAR_ENB(par_enb) |
+        `SET_DAC_COMMON_REG_CNTRL_2_PAR_TYPE(par_type) |
+        `SET_DAC_COMMON_REG_CNTRL_2_R1_MODE(r1_mode) |
+        `SET_DAC_COMMON_REG_CNTRL_2_SDR_DDR_N(sdr_ddr_n) |
+        `SET_DAC_COMMON_REG_CNTRL_2_SYMB_8_16B(symb_8_16b) |
+        `SET_DAC_COMMON_REG_CNTRL_2_SYMB_OP(symb_op));
+    endtask
+
     task get_status(output logic status)
       this.axi_read(GetAddrs(DAC_COMMON_REG_SYNC_STATUS), val);
       status = `GET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(val);
     endtask
+    
+    task set_channel_control_1(
+      input logic [5:0] dds_phase_dw,
+      input logic [15:0] dds_scale_1);
 
-    task set_control_7(input logic [3:0] dds_sel);
+      this.axi_write(GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
+        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_PHASE_DW(dds_phase_dw) |
+        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(dds_scale_1));
+    endtask
+
+    task set_channel_control_2(
+      input logic [15:0] dds_init_1,
+      input logic [15:0] dds_incr_1);
+
+      this.axi_write(GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
+        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INIT_1(dds_init_1) |
+        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(dds_incr_1));
+    endtask
+
+    task set_channel_control_7(input logic [3:0] dds_sel);
       this.axi_write(GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7), `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(dds_sel));
+    endtask
+
+    task set_rate(input logic [7:0] rate);
+      this.axi_write(GetAddrs(DAC_COMMON_REG_RATECNTRL), `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate-1));
     endtask
 
   endclass

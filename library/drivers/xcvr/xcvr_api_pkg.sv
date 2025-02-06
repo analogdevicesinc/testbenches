@@ -67,6 +67,15 @@ package xcvr_api_pkg;
       this.axi_verify(GetAddrs(XCVR_SCRATCH), `GET_XCVR_SCRATCH_SCRATCH(data));
     endtask
 
+    task reset(
+      input logic bufstatus_rst,
+      input logic resetn);
+
+      this.axi_read(GetAddrs(XCVR_RESETN),
+        `SET_XCVR_RESETN_BUFSTATUS_RST(bufstatus_rst) |
+        `SET_XCVR_RESETN_RESETN(resetn));
+    endtask
+
     task get_control(
       output logic lpm_dfe_n,
       output logic [2:0] rate,
@@ -91,32 +100,6 @@ package xcvr_api_pkg;
         `SET_XCVR_CONTROL_RATE(rate) |
         `SET_XCVR_CONTROL_SYSCLK_SEL(sysclk_sel) |
         `SET_XCVR_CONTROL_OUTCLK_SEL(outclk_sel));
-    endtask
-
-    
-
-
-
-    task enable();
-      this.axi_write(GetAddrs(DAC_COMMON_REG_RSTN), `SET_DAC_COMMON_REG_RSTN_RSTN(1));
-    endtask
-
-    task set_control_1(
-      input logic sync,
-      input logic ext_sync_arm,
-      input logic ext_sync_disarm,
-      input logic manual_sync_request);
-
-      this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_1), 
-        `SET_DAC_COMMON_REG_CNTRL_1_SYNC(sync) |
-        `SET_DAC_COMMON_REG_CNTRL_1_EXT_SYNC_ARM(ext_sync_arm) |
-        `SET_DAC_COMMON_REG_CNTRL_1_EXT_SYNC_DISARM(ext_sync_disarm) |
-        `SET_DAC_COMMON_REG_CNTRL_1_MANUAL_SYNC_REQUEST(manual_sync_request));
-    endtask
-
-    task get_status(output logic status)
-      this.axi_read(GetAddrs(DAC_COMMON_REG_SYNC_STATUS), val);
-      status = `GET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(val);
     endtask
 
   endclass

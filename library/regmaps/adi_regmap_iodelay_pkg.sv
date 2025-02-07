@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_iodelay_pkg;
   import logger_pkg::*;
@@ -68,7 +68,7 @@ package adi_regmap_iodelay_pkg;
       super.new(name, address, parent);
 
       for (int i=0; i<16; i++) begin
-        this.DELAY_CONTROL_n_R[i] = new($sformatf("DELAY_CONTROL_%0d", i), 'h0 + i * 4, this);
+        this.DELAY_CONTROL_n_R[i] = new($sformatf("DELAY_CONTROL_%0d", i), 'h0 + 'h1 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

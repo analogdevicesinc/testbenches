@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_i3c_controller_pkg;
   import logger_pkg::*;
@@ -535,10 +535,10 @@ package adi_regmap_i3c_controller_pkg;
       this.IBI_CONFIG_R = new("IBI_CONFIG", 'h140, this);
       this.DEV_CHAR_R = new("DEV_CHAR", 'h180, this);
       for (int i=0; i<16; i++) begin
-        this.OFFLOAD_CMD_n_R[i] = new($sformatf("OFFLOAD_CMD_%0d", i), 'h2c0 + i * 4, this);
+        this.OFFLOAD_CMD_n_R[i] = new($sformatf("OFFLOAD_CMD_%0d", i), 'h2c0 + 'h1 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.OFFLOAD_SDO_n_R[i] = new($sformatf("OFFLOAD_SDO_%0d", i), 'h300 + i * 4, this);
+        this.OFFLOAD_SDO_n_R[i] = new($sformatf("OFFLOAD_SDO_%0d", i), 'h300 + 'h1 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

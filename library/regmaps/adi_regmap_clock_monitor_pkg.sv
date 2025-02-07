@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Feb 07 11:48:47 2025 v0.4.1 */
 
 package adi_regmap_clock_monitor_pkg;
   import logger_pkg::*;
@@ -126,22 +126,7 @@ package adi_regmap_clock_monitor_pkg;
     ID_CLASS ID_R;
     NUM_OF_CLOCKS_CLASS NUM_OF_CLOCKS_R;
     OUT_RESET_CLASS OUT_RESET_R;
-    CLOCK_n_CLASS CLOCK_0_R;
-    CLOCK_n_CLASS CLOCK_1_R;
-    CLOCK_n_CLASS CLOCK_2_R;
-    CLOCK_n_CLASS CLOCK_3_R;
-    CLOCK_n_CLASS CLOCK_4_R;
-    CLOCK_n_CLASS CLOCK_5_R;
-    CLOCK_n_CLASS CLOCK_6_R;
-    CLOCK_n_CLASS CLOCK_7_R;
-    CLOCK_n_CLASS CLOCK_8_R;
-    CLOCK_n_CLASS CLOCK_9_R;
-    CLOCK_n_CLASS CLOCK_10_R;
-    CLOCK_n_CLASS CLOCK_11_R;
-    CLOCK_n_CLASS CLOCK_12_R;
-    CLOCK_n_CLASS CLOCK_13_R;
-    CLOCK_n_CLASS CLOCK_14_R;
-    CLOCK_n_CLASS CLOCK_15_R;
+    CLOCK_n_CLASS CLOCK_n_R [15:0];
 
     function new(
       input string name,
@@ -154,22 +139,9 @@ package adi_regmap_clock_monitor_pkg;
       this.ID_R = new("ID", 'h4, this);
       this.NUM_OF_CLOCKS_R = new("NUM_OF_CLOCKS", 'hc, this);
       this.OUT_RESET_R = new("OUT_RESET", 'h10, this);
-      this.CLOCK_0_R = new("CLOCK_0", 'h40, this);
-      this.CLOCK_1_R = new("CLOCK_1", 'h44, this);
-      this.CLOCK_2_R = new("CLOCK_2", 'h48, this);
-      this.CLOCK_3_R = new("CLOCK_3", 'h4c, this);
-      this.CLOCK_4_R = new("CLOCK_4", 'h50, this);
-      this.CLOCK_5_R = new("CLOCK_5", 'h54, this);
-      this.CLOCK_6_R = new("CLOCK_6", 'h58, this);
-      this.CLOCK_7_R = new("CLOCK_7", 'h5c, this);
-      this.CLOCK_8_R = new("CLOCK_8", 'h60, this);
-      this.CLOCK_9_R = new("CLOCK_9", 'h64, this);
-      this.CLOCK_10_R = new("CLOCK_10", 'h68, this);
-      this.CLOCK_11_R = new("CLOCK_11", 'h6c, this);
-      this.CLOCK_12_R = new("CLOCK_12", 'h70, this);
-      this.CLOCK_13_R = new("CLOCK_13", 'h74, this);
-      this.CLOCK_14_R = new("CLOCK_14", 'h78, this);
-      this.CLOCK_15_R = new("CLOCK_15", 'h7c, this);
+      for (int i=0; i<16; i++) begin
+        this.CLOCK_n_R[i] = new($sformatf("CLOCK_%0d", i), 'h40 + i * 4, this);
+      end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new

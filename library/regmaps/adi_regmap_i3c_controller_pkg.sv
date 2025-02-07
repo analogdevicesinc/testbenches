@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:17 2025 v0.3.55 */
+/* Feb 07 11:48:47 2025 v0.4.1 */
 
 package adi_regmap_i3c_controller_pkg;
   import logger_pkg::*;
@@ -502,38 +502,8 @@ package adi_regmap_i3c_controller_pkg;
     OPS_CLASS OPS_R;
     IBI_CONFIG_CLASS IBI_CONFIG_R;
     DEV_CHAR_CLASS DEV_CHAR_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_0_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_1_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_2_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_3_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_4_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_5_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_6_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_7_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_8_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_9_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_10_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_11_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_12_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_13_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_14_R;
-    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_15_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_0_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_1_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_2_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_3_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_4_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_5_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_6_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_7_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_8_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_9_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_10_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_11_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_12_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_13_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_14_R;
-    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_15_R;
+    OFFLOAD_CMD_n_CLASS OFFLOAD_CMD_n_R [15:0];
+    OFFLOAD_SDO_n_CLASS OFFLOAD_SDO_n_R [15:0];
 
     function new(
       input string name,
@@ -564,38 +534,12 @@ package adi_regmap_i3c_controller_pkg;
       this.OPS_R = new("OPS", 'h100, this);
       this.IBI_CONFIG_R = new("IBI_CONFIG", 'h140, this);
       this.DEV_CHAR_R = new("DEV_CHAR", 'h180, this);
-      this.OFFLOAD_CMD_0_R = new("OFFLOAD_CMD_0", 'h2c0, this);
-      this.OFFLOAD_CMD_1_R = new("OFFLOAD_CMD_1", 'h2c4, this);
-      this.OFFLOAD_CMD_2_R = new("OFFLOAD_CMD_2", 'h2c8, this);
-      this.OFFLOAD_CMD_3_R = new("OFFLOAD_CMD_3", 'h2cc, this);
-      this.OFFLOAD_CMD_4_R = new("OFFLOAD_CMD_4", 'h2d0, this);
-      this.OFFLOAD_CMD_5_R = new("OFFLOAD_CMD_5", 'h2d4, this);
-      this.OFFLOAD_CMD_6_R = new("OFFLOAD_CMD_6", 'h2d8, this);
-      this.OFFLOAD_CMD_7_R = new("OFFLOAD_CMD_7", 'h2dc, this);
-      this.OFFLOAD_CMD_8_R = new("OFFLOAD_CMD_8", 'h2e0, this);
-      this.OFFLOAD_CMD_9_R = new("OFFLOAD_CMD_9", 'h2e4, this);
-      this.OFFLOAD_CMD_10_R = new("OFFLOAD_CMD_10", 'h2e8, this);
-      this.OFFLOAD_CMD_11_R = new("OFFLOAD_CMD_11", 'h2ec, this);
-      this.OFFLOAD_CMD_12_R = new("OFFLOAD_CMD_12", 'h2f0, this);
-      this.OFFLOAD_CMD_13_R = new("OFFLOAD_CMD_13", 'h2f4, this);
-      this.OFFLOAD_CMD_14_R = new("OFFLOAD_CMD_14", 'h2f8, this);
-      this.OFFLOAD_CMD_15_R = new("OFFLOAD_CMD_15", 'h2fc, this);
-      this.OFFLOAD_SDO_0_R = new("OFFLOAD_SDO_0", 'h300, this);
-      this.OFFLOAD_SDO_1_R = new("OFFLOAD_SDO_1", 'h304, this);
-      this.OFFLOAD_SDO_2_R = new("OFFLOAD_SDO_2", 'h308, this);
-      this.OFFLOAD_SDO_3_R = new("OFFLOAD_SDO_3", 'h30c, this);
-      this.OFFLOAD_SDO_4_R = new("OFFLOAD_SDO_4", 'h310, this);
-      this.OFFLOAD_SDO_5_R = new("OFFLOAD_SDO_5", 'h314, this);
-      this.OFFLOAD_SDO_6_R = new("OFFLOAD_SDO_6", 'h318, this);
-      this.OFFLOAD_SDO_7_R = new("OFFLOAD_SDO_7", 'h31c, this);
-      this.OFFLOAD_SDO_8_R = new("OFFLOAD_SDO_8", 'h320, this);
-      this.OFFLOAD_SDO_9_R = new("OFFLOAD_SDO_9", 'h324, this);
-      this.OFFLOAD_SDO_10_R = new("OFFLOAD_SDO_10", 'h328, this);
-      this.OFFLOAD_SDO_11_R = new("OFFLOAD_SDO_11", 'h32c, this);
-      this.OFFLOAD_SDO_12_R = new("OFFLOAD_SDO_12", 'h330, this);
-      this.OFFLOAD_SDO_13_R = new("OFFLOAD_SDO_13", 'h334, this);
-      this.OFFLOAD_SDO_14_R = new("OFFLOAD_SDO_14", 'h338, this);
-      this.OFFLOAD_SDO_15_R = new("OFFLOAD_SDO_15", 'h33c, this);
+      for (int i=0; i<16; i++) begin
+        this.OFFLOAD_CMD_n_R[i] = new($sformatf("OFFLOAD_CMD_%0d", i), 'h2c0 + i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.OFFLOAD_SDO_n_R[i] = new($sformatf("OFFLOAD_SDO_%0d", i), 'h300 + i * 4, this);
+      end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new

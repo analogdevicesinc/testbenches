@@ -139,7 +139,7 @@ package adi_api_pkg;
 
     function new(
       input string name,
-      input int addr,
+      input int address,
       input adi_api parent = null);
 
       super.new(name, parent);

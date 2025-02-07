@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:16 2025 v0.3.55 */
+/* Feb 07 11:48:47 2025 v0.4.1 */
 
 package adi_regmap_pwm_gen_pkg;
   import logger_pkg::*;
@@ -215,54 +215,9 @@ package adi_regmap_pwm_gen_pkg;
     RSTN_CLASS RSTN_R;
     CONFIG_CLASS CONFIG_R;
     NB_PULSES_CLASS NB_PULSES_R;
-    PULSE_n_PERIOD_CLASS PULSE_0_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_1_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_2_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_3_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_4_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_5_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_6_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_7_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_8_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_9_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_10_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_11_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_12_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_13_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_14_PERIOD_R;
-    PULSE_n_PERIOD_CLASS PULSE_15_PERIOD_R;
-    PULSE_n_WIDTH_CLASS PULSE_0_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_1_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_2_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_3_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_4_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_5_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_6_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_7_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_8_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_9_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_10_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_11_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_12_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_13_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_14_WIDTH_R;
-    PULSE_n_WIDTH_CLASS PULSE_15_WIDTH_R;
-    PULSE_n_OFFSET_CLASS PULSE_0_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_1_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_2_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_3_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_4_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_5_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_6_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_7_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_8_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_9_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_10_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_11_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_12_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_13_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_14_OFFSET_R;
-    PULSE_n_OFFSET_CLASS PULSE_15_OFFSET_R;
+    PULSE_n_PERIOD_CLASS PULSE_n_PERIOD_R [15:0];
+    PULSE_n_WIDTH_CLASS PULSE_n_WIDTH_R [15:0];
+    PULSE_n_OFFSET_CLASS PULSE_n_OFFSET_R [15:0];
 
     function new(
       input string name,
@@ -278,54 +233,15 @@ package adi_regmap_pwm_gen_pkg;
       this.RSTN_R = new("RSTN", 'h10, this);
       this.CONFIG_R = new("CONFIG", 'h18, this);
       this.NB_PULSES_R = new("NB_PULSES", 'h14, this);
-      this.PULSE_0_PERIOD_R = new("PULSE_0_PERIOD", 'h40, this);
-      this.PULSE_1_PERIOD_R = new("PULSE_1_PERIOD", 'h44, this);
-      this.PULSE_2_PERIOD_R = new("PULSE_2_PERIOD", 'h48, this);
-      this.PULSE_3_PERIOD_R = new("PULSE_3_PERIOD", 'h4c, this);
-      this.PULSE_4_PERIOD_R = new("PULSE_4_PERIOD", 'h50, this);
-      this.PULSE_5_PERIOD_R = new("PULSE_5_PERIOD", 'h54, this);
-      this.PULSE_6_PERIOD_R = new("PULSE_6_PERIOD", 'h58, this);
-      this.PULSE_7_PERIOD_R = new("PULSE_7_PERIOD", 'h5c, this);
-      this.PULSE_8_PERIOD_R = new("PULSE_8_PERIOD", 'h60, this);
-      this.PULSE_9_PERIOD_R = new("PULSE_9_PERIOD", 'h64, this);
-      this.PULSE_10_PERIOD_R = new("PULSE_10_PERIOD", 'h68, this);
-      this.PULSE_11_PERIOD_R = new("PULSE_11_PERIOD", 'h6c, this);
-      this.PULSE_12_PERIOD_R = new("PULSE_12_PERIOD", 'h70, this);
-      this.PULSE_13_PERIOD_R = new("PULSE_13_PERIOD", 'h74, this);
-      this.PULSE_14_PERIOD_R = new("PULSE_14_PERIOD", 'h78, this);
-      this.PULSE_15_PERIOD_R = new("PULSE_15_PERIOD", 'h7c, this);
-      this.PULSE_0_WIDTH_R = new("PULSE_0_WIDTH", 'h80, this);
-      this.PULSE_1_WIDTH_R = new("PULSE_1_WIDTH", 'h84, this);
-      this.PULSE_2_WIDTH_R = new("PULSE_2_WIDTH", 'h88, this);
-      this.PULSE_3_WIDTH_R = new("PULSE_3_WIDTH", 'h8c, this);
-      this.PULSE_4_WIDTH_R = new("PULSE_4_WIDTH", 'h90, this);
-      this.PULSE_5_WIDTH_R = new("PULSE_5_WIDTH", 'h94, this);
-      this.PULSE_6_WIDTH_R = new("PULSE_6_WIDTH", 'h98, this);
-      this.PULSE_7_WIDTH_R = new("PULSE_7_WIDTH", 'h9c, this);
-      this.PULSE_8_WIDTH_R = new("PULSE_8_WIDTH", 'ha0, this);
-      this.PULSE_9_WIDTH_R = new("PULSE_9_WIDTH", 'ha4, this);
-      this.PULSE_10_WIDTH_R = new("PULSE_10_WIDTH", 'ha8, this);
-      this.PULSE_11_WIDTH_R = new("PULSE_11_WIDTH", 'hac, this);
-      this.PULSE_12_WIDTH_R = new("PULSE_12_WIDTH", 'hb0, this);
-      this.PULSE_13_WIDTH_R = new("PULSE_13_WIDTH", 'hb4, this);
-      this.PULSE_14_WIDTH_R = new("PULSE_14_WIDTH", 'hb8, this);
-      this.PULSE_15_WIDTH_R = new("PULSE_15_WIDTH", 'hbc, this);
-      this.PULSE_0_OFFSET_R = new("PULSE_0_OFFSET", 'hc0, this);
-      this.PULSE_1_OFFSET_R = new("PULSE_1_OFFSET", 'hc4, this);
-      this.PULSE_2_OFFSET_R = new("PULSE_2_OFFSET", 'hc8, this);
-      this.PULSE_3_OFFSET_R = new("PULSE_3_OFFSET", 'hcc, this);
-      this.PULSE_4_OFFSET_R = new("PULSE_4_OFFSET", 'hd0, this);
-      this.PULSE_5_OFFSET_R = new("PULSE_5_OFFSET", 'hd4, this);
-      this.PULSE_6_OFFSET_R = new("PULSE_6_OFFSET", 'hd8, this);
-      this.PULSE_7_OFFSET_R = new("PULSE_7_OFFSET", 'hdc, this);
-      this.PULSE_8_OFFSET_R = new("PULSE_8_OFFSET", 'he0, this);
-      this.PULSE_9_OFFSET_R = new("PULSE_9_OFFSET", 'he4, this);
-      this.PULSE_10_OFFSET_R = new("PULSE_10_OFFSET", 'he8, this);
-      this.PULSE_11_OFFSET_R = new("PULSE_11_OFFSET", 'hec, this);
-      this.PULSE_12_OFFSET_R = new("PULSE_12_OFFSET", 'hf0, this);
-      this.PULSE_13_OFFSET_R = new("PULSE_13_OFFSET", 'hf4, this);
-      this.PULSE_14_OFFSET_R = new("PULSE_14_OFFSET", 'hf8, this);
-      this.PULSE_15_OFFSET_R = new("PULSE_15_OFFSET", 'hfc, this);
+      for (int i=0; i<16; i++) begin
+        this.PULSE_n_PERIOD_R[i] = new($sformatf("PULSE_%0d_PERIOD", i), 'h40 + i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.PULSE_n_WIDTH_R[i] = new($sformatf("PULSE_%0d_WIDTH", i), 'h80 + i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.PULSE_n_OFFSET_R[i] = new($sformatf("PULSE_%0d_OFFSET", i), 'hc0 + i * 4, this);
+      end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new

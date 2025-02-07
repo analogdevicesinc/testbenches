@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -35,45 +35,61 @@
 /* Auto generated Register Map */
 /* Feb 07 11:48:47 2025 v0.4.1 */
 
-package adi_regmap_iodelay_pkg;
-  import logger_pkg::*;
-  import adi_api_pkg::*;
+`timescale 1ns/1ps
 
-  class adi_regmap_iodelay extends adi_regmap;
+`ifndef _ADI_REGMAP_FAN_CONTROL_PKG_DEFINITIONS_SVH_
+`define _ADI_REGMAP_FAN_CONTROL_PKG_DEFINITIONS_SVH_
 
-    /* IO Delay Control (axi_ad*) */
-    class DELAY_CONTROL_n_CLASS extends register_base;
-      field_base DELAY_CONTROL_IO_n_F;
+// Help build VIP Interface parameters name
+`define ADI_REGMAP_FAN_CONTROL_PKG_PARAM_IMPORT(n)  n``.inst.ID, \
+  n``.inst.INTERNAL_SYSMONE, \
+  n``.inst.PWM_PERIOD, \
+  n``.inst.TACHO_T100, \
+  n``.inst.TACHO_T25, \
+  n``.inst.TACHO_T50, \
+  n``.inst.TACHO_T75, \
+  n``.inst.TACHO_TOL_PERCENT, \
+  n``.inst.TEMP_00_H, \
+  n``.inst.TEMP_100_L, \
+  n``.inst.TEMP_25_H, \
+  n``.inst.TEMP_25_L, \
+  n``.inst.TEMP_50_H, \
+  n``.inst.TEMP_50_L, \
+  n``.inst.TEMP_75_H, \
+  n``.inst.TEMP_75_L
 
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
+`define ADI_REGMAP_FAN_CONTROL_PKG_PARAM_DECL int  ID, \
+  INTERNAL_SYSMONE, \
+  PWM_PERIOD, \
+  TACHO_T100, \
+  TACHO_T25, \
+  TACHO_T50, \
+  TACHO_T75, \
+  TACHO_TOL_PERCENT, \
+  TEMP_00_H, \
+  TEMP_100_L, \
+  TEMP_25_H, \
+  TEMP_25_L, \
+  TEMP_50_H, \
+  TEMP_50_L, \
+  TEMP_75_H, \
+  TEMP_75_L
 
-        super.new(name, address, parent);
+`define ADI_REGMAP_FAN_CONTROL_PKG_PARAM_ORDER  ID, \
+  INTERNAL_SYSMONE, \
+  PWM_PERIOD, \
+  TACHO_T100, \
+  TACHO_T25, \
+  TACHO_T50, \
+  TACHO_T75, \
+  TACHO_TOL_PERCENT, \
+  TEMP_00_H, \
+  TEMP_100_L, \
+  TEMP_25_H, \
+  TEMP_25_L, \
+  TEMP_50_H, \
+  TEMP_50_L, \
+  TEMP_75_H, \
+  TEMP_75_L
 
-        this.DELAY_CONTROL_IO_n_F = new("DELAY_CONTROL_IO_n", 4, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: DELAY_CONTROL_n_CLASS
-
-    DELAY_CONTROL_n_CLASS DELAY_CONTROL_n_R [15:0];
-
-    function new(
-      input string name,
-      input int address,
-      input adi_api parent = null);
-
-      super.new(name, address, parent);
-
-      for (int i=0; i<16; i++) begin
-        this.DELAY_CONTROL_n_R[i] = new($sformatf("DELAY_CONTROL_%0d", i), 'h0 + i * 4, this);
-      end
-
-      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
-    endfunction: new
-
-  endclass: adi_regmap_iodelay
-
-endpackage: adi_regmap_iodelay_pkg
+`endif

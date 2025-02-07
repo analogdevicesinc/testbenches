@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:17 2025 v0.3.55 */
+/* Feb 07 11:48:47 2025 v0.4.1 */
 
 package adi_regmap_tdd_gen_pkg;
   import logger_pkg::*;
@@ -362,70 +362,8 @@ package adi_regmap_tdd_gen_pkg;
     SYNC_PERIOD_LOW_CLASS SYNC_PERIOD_LOW_R;
     SYNC_PERIOD_HIGH_CLASS SYNC_PERIOD_HIGH_R;
     STATUS_CLASS STATUS_R;
-    CHn_ON_CLASS CH0_ON_R;
-    CHn_ON_CLASS CH1_ON_R;
-    CHn_ON_CLASS CH2_ON_R;
-    CHn_ON_CLASS CH3_ON_R;
-    CHn_ON_CLASS CH4_ON_R;
-    CHn_ON_CLASS CH5_ON_R;
-    CHn_ON_CLASS CH6_ON_R;
-    CHn_ON_CLASS CH7_ON_R;
-    CHn_ON_CLASS CH8_ON_R;
-    CHn_ON_CLASS CH9_ON_R;
-    CHn_ON_CLASS CH10_ON_R;
-    CHn_ON_CLASS CH11_ON_R;
-    CHn_ON_CLASS CH12_ON_R;
-    CHn_ON_CLASS CH13_ON_R;
-    CHn_ON_CLASS CH14_ON_R;
-    CHn_ON_CLASS CH15_ON_R;
-    CHn_ON_CLASS CH16_ON_R;
-    CHn_ON_CLASS CH17_ON_R;
-    CHn_ON_CLASS CH18_ON_R;
-    CHn_ON_CLASS CH19_ON_R;
-    CHn_ON_CLASS CH20_ON_R;
-    CHn_ON_CLASS CH21_ON_R;
-    CHn_ON_CLASS CH22_ON_R;
-    CHn_ON_CLASS CH23_ON_R;
-    CHn_ON_CLASS CH24_ON_R;
-    CHn_ON_CLASS CH25_ON_R;
-    CHn_ON_CLASS CH26_ON_R;
-    CHn_ON_CLASS CH27_ON_R;
-    CHn_ON_CLASS CH28_ON_R;
-    CHn_ON_CLASS CH29_ON_R;
-    CHn_ON_CLASS CH30_ON_R;
-    CHn_ON_CLASS CH31_ON_R;
-    CHn_OFF_CLASS CH0_OFF_R;
-    CHn_OFF_CLASS CH1_OFF_R;
-    CHn_OFF_CLASS CH2_OFF_R;
-    CHn_OFF_CLASS CH3_OFF_R;
-    CHn_OFF_CLASS CH4_OFF_R;
-    CHn_OFF_CLASS CH5_OFF_R;
-    CHn_OFF_CLASS CH6_OFF_R;
-    CHn_OFF_CLASS CH7_OFF_R;
-    CHn_OFF_CLASS CH8_OFF_R;
-    CHn_OFF_CLASS CH9_OFF_R;
-    CHn_OFF_CLASS CH10_OFF_R;
-    CHn_OFF_CLASS CH11_OFF_R;
-    CHn_OFF_CLASS CH12_OFF_R;
-    CHn_OFF_CLASS CH13_OFF_R;
-    CHn_OFF_CLASS CH14_OFF_R;
-    CHn_OFF_CLASS CH15_OFF_R;
-    CHn_OFF_CLASS CH16_OFF_R;
-    CHn_OFF_CLASS CH17_OFF_R;
-    CHn_OFF_CLASS CH18_OFF_R;
-    CHn_OFF_CLASS CH19_OFF_R;
-    CHn_OFF_CLASS CH20_OFF_R;
-    CHn_OFF_CLASS CH21_OFF_R;
-    CHn_OFF_CLASS CH22_OFF_R;
-    CHn_OFF_CLASS CH23_OFF_R;
-    CHn_OFF_CLASS CH24_OFF_R;
-    CHn_OFF_CLASS CH25_OFF_R;
-    CHn_OFF_CLASS CH26_OFF_R;
-    CHn_OFF_CLASS CH27_OFF_R;
-    CHn_OFF_CLASS CH28_OFF_R;
-    CHn_OFF_CLASS CH29_OFF_R;
-    CHn_OFF_CLASS CH30_OFF_R;
-    CHn_OFF_CLASS CH31_OFF_R;
+    CHn_ON_CLASS CHn_ON_R [31:0];
+    CHn_OFF_CLASS CHn_OFF_R [31:0];
 
     function new(
       input string name,
@@ -458,70 +396,12 @@ package adi_regmap_tdd_gen_pkg;
       this.SYNC_PERIOD_LOW_R = new("SYNC_PERIOD_LOW", 'h58, this);
       this.SYNC_PERIOD_HIGH_R = new("SYNC_PERIOD_HIGH", 'h5c, this);
       this.STATUS_R = new("STATUS", 'h60, this);
-      this.CH0_ON_R = new("CH0_ON", 'h80, this);
-      this.CH1_ON_R = new("CH1_ON", 'h88, this);
-      this.CH2_ON_R = new("CH2_ON", 'h90, this);
-      this.CH3_ON_R = new("CH3_ON", 'h98, this);
-      this.CH4_ON_R = new("CH4_ON", 'ha0, this);
-      this.CH5_ON_R = new("CH5_ON", 'ha8, this);
-      this.CH6_ON_R = new("CH6_ON", 'hb0, this);
-      this.CH7_ON_R = new("CH7_ON", 'hb8, this);
-      this.CH8_ON_R = new("CH8_ON", 'hc0, this);
-      this.CH9_ON_R = new("CH9_ON", 'hc8, this);
-      this.CH10_ON_R = new("CH10_ON", 'hd0, this);
-      this.CH11_ON_R = new("CH11_ON", 'hd8, this);
-      this.CH12_ON_R = new("CH12_ON", 'he0, this);
-      this.CH13_ON_R = new("CH13_ON", 'he8, this);
-      this.CH14_ON_R = new("CH14_ON", 'hf0, this);
-      this.CH15_ON_R = new("CH15_ON", 'hf8, this);
-      this.CH16_ON_R = new("CH16_ON", 'h100, this);
-      this.CH17_ON_R = new("CH17_ON", 'h108, this);
-      this.CH18_ON_R = new("CH18_ON", 'h110, this);
-      this.CH19_ON_R = new("CH19_ON", 'h118, this);
-      this.CH20_ON_R = new("CH20_ON", 'h120, this);
-      this.CH21_ON_R = new("CH21_ON", 'h128, this);
-      this.CH22_ON_R = new("CH22_ON", 'h130, this);
-      this.CH23_ON_R = new("CH23_ON", 'h138, this);
-      this.CH24_ON_R = new("CH24_ON", 'h140, this);
-      this.CH25_ON_R = new("CH25_ON", 'h148, this);
-      this.CH26_ON_R = new("CH26_ON", 'h150, this);
-      this.CH27_ON_R = new("CH27_ON", 'h158, this);
-      this.CH28_ON_R = new("CH28_ON", 'h160, this);
-      this.CH29_ON_R = new("CH29_ON", 'h168, this);
-      this.CH30_ON_R = new("CH30_ON", 'h170, this);
-      this.CH31_ON_R = new("CH31_ON", 'h178, this);
-      this.CH0_OFF_R = new("CH0_OFF", 'h84, this);
-      this.CH1_OFF_R = new("CH1_OFF", 'h8c, this);
-      this.CH2_OFF_R = new("CH2_OFF", 'h94, this);
-      this.CH3_OFF_R = new("CH3_OFF", 'h9c, this);
-      this.CH4_OFF_R = new("CH4_OFF", 'ha4, this);
-      this.CH5_OFF_R = new("CH5_OFF", 'hac, this);
-      this.CH6_OFF_R = new("CH6_OFF", 'hb4, this);
-      this.CH7_OFF_R = new("CH7_OFF", 'hbc, this);
-      this.CH8_OFF_R = new("CH8_OFF", 'hc4, this);
-      this.CH9_OFF_R = new("CH9_OFF", 'hcc, this);
-      this.CH10_OFF_R = new("CH10_OFF", 'hd4, this);
-      this.CH11_OFF_R = new("CH11_OFF", 'hdc, this);
-      this.CH12_OFF_R = new("CH12_OFF", 'he4, this);
-      this.CH13_OFF_R = new("CH13_OFF", 'hec, this);
-      this.CH14_OFF_R = new("CH14_OFF", 'hf4, this);
-      this.CH15_OFF_R = new("CH15_OFF", 'hfc, this);
-      this.CH16_OFF_R = new("CH16_OFF", 'h104, this);
-      this.CH17_OFF_R = new("CH17_OFF", 'h10c, this);
-      this.CH18_OFF_R = new("CH18_OFF", 'h114, this);
-      this.CH19_OFF_R = new("CH19_OFF", 'h11c, this);
-      this.CH20_OFF_R = new("CH20_OFF", 'h124, this);
-      this.CH21_OFF_R = new("CH21_OFF", 'h12c, this);
-      this.CH22_OFF_R = new("CH22_OFF", 'h134, this);
-      this.CH23_OFF_R = new("CH23_OFF", 'h13c, this);
-      this.CH24_OFF_R = new("CH24_OFF", 'h144, this);
-      this.CH25_OFF_R = new("CH25_OFF", 'h14c, this);
-      this.CH26_OFF_R = new("CH26_OFF", 'h154, this);
-      this.CH27_OFF_R = new("CH27_OFF", 'h15c, this);
-      this.CH28_OFF_R = new("CH28_OFF", 'h164, this);
-      this.CH29_OFF_R = new("CH29_OFF", 'h16c, this);
-      this.CH30_OFF_R = new("CH30_OFF", 'h174, this);
-      this.CH31_OFF_R = new("CH31_OFF", 'h17c, this);
+      for (int i=0; i<32; i++) begin
+        this.CHn_ON_R[i] = new($sformatf("CH%0d_ON", i), 'h80 + i * 4, this);
+      end
+      for (int i=0; i<32; i++) begin
+        this.CHn_OFF_R[i] = new($sformatf("CH%0d_OFF", i), 'h84 + i * 4, this);
+      end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new

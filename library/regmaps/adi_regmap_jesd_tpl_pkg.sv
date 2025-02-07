@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Jan 28 13:30:17 2025 v0.3.55 */
+/* Feb 07 11:48:47 2025 v0.4.1 */
 
 package adi_regmap_jesd_tpl_pkg;
   import logger_pkg::*;
@@ -116,12 +116,8 @@ package adi_regmap_jesd_tpl_pkg;
 
     TPL_CNTRL_CLASS TPL_CNTRL_R;
     TPL_STATUS_CLASS TPL_STATUS_R;
-    TPL_DESCRIPTORn_1_CLASS TPL_DESCRIPTOR0_1_R;
-    TPL_DESCRIPTORn_1_CLASS TPL_DESCRIPTOR1_1_R;
-    TPL_DESCRIPTORn_1_CLASS TPL_DESCRIPTOR2_1_R;
-    TPL_DESCRIPTORn_2_CLASS TPL_DESCRIPTOR0_2_R;
-    TPL_DESCRIPTORn_2_CLASS TPL_DESCRIPTOR1_2_R;
-    TPL_DESCRIPTORn_2_CLASS TPL_DESCRIPTOR2_2_R;
+    TPL_DESCRIPTORn_1_CLASS TPL_DESCRIPTORn_1_R [2:0];
+    TPL_DESCRIPTORn_2_CLASS TPL_DESCRIPTORn_2_R [2:0];
 
     function new(
       input string name,
@@ -132,12 +128,12 @@ package adi_regmap_jesd_tpl_pkg;
 
       this.TPL_CNTRL_R = new("TPL_CNTRL", 'h200, this);
       this.TPL_STATUS_R = new("TPL_STATUS", 'h204, this);
-      this.TPL_DESCRIPTOR0_1_R = new("TPL_DESCRIPTOR0_1", 'h240, this);
-      this.TPL_DESCRIPTOR1_1_R = new("TPL_DESCRIPTOR1_1", 'h248, this);
-      this.TPL_DESCRIPTOR2_1_R = new("TPL_DESCRIPTOR2_1", 'h250, this);
-      this.TPL_DESCRIPTOR0_2_R = new("TPL_DESCRIPTOR0_2", 'h244, this);
-      this.TPL_DESCRIPTOR1_2_R = new("TPL_DESCRIPTOR1_2", 'h24c, this);
-      this.TPL_DESCRIPTOR2_2_R = new("TPL_DESCRIPTOR2_2", 'h254, this);
+      for (int i=0; i<3; i++) begin
+        this.TPL_DESCRIPTORn_1_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_1", i), 'h240 + i * 4, this);
+      end
+      for (int i=0; i<3; i++) begin
+        this.TPL_DESCRIPTORn_2_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_2", i), 'h244 + i * 4, this);
+      end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new

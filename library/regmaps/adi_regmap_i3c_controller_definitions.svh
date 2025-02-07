@@ -35,45 +35,16 @@
 /* Auto generated Register Map */
 /* Feb 07 11:48:47 2025 v0.4.1 */
 
-package adi_regmap_iodelay_pkg;
-  import logger_pkg::*;
-  import adi_api_pkg::*;
+`timescale 1ns/1ps
 
-  class adi_regmap_iodelay extends adi_regmap;
+`ifndef _ADI_REGMAP_I3C_CONTROLLER_PKG_DEFINITIONS_SVH_
+`define _ADI_REGMAP_I3C_CONTROLLER_PKG_DEFINITIONS_SVH_
 
-    /* IO Delay Control (axi_ad*) */
-    class DELAY_CONTROL_n_CLASS extends register_base;
-      field_base DELAY_CONTROL_IO_n_F;
+// Help build VIP Interface parameters name
+`define ADI_REGMAP_I3C_CONTROLLER_PKG_PARAM_IMPORT(n)  n``.inst.ID
 
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
+`define ADI_REGMAP_I3C_CONTROLLER_PKG_PARAM_DECL int  ID
 
-        super.new(name, address, parent);
+`define ADI_REGMAP_I3C_CONTROLLER_PKG_PARAM_ORDER  ID
 
-        this.DELAY_CONTROL_IO_n_F = new("DELAY_CONTROL_IO_n", 4, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: DELAY_CONTROL_n_CLASS
-
-    DELAY_CONTROL_n_CLASS DELAY_CONTROL_n_R [15:0];
-
-    function new(
-      input string name,
-      input int address,
-      input adi_api parent = null);
-
-      super.new(name, address, parent);
-
-      for (int i=0; i<16; i++) begin
-        this.DELAY_CONTROL_n_R[i] = new($sformatf("DELAY_CONTROL_%0d", i), 'h0 + i * 4, this);
-      end
-
-      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
-    endfunction: new
-
-  endclass: adi_regmap_iodelay
-
-endpackage: adi_regmap_iodelay_pkg
+`endif

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -82,7 +82,7 @@ module test_program(
 
     env.src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
     for (int i = 0; i < `SRC_TRANSFERS_INITIAL_COUNT; i++)
-      env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
+      env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
 
     env.dst_axis_seq.set_mode(`DST_READY_MODE);
     env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
@@ -132,7 +132,7 @@ module test_program(
     #100
 
     for (int i = 0; i < `SRC_TRANSFERS_DELAYED_COUNT; i++)
-      env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
+      env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
 
     if (!`OFFLOAD_ONESHOT) begin
       env.src_axis_seq.wait_empty_descriptor_queue();

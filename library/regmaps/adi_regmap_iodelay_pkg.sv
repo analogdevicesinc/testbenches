@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,34 +33,47 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_iodelay_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_iodelay extends adi_regmap;
 
-/* IO Delay Control (axi_ad*) */
+    /* IO Delay Control (axi_ad*) */
+    class DELAY_CONTROL_n_CLASS extends register_base;
+      field_base DELAY_CONTROL_IO_n_F;
 
-  const reg_t IO_DELAY_CNTRL_REG_DELAY_CONTROL_0 = '{ 'h0000, "REG_DELAY_CONTROL_0" , '{
-    "DELAY_CONTROL_IO_0": '{ 4, 0, RW, 'h00 }}};
-  `define SET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0(x) SetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0",x)
-  `define GET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0(x) GetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0",x)
-  `define DEFAULT_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0 GetResetValue(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0")
-  `define UPDATE_IO_DELAY_CNTRL_REG_DELAY_CONTROL_0_DELAY_CONTROL_IO_0(x,y) UpdateField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_0,"DELAY_CONTROL_IO_0",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t IO_DELAY_CNTRL_REG_DELAY_CONTROL_1 = '{ 'h0004, "REG_DELAY_CONTROL_1" , '{
-    "DELAY_CONTROL_IO_1": '{ 4, 0, RW, 'h00 }}};
-  `define SET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1(x) SetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1",x)
-  `define GET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1(x) GetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1",x)
-  `define DEFAULT_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1 GetResetValue(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1")
-  `define UPDATE_IO_DELAY_CNTRL_REG_DELAY_CONTROL_1_DELAY_CONTROL_IO_1(x,y) UpdateField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_1,"DELAY_CONTROL_IO_1",x,y)
+        super.new(name, address, parent);
 
-  const reg_t IO_DELAY_CNTRL_REG_DELAY_CONTROL_F = '{ 'h003c, "REG_DELAY_CONTROL_F" , '{
-    "DELAY_CONTROL_IO_F": '{ 4, 0, RW, 'h00 }}};
-  `define SET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F(x) SetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F",x)
-  `define GET_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F(x) GetField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F",x)
-  `define DEFAULT_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F GetResetValue(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F")
-  `define UPDATE_IO_DELAY_CNTRL_REG_DELAY_CONTROL_F_DELAY_CONTROL_IO_F(x,y) UpdateField(IO_DELAY_CNTRL_REG_DELAY_CONTROL_F,"DELAY_CONTROL_IO_F",x,y)
+        this.DELAY_CONTROL_IO_n_F = new("DELAY_CONTROL_IO_n", 4, 0, RW, 'h0, this);
 
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DELAY_CONTROL_n_CLASS
 
-endpackage
+    DELAY_CONTROL_n_CLASS DELAY_CONTROL_n_R [15:0];
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      for (int i=0; i<16; i++) begin
+        this.DELAY_CONTROL_n_R[i] = new($sformatf("DELAY_CONTROL_%0d", i), 'h0 + 'h1 * i * 4, this);
+      end
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_iodelay
+
+endpackage: adi_regmap_iodelay_pkg

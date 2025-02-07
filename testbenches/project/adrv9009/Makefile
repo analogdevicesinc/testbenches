@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2018(c) Analog Devices, Inc.
+## Copyright (C) 2018 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -18,14 +18,12 @@ SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_adc_pkg.sv
 
 LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_dmac
-LIB_DEPS += axi_sysid
 LIB_DEPS += jesd204/ad_ip_jesd204_tpl_dac
 LIB_DEPS += jesd204/axi_jesd204_tx
 LIB_DEPS += jesd204/jesd204_tx
 LIB_DEPS += jesd204/ad_ip_jesd204_tpl_adc
 LIB_DEPS += jesd204/axi_jesd204_rx
 LIB_DEPS += jesd204/jesd204_rx
-LIB_DEPS += sysid_rom
 LIB_DEPS += util_dacfifo
 LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += util_pack/util_upack2

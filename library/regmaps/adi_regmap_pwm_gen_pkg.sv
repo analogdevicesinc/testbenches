@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,81 +33,219 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Tue Apr  9 06:15:30 2024 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_pwm_gen_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_pwm_gen extends adi_regmap;
 
-/* PWM Generator (axi_pwm_gen) */
+    /* PWM Generator (axi_pwm_gen) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_F;
 
-  const reg_t AXI_PWM_GEN_REG_VERSION = '{ 'h0000, "REG_VERSION" , '{
-    "VERSION": '{ 31, 0, RO, 'h00010100 }}};
-  `define SET_AXI_PWM_GEN_REG_VERSION_VERSION(x) SetField(AXI_PWM_GEN_REG_VERSION,"VERSION",x)
-  `define GET_AXI_PWM_GEN_REG_VERSION_VERSION(x) GetField(AXI_PWM_GEN_REG_VERSION,"VERSION",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_VERSION_VERSION GetResetValue(AXI_PWM_GEN_REG_VERSION,"VERSION")
-  `define UPDATE_AXI_PWM_GEN_REG_VERSION_VERSION(x,y) UpdateField(AXI_PWM_GEN_REG_VERSION,"VERSION",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_PWM_GEN_REG_ID = '{ 'h0004, "REG_ID" , '{
-    "ID": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_PWM_GEN_REG_ID_ID(x) SetField(AXI_PWM_GEN_REG_ID,"ID",x)
-  `define GET_AXI_PWM_GEN_REG_ID_ID(x) GetField(AXI_PWM_GEN_REG_ID,"ID",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_ID_ID GetResetValue(AXI_PWM_GEN_REG_ID,"ID")
-  `define UPDATE_AXI_PWM_GEN_REG_ID_ID(x,y) UpdateField(AXI_PWM_GEN_REG_ID,"ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_PWM_GEN_REG_SCRATCH = '{ 'h0008, "REG_SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_PWM_GEN_REG_SCRATCH_SCRATCH(x) SetField(AXI_PWM_GEN_REG_SCRATCH,"SCRATCH",x)
-  `define GET_AXI_PWM_GEN_REG_SCRATCH_SCRATCH(x) GetField(AXI_PWM_GEN_REG_SCRATCH,"SCRATCH",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_SCRATCH_SCRATCH GetResetValue(AXI_PWM_GEN_REG_SCRATCH,"SCRATCH")
-  `define UPDATE_AXI_PWM_GEN_REG_SCRATCH_SCRATCH(x,y) UpdateField(AXI_PWM_GEN_REG_SCRATCH,"SCRATCH",x,y)
+        this.VERSION_F = new("VERSION", 31, 0, RO, 'h20101, this);
 
-  const reg_t AXI_PWM_GEN_REG_CORE_MAGIC = '{ 'h000c, "REG_CORE_MAGIC" , '{
-    "CORE_MAGIC": '{ 31, 0, RW, 'h504C5347 }}};
-  `define SET_AXI_PWM_GEN_REG_CORE_MAGIC_CORE_MAGIC(x) SetField(AXI_PWM_GEN_REG_CORE_MAGIC,"CORE_MAGIC",x)
-  `define GET_AXI_PWM_GEN_REG_CORE_MAGIC_CORE_MAGIC(x) GetField(AXI_PWM_GEN_REG_CORE_MAGIC,"CORE_MAGIC",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_CORE_MAGIC_CORE_MAGIC GetResetValue(AXI_PWM_GEN_REG_CORE_MAGIC,"CORE_MAGIC")
-  `define UPDATE_AXI_PWM_GEN_REG_CORE_MAGIC_CORE_MAGIC(x,y) UpdateField(AXI_PWM_GEN_REG_CORE_MAGIC,"CORE_MAGIC",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
 
-  const reg_t AXI_PWM_GEN_REG_RSTN = '{ 'h0010, "REG_RSTN" , '{
-    "LOAD_CONFIG": '{ 1, 1, WO, 'h0 },
-    "RESET": '{ 0, 0, RW, 'h0 }}};
-  `define SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(x) SetField(AXI_PWM_GEN_REG_RSTN,"LOAD_CONFIG",x)
-  `define GET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(x) GetField(AXI_PWM_GEN_REG_RSTN,"LOAD_CONFIG",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG GetResetValue(AXI_PWM_GEN_REG_RSTN,"LOAD_CONFIG")
-  `define UPDATE_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(x,y) UpdateField(AXI_PWM_GEN_REG_RSTN,"LOAD_CONFIG",x,y)
-  `define SET_AXI_PWM_GEN_REG_RSTN_RESET(x) SetField(AXI_PWM_GEN_REG_RSTN,"RESET",x)
-  `define GET_AXI_PWM_GEN_REG_RSTN_RESET(x) GetField(AXI_PWM_GEN_REG_RSTN,"RESET",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_RSTN_RESET GetResetValue(AXI_PWM_GEN_REG_RSTN,"RESET")
-  `define UPDATE_AXI_PWM_GEN_REG_RSTN_RESET(x,y) UpdateField(AXI_PWM_GEN_REG_RSTN,"RESET",x,y)
+    class ID_CLASS extends register_base;
+      field_base ID_F;
 
-  const reg_t AXI_PWM_GEN_REG_NB_PULSES = '{ 'h0014, "REG_NB_PULSES" , '{
-    "NB_PULSES": '{ 31, 0, RO, 'h0000 }}};
-  `define SET_AXI_PWM_GEN_REG_NB_PULSES_NB_PULSES(x) SetField(AXI_PWM_GEN_REG_NB_PULSES,"NB_PULSES",x)
-  `define GET_AXI_PWM_GEN_REG_NB_PULSES_NB_PULSES(x) GetField(AXI_PWM_GEN_REG_NB_PULSES,"NB_PULSES",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_NB_PULSES_NB_PULSES GetResetValue(AXI_PWM_GEN_REG_NB_PULSES,"NB_PULSES")
-  `define UPDATE_AXI_PWM_GEN_REG_NB_PULSES_NB_PULSES(x,y) UpdateField(AXI_PWM_GEN_REG_NB_PULSES,"NB_PULSES",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_PWM_GEN_REG_PULSE_X_PERIOD = '{ 'h0040, "REG_PULSE_X_PERIOD" , '{
-    "PULSE_X_PERIOD": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(x) SetField(AXI_PWM_GEN_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD",x)
-  `define GET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(x) GetField(AXI_PWM_GEN_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD GetResetValue(AXI_PWM_GEN_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD")
-  `define UPDATE_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(x,y) UpdateField(AXI_PWM_GEN_REG_PULSE_X_PERIOD,"PULSE_X_PERIOD",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_PWM_GEN_REG_PULSE_X_WIDTH = '{ 'h0080, "REG_PULSE_X_WIDTH" , '{
-    "PULSE_X_WIDTH": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(x) SetField(AXI_PWM_GEN_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH",x)
-  `define GET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(x) GetField(AXI_PWM_GEN_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH GetResetValue(AXI_PWM_GEN_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH")
-  `define UPDATE_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(x,y) UpdateField(AXI_PWM_GEN_REG_PULSE_X_WIDTH,"PULSE_X_WIDTH",x,y)
+        this.ID_F = new("ID", 31, 0, RO, 'h0, this);
 
-  const reg_t AXI_PWM_GEN_REG_PULSE_X_OFFSET = '{ 'h00c0, "REG_PULSE_X_OFFSET" , '{
-    "PULSE_X_OFFSET": '{ 31, 0, RW, 'h0000 }}};
-  `define SET_AXI_PWM_GEN_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(x) SetField(AXI_PWM_GEN_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET",x)
-  `define GET_AXI_PWM_GEN_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(x) GetField(AXI_PWM_GEN_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET",x)
-  `define DEFAULT_AXI_PWM_GEN_REG_PULSE_X_OFFSET_PULSE_X_OFFSET GetResetValue(AXI_PWM_GEN_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET")
-  `define UPDATE_AXI_PWM_GEN_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(x,y) UpdateField(AXI_PWM_GEN_REG_PULSE_X_OFFSET,"PULSE_X_OFFSET",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ID_CLASS
 
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
 
-endpackage
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
+
+    class CORE_MAGIC_CLASS extends register_base;
+      field_base CORE_MAGIC_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CORE_MAGIC_F = new("CORE_MAGIC", 31, 0, RW, 'h504c5347, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CORE_MAGIC_CLASS
+
+    class RSTN_CLASS extends register_base;
+      field_base LOAD_CONFIG_F;
+      field_base RESET_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.LOAD_CONFIG_F = new("LOAD_CONFIG", 1, 1, WO, 'h0, this);
+        this.RESET_F = new("RESET", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: RSTN_CLASS
+
+    class CONFIG_CLASS extends register_base;
+      field_base EXT_SYNC_ALIGN_F;
+      field_base FORCE_ALIGN_F;
+      field_base START_AT_SYNC_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.EXT_SYNC_ALIGN_F = new("EXT_SYNC_ALIGN", 2, 2, RW, 'h0, this);
+        this.FORCE_ALIGN_F = new("FORCE_ALIGN", 1, 1, RW, 'h0, this);
+        this.START_AT_SYNC_F = new("START_AT_SYNC", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CONFIG_CLASS
+
+    class NB_PULSES_CLASS extends register_base;
+      field_base NB_PULSES_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.NB_PULSES_F = new("NB_PULSES", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: NB_PULSES_CLASS
+
+    class PULSE_n_PERIOD_CLASS extends register_base;
+      field_base PULSE_PERIOD_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PULSE_PERIOD_F = new("PULSE_PERIOD", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PULSE_n_PERIOD_CLASS
+
+    class PULSE_n_WIDTH_CLASS extends register_base;
+      field_base PULSE_WIDTH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PULSE_WIDTH_F = new("PULSE_WIDTH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PULSE_n_WIDTH_CLASS
+
+    class PULSE_n_OFFSET_CLASS extends register_base;
+      field_base PULSE_OFFSET_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PULSE_OFFSET_F = new("PULSE_OFFSET", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PULSE_n_OFFSET_CLASS
+
+    VERSION_CLASS VERSION_R;
+    ID_CLASS ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    CORE_MAGIC_CLASS CORE_MAGIC_R;
+    RSTN_CLASS RSTN_R;
+    CONFIG_CLASS CONFIG_R;
+    NB_PULSES_CLASS NB_PULSES_R;
+    PULSE_n_PERIOD_CLASS PULSE_n_PERIOD_R [15:0];
+    PULSE_n_WIDTH_CLASS PULSE_n_WIDTH_R [15:0];
+    PULSE_n_OFFSET_CLASS PULSE_n_OFFSET_R [15:0];
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.CORE_MAGIC_R = new("CORE_MAGIC", 'hc, this);
+      this.RSTN_R = new("RSTN", 'h10, this);
+      this.CONFIG_R = new("CONFIG", 'h18, this);
+      this.NB_PULSES_R = new("NB_PULSES", 'h14, this);
+      for (int i=0; i<16; i++) begin
+        this.PULSE_n_PERIOD_R[i] = new($sformatf("PULSE_%0d_PERIOD", i), 'h40 + 'h1 * i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.PULSE_n_WIDTH_R[i] = new($sformatf("PULSE_%0d_WIDTH", i), 'h80 + 'h1 * i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.PULSE_n_OFFSET_R[i] = new($sformatf("PULSE_%0d_OFFSET", i), 'hc0 + 'h1 * i * 4, this);
+      end
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_pwm_gen
+
+endpackage: adi_regmap_pwm_gen_pkg

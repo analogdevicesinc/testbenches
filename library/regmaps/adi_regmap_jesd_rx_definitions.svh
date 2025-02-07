@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,28 +26,25 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
+/* Auto generated Register Map */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
-`ifndef _INTERFACES_SVH_
-`define _INTERFACES_SVH_
+`timescale 1ns/1ps
 
-interface clk_if ();
-  logic clk;
+`ifndef _ADI_REGMAP_JESD_RX_PKG_DEFINITIONS_SVH_
+`define _ADI_REGMAP_JESD_RX_PKG_DEFINITIONS_SVH_
 
-  task start_clock(int clk_period);
-    clk = 1'b1;
-    fork
-      forever begin
-        #((clk_period / 2)*1ps);
-        clk = ~clk;
-      end
-    join_none
-  endtask: start_clock
-endinterface: clk_if
+// Help build VIP Interface parameters name
+`define ADI_REGMAP_JESD_RX_PKG_PARAM_IMPORT(n)  n``.inst.ASYNC_CLK
+
+`define ADI_REGMAP_JESD_RX_PKG_PARAM_DECL int  ASYNC_CLK
+
+`define ADI_REGMAP_JESD_RX_PKG_PARAM_ORDER  ASYNC_CLK
 
 `endif

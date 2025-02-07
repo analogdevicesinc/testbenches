@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,58 +26,70 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
+/* Auto generated Register Map */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
-`include "utils.svh"
+`timescale 1ns/1ps
 
-package s_spi_sequencer_pkg;
+`ifndef _ADI_REGMAP_FAN_CONTROL_PKG_DEFINITIONS_SVH_
+`define _ADI_REGMAP_FAN_CONTROL_PKG_DEFINITIONS_SVH_
 
-  import logger_pkg::*;
-  import adi_spi_vip_pkg::*;
+// Help build VIP Interface parameters name
+`define ADI_REGMAP_FAN_CONTROL_PKG_PARAM_IMPORT(n)  n``.inst.ID, \
+  n``.inst.INTERNAL_SYSMONE, \
+  n``.inst.PWM_PERIOD, \
+  n``.inst.TACHO_T100, \
+  n``.inst.TACHO_T25, \
+  n``.inst.TACHO_T50, \
+  n``.inst.TACHO_T75, \
+  n``.inst.TACHO_TOL_PERCENT, \
+  n``.inst.TEMP_00_H, \
+  n``.inst.TEMP_100_L, \
+  n``.inst.TEMP_25_H, \
+  n``.inst.TEMP_25_L, \
+  n``.inst.TEMP_50_H, \
+  n``.inst.TEMP_50_L, \
+  n``.inst.TEMP_75_H, \
+  n``.inst.TEMP_75_L
 
-  class s_spi_sequencer #(`SPI_VIP_PARAM_ORDER) extends adi_component;
+`define ADI_REGMAP_FAN_CONTROL_PKG_PARAM_DECL int  ID, \
+  INTERNAL_SYSMONE, \
+  PWM_PERIOD, \
+  TACHO_T100, \
+  TACHO_T25, \
+  TACHO_T50, \
+  TACHO_T75, \
+  TACHO_TOL_PERCENT, \
+  TEMP_00_H, \
+  TEMP_100_L, \
+  TEMP_25_H, \
+  TEMP_25_L, \
+  TEMP_50_H, \
+  TEMP_50_L, \
+  TEMP_75_H, \
+  TEMP_75_L
 
-    protected adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent;
+`define ADI_REGMAP_FAN_CONTROL_PKG_PARAM_ORDER  ID, \
+  INTERNAL_SYSMONE, \
+  PWM_PERIOD, \
+  TACHO_T100, \
+  TACHO_T25, \
+  TACHO_T50, \
+  TACHO_T75, \
+  TACHO_TOL_PERCENT, \
+  TEMP_00_H, \
+  TEMP_100_L, \
+  TEMP_25_H, \
+  TEMP_25_L, \
+  TEMP_50_H, \
+  TEMP_50_L, \
+  TEMP_75_H, \
+  TEMP_75_L
 
-    function new(
-      input string name,
-      input adi_spi_agent #(`SPI_VIP_PARAM_ORDER) agent,
-      input adi_component parent = null);
-
-      super.new(name, parent);
-
-      this.agent = agent;
-    endfunction: new
-
-    virtual task automatic send_data(input int unsigned data);
-      this.agent.send_data(data);
-    endtask : send_data
-
-    virtual task automatic receive_data(output int unsigned data);
-      this.agent.receive_data(data);
-    endtask : receive_data
-
-    virtual task automatic receive_data_verify(input int unsigned expected);
-      int unsigned received;
-      this.agent.receive_data(received);
-      if (received !== expected) begin
-        this.error($sformatf("Data mismatch. Received : %h; expected %h", received, expected));
-      end
-    endtask : receive_data_verify
-
-    virtual task flush_send();
-      this.agent.flush_send();
-    endtask : flush_send
-
-    virtual function void set_default_miso_data(input int unsigned data);
-      this.agent.set_default_miso_data(data);
-    endfunction : set_default_miso_data
-
-
-  endclass
-endpackage
+`endif

@@ -3,7 +3,7 @@
 ### SPDX short identifier: ADIBSD
 ###############################################################################
 
-source ../../../../../scripts/adi_env.tcl
+source ../../../../scripts/adi_tb_env.tcl
 source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 
 adi_ip_create io_vip
@@ -15,15 +15,20 @@ adi_ip_files io_vip [list \
 adi_ip_properties_lite io_vip
 adi_ip_sim_ttcl io_vip "io_vip_pkg.ttcl"
 
+set cc [ipx::current_core]
+
+set_property company_url {Unavailable} $cc
+
+set_property display_name "ADI IO VIP" $cc
+set_property description "ADI IO Verification IP" $cc
+
 # Remove all inferred interfaces
-ipx::remove_all_bus_interface [ipx::current_core]
+ipx::remove_all_bus_interface $cc
 
 ## Interface definitions
 
 adi_set_ports_dependency "in" \
       "(spirit:decode(id('MODELPARAM_VALUE.MODE')) = 0)"
-
-set cc [ipx::current_core]
 
 ## MODE
 set_property -dict [list \
@@ -35,11 +40,10 @@ set_property -dict [list \
 ## Customize IP Layout
 ## Remove the automatically generated GUI page
 ipgui::remove_page -component $cc [ipgui::get_pagespec -name "Page 0" -component $cc]
-ipx::save_core [ipx::current_core]
-
+ipx::save_core $cc
 
 ## Create general configuration page
-ipgui::add_page -name {IO VIP} -component [ipx::current_core] -display_name {IO VIP}
+ipgui::add_page -name {IO VIP} -component $cc -display_name {IO VIP}
 set page0 [ipgui::get_pagespec -name "IO VIP" -component $cc]
 
 set general_group [ipgui::add_group -name "General Configuration" -component $cc \

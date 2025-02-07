@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_tdd_gen_pkg;
   import logger_pkg::*;
@@ -397,10 +397,10 @@ package adi_regmap_tdd_gen_pkg;
       this.SYNC_PERIOD_HIGH_R = new("SYNC_PERIOD_HIGH", 'h5c, this);
       this.STATUS_R = new("STATUS", 'h60, this);
       for (int i=0; i<32; i++) begin
-        this.CHn_ON_R[i] = new($sformatf("CH%0d_ON", i), 'h80 + i * 4, this);
+        this.CHn_ON_R[i] = new($sformatf("CH%0d_ON", i), 'h80 + 'h2 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.CHn_OFF_R[i] = new($sformatf("CH%0d_OFF", i), 'h84 + i * 4, this);
+        this.CHn_OFF_R[i] = new($sformatf("CH%0d_OFF", i), 'h84 + 'h2 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

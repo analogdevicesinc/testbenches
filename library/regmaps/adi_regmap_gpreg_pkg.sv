@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_gpreg_pkg;
   import logger_pkg::*;
@@ -136,19 +136,19 @@ package adi_regmap_gpreg_pkg;
       super.new(name, address, parent);
 
       for (int i=0; i<16; i++) begin
-        this.IO_ENBn_R[i] = new($sformatf("IO_ENB%0d", i), 'h400 + i * 4, this);
+        this.IO_ENBn_R[i] = new($sformatf("IO_ENB%0d", i), 'h400 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.IO_OUTn_R[i] = new($sformatf("IO_OUT%0d", i), 'h404 + i * 4, this);
+        this.IO_OUTn_R[i] = new($sformatf("IO_OUT%0d", i), 'h404 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.IO_INn_R[i] = new($sformatf("IO_IN%0d", i), 'h408 + i * 4, this);
+        this.IO_INn_R[i] = new($sformatf("IO_IN%0d", i), 'h408 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CM_RESETn_R[i] = new($sformatf("CM_RESET%0d", i), 'h800 + i * 4, this);
+        this.CM_RESETn_R[i] = new($sformatf("CM_RESET%0d", i), 'h800 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CM_COUNTn_R[i] = new($sformatf("CM_COUNT%0d", i), 'h808 + i * 4, this);
+        this.CM_COUNTn_R[i] = new($sformatf("CM_COUNT%0d", i), 'h808 + 'h22 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_pwm_gen_pkg;
   import logger_pkg::*;
@@ -234,13 +234,13 @@ package adi_regmap_pwm_gen_pkg;
       this.CONFIG_R = new("CONFIG", 'h18, this);
       this.NB_PULSES_R = new("NB_PULSES", 'h14, this);
       for (int i=0; i<16; i++) begin
-        this.PULSE_n_PERIOD_R[i] = new($sformatf("PULSE_%0d_PERIOD", i), 'h40 + i * 4, this);
+        this.PULSE_n_PERIOD_R[i] = new($sformatf("PULSE_%0d_PERIOD", i), 'h40 + 'h1 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.PULSE_n_WIDTH_R[i] = new($sformatf("PULSE_%0d_WIDTH", i), 'h80 + i * 4, this);
+        this.PULSE_n_WIDTH_R[i] = new($sformatf("PULSE_%0d_WIDTH", i), 'h80 + 'h1 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.PULSE_n_OFFSET_R[i] = new($sformatf("PULSE_%0d_OFFSET", i), 'hc0 + i * 4, this);
+        this.PULSE_n_OFFSET_R[i] = new($sformatf("PULSE_%0d_OFFSET", i), 'hc0 + 'h1 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

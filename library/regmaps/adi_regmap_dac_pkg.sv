@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_dac_pkg;
   import logger_pkg::*;
@@ -713,43 +713,43 @@ package adi_regmap_dac_pkg;
       this.DAC_GPIO_IN_R = new("DAC_GPIO_IN", 'hb8, this);
       this.DAC_GPIO_OUT_R = new("DAC_GPIO_OUT", 'hbc, this);
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_1_R[i] = new($sformatf("CHAN_CNTRL%0d_1", i), 'h400 + i * 4, this);
+        this.CHAN_CNTRLn_1_R[i] = new($sformatf("CHAN_CNTRL%0d_1", i), 'h400 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_2_R[i] = new($sformatf("CHAN_CNTRL%0d_2", i), 'h404 + i * 4, this);
+        this.CHAN_CNTRLn_2_R[i] = new($sformatf("CHAN_CNTRL%0d_2", i), 'h404 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_3_R[i] = new($sformatf("CHAN_CNTRL%0d_3", i), 'h408 + i * 4, this);
+        this.CHAN_CNTRLn_3_R[i] = new($sformatf("CHAN_CNTRL%0d_3", i), 'h408 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_4_R[i] = new($sformatf("CHAN_CNTRL%0d_4", i), 'h40c + i * 4, this);
+        this.CHAN_CNTRLn_4_R[i] = new($sformatf("CHAN_CNTRL%0d_4", i), 'h40c + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_5_R[i] = new($sformatf("CHAN_CNTRL%0d_5", i), 'h410 + i * 4, this);
+        this.CHAN_CNTRLn_5_R[i] = new($sformatf("CHAN_CNTRL%0d_5", i), 'h410 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_6_R[i] = new($sformatf("CHAN_CNTRL%0d_6", i), 'h414 + i * 4, this);
+        this.CHAN_CNTRLn_6_R[i] = new($sformatf("CHAN_CNTRL%0d_6", i), 'h414 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_7_R[i] = new($sformatf("CHAN_CNTRL%0d_7", i), 'h418 + i * 4, this);
+        this.CHAN_CNTRLn_7_R[i] = new($sformatf("CHAN_CNTRL%0d_7", i), 'h418 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_8_R[i] = new($sformatf("CHAN_CNTRL%0d_8", i), 'h41c + i * 4, this);
+        this.CHAN_CNTRLn_8_R[i] = new($sformatf("CHAN_CNTRL%0d_8", i), 'h41c + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.USR_CNTRLn_3_R[i] = new($sformatf("USR_CNTRL%0d_3", i), 'h420 + i * 4, this);
+        this.USR_CNTRLn_3_R[i] = new($sformatf("USR_CNTRL%0d_3", i), 'h420 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.USR_CNTRLn_4_R[i] = new($sformatf("USR_CNTRL%0d_4", i), 'h424 + i * 4, this);
+        this.USR_CNTRLn_4_R[i] = new($sformatf("USR_CNTRL%0d_4", i), 'h424 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.USR_CNTRLn_5_R[i] = new($sformatf("USR_CNTRL%0d_5", i), 'h428 + i * 4, this);
+        this.USR_CNTRLn_5_R[i] = new($sformatf("USR_CNTRL%0d_5", i), 'h428 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_9_R[i] = new($sformatf("CHAN_CNTRL%0d_9", i), 'h42c + i * 4, this);
+        this.CHAN_CNTRLn_9_R[i] = new($sformatf("CHAN_CNTRL%0d_9", i), 'h42c + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_10_R[i] = new($sformatf("CHAN_CNTRL%0d_10", i), 'h430 + i * 4, this);
+        this.CHAN_CNTRLn_10_R[i] = new($sformatf("CHAN_CNTRL%0d_10", i), 'h430 + 'h22 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

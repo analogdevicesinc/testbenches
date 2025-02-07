@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_jesd_rx_pkg;
   import logger_pkg::*;
@@ -855,28 +855,28 @@ package adi_regmap_jesd_rx_pkg;
       this.LINK_CONF3_R = new("LINK_CONF3", 'h244, this);
       this.LINK_STATUS_R = new("LINK_STATUS", 'h280, this);
       for (int i=0; i<32; i++) begin
-        this.LANEn_STATUS_R[i] = new($sformatf("LANE%0d_STATUS", i), 'h300 + i * 4, this);
+        this.LANEn_STATUS_R[i] = new($sformatf("LANE%0d_STATUS", i), 'h300 + 'h8 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.LANEn_LATENCY_R[i] = new($sformatf("LANE%0d_LATENCY", i), 'h304 + i * 4, this);
+        this.LANEn_LATENCY_R[i] = new($sformatf("LANE%0d_LATENCY", i), 'h304 + 'h8 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.LANEn_ERROR_STATISTICS_R[i] = new($sformatf("LANE%0d_ERROR_STATISTICS", i), 'h308 + i * 4, this);
+        this.LANEn_ERROR_STATISTICS_R[i] = new($sformatf("LANE%0d_ERROR_STATISTICS", i), 'h308 + 'h8 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.LANEn_LANE_FRAME_ALIGN_ERR_CNT_R[i] = new($sformatf("LANE%0d_LANE_FRAME_ALIGN_ERR_CNT", i), 'h30c + i * 4, this);
+        this.LANEn_LANE_FRAME_ALIGN_ERR_CNT_R[i] = new($sformatf("LANE%0d_LANE_FRAME_ALIGN_ERR_CNT", i), 'h30c + 'h8 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.LANEn_ILAS0_R[i] = new($sformatf("LANE%0d_ILAS0", i), 'h310 + i * 4, this);
+        this.LANEn_ILAS0_R[i] = new($sformatf("LANE%0d_ILAS0", i), 'h310 + 'h8 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.LANEn_ILAS1_R[i] = new($sformatf("LANE%0d_ILAS1", i), 'h314 + i * 4, this);
+        this.LANEn_ILAS1_R[i] = new($sformatf("LANE%0d_ILAS1", i), 'h314 + 'h8 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.LANEn_ILAS2_R[i] = new($sformatf("LANE%0d_ILAS2", i), 'h318 + i * 4, this);
+        this.LANEn_ILAS2_R[i] = new($sformatf("LANE%0d_ILAS2", i), 'h318 + 'h8 * i * 4, this);
       end
       for (int i=0; i<32; i++) begin
-        this.LANEn_ILAS3_R[i] = new($sformatf("LANE%0d_ILAS3", i), 'h31c + i * 4, this);
+        this.LANEn_ILAS3_R[i] = new($sformatf("LANE%0d_ILAS3", i), 'h31c + 'h8 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_clock_monitor_pkg;
   import logger_pkg::*;
@@ -140,7 +140,7 @@ package adi_regmap_clock_monitor_pkg;
       this.NUM_OF_CLOCKS_R = new("NUM_OF_CLOCKS", 'hc, this);
       this.OUT_RESET_R = new("OUT_RESET", 'h10, this);
       for (int i=0; i<16; i++) begin
-        this.CLOCK_n_R[i] = new($sformatf("CLOCK_%0d", i), 'h40 + i * 4, this);
+        this.CLOCK_n_R[i] = new($sformatf("CLOCK_%0d", i), 'h40 + 'h1 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Feb 07 11:48:47 2025 v0.4.1 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_jesd_tpl_pkg;
   import logger_pkg::*;
@@ -129,10 +129,10 @@ package adi_regmap_jesd_tpl_pkg;
       this.TPL_CNTRL_R = new("TPL_CNTRL", 'h200, this);
       this.TPL_STATUS_R = new("TPL_STATUS", 'h204, this);
       for (int i=0; i<3; i++) begin
-        this.TPL_DESCRIPTORn_1_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_1", i), 'h240 + i * 4, this);
+        this.TPL_DESCRIPTORn_1_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_1", i), 'h240 + 'h2 * i * 4, this);
       end
       for (int i=0; i<3; i++) begin
-        this.TPL_DESCRIPTORn_2_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_2", i), 'h244 + i * 4, this);
+        this.TPL_DESCRIPTORn_2_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_2", i), 'h244 + 'h2 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);

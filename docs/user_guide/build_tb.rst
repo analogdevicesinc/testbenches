@@ -1,6 +1,6 @@
 .. _build_tb:
 
-Build a test bench
+Build a testbench
 ===============================================================================
 
 **Please note that ADI only provides the source files necessary to create and
@@ -55,27 +55,27 @@ want to switch to any other branch you need to checkout that branch:
    $git branch
    $git checkout 2022_r2
 
-Building a test bench
+Building a testbench
 -------------------------------------------------------------------------------
 
 .. caution::
 
-   Before building any test bench, you must have the environment prepared each
+   Before building any testbench, you must have the environment prepared each
    time a new terminal session is started:
 
    #. Set the HDL repository path with ``export ADI_HDL_DIR=<path to dir>``.
 
    #. Set the Testbenches repository path with ``export ADI_TB_DIR=<path to dir>``.
 
-The way of building a test bench in Cygwin and WSL is almost the same.
-In this example, it is building the **AD7616** test bench.
+The way of building a testbench in Cygwin and WSL is almost the same.
+In this example, it is building the **AD7616** testbench.
 
 .. shell::
 
    $cd ad7616
    $make
 
-The ``make`` builds all the libraries first and then builds the test bench.
+The ``make`` builds all the libraries first and then builds the testbench.
 This assumes that you have the tools and licenses set up correctly. If
 you don't get to the last line, the make failed to build one or more
 targets: it could be a library component or the project itself. There is

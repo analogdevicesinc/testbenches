@@ -6,6 +6,7 @@ Xilinx Clock Verification IP (VIP)
 Overview
 -------------------------------------------------------------------------------
 
+The ADI Testbenches are using the clocking VIP from Xilinx.
 `[1] <https://docs.amd.com/v/u/en-US/pg291-clk-vip>`__
 
 

@@ -95,7 +95,10 @@ module system_tb();
 // FClock generation
 //
 localparam LATENCY = 3;
-reg [7:0] sample = 'hbc;
+reg [7:0] sample     = 'haa;
+reg [7:0] sample_d   = 'hbb;
+reg [7:0] sample_dd  = 'hcc;
+reg [7:0] sample_ddd = 'hdd;
 
 always @(posedge cnv_clk) begin
   repeat (LATENCY) @(posedge ssi_clk);
@@ -103,16 +106,19 @@ always @(posedge cnv_clk) begin
       begin
          drive_sample({sample,
                        sample+1,
-                       sample+2,
-                       sample+3,
-                       sample+4,
-                       sample+5,
-                       sample+6,
-                       sample+7});
+                       sample_d,
+                       sample_d+1,
+                       sample_dd,
+                       sample_dd+1,
+                       sample_ddd,
+                       sample_ddd+1});
       end
     join_none
+    sample     = sample     +2;
+    sample_d   = sample_d   +2;
+    sample_dd  = sample_dd  +2;
+    sample_ddd = sample_ddd +2;
 
-    sample = sample+8;
   end
 
 
@@ -131,6 +137,7 @@ task automatic drive_sample(bit [7:0] sample_t [0:7]) ;
       adc_data_in_n[2] <= ~sample_t[2][i];
       adc_data_in_p[3] <=  sample_t[3][i];
       adc_data_in_n[3] <= ~sample_t[3][i];
+
       adc_data_in_p[4] <=  sample_t[4][i];
       adc_data_in_n[4] <= ~sample_t[4][i];
       adc_data_in_p[5] <=  sample_t[5][i];
@@ -150,6 +157,7 @@ task automatic drive_sample(bit [7:0] sample_t [0:7]) ;
      adc_data_in_n[2] <= ~sample_t[2][i+1];
      adc_data_in_p[3] <=  sample_t[3][i+1];
      adc_data_in_n[3] <= ~sample_t[3][i+1];
+
      adc_data_in_p[4] <=  sample_t[4][i+1];
      adc_data_in_n[4] <= ~sample_t[4][i+1];
      adc_data_in_p[5] <=  sample_t[5][i+1];

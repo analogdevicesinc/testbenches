@@ -127,6 +127,8 @@ program test_program;
     // pull out RX of reset
     axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_RSTN),
               `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    axi_write (RX1_COMMON + GetAddrs(ADC_COMMON_REG_CNTRL_3),
+          `SET_ADC_COMMON_REG_CNTRL_3_CUSTOM_CONTROL(16));
   endtask
 
   // --------------------------

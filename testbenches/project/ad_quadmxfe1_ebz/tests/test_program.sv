@@ -112,10 +112,10 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
-    `TH.`DRP_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
+    `TH.`DRP_CLK.inst.IF.start_clock();
 
     if (`JESD_MODE != "64B66B") begin
       rx_xcvr.setup_clocks(lane_rate, `REF_CLK_RATE*1000000);
@@ -141,8 +141,13 @@ program test_program;
     // JESD LINK TEST - DMA - EXT_SYNC
     // =======================
     jesd_link_test_ext_sync(0);
-
+    
     base_env.stop();
+
+    `TH.`DRP_CLK.inst.IF.stop_clock();
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
     
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();

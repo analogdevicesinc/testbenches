@@ -70,9 +70,7 @@ program test_program;
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
-
-    `TH.`HBM_CLK.inst.IF.start_clock;
-
+    `TH.`HBM_CLK.inst.IF.start_clock();
     base_env.sys_reset();
 
 //    //  -------------------------------------------------------
@@ -97,12 +95,13 @@ program test_program;
 //      .dest_addr(`DDR_BASE+'h2000),
 //      .length('h1000)
 //    );
-//
-//    base_env.stop();
-//
-//    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
-//    $finish();
-//
+
+    base_env.stop();
+    `TH.`HBM_CLK.inst.IF.stop_clock();
+
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+    $finish();
+
   end
 
 //  task do_transfer(bit [31:0] src_addr,

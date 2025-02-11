@@ -569,12 +569,12 @@ program test_program;
 
 
   task start_clocks();
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
   endtask
 
 
   task stop_clocks();
-    `TH.`DEVICE_CLK.inst.IF.stop_clock;
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
   endtask
 
 

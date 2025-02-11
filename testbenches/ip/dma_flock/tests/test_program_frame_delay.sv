@@ -159,8 +159,8 @@ program test_program_frame_delay;
       `ERROR(("Both DMACs must be set in autorun mode."));
     end
 
-    stop_clocks();
     base_env.stop();
+    stop_clocks();
 
     `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);
     $finish();
@@ -337,15 +337,15 @@ program test_program_frame_delay;
      set_dst_clock(100000000);
      set_ddr_clock(500000000);
 
-    `TH.`SRC_CLK.inst.IF.start_clock;
-    `TH.`DST_CLK.inst.IF.start_clock;
+    `TH.`SRC_CLK.inst.IF.start_clock();
+    `TH.`DST_CLK.inst.IF.start_clock();
     #100ns;
   endtask
 
   // Stop all clocks
   task stop_clocks();
-    `TH.`SRC_CLK.inst.IF.stop_clock;
-    `TH.`DST_CLK.inst.IF.stop_clock;
+    `TH.`SRC_CLK.inst.IF.stop_clock();
+    `TH.`DST_CLK.inst.IF.stop_clock();
   endtask
 
   // Assert external sync for one clock cycle

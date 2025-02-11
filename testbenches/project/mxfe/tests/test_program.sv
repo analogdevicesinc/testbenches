@@ -112,9 +112,9 @@ program test_program;
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
     `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     rx_xcvr.setup_clocks(lane_rate,
                          `REF_CLK_RATE*1000000);
@@ -153,6 +153,10 @@ program test_program;
     jesd_link_test_ext_sync(0);
 
     base_env.stop();
+
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();

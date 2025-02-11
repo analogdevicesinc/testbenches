@@ -283,15 +283,15 @@ program test_program;
      set_dst_clock(100000000);
      set_ddr_clock(600000000);
 
-    `TH.`SRC_CLK.inst.IF.start_clock;
-    `TH.`DST_CLK.inst.IF.start_clock;
+    `TH.`SRC_CLK.inst.IF.start_clock();
+    `TH.`DST_CLK.inst.IF.start_clock();
     #100ns;
   endtask
 
   // Stop all clocks
   task stop_clocks();
-    `TH.`SRC_CLK.inst.IF.stop_clock;
-    `TH.`DST_CLK.inst.IF.stop_clock;
+    `TH.`SRC_CLK.inst.IF.stop_clock();
+    `TH.`DST_CLK.inst.IF.stop_clock();
   endtask
 
   // Assert external sync for one clock cycle

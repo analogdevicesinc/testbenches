@@ -127,7 +127,7 @@ module test_program();
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
     
-    `TH.`PLDDR_RST.inst.IF.assert_reset;
+    `TH.`PLDDR_RST.inst.IF.assert_reset();
     #1;
     
     start_clocks();
@@ -174,33 +174,33 @@ module test_program();
 
   task start_clocks();
     #1
-    `TH.`SRC_CLK.inst.IF.start_clock;
+    `TH.`SRC_CLK.inst.IF.start_clock();
     #1
-    `TH.`DST_CLK.inst.IF.start_clock;
+    `TH.`DST_CLK.inst.IF.start_clock();
     #1
-    `TH.`SYS_CLK.inst.IF.start_clock;
+    `TH.`SYS_CLK.inst.IF.start_clock();
     #1
-    `TH.`PLDDR_CLK.inst.IF.start_clock;
+    `TH.`PLDDR_CLK.inst.IF.start_clock();
   endtask
 
   task stop_clocks();
-    `TH.`SRC_CLK.inst.IF.stop_clock;
-    `TH.`DST_CLK.inst.IF.stop_clock;
-    `TH.`SYS_CLK.inst.IF.stop_clock;
-    `TH.`PLDDR_CLK.inst.IF.stop_clock;
+    `TH.`SRC_CLK.inst.IF.stop_clock();
+    `TH.`DST_CLK.inst.IF.stop_clock();
+    `TH.`SYS_CLK.inst.IF.stop_clock();
+    `TH.`PLDDR_CLK.inst.IF.stop_clock();
   endtask
 
   task sys_reset();
-    `TH.`SRC_RST.inst.IF.assert_reset;
-    `TH.`DST_RST.inst.IF.assert_reset;
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    `TH.`PLDDR_RST.inst.IF.assert_reset;
+    `TH.`SRC_RST.inst.IF.assert_reset();
+    `TH.`DST_RST.inst.IF.assert_reset();
+    `TH.`SYS_RST.inst.IF.assert_reset();
+    `TH.`PLDDR_RST.inst.IF.assert_reset();
 
     #500
-    `TH.`SRC_RST.inst.IF.deassert_reset;
-    `TH.`DST_RST.inst.IF.deassert_reset;
-    `TH.`SYS_RST.inst.IF.deassert_reset;
-    `TH.`PLDDR_RST.inst.IF.deassert_reset;
+    `TH.`SRC_RST.inst.IF.deassert_reset();
+    `TH.`DST_RST.inst.IF.deassert_reset();
+    `TH.`SYS_RST.inst.IF.deassert_reset();
+    `TH.`PLDDR_RST.inst.IF.deassert_reset();
   endtask
 
   task systemBringUp();

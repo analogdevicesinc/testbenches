@@ -291,8 +291,7 @@ initial begin
   base_env.stop();
 
   `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-
-  $finish;
+  $finish();
 
 end
 

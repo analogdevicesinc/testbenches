@@ -136,6 +136,9 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
+      this.input_clk_vip_if.stop_clock();
+      this.output_clk_vip_if.stop_clock();
+
       this.input_axis_agent.stop();
       this.output_axis_agent.stop();
     endtask

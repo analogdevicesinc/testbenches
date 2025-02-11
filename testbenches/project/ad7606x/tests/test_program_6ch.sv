@@ -138,6 +138,8 @@ program test_program_6ch (
 
     #100 db_transmission_test();
 
+    base_env.stop();
+
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2023 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2023 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import test_harness_env_pkg::*;
@@ -46,6 +44,9 @@ import adi_regmap_dmac_pkg::*;
 import adi_regmap_dac_pkg::*;
 import adi_regmap_adc_pkg::*;
 import adi_regmap_common_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program;
 
@@ -66,8 +67,8 @@ program test_program;
 
   parameter TDD1 = `AXI_AD9361_BA + 'h12_00 * 4;
 
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
-  test_harness_env env;
   bit [31:0] val;
 
   // --------------------------
@@ -77,7 +78,7 @@ program test_program;
       input   [31:0]  raddr,
       input   [31:0]  vdata);
 
-    env.mng.RegReadVerify32(raddr,vdata);
+    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   // --------------------------
@@ -87,7 +88,7 @@ program test_program;
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    env.mng.RegWrite32(waddr,wdata);
+    base_env.mng.sequencer.RegWrite32(waddr,wdata);
   endtask
 
   integer rate;
@@ -95,35 +96,38 @@ program test_program;
       rate = R1_MODE ? 2 : 4;
   end
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   // --------------------------
   // Main procedure
   // --------------------------
   initial begin
 
-    //creating environment
-    env = new("FMCOMMS2 Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
-
-    #2ps;
-
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    env.start();
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
+
+    //creating environment
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
+
+    base_env.start();
 
     //set source synchronous interface clock frequency
     `TH.`SSI_CLK.inst.IF.set_clk_frq(.user_frequency(80000000));
-    `TH.`SSI_CLK.inst.IF.start_clock;
+    `TH.`SSI_CLK.inst.IF.start_clock();
 
-    //asserts all the resets for 100 ns
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    #100
-    `TH.`SYS_RST.inst.IF.deassert_reset;
+    base_env.sys_reset();
 
-    #1us;
     // This is required since the AD9361 interface always requires to receive
     // something first before transmitting. This is not possible in loopback mode.
     force system_tb.test_harness.axi_ad9361.inst.i_tx.dac_sync_enable = 1'b1;
@@ -136,10 +140,11 @@ program test_program;
 
     dma_test();
 
-    env.stop();
+    base_env.stop();
+    `TH.`SSI_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-    $finish;
+    $finish();
 
   end
 
@@ -357,7 +362,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361_BA
+      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361_BA
     end
 
     // Configure TX DMA
@@ -465,7 +470,7 @@ program test_program;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
-      captured_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_address);
+      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_address);
       if (i==0) begin
         first = captured_word[15:0];
       end else begin

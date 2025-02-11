@@ -18,7 +18,6 @@ adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "environment.sv" \
   "tests/test_program.sv" \
 ]
 
@@ -26,6 +25,9 @@ adi_sim_project_files [list \
 adi_sim_add_define "TEST_PROGRAM=test_program"
 
 adi_sim_generate $project_name
+
+# Use this only for debugging specific seeds that failed previously
+#set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed 1695199824} -objects [get_filesets sim_1]
 
 # Use this only for debugging specific seeds that failed previously
 #set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed 1695199824} -objects [get_filesets sim_1]

@@ -6,7 +6,7 @@
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="\$unit_xpm_cdc_sv_220102727 " />
-            <top_module name="adi_peripheral_pkg" />
+            
             <top_module name="adi_regmap_data_offload_pkg" />
             <top_module name="adi_regmap_dmac_pkg" />
             <top_module name="adi_regmap_pkg" />
@@ -22,7 +22,7 @@
             <top_module name="m_axi_sequencer_pkg" />
             <top_module name="m_axis_sequencer_pkg" />
             <top_module name="mailbox_pkg" />
-            <top_module name="reg_accessor_pkg" />
+            
             <top_module name="s_axi_sequencer_pkg" />
             <top_module name="s_axis_sequencer_pkg" />
             <top_module name="scoreboard_pkg" />

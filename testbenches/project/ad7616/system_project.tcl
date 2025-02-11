@@ -16,12 +16,12 @@ set project_name [file rootname $cfg_file]
 # Set project params
 global ad_project_params
 
-set SER_PAR_N $ad_project_params(SER_PAR_N)
+set INTF $ad_project_params(INTF)
 
 #set a default test program
-if {$SER_PAR_N == 1} {
+if {$INTF == 1} {
   adi_sim_add_define "TEST_PROGRAM=test_program_si"
-} elseif {$SER_PAR_N == 0} {
+} elseif {$INTF == 0} {
   adi_sim_add_define "TEST_PROGRAM=test_program_pi"
 } else {
   adi_sim_add_define "TEST_PROGRAM=test_program_si"
@@ -49,3 +49,6 @@ adi_sim_project_files [list \
 ]
 
 adi_sim_generate $project_name
+
+# Use this only for debugging specific seeds that failed previously
+#set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed 1695199824} -objects [get_filesets sim_1]

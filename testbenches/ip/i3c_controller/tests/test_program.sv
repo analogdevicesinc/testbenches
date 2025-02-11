@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -36,13 +36,16 @@
 //
 
 `include "utils.svh"
-`include "../../../../../library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh"
-`include "../../../../../library/i3c_controller/i3c_controller_core/i3c_controller_word.vh"
+`include "i3c_controller_regmap.vh"
+`include "i3c_controller_word.vh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 //---------------------------------------------------------------------------
 // Wait statement with timeout
@@ -143,7 +146,7 @@ program test_program (
   output offload_sdi_ready,
   output offload_trigger);
 
-test_harness_env env;
+test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
 //---------------------------------------------------------------------------
 // Wrapper function for AXI read verify using dword
@@ -153,7 +156,7 @@ task axi_read_v(
     input   [13:0]  raddr,
     input   [31:0]  vdata);
 
-  env.mng.RegReadVerify32(baddr+{raddr,2'b00},vdata);
+  base_env.mng.sequencer.RegReadVerify32(baddr+{raddr,2'b00},vdata);
 endtask
 
 task axi_read(
@@ -161,7 +164,7 @@ task axi_read(
     input   [13:0]  raddr,
     output  [31:0]  data);
 
-  env.mng.RegRead32(baddr+{raddr,2'b00},data);
+  base_env.mng.sequencer.RegRead32(baddr+{raddr,2'b00},data);
 endtask
 
 //---------------------------------------------------------------------------
@@ -172,7 +175,7 @@ task axi_write(
   input [13:0]  waddr,
   input [31:0]  wdata);
 
-  env.mng.RegWrite32(baddr+{waddr,2'b00},wdata);
+  base_env.mng.sequencer.RegWrite32(baddr+{waddr,2'b00},wdata);
 endtask
 
 //---------------------------------------------------------------------------
@@ -244,24 +247,32 @@ initial begin
   end
 end
 
+  // process variables
+process current_process;
+string current_process_random_state;
+
 //---------------------------------------------------------------------------
 // Main procedure
 //---------------------------------------------------------------------------
 initial begin
 
-  // Creating environment
-  env = new("I3C Controller Environment",
-            `TH.`SYS_CLK.inst.IF,
-            `TH.`DMA_CLK.inst.IF,
-            `TH.`DDR_CLK.inst.IF,
-            `TH.`SYS_RST.inst.IF,
-            `TH.`MNG_AXI.inst.IF,
-            `TH.`DDR_AXI.inst.IF);
-
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-  env.start();
-  env.sys_reset();
+  current_process = process::self();
+  current_process_random_state = current_process.get_randstate();
+  `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
+
+  // Creating environment
+  base_env = new("Base Environment",
+                  `TH.`SYS_CLK.inst.IF,
+                  `TH.`DMA_CLK.inst.IF,
+                  `TH.`DDR_CLK.inst.IF,
+                  `TH.`SYS_RST.inst.IF,
+                  `TH.`MNG_AXI.inst.IF,
+                  `TH.`DDR_AXI.inst.IF);
+
+  base_env.start();
+  base_env.sys_reset();
 
   sanity_test();
 
@@ -285,11 +296,10 @@ initial begin
 
   ibi_i3c_test();
 
-  env.stop();
+  base_env.stop();
 
   `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-
-  $finish;
+  $finish();
 
 end
 

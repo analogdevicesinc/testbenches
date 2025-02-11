@@ -117,7 +117,7 @@ package environment_pkg;
 
     task adc_stream_gen();
 
-      while(1) begin
+      forever begin
         if (adc_src_axis_agent.driver.is_driver_idle) begin
           rx_transaction = adc_src_axis_agent.driver.create_transaction("");
           ADC_TRANSACTION_FAIL: assert(rx_transaction.randomize());

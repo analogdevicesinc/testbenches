@@ -249,7 +249,7 @@ end
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
-    while(1) begin
+    forever begin
       @(posedge delay_clk) begin
         echo_delay_sclk <= {echo_delay_sclk, m_spi_sclk};
        end
@@ -258,7 +258,7 @@ end
   assign pulsar_adc_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
 initial begin
-  while(1) begin
+  forever begin
     #0.5   delay_clk = ~delay_clk;
   end
 end
@@ -279,7 +279,7 @@ bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge pulsar_adc_spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
@@ -297,7 +297,7 @@ assign end_of_word = (CPOL ^ CPHA) ?
                      (spi_sclk_neg_counter == DATA_DLENGTH);
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
       spi_sclk_pos_counter <= 8'b0;
@@ -308,7 +308,7 @@ initial begin
 end
 
 initial begin
-  while(1) begin
+  forever begin
     @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
       spi_sclk_neg_counter <= 8'b0;
@@ -320,7 +320,7 @@ end
 
 // SDI shift register
 initial begin
-  while(1) begin
+  forever begin
     // synchronization
     if (CPHA ^ CPOL)
       @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
@@ -366,7 +366,7 @@ bit [31:0]  sdi_fifo_data_store;
 bit [DATA_DLENGTH-1:0]  sdi_data_store;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge pulsar_adc_echo_sclk);
     sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
@@ -392,7 +392,7 @@ end
 bit [31:0] offload_transfer_cnt;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge shiftreg_sampled && offload_status);
       offload_transfer_cnt <= offload_transfer_cnt + 'h1;
   end

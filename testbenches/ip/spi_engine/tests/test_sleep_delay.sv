@@ -122,10 +122,20 @@ program test_sleep_delay (
   endtask
 
   
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   // --------------------------
   // Main procedure
   // --------------------------
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     //creating environment
     base_env = new("Base Environment",
@@ -141,8 +151,6 @@ program test_sleep_delay (
                     `TH.`SDO_SRC.inst.IF,
                   `endif
                   `TH.`SPI_S.inst.IF.vif);
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     spi_env.start();

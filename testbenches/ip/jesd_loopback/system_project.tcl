@@ -35,3 +35,6 @@ adi_sim_project_files [list \
 adi_sim_add_define "TEST_PROGRAM=test_program"
 
 adi_sim_generate $project_name
+
+# Use this only for debugging specific seeds that failed previously
+#set_property -name {xsim.simulate.xsim.more_options} -value {-sv_seed 1695199824} -objects [get_filesets sim_1]

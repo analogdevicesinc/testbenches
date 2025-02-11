@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2018(c) Analog Devices, Inc.
+## Copyright (C) 2018 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -29,8 +29,6 @@ LIB_DEPS += util_pack/util_upack2
 LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += xilinx/axi_adxcvr
 LIB_DEPS += xilinx/util_adxcvr
-LIB_DEPS += axi_sysid
-LIB_DEPS += sysid_rom
 
 # default test program
 TP := test_program

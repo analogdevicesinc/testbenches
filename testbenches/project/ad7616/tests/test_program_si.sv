@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2022 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -46,6 +46,9 @@ import adi_regmap_pwm_gen_pkg::*;
 import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -101,7 +104,7 @@ program test_program_si (
   output      rx_busy);
 
 
-test_harness_env env;
+test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
 // --------------------------
 // Wrapper function for AXI read verif
@@ -110,14 +113,14 @@ task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-  env.mng.RegReadVerify32(raddr,vdata);
+  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-  env.mng.RegRead32(raddr,data);
+  base_env.mng.sequencer.RegRead32(raddr,data);
 endtask
 
 // --------------------------
@@ -127,7 +130,7 @@ task axi_write(
   input [31:0]  waddr,
   input [31:0]  wdata);
 
-  env.mng.RegWrite32(waddr,wdata);
+  base_env.mng.sequencer.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
@@ -136,22 +139,18 @@ endtask
 initial begin
 
   //creating environment
-  env = new("AD7616 Environment",
-            `TH.`SYS_CLK.inst.IF,
-            `TH.`DMA_CLK.inst.IF,
-            `TH.`DDR_CLK.inst.IF,
-            `TH.`SYS_RST.inst.IF,
-            `TH.`MNG_AXI.inst.IF,
-            `TH.`DDR_AXI.inst.IF);
+  base_env = new("Base Environment",
+                  `TH.`SYS_CLK.inst.IF,
+                  `TH.`DMA_CLK.inst.IF,
+                  `TH.`DDR_CLK.inst.IF,
+                  `TH.`SYS_RST.inst.IF,
+                  `TH.`MNG_AXI.inst.IF,
+                  `TH.`DDR_AXI.inst.IF);
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
-  env.start();
 
-  //asserts all the resets for 100 ns
-  `TH.`SYS_RST.inst.IF.assert_reset;
-  #100
-  `TH.`SYS_RST.inst.IF.deassert_reset;
-  #100
+  base_env.start();
+  base_env.sys_reset();
 
   sanity_test();
 
@@ -163,10 +162,10 @@ initial begin
 
   offload_spi_test();
 
-  env.stop();
+  base_env.stop();
 
   `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-  $finish;
+  $finish();
 
 end
 
@@ -253,7 +252,7 @@ end
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
-    while(1) begin
+    forever begin
       @(posedge delay_clk) begin
         echo_delay_sclk <= {echo_delay_sclk, m_rx_sclk};
        end
@@ -262,7 +261,7 @@ end
   assign ad7616_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
 initial begin
-  while(1) begin
+  forever begin
     #0.5   delay_clk = ~delay_clk;
   end
 end
@@ -284,7 +283,7 @@ bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
@@ -300,7 +299,7 @@ assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_neg_counter == 16);
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
       rx_sclk_pos_counter <= 8'b0;
@@ -311,7 +310,7 @@ initial begin
 end
 
 initial begin
-  while(1) begin
+  forever begin
     @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
       rx_sclk_neg_counter <= 8'b0;
@@ -323,7 +322,7 @@ end
 
 // SDI shift register
 initial begin
-  while(1) begin
+  forever begin
     // synchronization
     if (CPHA ^ CPOL)
       @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
@@ -372,7 +371,7 @@ bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge rx_sclk_bfm);
     sdi_data_store <= {sdi_shiftreg[13:0], 2'b00};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
@@ -400,7 +399,7 @@ end
 bit [31:0] offload_transfer_cnt;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge shiftreg_sampled && offload_status);
       offload_transfer_cnt <= offload_transfer_cnt + 'h1;
   end
@@ -420,14 +419,14 @@ task offload_spi_test();
     `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
 
     //Configure DMA
-    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_FLAGS),
+    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
-    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
-    env.mng.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
+    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Configure the Offload module
     axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
@@ -456,7 +455,7 @@ task offload_spi_test();
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
+      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (offload_captured_word_arr [(NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:2]) begin
@@ -473,12 +472,6 @@ endtask
 bit   [31:0]  sdi_fifo_data = 0;
 
 task fifo_spi_test();
-  // Start spi clk generator
-  axi_write (`AD7616_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-    );
-
   // Enable SPI Engine
   axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 

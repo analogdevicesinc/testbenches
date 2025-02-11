@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 #
 #   2. An ADI specific BSD license, which can be found in the top level directory
 #      of this repository (LICENSE_ADIBSD), and also on-line at:
-#      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+#      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 #      This will allow to generate bit files and not release the source code,
 #      as long as it attaches to an ADI device.
 #
@@ -35,7 +35,10 @@
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "$ad_tb_dir/library/vip/amd/m_axi_sequencer.sv" \
-  "$ad_tb_dir/library/vip/amd/s_axi_sequencer.sv" \
-  "$ad_tb_dir/library/regmaps/reg_accessor.sv" \
+  "$ad_tb_dir/library/vip/amd/axi/adi_axi_agent.sv" \
+  "$ad_tb_dir/library/vip/amd/axi/m_axi_sequencer.sv" \
+  "$ad_tb_dir/library/vip/amd/axi/s_axi_sequencer.sv" \
+  "$ad_tb_dir/library/vip/amd/axi/adi_axi_monitor.sv" \
+  "$ad_tb_dir/library/vip/amd/axi/axi_definitions.svh" \
+  "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
 ]

@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2024(c) Analog Devices, Inc.
+## Copyright (C) 2024 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -9,7 +9,6 @@ include ../../../scripts/make_tb_path.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += environment.sv
 
 # default test program
 TP := test_program

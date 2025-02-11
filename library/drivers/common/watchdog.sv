@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,17 +26,19 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
+
 `include "utils.svh"
 
 package watchdog_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
 
   class watchdog extends adi_component;
     
@@ -81,7 +83,7 @@ package watchdog_pkg;
           fork
             begin
               #(this.timer*1ns);
-              this.error($sformatf("Watchdog timer timed out! %s", this.message));
+              this.fatal($sformatf("Watchdog timer timed out! %s", this.message));
             end
             @this.stop_event;
           join_any

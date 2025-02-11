@@ -81,9 +81,9 @@ program test_program;
     base_env.start();
     base_env.sys_reset();
 
-    `TH.`SYS_CLK.inst.IF.start_clock;
-    `TH.`DMA_CLK.inst.IF.start_clock;
-    `TH.`DDR_CLK.inst.IF.start_clock;
+    `TH.`SYS_CLK.inst.IF.start_clock();
+    `TH.`DMA_CLK.inst.IF.start_clock();
+    `TH.`DDR_CLK.inst.IF.start_clock();
 
     link_clk_freq_khz = lane_rate_khz/66;
     data_path_width = 8;
@@ -95,10 +95,10 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(device_clk_freq_khz*1000));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(sysref_freq_khz*1000));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DRP_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DRP_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     for (int i = 0; i < `JESD_M; i++) begin
       if (use_dds) begin
@@ -199,10 +199,19 @@ program test_program;
     // Read status back
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_RX_BA+GetAddrs(JESD_RX_LINK_STATUS),
                             `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
-
-    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     
     base_env.stop();
+
+    `TH.`SYS_CLK.inst.IF.stop_clock();
+    `TH.`DMA_CLK.inst.IF.stop_clock();
+    `TH.`DDR_CLK.inst.IF.stop_clock();
+
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DRP_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
+
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end

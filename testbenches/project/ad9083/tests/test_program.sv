@@ -95,10 +95,10 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(device_clk_freq));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(sysref_freq));
 
-    `TH.`DRP_CLK.inst.IF.start_clock;
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`DRP_CLK.inst.IF.start_clock();
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     base_env.sys_reset();
 
@@ -372,8 +372,13 @@ program test_program;
       .step (1),
       .max_sample(496)
     );
-
+    
     base_env.stop();
+
+    `TH.`DRP_CLK.inst.IF.stop_clock();
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();

@@ -118,9 +118,9 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     rx_xcvr.setup_clocks(lane_rate,
                          `REF_CLK_RATE*1000000);
@@ -145,13 +145,13 @@ program test_program;
     // TPL SYNC control test 
     // =======================
     arm_disarm_test();
-
-
-    `INFO(("======================="), ADI_VERBOSITY_LOW);
-    `INFO(("      TB   DONE        "), ADI_VERBOSITY_LOW);
-    `INFO(("======================="), ADI_VERBOSITY_LOW);
-
+    
     base_env.stop();
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
+
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end

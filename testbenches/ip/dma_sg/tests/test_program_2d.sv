@@ -142,6 +142,7 @@ program test_program_2d;
     );
 
     base_env.stop();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
     
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();

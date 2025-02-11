@@ -212,12 +212,12 @@ program test_program;
 
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(common_sysref_clk));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`RX_DEVICE_CLK.inst.IF.start_clock;
-    `TH.`TX_DEVICE_CLK.inst.IF.start_clock;
-    `TH.`TX_LINK_CLK.inst.IF.start_clock;
-    `TH.`TX_OS_DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`RX_DEVICE_CLK.inst.IF.start_clock();
+    `TH.`TX_DEVICE_CLK.inst.IF.start_clock();
+    `TH.`TX_LINK_CLK.inst.IF.start_clock();
+    `TH.`TX_OS_DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     ex_rx_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000);
@@ -242,6 +242,13 @@ program test_program;
     rx_os_tpl_test(.use_dds (0));
 
     base_env.stop();
+
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`RX_DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`TX_DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`TX_LINK_CLK.inst.IF.stop_clock();
+    `TH.`TX_OS_DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();

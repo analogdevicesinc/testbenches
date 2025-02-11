@@ -116,7 +116,7 @@ program test_program;
 
     //set source synchronous interface clock frequency
     `TH.`SSI_CLK.inst.IF.set_clk_frq(.user_frequency(80000000));
-    `TH.`SSI_CLK.inst.IF.start_clock;
+    `TH.`SSI_CLK.inst.IF.start_clock();
 
     base_env.sys_reset();
 
@@ -133,6 +133,7 @@ program test_program;
     dma_test();
 
     base_env.stop();
+    `TH.`SSI_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();

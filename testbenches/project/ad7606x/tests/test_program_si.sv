@@ -161,6 +161,8 @@ program test_program_si (
 
     offload_spi_test();
 
+    base_env.stop();
+
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();
 

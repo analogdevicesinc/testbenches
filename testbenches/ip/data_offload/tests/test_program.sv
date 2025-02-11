@@ -87,17 +87,6 @@ program test_program;
     // Setup generator/monitor stubs
     //=========================================================================
 
-<<<<<<< HEAD
-=======
-    // ADC stub
-    env.adc_src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-    env.adc_src_axis_seq.add_xfer_descriptor_byte_count(`ADC_TRANSFER_LENGTH, 0, 0);
-
-    // DAC stub
-    dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
-    env.dac_dst_axis_seq.set_mode(dac_mode);
-
->>>>>>> 8ee0dee (General updates:)
     //=========================================================================
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);

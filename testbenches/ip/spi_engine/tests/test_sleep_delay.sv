@@ -172,8 +172,7 @@ program test_sleep_delay (
     base_env.stop();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-
-    $finish;
+    $finish();
 
   end
 

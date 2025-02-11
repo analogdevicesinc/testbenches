@@ -138,7 +138,7 @@ bit transfer_status = 0;
 assign rx_db_i = tx_data_buf;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge sys_clk);
     rx_rd_n_tmp <= rx_rd_n;
     fork
@@ -151,7 +151,7 @@ assign rx_rd_n_negedge_s = ~rx_rd_n & rx_rd_n_d;
 assign rx_rd_n_posedge_s = rx_rd_n & ~rx_rd_n_d;
 
 initial begin
-  while(1) begin
+  forever begin
     @(negedge rx_rd_n);
       if (transfer_status)
         if (transfer_cnt[0]) begin
@@ -180,7 +180,7 @@ endtask
 //---------------------------------------------------------------------------
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge rx_rd_n);
     if (transfer_status)
         transfer_cnt <= transfer_cnt + 'h1;

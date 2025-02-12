@@ -43,11 +43,11 @@ package test_harness_env_pkg;
   import adi_axi_agent_pkg::*;
 
 
-  class test_harness_env #(int `AXI_VIP_PARAM_ORDER(mng), int `AXI_VIP_PARAM_ORDER(ddr)) extends adi_environment;
+  class test_harness_env extends adi_environment;
 
     // Agents
-    adi_axi_master_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng;
-    adi_axi_slave_mem_agent #(`AXI_VIP_PARAM_ORDER(ddr)) ddr;
+    adi_axi_agent_base mng;
+    adi_axi_agent_base ddr;
 
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if;
@@ -65,10 +65,7 @@ package test_harness_env_pkg;
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
 
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(mng)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(ddr)) ddr_vip_if);
+      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if);
 
       super.new(name);
 
@@ -78,8 +75,8 @@ package test_harness_env_pkg;
       this.sys_rst_vip_if = sys_rst_vip_if;
 
       // Creating the agents
-      this.mng = new("AXI Manager agent", mng_vip_if, this);
-      this.ddr = new("AXI DDR stub agent", ddr_vip_if, this);
+      this.mng = new("AXI Manager agent", adi_axi_agent_pkg::MASTER, this);
+      this.ddr = new("AXI DDR stub agent", adi_axi_agent_pkg::SLAVE, this);
     endfunction
 
     //============================================================================
@@ -88,8 +85,8 @@ package test_harness_env_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      this.mng.agent.start_master();
-      this.ddr.agent.start_slave();
+      this.mng.start_master();
+      this.ddr.start_slave();
 
       this.sys_clk_vip_if.start_clock();
       this.dma_clk_vip_if.start_clock();
@@ -100,8 +97,8 @@ package test_harness_env_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.mng.agent.stop_master();
-      this.ddr.agent.stop_slave();
+      this.mng.stop_master();
+      this.ddr.stop_slave();
 
       this.sys_clk_vip_if.stop_clock();
       this.dma_clk_vip_if.stop_clock();
@@ -114,9 +111,9 @@ package test_harness_env_pkg;
     task sys_reset();
       //asserts all the resets for 100 ns
       this.sys_rst_vip_if.assert_reset();
-      #200;
+      #200ns;
       this.sys_rst_vip_if.deassert_reset();
-      #800;
+      #800ns;
     endtask
 
   endclass

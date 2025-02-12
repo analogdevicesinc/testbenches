@@ -143,9 +143,9 @@ package s_axis_sequencer_pkg;
     endtask: verify_byte
 
     // call ready generation function
-    task run();
-      user_gen_tready();
-    endtask: run
+    virtual task start();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: start
 
 
     // virtual tasks to be implemented
@@ -153,9 +153,9 @@ package s_axis_sequencer_pkg;
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: user_gen_tready
 
-    virtual task get_transfer();
+    virtual task stop();
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: get_transfer
+    endtask: stop
 
   endclass: s_axis_sequencer_base
 
@@ -176,7 +176,7 @@ package s_axis_sequencer_pkg;
     endfunction: new
 
 
-    virtual task user_gen_tready();
+    virtual task start();
       axi4stream_ready_gen tready_gen;
       
       tready_gen = this.driver.create_ready("TREADY");
@@ -196,7 +196,11 @@ package s_axis_sequencer_pkg;
         tready_gen.set_high_time_range(this.high_time_min, this.high_time_max);
       end
       this.driver.send_tready(tready_gen);
-    endtask: user_gen_tready
+    endtask: start
+
+    virtual task stop();
+      this.driver.vif_proxy.reset();
+    endtask: stop
 
   endclass: s_axis_sequencer
 

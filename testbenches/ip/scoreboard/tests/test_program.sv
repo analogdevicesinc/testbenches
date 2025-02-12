@@ -40,6 +40,8 @@
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 import environment_pkg::*;
+import adi_axi_agent_pkg::*;
+import adi_axis_agent_pkg::*;
 import dmac_api_pkg::*;
 import data_offload_api_pkg::*;
 
@@ -61,9 +63,24 @@ import `PKGIFY(test_harness, dac_src_axi_pt_1)::*;
 program test_program();
 
   // declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_0), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis_0), `AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_0), `AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_0)) scb_env_0;
-  scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_1), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis_1), `AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_1), `AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_1)) scb_env_1;
+  test_harness_env base_env;
+  
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+
+  scoreboard_environment scb_env_0;
+
+  adi_axis_master_agent #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_0)) adc_src_axis_agent_0;
+  adi_axis_slave_agent #(`AXIS_VIP_PARAMS(test_harness, dac_dst_axis_0)) dac_dst_axis_agent_0;
+  adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_0)) adc_dst_axi_pt_agent_0;
+  adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_0)) dac_src_axi_pt_agent_0;
+
+  scoreboard_environment scb_env_1;
+
+  adi_axis_master_agent #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis_1)) adc_src_axis_agent_1;
+  adi_axis_slave_agent #(`AXIS_VIP_PARAMS(test_harness, dac_dst_axis_1)) dac_dst_axis_agent_1;
+  adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAMS(test_harness, adc_dst_axi_pt_1)) adc_dst_axi_pt_agent_1;
+  adi_axi_passthrough_mem_agent #(`AXI_VIP_PARAMS(test_harness, dac_src_axi_pt_1)) dac_src_axi_pt_agent_1;
 
   dmac_api dmac_tx_0;
   dmac_api dmac_rx_0;
@@ -82,31 +99,67 @@ program test_program();
                     `TH.`SYS_CLK.inst.IF,
                     `TH.`DMA_CLK.inst.IF,
                     `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+                    `TH.`SYS_RST.inst.IF);
 
-    scb_env_0 = new("Scoreboard Environment 0",
-                    `TH.`ADC_SRC_AXIS_0.inst.IF,
-                    `TH.`DAC_DST_AXIS_0.inst.IF,
-                    `TH.`ADC_DST_AXI_PT_0.inst.IF,
-                    `TH.`DAC_SRC_AXI_PT_0.inst.IF);
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+    
+    mng.pre_link_agent(base_env.mng);
+    ddr.pre_link_agent(base_env.ddr);
+    base_env.mng = mng;
+    base_env.ddr = ddr;
+    mng.post_link_agent(base_env.mng);
+    ddr.post_link_agent(base_env.ddr);
 
-    scb_env_1 = new("Scoreboard Environment 1",
-                    `TH.`ADC_SRC_AXIS_1.inst.IF,
-                    `TH.`DAC_DST_AXIS_1.inst.IF,
-                    `TH.`ADC_DST_AXI_PT_1.inst.IF,
-                    `TH.`DAC_SRC_AXI_PT_1.inst.IF);
+    scb_env_0 = new("Scoreboard Environment 0");
 
-    dmac_tx_0 = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA_0);
-    dmac_rx_0 = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA_0);
-    dmac_tx_1 = new("DMAC TX 1", base_env.mng.sequencer, `TX_DMA_BA_1);
-    dmac_rx_1 = new("DMAC RX 1", base_env.mng.sequencer, `RX_DMA_BA_1);
+    adc_src_axis_agent_0 = new("", `TH.`ADC_SRC_AXIS_0.inst.IF);
+    dac_dst_axis_agent_0 = new("", `TH.`DAC_DST_AXIS_0.inst.IF);
+    adc_dst_axi_pt_agent_0 = new("", `TH.`ADC_DST_AXI_PT_0.inst.IF);
+    dac_src_axi_pt_agent_0 = new("", `TH.`DAC_SRC_AXI_PT_0.inst.IF);
 
-    do_tx_0 = new("Data Offload TX 0", base_env.mng.sequencer, `TX_DOFF_BA_0);
-    do_rx_0 = new("Data Offload RX 0", base_env.mng.sequencer, `RX_DOFF_BA_0);
-    do_tx_1 = new("Data Offload TX 1", base_env.mng.sequencer, `TX_DOFF_BA_1);
-    do_rx_1 = new("Data Offload RX 1", base_env.mng.sequencer, `RX_DOFF_BA_1);
+    adc_src_axis_agent_0.pre_link_agent(scb_env_0.adc_src_axis_agent);
+    dac_dst_axis_agent_0.pre_link_agent(scb_env_0.dac_dst_axis_agent);
+    adc_dst_axi_pt_agent_0.pre_link_agent(scb_env_0.adc_dst_axi_pt_agent);
+    dac_src_axi_pt_agent_0.pre_link_agent(scb_env_0.dac_src_axi_pt_agent);
+    scb_env_0.adc_src_axis_agent = adc_src_axis_agent_0;
+    scb_env_0.dac_dst_axis_agent = dac_dst_axis_agent_0;
+    scb_env_0.adc_dst_axi_pt_agent = adc_dst_axi_pt_agent_0;
+    scb_env_0.dac_src_axi_pt_agent = dac_src_axi_pt_agent_0;
+    adc_src_axis_agent_0.post_link_agent(scb_env_0.adc_src_axis_agent);
+    dac_dst_axis_agent_0.post_link_agent(scb_env_0.dac_dst_axis_agent);
+    adc_dst_axi_pt_agent_0.post_link_agent(scb_env_0.adc_dst_axi_pt_agent);
+    dac_src_axi_pt_agent_0.post_link_agent(scb_env_0.dac_src_axi_pt_agent);
+
+    scb_env_1 = new("Scoreboard Environment 1");
+
+    adc_src_axis_agent_1 = new("", `TH.`ADC_SRC_AXIS_1.inst.IF);
+    dac_dst_axis_agent_1 = new("", `TH.`DAC_DST_AXIS_1.inst.IF);
+    adc_dst_axi_pt_agent_1 = new("", `TH.`ADC_DST_AXI_PT_1.inst.IF);
+    dac_src_axi_pt_agent_1 = new("", `TH.`DAC_SRC_AXI_PT_1.inst.IF);
+
+    adc_src_axis_agent_1.pre_link_agent(scb_env_1.adc_src_axis_agent);
+    dac_dst_axis_agent_1.pre_link_agent(scb_env_1.dac_dst_axis_agent);
+    adc_dst_axi_pt_agent_1.pre_link_agent(scb_env_1.adc_dst_axi_pt_agent);
+    dac_src_axi_pt_agent_1.pre_link_agent(scb_env_1.dac_src_axi_pt_agent);
+    scb_env_1.adc_src_axis_agent = adc_src_axis_agent_1;
+    scb_env_1.dac_dst_axis_agent = dac_dst_axis_agent_1;
+    scb_env_1.adc_dst_axi_pt_agent = adc_dst_axi_pt_agent_1;
+    scb_env_1.dac_src_axi_pt_agent = dac_src_axi_pt_agent_1;
+    adc_src_axis_agent_1.post_link_agent(scb_env_1.adc_src_axis_agent);
+    dac_dst_axis_agent_1.post_link_agent(scb_env_1.dac_dst_axis_agent);
+    adc_dst_axi_pt_agent_1.post_link_agent(scb_env_1.adc_dst_axi_pt_agent);
+    dac_src_axi_pt_agent_1.post_link_agent(scb_env_1.dac_src_axi_pt_agent);
+
+    dmac_tx_0 = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA_0);
+    dmac_rx_0 = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA_0);
+    dmac_tx_1 = new("DMAC TX 1", base_env.mng.master_sequencer, `TX_DMA_BA_1);
+    dmac_rx_1 = new("DMAC RX 1", base_env.mng.master_sequencer, `RX_DMA_BA_1);
+
+    do_tx_0 = new("Data Offload TX 0", base_env.mng.master_sequencer, `TX_DOFF_BA_0);
+    do_rx_0 = new("Data Offload RX 0", base_env.mng.master_sequencer, `RX_DOFF_BA_0);
+    do_tx_1 = new("Data Offload TX 1", base_env.mng.master_sequencer, `TX_DOFF_BA_1);
+    do_rx_1 = new("Data Offload RX 1", base_env.mng.master_sequencer, `RX_DOFF_BA_1);
 
     //=========================================================================
     // Setup generator/monitor stubs
@@ -133,15 +186,12 @@ program test_program();
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
     
     // Start the ADC/DAC stubs
-    `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
-    scb_env_0.run();
-    scb_env_1.run();
-
-    scb_env_0.adc_src_axis_agent.sequencer.start();
-    scb_env_1.adc_src_axis_agent.sequencer.start();
+    `INFO(("Start the sequencer"), ADI_VERBOSITY_LOW);
+    scb_env_0.adc_src_axis_agent.master_sequencer.start();
+    scb_env_1.adc_src_axis_agent.master_sequencer.start();
 
     // Generate DMA transfers
-    `INFO(("Start RX DMA ..."), ADI_VERBOSITY_LOW);
+    `INFO(("Start RX DMA"), ADI_VERBOSITY_LOW);
     rx_dma_transfer(dmac_rx_0, 32'h80000000, `ADC_TRANSFER_LENGTH);
     rx_dma_transfer(dmac_rx_1, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
@@ -150,10 +200,10 @@ program test_program();
       scb_env_1.scoreboard_rx.wait_until_complete();
     join
 
-    `INFO(("Initialize the memory ..."), ADI_VERBOSITY_LOW);
+    `INFO(("Initialize the memory"), ADI_VERBOSITY_LOW);
     init_mem_64(32'h80000000, 1024);
 
-    `INFO(("Start TX DMA ..."), ADI_VERBOSITY_LOW);
+    `INFO(("Start TX DMA"), ADI_VERBOSITY_LOW);
     tx_dma_transfer(dmac_tx_0, 32'h80000000, 1024);
     tx_dma_transfer(dmac_tx_1, 32'h80000000, 1024);
 
@@ -233,7 +283,8 @@ program test_program();
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      // base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
     end
     `INFO(("Final address: %x", addr + byte_length*8), ADI_VERBOSITY_LOW);
   endtask

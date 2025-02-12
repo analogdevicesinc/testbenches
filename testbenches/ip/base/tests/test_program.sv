@@ -38,6 +38,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -45,7 +46,10 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 program test_program;
 
   // Declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
   // Process variables
   process current_process;
@@ -61,20 +65,24 @@ program test_program;
     `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     // Create environment
-    env = new("Base Environment",
+    base_env = new("Base Environment",
               `TH.`SYS_CLK.inst.IF,
               `TH.`DMA_CLK.inst.IF,
               `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
+              `TH.`SYS_RST.inst.IF);
 
-    env.start();
-    env.sys_reset();
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    mng.link_agent(base_env.mng);
+    ddr.link_agent(base_env.ddr);
+
+    base_env.start();
+    base_env.sys_reset();
 
     /* Add stimulus tasks */
         
-    env.stop();
+    base_env.stop();
     
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();

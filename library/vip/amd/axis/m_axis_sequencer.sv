@@ -58,8 +58,9 @@ package m_axis_sequencer_pkg;
   class m_axis_sequencer_base extends adi_sequencer;
 
     protected bit enabled;
+    protected bit generator_running;
+    protected bit sender_running;
     protected bit queue_empty_sig;
-    protected event enable_ev;
     protected event disable_ev;
 
     protected data_gen_mode_t data_gen_mode;
@@ -162,16 +163,18 @@ package m_axis_sequencer_pkg;
 
     // set disable policy
     function void set_stop_policy(input stop_policy_t stop_policy);
-      if (enabled)
+      if (enabled) begin
         this.error($sformatf("Sequencer must be disabled before configuring stop policy"));
+      end
       this.stop_policy = stop_policy;
       this.info($sformatf("Disable policy configured"), ADI_VERBOSITY_HIGH);
     endfunction: set_stop_policy
 
     // set data generation mode
     function void set_data_gen_mode(input data_gen_mode_t data_gen_mode);
-      if (enabled)
+      if (enabled) begin
         this.error($sformatf("Sequencer must be disabled before configuring data generation mode"));
+      end
       this.data_gen_mode = data_gen_mode;
       this.info($sformatf("Data generation mode configured"), ADI_VERBOSITY_HIGH);
     endfunction: set_data_gen_mode
@@ -198,15 +201,17 @@ package m_axis_sequencer_pkg;
 
     // set all bytes valid in a sample, sets keep to 1
     function void set_keep_all();
-      if (enabled)
+      if (enabled) begin
         this.error($sformatf("Sequencer must be disabled before configuring keep all parameter"));
+      end
       this.keep_all = 1;
     endfunction: set_keep_all
 
     // bytes in a sample may not be valid, sets some bits of keep to 0
     function void set_keep_some();
-      if (enabled)
+      if (enabled) begin
         this.error($sformatf("Sequencer must be disabled before configuring keep all parameter"));
+      end
       this.keep_all = 0;
     endfunction: set_keep_some
 
@@ -236,8 +241,9 @@ package m_axis_sequencer_pkg;
 
     // wait until queue is empty
     task wait_empty_descriptor_queue();
-      if (this.queue_empty_sig)
+      if (this.queue_empty_sig) begin
         return;
+      end
       @queue_empty;
     endtask: wait_empty_descriptor_queue
 
@@ -248,38 +254,34 @@ package m_axis_sequencer_pkg;
 
     // generate transfer with transfer descriptors
     protected task generator();
-      this.info($sformatf("generator start"), ADI_VERBOSITY_HIGH);
-      forever begin
-        this.info($sformatf("Waiting for enable"), ADI_VERBOSITY_HIGH);
-        @enable_ev;
-        this.info($sformatf("Enable found"), ADI_VERBOSITY_HIGH);
-        fork begin
-          fork
-            begin
-              @disable_ev;
-              case (stop_policy)
-                STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
-                STOP_POLICY_PACKET: packet_sent();
-                STOP_POLICY_DATA_BEAT: beat_sent();
-              endcase
-            end
-            forever begin
-              if (descriptor_q.size() > 0) begin
-                if (enabled || (!enabled && stop_policy == STOP_POLICY_DESCRIPTOR_QUEUE)) begin
-                  packetize();
-                  descriptor_delay_subroutine();
-                end else
-                  @enable_ev;
-              end else begin
-                this.queue_empty_sig = 1;
-                ->> queue_empty;
-                @queue_ev;
+      this.info($sformatf("Generator started"), ADI_VERBOSITY_HIGH);
+      this.generator_running = 1;
+      fork begin
+        fork
+          begin
+            @disable_ev;
+            case (stop_policy)
+              STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
+              STOP_POLICY_PACKET: packet_sent();
+              STOP_POLICY_DATA_BEAT: beat_sent();
+            endcase
+          end
+          forever begin
+            if (descriptor_q.size() > 0) begin
+              if (enabled || (!enabled && stop_policy == STOP_POLICY_DESCRIPTOR_QUEUE)) begin
+                packetize();
+                descriptor_delay_subroutine();
               end
+            end else begin
+              this.queue_empty_sig = 1;
+              ->> queue_empty;
+              @queue_ev;
             end
-          join_any
-          disable fork;
-        end join
-      end
+          end
+        join_any
+        disable fork;
+      end join
+      this.generator_running = 0;
     endtask: generator
 
     // function 
@@ -295,25 +297,29 @@ package m_axis_sequencer_pkg;
     endtask: data_beat_delay_subroutine
 
     task start();
-      this.info($sformatf("enable sequencer"), ADI_VERBOSITY_HIGH);
-      enabled = 1;
-      ->> enable_ev;
-    endtask: start
-
-    task stop();
-      this.info($sformatf("disable sequencer"), ADI_VERBOSITY_HIGH);
-      enabled = 0;
-      byte_count = 0;
-      ->> disable_ev;
-      #1step;
-    endtask: stop
-
-    task run();
+      this.info($sformatf("Sequencer started"), ADI_VERBOSITY_HIGH);
+      if (this.generator_running || this.sender_running) begin
+        if (this.enabled) begin
+          this.warning($sformatf("Sequencer is already running!"));
+        end else begin
+          this.warning($sformatf("Sequencer is still running!"));
+        end
+        return;
+      end
+      this.enabled = 1;
       fork
         generator();
         sender();
       join_none
-    endtask: run
+    endtask: start
+
+    task stop();
+      this.info($sformatf("Sequencer stopped"), ADI_VERBOSITY_HIGH);
+      this.enabled = 0;
+      this.byte_count = 0;
+      ->> this.disable_ev;
+      #1step;
+    endtask: stop
 
   endclass: m_axis_sequencer_base
 
@@ -388,44 +394,48 @@ package m_axis_sequencer_pkg;
 
       this.info($sformatf("packetize start"), ADI_VERBOSITY_HIGH);
       byte_per_beat = AXIS_VIP_DATA_WIDTH/8;
-      descriptor = descriptor_q.pop_front();
+      descriptor = this.descriptor_q.pop_front();
 
       // put a copy of the descriptor back into the queue and continue processing
-      if (this.descriptor_gen_mode == 1 && enabled)
-        descriptor_q.push_back(descriptor);
+      if (this.descriptor_gen_mode == 1 && enabled) begin
+        this.descriptor_q.push_back(descriptor);
+      end
 
       packet_length = descriptor.num_bytes / byte_per_beat;
-      if (packet_length*byte_per_beat < descriptor.num_bytes)
+      if (packet_length*byte_per_beat < descriptor.num_bytes) begin
         packet_length++;
+      end
 
-      if (keep_all)
+      if (this.keep_all) begin
         descriptor.num_bytes = packet_length*byte_per_beat;
+      end
 
       for (int tc=0; tc<packet_length; tc++) begin : packet_loop
         data = new[byte_per_beat];
-        for (int i=0; i<byte_per_beat; i++)
+        for (int i=0; i<byte_per_beat; i++) begin
           data[i] = 'd0;
+        end
         keep = new[byte_per_beat];
 
-        for (int i=0; i<byte_per_beat && (keep_all || tc*byte_per_beat+i<descriptor.num_bytes); i++) begin
-          case (data_gen_mode)
-            DATA_GEN_MODE_TEST_DATA:
+        for (int i=0; i<byte_per_beat && (this.keep_all || tc*byte_per_beat+i<descriptor.num_bytes); i++) begin
+          case (this.data_gen_mode)
+            DATA_GEN_MODE_TEST_DATA: begin
               // block transfer until we get data from byte stream queue
               forever begin
-                if (byte_stream.size() > 0) begin
-                  data[i] = byte_stream.pop_front();
+                if (this.byte_stream.size() > 0) begin
+                  data[i] = this.byte_stream.pop_front();
                   keep[i] = 1'b1;
                   break;
                 end else
                   fork begin
                     fork
-                      @byte_stream_ev;
+                      @this.byte_stream_ev;
                       begin
-                        @disable_ev;
+                        @this.disable_ev;
                         if (tc==0 && i==0) begin
                           case (stop_policy)
-                            STOP_POLICY_PACKET: ->> packet_done;
-                            STOP_POLICY_DATA_BEAT: ->> beat_done;
+                            STOP_POLICY_PACKET: ->> this.packet_done;
+                            STOP_POLICY_DATA_BEAT: ->> this.beat_done;
                             default: ;
                           endcase
                         end
@@ -434,8 +444,9 @@ package m_axis_sequencer_pkg;
                     disable fork;
                   end join
               end
+            end
             DATA_GEN_MODE_AUTO_INCR: begin
-              data[i] = byte_count++;
+              data[i] = this.byte_count++;
               keep[i] = 1'b1;
             end
             DATA_GEN_MODE_AUTO_RAND: begin
@@ -446,57 +457,58 @@ package m_axis_sequencer_pkg;
         end
 
         this.info($sformatf("generating axis transaction"), ADI_VERBOSITY_HIGH);
-        trans = this.driver.create_transaction();
-        trans.set_data(data);
-        trans.set_id('h0);
-        trans.set_dest('h0);
-        data_beat_delay_subroutine();
+        this.trans = this.driver.create_transaction();
+        this.trans.set_data(data);
+        this.trans.set_id('h0);
+        this.trans.set_dest('h0);
 
-        if (AXIS_VIP_HAS_TKEEP)
-          trans.set_keep(keep);
+        this.data_beat_delay_subroutine();
 
-        if (AXIS_VIP_HAS_TLAST)
-          trans.set_last((tc == packet_length-1) & descriptor.gen_last);
+        if (AXIS_VIP_HAS_TKEEP) begin
+          this.trans.set_keep(keep);
+        end
 
-        if (AXIS_VIP_USER_WIDTH > 0)
-          trans.set_user_beat((tc == 0) & descriptor.gen_sync);
+        if (AXIS_VIP_HAS_TLAST) begin
+          this.trans.set_last((tc == packet_length-1) & descriptor.gen_last);
+        end
+
+        if (AXIS_VIP_USER_WIDTH > 0) begin
+          this.trans.set_user_beat((tc == 0) & descriptor.gen_sync);
+        end
 
         ->> data_av_ev;
         this.info($sformatf("waiting transfer to complete"), ADI_VERBOSITY_HIGH);
-        @beat_done;
+        @this.beat_done;
       end
     endtask: packetize
 
     // packet sender function
     virtual protected task sender();
-      this.info($sformatf("sender start"), ADI_VERBOSITY_HIGH);
-      forever begin
-        this.info($sformatf("Waiting for enable"), ADI_VERBOSITY_HIGH);
-        @enable_ev;
-        this.info($sformatf("Enable found"), ADI_VERBOSITY_HIGH);
-        fork begin
-          fork
-            begin
-              @disable_ev;
-              case (stop_policy)
-                STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
-                STOP_POLICY_PACKET: packet_sent();
-                STOP_POLICY_DATA_BEAT: beat_sent();
-              endcase
+      this.info($sformatf("Sender started"), ADI_VERBOSITY_HIGH);
+      this.sender_running = 1;
+      fork begin
+        fork
+          begin
+            @this.disable_ev;
+            case (this.stop_policy)
+              STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
+              STOP_POLICY_PACKET: packet_sent();
+              STOP_POLICY_DATA_BEAT: beat_sent();
+            endcase
+          end
+          forever begin
+            @this.data_av_ev;
+            this.info($sformatf("sending axis transaction"), ADI_VERBOSITY_HIGH);
+            this.driver.send(this.trans);
+            ->> this.beat_done;
+            if (this.trans.get_last()) begin
+              ->> this.packet_done;
             end
-            forever begin
-              @data_av_ev;
-              this.info($sformatf("sending axis transaction"), ADI_VERBOSITY_HIGH);
-              this.driver.send(trans);
-              ->> beat_done;
-              if (this.trans.get_last()) begin
-                ->> packet_done;
-              end
-            end
-          join_any
-          disable fork;
-        end join
-      end
+          end
+        join_any
+        disable fork;
+      end join
+      this.sender_running = 0;
     endtask: sender
 
   endclass: m_axis_sequencer

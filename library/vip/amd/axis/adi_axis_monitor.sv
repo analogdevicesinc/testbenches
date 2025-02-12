@@ -42,10 +42,8 @@ package adi_axis_monitor_pkg;
   import adi_vip_pkg::*;
   import pub_sub_pkg::*;
 
-  class adi_axis_monitor #(`AXIS_VIP_PARAM_DECL(AXIS)) extends adi_monitor;
 
-    // analysis port from the monitor
-    protected axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(AXIS)) monitor;
+  class adi_axis_monitor_base extends adi_monitor;
 
     adi_publisher #(logic [7:0]) publisher;
 
@@ -55,19 +53,16 @@ package adi_axis_monitor_pkg;
     // constructor
     function new(
       input string name,
-      input axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(AXIS)) monitor,
       input adi_agent parent = null);
 
       super.new(name, parent);
-
-      this.monitor = monitor;
 
       this.publisher = new("Publisher", this);
 
       this.enabled = 0;
     endfunction: new
 
-    task run();
+    task start();
       if (this.enabled) begin
         this.error($sformatf("Monitor is already running!"));
         return;
@@ -87,16 +82,38 @@ package adi_axis_monitor_pkg;
           disable fork;
         end
       join_none
-    endtask: run
+    endtask: start
 
     function void stop();
       this.enabled = 0;
       -> enable_ev;
     endfunction: stop
 
+    virtual task get_transaction();
+    endtask: get_transaction
+
+  endclass: adi_axis_monitor_base
+
+
+  class adi_axis_monitor #(`AXIS_VIP_PARAM_DECL(AXIS)) extends adi_axis_monitor_base;
+
+    // analysis port from the monitor
+    protected axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(AXIS)) monitor;
+
+    // constructor
+    function new(
+      input string name,
+      input axi4stream_monitor #(`AXIS_VIP_IF_PARAMS(AXIS)) monitor,
+      input adi_agent parent = null);
+
+      super.new(name, parent);
+
+      this.monitor = monitor;
+    endfunction: new
+
     // collect data from the AXI4Strean interface of the stub, this task
     // handles both ONESHOT and CYCLIC scenarios
-    task get_transaction();
+    virtual task get_transaction();
       axi4stream_transaction transaction;
       xil_axi4stream_data_beat data_beat;
       xil_axi4stream_strb_beat keep_beat;

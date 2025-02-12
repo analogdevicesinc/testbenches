@@ -46,11 +46,77 @@ package adi_axis_agent_pkg;
   import s_axis_sequencer_pkg::*;
   import adi_axis_monitor_pkg::*;
 
+  typedef enum {MASTER, SLAVE, PASSTHROUGH} axis_agent_typedef;
 
-  class adi_axis_master_agent #(`AXIS_VIP_PARAM_DECL(master)) extends adi_agent;
+  class adi_axis_agent_base extends adi_agent;
+
+    m_axis_sequencer_base master_sequencer;
+    s_axis_sequencer_base slave_sequencer;
+    adi_axis_monitor_base monitor;
+
+    local axis_agent_typedef agent_type;
+
+    function new(
+      input string name,
+      input axis_agent_typedef agent_type,
+      input adi_environment parent = null);
+
+      super.new(name, parent);
+
+      this.agent_type = agent_type;
+    endfunction: new
+
+    virtual task start_master();
+      if (agent_type == SLAVE) begin
+        this.fatal($sformatf("Agent is in slave mode!"));
+      end
+      this.monitor.start();
+    endtask: start_master
+    
+    virtual task start_slave();
+      if (agent_type == MASTER) begin
+        this.fatal($sformatf("Agent is in master mode!"));
+      end
+      this.monitor.start();
+    endtask: start_slave
+
+    virtual task start_monitor();
+      if (agent_type != PASSTHROUGH) begin
+        this.fatal($sformatf("Agent is not in passthrough mode!"));
+      end
+      this.monitor.start();
+    endtask: start_monitor
+    
+    virtual task stop_master();
+      if (agent_type == SLAVE) begin
+        this.fatal($sformatf("Agent is in slave mode!"));
+      end
+      this.master_sequencer.stop();
+      this.monitor.stop();
+    endtask: stop_master
+
+    virtual task stop_slave();
+      if (agent_type == MASTER) begin
+        this.fatal($sformatf("Agent is in master mode!"));
+      end
+      this.slave_sequencer.stop();
+      this.monitor.stop();
+    endtask: stop_slave
+
+    virtual task stop_monitor();
+      if (agent_type != PASSTHROUGH) begin
+        this.fatal($sformatf("Agent is not in passthrough mode!"));
+      end
+      this.monitor.stop();
+    endtask: stop_monitor
+    
+  endclass: adi_axis_agent_base
+
+
+  class adi_axis_master_agent #(`AXIS_VIP_PARAM_DECL(master)) extends adi_axis_agent_base;
 
     axi4stream_mst_agent #(`AXIS_VIP_IF_PARAMS(master)) agent;
-    m_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(master)) sequencer;
+    m_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(master)) master_sequencer;
     adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(master)) monitor;
 
     function new(
@@ -58,35 +124,40 @@ package adi_axis_agent_pkg;
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(master)) master_vip_if,
       input adi_environment parent = null);
 
-      super.new(name, parent);
+      super.new(name, MASTER, parent);
 
       this.agent = new("Agent", master_vip_if);
-      this.sequencer = new("Sequencer", this.agent.driver, this);
+      this.master_sequencer = new("Sequencer", this.agent.driver, this);
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
-    task start();
+    function void pre_link_agent(adi_axis_agent_base adi_axis_agent);
+      this.name = adi_axis_agent.name;
+      this.parent = adi_axis_agent.parent;
+    endfunction: pre_link_agent
+
+    function void post_link_agent(adi_axis_agent_base adi_axis_agent);
+      adi_axis_agent.master_sequencer = this.master_sequencer;
+      adi_axis_agent.monitor = this.monitor;
+    endfunction: post_link_agent
+
+    virtual task start_master();
+      super.start_master();
       this.agent.start_master();
-    endtask: start
+    endtask: start_master
 
-    task run();
-      this.sequencer.run();
-      this.monitor.run();
-    endtask: run
-
-    task stop();
-      this.monitor.stop();
-      this.sequencer.stop();
+    virtual task stop_master();
+      super.stop_master();
       this.agent.stop_master();
-    endtask: stop
+    endtask: stop_master
 
   endclass: adi_axis_master_agent
 
 
-  class adi_axis_slave_agent #(`AXIS_VIP_PARAM_DECL(slave)) extends adi_agent;
+  class adi_axis_slave_agent #(`AXIS_VIP_PARAM_DECL(slave)) extends adi_axis_agent_base;
 
     axi4stream_slv_agent #(`AXIS_VIP_IF_PARAMS(slave)) agent;
-    s_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(slave)) sequencer;
+    s_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(slave)) slave_sequencer;
     adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(slave)) monitor;
 
     function new(
@@ -94,31 +165,37 @@ package adi_axis_agent_pkg;
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(slave)) slave_vip_if,
       input adi_environment parent = null);
 
-      super.new(name, parent);
+      super.new(name, SLAVE, parent);
 
       this.agent = new("Agent", slave_vip_if);
-      this.sequencer = new("Sequencer", this.agent.driver, this);
+      this.slave_sequencer = new("Sequencer", this.agent.driver, this);
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
-    task start();
+    function void pre_link_agent(adi_axis_agent_base adi_axis_agent);
+      this.name = adi_axis_agent.name;
+      this.parent = adi_axis_agent.parent;
+    endfunction: pre_link_agent
+
+    function void post_link_agent(adi_axis_agent_base adi_axis_agent);
+      adi_axis_agent.slave_sequencer = this.slave_sequencer;
+      adi_axis_agent.monitor = this.monitor;
+    endfunction: post_link_agent
+
+    virtual task start_slave();
+      super.start_slave();
       this.agent.start_slave();
-    endtask: start
+    endtask: start_slave
 
-    task run();
-      this.sequencer.run();
-      this.monitor.run();
-    endtask: run
-
-    task stop();
-      this.monitor.stop();
+    virtual task stop_slave();
+      super.stop_slave();
       this.agent.stop_slave();
-    endtask: stop
+    endtask: stop_slave
 
   endclass: adi_axis_slave_agent
 
 
-  class adi_axis_passthrough_mem_agent #(`AXIS_VIP_PARAM_DECL(passthrough)) extends adi_agent;
+  class adi_axis_passthrough_mem_agent #(`AXIS_VIP_PARAM_DECL(passthrough)) extends adi_axis_agent_base;
 
     axi4stream_passthrough_agent #(`AXIS_VIP_IF_PARAMS(passthrough)) agent;
     m_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(passthrough)) master_sequencer;
@@ -130,7 +207,7 @@ package adi_axis_agent_pkg;
       virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(passthrough)) passthrough_vip_if,
       input adi_environment parent = null);
 
-      super.new(name, parent);
+      super.new(name, PASSTHROUGH, parent);
 
       this.agent = new("Agent", passthrough_vip_if);
       this.master_sequencer = new("Master Sequencer", this.agent.mst_driver, this);
@@ -138,22 +215,48 @@ package adi_axis_agent_pkg;
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
-    task start();
-      this.warning($sformatf("Start must called manually in the test program or environment"));
-    endtask: start
+    function void pre_link_agent(adi_axis_agent_base adi_axis_agent);
+      this.name = adi_axis_agent.name;
+      this.parent = adi_axis_agent.parent;
+    endfunction: pre_link_agent
 
-    task run();
-      this.master_sequencer.run();
-      this.slave_sequencer.run();
-      this.monitor.run();
-    endtask: run
+    function void post_link_agent(adi_axis_agent_base adi_axis_agent);
+      adi_axis_agent.master_sequencer = this.master_sequencer;
+      adi_axis_agent.slave_sequencer = this.slave_sequencer;
+      adi_axis_agent.monitor = this.monitor;
+    endfunction: post_link_agent
 
-    task stop();
-      this.monitor.stop();
-      this.master_sequencer.stop();
-      this.agent.stop_slave();
+    virtual task start_master();
+      super.start_master();
+      this.agent.start_master();
+      this.warning($sformatf("Sequencer must be started manually!"));
+    endtask: start_master
+
+    virtual task start_slave();
+      super.start_slave();
+      this.agent.start_slave();
+      this.warning($sformatf("Sequencer must be started manually!"));
+    endtask: start_slave
+
+    virtual task start_monitor();
+      super.start_monitor();
+      this.agent.start_monitor();
+    endtask: start_monitor
+
+    virtual task stop_master();
+      super.stop_master();
       this.agent.stop_master();
-    endtask: stop
+    endtask: stop_master
+
+    virtual task stop_slave();
+      super.stop_slave();
+      this.agent.stop_slave();
+    endtask: stop_slave
+
+    virtual task stop_monitor();
+      super.stop_monitor();
+      this.agent.stop_monitor();
+    endtask: stop_monitor
 
   endclass: adi_axis_passthrough_mem_agent
 

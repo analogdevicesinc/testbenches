@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2018 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2018-2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,13 +35,13 @@
 
 global ad_project_params
 
-source $ad_hdl_dir/projects/common/xilinx/adcfifo_bd.tcl
-source $ad_hdl_dir/projects/common/xilinx/dacfifo_bd.tcl
-
-## ADC FIFO depth in samples per converter
-set adc_fifo_samples_per_converter [expr 4*1024]
-## DAC FIFO depth in samples per converter
-set dac_fifo_samples_per_converter [expr 4*1024]
+## Data Offload
+set adc_offload_type $ad_project_params(ADC_OFFLOAD_TYPE)
+set adc_offload_size $ad_project_params(ADC_OFFLOAD_SIZE)
+set dac_offload_type $ad_project_params(DAC_OFFLOAD_TYPE)
+set dac_offload_size $ad_project_params(DAC_OFFLOAD_SIZE)
+set rd_data_registered $ad_project_params(RD_DATA_REGISTERED)
+set rd_fifo_address_width $ad_project_params(RD_FIFO_ADDRESS_WIDTH)
 
 # DRP clk for 204C phy
 ad_ip_instance clk_vip drp_clk_vip [ list \
@@ -84,6 +84,9 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 #
 source $ad_hdl_dir/projects/ad_quadmxfe1_ebz/common/ad_quadmxfe1_ebz_bd.tcl
 
+ad_ip_parameter $dac_offload_name/storage_unit CONFIG.RD_DATA_REGISTERED $rd_data_registered
+ad_ip_parameter $dac_offload_name/storage_unit CONFIG.RD_FIFO_ADDRESS_WIDTH $rd_fifo_address_width
+
 if {$ad_project_params(JESD_MODE) == "8B10B"} {
 } else {
   ad_connect  drp_clk_vip/clk_out jesd204_phy_121_122/drpclk
@@ -96,6 +99,10 @@ set RX_DMA 0x7C420000
 set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_dma}]
 adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
 
+set RX_OFFLOAD 0x7C450000
+set_property offset $RX_OFFLOAD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mxfe_rx_data_offload}]
+adi_sim_add_define "RX_OFFLOAD_BA=[format "%d" ${RX_OFFLOAD}]"
+
 set AXI_JESD_RX 0x44A90000
 set_property offset $AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_jesd}]
 adi_sim_add_define "AXI_JESD_RX_BA=[format "%d" ${AXI_JESD_RX}]"
@@ -107,6 +114,10 @@ adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
 set TX_DMA 0x7C430000
 set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_dma}]
 adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
+
+set TX_OFFLOAD 0x7C460000
+set_property offset $TX_OFFLOAD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mxfe_tx_data_offload}]
+adi_sim_add_define "TX_OFFLOAD_BA=[format "%d" ${TX_OFFLOAD}]"
 
 set AXI_JESD_TX 0x44B90000
 set_property offset $AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_jesd}]

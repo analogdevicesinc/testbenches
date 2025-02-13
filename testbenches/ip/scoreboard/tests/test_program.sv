@@ -263,8 +263,8 @@ program test_program();
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin
-      // base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
-      ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(addr + i*8, i, 255);
+      // ddr.slave_sequencer.set_reg_data_in_mem(addr + i*8, i, 255);
     end
     `INFO(("Final address: %x", addr + byte_length*8), ADI_VERBOSITY_LOW);
   endtask

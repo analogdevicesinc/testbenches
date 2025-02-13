@@ -462,7 +462,7 @@ task offload_spi_test();
 
     for (int i=0; i<=((2* NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.get_reg_data_from_mem(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin

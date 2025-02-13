@@ -129,19 +129,6 @@ package s_axis_sequencer_pkg;
       this.low_time_max = low_time_max;
     endfunction: set_low_time_range
 
-    // function for verifying bytes
-    task verify_byte(input bit [7:0] refdata);
-      bit [7:0] data;
-      if (byte_stream.size() == 0) begin
-        this.error($sformatf("Byte steam empty !!!"));
-      end else begin
-        data = byte_stream.pop_front();
-        if (data !== refdata) begin
-          this.error($sformatf("Unexpected data received. Expected: %0h Found: %0h Left : %0d", refdata, data, byte_stream.size()));
-        end
-      end
-    endtask: verify_byte
-
     // call ready generation function
     virtual task start();
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));

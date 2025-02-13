@@ -245,7 +245,7 @@ module test_program();
   // Memory initialization function for a 8byte DATA_WIDTH AXI4 bus
   task init_mem_64(longint unsigned addr, int byte_length);
     for (int i=0; i<byte_length; i=i+8) begin
-      env.ddr_agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      env.ddr_slave_sequencer.set_reg_data_in_mem(addr + i*8, i, 255);
     end
   endtask
 

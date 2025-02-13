@@ -36,6 +36,7 @@
 `include "utils.svh"
 
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import adi_regmap_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -67,7 +68,10 @@ program test_program;
 
   parameter TDD1 = `AXI_AD9361_BA + 'h12_00 * 4;
 
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
   bit [31:0] val;
 
@@ -78,7 +82,7 @@ program test_program;
       input   [31:0]  raddr,
       input   [31:0]  vdata);
 
-    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+    base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   // --------------------------
@@ -88,7 +92,7 @@ program test_program;
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    base_env.mng.sequencer.RegWrite32(waddr,wdata);
+    base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
   endtask
 
   integer rate;
@@ -103,12 +107,16 @@ program test_program;
 
     //creating environment
     base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 

@@ -38,6 +38,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import environment_pkg::*;
 import watchdog_pkg::*;
 
@@ -50,7 +51,11 @@ import `PKGIFY(test_harness, output_axis)::*;
 program test_program ();
 
   // declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+  
   util_axis_fifo_environment #(`AXIS_VIP_PARAMS(test_harness, input_axis), `AXIS_VIP_PARAMS(test_harness, output_axis), `INPUT_CLK, `OUTPUT_CLK) uaf_env;
 
   watchdog send_data_wd;
@@ -59,12 +64,16 @@ program test_program ();
 
     // create environment
     base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     uaf_env = new("Util AXIS FIFO Environment",
                   `TH.`INPUT_CLK_VIP.inst.IF,

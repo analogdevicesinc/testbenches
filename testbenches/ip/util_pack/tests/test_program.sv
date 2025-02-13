@@ -39,6 +39,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import environment_pkg::*;
 import dmac_api_pkg::*;
 import watchdog_pkg::*;
@@ -54,7 +55,11 @@ import `PKGIFY(test_harness, rx_dst_axis)::*;
 program test_program;
 
   // declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+  
   util_pack_environment #(`AXIS_VIP_PARAMS(test_harness, tx_src_axis), `AXIS_VIP_PARAMS(test_harness, tx_dst_axis), `AXIS_VIP_PARAMS(test_harness, rx_src_axis), `AXIS_VIP_PARAMS(test_harness, rx_dst_axis)) pack_env;
 
   watchdog packer_scoreboard_wd;
@@ -70,12 +75,16 @@ program test_program;
 
     // create environment
     base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     pack_env = new("Util Pack Environment",
                     `TH.`TX_SRC_AXIS.inst.IF,
@@ -83,8 +92,8 @@ program test_program;
                     `TH.`RX_SRC_AXIS.inst.IF,
                     `TH.`RX_DST_AXIS.inst.IF);
 
-    dmac_tx = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA);
-    dmac_rx = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA);
+    dmac_tx = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA);
+    dmac_rx = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA);
 
     base_env.start();
     pack_env.start();

@@ -96,14 +96,14 @@ program test_program();
 
     // create environment
     base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF);
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
 
     mng = new("", `TH.`MNG_AXI.inst.IF);
     ddr = new("", `TH.`DDR_AXI.inst.IF);
-    
+
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 

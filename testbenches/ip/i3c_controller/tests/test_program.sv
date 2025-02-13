@@ -43,6 +43,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -146,7 +147,10 @@ program test_program (
   output offload_sdi_ready,
   output offload_trigger);
 
-test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+test_harness_env base_env;
+
+adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
 //---------------------------------------------------------------------------
 // Wrapper function for AXI read verify using dword
@@ -156,7 +160,7 @@ task axi_read_v(
     input   [13:0]  raddr,
     input   [31:0]  vdata);
 
-  base_env.mng.sequencer.RegReadVerify32(baddr+{raddr,2'b00},vdata);
+  base_env.mng.master_sequencer.RegReadVerify32(baddr+{raddr,2'b00},vdata);
 endtask
 
 task axi_read(
@@ -164,7 +168,7 @@ task axi_read(
     input   [13:0]  raddr,
     output  [31:0]  data);
 
-  base_env.mng.sequencer.RegRead32(baddr+{raddr,2'b00},data);
+  base_env.mng.master_sequencer.RegRead32(baddr+{raddr,2'b00},data);
 endtask
 
 //---------------------------------------------------------------------------
@@ -175,7 +179,7 @@ task axi_write(
   input [13:0]  waddr,
   input [31:0]  wdata);
 
-  base_env.mng.sequencer.RegWrite32(baddr+{waddr,2'b00},wdata);
+  base_env.mng.master_sequencer.RegWrite32(baddr+{waddr,2'b00},wdata);
 endtask
 
 //---------------------------------------------------------------------------
@@ -254,12 +258,16 @@ initial begin
 
   // Creating environment
   base_env = new("Base Environment",
-                  `TH.`SYS_CLK.inst.IF,
-                  `TH.`DMA_CLK.inst.IF,
-                  `TH.`DDR_CLK.inst.IF,
-                  `TH.`SYS_RST.inst.IF,
-                  `TH.`MNG_AXI.inst.IF,
-                  `TH.`DDR_AXI.inst.IF);
+    `TH.`SYS_CLK.inst.IF,
+    `TH.`DMA_CLK.inst.IF,
+    `TH.`DDR_CLK.inst.IF,
+    `TH.`SYS_RST.inst.IF);
+
+  mng = new("", `TH.`MNG_AXI.inst.IF);
+  ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+  `LINK(mng, base_env, mng)
+  `LINK(ddr, base_env, ddr)
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 

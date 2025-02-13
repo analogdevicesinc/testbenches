@@ -46,6 +46,7 @@ import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -64,7 +65,10 @@ program test_program_pi (
   input         sys_clk,
   input         rx_busy);
 
-test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+test_harness_env base_env;
+
+adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
 // --------------------------
 // Wrapper function for AXI read verif
@@ -73,14 +77,14 @@ task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+  base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-  base_env.mng.sequencer.RegRead32(raddr,data);
+  base_env.mng.master_sequencer.RegRead32(raddr,data);
 endtask
 
 // --------------------------
@@ -90,7 +94,7 @@ task axi_write(
   input [31:0]  waddr,
   input [31:0]  wdata);
 
-  base_env.mng.sequencer.RegWrite32(waddr,wdata);
+  base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
@@ -100,12 +104,16 @@ initial begin
 
   //creating environment
   base_env = new("Base Environment",
-                  `TH.`SYS_CLK.inst.IF,
-                  `TH.`DMA_CLK.inst.IF,
-                  `TH.`DDR_CLK.inst.IF,
-                  `TH.`SYS_RST.inst.IF,
-                  `TH.`MNG_AXI.inst.IF,
-                  `TH.`DDR_AXI.inst.IF);
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
+
+  mng = new("", `TH.`MNG_AXI.inst.IF);
+  ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+  `LINK(mng, base_env, mng)
+  `LINK(ddr, base_env, ddr)
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
@@ -203,13 +211,13 @@ task data_acquisition_test();
     `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
 
      // Configure DMA
-    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_FLAGS),
+    base_env.mng.master_sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    base_env.mng.master_sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
-    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
+    base_env.mng.master_sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    base_env.mng.master_sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
 
     // Configure AXI_AD7616
     axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_UP_CNTRL),
@@ -226,7 +234,7 @@ task data_acquisition_test();
 
     transfer_status = 1;
 
-    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    base_env.mng.master_sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 

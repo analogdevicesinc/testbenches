@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -34,13 +34,15 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axis_definitions.svh"
 
 package s_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
+  import adi_vip_pkg::*;
   import logger_pkg::*;
 
-  class s_axis_sequencer_base extends adi_component;
+  class s_axis_sequencer_base extends adi_sequencer;
 
     protected xil_axi4stream_data_byte byte_stream [$];
     protected xil_axi4stream_ready_gen_policy_t mode;
@@ -60,7 +62,7 @@ package s_axis_sequencer_pkg;
     // new
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_agent parent = null);
       
       super.new(name, parent);
 
@@ -87,20 +89,20 @@ package s_axis_sequencer_pkg;
     // ready generation policy functions
     function void set_mode(input xil_axi4stream_ready_gen_policy_t mode);
       this.mode = mode;
-    endfunction
+    endfunction: set_mode
 
     function xil_axi4stream_ready_gen_policy_t get_mode();
       return this.mode;
-    endfunction
+    endfunction: get_mode
 
     // high time functions
     function void set_high_time(input xil_axi4stream_uint high_time);
       this.high_time = high_time;
-    endfunction
+    endfunction: set_high_time
 
     function xil_axi4stream_uint get_high_time();
       return this.high_time;
-    endfunction
+    endfunction: get_high_time
 
     function void set_high_time_range(
       input xil_axi4stream_uint high_time_min, 
@@ -108,12 +110,12 @@ package s_axis_sequencer_pkg;
 
       this.high_time_min = high_time_min;
       this.high_time_max = high_time_max;
-    endfunction
+    endfunction: set_high_time_range
 
     // low time functions
     function void set_low_time(input xil_axi4stream_uint low_time);
       this.low_time = low_time;
-    endfunction
+    endfunction: set_low_time
 
     function xil_axi4stream_uint get_low_time();
       return this.low_time;
@@ -125,57 +127,46 @@ package s_axis_sequencer_pkg;
 
       this.low_time_min = low_time_min;
       this.low_time_max = low_time_max;
-    endfunction
-
-    // function for verifying bytes
-    task verify_byte(input bit [7:0] refdata);
-      bit [7:0] data;
-      if (byte_stream.size() == 0) begin
-        this.error($sformatf("Byte steam empty !!!"));
-      end else begin
-        data = byte_stream.pop_front();
-        if (data !== refdata) begin
-          this.error($sformatf("Unexpected data received. Expected: %0h Found: %0h Left : %0d", refdata, data, byte_stream.size()));
-        end
-      end
-    endtask
+    endfunction: set_low_time_range
 
     // call ready generation function
-    task run();
-      user_gen_tready();
-    endtask
+    virtual task start();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: start
 
 
     // virtual tasks to be implemented
     virtual task user_gen_tready();
-    endtask
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: user_gen_tready
 
-    virtual task get_transfer();
-    endtask
+    virtual task stop();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: stop
 
   endclass: s_axis_sequencer_base
 
 
-  class s_axis_sequencer #( type T ) extends s_axis_sequencer_base;
+  class s_axis_sequencer #(`AXIS_VIP_PARAM_DECL(AXIS)) extends s_axis_sequencer_base;
 
-    protected T agent;
+    protected axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver;
 
 
     function new(
       input string name,
-      input T agent,
-      input adi_component parent = null);
+      input axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
+      input adi_agent parent = null);
       
       super.new(name, parent);
 
-      this.agent = agent;
-    endfunction
+      this.driver = driver;
+    endfunction: new
 
 
-    virtual task user_gen_tready();
+    virtual task start();
       axi4stream_ready_gen tready_gen;
       
-      tready_gen = agent.driver.create_ready("TREADY");
+      tready_gen = this.driver.create_ready("TREADY");
       
       tready_gen.set_ready_policy(this.mode);
 
@@ -191,27 +182,13 @@ package s_axis_sequencer_pkg;
         tready_gen.set_low_time_range(this.low_time_min, this.low_time_max);
         tready_gen.set_high_time_range(this.high_time_min, this.high_time_max);
       end
-      agent.driver.send_tready(tready_gen);
-    endtask
+      this.driver.send_tready(tready_gen);
+    endtask: start
 
-    // Get transfer from the monitor and serialize data into a byte stream
-    // Assumption: all bytes from beat are valid (no position or null bytes)
-    virtual task get_transfer();
+    virtual task stop();
+      this.driver.vif_proxy.reset();
+    endtask: stop
 
-      axi4stream_monitor_transaction mytrans;
-      xil_axi4stream_data_beat  data_beat;
+  endclass: s_axis_sequencer
 
-      agent.monitor.item_collected_port.get(mytrans);
-
-      //$display(mytrans.convert2string);
-
-      data_beat = mytrans.get_data_beat();
-
-      for (int i=0; i<mytrans.get_data_width()/8; i++) begin
-        byte_stream.push_back(data_beat[i*8+:8]);
-      end
-    endtask;
-
-  endclass
-
-endpackage
+endpackage: s_axis_sequencer_pkg

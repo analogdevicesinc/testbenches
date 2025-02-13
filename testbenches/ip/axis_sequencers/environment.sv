@@ -1,32 +1,56 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsabilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
 `include "utils.svh"
+`include "axis_definitions.svh"
 
 package environment_pkg;
 
-  import m_axi_sequencer_pkg::*;
-  import s_axi_sequencer_pkg::*;
+  import logger_pkg::*;
+  import adi_environment_pkg::*;
+
+  import axi4stream_vip_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
-  import logger_pkg::*;
-  import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import test_harness_env_pkg::*;
+  import adi_axis_agent_pkg::*;
 
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
+  class axis_sequencer_environment #(`AXIS_VIP_PARAM_DECL(src_axis), `AXIS_VIP_PARAM_DECL(dst_axis)) extends adi_environment;
 
-  import `PKGIFY(test_harness, src_axis)::*;
-  import `PKGIFY(test_harness, dst_axis)::*;
-
-  class environment extends test_harness_env;
-
-    // agents and sequencers
-    `AGENT(test_harness, src_axis, mst_t) src_axis_agent;
-    `AGENT(test_harness, dst_axis, slv_t) dst_axis_agent;
-
-    m_axis_sequencer #(`AGENT(test_harness, src_axis, mst_t),
-                      `AXIS_VIP_PARAMS(test_harness, src_axis)
-                      ) src_axis_seq;
-    s_axis_sequencer #(`AGENT(test_harness, dst_axis, slv_t)) dst_axis_seq;
+    // Agents
+    adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(src_axis)) src_axis_agent;
+    adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(dst_axis)) dst_axis_agent;
 
     //============================================================================
     // Constructor
@@ -34,34 +58,14 @@ package environment_pkg;
     function new (
       input string name,
 
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
-
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, src_axis)) src_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dst_axis)) dst_axis_vip_if
-    );
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(src_axis)) src_axis_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(dst_axis)) dst_axis_vip_if);
 
       // creating the agents
-      super.new(name,
-                sys_clk_vip_if, 
-                dma_clk_vip_if, 
-                ddr_clk_vip_if, 
-                sys_rst_vip_if, 
-                mng_vip_if, 
-                ddr_vip_if);
+      super.new(name);
 
-      src_axis_agent = new("Source AXI Stream Agent", src_axis_vip_if);
-      dst_axis_agent = new("Destination AXI Stream Agent", dst_axis_vip_if);
-
-      src_axis_seq = new("Source AXI Stream Agent", src_axis_agent, this);
-      dst_axis_seq = new("Destination AXI Stream Agent", dst_axis_agent, this);
-
+      this.src_axis_agent = new("Source AXI Stream Agent", src_axis_vip_if, this);
+      this.dst_axis_agent = new("Destination AXI Stream Agent", dst_axis_vip_if, this);
     endfunction
 
     //============================================================================
@@ -69,68 +73,41 @@ package environment_pkg;
     //   - Configure the sequencer VIPs with an initial configuration before starting them
     //============================================================================
     task configure();
-
       xil_axi4stream_ready_gen_policy_t dac_mode;
 
       // source stub
-      src_axis_seq.set_stop_policy(STOP_POLICY_PACKET);
+      this.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
 
       // destination stub
       dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
-      dst_axis_seq.set_mode(dac_mode);
-
+      this.dst_axis_agent.sequencer.set_mode(dac_mode);
     endtask
 
     //============================================================================
     // Start environment
     //============================================================================
     task start();
-
-      super.start();
-
-      src_axis_agent.start_master();
-      dst_axis_agent.start_slave();
-
-    endtask
-
-    //============================================================================
-    // Start the test
-    //============================================================================
-    task test();
-      fork
-        src_axis_seq.run();
-        dst_axis_seq.run();
-      join_none
-    endtask
-
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
+      this.src_axis_agent.agent.start_master();
+      this.dst_axis_agent.agent.start_slave();
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
     task run;
-
-      //pre_test();
-      test();
-
+      fork
+        this.src_axis_agent.sequencer.run();
+        this.dst_axis_agent.sequencer.run();
+      join_none
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
     task stop;
-
-      super.stop();
-        src_axis_seq.stop();
-        src_axis_agent.stop_master();
-        dst_axis_agent.stop_slave();
-      post_test();
-
+      this.src_axis_agent.sequencer.stop();
+      this.src_axis_agent.agent.stop_master();
+      this.dst_axis_agent.agent.stop_slave();
     endtask
 
   endclass

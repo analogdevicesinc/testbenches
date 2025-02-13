@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -70,55 +70,5 @@ package logger_pkg;
   function void setLoggerVerbosity(input adi_verbosity_t value);
     verbosity = value;
   endfunction: setLoggerVerbosity
-
-
-  class adi_reporter;
-    string name;
-    adi_reporter parent;
-    
-    function new(
-      input string name,
-      input adi_reporter parent = null);
-
-      this.name = name;
-      this.parent = parent;
-    endfunction
-
-    function string get_path();
-      if (this.parent == null)
-        return this.name;
-      else
-        return $sformatf("%s.%s", this.parent.get_path(), this.name);
-    endfunction: get_path
-
-    function void info(
-      input string message,
-      input adi_verbosity_t verbosity);
-
-      PrintInfo($sformatf("[%s] %s", this.get_path(), message), verbosity);
-    endfunction: info
-
-    function void warning(input string message);
-      PrintWarning($sformatf("[%s] %s", this.get_path(), message));
-    endfunction: warning
-
-    function void error(input string message);
-      PrintError($sformatf("[%s] %s", this.get_path(), message));
-    endfunction: error
-
-    function void fatal(input string message);
-      PrintFatal($sformatf("[%s] %s", this.get_path(), message));
-    endfunction: fatal
-  endclass: adi_reporter
-
-
-  class adi_component extends adi_reporter;
-    function new(
-      input string name,
-      input adi_component parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_component
 
 endpackage

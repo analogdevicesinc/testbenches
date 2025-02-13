@@ -1,145 +1,84 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsabilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
 `include "utils.svh"
+`include "axi_definitions.svh"
+`include "axis_definitions.svh"
 
 package environment_pkg;
 
+  import logger_pkg::*;
+  import adi_environment_pkg::*;
+
+  import axi_vip_pkg::*;
+  import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
-  import logger_pkg::*;
-
-  import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import test_harness_env_pkg::*;
+  import adi_axi_agent_pkg::*;
+  import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
-  import x_monitor_pkg::*;
 
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-  import `PKGIFY(test_harness, adc_src_axis_0)::*;
-  import `PKGIFY(test_harness, dac_dst_axis_0)::*;
-  import `PKGIFY(test_harness, adc_dst_axi_pt_0)::*;
-  import `PKGIFY(test_harness, dac_src_axi_pt_0)::*;
-  
-  // import `PKGIFY(test_harness, adc_src_axis_1)::*;
-  // import `PKGIFY(test_harness, dac_dst_axis_1)::*;
-  // import `PKGIFY(test_harness, adc_dst_axi_pt_1)::*;
-  // import `PKGIFY(test_harness, dac_src_axi_pt_1)::*;
+  class scoreboard_environment extends adi_environment;
 
-  class environment extends test_harness_env;
+    // Agents
+    adi_axis_agent_base adc_src_axis_agent;
+    adi_axis_agent_base dac_dst_axis_agent;
+    adi_axi_agent_base adc_dst_axi_pt_agent;
+    adi_axi_agent_base dac_src_axi_pt_agent;
 
-    // agents and sequencers
-    `AGENT(test_harness, adc_src_axis_0, mst_t) adc_src_axis_agent_0;
-    `AGENT(test_harness, dac_dst_axis_0, slv_t) dac_dst_axis_agent_0;
-    `AGENT(test_harness, adc_dst_axi_pt_0, passthrough_mem_t) adc_dst_axi_pt_agent_0;
-    `AGENT(test_harness, dac_src_axi_pt_0, passthrough_mem_t) dac_src_axi_pt_agent_0;
-
-    // `AGENT(test_harness, adc_src_axis_1, mst_t) adc_src_axis_agent_1;
-    // `AGENT(test_harness, dac_dst_axis_1, slv_t) dac_dst_axis_agent_1;
-    // `AGENT(test_harness, adc_dst_axi_pt_1, passthrough_mem_t) adc_dst_axi_pt_agent_1;
-    // `AGENT(test_harness, dac_src_axi_pt_1, passthrough_mem_t) dac_src_axi_pt_agent_1;
-
-    m_axis_sequencer #(`AGENT(test_harness, adc_src_axis_0, mst_t),
-                      `AXIS_VIP_PARAMS(test_harness, adc_src_axis_0)
-                      ) adc_src_axis_seq_0;
-    s_axis_sequencer #(`AGENT(test_harness, dac_dst_axis_0, slv_t)) dac_dst_axis_seq_0;
-    s_axi_sequencer #(`AGENT(test_harness, adc_dst_axi_pt_0, passthrough_mem_t)) adc_dst_axi_pt_seq_0;
-    s_axi_sequencer #(`AGENT(test_harness, dac_src_axi_pt_0, passthrough_mem_t)) dac_src_axi_pt_seq_0;
-
-    // m_axis_sequencer #(`AGENT(test_harness, adc_src_axis_1, mst_t),
-    //                   `AXIS_VIP_PARAMS(test_harness, adc_src_axis_1)
-    //                   ) adc_src_axis_seq_1;
-    // s_axis_sequencer #(`AGENT(test_harness, dac_dst_axis_1, slv_t)) dac_dst_axis_seq_1;
-    // s_axi_sequencer #(`AGENT(test_harness, adc_dst_axi_pt_1, passthrough_mem_t)) adc_dst_axi_pt_seq_1;
-    // s_axi_sequencer #(`AGENT(test_harness, dac_src_axi_pt_1, passthrough_mem_t)) dac_src_axi_pt_seq_1;
-
-    x_axis_monitor #(`AGENT(test_harness, adc_src_axis_0, mst_t)) adc_src_axis_0_mon;
-    x_axis_monitor #(`AGENT(test_harness, dac_dst_axis_0, slv_t)) dac_dst_axis_0_mon;
-    x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_0, passthrough_mem_t), WRITE_OP) adc_dst_axi_pt_0_mon;
-    x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_0, passthrough_mem_t), READ_OP) dac_src_axi_pt_0_mon;
-
-    // x_axis_monitor #(`AGENT(test_harness, adc_src_axis_1, mst_t)) adc_src_axis_1_mon;
-    // x_axis_monitor #(`AGENT(test_harness, dac_dst_axis_1, slv_t)) dac_dst_axis_1_mon;
-    // x_axi_monitor #(`AGENT(test_harness, adc_dst_axi_pt_1, passthrough_mem_t), WRITE_OP) adc_dst_axi_pt_1_mon;
-    // x_axi_monitor #(`AGENT(test_harness, dac_src_axi_pt_1, passthrough_mem_t), READ_OP) dac_src_axi_pt_1_mon;
-
-    scoreboard scoreboard_tx0;
-    scoreboard scoreboard_rx0;
-    // scoreboard scoreboard_tx1;
-    // scoreboard scoreboard_rx1;
+    scoreboard #(logic [7:0]) scoreboard_tx;
+    scoreboard #(logic [7:0]) scoreboard_rx;
 
     //============================================================================
     // Constructor
     //============================================================================
-    function new (
-      input string name,
-
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
-
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, adc_src_axis_0)) adc_src_axis_vip_if_0,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dac_dst_axis_0)) dac_dst_axis_vip_if_0,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, adc_dst_axi_pt_0)) adc_dst_axi_pt_vip_if_0,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, dac_src_axi_pt_0)) dac_src_axi_pt_vip_if_0
-
-      // virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, adc_src_axis_1)) adc_src_axis_vip_if_1,
-      // virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, dac_dst_axis_1)) dac_dst_axis_vip_if_1,
-      // virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, adc_dst_axi_pt_1)) adc_dst_axi_pt_vip_if_1,
-      // virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, dac_src_axi_pt_1)) dac_src_axi_pt_vip_if_1
-
-    );
+    function new (input string name);
 
       // creating the agents
-      super.new(name,
-                sys_clk_vip_if, 
-                dma_clk_vip_if, 
-                ddr_clk_vip_if, 
-                sys_rst_vip_if, 
-                mng_vip_if, 
-                ddr_vip_if);
+      super.new(name);
 
-      adc_src_axis_agent_0 = new("ADC Source AXI Stream Agent 0", adc_src_axis_vip_if_0);
-      dac_dst_axis_agent_0 = new("DAC Destination AXI Stream Agent 0", dac_dst_axis_vip_if_0);
-      adc_dst_axi_pt_agent_0 = new("ADC Destination AXI Agent 0", adc_dst_axi_pt_vip_if_0);
-      dac_src_axi_pt_agent_0 = new("DAC Source AXI Agent 0", dac_src_axi_pt_vip_if_0);
+      this.adc_src_axis_agent = new("ADC Source AXI Stream Agent", adi_axis_agent_pkg::MASTER, this);
+      this.dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", adi_axis_agent_pkg::SLAVE, this);
+      this.adc_dst_axi_pt_agent = new("ADC Destination AXI Agent", adi_axi_agent_pkg::PASSTHROUGH, this);
+      this.dac_src_axi_pt_agent = new("DAC Source AXI Agent", adi_axi_agent_pkg::PASSTHROUGH, this);
 
-      // adc_src_axis_agent_1 = new("ADC Source AXI Stream Agent 1", adc_src_axis_vip_if_1);
-      // dac_dst_axis_agent_1 = new("DAC Destination AXI Stream Agent 1", dac_dst_axis_vip_if_1);
-      // adc_dst_axi_pt_agent_1 = new("ADC Destination AXI Agent 1", adc_dst_axi_pt_vip_if_1);
-      // dac_src_axi_pt_agent_1 = new("DAC Source AXI Agent 1", dac_src_axi_pt_vip_if_1);
-
-      adc_src_axis_seq_0 = new("ADC Source AXI Stream Sequencer 0", adc_src_axis_agent_0, this);
-      dac_dst_axis_seq_0 = new("DAC Destination AXI Stream Sequencer 0", dac_dst_axis_agent_0, this);
-      adc_dst_axi_pt_seq_0 = new("ADC Destination AXI Sequencer 0", adc_dst_axi_pt_agent_0, this);
-      dac_src_axi_pt_seq_0 = new("DAC Source AXI Sequencer 0", dac_src_axi_pt_agent_0, this);
-
-      // adc_src_axis_seq_1 = new("ADC Source AXI Stream Sequencer 1", adc_src_axis_agent_1, this);
-      // dac_dst_axis_seq_1 = new("DAC Destination AXI Stream Sequencer 1", dac_dst_axis_agent_1, this);
-      // adc_dst_axi_pt_seq_1 = new("ADC Destination AXI Sequencer 1", adc_dst_axi_pt_agent_1, this);
-      // dac_src_axi_pt_seq_1 = new("DAC Source AXI Sequencer 1", dac_src_axi_pt_agent_1, this);
-
-      adc_src_axis_0_mon = new("ADC Source AXIS 0 Transaction Monitor", adc_src_axis_agent_0, this);
-      dac_dst_axis_0_mon = new("DAC Destination AXIS 0 Transaction Monitor", dac_dst_axis_agent_0, this);
-      adc_dst_axi_pt_0_mon = new("ADC Destination AXI 0 Transaction Monitor", adc_dst_axi_pt_agent_0, this);
-      dac_src_axi_pt_0_mon = new("DAC Source AXI 0 Transaction Monitor", dac_src_axi_pt_agent_0, this);
-
-      // adc_src_axis_1_mon = new("ADC Source AXIS 1 Transaction Monitor", adc_src_axis_agent_1, this);
-      // dac_dst_axis_1_mon = new("DAC Destination AXIS 1 Transaction Monitor", dac_dst_axis_agent_1, this);
-      // adc_dst_axi_pt_1_mon = new("ADC Destination AXI 1 Transaction Monitor", adc_dst_axi_pt_agent_1, this);
-      // dac_src_axi_pt_1_mon = new("DAC Source AXI 1 Transaction Monitor", dac_src_axi_pt_agent_1, this);
-
-      scoreboard_tx0 = new("Data Offload TX 0 Scoreboard", this);
-      scoreboard_rx0 = new("Data Offload RX 0 Scoreboard", this);
-      // scoreboard_tx1 = new("Data Offload TX 1 Scoreboard", this);
-      // scoreboard_rx1 = new("Data Offload RX 1 Scoreboard", this);
-
+      this.scoreboard_tx = new("Data Offload TX Scoreboard", this);
+      this.scoreboard_rx = new("Data Offload RX Scoreboard", this);
     endfunction
 
     //============================================================================
@@ -147,21 +86,12 @@ package environment_pkg;
     //   - Configure the sequencer VIPs with an initial configuration before starting them
     //============================================================================
     task configure(int bytes_to_generate);
-
       // ADC stub
-      adc_src_axis_seq_0.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      adc_src_axis_seq_0.add_xfer_descriptor(bytes_to_generate, 0, 0);
+      this.adc_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.adc_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
 
       // DAC stub
-      dac_dst_axis_seq_0.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-
-      // // ADC stub
-      // adc_src_axis_seq_1.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      // adc_src_axis_seq_1.add_xfer_descriptor(bytes_to_generate, 0, 0);
-
-      // // DAC stub
-      // dac_dst_axis_seq_1.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-
+      this.dac_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask
 
     //============================================================================
@@ -170,103 +100,37 @@ package environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
+      this.adc_src_axis_agent.start_master();
+      this.dac_dst_axis_agent.start_slave();
+      this.adc_dst_axi_pt_agent.start_monitor();
+      this.dac_src_axi_pt_agent.start_monitor();
 
-      super.start();
+      this.dac_src_axi_pt_agent.monitor.publisher_rx.subscribe(this.scoreboard_tx.subscriber_source);
+      this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
-      adc_src_axis_agent_0.start_master();
-      dac_dst_axis_agent_0.start_slave();
-      adc_dst_axi_pt_agent_0.start_monitor();
-      dac_src_axi_pt_agent_0.start_monitor();
-      
-      // adc_src_axis_agent_1.start_master();
-      // dac_dst_axis_agent_1.start_slave();
-      // adc_dst_axi_pt_agent_1.start_monitor();
-      // dac_src_axi_pt_agent_1.start_monitor();
-
-      scoreboard_tx0.set_source_stream(dac_src_axi_pt_0_mon);
-      scoreboard_tx0.set_sink_stream(dac_dst_axis_0_mon);
-
-      scoreboard_rx0.set_source_stream(adc_src_axis_0_mon);
-      scoreboard_rx0.set_sink_stream(adc_dst_axi_pt_0_mon);
-
-      // scoreboard_tx1.set_source_stream(dac_src_axi_pt_1_mon);
-      // scoreboard_tx1.set_sink_stream(dac_dst_axis_1_mon);
-
-      // scoreboard_rx1.set_source_stream(adc_src_axis_1_mon);
-      // scoreboard_rx1.set_sink_stream(adc_dst_axi_pt_1_mon);
-
-    endtask
-
-    //============================================================================
-    // Start the test
-    //   - start the RX scoreboard and sequencer
-    //   - start the TX scoreboard and sequencer
-    //   - setup the RX DMA
-    //   - setup the TX DMA
-    //============================================================================
-    task test();
-
-      fork
-        adc_src_axis_seq_0.run();
-        dac_dst_axis_seq_0.run();
-
-        // adc_src_axis_seq_1.run();
-        // dac_dst_axis_seq_1.run();
-
-        adc_src_axis_0_mon.run();
-        dac_dst_axis_0_mon.run();
-        adc_dst_axi_pt_0_mon.run();
-        dac_src_axi_pt_0_mon.run();
-
-        // adc_src_axis_1_mon.run();
-        // dac_dst_axis_1_mon.run();
-        // adc_dst_axi_pt_1_mon.run();
-        // dac_src_axi_pt_1_mon.run();
-
-        scoreboard_tx0.run();
-        scoreboard_rx0.run();
-
-        // scoreboard_tx1.run();
-        // scoreboard_rx1.run();
-      join_none
-
-    endtask
-
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // Evaluate the scoreboard's results
+      this.adc_src_axis_agent.monitor.publisher.subscribe(this.scoreboard_rx.subscriber_source);
+      this.adc_dst_axi_pt_agent.monitor.publisher_tx.subscribe(this.scoreboard_rx.subscriber_sink);
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
-    task run;
+    task run();
+      fork
+        this.adc_src_axis_agent.master_sequencer.start();
+        this.dac_dst_axis_agent.slave_sequencer.start();
 
-      //pre_test();
-      test();
-
+        this.scoreboard_tx.run();
+        this.scoreboard_rx.run();
+      join_none
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
-
-      super.stop();
-
-      adc_src_axis_seq_0.stop();
-      adc_src_axis_agent_0.stop_master();
-      dac_dst_axis_agent_0.stop_slave();
-
-      // adc_src_axis_seq_1.stop();
-      // adc_src_axis_agent_1.stop_master();
-      // dac_dst_axis_agent_1.stop_slave();
-
-      post_test();
-
+    task stop();
+      this.adc_src_axis_agent.stop_master();
+      this.dac_dst_axis_agent.stop_slave();
     endtask
 
   endclass

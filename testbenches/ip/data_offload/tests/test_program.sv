@@ -1,3 +1,38 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright (C) 2021 - 2025 Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsabilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
 `include "utils.svh"
 
 import axi_vip_pkg::*;
@@ -82,7 +117,7 @@ module test_program();
 
     // ADC stub
     env.adc_src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-    env.adc_src_axis_seq.add_xfer_descriptor(`ADC_TRANSFER_LENGTH, 0, 0);
+    env.adc_src_axis_seq.add_xfer_descriptor_byte_count(`ADC_TRANSFER_LENGTH, 0, 0);
 
     // DAC stub
     dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
@@ -92,7 +127,7 @@ module test_program();
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
     
-    `TH.`PLDDR_RST.inst.IF.assert_reset;
+    `TH.`PLDDR_RST.inst.IF.assert_reset();
     #1;
     
     start_clocks();
@@ -139,33 +174,33 @@ module test_program();
 
   task start_clocks();
     #1
-    `TH.`SRC_CLK.inst.IF.start_clock;
+    `TH.`SRC_CLK.inst.IF.start_clock();
     #1
-    `TH.`DST_CLK.inst.IF.start_clock;
+    `TH.`DST_CLK.inst.IF.start_clock();
     #1
-    `TH.`SYS_CLK.inst.IF.start_clock;
+    `TH.`SYS_CLK.inst.IF.start_clock();
     #1
-    `TH.`PLDDR_CLK.inst.IF.start_clock;
+    `TH.`PLDDR_CLK.inst.IF.start_clock();
   endtask
 
   task stop_clocks();
-    `TH.`SRC_CLK.inst.IF.stop_clock;
-    `TH.`DST_CLK.inst.IF.stop_clock;
-    `TH.`SYS_CLK.inst.IF.stop_clock;
-    `TH.`PLDDR_CLK.inst.IF.stop_clock;
+    `TH.`SRC_CLK.inst.IF.stop_clock();
+    `TH.`DST_CLK.inst.IF.stop_clock();
+    `TH.`SYS_CLK.inst.IF.stop_clock();
+    `TH.`PLDDR_CLK.inst.IF.stop_clock();
   endtask
 
   task sys_reset();
-    `TH.`SRC_RST.inst.IF.assert_reset;
-    `TH.`DST_RST.inst.IF.assert_reset;
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    `TH.`PLDDR_RST.inst.IF.assert_reset;
+    `TH.`SRC_RST.inst.IF.assert_reset();
+    `TH.`DST_RST.inst.IF.assert_reset();
+    `TH.`SYS_RST.inst.IF.assert_reset();
+    `TH.`PLDDR_RST.inst.IF.assert_reset();
 
     #500
-    `TH.`SRC_RST.inst.IF.deassert_reset;
-    `TH.`DST_RST.inst.IF.deassert_reset;
-    `TH.`SYS_RST.inst.IF.deassert_reset;
-    `TH.`PLDDR_RST.inst.IF.deassert_reset;
+    `TH.`SRC_RST.inst.IF.deassert_reset();
+    `TH.`DST_RST.inst.IF.deassert_reset();
+    `TH.`SYS_RST.inst.IF.deassert_reset();
+    `TH.`PLDDR_RST.inst.IF.deassert_reset();
   endtask
 
   task systemBringUp();
@@ -210,7 +245,7 @@ module test_program();
   // Memory initialization function for a 8byte DATA_WIDTH AXI4 bus
   task init_mem_64(longint unsigned addr, int byte_length);
     for (int i=0; i<byte_length; i=i+8) begin
-      env.ddr_agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      env.ddr_slave_sequencer.set_reg_data_in_mem(addr + i*8, i, 255);
     end
   endtask
 

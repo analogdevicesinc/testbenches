@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -34,29 +34,20 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axi_definitions.svh"
 
 package test_harness_env_pkg;
 
   import logger_pkg::*;
-  import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import m_axi_sequencer_pkg::*;
-  import s_axi_sequencer_pkg::*;
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;
+  import adi_environment_pkg::*;
+  import adi_axi_agent_pkg::*;
 
-  class test_harness_env extends adi_component;
+
+  class test_harness_env extends adi_environment;
 
     // Agents
-    `AGENT(test_harness, mng_axi_vip, mst_t) mng_agent;
-    `AGENT(test_harness, ddr_axi_vip, slv_mem_t) ddr_axi_agent;
-
-    // Sequencers
-    m_axi_sequencer #(`AGENT(test_harness, mng_axi_vip, mst_t)) mng;
-    s_axi_sequencer #(`AGENT(test_harness, ddr_axi_vip, slv_mem_t)) ddr_axi_seq;
-
-    // Register accessors
-    bit done = 0;
+    adi_axi_agent_base mng;
+    adi_axi_agent_base ddr;
 
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if;
@@ -74,11 +65,7 @@ package test_harness_env_pkg;
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
       virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
 
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if
-    );
+      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if);
 
       super.new(name);
 
@@ -88,13 +75,8 @@ package test_harness_env_pkg;
       this.sys_rst_vip_if = sys_rst_vip_if;
 
       // Creating the agents
-      mng_agent = new("AXI Manager agent", mng_vip_if);
-      ddr_axi_agent = new("AXI DDR stub agent", ddr_vip_if);
-
-      // Creating the sequencers
-      mng = new("AXI Manager sequencer", mng_agent, this);
-      ddr_axi_seq = new("AXI DDR stub sequencer", ddr_axi_agent, this);
-
+      this.mng = new("AXI Manager agent", adi_axi_agent_pkg::MASTER, this);
+      this.ddr = new("AXI DDR stub agent", adi_axi_agent_pkg::SLAVE, this);
     endfunction
 
     //============================================================================
@@ -103,77 +85,35 @@ package test_harness_env_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      mng_agent.start_master();
-      ddr_axi_agent.start_slave();
+      this.mng.start_master();
+      this.ddr.start_slave();
 
-      sys_clk_vip_if.start_clock;
-      dma_clk_vip_if.start_clock;
-      ddr_clk_vip_if.start_clock;
-    endtask
-
-    //============================================================================
-    // Start the test
-    //   - start the scoreboard
-    //   - start the sequencers
-    //============================================================================
-    task test();
-      fork
-
-      join_none
-    endtask
-
-    //============================================================================
-    // Post test subroutine
-    //============================================================================
-    task post_test();
-      // wait until done
-      wait_done();
-    endtask
-
-    //============================================================================
-    // Run subroutine
-    //============================================================================
-    task run;
-      test();
-      post_test();
+      this.sys_clk_vip_if.start_clock();
+      this.dma_clk_vip_if.start_clock();
+      this.ddr_clk_vip_if.start_clock();
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
-    task stop;
-      mng_agent.stop_master();
-      ddr_axi_agent.stop_slave();
+    task stop();
+      this.mng.stop_master();
+      this.ddr.stop_slave();
 
-      sys_clk_vip_if.stop_clock;
-      dma_clk_vip_if.stop_clock;
-      ddr_clk_vip_if.stop_clock;
-    endtask
-
-    //============================================================================
-    // Wait until all component are done
-    //============================================================================
-    task wait_done;
-      wait (done == 1);
-      //`INFO(("Shutting down"));
-    endtask
-
-    //============================================================================
-    // Test controller routine
-    //============================================================================
-    task test_c_run();
-      done = 1;
+      this.sys_clk_vip_if.stop_clock();
+      this.dma_clk_vip_if.stop_clock();
+      this.ddr_clk_vip_if.stop_clock();
     endtask
 
     //============================================================================
     // System reset routine
     //============================================================================
-    task sys_reset;
+    task sys_reset();
       //asserts all the resets for 100 ns
-      sys_rst_vip_if.assert_reset;
-      #200;
-      sys_rst_vip_if.deassert_reset;
-      #800;
+      this.sys_rst_vip_if.assert_reset();
+      #200ns;
+      this.sys_rst_vip_if.deassert_reset();
+      #800ns;
     endtask
 
   endclass

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2018 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -26,29 +26,35 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
+`include "axi_definitions.svh"
 
 import test_harness_env_pkg::*;
-import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
+import adi_axi_agent_pkg::*;
 import logger_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import dmac_api_pkg::*;
 import dma_trans_pkg::*;
+import axi_vip_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program;
 
-  test_harness_env env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+
   // Register accessors
   dmac_api m_dmac_api;
   dmac_api s_dmac_api;
@@ -56,29 +62,29 @@ program test_program;
   initial begin
 
     //creating environment
-    env = new("DMA Loopback Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
+    base_env = new("Base Environment",
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
 
-    #2ps;
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    env.start();
+    
+    base_env.start();
+    start_clocks();
+    base_env.sys_reset();
 
-    m_dmac_api = new("TX_DMA", env.mng, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA", env.mng, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA", base_env.mng.master_sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
-
-    start_clocks();
-    sys_reset();
-
-    #1us;
 
     //  -------------------------------------------------------
     //  Test TX DMA and RX DMA in loopback 
@@ -86,7 +92,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,(((i+1)) << 16) | i ,'hF);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,'hF);
     end
 
     do_transfer(
@@ -102,6 +108,11 @@ program test_program;
       .dest_addr(`DDR_BA+'h2000),
       .length('h1000)
     );
+
+    base_env.stop();
+    
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+    $finish();
 
   end
 
@@ -147,8 +158,8 @@ program test_program;
     for (int i=0;i<length/4;i=i+4) begin
       current_src_address = src_addr+i;
       current_dest_address = dest_addr+i;
-      captured_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_dest_address);
-      reference_word = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(current_src_address);
+      captured_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_dest_address);
+      reference_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_src_address);
 
       if (captured_word !== reference_word) begin
         `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_dest_address,reference_word,captured_word));
@@ -158,18 +169,11 @@ program test_program;
   endtask
 
   task start_clocks;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
   endtask
 
   task stop_clocks;
-    `TH.`DEVICE_CLK.inst.IF.stop_clock;
-  endtask
-
-  task sys_reset;
-    //asserts all the resets for 100 ns
-    `TH.`SYS_RST.inst.IF.assert_reset;
-    #100
-    `TH.`SYS_RST.inst.IF.deassert_reset;
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
   endtask
 
 endprogram

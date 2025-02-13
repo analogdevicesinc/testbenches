@@ -451,7 +451,7 @@ program test_sleep_delay (
     #2000ns
 
     for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.slave_sequencer.get_reg_data_from_mem(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (irq_pending == 'h0) begin
@@ -511,7 +511,7 @@ program test_sleep_delay (
     #2000ns
 
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.slave_sequencer.get_reg_data_from_mem(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (irq_pending == 'h0) begin

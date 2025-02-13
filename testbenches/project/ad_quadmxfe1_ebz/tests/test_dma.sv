@@ -136,7 +136,7 @@ program test_dma;
     // Init test data
     //
     for (int i=0;i<1024;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BA+i*2,
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(`DDR_BA+i*2,
                                                               ((((i+1) % 1024)<<16) <<4) | ((i % 1024) << 4) ,
                                                               4'b1111);
     end
@@ -314,7 +314,7 @@ program test_dma;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_address);
+      captured_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_address);
       if (i==0) begin
         first = captured_word[15:0];
       end else begin

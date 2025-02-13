@@ -93,7 +93,7 @@ program test_program_1d;
 
     // Init test data with incrementing 16-bit value from 0 up to address 'h8000
     for (int i=0;i<'h4000;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,'hF);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,'hF);
     end
 
     // TX BLOCK
@@ -174,18 +174,18 @@ program test_program_1d;
                         bit [31:0] src_stride,
                         bit [31:0] dst_stride);
 
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h00, flags, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h04, id, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h08, dest_addr, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h0C, 0, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h10, src_addr, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h14, 0, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h18, next_desc_addr, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h1C, 0, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h20, y_len, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h24, x_len, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h28, src_stride, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h2C, dst_stride, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h00, flags, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h04, id, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h08, dest_addr, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h0C, 0, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h10, src_addr, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h14, 0, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h18, next_desc_addr, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h1C, 0, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h20, y_len, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h24, x_len, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h28, src_stride, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h2C, dst_stride, 'hF);
 
   endtask : write_descriptor
 
@@ -237,8 +237,8 @@ program test_program_1d;
     for (int i=0;i<length;i=i+4) begin
       current_src_address = src_addr+i;
       current_dest_address = dest_addr+i;
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_dest_address);
-      reference_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_src_address);
+      captured_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_dest_address);
+      reference_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_src_address);
 
       if (captured_word !== reference_word) begin
         `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_dest_address,reference_word,captured_word));

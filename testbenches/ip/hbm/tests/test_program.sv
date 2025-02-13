@@ -87,7 +87,7 @@ program test_program;
 //
 //    // Init test data
 //    for (int i=0;i<2048*2 ;i=i+2) begin
-//      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+src_addr+i*2,(((i+1)) << 16) | i ,'hF);
+//      base_env.ddr.slave_sequencer.set_reg_data_in_mem(`DDR_BASE+src_addr+i*2,(((i+1)) << 16) | i ,'hF);
 //    end
 //
 //    do_transfer(
@@ -155,8 +155,8 @@ program test_program;
 //    for (int i=0;i<length/4;i=i+4) begin
 //      current_src_address = src_addr+i;
 //      current_dest_address = dest_addr+i;
-//      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_dest_address);
-//      reference_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_src_address);
+//      captured_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_dest_address);
+//      reference_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_src_address);
 //
 //      if (captured_word !== reference_word) begin
 //        `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_dest_address,reference_word,captured_word));

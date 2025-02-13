@@ -247,7 +247,7 @@ program test_program_64b66b;
     //
 
     for (int i=0;i<1024;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(i*2,(((i+1)*16) << 16) | (i*16) ,15);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(i*2,(((i+1)*16) << 16) | (i*16) ,15);
     end
 
     // Arm external sync

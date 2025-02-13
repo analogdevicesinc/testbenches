@@ -267,7 +267,7 @@ program test_program;
   task tx_tpl_test(int use_dds);
     if (!use_dds) begin
       for (int i=0;i<2048*2 ;i=i+2) begin
-        base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
+        base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
       end
 
       // Configure TX DMA
@@ -495,7 +495,7 @@ program test_program;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_address);
+      captured_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_address);
       if (i==0) begin
         first = captured_word[15:8];
         second = captured_word[7:0];

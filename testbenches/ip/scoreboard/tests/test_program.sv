@@ -104,12 +104,8 @@ program test_program();
     mng = new("", `TH.`MNG_AXI.inst.IF);
     ddr = new("", `TH.`DDR_AXI.inst.IF);
     
-    mng.pre_link_agent(base_env.mng);
-    ddr.pre_link_agent(base_env.ddr);
-    base_env.mng = mng;
-    base_env.ddr = ddr;
-    mng.post_link_agent(base_env.mng);
-    ddr.post_link_agent(base_env.ddr);
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     scb_env_0 = new("Scoreboard Environment 0");
 
@@ -118,18 +114,10 @@ program test_program();
     adc_dst_axi_pt_agent_0 = new("", `TH.`ADC_DST_AXI_PT_0.inst.IF);
     dac_src_axi_pt_agent_0 = new("", `TH.`DAC_SRC_AXI_PT_0.inst.IF);
 
-    adc_src_axis_agent_0.pre_link_agent(scb_env_0.adc_src_axis_agent);
-    dac_dst_axis_agent_0.pre_link_agent(scb_env_0.dac_dst_axis_agent);
-    adc_dst_axi_pt_agent_0.pre_link_agent(scb_env_0.adc_dst_axi_pt_agent);
-    dac_src_axi_pt_agent_0.pre_link_agent(scb_env_0.dac_src_axi_pt_agent);
-    scb_env_0.adc_src_axis_agent = adc_src_axis_agent_0;
-    scb_env_0.dac_dst_axis_agent = dac_dst_axis_agent_0;
-    scb_env_0.adc_dst_axi_pt_agent = adc_dst_axi_pt_agent_0;
-    scb_env_0.dac_src_axi_pt_agent = dac_src_axi_pt_agent_0;
-    adc_src_axis_agent_0.post_link_agent(scb_env_0.adc_src_axis_agent);
-    dac_dst_axis_agent_0.post_link_agent(scb_env_0.dac_dst_axis_agent);
-    adc_dst_axi_pt_agent_0.post_link_agent(scb_env_0.adc_dst_axi_pt_agent);
-    dac_src_axi_pt_agent_0.post_link_agent(scb_env_0.dac_src_axi_pt_agent);
+    `LINK(adc_src_axis_agent_0, scb_env_0, adc_src_axis_agent)
+    `LINK(dac_dst_axis_agent_0, scb_env_0, dac_dst_axis_agent)
+    `LINK(adc_dst_axi_pt_agent_0, scb_env_0, adc_dst_axi_pt_agent)
+    `LINK(dac_src_axi_pt_agent_0, scb_env_0, dac_src_axi_pt_agent)
 
     scb_env_1 = new("Scoreboard Environment 1");
 
@@ -138,18 +126,10 @@ program test_program();
     adc_dst_axi_pt_agent_1 = new("", `TH.`ADC_DST_AXI_PT_1.inst.IF);
     dac_src_axi_pt_agent_1 = new("", `TH.`DAC_SRC_AXI_PT_1.inst.IF);
 
-    adc_src_axis_agent_1.pre_link_agent(scb_env_1.adc_src_axis_agent);
-    dac_dst_axis_agent_1.pre_link_agent(scb_env_1.dac_dst_axis_agent);
-    adc_dst_axi_pt_agent_1.pre_link_agent(scb_env_1.adc_dst_axi_pt_agent);
-    dac_src_axi_pt_agent_1.pre_link_agent(scb_env_1.dac_src_axi_pt_agent);
-    scb_env_1.adc_src_axis_agent = adc_src_axis_agent_1;
-    scb_env_1.dac_dst_axis_agent = dac_dst_axis_agent_1;
-    scb_env_1.adc_dst_axi_pt_agent = adc_dst_axi_pt_agent_1;
-    scb_env_1.dac_src_axi_pt_agent = dac_src_axi_pt_agent_1;
-    adc_src_axis_agent_1.post_link_agent(scb_env_1.adc_src_axis_agent);
-    dac_dst_axis_agent_1.post_link_agent(scb_env_1.dac_dst_axis_agent);
-    adc_dst_axi_pt_agent_1.post_link_agent(scb_env_1.adc_dst_axi_pt_agent);
-    dac_src_axi_pt_agent_1.post_link_agent(scb_env_1.dac_src_axi_pt_agent);
+    `LINK(adc_src_axis_agent_1, scb_env_1, adc_src_axis_agent)
+    `LINK(dac_dst_axis_agent_1, scb_env_1, dac_dst_axis_agent)
+    `LINK(adc_dst_axi_pt_agent_1, scb_env_1, adc_dst_axi_pt_agent)
+    `LINK(dac_src_axi_pt_agent_1, scb_env_1, dac_src_axi_pt_agent)
 
     dmac_tx_0 = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA_0);
     dmac_rx_0 = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA_0);

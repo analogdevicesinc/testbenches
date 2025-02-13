@@ -74,8 +74,8 @@ program test_program;
     mng = new("", `TH.`MNG_AXI.inst.IF);
     ddr = new("", `TH.`DDR_AXI.inst.IF);
 
-    mng.link_agent(base_env.mng);
-    ddr.link_agent(base_env.ddr);
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     base_env.start();
     base_env.sys_reset();

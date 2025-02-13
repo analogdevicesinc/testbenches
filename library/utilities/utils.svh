@@ -48,6 +48,12 @@
 // Help build VIP parameter name  e.g. test_harness_dst_axis_vip_0_VIP_DATA_WIDTH
 `define GETPARAM(th,vip,param) th``_``vip``_0_``param
 
+// Help link AMD AXI and AXIS VIPs to ADI Environment VIPs
+`define LINK(top,env,inst) \
+  top``.pre_link_agent(``env``.``inst``); \
+  env``.``inst`` = ``top``; \
+  top``.post_link_agent(``env``.``inst``);
+
 // Macros used in Simulation files during simulation
 `define INFO(m,v)  \
   PrintInfo($sformatf("%s", \

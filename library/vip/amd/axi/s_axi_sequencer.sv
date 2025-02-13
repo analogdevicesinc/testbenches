@@ -87,9 +87,10 @@ package s_axi_sequencer_pkg;
       input logic [31:0] data,
       input bit [3:0] strb);
 
-      this.mem_model.backdoor_memory_write_4byte(.addr(addr),
-                                                  .payload(data),
-                                                  .strb(strb));
+      this.mem_model.backdoor_memory_write_4byte(
+        .addr(addr),
+        .payload(data),
+        .strb(strb));
     endfunction: set_reg_data_in_mem
 
   endclass: s_axi_sequencer

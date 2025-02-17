@@ -29,15 +29,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2,147.800 ns"></ZoomStartTime>
-      <ZoomEndTime time="2,440.401 ns"></ZoomEndTime>
-      <Cursor1Time time="2,215.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="331.142970 us"></ZoomEndTime>
+      <Cursor1Time time="723.129000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="309"></NameColumnWidth>
       <ValueColumnWidth column_width="80"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="110" />
+   <WVObjectSize size="73" />
    <wvobject type="logic" fp_name="/system_tb/sync_n">
       <obj_property name="ElementShortName">sync_n</obj_property>
       <obj_property name="ObjectShortName">sync_n</obj_property>
@@ -58,41 +58,13 @@
       <obj_property name="ElementShortName">serdes_reset_d</obj_property>
       <obj_property name="ObjectShortName">serdes_reset_d</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/pattern_value">
-      <obj_property name="ElementShortName">pattern_value[7:0]</obj_property>
-      <obj_property name="ObjectShortName">pattern_value[7:0]</obj_property>
-   </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/bitslip_enable">
       <obj_property name="ElementShortName">bitslip_enable</obj_property>
       <obj_property name="ObjectShortName">bitslip_enable</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/slip_d">
-      <obj_property name="ElementShortName">slip_d</obj_property>
-      <obj_property name="ObjectShortName">slip_d</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/slip_dd">
-      <obj_property name="ElementShortName">slip_dd</obj_property>
-      <obj_property name="ObjectShortName">slip_dd</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/shift_cnt_en">
-      <obj_property name="ElementShortName">shift_cnt_en</obj_property>
-      <obj_property name="ObjectShortName">shift_cnt_en</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/shift_cnt">
-      <obj_property name="ElementShortName">shift_cnt[2:0]</obj_property>
-      <obj_property name="ObjectShortName">shift_cnt[2:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_frame_shifted">
-      <obj_property name="ElementShortName">data_frame_shifted[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_frame_shifted[7:0]</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/pattern_value">
       <obj_property name="ElementShortName">pattern_value[7:0]</obj_property>
       <obj_property name="ObjectShortName">pattern_value[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/shift_cnt">
-      <obj_property name="ElementShortName">shift_cnt[2:0]</obj_property>
-      <obj_property name="ObjectShortName">shift_cnt[2:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/sync_status_int">
       <obj_property name="ElementShortName">sync_status_int</obj_property>
@@ -115,14 +87,6 @@
       <obj_property name="ElementShortName">frame_clock_p</obj_property>
       <obj_property name="ObjectShortName">frame_clock_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/da_p">
-      <obj_property name="ElementShortName">da_p</obj_property>
-      <obj_property name="ObjectShortName">da_p</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/db_p">
-      <obj_property name="ElementShortName">db_p</obj_property>
-      <obj_property name="ObjectShortName">db_p</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data_frame">
       <obj_property name="ElementShortName">serdes_data_frame[7:0]</obj_property>
       <obj_property name="ObjectShortName">serdes_data_frame[7:0]</obj_property>
@@ -131,10 +95,6 @@
       <obj_property name="ElementShortName">serdes_data_frame_d[7:0]</obj_property>
       <obj_property name="ObjectShortName">serdes_data_frame_d[7:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clock_p">
-      <obj_property name="ElementShortName">frame_clock_p</obj_property>
-      <obj_property name="ObjectShortName">frame_clock_p</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_frame_shifted">
       <obj_property name="ElementShortName">data_frame_shifted[7:0]</obj_property>
       <obj_property name="ObjectShortName">data_frame_shifted[7:0]</obj_property>
@@ -143,9 +103,9 @@
       <obj_property name="ElementShortName">adc_clk_div</obj_property>
       <obj_property name="ObjectShortName">adc_clk_div</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/final_sample">
-      <obj_property name="ElementShortName">final_sample[15:0]</obj_property>
-      <obj_property name="ObjectShortName">final_sample[15:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_frame">
+      <obj_property name="ElementShortName">serdes_frame[7:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_frame[7:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_frame_shifted">
       <obj_property name="ElementShortName">data_frame_shifted[7:0]</obj_property>
@@ -154,36 +114,62 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/shift_cnt">
       <obj_property name="ElementShortName">shift_cnt[2:0]</obj_property>
       <obj_property name="ObjectShortName">shift_cnt[2:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFA500</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/state">
       <obj_property name="ElementShortName">state[2:0]</obj_property>
       <obj_property name="ObjectShortName">state[2:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clk">
-      <obj_property name="ElementShortName">frame_clk</obj_property>
-      <obj_property name="ObjectShortName">frame_clk</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/da_p">
+      <obj_property name="ElementShortName">da_p</obj_property>
+      <obj_property name="ObjectShortName">da_p</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/adc_data_shifted">
-      <obj_property name="ElementShortName">adc_data_shifted[15:0]</obj_property>
-      <obj_property name="ObjectShortName">adc_data_shifted[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/db_p">
+      <obj_property name="ElementShortName">db_p</obj_property>
+      <obj_property name="ObjectShortName">db_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/enable_pattern">
-      <obj_property name="ElementShortName">enable_pattern</obj_property>
-      <obj_property name="ObjectShortName">enable_pattern</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/frame_clock_p">
+      <obj_property name="ElementShortName">frame_clock_p</obj_property>
+      <obj_property name="ObjectShortName">frame_clock_p</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/sample">
-      <obj_property name="ElementShortName">sample[15:0]</obj_property>
-      <obj_property name="ObjectShortName">sample[15:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q1">
+      <obj_property name="ElementShortName">Q1</obj_property>
+      <obj_property name="ObjectShortName">Q1</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q2">
+      <obj_property name="ElementShortName">Q2</obj_property>
+      <obj_property name="ObjectShortName">Q2</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q3">
+      <obj_property name="ElementShortName">Q3</obj_property>
+      <obj_property name="ObjectShortName">Q3</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q4">
+      <obj_property name="ElementShortName">Q4</obj_property>
+      <obj_property name="ObjectShortName">Q4</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q5">
+      <obj_property name="ElementShortName">Q5</obj_property>
+      <obj_property name="ObjectShortName">Q5</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q6">
+      <obj_property name="ElementShortName">Q6</obj_property>
+      <obj_property name="ObjectShortName">Q6</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q7">
+      <obj_property name="ElementShortName">Q7</obj_property>
+      <obj_property name="ObjectShortName">Q7</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q8">
+      <obj_property name="ElementShortName">Q8</obj_property>
+      <obj_property name="ObjectShortName">Q8</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/adc_data">
       <obj_property name="ElementShortName">adc_data[15:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/ssi_clk">
-      <obj_property name="ElementShortName">ssi_clk</obj_property>
-      <obj_property name="ObjectShortName">ssi_clk</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_valid">
       <obj_property name="ElementShortName">serdes_valid[1:0]</obj_property>
@@ -192,66 +178,6 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_valid_d">
       <obj_property name="ElementShortName">serdes_valid_d[1:0]</obj_property>
       <obj_property name="ObjectShortName">serdes_valid_d[1:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data_0">
-      <obj_property name="ElementShortName">serdes_data_0[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_0[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data_1">
-      <obj_property name="ElementShortName">serdes_data_1[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_1[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/adc_clk_div">
-      <obj_property name="ElementShortName">adc_clk_div</obj_property>
-      <obj_property name="ObjectShortName">adc_clk_div</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/db_p">
-      <obj_property name="ElementShortName">db_p</obj_property>
-      <obj_property name="ObjectShortName">db_p</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/da_p">
-      <obj_property name="ElementShortName">da_p</obj_property>
-      <obj_property name="ObjectShortName">da_p</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clock_p">
-      <obj_property name="ElementShortName">frame_clock_p</obj_property>
-      <obj_property name="ObjectShortName">frame_clock_p</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s0">
-      <obj_property name="ElementShortName">data_s0[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s0[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s1">
-      <obj_property name="ElementShortName">data_s1[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s1[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s2">
-      <obj_property name="ElementShortName">data_s2[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s2[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s3">
-      <obj_property name="ElementShortName">data_s3[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s3[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s4">
-      <obj_property name="ElementShortName">data_s4[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s4[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s5">
-      <obj_property name="ElementShortName">data_s5[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s5[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s6">
-      <obj_property name="ElementShortName">data_s6[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s6[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/data_s7">
-      <obj_property name="ElementShortName">data_s7[0:0]</obj_property>
-      <obj_property name="ObjectShortName">data_s7[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/adc_clk_div">
-      <obj_property name="ElementShortName">adc_clk_div</obj_property>
-      <obj_property name="ObjectShortName">adc_clk_div</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data_16">
       <obj_property name="ElementShortName">serdes_data_16[15:0]</obj_property>
@@ -264,46 +190,6 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/adc_data_shifted">
       <obj_property name="ElementShortName">adc_data_shifted[15:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data_shifted[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s0_frame">
-      <obj_property name="ElementShortName">data_s0_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s0_frame</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s1_frame">
-      <obj_property name="ElementShortName">data_s1_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s1_frame</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s2_frame">
-      <obj_property name="ElementShortName">data_s2_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s2_frame</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s3_frame">
-      <obj_property name="ElementShortName">data_s3_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s3_frame</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s4_frame">
-      <obj_property name="ElementShortName">data_s4_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s4_frame</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s5_frame">
-      <obj_property name="ElementShortName">data_s5_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s5_frame</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s6_frame">
-      <obj_property name="ElementShortName">data_s6_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s6_frame</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/data_s7_frame">
-      <obj_property name="ElementShortName">data_s7_frame</obj_property>
-      <obj_property name="ObjectShortName">data_s7_frame</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data_frame">
-      <obj_property name="ElementShortName">serdes_data_frame[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_data_frame[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_frame">
-      <obj_property name="ElementShortName">serdes_frame[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serdes_frame[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider273" type="divider">
    </wvobject>
@@ -354,38 +240,6 @@
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes/\genblk4.g_data[0].i_iserdes /B_ISERDESE2_INST/BITSLIP">
       <obj_property name="ElementShortName">BITSLIP</obj_property>
       <obj_property name="ObjectShortName">BITSLIP</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q1">
-      <obj_property name="ElementShortName">Q1</obj_property>
-      <obj_property name="ObjectShortName">Q1</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q2">
-      <obj_property name="ElementShortName">Q2</obj_property>
-      <obj_property name="ObjectShortName">Q2</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q3">
-      <obj_property name="ElementShortName">Q3</obj_property>
-      <obj_property name="ObjectShortName">Q3</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q4">
-      <obj_property name="ElementShortName">Q4</obj_property>
-      <obj_property name="ObjectShortName">Q4</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q5">
-      <obj_property name="ElementShortName">Q5</obj_property>
-      <obj_property name="ObjectShortName">Q5</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q6">
-      <obj_property name="ElementShortName">Q6</obj_property>
-      <obj_property name="ObjectShortName">Q6</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q7">
-      <obj_property name="ElementShortName">Q7</obj_property>
-      <obj_property name="ObjectShortName">Q7</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /Q8">
-      <obj_property name="ElementShortName">Q8</obj_property>
-      <obj_property name="ObjectShortName">Q8</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/i_serdes_frame/\genblk4.g_data[0].i_iserdes /SHIFTOUT1">
       <obj_property name="ElementShortName">SHIFTOUT1</obj_property>

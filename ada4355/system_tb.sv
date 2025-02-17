@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -47,8 +47,6 @@ module system_tb #(
   localparam DCO_HALF_PERIOD = 1; // Period 2 ns -> 500 MHz DCO
   localparam FRAME_HALF_PERIOD = 4; // Period 8 ns -> 125 MHz Frame
   localparam BITS_PER_CYCLE = 2 * 2;
-  //localparam CNV_HALF_PERIOD_COR = DCO_HALF_PERIOD * (20 / BITS_PER_CYCLE);
-  //localparam CNV_HALF_PERIOD = `EN_UNCOR ? 4 * CNV_HALF_PERIOD_COR : CNV_HALF_PERIOD_COR;
   localparam LATENCY = 3;
 
   reg sync_n = 1'b0;

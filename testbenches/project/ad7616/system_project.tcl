@@ -41,7 +41,8 @@ source $ad_tb_dir/library/includes/sp_include_spi_engine.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "$ad_tb_dir/library/regmaps/adi_regmap_axi_ad7616_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_adc_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_common_pkg.sv" \
   "$ad_tb_dir/library/regmaps/adi_regmap_clkgen_pkg.sv" \
   "$ad_tb_dir/library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
   "tests/test_program_si.sv" \

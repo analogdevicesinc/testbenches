@@ -35,38 +35,12 @@
 
 `include "utils.svh"
 
-package pub_sub_pkg;
+package filter_pkg;
 
   import logger_pkg::*;
   import adi_common_pkg::*;
 
-  class adi_subscriber #(type data_type = int) extends adi_component;
-
-    protected static bit [15:0] last_id = 'd0;
-    bit [15:0] id;
-
-    function new(
-      input string name,
-      input adi_component parent = null);
-
-      super.new(name, parent);
-
-      this.last_id++;
-      this.id = this.last_id;
-    endfunction: new
-
-    virtual function void update(input data_type data [$]);
-      this.fatal($sformatf("This function is not implemented!"));
-    endfunction: update
-
-  endclass: adi_subscriber
-
-
-  class adi_publisher #(type data_type = int) extends adi_component;
-
-    protected adi_subscriber #(data_type) subscriber_list[bit[15:0]];
-
-    protected adi_filter #(data_type) filter;
+  class adi_filter #(type data_type = int) extends adi_component;
 
     function new(
       input string name,
@@ -74,42 +48,11 @@ package pub_sub_pkg;
 
       super.new(name, parent);
     endfunction: new
-    
-    function void setup_filter(input adi_filter #(data_type) filter);
-      this.filter = filter;
-    endfunction: setup_filter
 
-    function void remove_filter();
-      this.filter = null;
-    endfunction: remove_filter
+    virtual function bit filter(input data_type data [$]);
+      return 1'b0;
+    endfunction: filter
 
-    function void subscribe(input adi_subscriber #(data_type) subscriber);
-      if (this.subscriber_list.exists(subscriber.id)) begin
-        this.error($sformatf("Subscriber already on the list!"));
-      end else begin
-        this.subscriber_list[subscriber.id] = subscriber;
-      end
-    endfunction: subscribe
-
-    function void unsubscribe(input adi_subscriber #(data_type) subscriber);
-      if (!this.subscriber_list.exists(subscriber.id)) begin
-        this.error($sformatf("Subscriber does not exist on list!"));
-      end else begin
-        this.subscriber_list.delete(subscriber.id);
-      end
-    endfunction: unsubscribe
-
-    function void notify(input data_type data [$]);
-      if (this.filter != null) begin
-        if (!this.filter.filter(data)) begin
-          return;
-        end
-      end
-      foreach (this.subscriber_list[i]) begin
-        this.subscriber_list[i].update(data);
-      end
-    endfunction: notify
-
-  endclass: adi_publisher
+  endclass: adi_filter
 
 endpackage

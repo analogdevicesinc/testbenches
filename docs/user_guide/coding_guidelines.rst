@@ -214,7 +214,7 @@ array.
 
 .. _example-c4:
 
-.. code-block::
+.. code-block:: tcl
 
    global ad_project_params
 

@@ -36,8 +36,8 @@
 //
 
 `include "utils.svh"
-`include "../../../../../library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh"
-`include "../../../../../library/i3c_controller/i3c_controller_core/i3c_controller_word.vh"
+`include "i3c_controller_regmap.vh"
+`include "i3c_controller_word.vh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;

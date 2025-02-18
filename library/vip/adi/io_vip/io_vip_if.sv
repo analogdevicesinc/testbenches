@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -34,42 +34,88 @@
 // ***************************************************************************
 
 interface io_vip_if #(
-  int MODE = 0, // 1 - master, 0 - slave
-      WIDTH = 1
+  int MODE = 1, // 1 - master, 0 - slave, 2 - passthrough
+      WIDTH = 1, // bitwidth
+      ASYNC = 0 // clock synchronous
 ) (
   input bit clk
 );
 
+  import io_vip_if_base_pkg::*;
+
+  wire [WIDTH-1:0] IO = 0;
+
   logic [WIDTH-1:0] io = 0;
 
-  // Master functions
-  function void set_io(int o);
-    if (MODE === 0) begin
-      $display("[ERROR] %0t Unsupported in slave mode", $time);
-      $finish;
-    end else begin
-      io <= o[WIDTH-1:0];
-    end
-  endfunction
+  logic intf_is_master = 0;
+  logic intf_is_slave = 0;
 
-  // Wait and set
-  task setw_io(int o, int w=1);
-    repeat(w) wait_posedge_clk();
-    set_io(o);
-  endtask
+  function void set_intf_slave();
+    intf_is_master = 0;
+    intf_is_slave = 1;
+  endfunction: set_intf_slave
 
-  // Slave functions
-  function int get_io();
-    return io;
-  endfunction
+  function void set_intf_master();
+    intf_is_master = 1;
+    intf_is_slave = 0;
+  endfunction: set_intf_master
 
-  task wait_posedge_clk();
-    @(cb);
-  endtask
+  function void set_intf_monitor();
+    intf_is_master = 0;
+    intf_is_slave = 0;
+  endfunction: set_intf_monitor
+
+  assign IO = (intf_is_master) ? io : {WIDTH{1'bz}};
+
+  class io_vip_if_class #(int WIDTH = 1) extends io_vip_if_base;
+
+    function new();
+    endfunction
+
+    // Master functions
+    virtual function void set_io(logic [1023:0] o);
+      if (intf_is_master) begin
+        io <= o[WIDTH-1:0];
+      end else begin
+        $fatal(0, "[ERROR] %0t Supported only in runtime master mode", $time);
+      end
+    endfunction: set_io
+    
+    // Slave functions
+    virtual function logic [1023:0] get_io();
+      if (intf_is_slave) begin
+        get_io = {{1024-WIDTH{1'b0}}, io};
+      end else begin
+        $fatal(0, "[ERROR] %0t Supported only in runtime slave mode", $time);
+      end
+    endfunction: get_io
+
+    // Slave functions
+    virtual function int get_width();
+      get_width = WIDTH;
+    endfunction: get_width
+
+    virtual task wait_posedge_clk();
+      if (ASYNC == 1) begin
+        $fatal(0, "[ERROR] %0t Unsupported in async mode", $time);
+      end
+      @(posedge clk);
+    endtask: wait_posedge_clk
+
+    virtual task wait_negedge_clk();
+      if (ASYNC == 1) begin
+        $fatal(0, "[ERROR] %0t Unsupported in async mode", $time);
+      end
+      @(negedge clk);
+    endtask: wait_negedge_clk
+
+  endclass: io_vip_if_class
+
+  io_vip_if_class vif = new();
 
   default clocking cb @(posedge clk);
     default input #1step output #1ps;
     inout io;
   endclocking : cb
 
-endinterface
+endinterface: io_vip_if

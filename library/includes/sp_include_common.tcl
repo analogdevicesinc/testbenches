@@ -41,8 +41,10 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/utilities/logger_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_common_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_vip_pkg.sv" \
+  "$ad_tb_dir/library/utilities/adi_api_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_environment_pkg.sv" \
   "$ad_tb_dir/library/utilities/test_harness_env.sv" \
   "$ad_tb_dir/library/drivers/common/watchdog.sv" \
+  "$ad_tb_dir/library/vip/adi/io_vip/io_vip_if_base_pkg.sv" \
   "system_tb.sv" \
 ]

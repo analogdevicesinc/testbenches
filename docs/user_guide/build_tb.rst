@@ -111,6 +111,22 @@ the **test_program_si** test program.
 
    $make MODE=gui CFG=cfg_si TST=test_program_si
 
+In GUI mode, if the simulation was already run, there are a couple of options
+for restarting it.
+
+* The first option is to run the simulation again, with the ``Restart`` button
+  or by running the ``restart`` TCL command. This will reset the simulation and
+  start it again without recompiling the files.
+* The second option is to recompile the project and then run the simulation.
+  This is done by clicking the ``Relaunch Simulation`` button. This will not
+  close the simulation window, but it will recompile the project and start the
+  simulation.
+* The third option is to close the simulation window and use the ``Run
+  simulation`` option from the Flow Navigator. This will recompile the project
+  and start the simulation. This is needed when project simulation parameters
+  are changed after the build was created or when the block design is changed
+  manually. When the simulation seed is hard coded, this option must be used.
+
 Environment
 -------------------------------------------------------------------------------
 

@@ -164,12 +164,12 @@ interface, by writing and reading the SCRATCH register.
 Data acquisition test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Start the spi clk generator
-* Configure the pwm gen
+* Start the SPI clock generator (axi_clkgen)
+* Configure the PWM generator (axi_pwmgen)
 * Configure the DMA
 * Configure the axi_ad7616 IP
 * Submit a DMA transfer
-* Stop the pwm gen
+* Stop the PWM generator
 * Capture and compare the data
 
 Serial test program

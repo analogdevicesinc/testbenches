@@ -41,6 +41,7 @@ package io_vip_if_base_pkg;
 
     pure virtual function void set_io(input logic [1023:0] o);
     pure virtual function logic [1023:0] get_io();
+    pure virtual task wait_io_change();
     pure virtual task wait_posedge_clk();
     pure virtual task wait_negedge_clk();
     pure virtual function int get_width();

@@ -13,6 +13,7 @@ SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_vip_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_api_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_environment_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/test_harness_env.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/irq_handler_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/drivers/common/watchdog.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/adi/io_vip/io_vip_if_base_pkg.sv
 

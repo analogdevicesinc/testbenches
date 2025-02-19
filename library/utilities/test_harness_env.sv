@@ -41,13 +41,16 @@ package test_harness_env_pkg;
   import logger_pkg::*;
   import adi_environment_pkg::*;
   import adi_axi_agent_pkg::*;
-
+  import irq_handler_pkg::*;
+  import io_vip_if_base_pkg::*;
 
   class test_harness_env extends adi_environment;
 
     // Agents
     adi_axi_agent_base mng;
     adi_axi_agent_base ddr;
+
+    irq_handler_class irq_handler;
 
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if;
@@ -60,14 +63,13 @@ package test_harness_env_pkg;
     //============================================================================
     function new(
       input string name,
+      input virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
+      input virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
+      input virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
+      input virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
+      input adi_environment parent = null);
 
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
-
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if);
-
-      super.new(name);
+      super.new(name, parent);
 
       this.sys_clk_vip_if = sys_clk_vip_if;
       this.dma_clk_vip_if = dma_clk_vip_if;

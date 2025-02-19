@@ -45,7 +45,8 @@ package irq_handler_pkg;
   
   class irq_handler_class extends adi_api;
 
-    protected virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if;
+    // protected virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if;
+    protected io_vip_if_base irq_vip_if;
 
     protected event irq_event_list [31:0];
     protected bit [31:0] irq_valid_list;
@@ -57,7 +58,8 @@ package irq_handler_pkg;
       input string name,
       input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
-      virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if,
+      // virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if,
+      input io_vip_if_base irq_vip_if,
       input adi_component parent = null);
       
       super.new(name, bus, base_address, parent);
@@ -82,7 +84,11 @@ package irq_handler_pkg;
       this.info($sformatf("Enables: %d", enable_irq), ADI_VERBOSITY_HIGH);
       this.axi_write('h00, enable_irq); // software trigger IRQ
 
-      @(negedge this.irq_vip_if.io);
+      // negative edge detection
+      if (this.irq_vip_if.get_io() == 1'b0) begin
+        this.irq_vip_if.wait_io_change();
+      end
+      this.irq_vip_if.wait_io_change();
     endtask: software_irq_testing
 
     // IRQ event handler
@@ -99,7 +105,7 @@ package irq_handler_pkg;
 
       fork forever begin
         if (this.irq_vip_if.get_io() == 1'b0) begin
-          @(posedge this.irq_vip_if.io);
+          this.irq_vip_if.wait_io_change();
         end
 
         this.info($sformatf("IRQ controller triggered"), ADI_VERBOSITY_HIGH);

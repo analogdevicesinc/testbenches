@@ -91,9 +91,9 @@ interface io_vip_if #(
     endfunction: get_io
 
     // Slave functions
-    virtual function int get_width();
-      get_width = WIDTH;
-    endfunction: get_width
+    virtual task wait_io_change();
+      @(io);
+    endtask: wait_io_change
 
     virtual task wait_posedge_clk();
       if (ASYNC == 1) begin
@@ -108,6 +108,11 @@ interface io_vip_if #(
       end
       @(negedge clk);
     endtask: wait_negedge_clk
+
+    // Slave functions
+    virtual function int get_width();
+      get_width = WIDTH;
+    endfunction: get_width
 
   endclass: io_vip_if_class
 

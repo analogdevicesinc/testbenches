@@ -77,8 +77,11 @@ program test_program;
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 
+    base_env.irq_handler = new("IRQ handler", base_env.mng.master_sequencer, `IRQ_C_BA, `TH.`IRQ.inst.inst.IF.vif, base_env);
+
     base_env.start();
     base_env.sys_reset();
+    base_env.irq_handler.start();
 
     /* Add stimulus tasks */
         

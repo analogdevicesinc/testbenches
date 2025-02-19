@@ -211,7 +211,7 @@ The steps of this test are:
 Offload SPI test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The offload SPI test verifies the Offload module functionality.
+The Offload SPI test verifies the Offload module functionality.
 
 The steps of this test are:
 

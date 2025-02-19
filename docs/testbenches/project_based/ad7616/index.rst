@@ -167,7 +167,7 @@ Data acquisition test
 * Start the spi clk generator
 * Configure the pwm gen
 * Configure the DMA
-* Configure the AXI_AD7616 IP
+* Configure the axi_ad7616 IP
 * Submit a DMA transfer
 * Stop the pwm gen
 * Capture and compare the data
@@ -211,7 +211,7 @@ The steps of this test are:
 Offload SPI test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Offload SPI Test verifies the Offload module functionality.
+The offload SPI test verifies the Offload module functionality.
 
 The steps of this test are:
 

@@ -95,6 +95,34 @@ Process:
 Edit a testbench efficiently
 -------------------------------------------------------------------------------
 
+Depending on what needs to be, there are several ways to edit a testbench.
+
+Update testbench block design
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the block design needs to be updated, the ``system_bd.tcl`` script and the
+configuration files must be modified. After this, the block design must be
+rebuilt by running the ``make`` command.
+
+Update testbench stimulus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Changing the test stimulus can be done by modifying the ``test_program.sv``
+file. If new files need to be imported into the simulation, then the ``Makefile``
+and the ``system_project.tcl`` script must be updated. After this, the
+project must be rebuilt by running the ``make`` command.
+
+Update library files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the library files need to be updated for bugfixes or adding new functionality,
+the appropriate source files must be modified. After this, the simulation must
+be recompiled. In some cases, running the ``simulate`` command is enough, but
+in other cases, the project must be rebuilt by running the ``make`` command.
+
+File management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 When designing a testbench, it's crucial to comprehend the steps involved
 to ensure the testbench runs swiftly and exhibits predictable behavior.
 

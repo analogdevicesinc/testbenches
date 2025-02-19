@@ -45,7 +45,6 @@ package irq_handler_pkg;
   
   class irq_handler_class extends adi_api;
 
-    // protected virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if;
     protected io_vip_if_base irq_vip_if;
 
     protected event irq_event_list [31:0];
@@ -58,7 +57,6 @@ package irq_handler_pkg;
       input string name,
       input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
-      // virtual interface io_vip_if #(.MODE(0), .WIDTH(1), .ASYNC(1)) irq_vip_if,
       input io_vip_if_base irq_vip_if,
       input adi_component parent = null);
       

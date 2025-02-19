@@ -1,6 +1,6 @@
 .. _build_tb:
 
-Build a test bench
+Build a testbench
 ===============================================================================
 
 **Please note that ADI only provides the source files necessary to create and
@@ -55,27 +55,27 @@ want to switch to any other branch you need to checkout that branch:
    $git branch
    $git checkout 2022_r2
 
-Building a test bench
+Building a testbench
 -------------------------------------------------------------------------------
 
 .. caution::
 
-   Before building any test bench, you must have the environment prepared each
+   Before building any testbench, you must have the environment prepared each
    time a new terminal session is started:
 
    #. Set the HDL repository path with ``export ADI_HDL_DIR=<path to dir>``.
 
    #. Set the Testbenches repository path with ``export ADI_TB_DIR=<path to dir>``.
 
-The way of building a test bench in Cygwin and WSL is almost the same.
-In this example, it is building the **AD7616** test bench.
+The way of building a testbench in Cygwin and WSL is almost the same.
+In this example, it is building the **AD7616** testbench.
 
 .. shell::
 
    $cd ad7616
    $make
 
-The ``make`` builds all the libraries first and then builds the test bench.
+The ``make`` builds all the libraries first and then builds the testbench.
 This assumes that you have the tools and licenses set up correctly. If
 you don't get to the last line, the make failed to build one or more
 targets: it could be a library component or the project itself. There is
@@ -110,6 +110,22 @@ the **test_program_si** test program.
 .. shell::
 
    $make MODE=gui CFG=cfg_si TST=test_program_si
+
+In GUI mode, if the simulation was already run, there are a couple of options
+for restarting it.
+
+* The first option is to run the simulation again, with the ``Restart`` button
+  or by running the ``restart`` TCL command. This will reset the simulation and
+  start it again without recompiling the files.
+* The second option is to recompile the project and then run the simulation.
+  This is done by clicking the ``Relaunch Simulation`` button. This will not
+  close the simulation window, but it will recompile the project and start the
+  simulation.
+* The third option is to close the simulation window and use the ``Run
+  simulation`` option from the Flow Navigator. This will recompile the project
+  and start the simulation. This is needed when project simulation parameters
+  are changed after the build was created or when the block design is changed
+  manually. When the simulation seed is hard coded, this option must be used.
 
 Environment
 -------------------------------------------------------------------------------

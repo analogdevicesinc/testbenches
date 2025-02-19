@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Project based test bench template &#8212; Testbenches  documentation</title>
+    <title>Project based testbench template &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=9cb8e28d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -87,7 +87,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Project based test bench template</a><ul>
+<li><a class="reference internal" href="#">Project based testbench template</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -104,11 +104,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
-<li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
-<li><a class="reference internal" href="#sanity-test">Sanity Test</a></li>
+<li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
+<li><a class="reference internal" href="#sanity-test">Sanity test</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
+<li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
 <li><a class="reference internal" href="#resources">Resources</a><ul>
 <li><a class="reference internal" href="#hdl-related-dependencies">HDL related dependencies</a></li>
 <li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
@@ -223,8 +223,8 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="project-based-test-bench-template">
-<span id="project-based-template"></span><h1>Project based test bench template<a class="headerlink" href="#project-based-test-bench-template" title="Link to this heading"></a></h1>
+  <section id="project-based-testbench-template">
+<span id="project-based-template"></span><h1>Project based testbench template<a class="headerlink" href="#project-based-testbench-template" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p><strong>*This section must contain: the purpose of the testbench/ type of interface
@@ -277,7 +277,7 @@ Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
 <p>*** MENTION IF ANY CONFIGURATION FILES ARE AVAILABLE***</p>
 <p>*** THIS IS JUST AN EXAMPLE ***</p>
-<p>The following are available configurations for the test bench:</p>
+<p>The following are available configurations for the testbench:</p>
 <blockquote>
 <div><div class="table-wrapper docutils container">
 <table class="docutils align-default">
@@ -474,7 +474,7 @@ Please checkout the proposed combinations before running a custom test.</p>
 <p>*** THIS IS JUST AND EXAMPLE ***</p>
 <p>The test program is structured into several tests as follows:</p>
 <section id="environment-bringup">
-<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
+<h3>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
 <p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
@@ -484,14 +484,14 @@ Please checkout the proposed combinations before running a custom test.</p>
 </ul>
 </section>
 <section id="sanity-test">
-<h3>Sanity Test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h3>
+<h3>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h3>
 <p>This test is used to check the communication with the AXI REGMAP module of the
 AD7606 SPI Engine interface, by reading the core VERSION register, along with
 writing and reading the SCRATCH register.</p>
 </section>
 </section>
-<section id="building-the-test-bench">
-<h2>Building the test bench<a class="headerlink" href="#building-the-test-bench" title="Link to this heading"></a></h2>
+<section id="building-the-testbench">
+<h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
 <p>The testbench is built upon ADI’s generic HDL reference design framework.
 ADI does not distribute compiled files of these projects so they must be built
 from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">here</a>,
@@ -588,15 +588,15 @@ Example: if the following command was run for a single configuration in the clea
 </tr>
 <tr class="row-odd"><td><p>AXI_CLKGEN</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_clkgen">library/axi_clkgen</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_clkgen/index.html#axi-clkgen" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_clkgen/index.html#axi-clkgen" title="(in HDL)"><span>AXI CLK Generator</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>AXI_DMAC</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac">library/axi_dmac</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>AXI_HDMI_TX</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_hdmi_tx">library/axi_hdmi_tx</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_hdmi_tx/index.html#axi-hdmi-tx" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_hdmi_tx/index.html#axi-hdmi-tx" title="(in HDL)"><span>AXI HDMI TX</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>AXI_I2S_ADI</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_i2s_adi">library/axi_i2s_adi</a></p></td>
@@ -604,7 +604,7 @@ Example: if the following command was run for a single configuration in the clea
 </tr>
 <tr class="row-odd"><td><p>AXI_PWM_GEN</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_pwm_gen">library/axi_pwm_gen</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_pwm_gen/index.html#axi-pwm-gen" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_pwm_gen/index.html#axi-pwm-gen" title="(in HDL)"><span>AXI PWM Generator</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>AXI_SPDIF_TX</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_spdif_tx">library/axi_spdif_tx</a></p></td>
@@ -612,27 +612,27 @@ Example: if the following command was run for a single configuration in the clea
 </tr>
 <tr class="row-odd"><td><p>AXI_SYSID</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_sysid">library/axi_sysid</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" title="(in HDL)"><span>AXI System ID</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>AXI_SPI_ENGINE</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/axi_spi_engine">library/spi_engine/axi_spi_engine</a>  **</p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/axi_spi_engine.html#spi-engine-axi" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/axi_spi_engine.html#spi-engine-axi" title="(in HDL)"><span>AXI SPI Engine Module</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>SPI_ENGINE_EXECUTION</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_execution">library/spi_engine/spi_engine_execution</a> **</p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_execution.html#spi-engine-execution" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_execution.html#spi-engine-execution" title="(in HDL)"><span>SPI Engine Execution Module</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>SPI_ENGINE_INTERCONNECT</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_interconnect">library/spi_engine/spi_engine_interconnect</a> **</p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_interconnect.html#spi-engine-interconnect" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_interconnect.html#spi-engine-interconnect" title="(in HDL)"><span>SPI Engine Interconnect Module</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>SPI_ENGINE_OFFLOAD</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_offload">library/spi_engine/spi_engine_offload</a> **</p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_offload.html#spi-engine-offload" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_offload.html#spi-engine-offload" title="(in HDL)"><span>SPI Engine Offload Module</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>SYSID_ROM</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/sysid_rom">library/sysid_rom</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" title="(in HDL)"><span>AXI System ID</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>UTIL_I2C_MIXER</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_i2c_mixer">library/util_i2c_mixer</a></p></td>
@@ -640,7 +640,7 @@ Example: if the following command was run for a single configuration in the clea
 </tr>
 <tr class="row-even"><td><p>UTIL_CPACK2</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_pack/util_cpack2">library/util_pack/util_cpack2</a> *</p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/util_pack/util_cpack2.html#util-cpack2" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/util_pack/util_cpack2.html#util-cpack2" title="(in HDL)"><span>Channel CPACK Utility</span></a></p></td>
 </tr>
 </tbody>
 </table>

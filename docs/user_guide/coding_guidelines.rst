@@ -44,10 +44,13 @@ File names should be composed in the following way:
 * sp_include_<include_name> - system_project.tcl includes
 * adi_regmap_<ip_name>_pkg - used in registermap class definitions
 * <module_name>_pkg - generic file name
-* adi_<vip_name>_vip - packaged VIP top module
-* adi_<vip_name>_vip_pkg - VIP agent, driver, monitor and sequencer containing package
+* adi_<vip_name>_vip.sv - packaged VIP module
+* adi_<vip_name>_vip_top.v - packaged VIP top module
+* adi_<vip_name>_vip_pkg - VIP agent, driver, monitor and sequencer containing
+  package
 * adi_<vip_name>_if - VIP interface
-* adi_<vip_name>_if_base_pkg - abstract interface class, to be used and implemented in the VIP interface
+* adi_<vip_name>_if_base_pkg - abstract interface class, to be used and
+  implemented in the VIP interface
 
 B. General
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,11 +90,11 @@ classes that have multiple dependencies.
 **B3**
 
 Testbench must finish with all threads stopped, testbench done message must be
-printed and the finish system function must be called afterwards.
+printed and the ``finish()`` system function must be called afterwards.
 
 **B4**
 
-Forever statement must be used instead of while(1)
+Forever statement must be used instead of while(1).
 
 .. _example-b4:
 
@@ -99,15 +102,17 @@ Incorrect:
 
 .. code-block::
 
-   while(1)
+   while(1) begin
      ...
+   end
 
 Correct:
 
 .. code-block::
 
-   forever
+   forever begin
      ...
+   end
 
 **B5**
 
@@ -121,15 +126,17 @@ Incorrect:
 .. code-block:: systemverilog
 
    int i;
-   for (i=0; i<5; i++)
+   for (i=0; i<5; i++) begin
      ...
+   end
 
 Correct:
 
 .. code-block:: systemverilog
 
-   repeat(5)
+   repeat(5) begin
      ...
+   end
 
 **B6**
 
@@ -166,8 +173,8 @@ C. Design Under Test
 
 **C1**
 
-DUT IPs with a parameterizable registermap must have a macro that is used to
-import the IPs parameters.
+DUT IPs with a parameterizable registermap must be initialized using the macro
+that is provided in the SystemVerilog header file next to the registermap.
 
 **C2**
 
@@ -193,7 +200,8 @@ Case 2: AXI interface already connected.
 
 **C3**
 
-Testbench's FPGA part must be compatible with the IPs used in the design.
+Project level testbench's FPGA part must be compatible with one of the designs
+of the HDL projects.
 
 .. _example-c3:
 
@@ -288,7 +296,7 @@ Correct:
 **D2**
 
 Parenthesis must be present at method calls, even if these don't require any
-input value.
+input values.
 
 .. _example-d2:
 
@@ -310,8 +318,8 @@ Correct:
 
 **D3**
 
-All method arguments must have their direction specified as input, output or ref,
-except for classes.
+All method arguments must have their direction specified as input, output,
+inout or ref.
 
 **D4**
 
@@ -342,7 +350,7 @@ E. Event scheduling
 
 Event synchronization between multiple threads should be avoided, unless the user
 is very familiar with the simulation scheduler and knows about all of the corner
-cases that may arise using multiple threads.
+cases that may arise using multiple threads or there is no other way around it.
 
 **E2**
 
@@ -374,8 +382,9 @@ F. Reporting
 
 **F1**
 
-Reporting system functions calls from the standard must only be used in VIP files
-related to the block design IP.
+Reporting system functions calls from the standard must only be used in VIP
+files related to the block design IP, including the interface and the base
+interface class.
 
 .. _example-f1:
 
@@ -431,10 +440,8 @@ G. Classes
 
 **G1**
 
-Checker and scoreboard modules must be written to be parameterizable.
-
-..
-   TODO how and what exactly this means is an open question
+Checker and scoreboard modules must be written to be parameterizable, which
+means that they should be able to work with any data type.
 
 **G2**
 
@@ -460,7 +467,7 @@ Correct:
 
    // always assigned by the parent, invisible to child classes
    localparam class_id;
-   // both parent and child might need access to it, prevent the outside from accessing it
+   // both parent and child might need access to it, but prevent the outside from accessing it
    protected int device_address;
 
    task access_device();
@@ -470,7 +477,7 @@ Correct:
 **G3**
 
 ADI_FIFO or ADI_LIFO must be used for queues to avoid push-pull/front-back style
-differences and other issues (to be implemented).
+differences and other issues.
 
 .. _example-g3:
 
@@ -483,6 +490,14 @@ differences and other issues (to be implemented).
 **G4**
 
 Checker or scoreboard class should be used whenever comparing data streams.
+
+**G5**
+
+Use the IRQ handler class when dealing with any interrupt requests from the DUT.
+
+**G6**
+
+Checker and scoreboard classes must use a subscriber class to get data.
 
 H. VIP
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -574,8 +589,8 @@ VIP drivers, monitors and sequencers must not be instantiated outside of the age
 **H5**
 
 VIP agents, drivers, monitors and sequencers should not be parameterizable.
-These classes should read parameter values from the interface class, which ha
-direct access to the interface parameters.
+These classes should read parameter values from the interface class, which has
+direct access to the interface parameters if needed.
 
 **H6**
 
@@ -609,7 +624,7 @@ Correct:
 
 **H7**
 
-VIP agents must be instantiated with an interface class and not with a virtua
+VIP classes must be instantiated with an interface class and not with a virtual
 interface. AMD VIPs are an exception from this rule.
 
 .. _example-h7:
@@ -638,6 +653,25 @@ Correct:
      endfunction: new
    endclass: vip_agent
 
+**H8**
+
+AMD AXI and AXI Streaming VIPs must be linked to ADI base class VIPs located
+inside the environment.
+
+.. _example-h8:
+
+.. code-block:: systemverilog
+
+   test_harness_env base_env;
+
+   base_env = new(...);
+
+   mng = new("", `TH.`MNG_AXI.inst.IF);
+   ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+   `LINK(mng, base_env, mng)
+   `LINK(ddr, base_env, ddr)
+
 I. API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -648,15 +682,20 @@ parameterized with the same parameters using a macro.
 
 **I2**
 
-APIs with registermaps must have a sanity test implemented.
+APIs with registermaps must have a sanity test implemented. Exceptions are those
+that don't have Version, Magic and Scratch registers.
 
 .. _example-i2:
 
 .. code-block:: systemverilog
 
    task sanity_test();
-     axi_write (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
-     axi_read_v (`AXI_AD7616_BA + GetAddrs(AXI_AD7616_REG_SCRATCH), `SET_AXI_AD7616_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
+     // check version compatibility
+     ...
+     // check magic number
+     ...
+     // check scratch register
+     ...
      `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
    endtask
 
@@ -689,7 +728,7 @@ Incorrect:
 
 .. code-block:: systemverilog
 
-   class test_harness_env;
+   class test_harness_env extends adi_environment;
      ...
    endclass: test_harness_env
 
@@ -701,11 +740,11 @@ Correct:
 
 .. code-block:: systemverilog
 
-   class test_harness_env;
+   class test_harness_env extends adi_environment;
      ...
    endclass: test_harness_env
 
-   class new_env;
+   class new_env extends adi_environment;
      ...
    endclass: new_env
 
@@ -719,7 +758,7 @@ K. Randomization
 
 **K1**
 
-Constrained randomized values must be used for randomized testing.
+Constrained randomized values should be used for randomized testing.
 
 **K2**
 
@@ -769,6 +808,9 @@ beginning of the simulation.
 .. _example-k4:
 
 .. code-block:: systemverilog
+
+   process current_process;
+   string current_process_random_state;
 
    current_process = process::self();
    current_process_random_state = current_process.get_randstate();

@@ -38,6 +38,7 @@
 package s_spi_sequencer_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
   import adi_spi_vip_pkg::*;
 
   class s_spi_sequencer #(`SPI_VIP_PARAM_ORDER) extends adi_component;

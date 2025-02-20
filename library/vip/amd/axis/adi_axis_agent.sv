@@ -70,44 +70,36 @@ package adi_axis_agent_pkg;
       if (agent_type == SLAVE) begin
         this.fatal($sformatf("Agent is in slave mode!"));
       end
-      this.monitor.start();
     endtask: start_master
     
     virtual task start_slave();
       if (agent_type == MASTER) begin
         this.fatal($sformatf("Agent is in master mode!"));
       end
-      this.monitor.start();
     endtask: start_slave
 
     virtual task start_monitor();
       if (agent_type != PASSTHROUGH) begin
         this.fatal($sformatf("Agent is not in passthrough mode!"));
       end
-      this.monitor.start();
     endtask: start_monitor
     
     virtual task stop_master();
       if (agent_type == SLAVE) begin
         this.fatal($sformatf("Agent is in slave mode!"));
       end
-      this.master_sequencer.stop();
-      this.monitor.stop();
     endtask: stop_master
 
     virtual task stop_slave();
       if (agent_type == MASTER) begin
         this.fatal($sformatf("Agent is in master mode!"));
       end
-      this.slave_sequencer.stop();
-      this.monitor.stop();
     endtask: stop_slave
 
     virtual task stop_monitor();
       if (agent_type != PASSTHROUGH) begin
         this.fatal($sformatf("Agent is not in passthrough mode!"));
       end
-      this.monitor.stop();
     endtask: stop_monitor
     
   endclass: adi_axis_agent_base
@@ -144,11 +136,14 @@ package adi_axis_agent_pkg;
     virtual task start_master();
       super.start_master();
       this.agent.start_master();
+      this.monitor.start();
     endtask: start_master
 
     virtual task stop_master();
       super.stop_master();
       this.agent.stop_master();
+      this.master_sequencer.stop();
+      this.monitor.stop();
     endtask: stop_master
 
   endclass: adi_axis_master_agent
@@ -185,11 +180,14 @@ package adi_axis_agent_pkg;
     virtual task start_slave();
       super.start_slave();
       this.agent.start_slave();
+      this.monitor.start();
     endtask: start_slave
 
     virtual task stop_slave();
       super.stop_slave();
       this.agent.stop_slave();
+      this.slave_sequencer.stop();
+      this.monitor.stop();
     endtask: stop_slave
 
   endclass: adi_axis_slave_agent
@@ -229,33 +227,41 @@ package adi_axis_agent_pkg;
     virtual task start_master();
       super.start_master();
       this.agent.start_master();
+      this.monitor.start();
       this.warning($sformatf("Sequencer must be started manually!"));
     endtask: start_master
 
     virtual task start_slave();
       super.start_slave();
       this.agent.start_slave();
+      this.monitor.start();
       this.warning($sformatf("Sequencer must be started manually!"));
     endtask: start_slave
 
     virtual task start_monitor();
       super.start_monitor();
       this.agent.start_monitor();
+      this.monitor.start();
     endtask: start_monitor
 
     virtual task stop_master();
       super.stop_master();
       this.agent.stop_master();
+      this.master_sequencer.stop();
+      this.monitor.stop();
     endtask: stop_master
 
     virtual task stop_slave();
       super.stop_slave();
       this.agent.stop_slave();
+      this.slave_sequencer.stop();
+      this.monitor.stop();
     endtask: stop_slave
 
     virtual task stop_monitor();
       super.stop_monitor();
       this.agent.stop_monitor();
+      this.monitor.stop();
     endtask: stop_monitor
 
   endclass: adi_axis_passthrough_mem_agent

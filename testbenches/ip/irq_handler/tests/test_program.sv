@@ -60,7 +60,7 @@ program test_program;
 
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_LOW);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     current_process = process::self();
     current_process_random_state = current_process.get_randstate();

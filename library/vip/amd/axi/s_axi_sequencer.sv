@@ -34,31 +34,32 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axi_definitions.svh"
 
 package s_axi_sequencer_pkg;
 
-  import xil_common_vip_pkg::*;
   import axi_vip_pkg::*;
+  import adi_common_pkg::*;
   import logger_pkg::*;
 
-  class s_axi_sequencer #( type T ) extends adi_component;
+  class s_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends adi_component;
 
-    T agent;
+    xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(AXI)) mem_model;
 
     function new(
       input string name,
-      input T agent,
-      input adi_component parent = null);
+      input xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(AXI)) mem_model,
+      input adi_agent parent = null);
 
       super.new(name, parent);
       
-      this.agent = agent;
+      this.mem_model = mem_model;
     endfunction
 
     task get_byte_from_mem(input xil_axi_ulong addr,
                            output bit [7:0] data);
       bit [31:0] four_bytes;
-      four_bytes = agent.mem_model.backdoor_memory_read_4byte(addr);
+      four_bytes = this.mem_model.backdoor_memory_read_4byte(addr);
       case (addr[1:0])
         2'b00: data = four_bytes[0+:8];
         2'b01: data = four_bytes[8+:8];
@@ -76,7 +77,7 @@ package s_axi_sequencer_pkg;
         2'b10: strb = 'b0100;
         2'b11: strb = 'b1000;
       endcase
-      agent.mem_model.backdoor_memory_write_4byte(.addr(addr),
+      this.mem_model.backdoor_memory_write_4byte(.addr(addr),
                                                   .payload({4{data}}),
                                                   .strb(strb));
     endtask

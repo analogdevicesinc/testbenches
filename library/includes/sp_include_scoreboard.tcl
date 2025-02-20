@@ -35,8 +35,7 @@
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "$ad_tb_dir/library/drivers/common/mailbox.sv" \
+  "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
   "$ad_tb_dir/library/drivers/common/scoreboard.sv" \
   "$ad_tb_dir/library/drivers/common/scoreboard_pack.sv" \
-  "$ad_tb_dir/library/drivers/common/x_monitor.sv" \
 ]

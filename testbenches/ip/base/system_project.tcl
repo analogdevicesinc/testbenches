@@ -18,7 +18,6 @@ adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "environment.sv" \
   "tests/test_program.sv" \
 ]
 

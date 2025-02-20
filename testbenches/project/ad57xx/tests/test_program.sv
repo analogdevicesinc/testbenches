@@ -35,6 +35,9 @@
 
 `include "utils.svh"
 
+import logger_pkg::*;
+import test_harness_env_pkg::*;
+import ad57xx_environment_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import adi_regmap_pkg::*;
@@ -42,10 +45,11 @@ import adi_regmap_clkgen_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
 import adi_regmap_spi_engine_pkg::*;
-import logger_pkg::*;
-import ad57xx_environment_pkg::*;
 import spi_engine_instr_pkg::*;
 import adi_spi_vip_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -60,7 +64,8 @@ timeprecision 100ps;
 
 typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
 
-ad57xx_environment env;
+test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+ad57xx_environment spi_env;
 
 // --------------------------
 // Wrapper function for AXI read verify
@@ -68,13 +73,13 @@ ad57xx_environment env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-  env.mng.RegReadVerify32(raddr,vdata);
+  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-  env.mng.RegRead32(raddr,data);
+  base_env.mng.sequencer.RegRead32(raddr,data);
 endtask
 
 // --------------------------
@@ -83,7 +88,7 @@ endtask
 task axi_write(
     input [31:0]  waddr,
     input [31:0]  wdata);
-  env.mng.RegWrite32(waddr,wdata);
+  base_env.mng.sequencer.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
@@ -91,7 +96,7 @@ endtask
 // --------------------------
 task spi_receive(
     output [`DATA_DLENGTH:0]  data);
-  env.spi_seq.receive_data(data);
+  spi_env.spi_seq.receive_data(data);
 endtask
 
 // --------------------------
@@ -99,14 +104,14 @@ endtask
 // --------------------------
 task spi_send(
     input [`DATA_DLENGTH:0]  data);
-  env.spi_seq.send_data(data);
+  spi_env.spi_seq.send_data(data);
 endtask
 
 // --------------------------
 // Wrapper function for waiting for all SPI
 // --------------------------
 task spi_wait_send();
-  env.spi_seq.flush_send();
+  spi_env.spi_seq.flush_send();
 endtask
 
 
@@ -117,21 +122,25 @@ endtask
 initial begin
 
   //creating environment
-  env = new("Axis Sequencers Environment",
-            `TH.`SYS_CLK.inst.IF,
-            `TH.`DMA_CLK.inst.IF,
-            `TH.`DDR_CLK.inst.IF,
-            `TH.`SYS_RST.inst.IF,
-            `TH.`MNG_AXI.inst.IF,
-            `TH.`DDR_AXI.inst.IF,
-            `TH.`SPI_S.inst.IF);
+  base_env = new("Base Environment",
+                  `TH.`SYS_CLK.inst.IF,
+                  `TH.`DMA_CLK.inst.IF,
+                  `TH.`DDR_CLK.inst.IF,
+                  `TH.`SYS_RST.inst.IF,
+                  `TH.`MNG_AXI.inst.IF,
+                  `TH.`DDR_AXI.inst.IF);
+
+  spi_env = new("SPI Environment",
+                `TH.`SPI_S.inst.IF);
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
-  env.start();
 
-  env.spi_seq.set_default_miso_data('h0);
+  base_env.start();
+  spi_env.start();
 
-  env.sys_reset();
+  spi_env.spi_seq.set_default_miso_data('h0);
+
+  base_env.sys_reset();
 
   sanity_test();
 
@@ -143,10 +152,11 @@ initial begin
 
   offload_spi_test(`TEST_DATA_MODE);
 
-  env.stop();
+  spi_env.stop();
+  base_env.stop();
 
   `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-  $finish;
+  $finish();
 
 end
 
@@ -268,21 +278,21 @@ task offload_spi_test(
     temp_data = {4'b0001,dac_word,2'b00};
     sdo_write_data_store [i] = temp_data;
 
-    env.ddr_axi_agent.mem_model.backdoor_memory_write_4byte(.addr(`DDR_BA + 4*i),
+    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(.addr(`DDR_BA + 4*i),
                                                   .payload(temp_data),
                                                   .strb('1));
     spi_send('0);
   end
 
   //Configure TX DMA
-  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
+  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
     `SET_DMAC_FLAGS_TLAST(1) |
     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
     ); // Use TLAST
-  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
-  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-  env.mng.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
+  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
+  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   // Configure the Offload module
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);

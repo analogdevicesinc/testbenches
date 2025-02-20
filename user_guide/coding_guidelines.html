@@ -92,14 +92,21 @@
 <li><a class="reference internal" href="#">ADI Testbenches coding guidelines</a><ul>
 <li><a class="reference internal" href="#introduction">1. Introduction</a></li>
 <li><a class="reference internal" href="#coding-style">2. Coding style</a><ul>
-<li><a class="reference internal" href="#a-layout">A. Layout</a></li>
-<li><a class="reference internal" href="#b-naming-conventions">B. Naming Conventions</a></li>
-<li><a class="reference internal" href="#c-comments">C. Comments</a></li>
-<li><a class="reference internal" href="#d-general">D. General</a></li>
+<li><a class="reference internal" href="#a-naming">A. Naming</a></li>
+<li><a class="reference internal" href="#b-general">B. General</a></li>
+<li><a class="reference internal" href="#c-design-under-test">C. Design Under Test</a></li>
+<li><a class="reference internal" href="#d-methods">D. Methods</a></li>
+<li><a class="reference internal" href="#e-event-scheduling">E. Event scheduling</a></li>
+<li><a class="reference internal" href="#f-reporting">F. Reporting</a></li>
+<li><a class="reference internal" href="#g-classes">G. Classes</a></li>
+<li><a class="reference internal" href="#h-vip">H. VIP</a></li>
+<li><a class="reference internal" href="#i-api">I. API</a></li>
+<li><a class="reference internal" href="#j-environment">J. Environment</a></li>
+<li><a class="reference internal" href="#k-randomization">K. Randomization</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#annexes">3. Annexes</a><ul>
-<li><a class="reference internal" href="#annex-1-system-verilog-file-format">Annex 1 System Verilog file format</a></li>
+<li><a class="reference internal" href="#annex-1-system-verilog-file-format-different-use-cases">Annex 1 System Verilog file format (different use-cases)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#references">4. References</a></li>
@@ -224,31 +231,578 @@ listed below.</p>
 </section>
 <section id="coding-style">
 <h2>2. Coding style<a class="headerlink" href="#coding-style" title="Link to this heading"></a></h2>
-<section id="a-layout">
-<h3>A. Layout<a class="headerlink" href="#a-layout" title="Link to this heading"></a></h3>
+<section id="a-naming">
+<h3>A. Naming<a class="headerlink" href="#a-naming" title="Link to this heading"></a></h3>
 <p><strong>A1</strong></p>
+<p>Class names should be composed in the following way:</p>
+<ul class="simple">
+<li><p>&lt;class_name&gt;_vif - Virtual Interface</p></li>
+<li><p>&lt;class_name&gt;_env - Environment</p></li>
+<li><p>&lt;class_name&gt;_wd - Watchdog</p></li>
+<li><p>&lt;class_name&gt;_api - API class for an IP</p></li>
+<li><p>&lt;class_name&gt;_agent - Agent class for an VIP</p></li>
+<li><p>&lt;class_name&gt;_driver - Driver class for an VIP</p></li>
+<li><p>&lt;class_name&gt;_monitor - Monitor class for an VIP</p></li>
+<li><p>&lt;class_name&gt;_sequencer - Sequencer class for an VIP</p></li>
+</ul>
 <p><strong>A2</strong></p>
+<p>File names should be composed in the following way:</p>
+<ul class="simple">
+<li><p>&lt;driver_name&gt;_api - API</p></li>
+<li><p>Makeinclude_&lt;include_name&gt; - Makefile includes</p></li>
+<li><p>sp_include_&lt;include_name&gt; - system_project.tcl includes</p></li>
+<li><p>adi_regmap_&lt;ip_name&gt;_pkg - used in registermap class definitions</p></li>
+<li><p>&lt;module_name&gt;_pkg - generic file name</p></li>
+<li><p>adi_&lt;vip_name&gt;_vip.sv - packaged VIP module</p></li>
+<li><p>adi_&lt;vip_name&gt;_vip_top.v - packaged VIP top module</p></li>
+<li><p>adi_&lt;vip_name&gt;_vip_pkg - VIP agent, driver, monitor and sequencer containing
+package</p></li>
+<li><p>adi_&lt;vip_name&gt;_if - VIP interface</p></li>
+<li><p>adi_&lt;vip_name&gt;_if_base_pkg - abstract interface class, to be used and
+implemented in the VIP interface</p></li>
+</ul>
 </section>
-<section id="b-naming-conventions">
-<h3>B. Naming Conventions<a class="headerlink" href="#b-naming-conventions" title="Link to this heading"></a></h3>
+<section id="b-general">
+<h3>B. General<a class="headerlink" href="#b-general" title="Link to this heading"></a></h3>
 <p><strong>B1</strong></p>
+<p>Use safe-guarded thread construct when attempting to stop/kill a thread to
+prevent unknown behavior.</p>
+<p id="example-b1">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">fork</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">join</span>
+<span class="k">disable</span><span class="w"> </span><span class="k">fork</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">fork</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">  </span><span class="k">fork</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="w">  </span><span class="k">join</span>
+<span class="w"> </span><span class="k">disable</span><span class="w"> </span><span class="k">fork</span><span class="p">;</span>
+<span class="k">end</span><span class="w"> </span><span class="k">join</span>
+</pre></div>
+</div>
 <p><strong>B2</strong></p>
+<p>Include files should be used in Makefile and system_project.tcl scripts for
+classes that have multiple dependencies.</p>
+<p><strong>B3</strong></p>
+<p>Testbench must finish with all threads stopped, testbench done message must be
+printed and the <code class="docutils literal notranslate"><span class="pre">finish()</span></code> system function must be called afterwards.</p>
+<p><strong>B4</strong></p>
+<p>Forever statement must be used instead of while(1).</p>
+<p id="example-b4">Incorrect:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">begin</span>
+  <span class="o">...</span>
+<span class="n">end</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forever</span> <span class="n">begin</span>
+  <span class="o">...</span>
+<span class="n">end</span>
+</pre></div>
+</div>
+<p><strong>B5</strong></p>
+<p>Repeat statement must be used instead of for loops, where the same operation
+block is repeated with no changes.</p>
+<p id="example-b5">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">repeat</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+<p><strong>B6</strong></p>
+<p>Watchdogs must be used to ensure that the simulation doesn’t get stuck during a
+run.</p>
+<p><strong>B7</strong></p>
+<p>Test programs must use localparams instead of parameter.</p>
+<p id="example-b7">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">parameter</span><span class="w"> </span><span class="n">VAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">localparam</span><span class="w"> </span><span class="n">VAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><strong>B8</strong></p>
+<p>Use the proper equation type for various comparisons</p>
+<ul class="simple">
+<li><p>== for logical equality (1 and 0 comparison only)</p></li>
+<li><p>=== for case equality (1, 0, x and z comparison)</p></li>
+</ul>
 </section>
-<section id="c-comments">
-<h3>C. Comments<a class="headerlink" href="#c-comments" title="Link to this heading"></a></h3>
+<section id="c-design-under-test">
+<h3>C. Design Under Test<a class="headerlink" href="#c-design-under-test" title="Link to this heading"></a></h3>
 <p><strong>C1</strong></p>
+<p>DUT IPs with a parameterizable registermap must be initialized using the macro
+that is provided in the SystemVerilog header file next to the registermap.</p>
 <p><strong>C2</strong></p>
+<p>IP base addresses must be defined when the block design is created.</p>
+<p id="example-c2">Case 1: AXI interface not yet connected.</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>RX_DMA<span class="w"> </span><span class="mh">0x7C420000</span>
+<span class="nv">ad_cpu_interconnect</span><span class="w"> </span><span class="nv">$RX_DMA</span><span class="w"> </span>dut_rx_dma
+<span class="nv">adi_sim_add_define</span><span class="w"> </span><span class="s2">&quot;RX_DMA_BA=[format &quot;%d&quot; ${RX_DMA}]&quot;</span>
+</pre></div>
+</div>
+<p>Case 2: AXI interface already connected.</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>RX_DMA<span class="w"> </span><span class="mh">0x7C420000</span>
+<span class="nv">set_property</span><span class="w"> </span>offset<span class="w"> </span><span class="nv">$RX_DMA</span><span class="w"> </span><span class="k">[</span><span class="nv">get_bd_addr_segs</span><span class="w"> </span><span class="k">{</span><span class="nv">mng_axi_vip</span><span class="o">/</span>Master_AXI<span class="o">/</span>SEG_data_dut_rx_dma<span class="k">}]</span>
+<span class="nv">adi_sim_add_define</span><span class="w"> </span><span class="s2">&quot;RX_DMA_BA=[format &quot;%d&quot; ${RX_DMA}]&quot;</span>
+</pre></div>
+</div>
+<p><strong>C3</strong></p>
+<p>Project level testbench’s FPGA part must be compatible with one of the designs
+of the HDL projects.</p>
+<p id="example-c3">Set FPGA part number in system_project.tcl:</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="c"># VCU118 board example:</span>
+<span class="nv">adi_sim_project_xilinx</span><span class="w"> </span><span class="nv">$project_name</span><span class="w"> </span><span class="s2">&quot;xcvu9p-flga2104-2L-e&quot;</span>
+
+<span class="c"># Xilinx 7-series FPGA example:</span>
+<span class="nv">adi_sim_project_xilinx</span><span class="w"> </span><span class="nv">$project_name</span><span class="w"> </span><span class="s2">&quot;xc7z007sclg400-1&quot;</span>
+</pre></div>
+</div>
+<p><strong>C4</strong></p>
+<p>All configuration parameters must be defined in the ad_project_params associative
+array.</p>
+<div class="highlight-default notranslate" id="example-c4"><div class="highlight"><pre><span></span>global ad_project_params
+
+set ad_project_params(DATA_WIDTH) 16
+
+set rx_dma_cfg [list \
+  DMA_TYPE_SRC 1 \
+  DMA_TYPE_DEST 0 \
+  ID 0 \
+  AXI_SLICE_SRC 1 \
+  AXI_SLICE_DEST 1 \
+  SYNC_TRANSFER_START 0 \
+  DMA_LENGTH_WIDTH 24 \
+  DMA_2D_TRANSFER 0 \
+  MAX_BYTES_PER_BURST 4096 \
+  CYCLIC 0 \
+  DMA_DATA_WIDTH_SRC 32 \
+  DMA_DATA_WIDTH_DEST 32 \
+]
+
+set ad_project_params(rx_dma_cfg) $rx_dma_cfg
+</pre></div>
+</div>
+<p><strong>C5</strong></p>
+<p>In project level testbenches, the DUT block design should come from the HDL
+repository.</p>
+<p><strong>C6</strong></p>
+<p>If multiple test programs are created, the test program’s name should hint
+towards the use-case of that test program.</p>
+<p><strong>C7</strong></p>
+<p>If multiple configurations are created, the configuration file’s name should
+hint towards the use-case of that configuration file.</p>
 </section>
-<section id="d-general">
-<h3>D. General<a class="headerlink" href="#d-general" title="Link to this heading"></a></h3>
+<section id="d-methods">
+<h3>D. Methods<a class="headerlink" href="#d-methods" title="Link to this heading"></a></h3>
 <p><strong>D1</strong></p>
+<p>Function method definition must be used for operations that have no relation
+with simulation time.</p>
+<p id="example-d1">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">task</span><span class="w"> </span><span class="n">add_function</span><span class="p">(</span>
+<span class="w">  </span><span class="k">input</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span>
+<span class="w">  </span><span class="k">input</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">,</span>
+<span class="w">  </span><span class="k">output</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="k">endtask</span><span class="o">:</span><span class="w"> </span><span class="n">add_function</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">add_function</span><span class="p">(</span>
+<span class="w">  </span><span class="k">input</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">,</span>
+<span class="w">  </span><span class="k">input</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="n">add_function</span>
+</pre></div>
+</div>
 <p><strong>D2</strong></p>
+<p>Parenthesis must be present at method calls, even if these don’t require any
+input values.</p>
+<p id="example-d2">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">task</span><span class="w"> </span><span class="n">add_function</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">endtask</span><span class="o">:</span><span class="w"> </span><span class="n">add_function</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="k">task</span><span class="w"> </span><span class="n">add_function</span><span class="p">();</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">endtask</span><span class="o">:</span><span class="w"> </span><span class="n">add_function</span>
+</pre></div>
+</div>
+<p><strong>D3</strong></p>
+<p>All method arguments must have their direction specified as input, output,
+inout or ref.</p>
+<p><strong>D4</strong></p>
+<p>Every named block must end with their identifier.</p>
+<p id="example-d4">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">verifier</span><span class="p">();</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">verifier</span><span class="p">();</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">verifier</span>
+</pre></div>
+</div>
+</section>
+<section id="e-event-scheduling">
+<h3>E. Event scheduling<a class="headerlink" href="#e-event-scheduling" title="Link to this heading"></a></h3>
+<p><strong>E1</strong></p>
+<p>Event synchronization between multiple threads should be avoided, unless the user
+is very familiar with the simulation scheduler and knows about all of the corner
+cases that may arise using multiple threads or there is no other way around it.</p>
+<p><strong>E2</strong></p>
+<p>#0 must not be used. This would only mean that synchronization between events is
+not properly handled and it’s prone to error if not used exactly the way it was
+intended to be used.</p>
+<p><strong>E3</strong></p>
+<p>Time value and scale must be specified for delaying statements.</p>
+<p id="example-e3">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="p">#</span><span class="mi">5</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="p">#</span><span class="mi">5</span><span class="n">us</span><span class="p">;</span>
+<span class="p">#(</span><span class="mi">5</span><span class="o">*</span><span class="mi">1</span><span class="n">us</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="f-reporting">
+<h3>F. Reporting<a class="headerlink" href="#f-reporting" title="Link to this heading"></a></h3>
+<p><strong>F1</strong></p>
+<p>Reporting system functions calls from the standard must only be used in VIP
+files related to the block design IP, including the interface and the base
+interface class.</p>
+<div class="highlight-systemverilog notranslate" id="example-f1"><div class="highlight"><pre><span></span><span class="p">$</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Info message example&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>F2</strong></p>
+<p>Reporting macros must only be used in the test programs.</p>
+<div class="highlight-systemverilog notranslate" id="example-f2"><div class="highlight"><pre><span></span><span class="no">`INFO</span><span class="p">((</span><span class="s">&quot;Info message example&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_LOW</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>F3</strong></p>
+<p>Reporting functions from the base reporting class must be used in classes that
+inherit these functions.</p>
+<div class="highlight-systemverilog notranslate" id="example-f3"><div class="highlight"><pre><span></span><span class="k">this</span><span class="p">.</span><span class="n">info</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">&quot;Data received: %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_MEDIUM</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>F4</strong></p>
+<p>Error messages should be used where the simulation may continue if something is
+not working as expected. In every other instance, where the simulation must halt
+immediately, use fatal messages.</p>
+<div class="highlight-systemverilog notranslate" id="example-f4"><div class="highlight"><pre><span></span><span class="k">this</span><span class="p">.</span><span class="n">error</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">&quot;Error, but can continue&quot;</span><span class="p">));</span>
+<span class="k">this</span><span class="p">.</span><span class="n">fatal</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">&quot;Error and cannot continue&quot;</span><span class="p">));</span>
+</pre></div>
+</div>
+<p><strong>F5</strong></p>
+<p>Verbosity settings must be set as follows:</p>
+<ul class="simple">
+<li><p>ADI_VERBOSITY_NONE: Only for simulation randomization state and simulation done messages</p></li>
+<li><p>ADI_VERBOSITY_LOW: All info messages inside the test program, with the exceptions of ADI_VERBOSITY_NONE</p></li>
+<li><p>ADI_VERBOSITY_MEDIUM: Inside drivers</p></li>
+<li><p>ADI_VERBOSITY_HIGH: Inside VIP modules, regmaps, utilities</p></li>
+</ul>
+</section>
+<section id="g-classes">
+<h3>G. Classes<a class="headerlink" href="#g-classes" title="Link to this heading"></a></h3>
+<p><strong>G1</strong></p>
+<p>Checker and scoreboard modules must be written to be parameterizable, which
+means that they should be able to work with any data type.</p>
+<p><strong>G2</strong></p>
+<p>Data and methods inside classes should be protected from outside access using
+protected and local keywords where it makes sense.</p>
+<p id="example-g2">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">class_id</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">device_address</span><span class="p">;</span>
+
+<span class="k">task</span><span class="w"> </span><span class="n">access_device</span><span class="p">();</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">endtask</span><span class="o">:</span><span class="w"> </span><span class="n">access_device</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// always assigned by the parent, invisible to child classes</span>
+<span class="k">localparam</span><span class="w"> </span><span class="n">class_id</span><span class="p">;</span>
+<span class="c1">// both parent and child might need access to it, but prevent the outside from accessing it</span>
+<span class="k">protected</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">device_address</span><span class="p">;</span>
+
+<span class="k">task</span><span class="w"> </span><span class="n">access_device</span><span class="p">();</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">endtask</span><span class="o">:</span><span class="w"> </span><span class="n">access_device</span>
+</pre></div>
+</div>
+<p><strong>G3</strong></p>
+<p>ADI_FIFO or ADI_LIFO must be used for queues to avoid push-pull/front-back style
+differences and other issues.</p>
+<div class="highlight-systemverilog notranslate" id="example-g3"><div class="highlight"><pre><span></span><span class="n">adi_fifo</span><span class="w"> </span><span class="p">#(</span><span class="n">data_length</span><span class="p">)</span><span class="w"> </span><span class="n">fifo_buffer</span><span class="p">;</span>
+
+<span class="n">fifo_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><strong>G4</strong></p>
+<p>Checker or scoreboard class should be used whenever comparing data streams.</p>
+<p><strong>G5</strong></p>
+<p>Use the IRQ handler class when dealing with any interrupt requests from the DUT.</p>
+<p><strong>G6</strong></p>
+<p>Checker and scoreboard classes must use a subscriber class to get data.</p>
+</section>
+<section id="h-vip">
+<h3>H. VIP<a class="headerlink" href="#h-vip" title="Link to this heading"></a></h3>
+<p><strong>H1</strong></p>
+<p>VIP agents must contain a driver, monitor and sequencer modules.</p>
+<div class="highlight-systemverilog notranslate" id="example-h1"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">vip_driver</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_driver</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">vip_monitor</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_monitor</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">vip_sequencer</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_sequencer</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">vip_agent</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_driver</span><span class="w"> </span><span class="n">vip_drv</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_monitor</span><span class="w"> </span><span class="n">vip_mon</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_sequencer</span><span class="w"> </span><span class="n">vip_seq</span><span class="p">;</span>
+
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_agent</span>
+</pre></div>
+</div>
+<p><strong>H2</strong></p>
+<p>VIP monitors must contain a publisher module.</p>
+<div class="highlight-systemverilog notranslate" id="example-h2"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">vip_monitor</span><span class="p">;</span>
+<span class="w">  </span><span class="n">adi_publisher</span><span class="w"> </span><span class="p">#(</span><span class="o">&lt;</span><span class="n">data_type</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="n">publisher</span><span class="p">;</span>
+
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_monitor</span>
+</pre></div>
+</div>
+<p><strong>H3</strong></p>
+<p>VIP drivers, monitors and sequencers must have their agent parents set.</p>
+<p id="example-h3">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">vip_agent</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_driver</span><span class="w"> </span><span class="n">vip_drv</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_monitor</span><span class="w"> </span><span class="n">vip_mon</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_sequencer</span><span class="w"> </span><span class="n">vip_seq</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">    </span><span class="n">vip_drv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Driver&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_mon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Monitor&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Sequencer&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_agent</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">vip_agent</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_driver</span><span class="w"> </span><span class="n">vip_drv</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_monitor</span><span class="w"> </span><span class="n">vip_mon</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_sequencer</span><span class="w"> </span><span class="n">vip_seq</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">    </span><span class="n">vip_drv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Driver&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_mon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Monitor&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Sequencer&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_agent</span>
+</pre></div>
+</div>
+<p><strong>H4</strong></p>
+<p>VIP drivers, monitors and sequencers must not be instantiated outside of the agent.</p>
+<p><strong>H5</strong></p>
+<p>VIP agents, drivers, monitors and sequencers should not be parameterizable.
+These classes should read parameter values from the interface class, which has
+direct access to the interface parameters if needed.</p>
+<p><strong>H6</strong></p>
+<p>VIP agents should have an environment as a parent.</p>
+<p id="example-h6">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">environment</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_agent</span><span class="w"> </span><span class="n">vip_agnt</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">    </span><span class="n">vip_agnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Agent&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">environment</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">environment</span><span class="p">;</span>
+<span class="w">  </span><span class="n">vip_agent</span><span class="w"> </span><span class="n">vip_agnt</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">    </span><span class="n">vip_agnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Agent&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">environment</span>
+</pre></div>
+</div>
+<p><strong>H7</strong></p>
+<p>VIP classes must be instantiated with an interface class and not with a virtual
+interface. AMD VIPs are an exception from this rule.</p>
+<p id="example-h7">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">vip_agent</span><span class="p">;</span>
+<span class="w">  </span><span class="k">protected</span><span class="w"> </span><span class="n">vif</span><span class="w"> </span><span class="n">vif_proxy</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="k">virtual</span><span class="w"> </span><span class="k">interface</span><span class="w"> </span><span class="n">vif_proxy</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="n">vif_proxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vif_proxy</span><span class="p">;</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_agent</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">vip_agent</span><span class="p">;</span>
+<span class="w">  </span><span class="k">protected</span><span class="w"> </span><span class="n">vif_class</span><span class="w"> </span><span class="n">vif_class_proxy</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="n">vif_class</span><span class="w"> </span><span class="n">vif_class_proxy</span><span class="p">);</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="n">vif_class_proxy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vif_class_proxy</span><span class="p">;</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_agent</span>
+</pre></div>
+</div>
+<p><strong>H8</strong></p>
+<p>AMD AXI and AXI Streaming VIPs must be linked to ADI base class VIPs located
+inside the environment.</p>
+<div class="highlight-systemverilog notranslate" id="example-h8"><div class="highlight"><pre><span></span><span class="n">test_harness_env</span><span class="w"> </span><span class="n">base_env</span><span class="p">;</span>
+
+<span class="n">base_env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(...);</span>
+
+<span class="n">mng</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="no">`TH</span><span class="p">.</span><span class="no">`MNG_AXI</span><span class="p">.</span><span class="n">inst</span><span class="p">.</span><span class="n">IF</span><span class="p">);</span>
+<span class="n">ddr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="no">`TH</span><span class="p">.</span><span class="no">`DDR_AXI</span><span class="p">.</span><span class="n">inst</span><span class="p">.</span><span class="n">IF</span><span class="p">);</span>
+
+<span class="no">`LINK</span><span class="p">(</span><span class="n">mng</span><span class="p">,</span><span class="w"> </span><span class="n">base_env</span><span class="p">,</span><span class="w"> </span><span class="n">mng</span><span class="p">)</span>
+<span class="no">`LINK</span><span class="p">(</span><span class="n">ddr</span><span class="p">,</span><span class="w"> </span><span class="n">base_env</span><span class="p">,</span><span class="w"> </span><span class="n">ddr</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="i-api">
+<h3>I. API<a class="headerlink" href="#i-api" title="Link to this heading"></a></h3>
+<p><strong>I1</strong></p>
+<p>APIs that can control an IP that has a parameterizable registermap must also be
+parameterized with the same parameters using a macro.</p>
+<p><strong>I2</strong></p>
+<p>APIs with registermaps must have a sanity test implemented. Exceptions are those
+that don’t have Version, Magic and Scratch registers.</p>
+<div class="highlight-systemverilog notranslate" id="example-i2"><div class="highlight"><pre><span></span><span class="k">task</span><span class="w"> </span><span class="n">sanity_test</span><span class="p">();</span>
+<span class="w">  </span><span class="c1">// check version compatibility</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="c1">// check magic number</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="c1">// check scratch register</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="no">`INFO</span><span class="p">((</span><span class="s">&quot;Sanity Test Done&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_LOW</span><span class="p">);</span>
+<span class="k">endtask</span>
+</pre></div>
+</div>
+<p><strong>I3</strong></p>
+<p>IP register access calls must only be written inside an API.</p>
+<p><strong>I4</strong></p>
+<p>Every ADI IP that has a registermap must have its own API driver class.</p>
+<p><strong>I5</strong></p>
+<p>IRQ handler class must be used when dealing with interrupt requests.</p>
+</section>
+<section id="j-environment">
+<h3>J. Environment<a class="headerlink" href="#j-environment" title="Link to this heading"></a></h3>
+<p><strong>J1</strong></p>
+<p>An environment must only contain VIP agents, APIs and/or checkers.</p>
+<p><strong>J2</strong></p>
+<p>Test_harness_env should not be inherited by any environment.</p>
+<p id="example-j2">Incorrect:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">test_harness_env</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">adi_environment</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">test_harness_env</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">new_env</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">test_harness_env</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">new_env</span>
+</pre></div>
+</div>
+<p>Correct:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">test_harness_env</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">adi_environment</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">test_harness_env</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">new_env</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">adi_environment</span><span class="p">;</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">new_env</span>
+</pre></div>
+</div>
+<p><strong>J3</strong></p>
+<p>New environments should be created with the intent to be reused in other
+testbenches.</p>
+</section>
+<section id="k-randomization">
+<h3>K. Randomization<a class="headerlink" href="#k-randomization" title="Link to this heading"></a></h3>
+<p><strong>K1</strong></p>
+<p>Constrained randomized values should be used for randomized testing.</p>
+<p><strong>K2</strong></p>
+<p>Variable randomization states must always be checked.</p>
+<div class="highlight-systemverilog notranslate" id="example-k2"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">randomizer_class</span><span class="p">;</span>
+<span class="w">  </span><span class="k">rand</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="n">switch</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">randomize_switch</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="n">switch</span><span class="p">.</span><span class="n">randomize</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">      </span><span class="no">`FATAL</span><span class="p">((</span><span class="s">&quot;Randomization failed!&quot;</span><span class="p">));</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="n">randomize_switch</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">randomizer_class</span>
+</pre></div>
+</div>
+<p><strong>K3</strong></p>
+<p>All random variables must be randomized when the class creation occurs.</p>
+<div class="highlight-systemverilog notranslate" id="example-k3"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">randomizer_class</span><span class="p">;</span>
+<span class="w">  </span><span class="k">rand</span><span class="w"> </span><span class="kt">bit</span><span class="w"> </span><span class="n">switch</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="n">randomize_init</span><span class="p">();</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
+
+<span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">randomize_init</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="n">randomize</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">      </span><span class="no">`FATAL</span><span class="p">((</span><span class="s">&quot;Randomization failed!&quot;</span><span class="p">));</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="n">randomize_init</span>
+<span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">randomizer_class</span>
+</pre></div>
+</div>
+<p><strong>K4</strong></p>
+<p>Test programs must output the simulation randomization state at the very
+beginning of the simulation.</p>
+<div class="highlight-systemverilog notranslate" id="example-k4"><div class="highlight"><pre><span></span><span class="n">process</span><span class="w"> </span><span class="n">current_process</span><span class="p">;</span>
+<span class="kt">string</span><span class="w"> </span><span class="n">current_process_random_state</span><span class="p">;</span>
+
+<span class="n">current_process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">process</span><span class="o">::</span><span class="n">self</span><span class="p">();</span>
+<span class="n">current_process_random_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_process</span><span class="p">.</span><span class="n">get_randstate</span><span class="p">();</span>
+<span class="no">`INFO</span><span class="p">((</span><span class="s">&quot;Randomization state: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">current_process_random_state</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_NONE</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>K5</strong></p>
+<p>The testbench should have a randomized configuration file paired with a
+randomized testbench.</p>
 </section>
 </section>
 <section id="annexes">
 <h2>3. Annexes<a class="headerlink" href="#annexes" title="Link to this heading"></a></h2>
-<section id="annex-1-system-verilog-file-format">
-<h3>Annex 1 System Verilog file format<a class="headerlink" href="#annex-1-system-verilog-file-format" title="Link to this heading"></a></h3>
+<section id="annex-1-system-verilog-file-format-different-use-cases">
+<h3>Annex 1 System Verilog file format (different use-cases)<a class="headerlink" href="#annex-1-system-verilog-file-format-different-use-cases" title="Link to this heading"></a></h3>
 </section>
 </section>
 <section id="references">

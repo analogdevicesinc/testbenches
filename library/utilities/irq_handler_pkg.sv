@@ -132,7 +132,7 @@ package irq_handler_pkg;
     // register IRQ device
     function event register_device(input int position);
       if (this.irq_valid_list[position]) begin
-        this.error($sformatf("An interrupt handler is already assigned to position %0d!", position));
+        this.fatal($sformatf("An interrupt handler is already assigned to position %0d!", position));
       end
       this.irq_valid_list[position] = 1'b1;
       return this.irq_event_list[position];

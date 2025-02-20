@@ -43,22 +43,22 @@ interface io_vip_if #(
 
   import io_vip_if_base_pkg::*;
 
-  wire [WIDTH-1:0] IO = 0;
+  wire [WIDTH-1:0] IO;
 
-  logic [WIDTH-1:0] io = 0;
+  logic [WIDTH-1:0] io = {WIDTH{1'b0}};
 
   logic intf_is_master = 0;
   logic intf_is_slave = 0;
-
-  function void set_intf_slave();
-    intf_is_master = 0;
-    intf_is_slave = 1;
-  endfunction: set_intf_slave
 
   function void set_intf_master();
     intf_is_master = 1;
     intf_is_slave = 0;
   endfunction: set_intf_master
+
+  function void set_intf_slave();
+    intf_is_master = 0;
+    intf_is_slave = 1;
+  endfunction: set_intf_slave
 
   function void set_intf_monitor();
     intf_is_master = 0;
@@ -72,44 +72,40 @@ interface io_vip_if #(
     function new();
     endfunction
 
-    // Master functions
     virtual function void set_io(logic [1023:0] o);
       if (intf_is_master) begin
         io <= o[WIDTH-1:0];
       end else begin
-        $fatal(0, "[ERROR] %0t Supported only in runtime master mode", $time);
+        $fatal(0, "Supported only in runtime master mode");
       end
     endfunction: set_io
     
-    // Slave functions
     virtual function logic [1023:0] get_io();
       if (intf_is_slave) begin
-        get_io = {{1024-WIDTH{1'b0}}, io};
+        get_io = {{1024-WIDTH{1'b0}}, IO};
       end else begin
-        $fatal(0, "[ERROR] %0t Supported only in runtime slave mode", $time);
+        $fatal(0, "Supported only in runtime slave mode");
       end
     endfunction: get_io
 
-    // Slave functions
     virtual task wait_io_change();
-      @(io);
+      @(IO);
     endtask: wait_io_change
 
     virtual task wait_posedge_clk();
       if (ASYNC == 1) begin
-        $fatal(0, "[ERROR] %0t Unsupported in async mode", $time);
+        $fatal(0, "Unsupported in async mode");
       end
       @(posedge clk);
     endtask: wait_posedge_clk
 
     virtual task wait_negedge_clk();
       if (ASYNC == 1) begin
-        $fatal(0, "[ERROR] %0t Unsupported in async mode", $time);
+        $fatal(0, "Unsupported in async mode");
       end
       @(negedge clk);
     endtask: wait_negedge_clk
 
-    // Slave functions
     virtual function int get_width();
       get_width = WIDTH;
     endfunction: get_width
@@ -120,7 +116,7 @@ interface io_vip_if #(
 
   default clocking cb @(posedge clk);
     default input #1step output #1ps;
-    inout io;
+    inout IO;
   endclocking : cb
 
 endinterface: io_vip_if

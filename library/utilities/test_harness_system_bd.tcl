@@ -46,6 +46,7 @@ adi_sim_add_define "DDR_AXI=ddr_axi_vip"
 # Interrupt controller
 ad_ip_instance axi_intc axi_intc [list \
   C_IRQ_CONNECTION 1 \
+  C_IRQ_IS_LEVEL 0 \
   C_HAS_FAST 0 \
 ]
 

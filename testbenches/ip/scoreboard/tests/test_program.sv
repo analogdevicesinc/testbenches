@@ -86,26 +86,31 @@ program test_program();
 
     scoreboard = new("Scoreboard");
 
+    // configure the sequencers
     adc_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
     adc_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(32'h100, 1, 0);
 
     dac_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
 
+    // start the environment
     base_env.start();
     adc_src_axis_agent.start_master();
     dac_dst_axis_agent.start_slave();
     base_env.sys_reset();
     
+    // subscribe and start the scoreboard
     adc_src_axis_agent.monitor.publisher.subscribe(scoreboard.subscriber_source);
     dac_dst_axis_agent.monitor.publisher.subscribe(scoreboard.subscriber_sink);
     
     scoreboard.run();
 
+    // generate data
     adc_src_axis_agent.master_sequencer.start();
     dac_dst_axis_agent.slave_sequencer.start();
 
     #1us;
     
+    // wait for scoreboard to be empty on both sides
     scoreboard.wait_until_complete();
 
     base_env.stop();

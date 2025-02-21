@@ -36,7 +36,7 @@
 package reg_accessor_pkg;
 
   import axi_vip_pkg::*;
-  import logger_pkg::*;
+  import adi_common_pkg::*;
 
   class reg_accessor extends adi_component;
 

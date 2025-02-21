@@ -334,7 +334,7 @@ package adi_jesd204_pkg;
               all_lanes_in_data = 0;
           end
         end
-        timeout--;
+        // timeout--;
       end
 
       link_verify();

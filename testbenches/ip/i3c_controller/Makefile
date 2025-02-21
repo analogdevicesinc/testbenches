@@ -17,6 +17,9 @@ LIB_DEPS += i3c_controller/i3c_controller_host_interface
 LIB_DEPS += i3c_controller/i3c_controller_core
 LIB_DEPS += sysid_rom
 
+SV_DEPS += $(ADI_HDL_DIR)/library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh
+SV_DEPS += $(ADI_HDL_DIR)/library/i3c_controller/i3c_controller_core/i3c_controller_word.vh
+
 # default test program
 TP := test_program
 

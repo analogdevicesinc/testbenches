@@ -126,7 +126,7 @@ package adi_axi_agent_pkg;
 
       this.agent = new("Agent", master_vip_if);
       this.master_sequencer = new("Master Sequencer", this.agent.wr_driver, this.agent.rd_driver, this);
-      this.monitor = new("Monitor TX", this.agent.monitor, this);
+      this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
     function void pre_link_agent(adi_axi_agent_base adi_axi_agent);
@@ -167,7 +167,7 @@ package adi_axi_agent_pkg;
 
       this.agent = new("Agent", slave_vip_if);
       this.slave_sequencer = new("Slave Sequencer", this.agent.mem_model, this);
-      this.monitor = new("Monitor TX", this.agent.monitor, this);
+      this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
     function void pre_link_agent(adi_axi_agent_base adi_axi_agent);
@@ -210,7 +210,7 @@ package adi_axi_agent_pkg;
       this.agent = new("Agent", passthrough_vip_if);
       this.master_sequencer = new("Master Sequencer", this.agent.mst_wr_driver, this.agent.mst_rd_driver, this);
       this.slave_sequencer = new("Slave Sequencer", this.agent.mem_model, this);
-      this.monitor = new("Monitor TX", this.agent.monitor, this);
+      this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
     function void pre_link_agent(adi_axi_agent_base adi_axi_agent);

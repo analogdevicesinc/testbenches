@@ -45,44 +45,194 @@ package m_axi_sequencer_pkg;
   
   class m_axi_sequencer_base extends adi_sequencer;
 
+    local semaphore reader_s;
+    local semaphore writer_s;
+
+    local int reader_priority_counter;
+    local int writer_priority_counter;
+
+    local event reader_event;
+    local event writer_event;
+
     function new(
       input string name,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
+
+      this.reader_s = new(1);
+      this.writer_s = new(1);
+
+      this.reader_priority_counter = 0;
+      this.writer_priority_counter = 0;
     endfunction: new
 
-    virtual task automatic RegWrite32(
-      input xil_axi_ulong addr =0,
-      input bit [31:0]    data);
+
+    // Generic tasks
+    task automatic RegWrite32(
+      input xil_axi_ulong addr = 0,
+      input bit [31:0] data,
+      input bit priority_packet = 0);
+
+      static xil_axi_uint id = 0;
+
+      if (priority_packet) begin
+        this.writer_priority_counter++;
+      end else begin
+        while (this.writer_priority_counter) begin
+          @this.writer_event;
+        end
+      end
+      this.writer_s.get(1);
+      this.info($sformatf("Writing to address 0x%h, value %h with priority %0x", addr , data, priority_packet), ADI_VERBOSITY_HIGH);
+
+      single_write_transaction_readback_api(
+        .id(id),
+        .addr(addr),
+        .len(0),
+        .size(XIL_AXI_SIZE_4BYTE),
+        .burst(XIL_AXI_BURST_TYPE_INCR),
+        .data(data));
+
+      id++;
+      if (priority_packet) begin
+        this.writer_priority_counter--;
+        -> this.writer_event;
+      end
+      this.writer_s.put(1);
+    endtask : RegWrite32
+
+    task automatic RegRead32(
+      input xil_axi_ulong addr = 0,
+      output bit [31:0] data,
+      input bit priority_packet = 0);
+
+      xil_axi_data_beat DataBeat_for_read[];
+      static xil_axi_uint id = 0;
+
+      if (priority_packet) begin
+        this.reader_priority_counter++;
+      end else begin
+        while (this.reader_priority_counter) begin
+          @this.reader_event;
+        end
+      end
+      this.reader_s.get(1);
+
+      single_read_transaction_readback_api(
+        .id(id),
+        .addr(addr),
+        .len(0),
+        .size(XIL_AXI_SIZE_4BYTE),
+        .burst(XIL_AXI_BURST_TYPE_INCR),
+        .Rdatabeat(DataBeat_for_read));
+
+      id++;
+      if (priority_packet) begin
+        this.reader_priority_counter--;
+        -> this.reader_event;
+      end
+      this.reader_s.put(1);
+
+      data = DataBeat_for_read[0][0+:32];
+      this.info($sformatf(" Reading data %h from 0x%h with priority %0x", data, addr, priority_packet), ADI_VERBOSITY_HIGH);
+    endtask : RegRead32
+
+    task automatic RegReadVerify32(
+      input xil_axi_ulong addr = 0,
+      input bit [31:0] data,
+      input bit priority_packet = 0);
+
+      bit [31:0] data_out;
+
+      RegRead32(
+        .addr(addr),
+        .data(data_out),
+        .priority_packet(priority_packet));
+
+      if (data !== data_out) begin
+        this.error($sformatf("Data mismatch at address 0x%h; Read data is %h; expected is %h", addr, data_out, data));
+      end
+    endtask : RegReadVerify32
+
+
+    // Virtual task declarations
+    protected virtual task automatic single_write_transaction_api (
+      input string            name ="single_write",
+      input xil_axi_uint      id =0,
+      input xil_axi_ulong     addr =0,
+      input xil_axi_len_t     len =0,
+      input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
+      input xil_axi_cache_t   cache =3,
+      input xil_axi_prot_t    prot =0,
+      input xil_axi_region_t  region =0,
+      input xil_axi_qos_t     qos =0,
+      input bit [63:0]        data =0);
 
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: RegWrite32
+    endtask: single_write_transaction_api
 
-    virtual task automatic RegRead32(
-      input xil_axi_ulong  addr =0,
-      output bit [31:0]    data);
+    protected virtual task automatic single_write_transaction_readback_api (
+      input string            name ="single_write",
+      input xil_axi_uint      id =0,
+      input xil_axi_ulong     addr =0,
+      input xil_axi_len_t     len =0,
+      input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
+      input xil_axi_cache_t   cache =3,
+      input xil_axi_prot_t    prot =0,
+      input xil_axi_region_t  region =0,
+      input xil_axi_qos_t     qos =0,
+      input bit [63:0]        data =0);
 
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: RegRead32
+    endtask: single_write_transaction_readback_api
 
-    virtual task automatic RegReadVerify32(
-      input xil_axi_ulong  addr =0,
-      input bit [31:0]     data);
+    protected virtual task automatic single_read_transaction_api (
+      input string             name ="single_read",
+      input xil_axi_uint       id =0,
+      input xil_axi_ulong      addr =0,
+      input xil_axi_len_t      len =0,
+      input xil_axi_size_t     size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t    burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t     lock =XIL_AXI_ALOCK_NOLOCK ,
+      input xil_axi_cache_t    cache =3,
+      input xil_axi_prot_t     prot =0,
+      input xil_axi_region_t   region =0,
+      input xil_axi_qos_t      qos =0,
+      input xil_axi_data_beat  aruser =0);
 
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: RegReadVerify32
+    endtask: single_read_transaction_api
+
+    protected virtual task automatic single_read_transaction_readback_api (
+      input string             name ="single_read",
+      input xil_axi_uint       id =0,
+      input xil_axi_ulong      addr =0,
+      input xil_axi_len_t      len =0,
+      input xil_axi_size_t     size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t    burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t     lock =XIL_AXI_ALOCK_NOLOCK ,
+      input xil_axi_cache_t    cache =3,
+      input xil_axi_prot_t     prot =0,
+      input xil_axi_region_t   region =0,
+      input xil_axi_qos_t      qos =0,
+      input xil_axi_data_beat  aruser =0,
+      output xil_axi_data_beat Rdatabeat[]);
+
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: single_read_transaction_readback_api
 
   endclass: m_axi_sequencer_base
 
 
   class m_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends m_axi_sequencer_base;
 
-    axi_mst_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver;
-    axi_mst_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver;
-
-    semaphore reader_s;
-    semaphore writer_s;
+    protected axi_mst_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver;
+    protected axi_mst_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver;
 
     function new(
       input string name,
@@ -94,66 +244,7 @@ package m_axi_sequencer_pkg;
 
       this.wr_driver = wr_driver;
       this.rd_driver = rd_driver;
-      
-      reader_s = new(1);
-      writer_s = new(1);
     endfunction: new
-
-    // ---------------------------------------------------------------------------
-    // Generic tasks
-    // ---------------------------------------------------------------------------
-    virtual task automatic RegWrite32(
-      input xil_axi_ulong addr =0,
-      input bit [31:0]    data);
-
-      static xil_axi_uint       id =0;
-
-      writer_s.get(1);
-      this.info($sformatf("writing to address %h value %h", addr , data), ADI_VERBOSITY_HIGH);
-
-      single_write_transaction_readback_api(.id(id),
-                                            .addr(addr),
-                                            .len(0),
-                                            .size(XIL_AXI_SIZE_4BYTE),
-                                            .burst(XIL_AXI_BURST_TYPE_INCR),
-                                            .data(data));
-      id++;
-      writer_s.put(1);
-    endtask : RegWrite32
-
-    virtual task automatic RegRead32(
-      input xil_axi_ulong  addr =0,
-      output bit [31:0]    data);
-
-      xil_axi_data_beat DataBeat_for_read[];
-      static xil_axi_uint       id =0;
-
-      reader_s.get(1);
-
-      single_read_transaction_readback_api (.id(id),
-                                            .addr(addr),
-                                            .len(0),
-                                            .size(XIL_AXI_SIZE_4BYTE),
-                                            .burst(XIL_AXI_BURST_TYPE_INCR),
-                                            .Rdatabeat(DataBeat_for_read));
-      id++;
-      data = DataBeat_for_read[0][0+:32];
-      this.info($sformatf(" Reading data : %h @ 0x%h", data, addr), ADI_VERBOSITY_HIGH);
-
-      reader_s.put(1);
-    endtask : RegRead32
-
-    virtual task automatic RegReadVerify32(
-      input xil_axi_ulong  addr =0,
-      input bit [31:0]     data);
-
-      bit [31:0]    data_out;
-      RegRead32(.addr(addr),
-                .data(data_out));
-      if (data !== data_out) begin
-        this.error($sformatf(" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
-      end
-    endtask : RegReadVerify32
 
 
     // ---------------------------------------------------------------------------
@@ -174,7 +265,7 @@ package m_axi_sequencer_pkg;
       input bit [63:0]        data =0);
 
       axi_transaction  wr_trans;
-      wr_trans = wr_driver.create_transaction(name);
+      wr_trans = this.wr_driver.create_transaction(name);
       wr_trans.set_write_cmd(addr, burst, id, len, size);
       wr_trans.set_prot(prot);
       wr_trans.set_lock(lock);
@@ -182,7 +273,7 @@ package m_axi_sequencer_pkg;
       wr_trans.set_region(region);
       wr_trans.set_qos(qos);
       wr_trans.set_data_block(data);
-      wr_driver.send(wr_trans);
+      this.wr_driver.send(wr_trans);
     endtask : single_write_transaction_api
 
     protected task automatic single_write_transaction_readback_api (
@@ -200,7 +291,7 @@ package m_axi_sequencer_pkg;
       input bit [63:0]        data =0);
 
       axi_transaction  wr_trans;
-      wr_trans = wr_driver.create_transaction(name);
+      wr_trans = this.wr_driver.create_transaction(name);
       wr_trans.set_write_cmd(addr, burst, id, len, size);
       wr_trans.set_prot(prot);
       wr_trans.set_lock(lock);
@@ -209,8 +300,8 @@ package m_axi_sequencer_pkg;
       wr_trans.set_qos(qos);
       wr_trans.set_data_block(data);
       wr_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
-      wr_driver.send(wr_trans);
-      wr_driver.wait_rsp(wr_trans);
+      this.wr_driver.send(wr_trans);
+      this.wr_driver.wait_rsp(wr_trans);
     endtask : single_write_transaction_readback_api
 
     protected task automatic single_read_transaction_api (
@@ -228,14 +319,14 @@ package m_axi_sequencer_pkg;
       input xil_axi_data_beat  aruser =0);
 
       axi_transaction   rd_trans;
-      rd_trans = rd_driver.create_transaction(name);
+      rd_trans = this.rd_driver.create_transaction(name);
       rd_trans.set_read_cmd(addr, burst, id, len, size);
       rd_trans.set_prot(prot);
       rd_trans.set_lock(lock);
       rd_trans.set_cache(cache);
       rd_trans.set_region(region);
       rd_trans.set_qos(qos);
-      rd_driver.send(rd_trans);
+      this.rd_driver.send(rd_trans);
     endtask : single_read_transaction_api
 
     protected task automatic single_read_transaction_readback_api (
@@ -254,7 +345,7 @@ package m_axi_sequencer_pkg;
       output xil_axi_data_beat Rdatabeat[]);
 
       axi_transaction   rd_trans;
-      rd_trans = rd_driver.create_transaction(name);
+      rd_trans = this.rd_driver.create_transaction(name);
       rd_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
       rd_trans.set_read_cmd(addr, burst, id, len, size);
       rd_trans.set_prot(prot);
@@ -262,8 +353,8 @@ package m_axi_sequencer_pkg;
       rd_trans.set_cache(cache);
       rd_trans.set_region(region);
       rd_trans.set_qos(qos);
-      rd_driver.send(rd_trans);
-      rd_driver.wait_rsp(rd_trans);
+      this.rd_driver.send(rd_trans);
+      this.rd_driver.wait_rsp(rd_trans);
       Rdatabeat = new[rd_trans.get_len()+1];
       for( xil_axi_uint beat=0; beat<rd_trans.get_len()+1; beat++) begin
         Rdatabeat[beat] = rd_trans.get_data_beat(beat);

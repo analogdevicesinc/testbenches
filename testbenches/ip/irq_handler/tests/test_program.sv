@@ -56,11 +56,13 @@ program test_program;
   string current_process_random_state;
 
   event dummy_api_event;
+
+  reg [31:0] data;
   
 
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
     current_process = process::self();
     current_process_random_state = current_process.get_randstate();
@@ -106,6 +108,26 @@ program test_program;
     `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b0);
 
     #1us;
+
+    // priority packet test
+    fork
+      begin
+        repeat(5) begin
+          fork
+            base_env.mng.master_sequencer.RegWrite32(`IRQ_C_BA + 'h10, 'd0);
+            base_env.mng.master_sequencer.RegRead32(`IRQ_C_BA + 'h10, data);
+          join_none
+        end
+        repeat(5) begin
+          fork
+            base_env.mng.master_sequencer.RegWrite32(`IRQ_C_BA + 'h10, 'd0, 1);
+            base_env.mng.master_sequencer.RegRead32(`IRQ_C_BA + 'h10, data, 1);
+          join_none
+        end
+      end
+    join
+
+    #10us;
         
     base_env.stop();
     

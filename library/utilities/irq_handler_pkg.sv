@@ -80,7 +80,7 @@ package irq_handler_pkg;
         enable_irq = enable_irq | (this.irq_valid_list[i] << i);
       end
       this.info($sformatf("Enables: %d", enable_irq), ADI_VERBOSITY_HIGH);
-      this.axi_write('h00, enable_irq); // software trigger IRQ
+      this.axi_write('h00, enable_irq, 1); // software trigger IRQ
 
       // negative edge detection
       if (this.irq_vip_if.get_io() == 1'b0) begin
@@ -98,8 +98,8 @@ package irq_handler_pkg;
         enable_irq = enable_irq | (this.irq_valid_list[i] << i);
       end
 
-      this.axi_write('h10, enable_irq); // enable all IRQ handles
-      this.axi_write('h1C, 'b01); // enable IRQ controller / software interrupt disabled
+      this.axi_write('h10, enable_irq, 1); // enable all IRQ handles
+      this.axi_write('h1C, 'b01, 1); // enable IRQ controller / software interrupt disabled
 
       fork forever begin
         if (this.irq_vip_if.get_io() == 1'b0) begin
@@ -108,7 +108,7 @@ package irq_handler_pkg;
 
         this.info($sformatf("IRQ controller triggered"), ADI_VERBOSITY_HIGH);
 
-        this.axi_read('h04, irq_triggered); // check pending IRQ (status + enable)
+        this.axi_read('h04, irq_triggered, 1); // check pending IRQ (status + enable)
 
         for (int i=0; i<32; ++i) begin
           if (irq_triggered[i]) begin
@@ -117,7 +117,7 @@ package irq_handler_pkg;
             end
             ->this.irq_event_list[i];
             @(this.irq_event_list[i]);
-            this.axi_write('h0C, 'h1 << i); // acknowledge IRQ
+            this.axi_write('h0C, 'h1 << i, 1); // acknowledge IRQ
           end
         end
       end join_none
@@ -126,7 +126,7 @@ package irq_handler_pkg;
         this.software_irq_testing();
       end
 
-      this.axi_write('h1C, 'b11); // enable IRQ controller + software interrupt enabled
+      this.axi_write('h1C, 'b11, 1); // enable IRQ controller + software interrupt enabled
     endtask: start
 
     // register IRQ device

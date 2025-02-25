@@ -81,8 +81,8 @@ program test_program();
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 
-    adc_src_axis_agent = new("", `TH.`ADC_SRC_AXIS.inst.IF);
-    dac_dst_axis_agent = new("", `TH.`DAC_DST_AXIS.inst.IF);
+    adc_src_axis_agent = new("Source", `TH.`ADC_SRC_AXIS.inst.IF);
+    dac_dst_axis_agent = new("Destination", `TH.`DAC_DST_AXIS.inst.IF);
 
     scoreboard = new("Scoreboard");
 

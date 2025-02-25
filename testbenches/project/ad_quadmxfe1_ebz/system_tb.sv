@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -137,7 +137,6 @@ module system_tb();
     .ref_clk_q1     (ref_clk),         //-dir I
     .ref_clk_q2     (ref_clk),         //-dir I
     .ref_clk_q3     (ref_clk),         //-dir I
-    .dac_fifo_bypass(1'b0),            //-dir I
 
     .ext_sync (ext_sync) //-dir I
 

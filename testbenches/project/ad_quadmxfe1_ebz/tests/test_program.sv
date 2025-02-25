@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -42,6 +42,7 @@ import adi_regmap_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import adi_regmap_data_offload_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_jesd_tx_pkg::*;
 import adi_regmap_jesd_rx_pkg::*;
@@ -109,6 +110,7 @@ program test_program;
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
+    `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(250*1000000));
 
     `TH.`REF_CLK.inst.IF.start_clock;
     `TH.`DEVICE_CLK.inst.IF.start_clock;
@@ -190,6 +192,12 @@ program test_program;
       env.mng.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),
                          `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
     end
+
+    // Configure RX Offload
+    env.mng.RegWrite32(`RX_OFFLOAD_BA + GetAddrs(DO_CONTROL),
+                       `SET_DO_CONTROL_ONESHOT_EN(1));
+    env.mng.RegWrite32(`RX_OFFLOAD_BA + GetAddrs(DO_TRANSFER_LENGTH),
+                       `SET_DO_TRANSFER_LENGTH_PARTIAL_LENGTH(32'h0000003F));
 
     if (~use_dds) begin
 
@@ -380,6 +388,12 @@ program test_program;
     env.mng.RegReadVerify32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
                             `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(1));
     #1us;
+
+    // Configure RX Offload
+    env.mng.RegWrite32(`RX_OFFLOAD_BA + GetAddrs(DO_CONTROL),
+                       `SET_DO_CONTROL_ONESHOT_EN(1));
+    env.mng.RegWrite32(`RX_OFFLOAD_BA + GetAddrs(DO_TRANSFER_LENGTH),
+                       `SET_DO_TRANSFER_LENGTH_PARTIAL_LENGTH(32'h0000003F));
 
     if (~use_dds) begin
 

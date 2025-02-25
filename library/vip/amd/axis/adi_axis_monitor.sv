@@ -118,7 +118,7 @@ package adi_axis_monitor_pkg;
       xil_axi4stream_data_beat data_beat;
       xil_axi4stream_strb_beat keep_beat;
       int num_bytes;
-      logic [7:0] axi_byte;
+      logic [7:0] axis_byte;
       logic [7:0] data_queue [$];
 
       forever begin
@@ -128,13 +128,15 @@ package adi_axis_monitor_pkg;
         data_beat = transaction.get_data_beat();
         keep_beat = transaction.get_keep_beat();
         for (int j=0; j<num_bytes; j++) begin
-          axi_byte = data_beat[j*8+:8];
+          axis_byte = data_beat[j*8+:8];
           if (keep_beat[j+:1] || !this.monitor.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
-            data_queue.push_back(axi_byte);
+            data_queue.push_back(axis_byte);
         end
         this.info($sformatf("Caught an AXI4 stream transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
-        this.publisher.notify(data_queue);
-        data_queue.delete();
+        if (transaction.get_last()) begin
+          this.publisher.notify(data_queue);
+          data_queue.delete();
+        end
       end
     endtask: get_transaction
 

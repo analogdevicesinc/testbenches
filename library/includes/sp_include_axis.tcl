@@ -41,4 +41,5 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/amd/axis/adi_axis_monitor.sv" \
   "$ad_tb_dir/library/vip/amd/axis/axis_definitions.svh" \
   "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
+  "$ad_tb_dir/library/utilities/filter_pkg.sv" \
 ]

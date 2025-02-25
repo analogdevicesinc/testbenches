@@ -37,6 +37,7 @@
 package adi_peripheral_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
   import reg_accessor_pkg::*;
 
    //============================================================================

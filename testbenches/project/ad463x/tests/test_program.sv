@@ -362,14 +362,14 @@ initial begin
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
         if (`NUM_OF_SDI == 1) begin
-          sdi_shiftreg_old <= sdi_shiftreg;
-          if (sdi_store_cnt [0] == 'h1 ) begin
-            for (int i=0; i<16; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt-1][16 + i] = sdi_shiftreg[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt-1][i] = sdi_shiftreg_old[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
-              offload_sdi_data_store_arr[sdi_store_cnt][16 + i] =  sdi_shiftreg[2*i];
+          if (`DDR_EN == 1) begin
+            for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
+              offload_sdi_data_store_arr [sdi_store_cnt][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
+              offload_sdi_data_store_arr [sdi_store_cnt+1][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
             end
+          end else begin
+            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
+            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
           end
         end else if (`NUM_OF_SDI == 2) begin
           if (`DDR_EN == 1) begin

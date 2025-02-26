@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2022 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,27 +33,13 @@
 // ***************************************************************************
 // ***************************************************************************
 
+`timescale 1ns/1ps
+
 `include "utils.svh"
 
-package filter_pkg;
+module system_tb();
 
-  import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_datatypes_pkg::*;
+  `TEST_PROGRAM test();
+  test_harness `TH ();
 
-  class adi_filter #(type data_type = int) extends adi_component;
-
-    function new(
-      input string name,
-      input adi_component parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-
-    virtual function bit filter(input adi_fifo #(data_type) data);
-      return 1'b0;
-    endfunction: filter
-
-  endclass: adi_filter
-
-endpackage: filter_pkg
+endmodule

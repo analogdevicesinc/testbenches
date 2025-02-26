@@ -35,13 +35,13 @@
 
 `include "utils.svh"
 
-package filter_pkg;
+package packet_processor_pkg;
 
   import logger_pkg::*;
   import adi_common_pkg::*;
   import adi_datatypes_pkg::*;
 
-  class adi_filter #(type data_type = int) extends adi_component;
+  class adi_packet_processor #(type data_type = int) extends adi_component;
 
     function new(
       input string name,
@@ -50,10 +50,10 @@ package filter_pkg;
       super.new(name, parent);
     endfunction: new
 
-    virtual function bit filter(input adi_fifo #(data_type) data);
-      return 1'b0;
-    endfunction: filter
+    virtual function adi_fifo #(data_type) process_data(input adi_fifo #(data_type) data);
+      return data;
+    endfunction: process_data
 
-  endclass: adi_filter
+  endclass: adi_packet_processor
 
-endpackage: filter_pkg
+endpackage: packet_processor_pkg

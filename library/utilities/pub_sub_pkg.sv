@@ -39,7 +39,9 @@ package pub_sub_pkg;
 
   import logger_pkg::*;
   import adi_common_pkg::*;
+  import adi_datatypes_pkg::*;
   import filter_pkg::*;
+  import packet_processor_pkg::*;
 
   class adi_subscriber #(type data_type = int) extends adi_component;
 
@@ -56,7 +58,7 @@ package pub_sub_pkg;
       this.id = this.last_id;
     endfunction: new
 
-    virtual function void update(input data_type data [$]);
+    virtual function void update(input adi_fifo #(data_type) data);
       this.fatal($sformatf("This function is not implemented!"));
     endfunction: update
 
@@ -68,6 +70,7 @@ package pub_sub_pkg;
     protected adi_subscriber #(data_type) subscriber_list[bit[15:0]];
 
     protected adi_filter #(data_type) filter;
+    protected adi_packet_processor #(data_type) packet_processor;
 
     function new(
       input string name,
@@ -83,6 +86,14 @@ package pub_sub_pkg;
     function void remove_filter();
       this.filter = null;
     endfunction: remove_filter
+
+    function void setup_processor(input adi_packet_processor #(data_type) packet_processor);
+      this.packet_processor = packet_processor;
+    endfunction: setup_processor
+
+    function void remove_processor();
+      this.packet_processor = null;
+    endfunction: remove_processor
 
     function void subscribe(input adi_subscriber #(data_type) subscriber);
       if (this.subscriber_list.exists(subscriber.id)) begin
@@ -100,17 +111,31 @@ package pub_sub_pkg;
       end
     endfunction: unsubscribe
 
-    function void notify(input data_type data [$]);
+    function void notify(input adi_fifo #(data_type) data);
+      adi_fifo #(data_type) processed_data;
+
       if (this.filter != null) begin
         if (!this.filter.filter(data)) begin
+          this.info($sformatf("Data filtered"), ADI_VERBOSITY_HIGH);
           return;
         end
       end
-      foreach (this.subscriber_list[i]) begin
-        this.subscriber_list[i].update(data);
+
+      // data processing
+      if (this.packet_processor != null) begin
+        processed_data = this.packet_processor.process_data(data);
+        this.info($sformatf("Data processed"), ADI_VERBOSITY_HIGH);
+      end else begin
+        processed_data = data;
       end
+
+      // data publishing
+      foreach (this.subscriber_list[i]) begin
+        this.subscriber_list[i].update(processed_data);
+      end
+      this.info($sformatf("Data published"), ADI_VERBOSITY_HIGH);
     endfunction: notify
 
   endclass: adi_publisher
 
-endpackage
+endpackage: pub_sub_pkg

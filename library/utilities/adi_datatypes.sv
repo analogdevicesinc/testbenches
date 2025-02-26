@@ -42,7 +42,7 @@ package adi_datatypes_pkg;
 
   class adi_fifo #(type data_type = int) extends adi_component;
 
-    local data_type adi_fifo [$];
+    local data_type fifo [$];
     local int depth;
 
     function new(
@@ -56,52 +56,53 @@ package adi_datatypes_pkg;
     endfunction: new
 
     function bit push(input data_type data);
-      if (this.adi_fifo.size() == this.depth && this.depth != 0) begin
+      if (this.fifo.size() == this.depth && this.depth != 0) begin
+        this.warning($sformatf("FIFO is full!"));
         return 1'b0;
       end else begin
-        this.adi_fifo.push_back(data);
+        this.fifo.push_back(data);
         return 1'b1;
       end
     endfunction: push
 
     function data_type pop();
-      if (this.adi_fifo.size() == 0) begin
-        return null;
-      end else begin
-        return this.adi_fifo.pop_front();
+      if (this.fifo.size() == 0) begin
+        this.warning($sformatf("FIFO is empty!"));
       end
+      return this.fifo.pop_front();
     endfunction: pop
 
     function int room();
-      return depth-this.adi_fifo.size();
+      return depth-this.fifo.size();
     endfunction: room
 
     function int size();
-      return this.adi_fifo.size();
-    endfunction: room
+      return this.fifo.size();
+    endfunction: size
 
-    function void clear();
-      this.adi_fifo.delete();
-    endfunction: clear
+    function void delete();
+      this.fifo.delete();
+    endfunction: delete
 
     function bit insert(
       input int index,
       input data_type data);
 
-      if (this.adi_fifo.size() == this.depth && this.depth != 0) begin
+      if (this.fifo.size() == this.depth && this.depth != 0) begin
+        this.warning($sformatf("FIFO is full!"));
         return 1'b0;
       end else begin
-        this.adi_fifo.insert(index, data);
+        this.fifo.insert(index, data);
         return 1'b1;
       end
-    endfunction: clear
+    endfunction: insert
 
   endclass: adi_fifo
 
 
   class adi_lifo #(type data_type = int) extends adi_component;
 
-    local data_type adi_fifo [$];
+    local data_type lifo [$];
     local int depth;
 
     function new(
@@ -115,45 +116,46 @@ package adi_datatypes_pkg;
     endfunction: new
 
     function bit push(input data_type data);
-      if (this.adi_fifo.size() == this.depth && this.depth != 0) begin
+      if (this.lifo.size() == this.depth && this.depth != 0) begin
+        this.warning($sformatf("LIFO is full!"));
         return 1'b0;
       end else begin
-        this.adi_fifo.push_front(data);
+        this.lifo.push_front(data);
         return 1'b1;
       end
     endfunction: push
 
     function data_type pop();
-      if (this.adi_fifo.size() == 0) begin
-        return null;
-      end else begin
-        return this.adi_fifo.pop_front();
+      if (this.lifo.size() == 0) begin
+        this.warning($sformatf("LIFO is empty!"));
       end
+      return this.lifo.pop_front();
     endfunction: pop
 
     function int room();
-      return depth-this.adi_fifo.size();
+      return depth-this.lifo.size();
     endfunction: room
 
     function int size();
-      return this.adi_fifo.size();
-    endfunction: room
+      return this.lifo.size();
+    endfunction: size
 
-    function void clear();
-      this.adi_fifo.delete();
-    endfunction: clear
+    function void delete();
+      this.lifo.delete();
+    endfunction: delete
 
     function bit insert(
       input int index,
       input data_type data);
 
-      if (this.adi_fifo.size() == this.depth && this.depth != 0) begin
+      if (this.lifo.size() == this.depth && this.depth != 0) begin
+        this.warning($sformatf("LIFO is full!"));
         return 1'b0;
       end else begin
-        this.adi_fifo.insert(index, data);
+        this.lifo.insert(index, data);
         return 1'b1;
       end
-    endfunction: clear
+    endfunction: insert
 
   endclass: adi_lifo
 

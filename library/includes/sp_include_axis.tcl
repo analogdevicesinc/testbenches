@@ -33,6 +33,8 @@
 # ***************************************************************************
 # ***************************************************************************
 
+source $ad_tb_dir/library/includes/sp_include_publisher.tcl
+
 # Add test files to the project
 adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/amd/axis/adi_axis_agent.sv" \
@@ -40,6 +42,4 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/amd/axis/s_axis_sequencer.sv" \
   "$ad_tb_dir/library/vip/amd/axis/adi_axis_monitor.sv" \
   "$ad_tb_dir/library/vip/amd/axis/axis_definitions.svh" \
-  "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
-  "$ad_tb_dir/library/utilities/filter_pkg.sv" \
 ]

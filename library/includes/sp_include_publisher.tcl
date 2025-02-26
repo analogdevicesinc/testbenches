@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024 - 2025 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,13 +33,10 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source $ad_tb_dir/library/includes/sp_include_publisher.tcl
-
 # Add test files to the project
 adi_sim_project_files [list \
-  "$ad_tb_dir/library/vip/amd/axi/adi_axi_agent.sv" \
-  "$ad_tb_dir/library/vip/amd/axi/m_axi_sequencer.sv" \
-  "$ad_tb_dir/library/vip/amd/axi/s_axi_sequencer.sv" \
-  "$ad_tb_dir/library/vip/amd/axi/adi_axi_monitor.sv" \
-  "$ad_tb_dir/library/vip/amd/axi/axi_definitions.svh" \
+  "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
+  "$ad_tb_dir/library/utilities/filter_pkg.sv" \
+  "$ad_tb_dir/library/utilities/packet_processor_pkg.sv" \
+  "$ad_tb_dir/library/utilities/adi_datatypes.sv" \
 ]

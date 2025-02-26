@@ -40,6 +40,7 @@ package adi_axis_monitor_pkg;
   import axi4stream_vip_pkg::*;
   import logger_pkg::*;
   import adi_vip_pkg::*;
+  import adi_datatypes_pkg::*;
   import pub_sub_pkg::*;
 
 
@@ -119,18 +120,18 @@ package adi_axis_monitor_pkg;
       xil_axi4stream_strb_beat keep_beat;
       int num_bytes;
       logic [7:0] axis_byte;
-      logic [7:0] data_queue [$];
+      adi_fifo #(logic [7:0]) data_queue;
+      data_queue = new("Data queue", 0, this);
 
       forever begin
         this.monitor.item_collected_port.get(transaction);
-        // all bytes from a beat are valid
         num_bytes = transaction.get_data_width()/8;
         data_beat = transaction.get_data_beat();
         keep_beat = transaction.get_keep_beat();
         for (int j=0; j<num_bytes; j++) begin
           axis_byte = data_beat[j*8+:8];
           if (keep_beat[j+:1] || !this.monitor.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
-            data_queue.push_back(axis_byte);
+            void'(data_queue.push(axis_byte));
         end
         this.info($sformatf("Caught an AXI4 stream transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
         if (transaction.get_last()) begin

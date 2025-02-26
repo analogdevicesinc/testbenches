@@ -40,6 +40,7 @@ package adi_axi_monitor_pkg;
   import axi_vip_pkg::*;
   import logger_pkg::*;
   import adi_vip_pkg::*;
+  import adi_datatypes_pkg::*;
   import pub_sub_pkg::*;
 
 
@@ -121,7 +122,8 @@ package adi_axi_monitor_pkg;
       xil_axi_strb_beat strb_beat;
       int num_bytes;
       logic [7:0] axi_byte;
-      logic [7:0] data_queue [$];
+      adi_fifo #(logic [7:0]) data_queue;
+      data_queue = new("Data queue", 0, this);
 
       forever begin
         this.monitor.item_collected_port.get(transaction);
@@ -133,9 +135,9 @@ package adi_axi_monitor_pkg;
             axi_byte = data_beat[j*8+:8];
             // put each beat into byte queues
             if (bit'(transaction.get_cmd_type()) == 1'b0) begin // READ
-              data_queue.push_back(axi_byte);
+              void'(data_queue.push(axi_byte));
             end else if (strb_beat[j] || !this.monitor.vif_proxy.C_AXI_HAS_WSTRB) begin // WRITE
-              data_queue.push_back(axi_byte);
+              void'(data_queue.push(axi_byte));
             end
           end
           this.info($sformatf("Caught an AXI4 transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);

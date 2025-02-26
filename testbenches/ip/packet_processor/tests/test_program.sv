@@ -45,7 +45,7 @@ import adi_axis_agent_pkg::*;
 import axi4stream_vip_pkg::*;
 import m_axis_sequencer_pkg::*;
 import scoreboard_pkg::*;
-import filter_pkg::*;
+import packet_processor_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -66,7 +66,7 @@ program test_program();
 
   scoreboard #(logic [7:0]) scoreboard;
 
-  class filter_class extends adi_filter#(.data_type(logic [7:0]));
+  class packet_processor_class extends adi_packet_processor#(.data_type(logic [7:0]));
 
     function new(
       input string name,
@@ -75,19 +75,23 @@ program test_program();
       super.new(name, parent);
     endfunction: new
 
-    virtual function bit filter(input adi_fifo #(data_type) data);
-      if (data.pop() == 8'h00) begin
-        this.info($sformatf("Packet filtered"), ADI_VERBOSITY_NONE);
-        return 1'b0;
-      end else begin
-        this.info($sformatf("Packet Not filtered"), ADI_VERBOSITY_NONE);
-        return 1'b1;
+    virtual function adi_fifo #(data_type) process_data(input adi_fifo #(data_type) data);
+      adi_fifo #(data_type) processed_data;
+      int fifo_depth = data.size();
+
+      processed_data = new("Packet processor", 0, this);
+
+      for (int i=0; i<fifo_depth; ++i) begin
+        // void'(processed_data.push(data.pop()+1));
+        void'(processed_data.push('d0));
       end
-    endfunction: filter
 
-  endclass: filter_class
+      return processed_data;
+    endfunction: process_data
 
-  filter_class filter;
+  endclass: packet_processor_class
+
+  packet_processor_class packet_processor;
 
 
   initial begin
@@ -110,10 +114,10 @@ program test_program();
     adc_src_axis_agent = new("Source", `TH.`ADC_SRC_AXIS.inst.IF);
     dac_dst_axis_agent = new("Destination", `TH.`DAC_DST_AXIS.inst.IF);
 
-    filter = new("Filter");
+    packet_processor = new("Packet Processor");
 
-    adc_src_axis_agent.monitor.publisher.setup_filter(filter);
-    dac_dst_axis_agent.monitor.publisher.setup_filter(filter);
+    adc_src_axis_agent.monitor.publisher.setup_processor(packet_processor);
+    dac_dst_axis_agent.monitor.publisher.setup_processor(packet_processor);
 
     scoreboard = new("Scoreboard");
 

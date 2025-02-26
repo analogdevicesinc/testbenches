@@ -39,6 +39,7 @@ package scoreboard_pkg;
 
   import logger_pkg::*;
   import adi_common_pkg::*;
+  import adi_datatypes_pkg::*;
   import pub_sub_pkg::*;
 
   class scoreboard #(type data_type = int) extends adi_component;
@@ -47,7 +48,7 @@ package scoreboard_pkg;
 
       protected scoreboard #(data_type) scoreboard_ref;
       
-      protected data_type byte_stream [$];
+      protected adi_fifo #(data_type) byte_stream;
 
       function new(
         input string name,
@@ -57,12 +58,14 @@ package scoreboard_pkg;
         super.new(name, parent);
 
         this.scoreboard_ref = scoreboard_ref;
+
+        byte_stream = new("Data queue", 0, this);
       endfunction: new
 
-      virtual function void update(input data_type data [$]);
+      virtual function void update(input adi_fifo #(data_type) data);
         this.info($sformatf("Data received: %d", data.size()), ADI_VERBOSITY_MEDIUM);
         while (data.size()) begin
-          this.byte_stream.push_back(data.pop_front());
+          void'(this.byte_stream.push(data.pop()));
         end
         
         if (this.scoreboard_ref.get_enabled()) begin
@@ -71,11 +74,11 @@ package scoreboard_pkg;
       endfunction: update
 
       function data_type get_data();
-        return this.byte_stream.pop_front();
+        return this.byte_stream.pop();
       endfunction: get_data
 
       function void put_data(data_type data);
-        this.byte_stream.push_back(data);
+        void'(this.byte_stream.push(data));
       endfunction: put_data
 
       function int get_size();

@@ -31,7 +31,7 @@ The data path and clock domains are depicted in the below diagram:
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are no parameters of this project that can be configured in the testbench
+There are no project parameters that can be configured in the testbench
 configuration files.
    
 Build parameters
@@ -57,11 +57,11 @@ Tests
 
 The following test program file is available:
 
-============ ===============================================
+============ ========================================
 Test program Usage
-============ ===============================================
-test_program Tests the fmcomms2 LVDS interface capabilities.
-============ ===============================================
+============ ========================================
+test_program Tests the fmcomms2 project capabilities.
+============ ========================================
 
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -122,12 +122,9 @@ The PN test verifies the PN data.
 The steps of this test are:
 
 * Link setup
-    * Configure RX interface
-    * Configure TX interface
-    * Pull out RX of reset
-    * Pull out TX of reset
-* Enable test data for TX1
-* Enable test data for RX1
+    * Configure RX and TX interfaces
+    * Pull RX and TX out of reset
+* Enable test data for TX1 and RX1
 * Sync DAC channels
 * Sync ADC channels
 * Allow initial OOS to propagate
@@ -149,8 +146,7 @@ The steps of this test are:
 * Sync DAC channels
 * Sync ADC channels
 * Link down
-    * Put RX in reset
-    * Put TX in reset
+    * Put RX and TX in reset
 
 DMA test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -159,7 +155,7 @@ The DMA test verifies the DMA path.
 
 The steps of this test are:
 
-* Read data from DDR
+* Write data to DDR
 * Configure the TX DMA
 * Select DDS as source
 * Enable normal data path for RX1

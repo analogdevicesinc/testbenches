@@ -8,7 +8,6 @@ Contents
 
 .. toctree::
    :maxdepth: 1
+   :glob:
 
-   Monitor <monitor/index>
-   Scoreboard <scoreboard/index>
-   Watchdog <watchdog/index>
+   */index

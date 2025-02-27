@@ -1,0 +1,78 @@
+# Classes
+
+xil_void: {shape: class}
+xil_object: {shape: class}
+xil_reporter: {shape: class}
+xil_component: {shape: class}
+xil_agent: {shape: class; -empty: ""}
+"xil_analysis_port#": {shape: class; +write: "input T"; +get: "output T"}
+"xil_driver#": {shape: class; -empty: ""}
+xil_monitor: {shape: class; -empty: ""}
+
+"axi4stream_vif_proxy#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_monitor#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_mst_driver#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_slv_driver#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_mst_agent#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_slv_agent#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_passthrough_agent#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+
+# Inheritances
+
+xil_void <- xil_object: {shape: triangle; source-arrowhead.style.filled: false}
+xil_object <- xil_reporter: {shape: triangle; source-arrowhead.style.filled: false}
+xil_reporter <- xil_component: {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- xil_agent: {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- "xil_analysis_port#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- "xil_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- xil_monitor: {shape: triangle; source-arrowhead.style.filled: false}
+
+xil_component <- "axi4stream_vif_proxy#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_monitor <- "axi4stream_monitor#": {shape: triangle; source-arrowhead.style.filled: false}
+"xil_driver#" <- "axi4stream_mst_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+"xil_driver#" <- "axi4stream_slv_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_agent <- "axi4stream_mst_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_agent <- "axi4stream_slv_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_agent <- "axi4stream_passthrough_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+"axi4stream_passthrough_agent#" <- "axi4stream_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi4stream_passthrough_agent#" <- "axi4stream_mst_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi4stream_passthrough_agent#" <- "axi4stream_slv_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi4stream_passthrough_agent#" <- "axi4stream_vif_proxy#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"axi4stream_slv_agent#" <- "axi4stream_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi4stream_slv_agent#" <- "axi4stream_slv_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi4stream_slv_agent#" <- "axi4stream_vif_proxy#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"axi4stream_mst_agent#" <- "axi4stream_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi4stream_mst_agent#" <- "axi4stream_mst_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi4stream_mst_agent#" <- "axi4stream_vif_proxy#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"axi4stream_mst_driver#" <- "axi4stream_vif_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+"axi4stream_slv_driver#" <- "axi4stream_vif_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+
+"axi4stream_monitor#" <- "axi4stream_vif_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+"axi4stream_monitor#" <- "xil_analysis_port#": {source-arrowhead: {shape: diamond; style.filled: true}}

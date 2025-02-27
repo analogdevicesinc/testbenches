@@ -55,10 +55,11 @@ Class hierarchy
 For class inheritance and aggregation hierarchy generation the
 `D2 Playground <https://play.d2lang.com/>`_ is used. This is helpful when
 changes need to be made to the hierarchy and the documentation is updated in the
-future. The hierarchy code must include the inheritance graph, and the
-aggregation graph if applicable. All classes drawn in the graph should have a
+future. The hierarchy code must include the inheritance graph and, if applicable,
+the aggregation graph. All classes drawn in the graph should have a
 link to the documentation that explains it. Listing properties and methods is a
 nice to have, but not mandatory. The layout engine must be set to ELK. When
-generating the SVG files the inheritance graph and the aggregation graph must be
-generated separately using the tools Export SVG function. The class hierarchy
-code must be written to a txt file and must be uploaded next to SVG files.
+generating the SVG files, the inheritance graph and the aggregation graph must
+be generated separately using the tool’s Export SVG function. The class
+hierarchy code must be saved as a .txt file and uploaded alongside the SVG
+files.

@@ -8,6 +8,9 @@ Overview
 
 Base classes that form the base of the other ADI classes.
 
+.. svg:: library/utilities/adi_classes/adi_common.svg
+   :align: center
+
 adi_reporter
 -------------------------------------------------------------------------------
 

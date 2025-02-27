@@ -8,6 +8,9 @@ Overview
 
 VIP related base classes.
 
+.. svg:: library/utilities/adi_classes/adi_vip.svg
+   :align: center
+
 adi_agent
 -------------------------------------------------------------------------------
 

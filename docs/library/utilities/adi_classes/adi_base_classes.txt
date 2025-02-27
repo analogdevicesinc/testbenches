@@ -1,0 +1,100 @@
+# Classes
+
+adi_reporter: {
+  shape: class
+  \#name
+  \#parent
+  -get_path()
+  +info()
+  +warning()
+  +error()
+  +fatal()
+}
+adi_component: {shape: class}
+adi_fifo: {
+  shape: class
+  -adi_fifo\[\$\]
+  -depth
+  +push()
+  +pop()
+  +room()
+  +size()
+  +delete()
+  +insert()
+}
+adi_lifo: {
+  shape: class
+  -adi_fifo\[\$\]
+  -depth
+  +push()
+  +pop()
+  +room()
+  +size()
+  +delete()
+  +insert()
+}
+adi_environment: {shape: class}
+adi_agent: {shape: class}
+adi_driver: {shape: class}
+adi_sequencer: {shape: class}
+adi_monitor: {shape: class}
+adi_api: {
+  shape: class
+  \#bus
+  +axi_read()
+  +axi_write()
+  +axi_verify()
+}
+adi_api_legacy: {
+  shape: class
+  \#bus
+  \#address
+  +axi_read()
+  +axi_write()
+  +axi_verify()
+}
+adi_regmap: {
+  shape: class
+  -address
+  +get_address()
+}
+register_base: {
+  shape: class
+  +value
+  \#reset_value
+  \#address
+  \#initialization_done
+  +get()
+  +set()
+  +get_reset_value()
+  +set_reset_value()
+  +get_address()
+  +get_name()
+}
+field_base: {
+  shape: class
+  -msb
+  -lsb
+  -access
+  -reset_value
+  -reg_handle
+  +get()
+  +set()
+  +get_reset_value()
+}
+
+# Inheritances
+
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_fifo: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_lifo: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_environment: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_agent: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_driver: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_sequencer: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_monitor: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_api: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_api_legacy: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_regmap: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- register_base: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- field_base: {shape: triangle; source-arrowhead.style.filled: false}

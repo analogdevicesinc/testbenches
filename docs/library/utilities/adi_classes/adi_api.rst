@@ -9,6 +9,9 @@ Overview
 API related base classes. It also defined the register access types for the
 fields.
 
+.. svg:: library/utilities/adi_classes/adi_api.svg
+   :align: center
+
 adi_api
 -------------------------------------------------------------------------------
 

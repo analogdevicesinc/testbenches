@@ -8,6 +8,9 @@ Overview
 
 Environment related base class.
 
+.. svg:: library/utilities/adi_classes/adi_environment.svg
+   :align: center
+
 adi_environment
 -------------------------------------------------------------------------------
 

@@ -8,6 +8,9 @@ Overview
 
 Provides abstract and implemented classes for datatypes.
 
+.. svg:: library/utilities/adi_classes/adi_datatypes.svg
+   :align: center
+
 adi_fifo
 -------------------------------------------------------------------------------
 

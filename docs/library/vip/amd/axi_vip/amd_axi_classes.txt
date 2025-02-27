@@ -1,0 +1,111 @@
+# Classes
+
+xil_void: {shape: class}
+xil_object: {shape: class}
+xil_reporter: {shape: class}
+xil_component: {shape: class}
+xil_agent: {shape: class; -empty: ""}
+"xil_analysis_port#": {shape: class; +write: "input T"; +get: "output T"}
+"xil_driver#": {shape: class; -empty: ""}
+xil_monitor: {shape: class; -empty: ""}
+
+"xil_axi_slv_mem_model#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/Simple-SRAM-Model
+}
+"axi_vif_mem_proxy#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Slave-Simple-Memory-VIP
+}
+"axi_monitor#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Monitor
+}
+"axi_mst_wr_driver#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Master-Write-Driver
+}
+"axi_mst_rd_driver#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Master-Read-Driver
+}
+"axi_slv_wr_driver#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Slave-Write-Driver
+}
+"axi_slv_rd_driver#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Slave-Read-Driver
+}
+"axi_mst_agent#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Master-Agent
+}
+"axi_slv_agent#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Slave-Agent
+}
+"axi_slv_mem_agent#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Slave-Agent
+}
+"axi_passthrough_agent#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Pass-Through-Agent
+}
+"axi_passthrough_mem_agent#": {
+  shape: class
+  link: https://docs.amd.com/r/en-US/pg267-axi-vip/AXI-Pass-Through-Agent
+}
+
+# Inheritances
+
+xil_void <- xil_object: {shape: triangle; source-arrowhead.style.filled: false}
+xil_object <- xil_reporter: {shape: triangle; source-arrowhead.style.filled: false}
+xil_reporter <- xil_component: {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- xil_agent: {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- "xil_analysis_port#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- "xil_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- xil_monitor: {shape: triangle; source-arrowhead.style.filled: false}
+
+xil_component <- "xil_axi_slv_mem_model#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_component <- "axi_vif_mem_proxy#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_monitor <- "axi_monitor#": {shape: triangle; source-arrowhead.style.filled: false}
+"xil_driver#" <- "axi_mst_wr_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+"xil_driver#" <- "axi_mst_rd_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+"xil_driver#" <- "axi_slv_wr_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+"xil_driver#" <- "axi_slv_rd_driver#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_agent <- "axi_mst_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_agent <- "axi_slv_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+xil_agent <- "axi_passthrough_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+"axi_slv_agent#" <- "axi_slv_mem_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+"axi_passthrough_agent#" <- "axi_passthrough_mem_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+"axi_passthrough_mem_agent#" <- "xil_axi_slv_mem_model#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_passthrough_agent#" <- "axi_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_passthrough_agent#" <- "axi_mst_wr_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_passthrough_agent#" <- "axi_mst_rd_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_passthrough_agent#" <- "axi_slv_wr_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_passthrough_agent#" <- "axi_slv_rd_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_passthrough_agent#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"axi_slv_mem_agent#" <- "xil_axi_slv_mem_model#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_slv_agent#" <- "axi_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_slv_agent#" <- "axi_slv_wr_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_slv_agent#" <- "axi_slv_rd_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_slv_agent#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"axi_mst_agent#" <- "axi_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_mst_agent#" <- "axi_mst_wr_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_mst_agent#" <- "axi_mst_rd_driver#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"axi_mst_agent#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"axi_mst_wr_driver#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+"axi_mst_rd_driver#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+"axi_slv_wr_driver#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+"axi_slv_rd_driver#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+
+"axi_monitor#" <- "axi_vif_mem_proxy#": {source-arrowhead: {shape: diamond; style.filled: false}}
+"axi_monitor#" <- "xil_analysis_port#": {source-arrowhead: {shape: diamond; style.filled: true}}

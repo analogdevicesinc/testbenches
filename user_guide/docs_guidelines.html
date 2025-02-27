@@ -92,6 +92,7 @@
 <li><a class="reference internal" href="#">Documentation guidelines</a><ul>
 <li><a class="reference internal" href="#templates">Templates</a></li>
 <li><a class="reference internal" href="#common-sections">Common sections</a></li>
+<li><a class="reference internal" href="#class-hierarchy">Class hierarchy</a></li>
 </ul>
 </li>
 </ul>
@@ -239,6 +240,20 @@ they’re not included in any toctree.</p>
 </pre></div>
 </div>
 <p>And they will be rendered as sections of the page.</p>
+</section>
+<section id="class-hierarchy">
+<h2>Class hierarchy<a class="headerlink" href="#class-hierarchy" title="Link to this heading"></a></h2>
+<p>For class inheritance and aggregation hierarchy generation the
+<a class="reference external" href="https://play.d2lang.com/">D2 Playground</a> is used. This is helpful when
+changes need to be made to the hierarchy and the documentation is updated in the
+future. The hierarchy code must include the inheritance graph and, if applicable,
+the aggregation graph. All classes drawn in the graph should have a
+link to the documentation that explains it. Listing properties and methods is a
+nice to have, but not mandatory. The layout engine must be set to ELK. When
+generating the SVG files, the inheritance graph and the aggregation graph must
+be generated separately using the tool’s Export SVG function. The class
+hierarchy code must be saved as a .txt file and uploaded alongside the SVG
+files.</p>
 </section>
 </section>
 

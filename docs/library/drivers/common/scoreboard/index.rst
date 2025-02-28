@@ -14,6 +14,9 @@ subscriber_class which extends adi_subscriber and is responsible for receiving
 and storing data streams. The scoreboard can operate in oneshot or in
 cyclic mode, which allows the verification of repeating sequence verification.
 
+.. svg:: library/drivers/common/scoreboard/scoreboard.svg
+   :align: center
+
 Variables
 -------------------------------------------------------------------------------
 

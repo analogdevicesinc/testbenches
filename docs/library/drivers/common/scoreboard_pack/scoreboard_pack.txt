@@ -1,0 +1,33 @@
+# Classes
+
+# Base
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+
+# Component
+adi_subscriber: {shape: class}
+
+# Scoreboard
+scoreboard: {shape: class}
+scoreboard_pack: {
+  shape: class
+  \#channels
+  \#samples
+  \#width
+  \#mode
+  +compare_transaction()
+}
+
+# Inheritances
+
+# Base
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Scoreboard
+adi_component <- scoreboard: {shape: triangle; source-arrowhead.style.filled: false}
+scoreboard <- scoreboard_pack: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+# Scoreboard
+scoreboard_pack <- adi_subscriber: {source-arrowhead: 2 {shape: diamond; style.filled: true}}

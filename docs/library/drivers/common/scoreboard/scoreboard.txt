@@ -1,0 +1,40 @@
+# Classes
+
+# Base
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+
+# Component
+adi_subscriber: {shape: class}
+
+# Scoreboard
+scoreboard: {
+  shape: class
+  +subscriber_source
+  +subscriber_sink
+  \#sink_type
+  \#enabled
+  \#bytestream_empty_sig
+  \#byte_streams_empty
+  \#stop_scoreboard
+  +run()
+  +stop()
+  +set_sink_type()
+  +get_sink_type()
+  \#clear_streams()
+  +wait_until_complete()
+  +compare_transaction()
+}
+
+# Inheritances
+
+# Base
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Scoreboard
+adi_component <- scoreboard: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+# Scoreboard
+scoreboard <- adi_subscriber: {source-arrowhead: 2 {shape: diamond; style.filled: true}}

@@ -1,3 +1,3 @@
 global ad_project_params
 
-set ad_project_params(SER_PAR_N) 0
+set ad_project_params(INTF) 0

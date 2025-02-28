@@ -10,6 +10,9 @@ This class is a specialized version of a generic scoreboard class, parameterized
 by the data type and packer mode. The scoreboard pack class is designed to
 handle and compare data streams in a verification environment.
 
+.. svg:: library/drivers/common/scoreboard_pack/scoreboard_pack.svg
+   :align: center
+
 Variables
 -------------------------------------------------------------------------------
 

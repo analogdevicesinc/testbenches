@@ -36,18 +36,28 @@
 //
 //
 `include "utils.svh"
+`include "axi_definitions.svh"
+`include "axis_definitions.svh"
 
-import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import test_harness_env_pkg::*;
 import environment_pkg::*;
 import dmac_api_pkg::*;
 import watchdog_pkg::*;
 
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+import `PKGIFY(test_harness, tx_src_axis)::*;
+import `PKGIFY(test_harness, tx_dst_axis)::*;
+import `PKGIFY(test_harness, rx_src_axis)::*;
+import `PKGIFY(test_harness, rx_dst_axis)::*;
+
 program test_program;
 
   // declare the class instances
-  environment env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  util_pack_environment #(`AXIS_VIP_PARAMS(test_harness, tx_src_axis), `AXIS_VIP_PARAMS(test_harness, tx_dst_axis), `AXIS_VIP_PARAMS(test_harness, rx_src_axis), `AXIS_VIP_PARAMS(test_harness, rx_dst_axis)) pack_env;
 
   watchdog packer_scoreboard_wd;
 
@@ -61,35 +71,37 @@ program test_program;
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     // create environment
-    env = new("Util Pack Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF,
+    base_env = new("Base Environment",
+                    `TH.`SYS_CLK.inst.IF,
+                    `TH.`DMA_CLK.inst.IF,
+                    `TH.`DDR_CLK.inst.IF,
+                    `TH.`SYS_RST.inst.IF,
+                    `TH.`MNG_AXI.inst.IF,
+                    `TH.`DDR_AXI.inst.IF);
 
-              `TH.`TX_SRC_AXIS.inst.IF,
-              `TH.`TX_DST_AXIS.inst.IF,
-              `TH.`RX_SRC_AXIS.inst.IF,
-              `TH.`RX_DST_AXIS.inst.IF
-             );
+    pack_env = new("Util Pack Environment",
+                    `TH.`TX_SRC_AXIS.inst.IF,
+                    `TH.`TX_DST_AXIS.inst.IF,
+                    `TH.`RX_SRC_AXIS.inst.IF,
+                    `TH.`RX_DST_AXIS.inst.IF);
 
-    dmac_tx = new("DMAC TX 0", env.mng, `TX_DMA_BA);
-    dmac_rx = new("DMAC RX 0", env.mng, `RX_DMA_BA);
+    dmac_tx = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA);
+    dmac_rx = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA);
 
-    env.start();
-    env.sys_reset();
+    base_env.start();
+    pack_env.start();
+
+    base_env.sys_reset();
 
     // configure environment sequencers
-    env.configure(data_length);
+    pack_env.configure(data_length);
 
     `INFO(("Bring up IPs from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
     
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
-    env.run();
+    pack_env.run();
 
     // Generate DMA transfers
     `INFO(("Start DMAs"), ADI_VERBOSITY_LOW);
@@ -97,8 +109,8 @@ program test_program;
     tx_dma_transfer(data_length);
 
     // start generating data
-    env.tx_src_axis_seq.start();
-    env.rx_src_axis_seq.start();
+    pack_env.tx_src_axis_agent.sequencer.start();
+    pack_env.rx_src_axis_agent.sequencer.start();
 
     // prepare watchdog with 20 us of wait time
     packer_scoreboard_wd = new("Packer watchdog", 20000, "Packers Scoreboard");
@@ -108,13 +120,14 @@ program test_program;
 
     // wait for scoreboards to finish
     fork
-      env.scoreboard_rx.wait_until_complete();
-      env.scoreboard_tx.wait_until_complete();
+      pack_env.scoreboard_rx.wait_until_complete();
+      pack_env.scoreboard_tx.wait_until_complete();
     join
 
     packer_scoreboard_wd.stop();
 
-    env.stop();
+    pack_env.stop();
+    base_env.stop();
     
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
@@ -122,12 +135,10 @@ program test_program;
   end
 
   task systemBringUp();
-
     `INFO(("Bring up RX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_rx.enable_dma();
     `INFO(("Bring up TX DMAC 0"), ADI_VERBOSITY_LOW);
     dmac_tx.enable_dma();
-
   endtask
 
   // RX DMA transfer generator

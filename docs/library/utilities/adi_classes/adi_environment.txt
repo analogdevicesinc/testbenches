@@ -1,0 +1,10 @@
+# Classes
+
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+adi_environment: {shape: class}
+
+# Inheritances
+
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_environment: {shape: triangle; source-arrowhead.style.filled: false}

@@ -1,0 +1,16 @@
+# Classes
+
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+adi_agent: {shape: class}
+adi_driver: {shape: class}
+adi_sequencer: {shape: class}
+adi_monitor: {shape: class}
+
+# Inheritances
+
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_agent: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_driver: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_sequencer: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_monitor: {shape: triangle; source-arrowhead.style.filled: false}

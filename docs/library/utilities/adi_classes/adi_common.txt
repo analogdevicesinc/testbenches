@@ -1,0 +1,17 @@
+# Classes
+
+adi_reporter: {
+  shape: class
+  \#name
+  \#parent
+  -get_path()
+  +info()
+  +warning()
+  +error()
+  +fatal()
+}
+adi_component: {shape: class}
+
+# Inheritances
+
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}

@@ -1,43 +1,7 @@
 # Classes
 
-adi_reporter: {
-  shape: class
-  \#name
-  \#parent
-  -get_path()
-  +info()
-  +warning()
-  +error()
-  +fatal()
-}
+adi_reporter: {shape: class}
 adi_component: {shape: class}
-adi_fifo: {
-  shape: class
-  -adi_fifo\[\$\]
-  -depth
-  +push()
-  +pop()
-  +room()
-  +size()
-  +delete()
-  +insert()
-}
-adi_lifo: {
-  shape: class
-  -adi_fifo\[\$\]
-  -depth
-  +push()
-  +pop()
-  +room()
-  +size()
-  +delete()
-  +insert()
-}
-adi_environment: {shape: class}
-adi_agent: {shape: class}
-adi_driver: {shape: class}
-adi_sequencer: {shape: class}
-adi_monitor: {shape: class}
 adi_api: {
   shape: class
   \#bus
@@ -86,13 +50,6 @@ field_base: {
 # Inheritances
 
 adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
-adi_component <- adi_fifo: {shape: triangle; source-arrowhead.style.filled: false}
-adi_component <- adi_lifo: {shape: triangle; source-arrowhead.style.filled: false}
-adi_component <- adi_environment: {shape: triangle; source-arrowhead.style.filled: false}
-adi_component <- adi_agent: {shape: triangle; source-arrowhead.style.filled: false}
-adi_component <- adi_driver: {shape: triangle; source-arrowhead.style.filled: false}
-adi_component <- adi_sequencer: {shape: triangle; source-arrowhead.style.filled: false}
-adi_component <- adi_monitor: {shape: triangle; source-arrowhead.style.filled: false}
 adi_component <- adi_api: {shape: triangle; source-arrowhead.style.filled: false}
 adi_component <- adi_api_legacy: {shape: triangle; source-arrowhead.style.filled: false}
 adi_component <- adi_regmap: {shape: triangle; source-arrowhead.style.filled: false}

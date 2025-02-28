@@ -15,6 +15,9 @@ subscriber classes.
   The filter base class must be inherited and a new implementation must be
   written in a subclass.
 
+.. svg:: library/utilities/pub_sub/filter.svg
+   :align: center
+
 Variables
 -------------------------------------------------------------------------------
 

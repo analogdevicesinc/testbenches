@@ -1,0 +1,19 @@
+# Classes
+
+# Base
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+
+# Components
+adi_processor: {
+  shape: class
+  +process_data()
+}
+
+# Inheritances
+
+# Base
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Components
+adi_component <- adi_processor: {shape: triangle; source-arrowhead.style.filled: false}

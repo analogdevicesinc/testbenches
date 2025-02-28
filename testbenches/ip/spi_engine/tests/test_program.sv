@@ -259,8 +259,14 @@ end
 //---------------------------------------------------------------------------
 // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
 //---------------------------------------------------------------------------
+reg echo_sclk;
+assign spi_engine_echo_sclk = echo_sclk;
 `ifdef DEF_ECHO_SCLK
-  assign #(`ECHO_SCLK_DELAY * 1ns) spi_engine_echo_sclk = spi_engine_spi_sclk;
+  initial begin
+    forever begin
+      @(spi_engine_spi_sclk) echo_sclk <= #(`ECHO_SCLK_DELAY * 1ns) spi_engine_spi_sclk;
+    end
+  end
 `endif
 
 
@@ -339,7 +345,7 @@ task offload_spi_test();
     sdi_read_data[i] = env.ddr_axi_agent.mem_model.backdoor_memory_read_4byte(`DDR_BA + 4*i);
     if (sdi_read_data[i] != sdi_read_data_store[i]) begin
       `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
-      `ERROR(("Offload Read Test FAILED"));
+      `FATAL(("Offload Read Test FAILED"));
     end
   end
   `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);
@@ -348,7 +354,7 @@ task offload_spi_test();
     spi_receive(sdo_write_data[i]);
     if (sdo_write_data[i] != sdo_write_data_store[i]) begin
       `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]), ADI_VERBOSITY_LOW);
-      `ERROR(("Offload Write Test FAILED"));
+      `FATAL(("Offload Write Test FAILED"));
     end
   end
   `INFO(("Offload Write Test PASSED"), ADI_VERBOSITY_LOW);
@@ -417,13 +423,13 @@ task fifo_spi_test();
 
   if (sdi_fifo_data !== sdi_fifo_data_store) begin
     `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
-    `ERROR(("Fifo Read Test FAILED"));
+    `FATAL(("Fifo Read Test FAILED"));
   end
   `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
 
   if (sdo_fifo_data !== sdo_fifo_data_store) begin
     `INFO(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data, sdo_fifo_data_store), ADI_VERBOSITY_LOW);
-    `ERROR(("Fifo Write Test FAILED"));
+    `FATAL(("Fifo Write Test FAILED"));
   end
   `INFO(("Fifo Write Test PASSED"), ADI_VERBOSITY_LOW);
 endtask

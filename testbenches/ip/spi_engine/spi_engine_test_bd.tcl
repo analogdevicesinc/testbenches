@@ -30,6 +30,9 @@ spi_engine_create $hier_spi_engine  $data_width $async_spi_clk $num_cs $num_sdi 
                                     $sdi_fifo_addr_width $sdo_fifo_addr_width \
                                     $sync_fifo_addr_width $cmd_fifo_addr_width
 
+set default_spi_cfg_var [expr [expr $ad_project_params(CPOL) << 1] | $ad_project_params(CPHA)]
+ad_ip_parameter $hier_spi_engine/${hier_spi_engine}_execution CONFIG.DEFAULT_SPI_CFG $default_spi_cfg_var
+
 ad_ip_instance axi_clkgen spi_clkgen
 ad_ip_parameter spi_clkgen CONFIG.CLK0_DIV 5
 ad_ip_parameter spi_clkgen CONFIG.VCO_DIV 1

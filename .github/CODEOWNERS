@@ -1,0 +1,17 @@
+# This file contains code owners per hdl project, for Pull Requests to main.
+#
+# Code owners are added automatically as reviewers in Pull Requests open
+# to main, depending on the folders/projects affected by PR changes.
+# All PRs open against 'main' will require approval of at least one codeowner.
+#
+# More general documentation about code owners can be found here:
+# https://github.blog/2017-07-06-introducing-code-owners/
+
+# CODEOWNERS file format: <pattern> + <mail address of one or more owners>
+# The last matching line will take precedence.
+
+# Global code owners (for folders with no later match)
+*      @analogdevicesinc/tb-dev
+
+# Code owners for docs
+/docs/ @analogdevicesinc/tb-doc

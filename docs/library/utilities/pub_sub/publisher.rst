@@ -11,6 +11,9 @@ filters, process data packets, and notify subscribers with the received data.
 The class is parameterized with a data_type. It is mainly used in VIP monitors,
 but it can also be integrated in other environments as well.
 
+.. svg:: library/utilities/pub_sub/publisher.svg
+   :align: center
+
 Variables
 -------------------------------------------------------------------------------
 

@@ -1,0 +1,38 @@
+# Classes
+
+# Base
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+
+# Components
+adi_publisher: {
+  shape: class
+  \#subscriber_list
+  \#filter
+  \#packet_processor
+  +setup_filter()
+  +remove_filter()
+  +setup_processor()
+  +remove_processor()
+  +subscribe()
+  +unsubscribe()
+  +notify()
+}
+adi_subscriber: {shape: class}
+adi_filter: {shape: class}
+adi_processor: {shape: class}
+
+# Inheritances
+
+# Base
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Components
+adi_component <- adi_publisher: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+# Components
+adi_publisher <- adi_subscriber: {source-arrowhead: * {shape: diamond; style.filled: true}}
+adi_publisher <- adi_filter: {source-arrowhead: 0..1 {shape: diamond; style.filled: true}}
+adi_publisher <- adi_processor: {source-arrowhead: 0..1 {shape: diamond; style.filled: true}}

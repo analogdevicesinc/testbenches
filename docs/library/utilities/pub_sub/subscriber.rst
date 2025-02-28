@@ -15,6 +15,9 @@ checker classes which need data inputs from various other modules.
   The subscriber base class must be inherited and a new implementation must be
   written in a subclass.
 
+.. svg:: library/utilities/pub_sub/subscriber.svg
+   :align: center
+
 Variables
 -------------------------------------------------------------------------------
 

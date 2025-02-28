@@ -288,9 +288,6 @@ HDL related dependencies
    * - UTIL_UPACK2
      - :git-hdl:`library/util_pack/util_upack2`
      - :external+hdl:ref:`util_upack2`
-   * - UTIL_CLKDIV
-     - :git-hdl:`library/xilinx/util_clkdiv`
-     - ---
 
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

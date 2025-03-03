@@ -7,6 +7,9 @@ Common with most testbenches:
    * - SV dependency name
      - Source code link
      - Documentation link
+   * - IRQ_HANDLER
+     - :git-testbenches:`library/utilities/irq_handler_pkg.sv`
+     - ---
    * - LOGGER_PKG
      - :git-testbenches:`library/utilities/logger_pkg.sv`
      - ---

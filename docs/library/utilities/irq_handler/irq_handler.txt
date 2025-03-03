@@ -1,0 +1,30 @@
+# Classes
+
+# Base
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+m_axi_sequencer: {shape: class}
+io_vip: {shape: class}
+
+# Scoreboard
+irq_handler: {
+  shape: class
+  \#irq_vip_if
+  \#irq_event_list
+  \#irq_valid_list
+  \#software_testing
+  +enable_software_testing()
+  +software_irq_testing()
+  +start()
+  +register_device()
+}
+
+# Inheritances
+
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- irq_handler: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+irq_handler <- m_axi_sequencer: {source-arrowhead: {shape: diamond; style.filled: false}}
+irq_handler <- io_vip: {source-arrowhead: {shape: diamond; style.filled: true}}

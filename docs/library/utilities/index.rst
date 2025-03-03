@@ -8,5 +8,6 @@ Contents
 
 .. toctree::
    :maxdepth: 1
+   :glob:
 
-   Test Harness <test_harness/index>
+   */index

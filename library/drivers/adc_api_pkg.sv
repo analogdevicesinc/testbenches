@@ -131,12 +131,54 @@ package adc_api_pkg;
         `SET_ADC_COMMON_REG_CNTRL_3_CUSTOM_CONTROL(custom_control));
     endtask
 
-    task enable_channel();
-      this.axi_write(GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+    task set_channel_control(
+      input bit [7:0] channel,
+      input logic adc_lb_owr,
+      input logic adc_pn_sel_owr,
+      input logic iqcor_enb,
+      input logic dcfilt_enb,
+      input logic format_signext,
+      input logic format_type,
+      input logic format_enable,
+      input logic adc_pn_type_owr,
+      input logic enable);
+
+      this.axi_write(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ADC_LB_OWR(adc_lb_owr) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ADC_PN_SEL_OWR(adc_pn_sel_owr) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_IQCOR_ENB(iqcor_enb) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_DCFILT_ENB(dcfilt_enb) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_SIGNEXT(format_signext) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_TYPE(format_type) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_FORMAT_ENABLE(format_enable) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ADC_PN_TYPE_OWR(adc_pn_type_owr) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(enable));
     endtask
 
-    task disable_channel();
-      this.axi_write(GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(0));
+    task set_channel_control_3(
+      input bit [7:0] channel,
+      input logic [3:0] pn_sel,
+      input logic [3:0] data_sel);
+
+      this.axi_write(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL_3),
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_PN_SEL(pn_sel) |
+        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(data_sel));
+    endtask
+
+    task clear_channel_status(input bit [7:0] channel);
+      this.axi_write(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS),
+        `SET_ADC_CHANNEL_REG_CHAN_STATUS_CRC_ERR(1'b1) |
+        `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_ERR(1'b1) |
+        `SET_ADC_CHANNEL_REG_CHAN_STATUS_PN_OOS(1'b1) |
+        `SET_ADC_CHANNEL_REG_CHAN_STATUS_OVER_RANGE(1'b1));
+    endtask
+
+    task enable_channel(input bit [7:0] channel);
+      this.axi_write(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+    endtask
+
+    task disable_channel(input bit [7:0] channel);
+      this.axi_write(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(0));
     endtask
 
     task get_status(

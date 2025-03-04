@@ -107,25 +107,30 @@ package dac_api_pkg;
     endtask
     
     task set_channel_control_1(
+      input bit [7:0] channel,
       input logic [5:0] dds_phase_dw,
       input logic [15:0] dds_scale_1);
 
-      this.axi_write(GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
+      this.axi_write(channel * 'h40 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
         `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_PHASE_DW(dds_phase_dw) |
         `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(dds_scale_1));
     endtask
 
     task set_channel_control_2(
+      input bit [7:0] channel,
       input logic [15:0] dds_init_1,
       input logic [15:0] dds_incr_1);
 
-      this.axi_write(GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
+      this.axi_write(channel * 'h40 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
         `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INIT_1(dds_init_1) |
         `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(dds_incr_1));
     endtask
 
-    task set_channel_control_7(input logic [3:0] dds_sel);
-      this.axi_write(GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7), `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(dds_sel));
+    task set_channel_control_7(
+      input bit [7:0] channel,
+      input logic [3:0] dds_sel);
+
+      this.axi_write(channel * 'h40 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7), `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(dds_sel));
     endtask
 
     task set_rate(input logic [7:0] rate);

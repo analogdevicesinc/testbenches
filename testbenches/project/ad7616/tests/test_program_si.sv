@@ -36,6 +36,7 @@
 //
 
 `include "utils.svh"
+`include "axi_definitions.svh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;

@@ -64,6 +64,21 @@ package adi_axis_agent_pkg;
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
+    task start();
+      this.agent.start_master();
+    endtask: start
+
+    task run();
+      this.sequencer.run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.sequencer.stop();
+      this.agent.stop_master();
+    endtask: stop
+
   endclass: adi_axis_master_agent
 
 
@@ -85,12 +100,28 @@ package adi_axis_agent_pkg;
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
+    task start();
+      this.agent.start_slave();
+    endtask: start
+
+    task run();
+      this.sequencer.run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.agent.stop_slave();
+    endtask: stop
+
   endclass: adi_axis_slave_agent
 
 
   class adi_axis_passthrough_mem_agent #(`AXIS_VIP_PARAM_DECL(passthrough)) extends adi_agent;
 
     axi4stream_passthrough_agent #(`AXIS_VIP_IF_PARAMS(passthrough)) agent;
+    m_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(passthrough)) master_sequencer;
+    s_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(passthrough)) slave_sequencer;
     adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(passthrough)) monitor;
 
     function new(
@@ -103,6 +134,23 @@ package adi_axis_agent_pkg;
       this.agent = new("Agent", passthrough_vip_if);
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
+
+    task start();
+      this.warning($sformatf("Start must called manually in the test program or environment"));
+    endtask: start
+
+    task run();
+      this.master_sequencer.run();
+      this.slave_sequencer.run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.master_sequencer.stop();
+      this.agent.stop_slave();
+      this.agent.stop_master();
+    endtask: stop
 
   endclass: adi_axis_passthrough_mem_agent
 

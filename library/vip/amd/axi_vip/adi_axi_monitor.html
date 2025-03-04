@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Xilinx AXI Stream Verification IP (VIP) &#8212; Testbenches  documentation</title>
+    <title>ADI AXI Monitor (VIP) &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
@@ -16,8 +16,8 @@
     <link rel="icon" href="../../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="Xilinx Clock Verification IP (VIP)" href="../clk_vip/index.html" />
-    <link rel="prev" title="ADI AXI Monitor (VIP)" href="../axi_vip/adi_axi_monitor.html" />
+    <link rel="next" title="Xilinx AXI Stream Verification IP (VIP)" href="../axis_vip/index.html" />
+    <link rel="prev" title="ADI AXI Slave Sequencer (VIP)" href="s_axi_sequencer.html" />
    
   
   <meta name="repository" content="testbenches">
@@ -89,19 +89,18 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Xilinx AXI Stream Verification IP (VIP)</a><ul>
+<li><a class="reference internal" href="#">ADI AXI Monitor (VIP)</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#m-axi-sequencer">m_axi_sequencer</a><ul>
-<li><a class="reference internal" href="#files">Files</a></li>
-<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#methods">Methods</a><ul>
+<li><a class="reference internal" href="#function-new">function new(…);</a></li>
+<li><a class="reference internal" href="#task-run">task run();</a></li>
+<li><a class="reference internal" href="#function-stop">function stop();</a></li>
+<li><a class="reference internal" href="#task-get-transaction">task get_transaction();</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#s-axi-sequencer">s_axi_sequencer</a><ul>
-<li><a class="reference internal" href="#id1">Files</a></li>
-<li><a class="reference internal" href="#id2">Functions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#usage-and-recommendations">Usage and recommendations</a></li>
 </ul>
 </li>
 </ul>
@@ -167,14 +166,14 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
-<li class="toctree-l5"><a class="reference internal" href="../axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+<li class="toctree-l4 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ADI AXI Monitor</a></li>
 </ul>
 </li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">AXIS VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../axis_vip/index.html">AXIS VIP</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../clk_vip/index.html">Clock VIP</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../rst_vip/index.html">Reset VIP</a></li>
 </ul>
@@ -217,34 +216,65 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="xilinx-axi-stream-verification-ip-vip">
-<span id="xilinx-axis-vip"></span><h1>Xilinx AXI Stream Verification IP (VIP)<a class="headerlink" href="#xilinx-axi-stream-verification-ip-vip" title="Link to this heading"></a></h1>
+  <section id="adi-axi-monitor-vip">
+<span id="adi-axi-monitor"></span><h1>ADI AXI Monitor (VIP)<a class="headerlink" href="#adi-axi-monitor-vip" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p><a class="reference external" href="https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip">[1]</a></p>
+<p>The ADI AXI Monitor is created to efficiently capture data and broadcast it to
+a set of subscribers that are monitoring the interface.</p>
 </section>
-<section id="m-axi-sequencer">
-<h2>m_axi_sequencer<a class="headerlink" href="#m-axi-sequencer" title="Link to this heading"></a></h2>
-<section id="files">
-<h3>Files<a class="headerlink" href="#files" title="Link to this heading"></a></h3>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<p>The ADI AXI Monitor parameters are inherited from the ADI AXI Agent.</p>
 </section>
-<section id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
+<p>The publisher classes are instantiated inside the monitor, which are available
+for external access. One for Write and one for Read operations. This provides a
+means for other classes to subscribe to one or another.</p>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
+<section id="function-new">
+<h3>function new(…);<a class="headerlink" href="#function-new" title="Link to this heading"></a></h3>
+<p>Creates the ADI AXI Monitor object. The name string is assigned to the instance
+as an Identifier when logging. The axi_monitor references the monitor class
+that is in the AMD AXI VIP agent. The parent variable is optional, it is used
+to narrow down the origin of this class, used in logging. The parent variable
+can only reference an adi_agent.</p>
+</section>
+<section id="task-run">
+<h3>task run();<a class="headerlink" href="#task-run" title="Link to this heading"></a></h3>
+<p>Used to start up the monitor. If a monitor instance is already running, it will
+throw an error message and continues the simulation.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This error message can be ommitted, as this causes no harm during simulation.
+However, it is highly recommended to review the simulation stimulus and
+correct this error.</p>
+</div>
+</section>
+<section id="function-stop">
+<h3>function stop();<a class="headerlink" href="#function-stop" title="Link to this heading"></a></h3>
+<p>Used to stop the monitor. If the monitor is not running, it will have no effect.</p>
+</section>
+<section id="task-get-transaction">
+<h3>task get_transaction();<a class="headerlink" href="#task-get-transaction" title="Link to this heading"></a></h3>
+<p>An infinite loop called by the run function. It is used to monitor the AXI
+interface, collect data and broadcast to the modules that subscribed to it.</p>
 </section>
 </section>
-<section id="s-axi-sequencer">
-<h2>s_axi_sequencer<a class="headerlink" href="#s-axi-sequencer" title="Link to this heading"></a></h2>
-<section id="id1">
-<h3>Files<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-</section>
-<section id="id2">
-<h3>Functions<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
-</section>
-</section>
-<section id="references">
-<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
-<p><a class="reference external" href="https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip">[1] “AXI4-Stream Verification IP v1.1 LogiCORE IP Product Guide (PG277)”,
-Xilinx, 2019</a></p>
+<section id="usage-and-recommendations">
+<h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading"></a></h2>
+<p>Basic usage of the ADI AXI Monitor:</p>
+<ul class="simple">
+<li><p>Use it through the ADI AXI Agent, declare and instantiate the agent</p></li>
+<li><p>Call the run function through the Agent</p></li>
+<li><p>Subscribe the modules that need to check data on this interface</p></li>
+<li><p>Run the test stimulus</p></li>
+<li><p>Call the stop function through the Agent before the clocks associated to the
+VIP are stopped</p></li>
+</ul>
 </section>
 </section>
 
@@ -252,8 +282,8 @@ Xilinx, 2019</a></p>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../axi_vip/adi_axi_monitor.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADI AXI Monitor (VIP)</a>
-    <a href="../clk_vip/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Xilinx Clock Verification IP (VIP)</a>
+    <a href="s_axi_sequencer.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADI AXI Slave Sequencer (VIP)</a>
+    <a href="../axis_vip/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Xilinx AXI Stream Verification IP (VIP)</a>
               </div>
           
         </div>

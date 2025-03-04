@@ -59,14 +59,6 @@ package environment_pkg;
 
       // configuration for output
       this.output_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-
-      // this.output_axis_agent.sequencer.set_use_variable_ranges();
-      // this.output_axis_agent.sequencer.set_high_time_range(1,1);
-      // this.output_axis_agent.sequencer.set_low_time_range(0,0);
-
-      // this.output_axis_agent.sequencer.clr_use_variable_ranges();
-      // this.output_axis_agent.sequencer.set_high_time(1);
-      // this.output_axis_agent.sequencer.set_low_time(1);
     endtask
 
     //============================================================================

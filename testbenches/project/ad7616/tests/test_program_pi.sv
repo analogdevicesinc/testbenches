@@ -201,7 +201,7 @@ task data_acquisition_test();
 
     // Enable all ADC channels
     for (int i = 0; i < 16; i=i+1) begin
-    axi_write (`AXI_AD7616_BA + i*'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(32'h00000001));
+        axi_write (`AXI_AD7616_BA + i*'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(32'h00000001));
     end
 
     // Configure pwm gen

@@ -369,7 +369,7 @@ program test_program;
                `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000));
     axi_write (`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-    // Select DDS as source
+    // Select DMA as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
     axi_write (TX1_CHANNEL + CH1 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),

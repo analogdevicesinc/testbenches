@@ -38,6 +38,7 @@
 package adi_spi_vip_pkg;
 
   import logger_pkg::*;
+  import adi_common_pkg::*;
 
   `define SPI_VIP_PARAM_ORDER       SPI_VIP_MODE              ,\
                                     SPI_VIP_CPOL              ,\

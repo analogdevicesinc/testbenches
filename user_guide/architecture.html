@@ -16,8 +16,8 @@
     <link rel="icon" href="../_static/icon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ADI Testbenches coding guidelines" href="coding_guidelines.html" />
-    <link rel="prev" title="Build a test bench" href="build_tb.html" />
+    <link rel="next" title="Creation and Editing of HDL Testbenches" href="create_edit_tb.html" />
+    <link rel="prev" title="Build a testbench" href="build_tb.html" />
    
   
   <meta name="repository" content="testbenches">
@@ -94,12 +94,6 @@
 <li><a class="reference internal" href="#project-files-for-test-benches">Project files for test benches</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#creating-a-new-testbench">Creating a new testbench</a><ul>
-<li><a class="reference internal" href="#adding-a-new-configuration-to-a-test-bench">Adding a new configuration to a test bench</a></li>
-<li><a class="reference internal" href="#adding-a-new-test-program-to-a-test-bench">Adding a new test program to a test bench</a></li>
-<li><a class="reference internal" href="#creating-a-modified-block-design-in-the-same-project-folder">Creating a modified block design in the same project folder</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -133,8 +127,9 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="git_repository.html">Git repository</a></li>
 <li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build_tb.html">Build a test bench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_tb.html">Build a testbench</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Testbenches architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coding_guidelines.html">Testbenches coding guidelines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs_guidelines.html">Documentation guidelines</a></li>
 </ul>
@@ -260,109 +255,14 @@ exist)</p></li>
 </ul>
 </section>
 </section>
-<section id="creating-a-new-testbench">
-<h2>Creating a new testbench<a class="headerlink" href="#creating-a-new-testbench" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>Create the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> and list all of the currently known dependencies</p></li>
-<li><p>Create the <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> script and add the currently known
-simulation dependencies there as well</p></li>
-<li><p>Create at least one <code class="docutils literal notranslate"><span class="pre">configuration</span> <span class="pre">file</span></code> (it can be left empty)</p></li>
-<li><p>Create the <code class="docutils literal notranslate"><span class="pre">system_bd.tcl</span></code> script, which creates the block design (consider
-using Verification IPs as these are created to make testing easier and facilitates
-faster testbench bring-up as well as less bugs in general)</p></li>
-<li><p>Create the <code class="docutils literal notranslate"><span class="pre">system_tb.sv</span></code> file that connects the testbench with the block design</p></li>
-<li><p>Consider creating <code class="docutils literal notranslate"><span class="pre">classes</span></code> that encapsulate the variables and functions, so it
-can be used in other testbenches</p></li>
-<li><p>Create the <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code> to run the simulation</p></li>
-<li><p>Update the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> and <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> with the new dependencies
-if needed.</p></li>
-</ul>
-<section id="adding-a-new-configuration-to-a-test-bench">
-<h3>Adding a new configuration to a test bench<a class="headerlink" href="#adding-a-new-configuration-to-a-test-bench" title="Link to this heading"></a></h3>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Simple, all of the configurations are compatible with all of the test programs.</p>
-</div>
-<p>Requirements:</p>
-<ul class="simple">
-<li><p>New <code class="docutils literal notranslate"><span class="pre">configuration</span></code> doesn’t change the connections between the block design and
-the <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Test</span> <span class="pre">program</span></code> can be used with the new <code class="docutils literal notranslate"><span class="pre">configuration</span></code> without modifications.</p></li>
-</ul>
-<p>Process:</p>
-<ul class="simple">
-<li><p>Create a <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">configuration</span></code> in <code class="docutils literal notranslate"><span class="pre">cfg</span></code> folder.</p></li>
-<li><p>Check if the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> automatically includes the newly created <code class="docutils literal notranslate"><span class="pre">configuration</span></code>,
-otherwise add it to the list manually.</p></li>
-<li><p>If a <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">parameter</span></code> needs to be added, make sure all of the other <code class="docutils literal notranslate"><span class="pre">configuration</span></code>
-files are updated with the new parameter name and a new value as well</p></li>
-<li><p>Test the configuration with the existing test program.</p></li>
-</ul>
-</section>
-<section id="adding-a-new-test-program-to-a-test-bench">
-<h3>Adding a new test program to a test bench<a class="headerlink" href="#adding-a-new-test-program-to-a-test-bench" title="Link to this heading"></a></h3>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Simple, all of the configurations are compatible with all of the test programs.</p>
-</div>
-<p>Requirements:</p>
-<ul class="simple">
-<li><p>Connections between the block design and the test program don’t change.</p></li>
-<li><p>All of the existing <code class="docutils literal notranslate"><span class="pre">configurations</span></code> must be compatible with the new
-<code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
-</ul>
-<p>Process:</p>
-<ul class="simple">
-<li><p>Create a <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">test</span> <span class="pre">program</span></code> in tests folder.</p></li>
-<li><p>Check if the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> automatically includes the newly created
-<code class="docutils literal notranslate"><span class="pre">configuration</span></code>, otherwise add it to the list manually.</p></li>
-<li><p>Test the program with the existing configurations.</p></li>
-</ul>
-</section>
-<section id="creating-a-modified-block-design-in-the-same-project-folder">
-<h3>Creating a modified block design in the same project folder<a class="headerlink" href="#creating-a-modified-block-design-in-the-same-project-folder" title="Link to this heading"></a></h3>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Advanced, not all configurations are compatible with the test programs.</p>
-</div>
-<p>Requirements:</p>
-<ul class="simple">
-<li><p>New <code class="docutils literal notranslate"><span class="pre">configuration</span> <span class="pre">file(s)</span></code> must be created for the new block design.</p></li>
-</ul>
-<p>Process:</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt>Create a new parameter that tells the <code class="docutils literal notranslate"><span class="pre">system_bd.tcl</span></code> what to build.</dt><dd><ul>
-<li><p>this parameter must be included in all of the existing and new
-configuration files;</p></li>
-<li><p>if the design already has multiple variations of the block design,
-update the existing parameter with the new value which corresponds
-to the new block design</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>Modify the <code class="docutils literal notranslate"><span class="pre">system_bd.tcl</span></code> script to use the created parameter to create the
-old or new block design.</p></li>
-<li><p>In <code class="docutils literal notranslate"><span class="pre">system_tb.sv</span></code> use the parameter to connect the new block design with a
-new <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
-<li><p>Create the <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>, modify the TESTS list to not be automatically generated
-and add the test program:config options to the list that you want to run.</p></li>
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> add a switch that chooses between the test programs
-based on the parameter.</p></li>
-<li><p>Write and test the new <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
-</ul>
-</section>
-</section>
 </section>
 
 
           </div>
               <div class="related">
                 &nbsp;
-    <a href="build_tb.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Build a test bench</a>
-    <a href="coding_guidelines.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADI Testbenches coding guidelines</a>
+    <a href="build_tb.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Build a testbench</a>
+    <a href="create_edit_tb.html" title="Next document (Alt+Shift+RightArrow)" class="next">Creation and Editing of HDL Testbenches</a>
               </div>
           
         </div>

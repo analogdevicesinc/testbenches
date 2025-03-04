@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Build a test bench &#8212; Testbenches  documentation</title>
+    <title>Build a testbench &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -89,9 +89,9 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Build a test bench</a><ul>
+<li><a class="reference internal" href="#">Build a testbench</a><ul>
 <li><a class="reference internal" href="#set-up-the-testbenches-repository">Set up the Testbenches repository</a></li>
-<li><a class="reference internal" href="#building-a-test-bench">Building a test bench</a></li>
+<li><a class="reference internal" href="#building-a-testbench">Building a testbench</a></li>
 <li><a class="reference internal" href="#environment">Environment</a><ul>
 <li><a class="reference internal" href="#linux-environment-setup">Linux environment setup</a></li>
 <li><a class="reference internal" href="#windows-environment-setup">Windows environment setup</a></li>
@@ -131,8 +131,9 @@ Content on this topic
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="git_repository.html">Git repository</a></li>
 <li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Build a test bench</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Build a testbench</a></li>
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Testbenches architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coding_guidelines.html">Testbenches coding guidelines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs_guidelines.html">Documentation guidelines</a></li>
 </ul>
@@ -206,8 +207,8 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="build-a-test-bench">
-<span id="build-tb"></span><h1>Build a test bench<a class="headerlink" href="#build-a-test-bench" title="Link to this heading"></a></h1>
+  <section id="build-a-testbench">
+<span id="build-tb"></span><h1>Build a testbench<a class="headerlink" href="#build-a-testbench" title="Link to this heading"></a></h1>
 <p><strong>Please note that ADI only provides the source files necessary to create and
 build the designs. This means that you are responsible for modifying and
 building these projects.</strong></p>
@@ -270,19 +271,19 @@ want to switch to any other branch you need to checkout that branch:</p>
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
-<section id="building-a-test-bench">
-<h2>Building a test bench<a class="headerlink" href="#building-a-test-bench" title="Link to this heading"></a></h2>
+<section id="building-a-testbench">
+<h2>Building a testbench<a class="headerlink" href="#building-a-testbench" title="Link to this heading"></a></h2>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>Before building any test bench, you must have the environment prepared each
+<p>Before building any testbench, you must have the environment prepared each
 time a new terminal session is started:</p>
 <ol class="arabic simple">
 <li><p>Set the HDL repository path with <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_HDL_DIR=&lt;path</span> <span class="pre">to</span> <span class="pre">dir&gt;</span></code>.</p></li>
 <li><p>Set the Testbenches repository path with <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_TB_DIR=&lt;path</span> <span class="pre">to</span> <span class="pre">dir&gt;</span></code>.</p></li>
 </ol>
 </div>
-<p>The way of building a test bench in Cygwin and WSL is almost the same.
-In this example, it is building the <strong>AD7616</strong> test bench.</p>
+<p>The way of building a testbench in Cygwin and WSL is almost the same.
+In this example, it is building the <strong>AD7616</strong> testbench.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
@@ -295,7 +296,7 @@ In this example, it is building the <strong>AD7616</strong> test bench.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
-<div class="clear-left"></div></div></div><p>The <code class="docutils literal notranslate"><span class="pre">make</span></code> builds all the libraries first and then builds the test bench.
+<div class="clear-left"></div></div></div><p>The <code class="docutils literal notranslate"><span class="pre">make</span></code> builds all the libraries first and then builds the testbench.
 This assumes that you have the tools and licenses set up correctly. If
 you don’t get to the last line, the make failed to build one or more
 targets: it could be a library component or the project itself. There is
@@ -329,7 +330,23 @@ the <strong>test_program_si</strong> test program.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_si<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_si
 </pre></div>
 </div>
-<div class="clear-left"></div></div></div></section>
+<div class="clear-left"></div></div></div><p>In GUI mode, if the simulation was already run, there are a couple of options
+for restarting it.</p>
+<ul class="simple">
+<li><p>The first option is to run the simulation again, with the <code class="docutils literal notranslate"><span class="pre">Restart</span></code> button
+or by running the <code class="docutils literal notranslate"><span class="pre">restart</span></code> TCL command. This will reset the simulation and
+start it again without recompiling the files.</p></li>
+<li><p>The second option is to recompile the project and then run the simulation.
+This is done by clicking the <code class="docutils literal notranslate"><span class="pre">Relaunch</span> <span class="pre">Simulation</span></code> button. This will not
+close the simulation window, but it will recompile the project and start the
+simulation.</p></li>
+<li><p>The third option is to close the simulation window and use the <code class="docutils literal notranslate"><span class="pre">Run</span>
+<span class="pre">simulation</span></code> option from the Flow Navigator. This will recompile the project
+and start the simulation. This is needed when project simulation parameters
+are changed after the build was created or when the block design is changed
+manually. When the simulation seed is hard coded, this option must be used.</p></li>
+</ul>
+</section>
 <section id="environment">
 <h2>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h2>
 <p>As mentioned above, our recommended build flow is to use <code class="docutils literal notranslate"><span class="pre">make</span></code> and the

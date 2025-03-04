@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ADI AXI Master Sequencer (VIP) &#8212; Testbenches  documentation</title>
+    <title>ADI AXIS Monitor (VIP) &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/app.min.css?v=3d3703ae" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
@@ -16,8 +16,8 @@
     <link rel="icon" href="../../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="ADI AXI Slave Sequencer (VIP)" href="s_axi_sequencer.html" />
-    <link rel="prev" title="ADI AXI Agent (VIP)" href="adi_axi_agent.html" />
+    <link rel="next" title="Xilinx Clock Verification IP (VIP)" href="../clk_vip/index.html" />
+    <link rel="prev" title="ADI AXIS Slave Sequencer (VIP)" href="s_axis_sequencer.html" />
    
   
   <meta name="repository" content="testbenches">
@@ -89,19 +89,15 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">ADI AXI Master Sequencer (VIP)</a><ul>
+<li><a class="reference internal" href="#">ADI AXIS Monitor (VIP)</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#parameters">Parameters</a></li>
 <li><a class="reference internal" href="#variables">Variables</a></li>
 <li><a class="reference internal" href="#methods">Methods</a><ul>
 <li><a class="reference internal" href="#function-new">function new(…);</a></li>
-<li><a class="reference internal" href="#virtual-task-regwrite32-input-xil-axi-ulong-addr-input-bit-31-0-data">virtual task RegWrite32(input xil_axi_ulong addr, input bit [31:0] data);</a></li>
-<li><a class="reference internal" href="#virtual-task-regread32-input-xil-axi-ulong-addr-output-bit-31-0-data">virtual task RegRead32(input xil_axi_ulong addr, output bit [31:0] data);</a></li>
-<li><a class="reference internal" href="#virtual-task-regreadverify32-input-xil-axi-ulong-addr-input-bit-31-0-data">virtual task RegReadVerify32(input xil_axi_ulong addr, input bit [31:0] data);</a></li>
-<li><a class="reference internal" href="#task-single-write-transaction-api">task single_write_transaction_api(…)</a></li>
-<li><a class="reference internal" href="#task-single-write-transaction-readback-api">task single_write_transaction_readback_api(…)</a></li>
-<li><a class="reference internal" href="#task-single-read-transaction-api">task single_read_transaction_api(…)</a></li>
-<li><a class="reference internal" href="#task-single-read-transaction-readback-api">task single_read_transaction_readback_api(…)</a></li>
+<li><a class="reference internal" href="#task-run">task run();</a></li>
+<li><a class="reference internal" href="#function-stop">function stop();</a></li>
+<li><a class="reference internal" href="#task-get-transaction">task get_transaction();</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#usage-and-recommendations">Usage and recommendations</a></li>
@@ -170,18 +166,18 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l4 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l5"><a class="reference internal" href="adi_axi_agent.html">ADI AXI Agent</a></li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">ADI AXI Master Sequencer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="adi_axi_monitor.html">ADI AXI Monitor</a></li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
-<li class="toctree-l5"><a class="reference internal" href="../axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+<li class="toctree-l4 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ADI AXIS Monitor</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../clk_vip/index.html">Clock VIP</a></li>
@@ -226,84 +222,62 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="adi-axi-master-sequencer-vip">
-<span id="m-axi-sequencer"></span><h1>ADI AXI Master Sequencer (VIP)<a class="headerlink" href="#adi-axi-master-sequencer-vip" title="Link to this heading"></a></h1>
+  <section id="adi-axis-monitor-vip">
+<span id="adi-axis-monitor"></span><h1>ADI AXIS Monitor (VIP)<a class="headerlink" href="#adi-axis-monitor-vip" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The ADI AXI Master Sequencer is created to easily generate AXI4Lite transfers,
-mimicing a processing system.</p>
+<p>The ADI AXIS Monitor is created to efficiently capture data and broadcast it to
+a set of subscribers that are monitoring the interface.</p>
 </section>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<p>The ADI AXI Master Sequencer parameters are inherited from the ADI AXI Agent.</p>
+<p>The ADI AXIS Monitor parameters are inherited from the ADI AXIS Agent.</p>
 </section>
 <section id="variables">
 <h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
-<p>None are available for direct external access.</p>
+<p>The publisher class is instantiated inside the monitor, which is available for
+external access. This provides a means for other classes to subscribe and
+receive captured data.</p>
 </section>
 <section id="methods">
 <h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
 <section id="function-new">
 <h3>function new(…);<a class="headerlink" href="#function-new" title="Link to this heading"></a></h3>
-<p>Creates the ADI AXI Master Sequencer object. The name string is assigned to the
-instance as an Identifier when logging. The write and read drivers reference
-the driver classes that are in the AMD AXI VIP agent. The parent variable is
-optional, it is used to narrow down the origin of this class, used in logging.
-The parent variable can only reference an adi_agent.</p>
+<p>Creates the ADI AXIS Monitor object. The name string is assigned to the instance
+as an Identifier when logging. The axis_monitor references the monitor class
+that is in the AMD AXIS VIP agent. The parent variable is optional, it is used
+to narrow down the origin of this class, used in logging. The parent variable
+can only reference an adi_agent.</p>
 </section>
-<section id="virtual-task-regwrite32-input-xil-axi-ulong-addr-input-bit-31-0-data">
-<h3>virtual task RegWrite32(input xil_axi_ulong addr, input bit [31:0] data);<a class="headerlink" href="#virtual-task-regwrite32-input-xil-axi-ulong-addr-input-bit-31-0-data" title="Link to this heading"></a></h3>
-<p>Writes the data at the specified address. When multiple writes are initiated,
-only one transfer is processed at a given time. The other transfers will wait
-for the previous one to finish. There is no priority between the transfers and
-the processing order is subject to the event scheduling.</p>
+<section id="task-run">
+<h3>task run();<a class="headerlink" href="#task-run" title="Link to this heading"></a></h3>
+<p>Used to start up the monitor. If a monitor instance is already running, it will
+throw an error message and continues the simulation.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This error message can be ommitted, as this causes no harm during simulation.
+However, it is highly recommended to review the simulation stimulus and
+correct this error.</p>
+</div>
 </section>
-<section id="virtual-task-regread32-input-xil-axi-ulong-addr-output-bit-31-0-data">
-<h3>virtual task RegRead32(input xil_axi_ulong addr, output bit [31:0] data);<a class="headerlink" href="#virtual-task-regread32-input-xil-axi-ulong-addr-output-bit-31-0-data" title="Link to this heading"></a></h3>
-<p>Reads the data at the specified address. When multiple reads are initiated,
-only one transfer is processed at a given time. The other transfers will wait
-for the previous one to finish. There is no priority between the transfers and
-the processing order is subject to the event scheduling.</p>
+<section id="function-stop">
+<h3>function stop();<a class="headerlink" href="#function-stop" title="Link to this heading"></a></h3>
+<p>Used to stop the monitor. If the monitor is not running, it will have no effect.</p>
 </section>
-<section id="virtual-task-regreadverify32-input-xil-axi-ulong-addr-input-bit-31-0-data">
-<h3>virtual task RegReadVerify32(input xil_axi_ulong addr, input bit [31:0] data);<a class="headerlink" href="#virtual-task-regreadverify32-input-xil-axi-ulong-addr-input-bit-31-0-data" title="Link to this heading"></a></h3>
-<p>Reads the data at the specified address and compares it with the data
-specified. When multiple reads are initiated, only one transfer is processed at
-a given time. The other transfers will wait for the previous one to finish.
-There is no priority between the transfers and the processing order is subject
-to the event scheduling.</p>
-</section>
-<section id="task-single-write-transaction-api">
-<h3>task single_write_transaction_api(…)<a class="headerlink" href="#task-single-write-transaction-api" title="Link to this heading"></a></h3>
-<p>Used to create a transaction for the AMD AXI VIP write driver. After the
-transaction is created based on the parameters given, sends the transaction
-object to the driver to send the data. Does not wait for a response from the
-slave side.</p>
-</section>
-<section id="task-single-write-transaction-readback-api">
-<h3>task single_write_transaction_readback_api(…)<a class="headerlink" href="#task-single-write-transaction-readback-api" title="Link to this heading"></a></h3>
-<p>Same as single_write_transaction_api with the addition of waiting for a
-response from the slave side. It is used by RegWrite32.</p>
-</section>
-<section id="task-single-read-transaction-api">
-<h3>task single_read_transaction_api(…)<a class="headerlink" href="#task-single-read-transaction-api" title="Link to this heading"></a></h3>
-<p>Used to create a transaction for the AMD AXI VIP read driver. After the
-transaction is created based on the parameters given, sends the transaction
-object to the driver to send the data. Does not wait for a response from the
-slave side.</p>
-</section>
-<section id="task-single-read-transaction-readback-api">
-<h3>task single_read_transaction_readback_api(…)<a class="headerlink" href="#task-single-read-transaction-readback-api" title="Link to this heading"></a></h3>
-<p>Same as single_read_transaction_api with the addition of waiting for a
-response from the slave side. It is used by RegRead32 and RegReadVerify32.</p>
+<section id="task-get-transaction">
+<h3>task get_transaction();<a class="headerlink" href="#task-get-transaction" title="Link to this heading"></a></h3>
+<p>An infinite loop called by the run function. It is used to monitor the AXIS
+interface, collect data and broadcast to the modules that subscribed to it.</p>
 </section>
 </section>
 <section id="usage-and-recommendations">
 <h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading"></a></h2>
-<p>Basic usage of the ADI AXI Master Sequencer:</p>
+<p>Basic usage of the ADI AXIS Monitor:</p>
 <ul class="simple">
-<li><p>Use it through the ADI AXI Agent, declare and instantiate the agent</p></li>
-<li><p>Initiate the transactions whenever needed</p></li>
+<li><p>Use it through the ADI AXIS Agent, declare and instantiate the agent</p></li>
+<li><p>Call the run function through the Agent</p></li>
+<li><p>Subscribe the modules that need to check data on this interface</p></li>
+<li><p>Run the test stimulus</p></li>
 <li><p>Call the stop function through the Agent before the clocks associated to the
 VIP are stopped</p></li>
 </ul>
@@ -314,8 +288,8 @@ VIP are stopped</p></li>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="adi_axi_agent.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADI AXI Agent (VIP)</a>
-    <a href="s_axi_sequencer.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADI AXI Slave Sequencer (VIP)</a>
+    <a href="s_axis_sequencer.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADI AXIS Slave Sequencer (VIP)</a>
+    <a href="../clk_vip/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Xilinx Clock Verification IP (VIP)</a>
               </div>
           
         </div>

@@ -1,0 +1,85 @@
+# Classes
+
+adi_reporter: {
+  shape: class
+  \#name
+  \#parent
+  \#get_path()
+  +info()
+  +warning()
+  +error()
+  +fatal()
+}
+adi_component: {shape: class; -empty: ""}
+adi_environment: {shape: class; -empty: ""}
+adi_api: {shape: class; -empty: ""}
+adi_regmap: {shape: class; -empty: ""}
+adi_agent: {shape: class; -empty: ""}
+adi_driver: {shape: class; -empty: ""}
+adi_sequencer: {shape: class; -empty: ""}
+adi_monitor: {shape: class; -empty: ""}
+
+"axi4stream_mst_agent#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_slv_agent#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+"axi4stream_passthrough_agent#": {
+  shape: class
+  link: https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip
+}
+
+adi_m_axis_sequencer_base: {shape: class}
+adi_s_axis_sequencer_base: {shape: class}
+
+"adi_m_axis_sequencer#": {shape: class}
+"adi_s_axis_sequencer#": {shape: class}
+"adi_x_axis_monitor#": {shape: class}
+
+"adi_axi4stream_mst_agent#": {shape: class}
+"adi_axi4stream_slv_agent#": {shape: class}
+"adi_axi4stream_passthrough_agent#": {shape: class}
+
+# Inheritances
+
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_environment: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_api: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_regmap: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_agent: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_driver: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_sequencer: {shape: triangle; source-arrowhead.style.filled: false}
+adi_component <- adi_monitor: {shape: triangle; source-arrowhead.style.filled: false}
+
+adi_sequencer <- adi_m_axis_sequencer_base: {shape: triangle; source-arrowhead.style.filled: false}
+adi_m_axis_sequencer_base <- "adi_m_axis_sequencer#": {shape: triangle; source-arrowhead.style.filled: false}
+adi_sequencer <- adi_s_axis_sequencer_base: {shape: triangle; source-arrowhead.style.filled: false}
+adi_s_axis_sequencer_base <- "adi_s_axis_sequencer#": {shape: triangle; source-arrowhead.style.filled: false}
+adi_monitor <- "adi_x_axis_monitor#": {shape: triangle; source-arrowhead.style.filled: false}
+
+adi_agent <- "adi_axi4stream_mst_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+adi_agent <- "adi_axi4stream_slv_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+adi_agent <- "adi_axi4stream_passthrough_agent#": {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+adi_agent <- adi_driver: {source-arrowhead: {shape: diamond; style.filled: true}}
+adi_agent <- adi_monitor: {source-arrowhead: {shape: diamond; style.filled: true}}
+adi_agent <- adi_sequencer: {source-arrowhead: {shape: diamond; style.filled: true}}
+
+# AXIS
+
+"adi_axi4stream_mst_agent#" <- "axi4stream_mst_agent#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"adi_axi4stream_mst_agent#" <- "adi_m_axis_sequencer#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"adi_axi4stream_mst_agent#" <- "adi_x_axis_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"adi_axi4stream_slv_agent#" <- "axi4stream_slv_agent#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"adi_axi4stream_slv_agent#" <- "adi_s_axis_sequencer#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"adi_axi4stream_slv_agent#" <- "adi_x_axis_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}
+
+"adi_axi4stream_passthrough_agent#" <- "axi4stream_passthrough_agent#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"adi_axi4stream_passthrough_agent#" <- "adi_s_axis_sequencer#": {source-arrowhead: {shape: diamond; style.filled: true}}
+"adi_axi4stream_passthrough_agent#" <- "adi_x_axis_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}

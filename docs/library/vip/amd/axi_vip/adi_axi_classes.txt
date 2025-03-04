@@ -71,6 +71,7 @@ adi_agent <- adi_monitor: {source-arrowhead: {shape: diamond; style.filled: true
 adi_agent <- adi_sequencer: {source-arrowhead: {shape: diamond; style.filled: true}}
 
 # AXI
+
 "adi_axi_mst_agent#" <- "axi_mst_agent#": {source-arrowhead: {shape: diamond; style.filled: true}}
 "adi_axi_mst_agent#" <- "adi_m_axi_sequencer#": {source-arrowhead: {shape: diamond; style.filled: true}}
 "adi_axi_mst_agent#" <- "adi_x_axi_monitor#": {source-arrowhead: {shape: diamond; style.filled: true}}

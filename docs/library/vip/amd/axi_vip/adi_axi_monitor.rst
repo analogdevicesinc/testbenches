@@ -24,8 +24,8 @@ means for other classes to subscribe to one or another.
 Methods
 -------------------------------------------------------------------------------
 
-function new(input string name, input axi_monitor monitor, input adi_agent parent);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+function new(...);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creates the ADI AXI Monitor object. The name string is assigned to the instance
 as an Identifier when logging. The axi_monitor references the monitor class

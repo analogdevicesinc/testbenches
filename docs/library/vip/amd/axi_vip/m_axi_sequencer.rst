@@ -22,8 +22,8 @@ None are available for direct external access.
 Methods
 -------------------------------------------------------------------------------
 
-function new(input string name, input axi_mst_wr_driver wr_driver, input axi_mst_rd_driver rd_driver, input adi_agent parent);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+function new(...);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creates the ADI AXI Master Sequencer object. The name string is assigned to the
 instance as an Identifier when logging. The write and read drivers reference
@@ -62,7 +62,7 @@ task single_write_transaction_api(...)
 Used to create a transaction for the AMD AXI VIP write driver. After the
 transaction is created based on the parameters given, sends the transaction
 object to the driver to send the data. Does not wait for a response from the
-slave side
+slave side.
 
 task single_write_transaction_readback_api(...)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,7 +76,7 @@ task single_read_transaction_api(...)
 Used to create a transaction for the AMD AXI VIP read driver. After the
 transaction is created based on the parameters given, sends the transaction
 object to the driver to send the data. Does not wait for a response from the
-slave side
+slave side.
 
 task single_read_transaction_readback_api(...)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

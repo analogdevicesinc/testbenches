@@ -22,8 +22,8 @@ None are available for direct external access.
 Methods
 -------------------------------------------------------------------------------
 
-function new(input string name, input axi4stream_mst_driver driver, input adi_agent parent);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+function new(...);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creates the ADI AXIS Master Sequencer object. The name string is assigned to the
 instance as an Identifier when logging. The write and read drivers reference

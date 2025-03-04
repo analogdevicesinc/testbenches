@@ -18,7 +18,7 @@ Parameters
 The ADI AXIS Agent parameters ``must`` be compatible with the VIP used in the
 design. The virtual interface that is defined must be of the same type that
 the VIP is using. The AMD AXIS VIP must also be compatible with the specified
-parameters. The axis_definitions.svh header files has useful macros to create
+parameters. The axis_definitions.svh header file has useful macros to create
 and build the required parameter list.
 
 Variables
@@ -52,8 +52,8 @@ adi_axis_passthrough_agent variant
 Methods
 -------------------------------------------------------------------------------
 
-function new(input string name, virtual interface axis_vip_if vip_if, input adi_environment parent);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+function new(...);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creates the ADI AXIS Agent object. The name string is assigned to the instance
 as an Identifier when logging. The vip_if is a Virtual Interface that is

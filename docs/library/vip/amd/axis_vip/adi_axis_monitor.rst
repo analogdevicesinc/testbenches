@@ -24,8 +24,8 @@ receive captured data.
 Methods
 -------------------------------------------------------------------------------
 
-function new(input string name, input axis_monitor monitor, input adi_agent parent);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+function new(...);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creates the ADI AXIS Monitor object. The name string is assigned to the instance
 as an Identifier when logging. The axis_monitor references the monitor class

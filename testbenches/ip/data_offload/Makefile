@@ -20,6 +20,7 @@ LIB_DEPS += util_axis_fifo
 LIB_DEPS += axi_dmac
 LIB_DEPS += data_offload
 LIB_DEPS += util_do_ram
+LIB_DEPS += util_hbm
 
 # default test program
 TP := test_program

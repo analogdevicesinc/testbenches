@@ -6,7 +6,7 @@ package environment_pkg;
 
   import logger_pkg::*;
   import adi_common_pkg::*;
-
+  import adi_environment_pkg::*;
   import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
@@ -53,7 +53,7 @@ package environment_pkg;
     task configure(int bytes_to_generate);
       // ADC stub
       this.adc_src_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.adc_src_axis_agent.sequencer.add_xfer_descriptor(bytes_to_generate, 0, 0);
+      this.adc_src_axis_agent.sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
 
       // DAC stub
       this.dac_dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);

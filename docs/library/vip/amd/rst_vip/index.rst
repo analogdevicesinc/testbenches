@@ -6,6 +6,7 @@ Xilinx Reset Verification IP (VIP)
 Overview
 -------------------------------------------------------------------------------
 
+The ADI Testbenches are using the reset VIP from Xilinx.
 `[1] <https://docs.amd.com/v/u/en-US/pg298-rst-vip>`__
 
 

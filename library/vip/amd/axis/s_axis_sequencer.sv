@@ -63,7 +63,7 @@ package s_axis_sequencer_pkg;
     function new(
       input string name,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
 
       this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
@@ -105,7 +105,7 @@ package s_axis_sequencer_pkg;
     endfunction: get_high_time
 
     function void set_high_time_range(
-      input xil_axi4stream_uint high_time_min, 
+      input xil_axi4stream_uint high_time_min,
       input xil_axi4stream_uint high_time_max);
 
       this.high_time_min = high_time_min;
@@ -122,7 +122,7 @@ package s_axis_sequencer_pkg;
     endfunction
 
     function void set_low_time_range(
-      input xil_axi4stream_uint low_time_min, 
+      input xil_axi4stream_uint low_time_min,
       input xil_axi4stream_uint low_time_max);
 
       this.low_time_min = low_time_min;
@@ -169,7 +169,7 @@ package s_axis_sequencer_pkg;
       input string name,
       input axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
 
       this.driver = driver;
@@ -178,9 +178,9 @@ package s_axis_sequencer_pkg;
 
     virtual task user_gen_tready();
       axi4stream_ready_gen tready_gen;
-      
+
       tready_gen = this.driver.create_ready("TREADY");
-      
+
       tready_gen.set_ready_policy(this.mode);
 
       if (this.variable_ranges)

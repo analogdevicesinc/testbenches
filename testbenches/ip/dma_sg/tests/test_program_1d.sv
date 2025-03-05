@@ -49,7 +49,7 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 program test_program_1d;
 
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-  
+
   // Register accessors
   dmac_api m_dmac_api;
   dmac_api s_dmac_api;
@@ -80,7 +80,7 @@ program test_program_1d;
     #1us;
 
     //  -------------------------------------------------------
-    //  Test TX DMA and RX DMA in loopback 
+    //  Test TX DMA and RX DMA in loopback
     //  -------------------------------------------------------
 
     // Init test data with incrementing 16-bit value from 0 up to address 'h8000
@@ -149,7 +149,7 @@ program test_program_1d;
 
     base_env.stop();
     `TH.`DEVICE_CLK.inst.IF.stop_clock();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
@@ -216,7 +216,7 @@ program test_program_1d;
 
   endtask : do_sg_transfer
 
-  // Check captured data 
+  // Check captured data
   task check_data(bit [31:0] src_addr,
                   bit [31:0] dest_addr,
                   bit [31:0] length);

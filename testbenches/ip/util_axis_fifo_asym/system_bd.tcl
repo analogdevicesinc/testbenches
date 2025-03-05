@@ -95,7 +95,7 @@ ad_connect input_resetn util_axis_fifo_asym_DUT/s_axis_aresetn
 
 ad_connect output_clk util_axis_fifo_asym_DUT/m_axis_aclk
 ad_connect output_resetn util_axis_fifo_asym_DUT/m_axis_aresetn
-  
+
 ad_ip_instance axi4stream_vip input_axis [list \
   INTERFACE_MODE {MASTER} \
   HAS_TREADY {1} \

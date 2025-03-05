@@ -143,7 +143,7 @@ BUILD_CFGS := $(sort $(BUILD_CFGS))
 
 .PHONY: all clean $(BUILD_CFGS)
 
-all: $(BUILD_CFGS) 
+all: $(BUILD_CFGS)
 
 clean:
 	-rm -rf runs
@@ -177,8 +177,8 @@ $(foreach cfg_test, $(TESTS),\
 	$(eval $(call sim,$(cfg),$(test))) \
 )
 
-# Group sim targets based on env config so we can run easily all test 
-# from one configuration 
+# Group sim targets based on env config so we can run easily all test
+# from one configuration
 # e.g "make cfg1"  will run all tests associated to that configuration
 $(foreach cfg, $(BUILD_CFGS),\
 	$(eval $(cfg): $($(cfg))) \

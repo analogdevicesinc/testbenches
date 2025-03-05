@@ -40,7 +40,7 @@ package adi_vip_pkg;
   import logger_pkg::*;
   import adi_common_pkg::*;
   import adi_environment_pkg::*;
-  
+
   class adi_agent extends adi_component;
     function new(
       input string name,
@@ -50,7 +50,7 @@ package adi_vip_pkg;
     endfunction: new
   endclass: adi_agent
 
-  
+
   class adi_driver extends adi_component;
     function new(
       input string name,
@@ -60,7 +60,7 @@ package adi_vip_pkg;
     endfunction: new
   endclass: adi_driver
 
-  
+
   class adi_sequencer extends adi_component;
     function new(
       input string name,

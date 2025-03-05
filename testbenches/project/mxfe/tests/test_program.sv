@@ -80,7 +80,7 @@ program test_program;
                     `TH.`DDR_AXI.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     base_env.sys_reset();
 

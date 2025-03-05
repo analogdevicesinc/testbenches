@@ -199,7 +199,7 @@ program test_program;
     // Read status back
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_RX_BA+GetAddrs(JESD_RX_LINK_STATUS),
                             `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
-    
+
     base_env.stop();
 
     `TH.`SYS_CLK.inst.IF.stop_clock();

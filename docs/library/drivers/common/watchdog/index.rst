@@ -103,6 +103,6 @@ Other use-cases for the watchdog timer:
   system hanging. In this case it is more advisable have a watchdog timer
   stopped and started or reset each time a repetitive task is completed. This
   allows for a stricter watchdog timer value, which may stop a hanging
-  simulation sooner without waiting for the whole process to finish. 
+  simulation sooner without waiting for the whole process to finish.
 
 .. include:: ../../../../common/support.rst

@@ -107,7 +107,7 @@ program test_program();
     //=========================================================================
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     scb_env_0.start();
     scb_env_1.start();
@@ -129,7 +129,7 @@ program test_program();
 
     //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
-    
+
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     scb_env_0.run();
@@ -164,7 +164,7 @@ program test_program();
     scb_env_0.stop();
     scb_env_1.stop();
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
@@ -205,8 +205,8 @@ program test_program();
 
   // RX DMA transfer generator
   task rx_dma_transfer(
-    input dmac_api dmac, 
-    input int xfer_addr, 
+    input dmac_api dmac,
+    input int xfer_addr,
     input int xfer_length);
     dmac.set_flags('b110);
     dmac.set_dest_addr(xfer_addr);
@@ -216,8 +216,8 @@ program test_program();
 
   // TX DMA transfer generator
   task tx_dma_transfer(
-    input dmac_api dmac, 
-    input int xfer_addr, 
+    input dmac_api dmac,
+    input int xfer_addr,
     input int xfer_length);
     dmac.set_flags('b010); // enable TLAST, CYCLIC
     dmac.set_src_addr(xfer_addr);
@@ -227,7 +227,7 @@ program test_program();
 
   // Memory initialization function for a 8byte DATA_WIDTH AXI4 bus
   task init_mem_64(
-    input longint unsigned addr, 
+    input longint unsigned addr,
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin

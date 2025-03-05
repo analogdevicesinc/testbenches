@@ -141,17 +141,17 @@ program test_program;
     // JESD LINK TEST - DMA - EXT_SYNC
     // =======================
     jesd_link_test_ext_sync(0);
-    
+
     base_env.stop();
 
     `TH.`DRP_CLK.inst.IF.stop_clock();
     `TH.`REF_CLK.inst.IF.stop_clock();
     `TH.`DEVICE_CLK.inst.IF.stop_clock();
     `TH.`SYSREF_CLK.inst.IF.stop_clock();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
-    
+
   end
 
   // -----------------

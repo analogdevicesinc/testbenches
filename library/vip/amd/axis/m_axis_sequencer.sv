@@ -68,7 +68,7 @@ package m_axis_sequencer_pkg;
                                         // 1 - autogenerate descriptor based on the first descriptor from test until aborted
     protected bit keep_all; // 0 - bytes can be set to be invalid
                             // 1 - all bytes are always valid, data is generated only for the set part
-    
+
     protected int byte_count;
 
     protected int data_beat_delay; // delay in clock cycles
@@ -99,7 +99,7 @@ package m_axis_sequencer_pkg;
     function new(
       input string name,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
 
       this.trans = new();
@@ -282,7 +282,7 @@ package m_axis_sequencer_pkg;
       end
     endtask: generator
 
-    // function 
+    // function
     function void push_byte_for_stream(xil_axi4stream_data_byte byte_stream);
       this.byte_stream.push_back(byte_stream);
       ->>byte_stream_ev;
@@ -357,7 +357,7 @@ package m_axis_sequencer_pkg;
       input int data_beats_per_packet,
       input int gen_tlast = 1,
       input int gen_sync = 1);
-      
+
       add_xfer_descriptor_byte_count(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
     endfunction: add_xfer_descriptor_sample_count
 

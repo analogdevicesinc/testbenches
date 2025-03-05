@@ -50,7 +50,7 @@ program test_program;
   // Process variables
   process current_process;
   string current_process_random_state;
-  
+
 
   initial begin
 
@@ -73,9 +73,9 @@ program test_program;
     env.sys_reset();
 
     /* Add stimulus tasks */
-        
+
     env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

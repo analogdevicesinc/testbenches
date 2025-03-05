@@ -6,7 +6,7 @@ ADI AXI Agent (VIP)
 Overview
 -------------------------------------------------------------------------------
 
-The ADI AXI Agent uses the AMD (Xilinx) AXI VIP at its core with added 
+The ADI AXI Agent uses the AMD (Xilinx) AXI VIP at its core with added
 sequencer, monitor and wrapper class. Has a master, slave and passthrough
 variant. Provides functions to start, stop and run the classes within. Its
 purpose is to create and contain everything under a single construct and not

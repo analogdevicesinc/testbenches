@@ -294,7 +294,7 @@ package adi_spi_vip_pkg;
     endfunction
   endclass
 
-  
+
   class adi_spi_sequencer extends adi_sequencer;
 
     protected adi_spi_driver driver;

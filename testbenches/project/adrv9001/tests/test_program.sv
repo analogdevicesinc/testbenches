@@ -194,9 +194,9 @@ program test_program;
         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(1));
       dma_test_ch2();
     end
-    
+
     base_env.stop();
-    
+
     `TH.`SSI_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);

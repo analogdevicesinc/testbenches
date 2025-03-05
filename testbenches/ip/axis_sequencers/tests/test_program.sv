@@ -73,7 +73,7 @@ program test_program;
                         `TH.`DST_AXIS.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     axis_seq_env.start();
 
@@ -144,7 +144,7 @@ program test_program;
     send_data_wd.stop();
 
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

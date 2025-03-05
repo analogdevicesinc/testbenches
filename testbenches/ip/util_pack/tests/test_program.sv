@@ -61,7 +61,7 @@ program test_program;
 
   dmac_api dmac_tx;
   dmac_api dmac_rx;
-  
+
   int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**int($clog2(`CHANNELS));
 
   initial begin
@@ -96,7 +96,7 @@ program test_program;
 
     `INFO(("Bring up IPs from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
-    
+
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     pack_env.run();
@@ -126,7 +126,7 @@ program test_program;
 
     pack_env.stop();
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

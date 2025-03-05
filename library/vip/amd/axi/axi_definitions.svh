@@ -84,7 +84,7 @@
                                 n``_VIP_HAS_BRESP,\
                                 n``_VIP_HAS_RRESP,\
                                 n``_VIP_HAS_ARESETN
-                              
+
 `define AXI_VIP_IF_PARAMS(n)  n``_VIP_PROTOCOL,\
                               n``_VIP_ADDR_WIDTH,\
                               n``_VIP_WDATA_WIDTH,\

@@ -48,7 +48,7 @@ package s_axi_sequencer_pkg;
     function new(
       input string name,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
     endfunction: new
 
@@ -62,14 +62,14 @@ package s_axi_sequencer_pkg;
     virtual task set_byte_in_mem(
       input xil_axi_ulong addr,
       input bit [7:0] data);
-      
+
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: set_byte_in_mem
 
     virtual task verify_byte(
       input xil_axi_ulong addr,
       input bit [7:0] refdata);
-      
+
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: verify_byte
 
@@ -86,7 +86,7 @@ package s_axi_sequencer_pkg;
       input adi_agent parent = null);
 
       super.new(name, parent);
-      
+
       this.mem_model = mem_model;
     endfunction: new
 
@@ -123,7 +123,7 @@ package s_axi_sequencer_pkg;
     task verify_byte(
       input xil_axi_ulong addr,
       input bit [7:0] refdata);
-      
+
       bit [7:0] data;
 
       get_byte_from_mem (addr, data);

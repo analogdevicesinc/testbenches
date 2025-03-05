@@ -80,7 +80,7 @@ program test_program_tr_queue;
     #1us;
 
     //  -------------------------------------------------------
-    //  Test TX DMA and RX DMA in loopback 
+    //  Test TX DMA and RX DMA in loopback
     //  -------------------------------------------------------
 
     // Init test data
@@ -155,7 +155,7 @@ program test_program_tr_queue;
 
     base_env.stop();
     `TH.`DEVICE_CLK.inst.IF.stop_clock();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
@@ -234,7 +234,7 @@ program test_program_tr_queue;
 
   endtask : do_sg_transfer
 
-  // Check captured data 
+  // Check captured data
   task check_data(bit [31:0] src_addr,
                   bit [31:0] dest_addr,
                   bit [31:0] length);

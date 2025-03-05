@@ -38,20 +38,20 @@
 `include "utils.svh"
 
 module system_tb();
- 
+
   localparam RX_SAMPLES_PER_CHANNEL = (`RX_JESD_L*`LL_OUT_BYTES*8) / `RX_JESD_M / `RX_JESD_NP;
   localparam RX_DMA_NP = `RX_JESD_NP == 12 ? 16 : `RX_JESD_NP;
 
   localparam RX_OS_SAMPLES_PER_CHANNEL = (`RX_OS_JESD_L*`LL_OUT_BYTES1*8) / `RX_OS_JESD_M / `RX_OS_JESD_NP;
   localparam RX_OS_DMA_NP = `RX_OS_JESD_NP == 12 ? 16 : `RX_OS_JESD_NP;
-  
+
   reg [`RX_JESD_M*RX_SAMPLES_PER_CHANNEL*RX_DMA_NP-1:0] tx_ex_dac_data = 'h0;
   reg [`RX_OS_JESD_M*RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP-1:0] tx_os_ex_dac_data = 'h0;
 
   wire rx_sync;
   wire tx_sync;
   wire tx_os_sync;
-  
+
   wire [3:0] ex2dut_serial_lane_n;
   wire [3:0] ex2dut_serial_lane_p;
 
@@ -99,7 +99,7 @@ module system_tb();
     .rx_data1_2_p(dut2ex_serial_lane_p[2]),
     .rx_data1_3_n(dut2ex_serial_lane_n[3]),
     .rx_data1_3_p(dut2ex_serial_lane_p[3]),
-    
+
     .tx_data1_0_n(ex2dut_serial_lane_n[0]),
     .tx_data1_0_p(ex2dut_serial_lane_p[0]),
     .tx_data1_1_n(ex2dut_serial_lane_n[1]),
@@ -118,7 +118,7 @@ module system_tb();
     .rx_data_2_p(ex2dut_serial_lane_p[2]),
     .rx_data_3_n(ex2dut_serial_lane_n[3]),
     .rx_data_3_p(ex2dut_serial_lane_p[3]),
-       
+
     .tx_data_0_n(dut2ex_serial_lane_n[0]),
     .tx_data_0_p(dut2ex_serial_lane_p[0]),
     .tx_data_1_n(dut2ex_serial_lane_n[3]),
@@ -127,7 +127,7 @@ module system_tb();
     .tx_data_2_p(dut2ex_serial_lane_p[2]),
     .tx_data_3_n(dut2ex_serial_lane_n[1]),
     .tx_data_3_p(dut2ex_serial_lane_p[1]),
-    
+
     .dac_data_0(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*0 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
     .dac_data_1(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*1 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
     .dac_data_2(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*2 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
@@ -137,7 +137,7 @@ module system_tb();
     .dac_os_data_1(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*1 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
     .dac_os_data_2(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*2 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
     .dac_os_data_3(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*3 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
-    
+
     .dac_fir_filter_active (1'b0),
     .adc_fir_filter_active (1'b0)
   );

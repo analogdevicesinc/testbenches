@@ -42,7 +42,7 @@ package adi_common_pkg;
   class adi_reporter;
     string name;
     adi_reporter parent;
-    
+
     function new(
       input string name,
       input adi_reporter parent = null);

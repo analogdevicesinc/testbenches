@@ -14,7 +14,7 @@ Xilinx AXI Verification IP (VIP)
 Overview
 -------------------------------------------------------------------------------
 
-The ADI AXI Agent uses the AMD (Xilinx) AXI VIP at its core with added 
+The ADI AXI Agent uses the AMD (Xilinx) AXI VIP at its core with added
 sequencer, monitor and wrapper class.
 `[1] <https://docs.amd.com/r/en-US/pg267-axi-vip>`__
 

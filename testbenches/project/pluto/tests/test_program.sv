@@ -463,10 +463,10 @@ program test_program;
 
     #10us;
 
-    axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL), 
-               `SET_DMAC_CONTROL_ENABLE(0)); 
-    axi_write (`RX_DMA_BA+GetAddrs(DMAC_CONTROL), 
-               `SET_DMAC_CONTROL_ENABLE(0)); 
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL),
+               `SET_DMAC_CONTROL_ENABLE(0));
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_CONTROL),
+               `SET_DMAC_CONTROL_ENABLE(0));
 
     check_captured_data(
       .address (`DDR_BA+'h00002000),
@@ -493,7 +493,7 @@ program test_program;
     //  -------------------------------------------------------
     //  Configure the TX/RX Channels
     //  -------------------------------------------------------
-  
+
     // Select DMA as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));

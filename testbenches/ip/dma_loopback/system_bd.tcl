@@ -46,7 +46,7 @@ set device_clk device_clk_vip/clk_out
 
 #  ------------------
 #
-# Blocks under test 
+# Blocks under test
 #
 #  ------------------
 

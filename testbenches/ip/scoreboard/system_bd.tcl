@@ -91,7 +91,7 @@ for {set i 0} {$i < 2} {incr i} {
     DMA_DATA_WIDTH_SRC 64 \
     DMA_DATA_WIDTH_DEST $dac_offload_src_dwidth \
   ]
-  
+
   ad_data_offload_create RX_DUT_${i} \
                          0 \
                          $adc_offload_mem_type \
@@ -99,7 +99,7 @@ for {set i 0} {$i < 2} {incr i} {
                          $adc_offload_src_dwidth \
                          $adc_offload_dst_dwidth \
                          $plddr_offload_data_width
-  
+
   ad_data_offload_create TX_DUT_${i} \
                          1 \
                          $dac_offload_mem_type \
@@ -107,18 +107,18 @@ for {set i 0} {$i < 2} {incr i} {
                          $dac_offload_src_dwidth \
                          $dac_offload_dst_dwidth \
                          $plddr_offload_data_width
-  
+
   set BA 0x50000000
   ad_cpu_interconnect [expr ${BA} + 0x00000 + $i*0x40000] i_rx_dmac_${i}
   ad_cpu_interconnect [expr ${BA} + 0x10000 + $i*0x40000] i_tx_dmac_${i}
   ad_cpu_interconnect [expr ${BA} + 0x20000 + $i*0x40000] RX_DUT_${i}
   ad_cpu_interconnect [expr ${BA} + 0x30000 + $i*0x40000] TX_DUT_${i}
-  
+
   adi_sim_add_define "RX_DMA_BA_${i}=[format "%d" [expr ${BA} + 0x00000 + $i*0x40000]]"
   adi_sim_add_define "TX_DMA_BA_${i}=[format "%d" [expr ${BA} + 0x10000 + $i*0x40000]]"
   adi_sim_add_define "RX_DOFF_BA_${i}=[format "%d" [expr ${BA} + 0x20000 + $i*0x40000]]"
   adi_sim_add_define "TX_DOFF_BA_${i}=[format "%d" [expr ${BA} + 0x30000 + $i*0x40000]]"
-  
+
   ad_ip_instance axi4stream_vip adc_src_axis_${i} [list \
     INTERFACE_MODE {MASTER} \
     HAS_TREADY {1} \
@@ -126,27 +126,27 @@ for {set i 0} {$i < 2} {incr i} {
     TDATA_NUM_BYTES $adc_data_path_width \
   ]
   adi_sim_add_define "ADC_SRC_AXIS_${i}=adc_src_axis_${i}"
-  
+
   ad_connect adc_src_axis_${i}/m_axis RX_DUT_${i}/s_axis
   ad_connect RX_DUT_${i}/m_axis i_rx_dmac_${i}/s_axis
-  
+
   ad_connect sys_dma_clk adc_src_axis_${i}/aclk
   ad_connect sys_dma_resetn adc_src_axis_${i}/aresetn
-  
+
   ad_connect sys_dma_clk RX_DUT_${i}/s_axis_aclk
   ad_connect sys_dma_resetn RX_DUT_${i}/s_axis_aresetn
   ad_connect sys_cpu_clk RX_DUT_${i}/m_axis_aclk
   ad_connect sys_cpu_resetn RX_DUT_${i}/m_axis_aresetn
-  
+
   ad_connect sys_cpu_clk i_rx_dmac_${i}/s_axis_aclk
   ad_connect sys_mem_clk i_rx_dmac_${i}/m_dest_axi_aclk
   ad_connect sys_mem_resetn i_rx_dmac_${i}/m_dest_axi_aresetn
-  
+
   ad_connect i_rx_dmac_${i}/s_axis_xfer_req RX_DUT_${i}/init_req
   ad_connect gnd RX_DUT_${i}/sync_ext
 
   ad_mem_hp0_interconnect sys_mem_clk i_rx_dmac_${i}/m_dest_axi
-  
+
   ad_ip_instance axi4stream_vip dac_dst_axis_${i} [list \
     INTERFACE_MODE {SLAVE} \
     TDATA_NUM_BYTES $dac_data_path_width \
@@ -154,22 +154,22 @@ for {set i 0} {$i < 2} {incr i} {
     HAS_TKEEP {0} \
   ]
   adi_sim_add_define "DAC_DST_AXIS_${i}=dac_dst_axis_${i}"
-  
+
   ad_connect sys_dma_clk dac_dst_axis_${i}/aclk
   ad_connect sys_dma_resetn dac_dst_axis_${i}/aresetn
-  
+
   ad_connect sys_dma_clk TX_DUT_${i}/m_axis_aclk
   ad_connect sys_dma_resetn TX_DUT_${i}/m_axis_aresetn
   ad_connect sys_cpu_clk TX_DUT_${i}/s_axis_aclk
   ad_connect sys_cpu_resetn TX_DUT_${i}/s_axis_aresetn
-  
+
   ad_connect sys_cpu_clk i_tx_dmac_${i}/m_axis_aclk
   ad_connect sys_mem_clk i_tx_dmac_${i}/m_src_axi_aclk
   ad_connect sys_mem_resetn i_tx_dmac_${i}/m_src_axi_aresetn
-  
+
   ad_connect TX_DUT_${i}/m_axis dac_dst_axis_${i}/s_axis
   ad_connect TX_DUT_${i}/s_axis i_tx_dmac_${i}/m_axis
-  
+
   ad_connect i_tx_dmac_${i}/m_axis_xfer_req TX_DUT_${i}/init_req
   ad_connect gnd TX_DUT_${i}/sync_ext
 

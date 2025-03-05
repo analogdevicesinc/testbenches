@@ -89,7 +89,7 @@ program test_program;
   xcvr dut_tx_xcvr;
 
   initial begin
-    
+
     //creating environment
     base_env = new("Base Environment",
                     `TH.`SYS_CLK.inst.IF,
@@ -227,7 +227,7 @@ program test_program;
 
     ex_tx_os_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000);
-    
+
     dut_tx_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000, '{QPLL0, QPLL1});
 
@@ -236,7 +236,7 @@ program test_program;
 
     dut_rx_os_xcvr.setup_clocks(lane_rate,
                             `REF_CLK_RATE*1000000, '{CPLL});
-    
+
     tx_tpl_test(.use_dds(0));
     rx_tpl_test(.use_dds (0));
     rx_os_tpl_test(.use_dds (0));
@@ -324,11 +324,11 @@ program test_program;
     ex_rx_ll.wait_link_up();
 
     #10us;
-    
+
     ex_rx_xcvr.down();
     dut_tx_xcvr.down();
   endtask
- 
+
   task rx_tpl_test(int use_dds);
     for (int i = 0; i < `RX_JESD_M; i++) begin
       if (use_dds) begin
@@ -357,7 +357,7 @@ program test_program;
                        `SET_DAC_COMMON_REG_RSTN_RSTN(1));
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA+GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_RSTN(1));
-    
+
     // -----------------------
     // bringup DUT RX path
     // -----------------------
@@ -372,7 +372,7 @@ program test_program;
     dut_rx_ll.wait_link_up();
 
     #10us;
-    
+
     // Configure RX DMA
     if (!use_dds) begin
       base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_CONTROL),
@@ -385,16 +385,16 @@ program test_program;
                          `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00001000));
       base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-  
+
       #5us;
-  
+
       check_captured_data(
         .address (`DDR_BA+'h00001000),
         .length (992),
         .step (1),
         .max_sample(2048)
       );
-      
+
       #10us;
     end
 
@@ -445,7 +445,7 @@ program test_program;
     dut_rx_os_ll.wait_link_up();
 
     #10us;
-    
+
     // Configure RX OBS DMA
     if (!use_dds) begin
       base_env.mng.sequencer.RegWrite32(`RX_OS_DMA_BA+GetAddrs(DMAC_CONTROL),
@@ -458,9 +458,9 @@ program test_program;
                          `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00001000));
       base_env.mng.sequencer.RegWrite32(`RX_OS_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-  
+
       #5us;
-  
+
       check_captured_data(
         .address (`DDR_BA+'h00001000),
         .length (992),
@@ -490,17 +490,17 @@ program test_program;
       if (i==0) begin
         first = captured_word[15:8];
         second = captured_word[7:0];
-        
+
       end else begin
-        second = (second + 8'h02); 
+        second = (second + 8'h02);
         reference_word = {first, (second+ 8'h01), first, second};
 
         if (second == 8'hfe) begin
           first = (first + 8'h01);
         end
-      
+
         `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word), ADI_VERBOSITY_LOW);
-        
+
         if (i > 20 && captured_word !== reference_word) begin
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end

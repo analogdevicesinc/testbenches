@@ -67,7 +67,7 @@ program test_program;
                     `TH.`DDR_AXI.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     start_clocks();
     base_env.sys_reset();
@@ -79,7 +79,7 @@ program test_program;
     s_dmac_api.probe();
 
     //  -------------------------------------------------------
-    //  Test TX DMA and RX DMA in loopback 
+    //  Test TX DMA and RX DMA in loopback
     //  -------------------------------------------------------
 
     // Init test data
@@ -102,7 +102,7 @@ program test_program;
     );
 
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
@@ -137,7 +137,7 @@ program test_program;
   endtask
 
 
-  // Check captured data 
+  // Check captured data
   task check_data(bit [31:0] src_addr,
                   bit [31:0] dest_addr,
                   bit [31:0] length);

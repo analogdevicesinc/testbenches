@@ -42,7 +42,7 @@ package adi_api_pkg;
   import m_axi_sequencer_pkg::*;
 
   class adi_api extends adi_component;
-  
+
     protected m_axi_sequencer_base bus;
     protected bit [31:0] base_address;
 
@@ -70,7 +70,7 @@ package adi_api_pkg;
       {ver_major, ver_minor, ver_patch} = val;
       this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
     endtask
-    
+
     task axi_read(
       input  [31:0] addr,
       output [31:0] data);
@@ -94,7 +94,7 @@ package adi_api_pkg;
 
   endclass: adi_api
 
-  
+
   class adi_regmap extends adi_component;
     function new(
       input string name,

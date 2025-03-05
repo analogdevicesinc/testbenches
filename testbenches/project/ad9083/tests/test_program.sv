@@ -59,7 +59,7 @@ parameter TX_OUT_BYTES = 8;
 program test_program;
 
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-  
+
   bit [31:0] val;
   int link_clk_freq;
   int device_clk_freq;
@@ -82,7 +82,7 @@ program test_program;
                     `TH.`DDR_AXI.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
 
     link_clk_freq = lane_rate/40;
@@ -270,8 +270,8 @@ program test_program;
                        `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA)); // SRC_ADDRESS
     base_env.mng.sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer
-                       
-    
+
+
     // Configure RX DMA
     base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_CONTROL),
                        `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
@@ -284,7 +284,7 @@ program test_program;
                        `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00001000)); // DEST_ADDRESS
     base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer
-                       
+
     //LINK ENABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
@@ -308,7 +308,7 @@ program test_program;
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_STATUS),
                             `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(1)|
                             `SET_JESD_TX_LINK_STATUS_STATUS_STATE(3));
-    
+
     #5us;
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
                        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(0));
@@ -357,7 +357,7 @@ program test_program;
                        `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00002000)); // DEST_ADDRESS
     base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
-                       
+
     //LINK ENABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
@@ -372,7 +372,7 @@ program test_program;
       .step (1),
       .max_sample(496)
     );
-    
+
     base_env.stop();
 
     `TH.`DRP_CLK.inst.IF.stop_clock();

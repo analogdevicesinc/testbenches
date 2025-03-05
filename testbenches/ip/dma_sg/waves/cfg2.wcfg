@@ -5,7 +5,7 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
-            
+
             <top_module name="adi_regmap_dmac_pkg" />
             <top_module name="adi_regmap_pkg" />
             <top_module name="axi4stream_vip_pkg" />
@@ -17,7 +17,7 @@
             <top_module name="ipif_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
-            
+
             <top_module name="s_axi_sequencer_pkg" />
             <top_module name="std" />
             <top_module name="system_tb" />

@@ -121,7 +121,7 @@ package adi_regmap_pkg;
     return register.addr;
   endfunction;
 
-  function int GetResetValue(reg_t register, 
+  function int GetResetValue(reg_t register,
                              string field);
     return register.fields[field].reset_value;
   endfunction;

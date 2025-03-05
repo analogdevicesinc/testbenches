@@ -140,4 +140,4 @@ adi_sim_add_define "TDD_BA=[format "%d" ${TDD}]"
 
 if {$TDD_SUPPORT == 1} {
   set_property offset $TDD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_tdd_0}]
-}  
+}

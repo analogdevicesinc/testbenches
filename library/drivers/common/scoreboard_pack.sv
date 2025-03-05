@@ -105,7 +105,7 @@ package scoreboard_pack_pkg;
             end
           end
         end
-      end 
+      end
 
       if ((this.subscriber_source.get_size() == 0) &&
           (this.subscriber_sink.get_size() == 0)) begin

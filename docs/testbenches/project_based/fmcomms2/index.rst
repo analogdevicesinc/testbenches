@@ -33,12 +33,12 @@ Configuration parameters and modes
 
 There are no project parameters that can be configured in the testbench
 configuration files.
-   
+
 Build parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 There are no build parameters for this testbench.
- 
+
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -49,7 +49,7 @@ The following configuration file is available:
    |                       +----------+---------------+
    |                       | ---                      |
    +=======================+=============+============+
-   | cfg1                  | ---                      | 
+   | cfg1                  | ---                      |
    +-----------------------+-------------+------------+
 
 Tests
@@ -283,7 +283,7 @@ Testbench specific dependencies:
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
-   
+
    * - SV dependency name
      - Source code link
      - Documentation link
@@ -301,7 +301,7 @@ Testbench specific dependencies:
      - ---
    * - ADI_REGMAP_DAC_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_dac_pkg.sv`
-     - ---     
+     - ---
    * - DMA_TRANS
      - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
      - ---

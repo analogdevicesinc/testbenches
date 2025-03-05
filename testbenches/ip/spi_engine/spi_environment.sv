@@ -45,7 +45,7 @@ package spi_environment_pkg;
   import adi_axis_agent_pkg::*;
   import adi_spi_vip_pkg::*;
   import adi_spi_vip_if_base_pkg::*;
-  
+
   `ifdef DEF_SDO_STREAMING
     import `PKGIFY(test_harness, sdo_src)::*;
   `endif

@@ -3,7 +3,7 @@ Common with most testbenches:
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
-   
+
    * - SV dependency name
      - Source code link
      - Documentation link

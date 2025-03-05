@@ -121,7 +121,7 @@ program test_sleep_delay (
     spi_env.spi_agent.sequencer.flush_send();
   endtask
 
-  
+
   // --------------------------
   // Main procedure
   // --------------------------
@@ -135,7 +135,7 @@ program test_sleep_delay (
                       `TH.`SYS_RST.inst.IF,
                       `TH.`MNG_AXI.inst.IF,
                       `TH.`DDR_AXI.inst.IF);
-    
+
     spi_env = new("SPI Engine Environment",
                   `ifdef DEF_SDO_STREAMING
                     `TH.`SDO_SRC.inst.IF,

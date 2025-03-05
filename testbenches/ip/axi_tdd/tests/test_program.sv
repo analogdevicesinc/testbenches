@@ -164,7 +164,7 @@ program test_program;
       ch_off[i] = k;
       j = j+8;
       k = k+16;
-    end 
+    end
 
     for (int i=0; i<32; i++) begin
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
@@ -172,7 +172,7 @@ program test_program;
 
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
                          `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(ch_off[i]));
-    end 
+    end
 
 
     // Read back the values; unimplemented channels should not store these values
@@ -204,9 +204,9 @@ program test_program;
       end else begin
         success_count++;
       end
-    end 
+    end
 
-    // Read the status register to validate the current state 
+    // Read the status register to validate the current state
     base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b00) begin
@@ -231,7 +231,7 @@ program test_program;
     @(posedge waiting_state);
     delay_start = $time;
 
-    // Read the status register to validate the current state 
+    // Read the status register to validate the current state
     repeat (8) @(posedge `TH.dut_tdd.inst.up_clk);
     base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
@@ -274,7 +274,7 @@ program test_program;
     //*******//
     // ARMED //
     //*******//
-    // Read the status register to validate the current state 
+    // Read the status register to validate the current state
     repeat (8) @(posedge `TH.dut_tdd.inst.up_clk);
     base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
@@ -336,7 +336,7 @@ program test_program;
       ch_off[i] = k;
       j = j+8;
       k = k-8;
-    end 
+    end
 
     for (int i=0; i<32; i++) begin
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
@@ -344,7 +344,7 @@ program test_program;
 
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
                          `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(ch_off[i]));
-    end 
+    end
 
     // Read back the values; unimplemented channels should not store these values
     for (int i=0; i<32; i++) begin
@@ -375,7 +375,7 @@ program test_program;
       end else begin
         success_count++;
       end
-    end 
+    end
 
 
     // Enable the module; use external sync for transfer triggering

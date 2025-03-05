@@ -41,15 +41,15 @@ package watchdog_pkg;
   import adi_common_pkg::*;
 
   class watchdog extends adi_component;
-    
+
     protected event stop_event;
     protected bit [31:0] timer;
     protected string message;
 
-    
+
     function new(
       input string name,
-      input bit [31:0] timer, 
+      input bit [31:0] timer,
       input string message,
       input adi_component parent = null);
 

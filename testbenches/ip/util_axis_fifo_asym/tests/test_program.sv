@@ -73,7 +73,7 @@ program test_program ();
                   `TH.`OUTPUT_AXIS.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     uaf_env.start();
 
@@ -93,7 +93,7 @@ program test_program ();
     // stimulus
     repeat($urandom_range(5,10)) begin
       send_data_wd.reset();
-      
+
       if ((!`TKEEP_EN || !`TLAST_EN) && `INPUT_WIDTH < `OUTPUT_WIDTH) begin
         repeat($urandom_range(1,5)) begin
           uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128)*`OUTPUT_WIDTH/`INPUT_WIDTH, `TLAST_EN, 0);
@@ -103,7 +103,7 @@ program test_program ();
           uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_byte_count($urandom_range(1,1024), `TLAST_EN, 0);
         end
       end
-      
+
       #($urandom_range(1,10)*1us);
 
       uaf_env.input_axis_agent.sequencer.clear_descriptor_queue();
@@ -120,7 +120,7 @@ program test_program ();
 
     uaf_env.stop();
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

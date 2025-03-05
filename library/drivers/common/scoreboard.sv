@@ -46,7 +46,7 @@ package scoreboard_pkg;
     class subscriber_class extends adi_subscriber #(data_type);
 
       protected scoreboard #(data_type) scoreboard_ref;
-      
+
       protected data_type byte_stream [$];
 
       function new(
@@ -64,7 +64,7 @@ package scoreboard_pkg;
         while (data.size()) begin
           this.byte_stream.push_back(data.pop_front());
         end
-        
+
         if (this.scoreboard_ref.get_enabled()) begin
           this.scoreboard_ref.compare_transaction();
         end
@@ -121,7 +121,7 @@ package scoreboard_pkg;
     // run task
     task run();
       this.enabled = 1;
-      
+
       this.info($sformatf("Scoreboard enabled"), ADI_VERBOSITY_MEDIUM);
     endtask: run
 
@@ -170,7 +170,7 @@ package scoreboard_pkg;
 
       if (this.enabled == 0)
         return;
-      
+
       while ((this.subscriber_source.get_size() > 0) &&
             (this.subscriber_sink.get_size() > 0)) begin
         byte_streams_empty_sig = 0;

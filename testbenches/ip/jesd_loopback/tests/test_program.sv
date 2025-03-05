@@ -142,10 +142,10 @@ program test_program;
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_RX_BA + 'h2c4, 1);
 
     // =======================
-    // TPL SYNC control test 
+    // TPL SYNC control test
     // =======================
     arm_disarm_test();
-    
+
     base_env.stop();
     `TH.`REF_CLK.inst.IF.stop_clock();
     `TH.`DEVICE_CLK.inst.IF.stop_clock();
@@ -313,27 +313,27 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),2);
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,2);
     #1us;
-    
+
     // Check if armed
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(1));
     base_env.mng.sequencer.RegReadVerify32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
                             `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(1));
-                            
+
     // DisArm external sync
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),4);
-    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,4);    
+    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,4);
     #1us;
-                              
+
     // Check if disarmed
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(0));
     base_env.mng.sequencer.RegReadVerify32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
-                            `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(0));                           
+                            `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(0));
     `INFO(("======================="), ADI_VERBOSITY_LOW);
     `INFO(("  ARM-DISARM TEST DONE "), ADI_VERBOSITY_LOW);
     `INFO(("======================="), ADI_VERBOSITY_LOW);
-                            
+
   endtask : arm_disarm_test
 
 

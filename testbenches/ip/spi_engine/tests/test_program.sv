@@ -137,7 +137,7 @@ program test_program (
                       `TH.`SYS_RST.inst.IF,
                       `TH.`MNG_AXI.inst.IF,
                       `TH.`DDR_AXI.inst.IF);
-    
+
     spi_env = new("SPI Engine Environment",
                   `ifdef DEF_SDO_STREAMING
                     `TH.`SDO_SRC.inst.IF,

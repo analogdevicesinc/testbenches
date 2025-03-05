@@ -42,13 +42,13 @@ package m_axi_sequencer_pkg;
   import logger_pkg::*;
   import adi_vip_pkg::*;
 
-  
+
   class m_axi_sequencer_base extends adi_sequencer;
 
     function new(
       input string name,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
     endfunction: new
 
@@ -94,7 +94,7 @@ package m_axi_sequencer_pkg;
 
       this.wr_driver = wr_driver;
       this.rd_driver = rd_driver;
-      
+
       reader_s = new(1);
       writer_s = new(1);
     endfunction: new

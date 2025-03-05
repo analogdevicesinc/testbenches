@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2018(c) Analog Devices, Inc.
+## Copyright (C) 2018 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -21,12 +21,9 @@ LIB_DEPS += ad463x_data_capture
 LIB_DEPS += axi_dmac
 LIB_DEPS += util_pack/util_upack2
 LIB_DEPS += util_pack/util_cpack2
-LIB_DEPS += axi_sysid
-LIB_DEPS += sysid_rom
 LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_i2s_adi
 LIB_DEPS += axi_pwm_gen
-LIB_DEPS += axi_sysid
 LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_axis_reorder
 LIB_DEPS += spi_engine/spi_engine_execution

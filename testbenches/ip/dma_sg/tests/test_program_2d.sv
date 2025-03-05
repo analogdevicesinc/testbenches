@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import logger_pkg::*;
@@ -51,7 +49,7 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 program test_program_2d;
 
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-  
+
   // Register accessors
   dmac_api m_dmac_api;
   dmac_api s_dmac_api;
@@ -82,7 +80,7 @@ program test_program_2d;
     #1us;
 
     //  -------------------------------------------------------
-    //  Test TX DMA and RX DMA in loopback 
+    //  Test TX DMA and RX DMA in loopback
     //  -------------------------------------------------------
 
     // Init test data with sections of incrementing values up to address+'h1000, followed by buffers of 0s up to address+'h200
@@ -144,7 +142,8 @@ program test_program_2d;
     );
 
     base_env.stop();
-    
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
@@ -211,7 +210,7 @@ program test_program_2d;
 
   endtask : do_sg_transfer
 
-  // Check captured data 
+  // Check captured data
   task check_data(bit [31:0] src_addr,
                   bit [31:0] dest_addr,
                   bit [31:0] length);

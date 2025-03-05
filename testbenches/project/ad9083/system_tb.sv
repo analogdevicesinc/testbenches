@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2018 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -43,7 +43,7 @@ module system_tb();
   wire ref_clk;
   wire device_clk;
   wire sysref;
-  
+
   wire data_0_n;
   wire data_0_p;
   wire data_1_n;
@@ -57,7 +57,7 @@ module system_tb();
 
   test_harness `TH (
     .ref_clk_out    (ref_clk),
-    .rx_ref_clk_0   (ref_clk), 
+    .rx_ref_clk_0   (ref_clk),
     .vip_ref_clk    (ref_clk),
 
     .device_clk_out (device_clk),
@@ -70,7 +70,7 @@ module system_tb();
 
     .rx_sync_1_0    (sync),            //-dir O
     .tx_sync_0      (sync),            //-dir I
-    
+
     .rx_data_1_0_n    (data_0_n),        //-dir I
     .rx_data_1_0_p    (data_0_p),        //-dir I
     .rx_data_1_1_n    (data_1_n),        //-dir I

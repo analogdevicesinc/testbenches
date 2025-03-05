@@ -20,7 +20,7 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
   global use_smartconnect
   global ad_hdl_dir
   global ad_tb_dir
-  
+
   # Create project
   create_project ${project_name} ./runs/${project_name} -part $part -force
 

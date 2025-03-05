@@ -14,7 +14,7 @@ Xilinx AXIS Stream Verification IP (VIP)
 Overview
 --------------------------------------------------------------------------------
 
-The ADI AXIS Agent VIP uses the AMD (Xilinx) AXIS VIP at its core with added 
+The ADI AXIS Agent VIP uses the AMD (Xilinx) AXIS VIP at its core with added
 sequencer, monitor and wrapper class.
 `[1] <https://docs.amd.com/v/u/en-US/pg277-axi4stream-vip>`__
 

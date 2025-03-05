@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import test_harness_env_pkg::*;
@@ -118,7 +116,7 @@ program test_program;
 
     // Set source synchronous interface clock frequency
     `TH.`SSI_CLK.inst.IF.set_clk_frq(.user_frequency(61440000));
-    `TH.`SSI_CLK.inst.IF.start_clock;
+    `TH.`SSI_CLK.inst.IF.start_clock();
 
     // Initial system reset
     base_env.sys_reset();
@@ -150,6 +148,7 @@ program test_program;
     tdd_test();
 
     base_env.stop();
+    `TH.`SSI_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();
@@ -464,10 +463,10 @@ program test_program;
 
     #10us;
 
-    axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL), 
-               `SET_DMAC_CONTROL_ENABLE(0)); 
-    axi_write (`RX_DMA_BA+GetAddrs(DMAC_CONTROL), 
-               `SET_DMAC_CONTROL_ENABLE(0)); 
+    axi_write (`TX_DMA_BA+GetAddrs(DMAC_CONTROL),
+               `SET_DMAC_CONTROL_ENABLE(0));
+    axi_write (`RX_DMA_BA+GetAddrs(DMAC_CONTROL),
+               `SET_DMAC_CONTROL_ENABLE(0));
 
     check_captured_data(
       .address (`DDR_BA+'h00002000),
@@ -494,7 +493,7 @@ program test_program;
     //  -------------------------------------------------------
     //  Configure the TX/RX Channels
     //  -------------------------------------------------------
-  
+
     // Select DMA as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
               `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));

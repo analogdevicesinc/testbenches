@@ -33,12 +33,12 @@ Configuration parameters and modes
 
 There are no project parameters that can be configured in the testbench
 configuration files.
-   
+
 Build parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 There are no build parameters for this testbench.
- 
+
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -49,7 +49,7 @@ The following configuration file is available:
    |                       +----------+---------------+
    |                       | ---                      |
    +=======================+=============+============+
-   | cfg1                  | ---                      | 
+   | cfg1                  | ---                      |
    +-----------------------+-------------+------------+
 
 Tests
@@ -281,7 +281,7 @@ HDL related dependencies
      - :external+hdl:ref:`axi_dmac`
    * - AXI_TDD
      - :git-hdl:`library/axi_tdd`
-     - :external+hdl:ref:`axi_tdd`	 
+     - :external+hdl:ref:`axi_tdd`
    * - UTIL_CPACK2
      - :git-hdl:`library/util_pack/util_cpack2`
      - :external+hdl:ref:`util_cpack2`
@@ -299,7 +299,7 @@ Testbench specific dependencies:
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
-   
+
    * - SV dependency name
      - Source code link
      - Documentation link
@@ -320,14 +320,14 @@ Testbench specific dependencies:
      - ---
    * - ADI_REGMAP_TDD_GEN_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_tdd_gen_pkg.sv`
-     - ---             
+     - ---
    * - DMA_TRANS
      - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
      - ---
    * - DMAC_API
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
-  
+
 
 .. include:: ../../../common/more_information.rst
 

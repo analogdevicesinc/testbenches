@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import logger_pkg::*;
@@ -120,9 +118,9 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     rx_xcvr.setup_clocks(lane_rate,
                          `REF_CLK_RATE*1000000);
@@ -144,16 +142,16 @@ program test_program;
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_RX_BA + 'h2c4, 1);
 
     // =======================
-    // TPL SYNC control test 
+    // TPL SYNC control test
     // =======================
     arm_disarm_test();
 
-
-    `INFO(("======================="), ADI_VERBOSITY_LOW);
-    `INFO(("      TB   DONE        "), ADI_VERBOSITY_LOW);
-    `INFO(("======================="), ADI_VERBOSITY_LOW);
-
     base_env.stop();
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
+
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end
@@ -315,27 +313,27 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),2);
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,2);
     #1us;
-    
+
     // Check if armed
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(1));
     base_env.mng.sequencer.RegReadVerify32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
                             `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(1));
-                            
+
     // DisArm external sync
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),4);
-    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,4);    
+    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,4);
     #1us;
-                              
+
     // Check if disarmed
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(0));
     base_env.mng.sequencer.RegReadVerify32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_SYNC_STATUS),
-                            `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(0));                           
+                            `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(0));
     `INFO(("======================="), ADI_VERBOSITY_LOW);
     `INFO(("  ARM-DISARM TEST DONE "), ADI_VERBOSITY_LOW);
     `INFO(("======================="), ADI_VERBOSITY_LOW);
-                            
+
   endtask : arm_disarm_test
 
 

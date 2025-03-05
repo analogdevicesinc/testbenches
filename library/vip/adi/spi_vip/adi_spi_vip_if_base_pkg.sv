@@ -1,6 +1,5 @@
 // ***************************************************************************
-// ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +7,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,38 +25,65 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
 
-package reg_accessor_pkg;
+package adi_spi_vip_if_base_pkg;
 
-  import axi_vip_pkg::*;
-  import adi_common_pkg::*;
+  typedef enum {SPI_MODE_SLAVE, SPI_MODE_MASTER, SPI_MODE_MONITOR} spi_mode_t;
 
-  class reg_accessor extends adi_component;
+  virtual class adi_spi_vip_if_base;
 
-    function new(
-      input string name,
-      input adi_component parent = null);
-      
-      super.new(name, parent);
+    function new();
     endfunction
 
-    virtual task automatic RegWrite32(input xil_axi_ulong addr =0,
-                                           input bit [31:0]    data);
-    endtask: RegWrite32
+    pure virtual function int get_param_MODE();
 
-    virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
-                                          output bit [31:0]    data);
-    endtask: RegRead32
+    pure virtual function int get_param_CPOL();
 
-    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
-                                                input bit [31:0]     data);
-    endtask: RegReadVerify32
+    pure virtual function int get_param_CPHA();
+
+    pure virtual function int get_param_INV_CS();
+
+    pure virtual function int get_param_DATA_DLENGTH();
+
+    pure virtual function int get_param_SLAVE_TIN();
+
+    pure virtual function int get_param_SLAVE_TOUT();
+
+    pure virtual function int get_param_MASTER_TIN();
+
+    pure virtual function int get_param_MASTER_TOUT();
+
+    pure virtual function int get_param_CS_TO_MISO();
+
+    pure virtual function int get_param_DEFAULT_MISO_DATA();
+
+    pure virtual function spi_mode_t get_mode();
+
+    pure virtual function logic get_cs_active();
+
+    pure virtual task wait_cs_active();
+
+    pure virtual task wait_cs_inactive();
+
+    pure virtual task wait_for_sample_edge();
+
+    pure virtual function logic get_mosi_delayed();
+
+    pure virtual task set_miso_drive(bit val);
+
+    pure virtual task set_miso_drive_instantaneous(bit val);
+
+    pure virtual task wait_for_drive_edge();
+
+    pure virtual task wait_cs();
+
+    pure virtual task set_miso_oen(bit val);
 
   endclass
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 `include "axis_definitions.svh"
 
@@ -75,7 +73,7 @@ program test_program ();
                   `TH.`OUTPUT_AXIS.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     uaf_env.start();
 
@@ -95,17 +93,17 @@ program test_program ();
     // stimulus
     repeat($urandom_range(5,10)) begin
       send_data_wd.reset();
-      
+
       if ((!`TKEEP_EN || !`TLAST_EN) && `INPUT_WIDTH < `OUTPUT_WIDTH) begin
         repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_packet_size($urandom_range(1,128)*`OUTPUT_WIDTH/`INPUT_WIDTH, `TLAST_EN, 0);
+          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128)*`OUTPUT_WIDTH/`INPUT_WIDTH, `TLAST_EN, 0);
         end
       end else begin
         repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor($urandom_range(1,1024), `TLAST_EN, 0);
+          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_byte_count($urandom_range(1,1024), `TLAST_EN, 0);
         end
       end
-      
+
       #($urandom_range(1,10)*1us);
 
       uaf_env.input_axis_agent.sequencer.clear_descriptor_queue();
@@ -122,7 +120,7 @@ program test_program ();
 
     uaf_env.stop();
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

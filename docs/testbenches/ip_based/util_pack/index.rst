@@ -51,7 +51,7 @@ The following parameters of this project that can be configured:
 .. note::
 
    The max width is calculated with: CHANNELS*SAMPLES*WIDTH and it cannot
-   exceed 2048. 
+   exceed 2048.
 
 Build parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

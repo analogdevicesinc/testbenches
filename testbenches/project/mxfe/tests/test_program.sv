@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2018 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import test_harness_env_pkg::*;
@@ -82,7 +80,7 @@ program test_program;
                     `TH.`DDR_AXI.inst.IF);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     base_env.sys_reset();
 
@@ -114,9 +112,9 @@ program test_program;
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
     `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     rx_xcvr.setup_clocks(lane_rate,
                          `REF_CLK_RATE*1000000);
@@ -155,6 +153,10 @@ program test_program;
     jesd_link_test_ext_sync(0);
 
     base_env.stop();
+
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
 
     `INFO(("Test Done"), ADI_VERBOSITY_NONE);
     $finish();

@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2022 (c) Analog Devices, Inc.
+## Copyright (C) 2022 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -26,10 +26,8 @@ LIB_DEPS += axi_hdmi_tx
 LIB_DEPS += axi_i2s_adi
 LIB_DEPS += axi_pwm_gen
 LIB_DEPS += axi_spdif_tx
-LIB_DEPS += axi_sysid
-LIB_DEPS += sysid_rom
 LIB_DEPS += util_i2c_mixer
-LIB_DEPS += util_pack/util_cpack2 
+LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += util_cdc
 LIB_DEPS += util_axis_fifo
 LIB_DEPS += spi_engine/axi_spi_engine

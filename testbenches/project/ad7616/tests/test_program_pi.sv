@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2022 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -138,7 +138,7 @@ bit transfer_status = 0;
 assign rx_db_i = tx_data_buf;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge sys_clk);
     rx_rd_n_tmp <= rx_rd_n;
     fork
@@ -151,7 +151,7 @@ assign rx_rd_n_negedge_s = ~rx_rd_n & rx_rd_n_d;
 assign rx_rd_n_posedge_s = rx_rd_n & ~rx_rd_n_d;
 
 initial begin
-  while(1) begin
+  forever begin
     @(negedge rx_rd_n);
       if (transfer_status)
         if (transfer_cnt[0]) begin
@@ -180,7 +180,7 @@ endtask
 //---------------------------------------------------------------------------
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge rx_rd_n);
     if (transfer_status)
         transfer_cnt <= transfer_cnt + 'h1;

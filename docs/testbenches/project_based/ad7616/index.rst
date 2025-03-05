@@ -33,11 +33,11 @@ AD7616_SDZ parallel interface
 
 AD7616_SDZ serial interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   
+
 .. image:: ./ad7616_si_tb.svg
    :width: 800
    :align: center
-   :alt: AD7616 Serial Interface/Testbench block diagram   
+   :alt: AD7616 Serial Interface/Testbench block diagram
 
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,10 +46,10 @@ The following parameter of this project that can be configured:
 
 -  INTF: defines the device's interface:
    Options: 0 - Parallel, 1 - Serial
-      
+
 Build parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 The parameter mentioned above can be configured when starting the build, like in
 the following example:
 
@@ -57,10 +57,10 @@ the following example:
    :showuser:
 
    $make INTF=0
-   
+
 but we recommend using the already tested build configuration modes, that can be
 found in the ``cfg`` section.
- 
+
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -191,7 +191,7 @@ Sanity test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This test is used to check the communication with the AXI REGMAP module of the
-AD7616 SPI Engine interface, by reading the core VERSION register, along with 
+AD7616 SPI Engine interface, by reading the core VERSION register, along with
 writing and reading the SCRATCH register.
 
 FIFO SPI test
@@ -358,7 +358,7 @@ Testbench specific dependencies:
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
-   
+
    * - SV dependency name
      - Source code link
      - Documentation link
@@ -413,7 +413,7 @@ Testbench specific dependencies:
 
    - ``*`` used only for parallel interface
    - ``**`` used only for serial interface
-     
+
 .. include:: ../../../common/more_information.rst
 
 .. include:: ../../../common/support.rst

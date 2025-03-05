@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2018 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import logger_pkg::*;
@@ -83,9 +81,9 @@ program test_program;
     base_env.start();
     base_env.sys_reset();
 
-    `TH.`SYS_CLK.inst.IF.start_clock;
-    `TH.`DMA_CLK.inst.IF.start_clock;
-    `TH.`DDR_CLK.inst.IF.start_clock;
+    `TH.`SYS_CLK.inst.IF.start_clock();
+    `TH.`DMA_CLK.inst.IF.start_clock();
+    `TH.`DDR_CLK.inst.IF.start_clock();
 
     link_clk_freq_khz = lane_rate_khz/66;
     data_path_width = 8;
@@ -97,10 +95,10 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(device_clk_freq_khz*1000));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(sysref_freq_khz*1000));
 
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DRP_CLK.inst.IF.start_clock;
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DRP_CLK.inst.IF.start_clock();
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     for (int i = 0; i < `JESD_M; i++) begin
       if (use_dds) begin
@@ -202,9 +200,18 @@ program test_program;
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_RX_BA+GetAddrs(JESD_RX_LINK_STATUS),
                             `SET_JESD_RX_LINK_STATUS_STATUS_STATE(3));
 
-    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-    
     base_env.stop();
+
+    `TH.`SYS_CLK.inst.IF.stop_clock();
+    `TH.`DMA_CLK.inst.IF.stop_clock();
+    `TH.`DDR_CLK.inst.IF.stop_clock();
+
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DRP_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
+
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
   end

@@ -46,11 +46,11 @@ The following configuration file is available:
 
    +-----------------------+--------------------------+
    | Configuration mode    | Parameters               |
-   |                       +----------+---------------+
+   |                       +--------------------------+
    |                       | ---                      |
-   +=======================+=============+============+
+   +=======================+==========================+
    | cfg1                  | ---                      | 
-   +-----------------------+-------------+------------+
+   +-----------------------+--------------------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -157,7 +157,7 @@ The steps of this test are:
 
 * Write data to DDR
 * Configure the TX DMA
-* Select DDS as source
+* Select DMA as source
 * Enable normal data path for RX1
 * Enable RX channel, enable sign extension
 * Sync DAC channels

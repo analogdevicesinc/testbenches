@@ -86,25 +86,35 @@ package pwm_gen_api_pkg;
     endtask
 
     task pulse_config(
+      input bit [7:0] channel,
       input logic [31:0] period,
       input logic [31:0] width,
       input logic [31:0] offset);
 
-      this.pulse_period_config(period);
-      this.pulse_width_config(width);
-      this.pulse_offset_config(offset);
-    endtask
-    
-    task pulse_period_config(input logic [31:0] period);
-      this.axi_write(GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(period));
+      this.pulse_period_config(channel, period);
+      this.pulse_width_config(channel, width);
+      this.pulse_offset_config(channel, offset);
     endtask
 
-    task pulse_width_config(input logic [31:0] width);
-      this.axi_write(GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH), `SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(width));
+    task pulse_period_config(
+      input bit [7:0] channel,
+      input logic [31:0] period);
+
+      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_0_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(period));
     endtask
 
-    task pulse_offset_config(input logic [31:0] offset);
-      this.axi_write(GetAddrs(AXI_PWM_GEN_REG_PULSE_X_OFFSET), `SET_AXI_PWM_GEN_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(offset));
+    task pulse_width_config(
+      input bit [7:0] channel,
+      input logic [31:0] width);
+
+      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_0_WIDTH), `SET_AXI_PWM_GEN_REG_PULSE_0_WIDTH_PULSE_0_WIDTH(width));
+    endtask
+
+    task pulse_offset_config(
+      input bit [7:0] channel,
+      input logic [31:0] offset);
+
+      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_0_OFFSET), `SET_AXI_PWM_GEN_REG_PULSE_0_OFFSET_PULSE_0_OFFSET(offset));
     endtask
 
   endclass

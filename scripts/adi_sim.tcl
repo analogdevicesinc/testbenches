@@ -42,6 +42,9 @@ proc adi_sim_project_xilinx {project_name {part "xc7vx485tffg1157-1"}} {
 
   global sys_zynq
   set sys_zynq -1
+  if { ![info exists ad_project_params(CACHE_COHERENCY)] } {
+    set CACHE_COHERENCY false
+  }
   if { ![info exists ad_project_params(CUSTOM_HARNESS)] || !$ad_project_params(CUSTOM_HARNESS) } {
     source $ad_tb_dir/library/utilities/test_harness_system_bd.tcl
   }

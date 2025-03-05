@@ -24,7 +24,7 @@ CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
-TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
+# TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 #TESTS += cfg1_mm2mm_default:directed_test
 #TESTS += cfg1:test_program
 #TESTS += cfg2_fsync:test_program

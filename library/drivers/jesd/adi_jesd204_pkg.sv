@@ -336,6 +336,7 @@ package adi_jesd204_pkg;
               all_lanes_in_data = 0;
           end
         end
+        // TODO: better estimate the time that link up takes, and re-enable the timeout
         // timeout--;
       end
 

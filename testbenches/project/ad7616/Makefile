@@ -27,6 +27,7 @@ LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
+LIB_DEPS += util_pack/util_cpack2
 
 # default test program
 #TP := test_program_si

@@ -96,10 +96,20 @@ program test_program;
       rate = R1_MODE ? 2 : 4;
   end
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   // --------------------------
   // Main procedure
   // --------------------------
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     //creating environment
     base_env = new("Base Environment",
@@ -109,8 +119,6 @@ program test_program;
                     `TH.`SYS_RST.inst.IF,
                     `TH.`MNG_AXI.inst.IF,
                     `TH.`DDR_AXI.inst.IF);
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
 

@@ -38,6 +38,7 @@
 import logger_pkg::*;
 import environment_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import adi_regmap_pkg::*;
@@ -54,7 +55,11 @@ import `PKGIFY(test_harness, dst_axis_vip)::*;
 program test_program;
 
   // declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+  
   dma_flock_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis_vip), `AXIS_VIP_PARAMS(test_harness, dst_axis_vip)) dma_flock_env;
 
   // Register accessors
@@ -69,12 +74,16 @@ program test_program;
   initial begin
     //creating environment
     base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     dma_flock_env = new("DMA Flock Environment",
                         `TH.`SRC_AXIS.inst.IF,
@@ -94,10 +103,10 @@ program test_program;
 
     dma_flock_env.run();
 
-    m_dmac_api = new("TX_DMA_BA", base_env.mng.sequencer, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA_BA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA_BA", base_env.mng.sequencer, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA_BA", base_env.mng.master_sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
 
     sanity_test;
@@ -249,16 +258,16 @@ program test_program;
     bit [63:0]    mtestWData; // Write Data
     bit [31:0]    rdData;
 
-    base_env.mng.sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
+    base_env.mng.master_sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
 
     mtestWData = 0;
     repeat (10) begin
-      base_env.mng.sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
-      base_env.mng.sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
+      base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
+      base_env.mng.master_sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
       mtestWData += 4;
     end
 
-    base_env.mng.sequencer.RegReadVerify32(`RX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
+    base_env.mng.master_sequencer.RegReadVerify32(`RX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
 
   endtask
 

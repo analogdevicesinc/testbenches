@@ -110,6 +110,9 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
+    `set_member(subclass_t, SUBCLASSV);
+    `set_member(version_t, JESDV);
+    `set_member(bit, SCR);
     `set_member(int, L);
     `set_member(int, M);
     `set_member(int, F);
@@ -120,6 +123,7 @@ package adi_jesd204_pkg;
     `set_member(int, NP);
     `set_member(int, CS);
     `set_member(int, HD);
+    `set_member(int, CF);
     `set_member(longint unsigned, lane_rate);
 
     // -----------------
@@ -139,7 +143,9 @@ package adi_jesd204_pkg;
       `INFO(("N'        is %0d", NP), ADI_VERBOSITY_MEDIUM);
       `INFO(("CS        is %0d", CS), ADI_VERBOSITY_MEDIUM);
       `INFO(("HD        is %0d", HD), ADI_VERBOSITY_MEDIUM);
+      `INFO(("CF        is %0d", CF), ADI_VERBOSITY_MEDIUM);
       `INFO(("SCR       is %0d", SCR), ADI_VERBOSITY_MEDIUM);
+      `INFO(("JESDV     is %0d", JESDV), ADI_VERBOSITY_MEDIUM);
       `INFO(("SUBCLASSV is %0d", SUBCLASSV), ADI_VERBOSITY_MEDIUM);
       `INFO(("ENCODING  is %s", encoding_s[encoding]), ADI_VERBOSITY_MEDIUM);
     endfunction

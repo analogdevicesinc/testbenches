@@ -37,6 +37,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import dmac_api_pkg::*;
@@ -48,7 +49,10 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program_2d;
 
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
   // Register accessors
   dmac_api m_dmac_api;
@@ -58,12 +62,16 @@ program test_program_2d;
 
     // Creating environment
     base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF);
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
@@ -71,10 +79,10 @@ program test_program_2d;
     `TH.`DEVICE_CLK.inst.IF.start_clock();
     base_env.sys_reset();
 
-    m_dmac_api = new("TX_DMA", base_env.mng.sequencer, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA", base_env.mng.sequencer, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA", base_env.mng.master_sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
 
     #1us;
@@ -88,13 +96,13 @@ program test_program_2d;
 
       // Incremental data
       for (int j=0;j<'h800;j=j+2) begin
-        base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+offset+j*2),(((j+1+'h1000*i)) << 16) | (j+'h1000*i) ,'hF);
+        base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+offset+j*2),(((j+1+'h1000*i)) << 16) | (j+'h1000*i) ,'hF);
       end
       offset = offset + 'h1000;
 
       // Buffer filled with 0
       for (int k=0;k<'h80;k=k+1) begin
-        base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+offset+k*4), 32'h0,'hF);
+        base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+offset+k*4), 32'h0,'hF);
       end
       offset = offset + 'h200;
 
@@ -160,18 +168,18 @@ program test_program_2d;
                         bit [31:0] src_stride,
                         bit [31:0] dst_stride);
 
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h00, flags, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h04, id, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h08, dest_addr, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h0C, 0, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h10, src_addr, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h14, 0, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h18, next_desc_addr, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h1C, 0, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h20, y_len, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h24, x_len, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h28, src_stride, 'hF);
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(desc_addr+'h2C, dst_stride, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h00, flags, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h04, id, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h08, dest_addr, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h0C, 0, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h10, src_addr, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h14, 0, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h18, next_desc_addr, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h1C, 0, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h20, y_len, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h24, x_len, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h28, src_stride, 'hF);
+    base_env.ddr.slave_sequencer.set_reg_data_in_mem(desc_addr+'h2C, dst_stride, 'hF);
 
   endtask : write_descriptor
 
@@ -181,25 +189,25 @@ program test_program_2d;
     dma_segment m_seg, s_seg;
     int m_tid, s_tid;
 
-    base_env.mng.sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SG_ADDRESS), tx_desc_addr); //TX descriptor first address
-    base_env.mng.sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_CONTROL), //Enable DMA and set HWDESC
+    base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SG_ADDRESS), tx_desc_addr); //TX descriptor first address
+    base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_CONTROL), //Enable DMA and set HWDESC
                        `SET_DMAC_CONTROL_HWDESC(1) |
                        `SET_DMAC_CONTROL_ENABLE(1));
-    base_env.mng.sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_FLAGS), 0); //Disable all flags
+    base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_FLAGS), 0); //Disable all flags
 
-    base_env.mng.sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_SG_ADDRESS), rx_desc_addr); //RX descriptor first address
-    base_env.mng.sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_CONTROL), //Enable DMA and set HWDESC
+    base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_SG_ADDRESS), rx_desc_addr); //RX descriptor first address
+    base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_CONTROL), //Enable DMA and set HWDESC
                        `SET_DMAC_CONTROL_HWDESC(1) |
                        `SET_DMAC_CONTROL_ENABLE(1));
-    base_env.mng.sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_FLAGS), 0); //Disable all flags
+    base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_FLAGS), 0); //Disable all flags
 
-    base_env.mng.sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
+    base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-    base_env.mng.sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
+    base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
-    base_env.mng.sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_SG_ADDRESS), rx_desc_addr+'h90); //RX descriptor first address
-    base_env.mng.sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
+    base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_SG_ADDRESS), rx_desc_addr+'h90); //RX descriptor first address
+    base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
     m_dmac_api.transfer_id_get(m_tid);
@@ -223,8 +231,8 @@ program test_program_2d;
     for (int i=0;i<length;i=i+4) begin
       current_src_address = src_addr+i+(i/'h1000)*'h200;
       current_dest_address = dest_addr+i;
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_dest_address);
-      reference_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_src_address);
+      captured_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_dest_address);
+      reference_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_src_address);
 
       if (captured_word !== reference_word) begin
         `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_dest_address,reference_word,captured_word));

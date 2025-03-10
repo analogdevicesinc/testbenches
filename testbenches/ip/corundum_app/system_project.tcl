@@ -7,7 +7,7 @@ if {$argc < 1} {
   set cfg_file [lindex $argv 0]
 }
 
-# Read config file 
+# Read config file
 source "cfgs/${cfg_file}"
 
 # Set the project name
@@ -20,7 +20,6 @@ source $ad_tb_dir/library/includes/sp_include_axis.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "environment.sv" \
   "tests/test_program.sv" \
 ]
 

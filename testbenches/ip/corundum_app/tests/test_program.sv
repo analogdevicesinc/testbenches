@@ -95,7 +95,7 @@ program test_program();
 
     src_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
     src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-    src_axis_agent.master_sequencer.add_xfer_descriptor_sample_count(32'd64, 1, 0);
+    src_axis_agent.master_sequencer.add_xfer_descriptor_sample_count(32'd8192/src_axis_agent.agent.C_XIL_AXI4STREAM_DATA_WIDTH, 0, 0);
 
     os_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
     os_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);

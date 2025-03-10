@@ -33,14 +33,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="190.652501 us"></ZoomEndTime>
-      <Cursor1Time time="185.862500 us"></Cursor1Time>
+      <ZoomEndTime time="36.387502 us"></ZoomEndTime>
+      <Cursor1Time time="34.647500 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="201"></NameColumnWidth>
-      <ValueColumnWidth column_width="64"></ValueColumnWidth>
+      <NameColumnWidth column_width="283"></NameColumnWidth>
+      <ValueColumnWidth column_width="85"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="13" />
+   <WVObjectSize size="11" />
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/mng_axi_vip/M_AXI">
       <obj_property name="ElementShortName">M_AXI</obj_property>
       <obj_property name="ObjectShortName">M_AXI</obj_property>
@@ -54,8 +54,8 @@
          <obj_property name="ObjectShortName">input_clk</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/input_axis_tdata">
-         <obj_property name="ElementShortName">input_axis_tdata[127:0]</obj_property>
-         <obj_property name="ObjectShortName">input_axis_tdata[127:0]</obj_property>
+         <obj_property name="ElementShortName">input_axis_tdata[511:0]</obj_property>
+         <obj_property name="ObjectShortName">input_axis_tdata[511:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/input_axis_tvalid">
          <obj_property name="ElementShortName">input_axis_tvalid</obj_property>
@@ -65,76 +65,20 @@
          <obj_property name="ElementShortName">input_axis_tready</obj_property>
          <obj_property name="ObjectShortName">input_axis_tready</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/input_axis_tready_buffered">
-         <obj_property name="ElementShortName">input_axis_tready_buffered</obj_property>
-         <obj_property name="ObjectShortName">input_axis_tready_buffered</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group78">
       <obj_property name="label">CDC Scale</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/cdc_axis_tvalid">
-         <obj_property name="ElementShortName">cdc_axis_tvalid</obj_property>
-         <obj_property name="ObjectShortName">cdc_axis_tvalid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/cdc_axis_tready">
-         <obj_property name="ElementShortName">cdc_axis_tready</obj_property>
-         <obj_property name="ObjectShortName">cdc_axis_tready</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/cdc_axis_tdata">
-         <obj_property name="ElementShortName">cdc_axis_tdata[511:0]</obj_property>
-         <obj_property name="ObjectShortName">cdc_axis_tdata[511:0]</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group89">
       <obj_property name="label">Packet</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/packet_axis_tready">
-         <obj_property name="ElementShortName">packet_axis_tready</obj_property>
-         <obj_property name="ObjectShortName">packet_axis_tready</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/packet_axis_tvalid">
-         <obj_property name="ElementShortName">packet_axis_tvalid</obj_property>
-         <obj_property name="ObjectShortName">packet_axis_tvalid</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/packet_axis_tdata">
-         <obj_property name="ElementShortName">packet_axis_tdata[511:0]</obj_property>
-         <obj_property name="ObjectShortName">packet_axis_tdata[511:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/packet_axis_tkeep">
-         <obj_property name="ElementShortName">packet_axis_tkeep[63:0]</obj_property>
-         <obj_property name="ObjectShortName">packet_axis_tkeep[63:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/packet_axis_tlast">
-         <obj_property name="ElementShortName">packet_axis_tlast</obj_property>
-         <obj_property name="ObjectShortName">packet_axis_tlast</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group95">
       <obj_property name="label">Buffered packet</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/packet_buffer_axis_tready">
-         <obj_property name="ElementShortName">packet_buffer_axis_tready</obj_property>
-         <obj_property name="ObjectShortName">packet_buffer_axis_tready</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/packet_buffer_axis_tvalid">
-         <obj_property name="ElementShortName">packet_buffer_axis_tvalid</obj_property>
-         <obj_property name="ObjectShortName">packet_buffer_axis_tvalid</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/packet_buffer_axis_tdata">
-         <obj_property name="ElementShortName">packet_buffer_axis_tdata[511:0]</obj_property>
-         <obj_property name="ObjectShortName">packet_buffer_axis_tdata[511:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/packet_buffer_axis_tlast">
-         <obj_property name="ElementShortName">packet_buffer_axis_tlast</obj_property>
-         <obj_property name="ObjectShortName">packet_buffer_axis_tlast</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/packet_buffer_axis_tkeep">
-         <obj_property name="ElementShortName">packet_buffer_axis_tkeep[63:0]</obj_property>
-         <obj_property name="ObjectShortName">packet_buffer_axis_tkeep[63:0]</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/application_core/s_axis_sync_tx">
       <obj_property name="children_use_element_short_name">true</obj_property>
@@ -157,46 +101,6 @@
       <obj_property name="label">OS buffer</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/s_axis_ready">
-         <obj_property name="ElementShortName">s_axis_ready</obj_property>
-         <obj_property name="ObjectShortName">s_axis_ready</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/s_axis_valid">
-         <obj_property name="ElementShortName">s_axis_valid</obj_property>
-         <obj_property name="ObjectShortName">s_axis_valid</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/s_axis_data">
-         <obj_property name="ElementShortName">s_axis_data[511:0]</obj_property>
-         <obj_property name="ObjectShortName">s_axis_data[511:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/s_axis_tkeep">
-         <obj_property name="ElementShortName">s_axis_tkeep[63:0]</obj_property>
-         <obj_property name="ObjectShortName">s_axis_tkeep[63:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/s_axis_tlast">
-         <obj_property name="ElementShortName">s_axis_tlast</obj_property>
-         <obj_property name="ObjectShortName">s_axis_tlast</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/m_axis_ready">
-         <obj_property name="ElementShortName">m_axis_ready</obj_property>
-         <obj_property name="ObjectShortName">m_axis_ready</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/m_axis_valid">
-         <obj_property name="ElementShortName">m_axis_valid</obj_property>
-         <obj_property name="ObjectShortName">m_axis_valid</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/m_axis_data">
-         <obj_property name="ElementShortName">m_axis_data[511:0]</obj_property>
-         <obj_property name="ObjectShortName">m_axis_data[511:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/m_axis_tkeep">
-         <obj_property name="ElementShortName">m_axis_tkeep[63:0]</obj_property>
-         <obj_property name="ObjectShortName">m_axis_tkeep[63:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/os_buffer_fifo/m_axis_tlast">
-         <obj_property name="ElementShortName">m_axis_tlast</obj_property>
-         <obj_property name="ObjectShortName">m_axis_tlast</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group140">
       <obj_property name="label">Output</obj_property>
@@ -225,17 +129,9 @@
    </wvobject>
    <wvobject fp_name="divider73" type="divider">
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/datapath_switch">
-      <obj_property name="ElementShortName">datapath_switch</obj_property>
-      <obj_property name="ObjectShortName">datapath_switch</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/input_enable">
       <obj_property name="ElementShortName">input_enable[7:0]</obj_property>
       <obj_property name="ObjectShortName">input_enable[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/packet_size_dynamic">
-      <obj_property name="ElementShortName">packet_size_dynamic[15:0]</obj_property>
-      <obj_property name="ObjectShortName">packet_size_dynamic[15:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/counter_reg">
       <obj_property name="ElementShortName">counter_reg[31:0]</obj_property>

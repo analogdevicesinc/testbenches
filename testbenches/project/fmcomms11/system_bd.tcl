@@ -26,7 +26,7 @@
 #
 #   2. An ADI specific BSD license, which can be found in the top level directory
 #      of this repository (LICENSE_ADIBSD), and also on-line at:
-#      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+#      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 #      This will allow to generate bit files and not release the source code,
 #      as long as it attaches to an ADI device.
 #
@@ -49,15 +49,6 @@ ad_ip_instance clk_vip ref_clk_vip [ list \
 adi_sim_add_define "REF_CLK=ref_clk_vip"
 create_bd_port -dir O ref_clk_out
 ad_connect ref_clk_out ref_clk_vip/clk_out
-
-# SYSREF clk
-ad_ip_instance clk_vip sysref_clk_vip [ list \
-  INTERFACE_MODE {MASTER} \
-  FREQ_HZ 5000000 \
-]
-adi_sim_add_define "SYSREF_CLK=sysref_clk_vip"
-create_bd_port -dir O sysref_clk_out
-ad_connect sysref_clk_out sysref_clk_vip/clk_out
 
 #
 #  Block design under test

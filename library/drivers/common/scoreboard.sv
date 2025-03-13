@@ -122,7 +122,7 @@ package scoreboard_pkg;
     // run task
     task run();
       this.enabled = 1;
-
+      this.clear_streams();
       this.info($sformatf("Scoreboard enabled"), ADI_VERBOSITY_MEDIUM);
     endtask: run
 
@@ -154,7 +154,7 @@ package scoreboard_pkg;
     // clear source and sink byte streams
     protected function void clear_streams();
       this.subscriber_source.clear_stream();
-      this.subscriber_source.clear_stream();
+      this.subscriber_sink.clear_stream();
     endfunction: clear_streams
 
     // wait until source and sink byte streams are empty, full check

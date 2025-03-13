@@ -83,8 +83,8 @@ program test_program;
                     `TH.`RX_SRC_AXIS.inst.IF,
                     `TH.`RX_DST_AXIS.inst.IF);
 
-    dmac_tx = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA);
-    dmac_rx = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA);
+    dmac_tx = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA);
+    dmac_rx = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA);
 
     base_env.start();
     pack_env.start();

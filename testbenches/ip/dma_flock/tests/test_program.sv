@@ -94,10 +94,10 @@ program test_program;
 
     dma_flock_env.run();
 
-    m_dmac_api = new("TX_DMA_BA", base_env.mng.sequencer, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA_BA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA_BA", base_env.mng.sequencer, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA_BA", base_env.mng.master_sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
 
     sanity_test;

@@ -129,16 +129,10 @@ package s_axis_sequencer_pkg;
       this.low_time_max = low_time_max;
     endfunction: set_low_time_range
 
-    // call ready generation function
+    // virtual tasks to be implemented
     virtual task start();
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: start
-
-
-    // virtual tasks to be implemented
-    virtual task user_gen_tready();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: user_gen_tready
 
     virtual task stop();
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));

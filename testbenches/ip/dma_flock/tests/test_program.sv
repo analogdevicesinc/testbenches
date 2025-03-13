@@ -152,8 +152,8 @@ program test_program;
     axi_ready_gen  wready_gen;
 
     // Set no backpressure from AXIS destination
-    dma_flock_env.dst_axis_agent.master_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-    dma_flock_env.dst_axis_agent.master_sequencer.user_gen_tready();
+    dma_flock_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    dma_flock_env.dst_axis_agent.slave_sequencer.start();
 
     // Set no backpressure from DDR
     wready_gen = base_env.ddr.agent.wr_driver.create_ready("wready");

@@ -18,12 +18,9 @@ adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
 source $ad_tb_dir/library/includes/sp_include_axis.tcl
 source $ad_tb_dir/library/includes/sp_include_scoreboard.tcl
-source $ad_tb_dir/library/includes/sp_include_dmac.tcl
-source $ad_tb_dir/library/includes/sp_include_data_offload.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "environment.sv" \
   "tests/test_program.sv" \
 ]
 

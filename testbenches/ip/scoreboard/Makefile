@@ -12,15 +12,6 @@ include $(TB_LIBRARY_PATH)/includes/Makeinclude_scoreboard.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_data_offload.mk
 
-# Remaining test-bench dependencies except test programs
-SV_DEPS += environment.sv
-
-LIB_DEPS := util_cdc
-LIB_DEPS += util_axis_fifo
-LIB_DEPS += axi_dmac
-LIB_DEPS += data_offload
-LIB_DEPS += util_do_ram
-
 # default test program
 TP := test_program
 

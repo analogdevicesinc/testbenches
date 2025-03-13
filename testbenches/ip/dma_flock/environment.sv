@@ -94,7 +94,7 @@ package environment_pkg;
     //   - start the sequencers
     //============================================================================
     task test();
-      this.src_axis_agent.sequencer.run();
+      this.src_axis_agent.master_sequencer.run();
       // DEST AXIS does not have to run, scoreboard connects and
       // gathers packets from the agent
       this.scrb.run();

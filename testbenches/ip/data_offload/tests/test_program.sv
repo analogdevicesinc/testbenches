@@ -112,7 +112,7 @@ program test_program;
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     scb_env.run();
 
-    scb_env.adc_src_axis_agent.sequencer.start();
+    scb_env.adc_src_axis_agent.master_sequencer.start();
 
     // Generate DMA transfers
     `INFO(("Start RX DMA ..."), ADI_VERBOSITY_LOW);
@@ -186,7 +186,7 @@ program test_program;
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(addr + i*8, i, 255);
     end
     `INFO(("Final address: %x", addr + byte_length*8), ADI_VERBOSITY_LOW);
   endtask

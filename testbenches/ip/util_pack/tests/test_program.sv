@@ -107,8 +107,8 @@ program test_program;
     tx_dma_transfer(data_length);
 
     // start generating data
-    pack_env.tx_src_axis_agent.sequencer.start();
-    pack_env.rx_src_axis_agent.sequencer.start();
+    pack_env.tx_src_axis_agent.master_sequencer.start();
+    pack_env.rx_src_axis_agent.master_sequencer.start();
 
     // prepare watchdog with 20 us of wait time
     packer_scoreboard_wd = new("Packer watchdog", 20000, "Packers Scoreboard");

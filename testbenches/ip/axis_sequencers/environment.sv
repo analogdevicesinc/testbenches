@@ -76,11 +76,11 @@ package environment_pkg;
       xil_axi4stream_ready_gen_policy_t dac_mode;
 
       // source stub
-      this.src_axis_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
+      this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
 
       // destination stub
       dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
-      this.dst_axis_agent.sequencer.set_mode(dac_mode);
+      this.dst_axis_agent.master_sequencer.set_mode(dac_mode);
     endtask
 
     //============================================================================
@@ -96,8 +96,8 @@ package environment_pkg;
     //============================================================================
     task run;
       fork
-        this.src_axis_agent.sequencer.run();
-        this.dst_axis_agent.sequencer.run();
+        this.src_axis_agent.master_sequencer.run();
+        this.dst_axis_agent.master_sequencer.run();
       join_none
     endtask
 
@@ -105,7 +105,7 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop;
-      this.src_axis_agent.sequencer.stop();
+      this.src_axis_agent.master_sequencer.stop();
       this.src_axis_agent.agent.stop_master();
       this.dst_axis_agent.agent.stop_slave();
     endtask

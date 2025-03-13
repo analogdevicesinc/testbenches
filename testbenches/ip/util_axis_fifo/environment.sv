@@ -85,15 +85,15 @@ package environment_pkg;
     //============================================================================
     task configure();
       // configuration for input
-      this.input_axis_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
-      this.input_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.input_axis_agent.sequencer.set_descriptor_gen_mode(1);
-      this.input_axis_agent.sequencer.set_data_beat_delay(0);
-      this.input_axis_agent.sequencer.set_descriptor_delay(0);
-      this.input_axis_agent.sequencer.set_inactive_drive_output_0();
+      this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
+      this.input_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.input_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
+      this.input_axis_agent.master_sequencer.set_data_beat_delay(0);
+      this.input_axis_agent.master_sequencer.set_descriptor_delay(0);
+      this.input_axis_agent.master_sequencer.set_inactive_drive_output_0();
 
       // configuration for output
-      this.output_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      this.output_axis_agent.master_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask
 
     //============================================================================

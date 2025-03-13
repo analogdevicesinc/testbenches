@@ -86,16 +86,16 @@ package environment_pkg;
     //============================================================================
     task configure(int bytes_to_generate);
       // TX stubs
-      this.tx_src_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.tx_src_axis_agent.sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
+      this.tx_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.tx_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
 
-      this.tx_dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      this.tx_dst_axis_agent.master_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
 
       // RX stub
-      this.rx_src_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.rx_src_axis_agent.sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
+      this.rx_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.rx_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
 
-      this.rx_dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      this.rx_dst_axis_agent.master_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask
 
     //============================================================================
@@ -121,10 +121,10 @@ package environment_pkg;
     //============================================================================
     task run();
       fork
-        this.tx_src_axis_agent.sequencer.run();
-        this.tx_dst_axis_agent.sequencer.run();
-        this.rx_src_axis_agent.sequencer.run();
-        this.rx_dst_axis_agent.sequencer.run();
+        this.tx_src_axis_agent.master_sequencer.run();
+        this.tx_dst_axis_agent.master_sequencer.run();
+        this.rx_src_axis_agent.master_sequencer.run();
+        this.rx_dst_axis_agent.master_sequencer.run();
 
         this.scoreboard_tx.run();
         this.scoreboard_rx.run();
@@ -135,8 +135,8 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.tx_src_axis_agent.sequencer.stop();
-      this.rx_src_axis_agent.sequencer.stop();
+      this.tx_src_axis_agent.master_sequencer.stop();
+      this.rx_src_axis_agent.master_sequencer.stop();
 
       this.tx_src_axis_agent.agent.stop_master();
       this.tx_dst_axis_agent.agent.stop_slave();

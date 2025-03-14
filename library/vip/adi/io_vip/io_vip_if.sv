@@ -49,6 +49,7 @@ interface io_vip_if #(
 
   logic intf_is_master = 0;
   logic intf_is_slave = 0;
+  logic edge_case = 1'b1;
 
   function void set_intf_master();
     intf_is_master = 1;
@@ -79,44 +80,79 @@ interface io_vip_if #(
         $fatal(0, "Supported only in runtime master mode");
       end
     endfunction: set_io
-    
+
     virtual function logic [1023:0] get_io();
       if (intf_is_slave) begin
-        get_io = {{1024-WIDTH{1'b0}}, IO};
+        if (ASYNC == 1) begin
+          get_io = {{1024-WIDTH{1'b0}}, IO};
+        end else begin
+          if (edge_case) begin
+            get_io = {{1024-WIDTH{1'b0}}, cb_p.IO};
+          end else begin
+            get_io = {{1024-WIDTH{1'b0}}, cb_n.IO};
+          end
+        end
       end else begin
         $fatal(0, "Supported only in runtime slave mode");
       end
     endfunction: get_io
 
     virtual task wait_io_change();
-      @(IO);
+      if (ASYNC == 1) begin
+        @(IO);
+      end else begin
+        if (edge_case) begin
+          @(cb_p.IO);
+        end else begin
+          @(cb_n.IO);
+        end
+      end
     endtask: wait_io_change
 
     virtual task wait_posedge_clk();
       if (ASYNC == 1) begin
         $fatal(0, "Unsupported in async mode");
       end
-      @(posedge clk);
+      @(cb_p);
     endtask: wait_posedge_clk
 
     virtual task wait_negedge_clk();
       if (ASYNC == 1) begin
         $fatal(0, "Unsupported in async mode");
       end
-      @(negedge clk);
+      @(cb_n);
     endtask: wait_negedge_clk
 
     virtual function int get_width();
       get_width = WIDTH;
     endfunction: get_width
 
+    virtual function void set_positive_edge();
+      if (ASYNC == 1) begin
+        $fatal(0, "Unsupported in async mode");
+      end
+      edge_case = 1'b1;
+    endfunction: set_positive_edge
+
+    virtual function void set_negative_edge();
+      if (ASYNC == 1) begin
+        $fatal(0, "Unsupported in async mode");
+      end
+      edge_case = 1'b0;
+    endfunction: set_negative_edge
+
   endclass: io_vip_if_class
 
-  io_vip_if_class vif = new();
+  io_vip_if_class #(WIDTH) vif = new();
 
-  default clocking cb @(posedge clk);
+  clocking cb_p @(posedge clk);
     default input #1step output #1ps;
     inout IO;
-  endclocking : cb
+  endclocking : cb_p
+
+  clocking cb_n @(negedge clk);
+    default input #1step output #1ps;
+    inout IO;
+  endclocking : cb_n
 
 endinterface: io_vip_if

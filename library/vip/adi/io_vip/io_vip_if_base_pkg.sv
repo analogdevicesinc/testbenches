@@ -45,7 +45,9 @@ package io_vip_if_base_pkg;
     pure virtual task wait_posedge_clk();
     pure virtual task wait_negedge_clk();
     pure virtual function int get_width();
-    
+    pure virtual function void set_positive_edge();
+    pure virtual function void set_negative_edge();
+
   endclass: io_vip_if_base
 
 endpackage: io_vip_if_base_pkg

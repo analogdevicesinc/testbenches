@@ -33,14 +33,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="36.387502 us"></ZoomEndTime>
-      <Cursor1Time time="34.647500 us"></Cursor1Time>
+      <ZoomEndTime time="183.726001 us"></ZoomEndTime>
+      <Cursor1Time time="78.395001 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="283"></NameColumnWidth>
-      <ValueColumnWidth column_width="85"></ValueColumnWidth>
+      <ValueColumnWidth column_width="81"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="11" />
+   <WVObjectSize size="12" />
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/mng_axi_vip/M_AXI">
       <obj_property name="ElementShortName">M_AXI</obj_property>
       <obj_property name="ObjectShortName">M_AXI</obj_property>
@@ -48,14 +48,13 @@
    <wvobject type="group" fp_name="group68">
       <obj_property name="label">Input</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/input_clk">
          <obj_property name="ElementShortName">input_clk</obj_property>
          <obj_property name="ObjectShortName">input_clk</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/input_axis_tdata">
-         <obj_property name="ElementShortName">input_axis_tdata[511:0]</obj_property>
-         <obj_property name="ObjectShortName">input_axis_tdata[511:0]</obj_property>
+         <obj_property name="ElementShortName">input_axis_tdata[127:0]</obj_property>
+         <obj_property name="ObjectShortName">input_axis_tdata[127:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/input_axis_tvalid">
          <obj_property name="ElementShortName">input_axis_tvalid</obj_property>
@@ -95,7 +94,6 @@
       <obj_property name="Detail_Data">/system_tb/test_harness/application_core/s_axis_sync_tx.streamTooltipData</obj_property>
       <obj_property name="ElementShortName">s_axis_sync_tx</obj_property>
       <obj_property name="ObjectShortName">s_axis_sync_tx</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group89">
       <obj_property name="label">OS buffer</obj_property>
@@ -128,6 +126,10 @@
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider73" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/datapath_switch">
+      <obj_property name="ElementShortName">datapath_switch</obj_property>
+      <obj_property name="ObjectShortName">datapath_switch</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/input_enable">
       <obj_property name="ElementShortName">input_enable[7:0]</obj_property>

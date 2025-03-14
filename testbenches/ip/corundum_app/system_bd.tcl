@@ -224,7 +224,9 @@ set AXIS_IF_RX_DEST_WIDTH $ad_project_params(AXIS_IF_RX_DEST_WIDTH)
 set AXIS_IF_TX_USER_WIDTH $ad_project_params(AXIS_IF_TX_USER_WIDTH)
 set AXIS_IF_RX_USER_WIDTH $ad_project_params(AXIS_IF_RX_USER_WIDTH)
 set INPUT_WIDTH $ad_project_params(INPUT_WIDTH)
-set CHANNELS $ad_project_params(CHANNELS)
+set INPUT_CHANNELS $ad_project_params(INPUT_CHANNELS)
+set OUTPUT_WIDTH $ad_project_params(OUTPUT_WIDTH)
+set OUTPUT_CHANNELS $ad_project_params(OUTPUT_CHANNELS)
 
 ad_ip_instance application_core application_core [list \
   IF_COUNT $IF_COUNT \
@@ -294,7 +296,9 @@ ad_ip_instance application_core application_core [list \
   STAT_INC_WIDTH $STAT_INC_WIDTH \
   STAT_ID_WIDTH $STAT_ID_WIDTH \
   INPUT_WIDTH $INPUT_WIDTH \
-  CHANNELS $CHANNELS \
+  INPUT_CHANNELS $INPUT_CHANNELS \
+  OUTPUT_WIDTH $OUTPUT_WIDTH \
+  OUTPUT_CHANNELS $OUTPUT_CHANNELS \
 ]
 
 ad_ip_instance clk_vip corundum_clk_vip [ list \
@@ -331,7 +335,7 @@ ad_connect input_resetn input_rstgen/peripheral_aresetn
 
 ad_ip_instance io_vip enable_io_vip [list \
   MODE {Driver} \
-  WIDTH $CHANNELS \
+  WIDTH $INPUT_CHANNELS \
 ]
 adi_sim_add_define "EN_IO=enable_io_vip"
 
@@ -372,17 +376,17 @@ ad_connect corundum_clk dst_axis/aclk
 ad_connect corundum_resetn dst_axis/aresetn
 
 ad_ip_instance util_cpack2 input_cpack [ list \
-  NUM_OF_CHANNELS $CHANNELS \
-  SAMPLE_DATA_WIDTH [expr $INPUT_WIDTH/$CHANNELS] \
+  NUM_OF_CHANNELS $INPUT_CHANNELS \
+  SAMPLE_DATA_WIDTH [expr $INPUT_WIDTH/$INPUT_CHANNELS] \
   SAMPLES_PER_CHANNEL 1 \
 ]
 
 ad_connect input_cpack/clk input_clk
 ad_connect input_cpack/reset input_reset
 
-for {set i 0} {$i < $CHANNELS} {incr i} {
+for {set i 0} {$i < $INPUT_CHANNELS} {incr i} {
   ad_ip_instance xlslice enable_slice_${i} [ list \
-    DIN_WIDTH $CHANNELS \
+    DIN_WIDTH $INPUT_CHANNELS \
     DIN_FROM $i \
     DIN_TO $i \
     DOUT_WIDTH 1 \
@@ -393,9 +397,9 @@ for {set i 0} {$i < $CHANNELS} {incr i} {
 
   ad_ip_instance xlslice data_slice_${i} [ list \
     DIN_WIDTH $INPUT_WIDTH \
-    DIN_FROM [expr $INPUT_WIDTH/$CHANNELS*($i+1)-1] \
-    DIN_TO [expr $INPUT_WIDTH/$CHANNELS*$i] \
-    DOUT_WIDTH [expr $INPUT_WIDTH/$CHANNELS] \
+    DIN_FROM [expr $INPUT_WIDTH/$INPUT_CHANNELS*($i+1)-1] \
+    DIN_TO [expr $INPUT_WIDTH/$INPUT_CHANNELS*$i] \
+    DOUT_WIDTH [expr $INPUT_WIDTH/$INPUT_CHANNELS] \
   ]
 
   ad_connect data_slice_${i}/Din src_axis/m_axis_tdata
@@ -446,3 +450,6 @@ ad_connect application_core/hbm_status GND
 
 ad_connect application_core/input_clk input_clk
 ad_connect application_core/input_rstn input_resetn
+
+ad_connect application_core/output_clk input_clk
+ad_connect application_core/output_rstn input_resetn

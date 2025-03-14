@@ -56,10 +56,12 @@ program test_program;
   io_vip_if_base output_vip_if;
   io_vip_if_base polynomial_vip_if;
 
+  localparam MAX_WIDTH = `MAX(`DATA_WIDTH, `POLYNOMIAL_WIDTH+1);
+
   logic [`DATA_WIDTH-1:0] input_data;
   logic [`DATA_WIDTH-1:0] output_data;
   logic [`DATA_WIDTH-1:0] calculated_data = 'h0;
-  logic [`DATA_WIDTH-1:0] processed_data = 'h0;
+  logic [`POLYNOMIAL_WIDTH-1:0] processed_data = 'h0;
 
   logic [`POLYNOMIAL_WIDTH-1:0] polynomial;
 
@@ -97,20 +99,18 @@ program test_program;
     base_env.start();
     base_env.sys_reset();
 
-    // PRBS testing
+    // verification on negedge
     polynomial = $urandom();
     polynomial_vip_if.set_io(polynomial);
 
     input_data = $urandom();
-    calculated_data = input_data;
+    processed_data = {{MAX_WIDTH-`DATA_WIDTH{1'b0}}, input_data};
 
-    // verification on negedge
     `INFO(("Negative edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_negative_edge();
-    repeat(1000) begin
+    repeat(1) begin
       polynomial_vip_if.wait_posedge_clk();
 
-      input_data = calculated_data;
       input_vip_if.set_io(input_data);
 
       polynomial_vip_if.wait_negedge_clk();
@@ -118,30 +118,32 @@ program test_program;
       output_data = output_vip_if.get_io();
 
       // calculate PRBS
-      processed_data = input_data;
       for(int i=0; i<`DATA_WIDTH; i=i+1) begin
-        processed_data = {{`DATA_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data[`POLYNOMIAL_WIDTH-2:0], ^(polynomial & processed_data[`POLYNOMIAL_WIDTH-1:0])};
-        calculated_data[`DATA_WIDTH-i-1] = processed_data[0];
+        calculated_data[`DATA_WIDTH-i-1] = processed_data[`POLYNOMIAL_WIDTH-1];
+        processed_data = {processed_data[`POLYNOMIAL_WIDTH-2:0], ^(polynomial & processed_data)};
       end
 
       if (output_data !== calculated_data) begin
         `ERROR(("Output PRBS: %0h | Calculated PRBS: %0h", output_data, calculated_data));
       end
+
+      input_data = processed_data[`DATA_WIDTH-1:0];
     end
 
+    #1ns;
+
+    // verification on posedge
     polynomial = $urandom();
     polynomial_vip_if.set_io(polynomial);
 
     input_data = $urandom();
-    calculated_data = input_data;
+    processed_data = {{MAX_WIDTH-`DATA_WIDTH{1'b0}}, input_data};
 
-    // verification on posedge
     `INFO(("Positive edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_positive_edge();
-    repeat(1000) begin
+    repeat(1) begin
       polynomial_vip_if.wait_negedge_clk();
 
-      input_data = calculated_data;
       input_vip_if.set_io(input_data);
 
       polynomial_vip_if.wait_posedge_clk();
@@ -149,10 +151,9 @@ program test_program;
       output_data = output_vip_if.get_io();
 
       // calculate PRBS
-      processed_data = input_data;
       for(int i=0; i<`DATA_WIDTH; i=i+1) begin
-        processed_data = {{`DATA_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data[`POLYNOMIAL_WIDTH-2:0], ^(polynomial & processed_data[`POLYNOMIAL_WIDTH-1:0])};
-        calculated_data[`DATA_WIDTH-i-1] = processed_data[0];
+        calculated_data[`DATA_WIDTH-i-1] = processed_data[`POLYNOMIAL_WIDTH-1];
+        processed_data = {processed_data[`POLYNOMIAL_WIDTH-2:0], ^(polynomial & processed_data)};
       end
 
       if (output_data !== calculated_data) begin

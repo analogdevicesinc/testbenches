@@ -84,13 +84,13 @@ program test_slowdata (
   task axi_read_v(
       input   [31:0]  raddr,
       input   [31:0]  vdata);
-    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+    base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   task axi_read(
       input   [31:0]  raddr,
       output  [31:0]  data);
-    base_env.mng.sequencer.RegRead32(raddr,data);
+    base_env.mng.master_sequencer.RegRead32(raddr,data);
   endtask
 
   // --------------------------
@@ -99,7 +99,7 @@ program test_slowdata (
   task axi_write(
       input [31:0]  waddr,
       input [31:0]  wdata);
-    base_env.mng.sequencer.RegWrite32(waddr,wdata);
+    base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
   endtask
 
   // --------------------------
@@ -107,7 +107,7 @@ program test_slowdata (
   // --------------------------
   task spi_receive(
       output [`DATA_DLENGTH:0]  data);
-    spi_env.spi_agent.sequencer.receive_data(data);
+    spi_env.spi_agent.master_sequencer.receive_data(data);
   endtask
 
   // --------------------------
@@ -115,14 +115,14 @@ program test_slowdata (
   // --------------------------
   task spi_send(
       input [`DATA_DLENGTH:0]  data);
-    spi_env.spi_agent.sequencer.send_data(data);
+    spi_env.spi_agent.master_sequencer.send_data(data);
   endtask
 
   // --------------------------
   // Wrapper function for waiting for all SPI
   // --------------------------
   task spi_wait_send();
-    spi_env.spi_agent.sequencer.flush_send();
+    spi_env.spi_agent.master_sequencer.flush_send();
   endtask
 
 
@@ -157,11 +157,11 @@ program test_slowdata (
 
     spi_env.run();
 
-    spi_env.spi_agent.sequencer.set_default_miso_data('h2AA55);
+    spi_env.spi_agent.master_sequencer.set_default_miso_data('h2AA55);
 
     // start sdo source (will wait for data enqueued)
     `ifdef DEF_SDO_STREAMING
-      spi_env.sdo_src_agent.sequencer.start();
+      spi_env.sdo_src_agent.master_sequencer.start();
     `endif
 
     sanity_test();
@@ -355,9 +355,9 @@ program test_slowdata (
     `ifdef DEF_SDO_STREAMING
       for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
         data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
-        spi_env.sdo_src_agent.sequencer.push_byte_for_stream(data[i]);
+        spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i]);
       end
-      spi_env.sdo_src_agent.sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
+      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
     `endif
   endtask
 
@@ -527,14 +527,14 @@ program test_slowdata (
     `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
 
     //Configure DMA
-    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
+    base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+    base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
-    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
-    base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+    base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
+    base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));
+    base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
     // Configure the Offload module
     axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
@@ -588,7 +588,7 @@ program test_slowdata (
     end
 
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      sdi_read_data[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      sdi_read_data[i] = base_env.ddr.slave_sequencer.get_reg_data_from_mem(xil_axi_uint'(`DDR_BA + 4*i));
       if (sdi_read_data[i] != sdi_read_data_store[i]) begin
         `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
         `FATAL(("Offload Read Test FAILED"));

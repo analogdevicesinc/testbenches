@@ -72,7 +72,7 @@ program test_program;
                         `TH.`SRC_AXIS.inst.IF,
                         `TH.`DST_AXIS.inst.IF);
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
     base_env.start();
     axis_seq_env.start();
@@ -81,17 +81,15 @@ program test_program;
 
     axis_seq_env.configure();
 
-    axis_seq_env.run();
-
     axis_seq_env.src_axis_agent.master_sequencer.set_data_beat_delay(`SRC_BEAT_DELAY);
     axis_seq_env.src_axis_agent.master_sequencer.set_descriptor_delay(`SRC_DESCRIPTOR_DELAY);
 
-    axis_seq_env.dst_axis_agent.master_sequencer.set_high_time(`DEST_BEAT_DELAY_HIGH);
-    axis_seq_env.dst_axis_agent.master_sequencer.set_low_time(`DEST_BEAT_DELAY_LOW);
+    axis_seq_env.dst_axis_agent.slave_sequencer.set_high_time(`DEST_BEAT_DELAY_HIGH);
+    axis_seq_env.dst_axis_agent.slave_sequencer.set_low_time(`DEST_BEAT_DELAY_LOW);
 
     case (`DEST_BACKPRESSURE)
-      1: axis_seq_env.dst_axis_agent.master_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
-      2: axis_seq_env.dst_axis_agent.master_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      1: axis_seq_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
+      2: axis_seq_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
       default: `FATAL(("Destination backpressure mode parameter incorrect!"));
     endcase
 

@@ -137,40 +137,40 @@ program test_program;
     rx_os_link.set_encoding(enc8b10b);
     rx_os_link.set_lane_rate(lane_rate);
 
-    ex_rx_ll = new("EX RX_LINK_LAYER", base_env.mng.sequencer, `EX_AXI_JESD_RX_BA, tx_link);
+    ex_rx_ll = new("EX RX_LINK_LAYER", base_env.mng.master_sequencer, `EX_AXI_JESD_RX_BA, tx_link);
     ex_rx_ll.probe();
 
-    ex_tx_ll = new("EX TX_LINK_LAYER", base_env.mng.sequencer, `EX_AXI_JESD_TX_BA, rx_link);
+    ex_tx_ll = new("EX TX_LINK_LAYER", base_env.mng.master_sequencer, `EX_AXI_JESD_TX_BA, rx_link);
     ex_tx_ll.probe();
 
-    ex_tx_os_ll = new("EX TX_OS_LINK_LAYER", base_env.mng.sequencer, `EX_AXI_JESD_TX_OS_BA, rx_os_link);
+    ex_tx_os_ll = new("EX TX_OS_LINK_LAYER", base_env.mng.master_sequencer, `EX_AXI_JESD_TX_OS_BA, rx_os_link);
     ex_tx_os_ll.probe();
 
-    ex_rx_xcvr = new("EX RX_XCVR", base_env.mng.sequencer, `EX_AXI_XCVR_RX_BA);
+    ex_rx_xcvr = new("EX RX_XCVR", base_env.mng.master_sequencer, `EX_AXI_XCVR_RX_BA);
     ex_rx_xcvr.probe();
 
-    ex_tx_xcvr = new("EX TX_XCVR", base_env.mng.sequencer, `EX_AXI_XCVR_TX_BA);
+    ex_tx_xcvr = new("EX TX_XCVR", base_env.mng.master_sequencer, `EX_AXI_XCVR_TX_BA);
     ex_tx_xcvr.probe();
 
-    ex_tx_os_xcvr = new("EX TX_OS_XCVR", base_env.mng.sequencer, `EX_AXI_XCVR_TX_OS_BA);
+    ex_tx_os_xcvr = new("EX TX_OS_XCVR", base_env.mng.master_sequencer, `EX_AXI_XCVR_TX_OS_BA);
     ex_tx_os_xcvr.probe();
 
-    dut_rx_xcvr = new("DUT RX_XCVR", base_env.mng.sequencer, `DUT_AXI_XCVR_RX_BA);
+    dut_rx_xcvr = new("DUT RX_XCVR", base_env.mng.master_sequencer, `DUT_AXI_XCVR_RX_BA);
     dut_rx_xcvr.probe();
 
-    dut_rx_os_xcvr = new("DUT RX_OS_XCVR", base_env.mng.sequencer, `DUT_AXI_XCVR_RX_OS_BA);
+    dut_rx_os_xcvr = new("DUT RX_OS_XCVR", base_env.mng.master_sequencer, `DUT_AXI_XCVR_RX_OS_BA);
     dut_rx_os_xcvr.probe();
 
-    dut_tx_xcvr = new("DUT TX_XCVR", base_env.mng.sequencer, `DUT_AXI_XCVR_TX_BA);
+    dut_tx_xcvr = new("DUT TX_XCVR", base_env.mng.master_sequencer, `DUT_AXI_XCVR_TX_BA);
     dut_tx_xcvr.probe();
 
-    dut_rx_ll = new("DUT RX_LINK_LAYER", base_env.mng.sequencer, `AXI_JESD_RX_BA, rx_link);
+    dut_rx_ll = new("DUT RX_LINK_LAYER", base_env.mng.master_sequencer, `AXI_JESD_RX_BA, rx_link);
     dut_rx_ll.probe();
 
-    dut_rx_os_ll = new("DUT RX_OS_LINK_LAYER", base_env.mng.sequencer, `AXI_JESD_RX_OS_BA, rx_os_link);
+    dut_rx_os_ll = new("DUT RX_OS_LINK_LAYER", base_env.mng.master_sequencer, `AXI_JESD_RX_OS_BA, rx_os_link);
     dut_rx_os_ll.probe();
 
-    dut_tx_ll = new("DUT TX_LINK_LAYER", base_env.mng.sequencer, `AXI_JESD_TX_BA, tx_link);
+    dut_tx_ll = new("DUT TX_LINK_LAYER", base_env.mng.master_sequencer, `AXI_JESD_TX_BA, tx_link);
     dut_tx_ll.probe();
 
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));

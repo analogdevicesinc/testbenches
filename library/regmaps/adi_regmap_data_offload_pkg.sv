@@ -140,6 +140,6 @@ package adi_regmap_data_offload_pkg;
   `define GET_DO_FSM_DBG_FSM_STATE_READ(x) GetField(DO_FSM_DBG,"FSM_STATE_READ",x)
   `define DEFAULT_DO_FSM_DBG_FSM_STATE_READ GetResetValue(DO_FSM_DBG,"FSM_STATE_READ")
   `define GET_DO_FSM_DBG_FSM_STATE_WRITE(x) GetField(DO_FSM_DBG,"FSM_STATE_WRITE",x)
-  `define DEFAULT_DO_FSM_DBG_FSM_STATE_READ GetResetValue(DO_FSM_DBG,"FSM_STATE_WRITE")
+  `define DEFAULT_DO_FSM_DBG_FSM_STATE_WRITE GetResetValue(DO_FSM_DBG,"FSM_STATE_WRITE")
 
 endpackage

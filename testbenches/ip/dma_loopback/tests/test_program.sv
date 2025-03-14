@@ -72,10 +72,10 @@ program test_program;
     start_clocks();
     base_env.sys_reset();
 
-    m_dmac_api = new("TX_DMA", base_env.mng.sequencer, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA", base_env.mng.sequencer, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA", base_env.mng.master_sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
 
     //  -------------------------------------------------------

@@ -95,16 +95,16 @@ program test_program;
     link.set_encoding(`JESD_MODE != "64B66B" ? enc8b10b : enc64b66b);
     link.set_lane_rate(lane_rate);
 
-    rx_ll = new("RX_LINK_LAYER", base_env.mng.sequencer, `AXI_JESD_RX_BA, link);
+    rx_ll = new("RX_LINK_LAYER", base_env.mng.master_sequencer, `AXI_JESD_RX_BA, link);
     rx_ll.probe();
 
-    tx_ll = new("TX_LINK_LAYER", base_env.mng.sequencer, `AXI_JESD_TX_BA, link);
+    tx_ll = new("TX_LINK_LAYER", base_env.mng.master_sequencer, `AXI_JESD_TX_BA, link);
     tx_ll.probe();
 
-    rx_xcvr = new("RX_XCVR", base_env.mng.sequencer, `RX_XCVR_BA);
+    rx_xcvr = new("RX_XCVR", base_env.mng.master_sequencer, `RX_XCVR_BA);
     rx_xcvr.probe();
 
-    tx_xcvr = new("TX_XCVR", base_env.mng.sequencer, `TX_XCVR_BA);
+    tx_xcvr = new("TX_XCVR", base_env.mng.master_sequencer, `TX_XCVR_BA);
     tx_xcvr.probe();
 
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));

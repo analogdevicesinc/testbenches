@@ -271,6 +271,8 @@ package m_axis_sequencer_pkg;
               if (enabled || (!enabled && stop_policy == STOP_POLICY_DESCRIPTOR_QUEUE)) begin
                 packetize();
                 descriptor_delay_subroutine();
+              end else begin
+                packet_sent();
               end
             end else begin
               this.queue_empty_sig = 1;

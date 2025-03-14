@@ -56,7 +56,7 @@ program test_program;
   io_vip_if_base output_vip_if;
   io_vip_if_base polynomial_vip_if;
 
-  localparam MAX_WIDTH = `MAX(`DATA_WIDTH, `POLYNOMIAL_WIDTH+1);
+  localparam MAX_WIDTH = `MAX(`DATA_WIDTH, `POLYNOMIAL_WIDTH);
 
   logic [`DATA_WIDTH-1:0] input_data;
   logic [`DATA_WIDTH-1:0] output_data;
@@ -108,7 +108,7 @@ program test_program;
 
     `INFO(("Negative edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_negative_edge();
-    repeat(1) begin
+    repeat(1000) begin
       polynomial_vip_if.wait_posedge_clk();
 
       input_vip_if.set_io(input_data);
@@ -141,7 +141,7 @@ program test_program;
 
     `INFO(("Positive edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_positive_edge();
-    repeat(1) begin
+    repeat(1000) begin
       polynomial_vip_if.wait_negedge_clk();
 
       input_vip_if.set_io(input_data);
@@ -159,6 +159,8 @@ program test_program;
       if (output_data !== calculated_data) begin
         `ERROR(("Output PRBS: %0h | Calculated PRBS: %0h", output_data, calculated_data));
       end
+
+      input_data = processed_data[`DATA_WIDTH-1:0];
     end
 
     base_env.stop();

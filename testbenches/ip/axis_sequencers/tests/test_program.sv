@@ -72,7 +72,7 @@ program test_program;
                         `TH.`SRC_AXIS.inst.IF,
                         `TH.`DST_AXIS.inst.IF);
 
-    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     axis_seq_env.start();

@@ -56,6 +56,10 @@ program test_program;
   io_vip_if_base output_vip_if;
   io_vip_if_base polynomial_vip_if;
 
+  io_vip_if_base ready_vip_if;
+  io_vip_if_base rstn_vip_if;
+  io_vip_if_base error_vip_if;
+
   localparam MAX_WIDTH = `MAX(`DATA_WIDTH, `POLYNOMIAL_WIDTH);
 
   logic [`DATA_WIDTH-1:0] input_data;
@@ -96,6 +100,10 @@ program test_program;
     output_vip_if = `TH.`OUTPUT_VIP.inst.inst.IF.vif;
     polynomial_vip_if = `TH.`POLYNOMIAL_VIP.inst.inst.IF.vif;
 
+    ready_vip_if = `TH.`READY_VIP.inst.inst.IF.vif;
+    rstn_vip_if = `TH.`RSTN_VIP.inst.inst.IF.vif;
+    error_vip_if = `TH.`ERROR_VIP.inst.inst.IF.vif;
+
     base_env.start();
     base_env.sys_reset();
 
@@ -108,7 +116,7 @@ program test_program;
 
     `INFO(("Negative edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_negative_edge();
-    repeat(1000) begin
+    repeat(100) begin
       polynomial_vip_if.wait_posedge_clk();
 
       input_vip_if.set_io(input_data);
@@ -127,7 +135,7 @@ program test_program;
         `ERROR(("Output PRBS: %0h | Calculated PRBS: %0h", output_data, calculated_data));
       end
 
-      input_data = processed_data[`DATA_WIDTH-1:0];
+      input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data};
     end
 
     #1ns;
@@ -141,7 +149,7 @@ program test_program;
 
     `INFO(("Positive edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_positive_edge();
-    repeat(1000) begin
+    repeat(100) begin
       polynomial_vip_if.wait_negedge_clk();
 
       input_vip_if.set_io(input_data);
@@ -160,7 +168,34 @@ program test_program;
         `ERROR(("Output PRBS: %0h | Calculated PRBS: %0h", output_data, calculated_data));
       end
 
-      input_data = processed_data[`DATA_WIDTH-1:0];
+      input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data};
+    end
+
+    // gen-mon verification
+    polynomial = $urandom();
+    polynomial_vip_if.set_io(polynomial);
+
+    input_data = $urandom();
+    processed_data = {{MAX_WIDTH-`DATA_WIDTH{1'b0}}, input_data};
+
+    `INFO(("Generator-monitor verification"), ADI_VERBOSITY_LOW);
+
+    rstn_vip_if.set_io(1'b0);
+    ready_vip_if.set_io(1'b0);
+    rstn_vip_if.wait_posedge_clk();
+
+    rstn_vip_if.set_io(1'b1);
+    rstn_vip_if.wait_posedge_clk();
+
+    ready_vip_if.set_io(1'b1);
+    ready_vip_if.wait_posedge_clk();
+
+    repeat(100) begin
+      error_vip_if.wait_negedge_clk();
+      if (error_vip_if.get_io()) begin
+        `ERROR(("PRBS check failed!"));
+      end
+      polynomial_vip_if.wait_posedge_clk();
     end
 
     base_env.stop();

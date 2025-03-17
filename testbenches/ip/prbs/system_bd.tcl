@@ -40,6 +40,8 @@ set POLYNOMIAL_WIDTH $ad_project_params(POLYNOMIAL_WIDTH)
 
 # Add design sources to the project
 add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs.v"
+add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs_gen.v"
+add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs_mon.v"
 
 create_bd_cell -type module -reference prbs prbs_dut
 
@@ -80,3 +82,59 @@ ad_connect polynomial_vip/clk sys_cpu_clk
 ad_connect polynomial_vip/o prbs_dut/polynomial
 
 ad_connect GND prbs_dut/inverted
+
+# generator
+create_bd_cell -type module -reference prbs_gen prbs_gen_dut
+
+ad_ip_parameter prbs_gen_dut CONFIG.DATA_WIDTH $DATA_WIDTH
+ad_ip_parameter prbs_gen_dut CONFIG.POLYNOMIAL_WIDTH $POLYNOMIAL_WIDTH
+
+# monitor
+create_bd_cell -type module -reference prbs_mon prbs_mon_dut
+
+ad_ip_parameter prbs_mon_dut CONFIG.DATA_WIDTH $DATA_WIDTH
+ad_ip_parameter prbs_mon_dut CONFIG.POLYNOMIAL_WIDTH $POLYNOMIAL_WIDTH
+
+# create ready VIP
+ad_ip_instance io_vip ready_vip [ list \
+  MODE 1 \
+  WIDTH 1 \
+  ASYNC 0 \
+]
+adi_sim_add_define "READY_VIP=ready_vip"
+
+# create ready VIP
+ad_ip_instance io_vip rstn_vip [ list \
+  MODE 1 \
+  WIDTH 1 \
+  ASYNC 0 \
+]
+adi_sim_add_define "RSTN_VIP=rstn_vip"
+
+# create ready VIP
+ad_ip_instance io_vip error_vip [ list \
+  MODE 0 \
+  WIDTH 1 \
+  ASYNC 0 \
+]
+adi_sim_add_define "ERROR_VIP=error_vip"
+
+ad_connect prbs_gen_dut/clk sys_cpu_clk
+ad_connect prbs_mon_dut/clk sys_cpu_clk
+ad_connect ready_vip/clk sys_cpu_clk
+ad_connect rstn_vip/clk sys_cpu_clk
+ad_connect error_vip/clk sys_cpu_clk
+
+ad_connect ready_vip/o prbs_gen_dut/input_ready
+ad_connect input_vip/o prbs_gen_dut/initial_value
+ad_connect error_vip/i prbs_mon_dut/error
+
+ad_connect prbs_gen_dut/output_valid prbs_mon_dut/input_valid
+ad_connect prbs_gen_dut/output_data prbs_mon_dut/input_data
+
+ad_connect rstn_vip/o prbs_gen_dut/rstn
+ad_connect rstn_vip/o prbs_mon_dut/rstn
+ad_connect polynomial_vip/o prbs_gen_dut/polynomial
+ad_connect polynomial_vip/o prbs_mon_dut/polynomial
+ad_connect GND prbs_gen_dut/inverted
+ad_connect GND prbs_mon_dut/inverted

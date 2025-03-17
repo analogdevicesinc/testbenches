@@ -8,21 +8,22 @@ source $ad_hdl_dir/library/scripts/adi_ip_xilinx.tcl
 
 adi_ip_create adi_spi_vip
 adi_ip_files adi_spi_vip [list \
-    "adi_spi_vip_pkg.sv" \
     "adi_spi_vip.sv" \
     "spi_vip_if.sv" \
-    "adi_spi_vip_pkg.ttcl" \
-    "$ad_tb_dir/library/utilities/utils.svh" \
-    "$ad_tb_dir/library/utilities/logger_pkg.sv" \
+    "adi_spi_vip_if_base_pkg.sv" \
 ]
 
 adi_ip_properties_lite adi_spi_vip
-adi_ip_sim_ttcl adi_spi_vip "adi_spi_vip_pkg.ttcl"
 
-set_property company_url {https://wiki.analog.com/resources/fpga/peripherals/spi_engine} [ipx::current_core]
+set cc [ipx::current_core]
+
+set_property company_url {Unavailable} $cc
+
+set_property display_name "ADI SPI VIP" $cc
+set_property description "ADI SPI Verification IP" $cc
 
 # Remove all inferred interfaces
-ipx::remove_all_bus_interface [ipx::current_core]
+ipx::remove_all_bus_interface $cc
 
 ## Interface definitions
 
@@ -51,8 +52,6 @@ adi_add_bus "m_spi" "master" \
   "(spirit:decode(id('MODELPARAM_VALUE.MODE')) == 1) || (spirit:decode(id('MODELPARAM_VALUE.MODE')) == 2)"
 
 ## Parameter validations
-
-set cc [ipx::current_core]
 
 ## MODE
 set_property -dict [list \
@@ -157,7 +156,7 @@ set_property -dict [list \
 ## DEFAULT_MISO_DATA
 set_property	-dict [list \
   "value_bit_string_length" "32" \
-  "value_format" "bit_string" \
+  "value_format" "bitString" \
   "enablement_tcl_expr" "\$MODE==0" \
 ] \
 [ipx::get_user_parameters DEFAULT_MISO_DATA -of_objects $cc]

@@ -26,7 +26,7 @@
 #
 #   2. An ADI specific BSD license, which can be found in the top level directory
 #      of this repository (LICENSE_ADIBSD), and also on-line at:
-#      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+#      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 #      This will allow to generate bit files and not release the source code,
 #      as long as it attaches to an ADI device.
 #
@@ -210,7 +210,7 @@ ad_connect  $sys_cpu_resetn tx_os_device_clk_rstgen/ext_reset_in
 
 source $ad_hdl_dir/projects/adrv9009/common/adrv9009_bd.tcl
 
-source $ad_hdl_dir/testbenches/library/drivers/jesd/jesd_exerciser.tcl
+source $ad_tb_dir/library/drivers/jesd/jesd_exerciser.tcl
 
 create_jesd_exerciser rx_jesd_exerciser 0 $ENCODER_SEL $LANE_RATE $TX_NUM_OF_CONVERTERS $TX_NUM_OF_LANES $TX_SAMPLES_PER_FRAME $TX_SAMPLE_WIDTH
 create_bd_cell -type container -reference rx_jesd_exerciser i_rx_jesd_exerciser

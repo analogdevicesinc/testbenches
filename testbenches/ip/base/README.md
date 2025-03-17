@@ -1,6 +1,6 @@
 Base design to be copied when starting to work on a new testbench.
 
-By default includes: 
+By default includes:
 
  * all the files that are needed for any testbench
  * scoreboard and auxiliary module imports, ready to be integrated

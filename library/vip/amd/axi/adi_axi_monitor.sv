@@ -1,10 +1,45 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsibilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
 `include "utils.svh"
 
 package adi_axi_monitor_pkg;
 
   import axi_vip_pkg::*;
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_vip_pkg::*;
   import pub_sub_pkg::*;
 
   class adi_axi_monitor #(int `AXI_VIP_PARAM_ORDER(axi)) extends adi_monitor;
@@ -16,6 +51,7 @@ package adi_axi_monitor_pkg;
     adi_publisher #(logic [7:0]) publisher_rx;
 
     protected bit enabled;
+    protected event enable_ev;
 
     // constructor
     function new(
@@ -39,13 +75,26 @@ package adi_axi_monitor_pkg;
         return;
       end
 
-      fork
-        this.get_transaction();
-      join_none
-
       this.enabled = 1;
       this.info($sformatf("Monitor enabled"), ADI_VERBOSITY_MEDIUM);
+
+      fork
+        begin
+          this.get_transaction();
+        end
+        begin
+          if (this.enabled == 1) begin
+            @enable_ev;
+          end
+          disable fork;
+        end
+      join_none
     endtask: run
+
+    function void stop();
+      this.enabled = 0;
+      -> enable_ev;
+    endfunction: stop
 
     // collect data from the DDR interface, all WRITE transaction are coming
     // from the ADC and all READ transactions are going to the DAC
@@ -83,6 +132,6 @@ package adi_axi_monitor_pkg;
       end
     endtask: get_transaction
 
-  endclass
+  endclass: adi_axi_monitor
 
-endpackage
+endpackage: adi_axi_monitor_pkg

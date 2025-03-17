@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright 2022 (c) Analog Devices, Inc.
+## Copyright (C) 2022 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -11,7 +11,8 @@ include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_spi_engine.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_axi_ad7616_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_adc_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_common_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_clkgen_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_pwm_gen_pkg.sv
 
@@ -22,16 +23,14 @@ LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_ad7616
 LIB_DEPS += axi_pwm_gen
 LIB_DEPS += axi_dmac
-LIB_DEPS += axi_sysid
 LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
-LIB_DEPS += sysid_rom
 LIB_DEPS += util_pack/util_cpack2
 
 # default test program
-TP := test_program_si
+#TP := test_program_si
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl

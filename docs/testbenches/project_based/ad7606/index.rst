@@ -42,10 +42,10 @@ The following parameters of this project that can be configured:
 -  NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
    Options: 1 - Interleaved mode, 2 - 1 lane per channel,
    4 - 2 lanes per channel, 8 - 4 lanes per channel
-   
+
 Build parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 The parameters mentioned above can be configured when starting the build, like in
 the following example:
 
@@ -53,10 +53,10 @@ the following example:
    :showuser:
 
    $make DEV_CONFIG=0 EXT_CLK=0 INTF=0 NUM_OF_SDI=2
-   
+
 but we recommend using the already tested build configuration modes, that can be
 found in the ``cfg`` section.
- 
+
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -72,7 +72,7 @@ The following configuration files are available:
    | cfg2                  | 1          | 0       | 0    | 1          |
    +-----------------------+------------+---------+------+------------+
    | cfg3                  | 2          | 0       | 0    | 1          |
-   +-----------------------+------------+---------+------+------------+   
+   +-----------------------+------------+---------+------+------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -135,7 +135,7 @@ Sanity test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This test is used to check the communication with the AXI REGMAP module of the
-AD7606 SPI Engine interface, by reading the core VERSION register, along with 
+AD7606 SPI Engine interface, by reading the core VERSION register, along with
 writing and reading the SCRATCH register.
 
 Simple configuration test
@@ -313,13 +313,13 @@ HDL related dependencies
    * - UTIL_CPACK2
      - :git-hdl:`library/util_pack/util_cpack2 <library/util_pack/util_cpack2>` *
      - :external+hdl:ref:`here <util_cpack2>`
-     
+
 .. admonition:: Legend
    :class: note
 
    -   ``*`` instantiated only for INTF=0 (parallel interface)
    -   ``**`` instantiated only for INTF=1 (serial interface)
-     
+
 
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -331,7 +331,7 @@ Testbench specific dependencies:
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
-   
+
    * - SV dependency name
      - Source code link
      - Documentation link
@@ -362,7 +362,7 @@ Testbench specific dependencies:
    * - S_AXIS_SEQUENCER
      - :git-testbenches:`library/vip/amd/s_axis_sequencer.sv`
      - ---
-     
+
 .. include:: ../../../common/more_information.rst
 
 .. include:: ../../../common/support.rst

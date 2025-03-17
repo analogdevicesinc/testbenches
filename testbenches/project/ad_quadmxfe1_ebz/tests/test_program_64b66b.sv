@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2018 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import test_harness_env_pkg::*;
@@ -63,7 +61,7 @@ program test_program_64b66b;
   int tmp;
 
   initial begin
-  
+
     // create environment
     base_env = new("Base Environment",
                     `TH.`SYS_CLK.inst.IF,
@@ -73,10 +71,10 @@ program test_program_64b66b;
                     `TH.`MNG_AXI.inst.IF,
                     `TH.`DDR_AXI.inst.IF);
 
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
-    `TH.`REF_CLK.inst.IF.start_clock;
-    `TH.`DRP_CLK.inst.IF.start_clock;
-    `TH.`SYSREF_CLK.inst.IF.start_clock;
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
+    `TH.`REF_CLK.inst.IF.start_clock();
+    `TH.`DRP_CLK.inst.IF.start_clock();
+    `TH.`SYSREF_CLK.inst.IF.start_clock();
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
@@ -104,7 +102,7 @@ program test_program_64b66b;
     //
 
     // Enable Rx channel CH0
-    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA+(30'h0100<<2), 
+    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA+(30'h0100<<2),
                        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     // Enable Rx channel CH31
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA+(30'h02F0<<2),
@@ -113,7 +111,7 @@ program test_program_64b66b;
     // Enable Rx channel CH63
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA+(30'h04F0<<2),
                        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
- 
+
     // Select DDS as source CH0
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + (30'h0106<<2),
                        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
@@ -179,12 +177,12 @@ program test_program_64b66b;
                        `SET_JESD_TX_SYSREF_CONF_SYSREF_DISABLE(0));
     //CONF0
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_CONF0),
-                       `SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME('h3) | 
+                       `SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME('h3) |
                        `SET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME('hff));
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_CONF0),
-                       `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME('h3) | 
+                       `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME('h3) |
                        `SET_JESD_RX_LINK_CONF0_OCTETS_PER_MULTIFRAME('hff));
-    
+
     //CONF1
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_CONF1),
                        `SET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(0));
@@ -248,7 +246,7 @@ program test_program_64b66b;
                        `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_CNTRL),
                        `SET_ADC_COMMON_REG_CNTRL_SYNC(1));
- 
+
     // Configure RX DMA
     base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_CONTROL),
                        `SET_DMAC_CONTROL_ENABLE(1));
@@ -256,7 +254,7 @@ program test_program_64b66b;
                        `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003FF));
     base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-    // Configure TX DMA 
+    // Configure TX DMA
     base_env.mng.sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_CONTROL),
                        `SET_DMAC_CONTROL_ENABLE(1));
     base_env.mng.sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_FLAGS),
@@ -307,7 +305,12 @@ program test_program_64b66b;
     #2us;
 
     base_env.stop();
-    
+
+    `TH.`DRP_CLK.inst.IF.stop_clock();
+    `TH.`REF_CLK.inst.IF.stop_clock();
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
+    `TH.`SYSREF_CLK.inst.IF.stop_clock();
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

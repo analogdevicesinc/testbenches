@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 `include "axi_definitions.svh"
 `include "axis_definitions.svh"
@@ -63,7 +61,7 @@ program test_program;
 
   dmac_api dmac_tx;
   dmac_api dmac_rx;
-  
+
   int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**int($clog2(`CHANNELS));
 
   initial begin
@@ -98,7 +96,7 @@ program test_program;
 
     `INFO(("Bring up IPs from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
-    
+
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     pack_env.run();
@@ -128,7 +126,7 @@ program test_program;
 
     pack_env.stop();
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

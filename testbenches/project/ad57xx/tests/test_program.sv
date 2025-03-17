@@ -96,7 +96,7 @@ endtask
 // --------------------------
 task spi_receive(
     output [`DATA_DLENGTH:0]  data);
-  spi_env.spi_seq.receive_data(data);
+  spi_env.spi_agent.sequencer.receive_data(data);
 endtask
 
 // --------------------------
@@ -104,14 +104,14 @@ endtask
 // --------------------------
 task spi_send(
     input [`DATA_DLENGTH:0]  data);
-  spi_env.spi_seq.send_data(data);
+  spi_env.spi_agent.sequencer.send_data(data);
 endtask
 
 // --------------------------
 // Wrapper function for waiting for all SPI
 // --------------------------
 task spi_wait_send();
-  spi_env.spi_seq.flush_send();
+  spi_env.spi_agent.sequencer.flush_send();
 endtask
 
 
@@ -131,14 +131,14 @@ initial begin
                   `TH.`DDR_AXI.inst.IF);
 
   spi_env = new("SPI Environment",
-                `TH.`SPI_S.inst.IF);
+                `TH.`SPI_S.inst.IF.vif);
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
   base_env.start();
   spi_env.start();
 
-  spi_env.spi_seq.set_default_miso_data('h0);
+  spi_env.spi_agent.sequencer.set_default_miso_data('h0);
 
   base_env.sys_reset();
 

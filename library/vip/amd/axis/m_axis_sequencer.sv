@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -39,7 +39,7 @@
 package m_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
-  import adi_common_pkg::*;
+  import adi_vip_pkg::*;
   import logger_pkg::*;
 
   typedef enum {
@@ -49,14 +49,13 @@ package m_axis_sequencer_pkg;
   } data_gen_mode_t;
 
   typedef enum bit [1:0] {
-    STOP_POLICY_IMMEDIATE = 2'h0,        // disable as soon as possible
     STOP_POLICY_DATA_BEAT = 2'h1,        // disable after the data beat has been transferred
     STOP_POLICY_PACKET = 2'h2,           // disable after the packet has been transferred
     STOP_POLICY_DESCRIPTOR_QUEUE = 2'h3  // disable after the packet queue has been transferred
   } stop_policy_t;
 
 
-  class m_axis_sequencer_base extends adi_component;
+  class m_axis_sequencer_base extends adi_sequencer;
 
     protected bit enabled;
     protected bit queue_empty_sig;
@@ -69,7 +68,7 @@ package m_axis_sequencer_pkg;
                                         // 1 - autogenerate descriptor based on the first descriptor from test until aborted
     protected bit keep_all; // 0 - bytes can be set to be invalid
                             // 1 - all bytes are always valid, data is generated only for the set part
-    
+
     protected int byte_count;
 
     protected int data_beat_delay; // delay in clock cycles
@@ -100,8 +99,10 @@ package m_axis_sequencer_pkg;
     function new(
       input string name,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
+
+      this.trans = new();
 
       this.enabled = 1'b0;
       this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
@@ -117,29 +118,46 @@ package m_axis_sequencer_pkg;
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: set_inactive_drive_output_0
 
     // check if ready is asserted
     virtual function bit check_ready_asserted();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endfunction: check_ready_asserted
 
     // wait for set amount of clock cycles
     virtual task wait_clk_count(input int wait_clocks);
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: wait_clk_count
 
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
     virtual protected task packetize();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: packetize
 
     virtual protected task sender();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: sender
 
     // create transfer based on data beats per packet
-    virtual function void add_xfer_descriptor_packet_size(
+    virtual function void add_xfer_descriptor_sample_count(
       input int data_beats_per_packet,
       input int gen_tlast = 1,
       input int gen_sync = 1);
-    endfunction: add_xfer_descriptor_packet_size
+
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endfunction: add_xfer_descriptor_sample_count
+
+    // wait until data beat is sent
+    virtual task beat_sent();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: beat_sent
+
+    // wait until packet is sent
+    virtual task packet_sent();
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: packet_sent
 
 
     // set disable policy
@@ -193,7 +211,7 @@ package m_axis_sequencer_pkg;
     endfunction: set_keep_some
 
     // create transfer descriptor
-    function void add_xfer_descriptor(
+    function void add_xfer_descriptor_byte_count(
       input int bytes_to_generate,
       input int gen_last = 1,
       input int gen_sync = 1);
@@ -208,23 +226,13 @@ package m_axis_sequencer_pkg;
       descriptor_q.push_back(descriptor);
       this.queue_empty_sig = 0;
       ->>queue_ev;
-    endfunction: add_xfer_descriptor
+    endfunction: add_xfer_descriptor_byte_count
 
     // descriptor delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
     protected task descriptor_delay_subroutine();
       wait_clk_count(descriptor_delay);
     endtask: descriptor_delay_subroutine
-
-    // wait until data beat is sent
-    task beat_sent();
-      @beat_done;
-    endtask: beat_sent
-
-    // wait until packet is sent
-    task packet_sent();
-      @packet_done;
-    endtask: packet_sent
 
     // wait until queue is empty
     task wait_empty_descriptor_queue();
@@ -249,13 +257,11 @@ package m_axis_sequencer_pkg;
           fork
             begin
               @disable_ev;
-              if (this.queue_empty_sig == 0)
-                case (stop_policy)
-                  STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
-                  STOP_POLICY_PACKET: @packet_done;
-                  STOP_POLICY_DATA_BEAT: @beat_done;
-                  STOP_POLICY_IMMEDIATE: ;
-                endcase
+              case (stop_policy)
+                STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
+                STOP_POLICY_PACKET: packet_sent();
+                STOP_POLICY_DATA_BEAT: beat_sent();
+              endcase
             end
             forever begin
               if (descriptor_q.size() > 0) begin
@@ -276,7 +282,7 @@ package m_axis_sequencer_pkg;
       end
     endtask: generator
 
-    // function 
+    // function
     function void push_byte_for_stream(xil_axi4stream_data_byte byte_stream);
       this.byte_stream.push_back(byte_stream);
       ->>byte_stream_ev;
@@ -330,14 +336,30 @@ package m_axis_sequencer_pkg;
     endfunction: new
 
 
+    // wait until data beat is sent
+    virtual task beat_sent();
+      if (this.driver.is_driver_idle()) begin
+        return;
+      end
+      @beat_done;
+    endtask: beat_sent
+
+    // wait until packet is sent
+    virtual task packet_sent();
+      if (this.driver.is_driver_idle() && this.trans.get_last()) begin
+        return;
+      end
+      @packet_done;
+    endtask: packet_sent
+
     // create transfer based on data beats per packet
-    virtual function void add_xfer_descriptor_packet_size(
+    virtual function void add_xfer_descriptor_sample_count(
       input int data_beats_per_packet,
       input int gen_tlast = 1,
       input int gen_sync = 1);
-      
-      add_xfer_descriptor(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
-    endfunction: add_xfer_descriptor_packet_size
+
+      add_xfer_descriptor_byte_count(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
+    endfunction: add_xfer_descriptor_sample_count
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
@@ -443,7 +465,6 @@ package m_axis_sequencer_pkg;
         this.info($sformatf("waiting transfer to complete"), ADI_VERBOSITY_HIGH);
         @beat_done;
       end
-      ->> packet_done;
     endtask: packetize
 
     // packet sender function
@@ -457,19 +478,20 @@ package m_axis_sequencer_pkg;
           fork
             begin
               @disable_ev;
-              if (this.queue_empty_sig == 0)
-                case (stop_policy)
-                  STOP_POLICY_DESCRIPTOR_QUEUE: @queue_empty;
-                  STOP_POLICY_PACKET: @packet_done;
-                  STOP_POLICY_DATA_BEAT: @beat_done;
-                  STOP_POLICY_IMMEDIATE: ;
-                endcase
+              case (stop_policy)
+                STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
+                STOP_POLICY_PACKET: packet_sent();
+                STOP_POLICY_DATA_BEAT: beat_sent();
+              endcase
             end
             forever begin
               @data_av_ev;
               this.info($sformatf("sending axis transaction"), ADI_VERBOSITY_HIGH);
               this.driver.send(trans);
               ->> beat_done;
+              if (this.trans.get_last()) begin
+                ->> packet_done;
+              end
             end
           join_any
           disable fork;
@@ -477,6 +499,6 @@ package m_axis_sequencer_pkg;
       end
     endtask: sender
 
-  endclass
+  endclass: m_axis_sequencer
 
-endpackage
+endpackage: m_axis_sequencer_pkg

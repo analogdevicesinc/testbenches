@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2022 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import logger_pkg::*;
@@ -166,7 +164,7 @@ program test_program;
       ch_off[i] = k;
       j = j+8;
       k = k+16;
-    end 
+    end
 
     for (int i=0; i<32; i++) begin
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
@@ -174,7 +172,7 @@ program test_program;
 
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
                          `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(ch_off[i]));
-    end 
+    end
 
 
     // Read back the values; unimplemented channels should not store these values
@@ -206,9 +204,9 @@ program test_program;
       end else begin
         success_count++;
       end
-    end 
+    end
 
-    // Read the status register to validate the current state 
+    // Read the status register to validate the current state
     base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b00) begin
@@ -233,7 +231,7 @@ program test_program;
     @(posedge waiting_state);
     delay_start = $time;
 
-    // Read the status register to validate the current state 
+    // Read the status register to validate the current state
     repeat (8) @(posedge `TH.dut_tdd.inst.up_clk);
     base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
@@ -276,7 +274,7 @@ program test_program;
     //*******//
     // ARMED //
     //*******//
-    // Read the status register to validate the current state 
+    // Read the status register to validate the current state
     repeat (8) @(posedge `TH.dut_tdd.inst.up_clk);
     base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
@@ -338,7 +336,7 @@ program test_program;
       ch_off[i] = k;
       j = j+8;
       k = k-8;
-    end 
+    end
 
     for (int i=0; i<32; i++) begin
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
@@ -346,7 +344,7 @@ program test_program;
 
       base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
                          `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(ch_off[i]));
-    end 
+    end
 
     // Read back the values; unimplemented channels should not store these values
     for (int i=0; i<32; i++) begin
@@ -377,7 +375,7 @@ program test_program;
       end else begin
         success_count++;
       end
-    end 
+    end
 
 
     // Enable the module; use external sync for transfer triggering
@@ -571,12 +569,12 @@ program test_program;
 
 
   task start_clocks();
-    `TH.`DEVICE_CLK.inst.IF.start_clock;
+    `TH.`DEVICE_CLK.inst.IF.start_clock();
   endtask
 
 
   task stop_clocks();
-    `TH.`DEVICE_CLK.inst.IF.stop_clock;
+    `TH.`DEVICE_CLK.inst.IF.stop_clock();
   endtask
 
 

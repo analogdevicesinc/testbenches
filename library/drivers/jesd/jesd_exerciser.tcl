@@ -96,7 +96,7 @@ proc create_jesd_exerciser { \
                                                   $SAMPLE_WIDTH \
                                                   $TPL_DATAPATH_WIDTH \
                                                   $DMA_SAMPLE_WIDTH
-  
+
   if {$TX_OR_RX_N == 0} {
     ad_ip_parameter ${rxtx}_tpl_core/adc_tpl_core CONFIG.EN_FRAME_ALIGN {0}
   }

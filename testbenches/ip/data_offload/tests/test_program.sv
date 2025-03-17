@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,12 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
 `include "utils.svh"
 `include "axi_definitions.svh"
 `include "axis_definitions.svh"
@@ -93,7 +90,7 @@ program test_program;
     //=========================================================================
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-    
+
     base_env.start();
     scb_env.start();
 
@@ -110,7 +107,7 @@ program test_program;
 
     //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
-    
+
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
     scb_env.run();
@@ -134,7 +131,7 @@ program test_program;
 
     scb_env.stop();
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
@@ -163,8 +160,8 @@ program test_program;
 
   // RX DMA transfer generator
   task rx_dma_transfer(
-    input dmac_api dmac, 
-    input int xfer_addr, 
+    input dmac_api dmac,
+    input int xfer_addr,
     input int xfer_length);
     dmac.set_flags('b110);
     dmac.set_dest_addr(xfer_addr);
@@ -174,8 +171,8 @@ program test_program;
 
   // TX DMA transfer generator
   task tx_dma_transfer(
-    input dmac_api dmac, 
-    input int xfer_addr, 
+    input dmac_api dmac,
+    input int xfer_addr,
     input int xfer_length);
     dmac.set_flags('b010); // enable TLAST, CYCLIC
     dmac.set_src_addr(xfer_addr);
@@ -185,7 +182,7 @@ program test_program;
 
   // Memory initialization function for a 8byte DATA_WIDTH AXI4 bus
   task init_mem_64(
-    input longint unsigned addr, 
+    input longint unsigned addr,
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin

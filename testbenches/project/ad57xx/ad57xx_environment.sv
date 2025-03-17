@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -38,20 +38,15 @@
 package ad57xx_environment_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_environment_pkg::*;
 
-  import s_spi_sequencer_pkg::*;
   import adi_spi_vip_pkg::*;
-  
-  import `PKGIFY(test_harness, spi_s_vip)::*;
+  import adi_spi_vip_if_base_pkg::*;
 
   class ad57xx_environment extends adi_environment;
 
     // Agents
-    adi_spi_agent #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_agent;
-
-    // Sequencers
-    s_spi_sequencer #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_seq;
+    adi_spi_agent spi_agent;
 
     //============================================================================
     // Constructor
@@ -59,15 +54,12 @@ package ad57xx_environment_pkg;
     function new(
       input string name,
 
-      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if);
+      adi_spi_vip_if_base spi_s_vip_if);
 
       super.new(name);
 
       // Creating the agents
       this.spi_agent = new("SPI VIP Agent", spi_s_vip_if, this);
-
-      // Creating the sequencers
-      this.spi_seq = new("SPI VIP Sequencer", this.spi_agent, this);
 
     endfunction
 

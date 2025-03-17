@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -39,10 +39,10 @@
 package s_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
-  import adi_common_pkg::*;
+  import adi_vip_pkg::*;
   import logger_pkg::*;
 
-  class s_axis_sequencer_base extends adi_component;
+  class s_axis_sequencer_base extends adi_sequencer;
 
     protected xil_axi4stream_data_byte byte_stream [$];
     protected xil_axi4stream_ready_gen_policy_t mode;
@@ -63,7 +63,7 @@ package s_axis_sequencer_pkg;
     function new(
       input string name,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
 
       this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
@@ -89,45 +89,45 @@ package s_axis_sequencer_pkg;
     // ready generation policy functions
     function void set_mode(input xil_axi4stream_ready_gen_policy_t mode);
       this.mode = mode;
-    endfunction
+    endfunction: set_mode
 
     function xil_axi4stream_ready_gen_policy_t get_mode();
       return this.mode;
-    endfunction
+    endfunction: get_mode
 
     // high time functions
     function void set_high_time(input xil_axi4stream_uint high_time);
       this.high_time = high_time;
-    endfunction
+    endfunction: set_high_time
 
     function xil_axi4stream_uint get_high_time();
       return this.high_time;
-    endfunction
+    endfunction: get_high_time
 
     function void set_high_time_range(
-      input xil_axi4stream_uint high_time_min, 
+      input xil_axi4stream_uint high_time_min,
       input xil_axi4stream_uint high_time_max);
 
       this.high_time_min = high_time_min;
       this.high_time_max = high_time_max;
-    endfunction
+    endfunction: set_high_time_range
 
     // low time functions
     function void set_low_time(input xil_axi4stream_uint low_time);
       this.low_time = low_time;
-    endfunction
+    endfunction: set_low_time
 
     function xil_axi4stream_uint get_low_time();
       return this.low_time;
     endfunction
 
     function void set_low_time_range(
-      input xil_axi4stream_uint low_time_min, 
+      input xil_axi4stream_uint low_time_min,
       input xil_axi4stream_uint low_time_max);
 
       this.low_time_min = low_time_min;
       this.low_time_max = low_time_max;
-    endfunction
+    endfunction: set_low_time_range
 
     // function for verifying bytes
     task verify_byte(input bit [7:0] refdata);
@@ -140,20 +140,22 @@ package s_axis_sequencer_pkg;
           this.error($sformatf("Unexpected data received. Expected: %0h Found: %0h Left : %0d", refdata, data, byte_stream.size()));
         end
       end
-    endtask
+    endtask: verify_byte
 
     // call ready generation function
     task run();
       user_gen_tready();
-    endtask
+    endtask: run
 
 
     // virtual tasks to be implemented
     virtual task user_gen_tready();
-    endtask
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: user_gen_tready
 
     virtual task get_transfer();
-    endtask
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: get_transfer
 
   endclass: s_axis_sequencer_base
 
@@ -167,18 +169,18 @@ package s_axis_sequencer_pkg;
       input string name,
       input axi4stream_slv_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
       input adi_agent parent = null);
-      
+
       super.new(name, parent);
 
       this.driver = driver;
-    endfunction
+    endfunction: new
 
 
     virtual task user_gen_tready();
       axi4stream_ready_gen tready_gen;
-      
+
       tready_gen = this.driver.create_ready("TREADY");
-      
+
       tready_gen.set_ready_policy(this.mode);
 
       if (this.variable_ranges)
@@ -194,8 +196,8 @@ package s_axis_sequencer_pkg;
         tready_gen.set_high_time_range(this.high_time_min, this.high_time_max);
       end
       this.driver.send_tready(tready_gen);
-    endtask
+    endtask: user_gen_tready
 
-  endclass
+  endclass: s_axis_sequencer
 
-endpackage
+endpackage: s_axis_sequencer_pkg

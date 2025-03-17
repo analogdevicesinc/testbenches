@@ -1,4 +1,4 @@
-## Copyright 2024(c) Analog Devices, Inc.
+## Copyright (C) 2024-2025 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -9,6 +9,8 @@ include $(TB_LIBRARY_PATH)/includes/Makeinclude_axi.mk
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/utils.svh
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/logger_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_common_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_vip_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_environment_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/test_harness_env.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/drivers/common/watchdog.sv
 

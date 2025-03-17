@@ -70,8 +70,8 @@ Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 \**\* MENTION IF ANY CONFIGURATION FILES ARE AVAILABLE\**\*
-   
-\**\* THIS IS JUST AN EXAMPLE \**\*   
+
+\**\* THIS IS JUST AN EXAMPLE \**\*
 
 The following are available configurations for the testbench:
 
@@ -191,7 +191,7 @@ Sanity test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This test is used to check the communication with the AXI REGMAP module of the
-AD7606 SPI Engine interface, by reading the core VERSION register, along with 
+AD7606 SPI Engine interface, by reading the core VERSION register, along with
 writing and reading the SCRATCH register.
 
 Building the testbench
@@ -319,13 +319,13 @@ HDL related dependencies
    * - UTIL_CPACK2
      - :git-hdl:`library/util_pack/util_cpack2 <library/util_pack/util_cpack2>` *
      - :external+hdl:ref:`util_cpack2`
-     
+
 .. admonition:: Legend
    :class: note
 
    -   ``*`` instantiated only for INTF=0 (parallel interface)
    -   ``**`` instantiated only for INTF=1 (serial interface)
-     
+
 
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -339,7 +339,7 @@ Testbench specific dependencies:
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
-   
+
    * - SV dependency name
      - Source code link
      - Documentation link

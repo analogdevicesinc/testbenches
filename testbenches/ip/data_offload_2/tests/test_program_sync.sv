@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -48,9 +48,9 @@ import data_offload_pkg::*;
 //=============================================================================
 
 module test_program_sync (
-  output  reg       init_req = 1'b0,  
+  output  reg       init_req = 1'b0,
   output  reg       sync_ext = 1'b0,
-  output  reg       mem_rst_n = 1'b0  
+  output  reg       mem_rst_n = 1'b0
 );
 
   //declaring environment instance
@@ -73,7 +73,7 @@ module test_program_sync (
     //=========================================================================
 
     env.src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-    env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, 1, 0);
+    env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
 
     env.dst_axis_seq.set_mode(`DST_READY_MODE);
     env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
@@ -140,7 +140,7 @@ module test_program_sync (
 
     //init_req <= 1'b1;
     #100
-    // env.src_axis_seq.add_xfer_descriptor(`SRC_TRANSFERS_LENGTH, 1, 0);
+    // env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
 
     // @env.src_axis_seq.queue_empty;
     // init_req <= 1'b0;
@@ -163,28 +163,28 @@ module test_program_sync (
 
   task start_clocks();
     #1
-    `TH.`SRC_CLK.inst.IF.start_clock;
+    `TH.`SRC_CLK.inst.IF.start_clock();
     #1
-    `TH.`DST_CLK.inst.IF.start_clock;
+    `TH.`DST_CLK.inst.IF.start_clock();
     #1
-    `TH.`SYS_CLK.inst.IF.start_clock;
+    `TH.`SYS_CLK.inst.IF.start_clock();
   endtask
 
   task stop_clocks();
-    `TH.`SRC_CLK.inst.IF.stop_clock;
-    `TH.`DST_CLK.inst.IF.stop_clock;
-    `TH.`SYS_CLK.inst.IF.stop_clock;
+    `TH.`SRC_CLK.inst.IF.stop_clock();
+    `TH.`DST_CLK.inst.IF.stop_clock();
+    `TH.`SYS_CLK.inst.IF.stop_clock();
   endtask
 
   task sys_reset();
-    `TH.`SRC_RST.inst.IF.assert_reset;
-    `TH.`DST_RST.inst.IF.assert_reset;
-    `TH.`SYS_RST.inst.IF.assert_reset;
+    `TH.`SRC_RST.inst.IF.assert_reset();
+    `TH.`DST_RST.inst.IF.assert_reset();
+    `TH.`SYS_RST.inst.IF.assert_reset();
 
     #500
-    `TH.`SRC_RST.inst.IF.deassert_reset;
-    `TH.`DST_RST.inst.IF.deassert_reset;
-    `TH.`SYS_RST.inst.IF.deassert_reset;
+    `TH.`SRC_RST.inst.IF.deassert_reset();
+    `TH.`DST_RST.inst.IF.deassert_reset();
+    `TH.`SYS_RST.inst.IF.deassert_reset();
   endtask
 
   task systemBringUp();

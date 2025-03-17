@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -40,34 +40,71 @@ package m_axi_sequencer_pkg;
 
   import axi_vip_pkg::*;
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import reg_accessor_pkg::*;
+  import adi_vip_pkg::*;
 
-  class m_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends reg_accessor;
 
-    axi_mst_agent #(`AXI_VIP_PARAM_ORDER(AXI)) agent;
+  class m_axi_sequencer_base extends adi_sequencer;
+
+    function new(
+      input string name,
+      input adi_agent parent = null);
+
+      super.new(name, parent);
+    endfunction: new
+
+    virtual task automatic RegWrite32(
+      input xil_axi_ulong addr =0,
+      input bit [31:0]    data);
+
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: RegWrite32
+
+    virtual task automatic RegRead32(
+      input xil_axi_ulong  addr =0,
+      output bit [31:0]    data);
+
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: RegRead32
+
+    virtual task automatic RegReadVerify32(
+      input xil_axi_ulong  addr =0,
+      input bit [31:0]     data);
+
+      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
+    endtask: RegReadVerify32
+
+  endclass: m_axi_sequencer_base
+
+
+  class m_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends m_axi_sequencer_base;
+
+    axi_mst_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver;
+    axi_mst_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver;
 
     semaphore reader_s;
     semaphore writer_s;
 
     function new(
       input string name,
-      input axi_mst_agent #(`AXI_VIP_PARAM_ORDER(AXI)) agent,
+      input axi_mst_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver,
+      input axi_mst_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver,
       input adi_agent parent = null);
 
       super.new(name, parent);
 
-      this.agent = agent;
-      
+      this.wr_driver = wr_driver;
+      this.rd_driver = rd_driver;
+
       reader_s = new(1);
       writer_s = new(1);
-    endfunction
+    endfunction: new
 
     // ---------------------------------------------------------------------------
     // Generic tasks
     // ---------------------------------------------------------------------------
-    virtual task automatic RegWrite32(input xil_axi_ulong  addr =0,
-                                      input bit [31:0]    data);
+    virtual task automatic RegWrite32(
+      input xil_axi_ulong addr =0,
+      input bit [31:0]    data);
 
       static xil_axi_uint       id =0;
 
@@ -82,11 +119,11 @@ package m_axi_sequencer_pkg;
                                             .data(data));
       id++;
       writer_s.put(1);
-
     endtask : RegWrite32
 
-    virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
-                                     output bit [31:0]    data);
+    virtual task automatic RegRead32(
+      input xil_axi_ulong  addr =0,
+      output bit [31:0]    data);
 
       xil_axi_data_beat DataBeat_for_read[];
       static xil_axi_uint       id =0;
@@ -104,52 +141,25 @@ package m_axi_sequencer_pkg;
       this.info($sformatf(" Reading data : %h @ 0x%h", data, addr), ADI_VERBOSITY_HIGH);
 
       reader_s.put(1);
-
     endtask : RegRead32
 
-    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
-                                           input bit [31:0]     data);
+    virtual task automatic RegReadVerify32(
+      input xil_axi_ulong  addr =0,
+      input bit [31:0]     data);
+
       bit [31:0]    data_out;
       RegRead32(.addr(addr),
                 .data(data_out));
       if (data !== data_out) begin
         this.error($sformatf(" Address : %h; Data mismatch. Read data is : %h; expected is %h", addr, data_out, data));
       end
-
     endtask : RegReadVerify32
 
 
     // ---------------------------------------------------------------------------
     // BFM specific tasks
     // ---------------------------------------------------------------------------
-    task automatic single_write_transaction_api (
-                                  input string            name ="single_write",
-                                  input xil_axi_uint      id =0,
-                                  input xil_axi_ulong     addr =0,
-                                  input xil_axi_len_t     len =0,
-                                  input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
-                                  input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
-                                  input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
-                                  input xil_axi_cache_t   cache =3,
-                                  input xil_axi_prot_t    prot =0,
-                                  input xil_axi_region_t  region =0,
-                                  input xil_axi_qos_t     qos =0,
-                                  input bit [63:0]        data =0);
-
-      axi_transaction  wr_trans;
-      wr_trans = agent.wr_driver.create_transaction(name);
-      wr_trans.set_write_cmd(addr, burst, id, len, size);
-      wr_trans.set_prot(prot);
-      wr_trans.set_lock(lock);
-      wr_trans.set_cache(cache);
-      wr_trans.set_region(region);
-      wr_trans.set_qos(qos);
-      wr_trans.set_data_block(data);
-      agent.wr_driver.send(wr_trans);
-
-    endtask : single_write_transaction_api
-
-    task automatic single_write_transaction_readback_api (
+    protected task automatic single_write_transaction_api (
       input string            name ="single_write",
       input xil_axi_uint      id =0,
       input xil_axi_ulong     addr =0,
@@ -164,7 +174,33 @@ package m_axi_sequencer_pkg;
       input bit [63:0]        data =0);
 
       axi_transaction  wr_trans;
-      wr_trans = agent.wr_driver.create_transaction(name);
+      wr_trans = wr_driver.create_transaction(name);
+      wr_trans.set_write_cmd(addr, burst, id, len, size);
+      wr_trans.set_prot(prot);
+      wr_trans.set_lock(lock);
+      wr_trans.set_cache(cache);
+      wr_trans.set_region(region);
+      wr_trans.set_qos(qos);
+      wr_trans.set_data_block(data);
+      wr_driver.send(wr_trans);
+    endtask : single_write_transaction_api
+
+    protected task automatic single_write_transaction_readback_api (
+      input string            name ="single_write",
+      input xil_axi_uint      id =0,
+      input xil_axi_ulong     addr =0,
+      input xil_axi_len_t     len =0,
+      input xil_axi_size_t    size =xil_axi_size_t'(xil_clog2((32)/8)),
+      input xil_axi_burst_t   burst =XIL_AXI_BURST_TYPE_INCR,
+      input xil_axi_lock_t    lock = XIL_AXI_ALOCK_NOLOCK,
+      input xil_axi_cache_t   cache =3,
+      input xil_axi_prot_t    prot =0,
+      input xil_axi_region_t  region =0,
+      input xil_axi_qos_t     qos =0,
+      input bit [63:0]        data =0);
+
+      axi_transaction  wr_trans;
+      wr_trans = wr_driver.create_transaction(name);
       wr_trans.set_write_cmd(addr, burst, id, len, size);
       wr_trans.set_prot(prot);
       wr_trans.set_lock(lock);
@@ -173,12 +209,11 @@ package m_axi_sequencer_pkg;
       wr_trans.set_qos(qos);
       wr_trans.set_data_block(data);
       wr_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
-      agent.wr_driver.send(wr_trans);
-      agent.wr_driver.wait_rsp(wr_trans);
-
+      wr_driver.send(wr_trans);
+      wr_driver.wait_rsp(wr_trans);
     endtask : single_write_transaction_readback_api
 
-    task automatic single_read_transaction_api (
+    protected task automatic single_read_transaction_api (
       input string             name ="single_read",
       input xil_axi_uint       id =0,
       input xil_axi_ulong      addr =0,
@@ -193,17 +228,17 @@ package m_axi_sequencer_pkg;
       input xil_axi_data_beat  aruser =0);
 
       axi_transaction   rd_trans;
-      rd_trans = agent.rd_driver.create_transaction(name);
+      rd_trans = rd_driver.create_transaction(name);
       rd_trans.set_read_cmd(addr, burst, id, len, size);
       rd_trans.set_prot(prot);
       rd_trans.set_lock(lock);
       rd_trans.set_cache(cache);
       rd_trans.set_region(region);
       rd_trans.set_qos(qos);
-      agent.rd_driver.send(rd_trans);
+      rd_driver.send(rd_trans);
     endtask : single_read_transaction_api
 
-    task automatic single_read_transaction_readback_api (
+    protected task automatic single_read_transaction_readback_api (
       input string             name ="single_read",
       input xil_axi_uint       id =0,
       input xil_axi_ulong      addr =0,
@@ -219,7 +254,7 @@ package m_axi_sequencer_pkg;
       output xil_axi_data_beat Rdatabeat[]);
 
       axi_transaction   rd_trans;
-      rd_trans = agent.rd_driver.create_transaction(name);
+      rd_trans = rd_driver.create_transaction(name);
       rd_trans.set_driver_return_item_policy(XIL_AXI_PAYLOAD_RETURN);
       rd_trans.set_read_cmd(addr, burst, id, len, size);
       rd_trans.set_prot(prot);
@@ -227,16 +262,15 @@ package m_axi_sequencer_pkg;
       rd_trans.set_cache(cache);
       rd_trans.set_region(region);
       rd_trans.set_qos(qos);
-      agent.rd_driver.send(rd_trans);
-      agent.rd_driver.wait_rsp(rd_trans);
+      rd_driver.send(rd_trans);
+      rd_driver.wait_rsp(rd_trans);
       Rdatabeat = new[rd_trans.get_len()+1];
       for( xil_axi_uint beat=0; beat<rd_trans.get_len()+1; beat++) begin
         Rdatabeat[beat] = rd_trans.get_data_beat(beat);
         //$display("Read data from Driver: beat index %d, Data beat %h ", beat, Rdatabeat[beat]);
       end
-
     endtask : single_read_transaction_readback_api
 
-  endclass
+  endclass: m_axi_sequencer
 
-endpackage
+endpackage: m_axi_sequencer_pkg

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2018 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,15 +26,13 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
-//
+
 `include "utils.svh"
 
 import test_harness_env_pkg::*;
@@ -72,13 +70,11 @@ program test_program;
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
-
-    `TH.`HBM_CLK.inst.IF.start_clock;
-
+    `TH.`HBM_CLK.inst.IF.start_clock();
     base_env.sys_reset();
 
 //    //  -------------------------------------------------------
-//    //  Test TX DMA and RX DMA in loopback 
+//    //  Test TX DMA and RX DMA in loopback
 //    //  -------------------------------------------------------
 //
 //    // Init test data
@@ -99,12 +95,13 @@ program test_program;
 //      .dest_addr(`DDR_BASE+'h2000),
 //      .length('h1000)
 //    );
-//
-//    base_env.stop();
-//
-//    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
-//    $finish();
-//
+
+    base_env.stop();
+    `TH.`HBM_CLK.inst.IF.stop_clock();
+
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+    $finish();
+
   end
 
 //  task do_transfer(bit [31:0] src_addr,
@@ -137,7 +134,7 @@ program test_program;
 //  endtask
 //
 //
-//  // Check captured data 
+//  // Check captured data
 //  task check_data(bit [31:0] src_addr,
 //                  bit [31:0] dest_addr,
 //                  bit [31:0] length);

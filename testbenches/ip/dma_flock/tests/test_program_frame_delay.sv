@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -159,8 +159,8 @@ program test_program_frame_delay;
       `ERROR(("Both DMACs must be set in autorun mode."));
     end
 
-    stop_clocks();
     base_env.stop();
+    stop_clocks();
 
     `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);
     $finish();
@@ -253,7 +253,7 @@ program test_program_frame_delay;
               begin
                 for (int l = 0; l < m_seg.ylength; l++) begin
                   // update the AXIS generator command
-                  dma_flock_env.src_axis_agent.sequencer.add_xfer_descriptor(.bytes_to_generate(m_seg.length),
+                  dma_flock_env.src_axis_agent.sequencer.add_xfer_descriptor_byte_count(.bytes_to_generate(m_seg.length),
                                                        .gen_last(1),
                                                        .gen_sync(l==0));
                 end
@@ -337,15 +337,15 @@ program test_program_frame_delay;
      set_dst_clock(100000000);
      set_ddr_clock(500000000);
 
-    `TH.`SRC_CLK.inst.IF.start_clock;
-    `TH.`DST_CLK.inst.IF.start_clock;
+    `TH.`SRC_CLK.inst.IF.start_clock();
+    `TH.`DST_CLK.inst.IF.start_clock();
     #100ns;
   endtask
 
   // Stop all clocks
   task stop_clocks();
-    `TH.`SRC_CLK.inst.IF.stop_clock;
-    `TH.`DST_CLK.inst.IF.stop_clock;
+    `TH.`SRC_CLK.inst.IF.stop_clock();
+    `TH.`DST_CLK.inst.IF.stop_clock();
   endtask
 
   // Assert external sync for one clock cycle

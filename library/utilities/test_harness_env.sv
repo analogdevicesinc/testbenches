@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -39,7 +39,7 @@
 package test_harness_env_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_environment_pkg::*;
   import adi_axi_agent_pkg::*;
 
 
@@ -91,9 +91,9 @@ package test_harness_env_pkg;
       this.mng.agent.start_master();
       this.ddr.agent.start_slave();
 
-      this.sys_clk_vip_if.start_clock;
-      this.dma_clk_vip_if.start_clock;
-      this.ddr_clk_vip_if.start_clock;
+      this.sys_clk_vip_if.start_clock();
+      this.dma_clk_vip_if.start_clock();
+      this.ddr_clk_vip_if.start_clock();
     endtask
 
     //============================================================================
@@ -103,9 +103,9 @@ package test_harness_env_pkg;
       this.mng.agent.stop_master();
       this.ddr.agent.stop_slave();
 
-      this.sys_clk_vip_if.stop_clock;
-      this.dma_clk_vip_if.stop_clock;
-      this.ddr_clk_vip_if.stop_clock;
+      this.sys_clk_vip_if.stop_clock();
+      this.dma_clk_vip_if.stop_clock();
+      this.ddr_clk_vip_if.stop_clock();
     endtask
 
     //============================================================================
@@ -113,9 +113,9 @@ package test_harness_env_pkg;
     //============================================================================
     task sys_reset();
       //asserts all the resets for 100 ns
-      this.sys_rst_vip_if.assert_reset;
+      this.sys_rst_vip_if.assert_reset();
       #200;
-      this.sys_rst_vip_if.deassert_reset;
+      this.sys_rst_vip_if.deassert_reset();
       #800;
     endtask
 

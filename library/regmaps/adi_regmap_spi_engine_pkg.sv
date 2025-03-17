@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -44,7 +44,7 @@ package adi_regmap_spi_engine_pkg;
   const reg_t AXI_SPI_ENGINE_VERSION = '{ 'h0000, "VERSION" , '{
     "VERSION_MAJOR": '{ 31, 16, RO, 'h00000001 },
     "VERSION_MINOR": '{ 15, 8, RO, 'h00000004 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h00000000 }}};
+    "VERSION_PATCH": '{ 7, 0, RO, 'h00000001 }}};
   `define SET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) SetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
   `define GET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) GetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
   `define DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR GetResetValue(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR")

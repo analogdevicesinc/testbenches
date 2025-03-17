@@ -44,7 +44,7 @@ The following parameters of this project that can be configured:
 
 Build parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- 
+
 The parameters mentioned above can be configured when starting the build, like in
 the following example:
 
@@ -52,10 +52,10 @@ the following example:
    :showuser:
 
    $make CLK_MODE=0 NUM_OF_SDI=1 CAPTURE_ZONE=1 DDR_EN=0
-   
+
 but we recommend using the already tested build configuration modes, that can be
 found in the ``cfg`` section.
- 
+
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -68,7 +68,7 @@ The following configuration file is available:
    +=======================+==========+============+==============+========+
    | cfg1                  | 0        | 2          | 1            | 0      |
    +-----------------------+----------+------------+--------------+--------+
-  
+
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -277,7 +277,7 @@ HDL related dependencies
    :class: note
 
    ``*`` instantiated only for AD40xx/ADAQ40xx
-     
+
      - ---
 
 Testbenches related dependencies
@@ -290,7 +290,7 @@ Testbench specific dependencies:
 .. list-table::
    :widths: 30 45 25
    :header-rows: 1
-   
+
    * - SV dependency name
      - Source code link
      - Documentation link

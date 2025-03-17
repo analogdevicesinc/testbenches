@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -39,7 +39,8 @@
 package adi_axis_agent_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_vip_pkg::*;
+  import adi_environment_pkg::*;
   import axi4stream_vip_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
@@ -64,6 +65,21 @@ package adi_axis_agent_pkg;
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
+    task start();
+      this.agent.start_master();
+    endtask: start
+
+    task run();
+      this.sequencer.run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.sequencer.stop();
+      this.agent.stop_master();
+    endtask: stop
+
   endclass: adi_axis_master_agent
 
 
@@ -85,12 +101,28 @@ package adi_axis_agent_pkg;
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
+    task start();
+      this.agent.start_slave();
+    endtask: start
+
+    task run();
+      this.sequencer.run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.agent.stop_slave();
+    endtask: stop
+
   endclass: adi_axis_slave_agent
 
 
   class adi_axis_passthrough_mem_agent #(`AXIS_VIP_PARAM_DECL(passthrough)) extends adi_agent;
 
     axi4stream_passthrough_agent #(`AXIS_VIP_IF_PARAMS(passthrough)) agent;
+    m_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(passthrough)) master_sequencer;
+    s_axis_sequencer #(`AXIS_VIP_PARAM_ORDER(passthrough)) slave_sequencer;
     adi_axis_monitor #(`AXIS_VIP_PARAM_ORDER(passthrough)) monitor;
 
     function new(
@@ -101,9 +133,28 @@ package adi_axis_agent_pkg;
       super.new(name, parent);
 
       this.agent = new("Agent", passthrough_vip_if);
+      this.master_sequencer = new("Master Sequencer", this.agent.mst_driver, this);
+      this.slave_sequencer = new("Slave Sequencer", this.agent.slv_driver, this);
       this.monitor = new("Monitor", this.agent.monitor, this);
     endfunction: new
 
+    task start();
+      this.warning($sformatf("Start must called manually in the test program or environment"));
+    endtask: start
+
+    task run();
+      this.master_sequencer.run();
+      this.slave_sequencer.run();
+      this.monitor.run();
+    endtask: run
+
+    task stop();
+      this.monitor.stop();
+      this.master_sequencer.stop();
+      this.agent.stop_slave();
+      this.agent.stop_master();
+    endtask: stop
+
   endclass: adi_axis_passthrough_mem_agent
 
-endpackage
+endpackage: adi_axis_agent_pkg

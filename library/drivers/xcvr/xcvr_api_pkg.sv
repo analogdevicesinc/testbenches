@@ -33,31 +33,74 @@
 // ***************************************************************************
 // ***************************************************************************
 
-package reg_accessor_pkg;
+`include "utils.svh"
 
-  import axi_vip_pkg::*;
-  import adi_common_pkg::*;
+package xcvr_api_pkg;
 
-  class reg_accessor extends adi_component;
+  import logger_pkg::*;
+  import adi_peripheral_pkg::*;
+  import adi_regmap_xcvr_pkg::*;
+  import adi_regmap_pkg::*;
+  import reg_accessor_pkg::*;
+
+  class xcvr_api extends adi_peripheral;
+
+    protected logic [31:0] val;
 
     function new(
       input string name,
+      input reg_accessor bus,
+      input bit [31:0] base_address,
       input adi_component parent = null);
-      
-      super.new(name, parent);
+
+      super.new(name, bus, base_address, parent);
     endfunction
 
-    virtual task automatic RegWrite32(input xil_axi_ulong addr =0,
-                                           input bit [31:0]    data);
-    endtask: RegWrite32
 
-    virtual task automatic RegRead32(input xil_axi_ulong  addr =0,
-                                          output bit [31:0]    data);
-    endtask: RegRead32
+    task sanity_test();
+      reg [31:0] data;
+      // version
+      this.axi_verify(GetAddrs(XCVR_VERSION), `SET_XCVR_VERSION_VERSION(`DEFAULT_XCVR_VERSION_VERSION));
+      // scratch
+      data = 32'hdeadbeef;
+      this.axi_write(GetAddrs(XCVR_SCRATCH), `SET_XCVR_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(XCVR_SCRATCH), `SET_XCVR_SCRATCH_SCRATCH(data));
+    endtask
 
-    virtual task automatic RegReadVerify32(input xil_axi_ulong  addr =0,
-                                                input bit [31:0]     data);
-    endtask: RegReadVerify32
+    task reset(
+      input logic bufstatus_rst,
+      input logic resetn);
+
+      this.axi_write(GetAddrs(XCVR_RESETN),
+        `SET_XCVR_RESETN_BUFSTATUS_RST(bufstatus_rst) |
+        `SET_XCVR_RESETN_RESETN(resetn));
+    endtask
+
+    task get_control(
+      output logic lpm_dfe_n,
+      output logic [2:0] rate,
+      output logic [1:0] sysclk_sel,
+      output logic [2:0] outclk_sel);
+
+      this.axi_read(GetAddrs(XCVR_CONTROL), val);
+      lpm_dfe_n = `GET_XCVR_CONTROL_LPM_DFE_N(val);
+      rate = `GET_XCVR_CONTROL_RATE(val);
+      sysclk_sel = `GET_XCVR_CONTROL_SYSCLK_SEL(val);
+      outclk_sel = `GET_XCVR_CONTROL_OUTCLK_SEL(val);
+    endtask
+
+    task set_control(
+      input logic lpm_dfe_n,
+      input logic [2:0] rate,
+      input logic [1:0] sysclk_sel,
+      input logic [2:0] outclk_sel);
+
+      this.axi_write(GetAddrs(XCVR_CONTROL),
+        `SET_XCVR_CONTROL_LPM_DFE_N(lpm_dfe_n) |
+        `SET_XCVR_CONTROL_RATE(rate) |
+        `SET_XCVR_CONTROL_SYSCLK_SEL(sysclk_sel) |
+        `SET_XCVR_CONTROL_OUTCLK_SEL(outclk_sel));
+    endtask
 
   endclass
 

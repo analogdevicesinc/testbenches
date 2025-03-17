@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -269,7 +269,7 @@ package adi_regmap_jesd_rx_pkg;
 
   const reg_t JESD_RX_LINK_CONF2 = '{ 'h0240, "LINK_CONF2" , '{
     "BUFFER_EARLY_RELEASE": '{ 16, 16, RW, 'h0 },
-    "BUFFER_DEALY": '{ 9, 0, RW, 'h0 }}};
+    "BUFFER_DEALY": '{ 9, 2, RW, 'h0 }}};
   `define SET_JESD_RX_LINK_CONF2_BUFFER_EARLY_RELEASE(x) SetField(JESD_RX_LINK_CONF2,"BUFFER_EARLY_RELEASE",x)
   `define GET_JESD_RX_LINK_CONF2_BUFFER_EARLY_RELEASE(x) GetField(JESD_RX_LINK_CONF2,"BUFFER_EARLY_RELEASE",x)
   `define DEFAULT_JESD_RX_LINK_CONF2_BUFFER_EARLY_RELEASE GetResetValue(JESD_RX_LINK_CONF2,"BUFFER_EARLY_RELEASE")

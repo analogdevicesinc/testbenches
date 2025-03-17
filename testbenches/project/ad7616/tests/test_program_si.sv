@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2022 (c) Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -36,6 +36,7 @@
 //
 
 `include "utils.svh"
+`include "axi_definitions.svh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -252,7 +253,7 @@ end
 
   // Add an arbitrary delay to the echo_sclk signal
   initial begin
-    while(1) begin
+    forever begin
       @(posedge delay_clk) begin
         echo_delay_sclk <= {echo_delay_sclk, m_rx_sclk};
        end
@@ -261,7 +262,7 @@ end
   assign ad7616_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
 initial begin
-  while(1) begin
+  forever begin
     #0.5   delay_clk = ~delay_clk;
   end
 end
@@ -283,7 +284,7 @@ bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge spi_clk);
       m_spi_csn_int_d <= m_spi_csn_int_s;
   end
@@ -299,7 +300,7 @@ assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_neg_counter == 16);
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
       rx_sclk_pos_counter <= 8'b0;
@@ -310,7 +311,7 @@ initial begin
 end
 
 initial begin
-  while(1) begin
+  forever begin
     @(negedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
     if (m_spi_csn_negedge_s) begin
       rx_sclk_neg_counter <= 8'b0;
@@ -322,7 +323,7 @@ end
 
 // SDI shift register
 initial begin
-  while(1) begin
+  forever begin
     // synchronization
     if (CPHA ^ CPOL)
       @(posedge rx_sclk_bfm or posedge m_spi_csn_negedge_s);
@@ -371,7 +372,7 @@ bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge rx_sclk_bfm);
     sdi_data_store <= {sdi_shiftreg[13:0], 2'b00};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
@@ -399,7 +400,7 @@ end
 bit [31:0] offload_transfer_cnt;
 
 initial begin
-  while(1) begin
+  forever begin
     @(posedge shiftreg_sampled && offload_status);
       offload_transfer_cnt <= offload_transfer_cnt + 'h1;
   end

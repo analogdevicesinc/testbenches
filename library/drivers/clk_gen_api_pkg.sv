@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,21 +33,34 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`ifndef _INTERFACES_SVH_
-`define _INTERFACES_SVH_
+`include "utils.svh"
 
-interface clk_if ();
-  logic clk;
+package clk_gen_api_pkg;
 
-  task start_clock(int clk_period);
-    clk = 1'b1;
-    fork
-      forever begin
-        #((clk_period / 2)*1ps);
-        clk = ~clk;
-      end
-    join_none
-  endtask: start_clock
-endinterface: clk_if
+  import logger_pkg::*;
+  import adi_peripheral_pkg::*;
+  import adi_regmap_clkgen_pkg::*;
+  import adi_regmap_pkg::*;
+  import reg_accessor_pkg::*;
 
-`endif
+  class clk_gen_api extends adi_peripheral;
+
+    function new(
+      input string name,
+      input reg_accessor bus,
+      input bit [31:0] base_address,
+      input adi_component parent = null);
+
+      super.new(name, bus, base_address, parent);
+    endfunction
+
+
+    task enable_clkgen();
+      this.axi_write(GetAddrs(AXI_CLKGEN_REG_RSTN),
+        `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+        `SET_AXI_CLKGEN_REG_RSTN_RSTN(1));
+    endtask
+
+  endclass
+
+endpackage

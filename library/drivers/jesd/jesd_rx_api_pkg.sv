@@ -56,20 +56,20 @@ package jesd_rx_api_pkg;
       super.new(name, bus, base_address, parent);
     endfunction
 
-    
+
     task sanity_test();
       reg [31:0] data;
       // version
-      this.axi_verify(GetAddrs(JESD_RX_VERSION), 
+      this.axi_verify(GetAddrs(JESD_RX_VERSION),
         `SET_JESD_RX_VERSION_VERSION_MAJOR(`DEFAULT_JESD_RX_VERSION_VERSION_MAJOR) |
         `SET_JESD_RX_VERSION_VERSION_MINOR(`DEFAULT_JESD_RX_VERSION_VERSION_MINOR) |
         `SET_JESD_RX_VERSION_VERSION_PATCH(`DEFAULT_JESD_RX_VERSION_VERSION_PATCH));
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(JESD_RX_SCRATCH), `SET_JESD_RX_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(JESD_RX_SCRATCH), `GET_JESD_RX_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(JESD_RX_SCRATCH), `SET_JESD_RX_SCRATCH_SCRATCH(data));
       // magic
-      this.axi_verify(GetAddrs(JESD_RX_IDENTIFICATION), `DEFAULT_JESD_RX_IDENTIFICATION_IDENTIFICATION);
+      this.axi_verify(GetAddrs(JESD_RX_IDENTIFICATION), `SET_JESD_RX_IDENTIFICATION_IDENTIFICATION(`DEFAULT_JESD_RX_IDENTIFICATION_IDENTIFICATION));
     endtask
 
     task get_sysref_status(
@@ -95,7 +95,7 @@ package jesd_rx_api_pkg;
 
     task set_link_conf0(
       input logic [2:0] octets_per_frame,
-      input logic [9:0] octets_per_multiframe);
+      input logic [7:0] octets_per_multiframe);
 
       this.axi_write(GetAddrs(JESD_RX_LINK_CONF0),
         `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME(octets_per_frame) |

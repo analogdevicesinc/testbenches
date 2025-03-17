@@ -60,13 +60,13 @@ package pwm_gen_api_pkg;
     task sanity_test();
       reg [31:0] data;
       // version
-      this.axi_verify(GetAddrs(AXI_PWM_GEN_REG_VERSION), `DEFAULT_AXI_PWM_GEN_REG_VERSION_VERSION);
+      this.axi_verify(GetAddrs(AXI_PWM_GEN_REG_VERSION), `SET_AXI_PWM_GEN_REG_VERSION_VERSION(`DEFAULT_AXI_PWM_GEN_REG_VERSION_VERSION));
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(AXI_PWM_GEN_REG_SCRATCH), `SET_AXI_PWM_GEN_REG_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(AXI_PWM_GEN_REG_SCRATCH), `GET_AXI_PWM_GEN_REG_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(AXI_PWM_GEN_REG_SCRATCH), `SET_AXI_PWM_GEN_REG_SCRATCH_SCRATCH(data));
       // magic
-      this.axi_verify(GetAddrs(AXI_PWM_GEN_REG_CORE_MAGIC), `DEFAULT_AXI_PWM_GEN_REG_CORE_MAGIC_CORE_MAGIC);
+      this.axi_verify(GetAddrs(AXI_PWM_GEN_REG_CORE_MAGIC), `SET_AXI_PWM_GEN_REG_CORE_MAGIC_CORE_MAGIC(`DEFAULT_AXI_PWM_GEN_REG_CORE_MAGIC_CORE_MAGIC));
     endtask
 
     task reset();

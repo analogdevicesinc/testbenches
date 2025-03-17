@@ -56,7 +56,7 @@ package jesd_tx_api_pkg;
       super.new(name, bus, base_address, parent);
     endfunction
 
-    
+
     task sanity_test();
       reg [31:0] data;
       // version
@@ -67,9 +67,9 @@ package jesd_tx_api_pkg;
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(JESD_TX_SCRATCH), `SET_JESD_TX_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(JESD_TX_SCRATCH), `GET_JESD_TX_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(JESD_TX_SCRATCH), `SET_JESD_TX_SCRATCH_SCRATCH(data));
       // magic
-      this.axi_verify(GetAddrs(JESD_TX_IDENTIFICATION), `DEFAULT_JESD_TX_IDENTIFICATION_IDENTIFICATION);
+      this.axi_verify(GetAddrs(JESD_TX_IDENTIFICATION), `SET_JESD_TX_IDENTIFICATION_IDENTIFICATION(`DEFAULT_JESD_TX_IDENTIFICATION_IDENTIFICATION));
     endtask
 
     task get_sysref_status(

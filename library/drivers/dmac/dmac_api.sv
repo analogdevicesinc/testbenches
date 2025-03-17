@@ -61,20 +61,20 @@ package dmac_api_pkg;
       super.new(name, bus, base_address, parent);
     endfunction
 
-    
+
     task sanity_test();
       reg [31:0] data;
       // version
-      this.axi_verify(GetAddrs(DMAC_VERSION), 
+      this.axi_verify(GetAddrs(DMAC_VERSION),
         `SET_DMAC_VERSION_VERSION_MAJOR(`DEFAULT_DMAC_VERSION_VERSION_MAJOR) |
         `SET_DMAC_VERSION_VERSION_MINOR(`DEFAULT_DMAC_VERSION_VERSION_MINOR) |
         `SET_DMAC_VERSION_VERSION_PATCH(`DEFAULT_DMAC_VERSION_VERSION_PATCH));
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(DMAC_SCRATCH), `SET_DMAC_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(DMAC_SCRATCH), `GET_DMAC_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(DMAC_SCRATCH), `SET_DMAC_SCRATCH_SCRATCH(data));
       // magic
-      this.axi_verify(GetAddrs(DMAC_IDENTIFICATION), `DEFAULT_DMAC_IDENTIFICATION_IDENTIFICATION);
+      this.axi_verify(GetAddrs(DMAC_IDENTIFICATION), `SET_DMAC_IDENTIFICATION_IDENTIFICATION(`DEFAULT_DMAC_IDENTIFICATION_IDENTIFICATION));
     endtask
 
     // -----------------

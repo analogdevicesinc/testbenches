@@ -56,7 +56,7 @@ package xcvr_api_pkg;
       super.new(name, bus, base_address, parent);
     endfunction
 
-    
+
     task sanity_test();
       reg [31:0] data;
       // version
@@ -64,7 +64,7 @@ package xcvr_api_pkg;
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(XCVR_SCRATCH), `SET_XCVR_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(XCVR_SCRATCH), `GET_XCVR_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(XCVR_SCRATCH), `SET_XCVR_SCRATCH_SCRATCH(data));
     endtask
 
     task reset(

@@ -60,16 +60,16 @@ package tdd_api_pkg;
     task sanity_test();
       reg [31:0] data;
       // version
-      this.axi_verify(GetAddrs(TDDN_CNTRL_VERSION), 
+      this.axi_verify(GetAddrs(TDDN_CNTRL_VERSION),
         `SET_TDDN_CNTRL_VERSION_VERSION_MAJOR(`DEFAULT_TDDN_CNTRL_VERSION_VERSION_MAJOR) |
         `SET_TDDN_CNTRL_VERSION_VERSION_MINOR(`DEFAULT_TDDN_CNTRL_VERSION_VERSION_MINOR) |
         `SET_TDDN_CNTRL_VERSION_VERSION_PATCH(`DEFAULT_TDDN_CNTRL_VERSION_VERSION_PATCH));
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(TDDN_CNTRL_SCRATCH), `SET_TDDN_CNTRL_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(TDDN_CNTRL_SCRATCH), `GET_TDDN_CNTRL_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(TDDN_CNTRL_SCRATCH), `SET_TDDN_CNTRL_SCRATCH_SCRATCH(data));
       // magic
-      this.axi_verify(GetAddrs(TDDN_CNTRL_IDENTIFICATION), `DEFAULT_TDDN_CNTRL_IDENTIFICATION_IDENTIFICATION);
+      this.axi_verify(GetAddrs(TDDN_CNTRL_IDENTIFICATION), `SET_TDDN_CNTRL_IDENTIFICATION_IDENTIFICATION(`DEFAULT_TDDN_CNTRL_IDENTIFICATION_IDENTIFICATION));
     endtask
 
     task get_interface_description(output logic [31:0] description);
@@ -159,7 +159,7 @@ package tdd_api_pkg;
       input logic sync_rst,
       input logic enable);
 
-      this.axi_write(GetAddrs(TDDN_CNTRL_CONTROL), 
+      this.axi_write(GetAddrs(TDDN_CNTRL_CONTROL),
         `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(sync_soft) |
         `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(sync_ext) |
         `SET_TDDN_CNTRL_CONTROL_SYNC_INT(sync_int) |

@@ -77,7 +77,7 @@ package adc_api_pkg;
       input logic symb_op,
       input logic sdr_ddr_n);
 
-      this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL), 
+      this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL),
         `SET_ADC_COMMON_REG_CNTRL_DDR_EDGESEL(ddr_edgesel) |
         `SET_ADC_COMMON_REG_CNTRL_NUM_LANES(num_lanes) |
         `SET_ADC_COMMON_REG_CNTRL_PIN_MODE(pin_mode) |
@@ -93,7 +93,7 @@ package adc_api_pkg;
       input logic ext_sync_disarm,
       input logic manual_sync_request);
 
-      this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL_2), 
+      this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL_2),
         `SET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_ARM(ext_sync_arm) |
         `SET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_DISARM(ext_sync_disarm) |
         `SET_ADC_COMMON_REG_CNTRL_2_MANUAL_SYNC_REQUEST(manual_sync_request));
@@ -113,6 +113,11 @@ package adc_api_pkg;
       cfg = `GET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(val);
     endtask
 
+    task get_adc_config_rd(output logic [31:0] cfg);
+      this.axi_read(GetAddrs(ADC_COMMON_REG_ADC_CONFIG_RD), val);
+      cfg = `GET_ADC_COMMON_REG_ADC_CONFIG_RD_ADC_CONFIG_RD(val);
+    endtask
+
     task set_adc_config_control(input logic [31:0] cfg);
       this.axi_write(GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(cfg));
     endtask
@@ -126,7 +131,7 @@ package adc_api_pkg;
       input logic crc_en,
       input logic [7:0] custom_control);
 
-      this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL_3), 
+      this.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL_3),
         `SET_ADC_COMMON_REG_CNTRL_3_CRC_EN(crc_en) |
         `SET_ADC_COMMON_REG_CNTRL_3_CUSTOM_CONTROL(custom_control));
     endtask

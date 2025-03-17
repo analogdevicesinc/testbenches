@@ -73,7 +73,7 @@ package dac_api_pkg;
       input logic ext_sync_disarm,
       input logic manual_sync_request);
 
-      this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_1), 
+      this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_1),
         `SET_DAC_COMMON_REG_CNTRL_1_SYNC(sync) |
         `SET_DAC_COMMON_REG_CNTRL_1_EXT_SYNC_ARM(ext_sync_arm) |
         `SET_DAC_COMMON_REG_CNTRL_1_EXT_SYNC_DISARM(ext_sync_disarm) |
@@ -90,7 +90,7 @@ package dac_api_pkg;
       input logic symb_8_16b,
       input logic symb_op);
 
-      this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_2), 
+      this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_2),
         `SET_DAC_COMMON_REG_CNTRL_2_DATA_FORMAT(data_format) |
         `SET_DAC_COMMON_REG_CNTRL_2_NUM_LANES(num_lanes) |
         `SET_DAC_COMMON_REG_CNTRL_2_PAR_ENB(par_enb) |
@@ -101,18 +101,16 @@ package dac_api_pkg;
         `SET_DAC_COMMON_REG_CNTRL_2_SYMB_OP(symb_op));
     endtask
 
-    task get_status(output logic status);
+    task get_sync_status(output logic status);
       this.axi_read(GetAddrs(DAC_COMMON_REG_SYNC_STATUS), val);
       status = `GET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(val);
     endtask
-    
+
     task set_channel_control_1(
       input bit [7:0] channel,
-      input logic [5:0] dds_phase_dw,
       input logic [15:0] dds_scale_1);
 
       this.axi_write(channel * 'h40 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
-        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_PHASE_DW(dds_phase_dw) |
         `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(dds_scale_1));
     endtask
 

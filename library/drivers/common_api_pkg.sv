@@ -60,11 +60,11 @@ package common_api_pkg;
     task sanity_test();
       reg [31:0] data;
       // version
-      this.axi_verify(GetAddrs(COMMON_REG_VERSION), `DEFAULT_COMMON_REG_VERSION_VERSION);
+      this.axi_verify(GetAddrs(COMMON_REG_VERSION), `SET_COMMON_REG_VERSION_VERSION(`DEFAULT_COMMON_REG_VERSION_VERSION));
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(COMMON_REG_SCRATCH), `SET_COMMON_REG_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(COMMON_REG_SCRATCH), `GET_COMMON_REG_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(COMMON_REG_SCRATCH), `SET_COMMON_REG_SCRATCH_SCRATCH(data));
     endtask
 
     task set_config(

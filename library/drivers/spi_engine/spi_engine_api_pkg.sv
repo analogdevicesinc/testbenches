@@ -60,18 +60,22 @@ package spi_engine_api_pkg;
     task sanity_test();
       reg [31:0] data;
       // version
-      this.axi_verify(GetAddrs(AXI_SPI_ENGINE_VERSION), 
+      this.axi_verify(GetAddrs(AXI_SPI_ENGINE_VERSION),
         `SET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR) |
         `SET_AXI_SPI_ENGINE_VERSION_VERSION_MINOR(`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR) |
         `SET_AXI_SPI_ENGINE_VERSION_VERSION_PATCH(`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH));
       // scratch
       data = 32'hdeadbeef;
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_SCRATCH), `SET_AXI_SPI_ENGINE_SCRATCH_SCRATCH(data));
-      this.axi_verify(GetAddrs(AXI_SPI_ENGINE_SCRATCH), `GET_AXI_SPI_ENGINE_SCRATCH_SCRATCH(data));
+      this.axi_verify(GetAddrs(AXI_SPI_ENGINE_SCRATCH), `SET_AXI_SPI_ENGINE_SCRATCH_SCRATCH(data));
     endtask
 
     task enable_spi_engine();
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+    endtask
+
+    task disable_spi_engine();
+      this.axi_write(GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(1));
     endtask
 
     task fifo_command(input logic [31:0] cmd);
@@ -84,15 +88,6 @@ package spi_engine_api_pkg;
 
     task set_sdo_fifo_control(input logic [31:0] control);
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), `SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(control));
-    endtask
-
-    task get_sdo_fifo_control(output logic [31:0] control);
-      this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), val);
-      control = `GET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(val);
-    endtask
-
-    task set_sdi_fifo_control(input logic [31:0] control);
-      this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), `SET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(control));
     endtask
 
     task get_sdi_fifo_control(output logic [31:0] control);

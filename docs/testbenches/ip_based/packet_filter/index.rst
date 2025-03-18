@@ -62,16 +62,6 @@ Available configurations & tests combinations
 
 The test program is compatible with the configuration.
 
-CPU/Memory interconnects addresses
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Irrelevant for this testbench.
-
-Interrupts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Irrelevant for this testbench.
-
 Test stimulus
 -------------------------------------------------------------------------------
 
@@ -92,9 +82,9 @@ The steps of the environment bringup are:
 Packet filtering testing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Filter classes are implemented which are application specific
-* Before the resets are asserted, the filters are instantiated
-* The filters are connected with the publisher filters
+* Filter class are implemented which is a simple data filter
+* Before the resets are asserted, the filter is instantiated
+* The filter is connected with the publisher filters
 * The master and slave sequencers are configured and then the resets are
   asserted
 * The scoreboard is subscribed to the master and slave sequencers' publisher

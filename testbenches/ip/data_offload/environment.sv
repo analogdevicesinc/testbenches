@@ -52,11 +52,11 @@ package environment_pkg;
     //============================================================================
     task configure(int bytes_to_generate);
       // ADC stub
-      this.adc_src_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.adc_src_axis_agent.sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
+      this.adc_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.adc_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
 
       // DAC stub
-      this.dac_dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      this.dac_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask
 
     //============================================================================
@@ -65,8 +65,8 @@ package environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      this.adc_src_axis_agent.agent.start_master();
-      this.dac_dst_axis_agent.agent.start_slave();
+      this.adc_src_axis_agent.start_master();
+      this.dac_dst_axis_agent.start_slave();
 
       this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
@@ -78,12 +78,6 @@ package environment_pkg;
     //============================================================================
     task run();
       fork
-        this.adc_src_axis_agent.sequencer.run();
-        this.dac_dst_axis_agent.sequencer.run();
-
-        this.adc_src_axis_agent.monitor.run();
-        this.dac_dst_axis_agent.monitor.run();
-
         this.scoreboard_tx.run();
         this.scoreboard_rx.run();
       join_none
@@ -93,9 +87,8 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.adc_src_axis_agent.sequencer.stop();
-      this.adc_src_axis_agent.agent.stop_master();
-      this.dac_dst_axis_agent.agent.stop_slave();
+      this.adc_src_axis_agent.stop_master();
+      this.dac_dst_axis_agent.stop_slave();
     endtask
 
   endclass

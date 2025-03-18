@@ -99,16 +99,6 @@ Available configurations & tests combinations
 
 The test program is compatible with the above-mentioned configuration.
 
-CPU/Memory interconnects addresses
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Irrelevant for this testbench.
-
-Interrupts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Nothing connected.
-
 Test stimulus
 -------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -35,13 +35,13 @@
 /* Auto generated Register Map */
 /* Feb 07 14:25:05 2025 v0.4.1 */
 
-package adi_regmap_dac_pkg;
+package adi_regmap_axi_adc_template_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_dac extends adi_regmap;
+  class adi_regmap_axi_adc_template extends adi_regmap;
 
-    /* DAC Common (axi_ad) */
+    /* AXI TEMPLATE ADC Common (axi_template) */
     class RSTN_CLASS extends register_base;
       field_base CE_N_F;
       field_base MMCM_RSTN_F;
@@ -62,37 +62,15 @@ package adi_regmap_dac_pkg;
       endfunction: new
     endclass: RSTN_CLASS
 
-    class CNTRL_1_CLASS extends register_base;
-      field_base SYNC_F;
-      field_base EXT_SYNC_ARM_F;
-      field_base EXT_SYNC_DISARM_F;
-      field_base MANUAL_SYNC_REQUEST_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.SYNC_F = new("SYNC", 0, 0, RW, 'h0, this);
-        this.EXT_SYNC_ARM_F = new("EXT_SYNC_ARM", 1, 1, RW, 'h0, this);
-        this.EXT_SYNC_DISARM_F = new("EXT_SYNC_DISARM", 2, 2, RW, 'h0, this);
-        this.MANUAL_SYNC_REQUEST_F = new("MANUAL_SYNC_REQUEST", 8, 8, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CNTRL_1_CLASS
-
-    class CNTRL_2_CLASS extends register_base;
+    class CNTRL_CLASS extends register_base;
       field_base SDR_DDR_N_F;
       field_base SYMB_OP_F;
       field_base SYMB_8_16B_F;
       field_base NUM_LANES_F;
-      field_base PAR_TYPE_F;
-      field_base PAR_ENB_F;
+      field_base SYNC_F;
       field_base R1_MODE_F;
-      field_base DATA_FORMAT_F;
+      field_base DDR_EDGESEL_F;
+      field_base PIN_MODE_F;
 
       function new(
         input string name,
@@ -105,17 +83,38 @@ package adi_regmap_dac_pkg;
         this.SYMB_OP_F = new("SYMB_OP", 15, 15, RW, 'h0, this);
         this.SYMB_8_16B_F = new("SYMB_8_16B", 14, 14, RW, 'h0, this);
         this.NUM_LANES_F = new("NUM_LANES", 12, 8, RW, 'h0, this);
-        this.PAR_TYPE_F = new("PAR_TYPE", 7, 7, RW, 'h0, this);
-        this.PAR_ENB_F = new("PAR_ENB", 6, 6, RW, 'h0, this);
-        this.R1_MODE_F = new("R1_MODE", 5, 5, RW, 'h0, this);
-        this.DATA_FORMAT_F = new("DATA_FORMAT", 4, 4, RW, 'h0, this);
+        this.SYNC_F = new("SYNC", 3, 3, RW, 'h0, this);
+        this.R1_MODE_F = new("R1_MODE", 2, 2, RW, 'h0, this);
+        this.DDR_EDGESEL_F = new("DDR_EDGESEL", 1, 1, RW, 'h0, this);
+        this.PIN_MODE_F = new("PIN_MODE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CNTRL_CLASS
+
+    class CNTRL_2_CLASS extends register_base;
+      field_base EXT_SYNC_ARM_F;
+      field_base EXT_SYNC_DISARM_F;
+      field_base MANUAL_SYNC_REQUEST_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.EXT_SYNC_ARM_F = new("EXT_SYNC_ARM", 1, 1, RW, 'h0, this);
+        this.EXT_SYNC_DISARM_F = new("EXT_SYNC_DISARM", 2, 2, RW, 'h0, this);
+        this.MANUAL_SYNC_REQUEST_F = new("MANUAL_SYNC_REQUEST", 8, 8, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: CNTRL_2_CLASS
 
-    class RATECNTRL_CLASS extends register_base;
-      field_base RATE_F;
+    class CNTRL_3_CLASS extends register_base;
+      field_base CRC_EN_F;
+      field_base CUSTOM_CONTROL_F;
 
       function new(
         input string name,
@@ -124,29 +123,14 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.RATE_F = new("RATE", 7, 0, RW, 'h0, this);
+        this.CRC_EN_F = new("CRC_EN", 8, 8, RW, 'h0, this);
+        this.CUSTOM_CONTROL_F = new("CUSTOM_CONTROL", 7, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: RATECNTRL_CLASS
+    endclass: CNTRL_3_CLASS
 
-    class FRAME_CLASS extends register_base;
-      field_base FRAME_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.FRAME_F = new("FRAME", 0, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: FRAME_CLASS
-
-    class STATUS1_CLASS extends register_base;
+    class CLK_FREQ_CLASS extends register_base;
       field_base CLK_FREQ_F;
 
       function new(
@@ -160,9 +144,9 @@ package adi_regmap_dac_pkg;
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: STATUS1_CLASS
+    endclass: CLK_FREQ_CLASS
 
-    class STATUS2_CLASS extends register_base;
+    class CLK_RATIO_CLASS extends register_base;
       field_base CLK_RATIO_F;
 
       function new(
@@ -176,9 +160,13 @@ package adi_regmap_dac_pkg;
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: STATUS2_CLASS
+    endclass: CLK_RATIO_CLASS
 
-    class STATUS3_CLASS extends register_base;
+    class STATUS_CLASS extends register_base;
+      field_base ADC_CTRL_STATUS_F;
+      field_base PN_ERR_F;
+      field_base PN_OOS_F;
+      field_base OVER_RANGE_F;
       field_base STATUS_F;
 
       function new(
@@ -188,30 +176,18 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
+        this.ADC_CTRL_STATUS_F = new("ADC_CTRL_STATUS", 4, 4, RO, 'h0, this);
+        this.PN_ERR_F = new("PN_ERR", 3, 3, RO, 'h0, this);
+        this.PN_OOS_F = new("PN_OOS", 2, 2, RO, 'h0, this);
+        this.OVER_RANGE_F = new("OVER_RANGE", 1, 1, RO, 'h0, this);
         this.STATUS_F = new("STATUS", 0, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: STATUS3_CLASS
-
-    class DAC_CLKSEL_CLASS extends register_base;
-      field_base DAC_CLKSEL_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DAC_CLKSEL_F = new("DAC_CLKSEL", 0, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: DAC_CLKSEL_CLASS
+    endclass: STATUS_CLASS
 
     class SYNC_STATUS_CLASS extends register_base;
-      field_base DAC_SYNC_STATUS_F;
+      field_base ADC_SYNC_F;
 
       function new(
         input string name,
@@ -220,7 +196,7 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DAC_SYNC_STATUS_F = new("DAC_SYNC_STATUS", 0, 0, RO, 'h0, this);
+        this.ADC_SYNC_F = new("ADC_SYNC", 0, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
@@ -294,8 +270,8 @@ package adi_regmap_dac_pkg;
       endfunction: new
     endclass: DRP_RDATA_CLASS
 
-    class DAC_CUSTOM_RD_CLASS extends register_base;
-      field_base DAC_CUSTOM_RD_F;
+    class ADC_CONFIG_WR_CLASS extends register_base;
+      field_base ADC_CONFIG_WR_F;
 
       function new(
         input string name,
@@ -304,14 +280,14 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DAC_CUSTOM_RD_F = new("DAC_CUSTOM_RD", 31, 0, RO, 'h0, this);
+        this.ADC_CONFIG_WR_F = new("ADC_CONFIG_WR", 31, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DAC_CUSTOM_RD_CLASS
+    endclass: ADC_CONFIG_WR_CLASS
 
-    class DAC_CUSTOM_WR_CLASS extends register_base;
-      field_base DAC_CUSTOM_WR_F;
+    class ADC_CONFIG_RD_CLASS extends register_base;
+      field_base ADC_CONFIG_RD_F;
 
       function new(
         input string name,
@@ -320,16 +296,16 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DAC_CUSTOM_WR_F = new("DAC_CUSTOM_WR", 31, 0, RW, 'h0, this);
+        this.ADC_CONFIG_RD_F = new("ADC_CONFIG_RD", 31, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DAC_CUSTOM_WR_CLASS
+    endclass: ADC_CONFIG_RD_CLASS
 
     class UI_STATUS_CLASS extends register_base;
-      field_base IF_BUSY_F;
       field_base UI_OVF_F;
       field_base UI_UNF_F;
+      field_base UI_RESERVED_F;
 
       function new(
         input string name,
@@ -338,16 +314,16 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.IF_BUSY_F = new("IF_BUSY", 4, 4, RO, 'h0, this);
-        this.UI_OVF_F = new("UI_OVF", 1, 1, RW1C, 'h0, this);
-        this.UI_UNF_F = new("UI_UNF", 0, 0, RW1C, 'h0, this);
+        this.UI_OVF_F = new("UI_OVF", 2, 2, RW1C, 'h0, this);
+        this.UI_UNF_F = new("UI_UNF", 1, 1, RW1C, 'h0, this);
+        this.UI_RESERVED_F = new("UI_RESERVED", 0, 0, RW1C, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: UI_STATUS_CLASS
 
-    class DAC_CUSTOM_CTRL_CLASS extends register_base;
-      field_base DAC_CUSTOM_CTRL_F;
+    class ADC_CONFIG_CTRL_CLASS extends register_base;
+      field_base ADC_CONFIG_CTRL_F;
 
       function new(
         input string name,
@@ -356,11 +332,11 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DAC_CUSTOM_CTRL_F = new("DAC_CUSTOM_CTRL", 31, 0, RW, 'h0, this);
+        this.ADC_CONFIG_CTRL_F = new("ADC_CONFIG_CTRL", 31, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DAC_CUSTOM_CTRL_CLASS
+    endclass: ADC_CONFIG_CTRL_CLASS
 
     class USR_CNTRL_1_CLASS extends register_base;
       field_base USR_CHANMAX_F;
@@ -378,8 +354,8 @@ package adi_regmap_dac_pkg;
       endfunction: new
     endclass: USR_CNTRL_1_CLASS
 
-    class DAC_GPIO_IN_CLASS extends register_base;
-      field_base DAC_GPIO_IN_F;
+    class ADC_START_CODE_CLASS extends register_base;
+      field_base ADC_START_CODE_F;
 
       function new(
         input string name,
@@ -388,14 +364,14 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DAC_GPIO_IN_F = new("DAC_GPIO_IN", 31, 0, RO, 'h0, this);
+        this.ADC_START_CODE_F = new("ADC_START_CODE", 31, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DAC_GPIO_IN_CLASS
+    endclass: ADC_START_CODE_CLASS
 
-    class DAC_GPIO_OUT_CLASS extends register_base;
-      field_base DAC_GPIO_OUT_F;
+    class ADC_GPIO_IN_CLASS extends register_base;
+      field_base ADC_GPIO_IN_F;
 
       function new(
         input string name,
@@ -404,16 +380,136 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DAC_GPIO_OUT_F = new("DAC_GPIO_OUT", 31, 0, RW, 'h0, this);
+        this.ADC_GPIO_IN_F = new("ADC_GPIO_IN", 31, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: DAC_GPIO_OUT_CLASS
+    endclass: ADC_GPIO_IN_CLASS
 
-    /* DAC Channel (axi_ad*) */
+    class ADC_GPIO_OUT_CLASS extends register_base;
+      field_base ADC_GPIO_OUT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.ADC_GPIO_OUT_F = new("ADC_GPIO_OUT", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ADC_GPIO_OUT_CLASS
+
+    class PPS_COUNTER_CLASS extends register_base;
+      field_base PPS_COUNTER_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PPS_COUNTER_F = new("PPS_COUNTER", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PPS_COUNTER_CLASS
+
+    class PPS_STATUS_CLASS extends register_base;
+      field_base PPS_STATUS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PPS_STATUS_F = new("PPS_STATUS", 0, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PPS_STATUS_CLASS
+
+    /* AXI TEMPLATE ADC Channel (axi_template_adc_channel) */
+    class CHAN_CNTRLn_CLASS extends register_base;
+      field_base ADC_LB_OWR_F;
+      field_base ADC_PN_SEL_OWR_F;
+      field_base IQCOR_ENB_F;
+      field_base DCFILT_ENB_F;
+      field_base FORMAT_SIGNEXT_F;
+      field_base FORMAT_TYPE_F;
+      field_base FORMAT_ENABLE_F;
+      field_base ADC_PN_TYPE_OWR_F;
+      field_base ENABLE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.ADC_LB_OWR_F = new("ADC_LB_OWR", 11, 11, RW, 'h0, this);
+        this.ADC_PN_SEL_OWR_F = new("ADC_PN_SEL_OWR", 10, 10, RW, 'h0, this);
+        this.IQCOR_ENB_F = new("IQCOR_ENB", 9, 9, RW, 'h0, this);
+        this.DCFILT_ENB_F = new("DCFILT_ENB", 8, 8, RW, 'h0, this);
+        this.FORMAT_SIGNEXT_F = new("FORMAT_SIGNEXT", 6, 6, RW, 'h0, this);
+        this.FORMAT_TYPE_F = new("FORMAT_TYPE", 5, 5, RW, 'h0, this);
+        this.FORMAT_ENABLE_F = new("FORMAT_ENABLE", 4, 4, RW, 'h0, this);
+        this.ADC_PN_TYPE_OWR_F = new("ADC_PN_TYPE_OWR", 1, 1, RW, 'h0, this);
+        this.ENABLE_F = new("ENABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_CNTRLn_CLASS
+
+    class CHAN_STATUSn_CLASS extends register_base;
+      field_base CRC_ERR_F;
+      field_base STATUS_HEADER_F;
+      field_base PN_ERR_F;
+      field_base PN_OOS_F;
+      field_base OVER_RANGE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CRC_ERR_F = new("CRC_ERR", 12, 12, RW1C, 'h0, this);
+        this.STATUS_HEADER_F = new("STATUS_HEADER", 11, 4, RO, 'h0, this);
+        this.PN_ERR_F = new("PN_ERR", 2, 2, RW1C, 'h0, this);
+        this.PN_OOS_F = new("PN_OOS", 1, 1, RW1C, 'h0, this);
+        this.OVER_RANGE_F = new("OVER_RANGE", 0, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_STATUSn_CLASS
+
+    class CHAN_RAW_DATAn_CLASS extends register_base;
+      field_base ADC_READ_DATA_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.ADC_READ_DATA_F = new("ADC_READ_DATA", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_RAW_DATAn_CLASS
+
     class CHAN_CNTRLn_1_CLASS extends register_base;
-      field_base DDS_PHASE_DW_F;
-      field_base DDS_SCALE_1_F;
+      field_base DCFILT_OFFSET_F;
+      field_base DCFILT_COEFF_F;
 
       function new(
         input string name,
@@ -422,120 +518,14 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DDS_PHASE_DW_F = new("DDS_PHASE_DW", 21, 16, RO, 'h0, this);
-        this.DDS_SCALE_1_F = new("DDS_SCALE_1", 15, 0, RW, 'h0, this);
+        this.DCFILT_OFFSET_F = new("DCFILT_OFFSET", 31, 16, RW, 'h0, this);
+        this.DCFILT_COEFF_F = new("DCFILT_COEFF", 15, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
     endclass: CHAN_CNTRLn_1_CLASS
 
     class CHAN_CNTRLn_2_CLASS extends register_base;
-      field_base DDS_INIT_1_F;
-      field_base DDS_INCR_1_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DDS_INIT_1_F = new("DDS_INIT_1", 31, 16, RW, 'h0, this);
-        this.DDS_INCR_1_F = new("DDS_INCR_1", 15, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_2_CLASS
-
-    class CHAN_CNTRLn_3_CLASS extends register_base;
-      field_base DDS_SCALE_2_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DDS_SCALE_2_F = new("DDS_SCALE_2", 15, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_3_CLASS
-
-    class CHAN_CNTRLn_4_CLASS extends register_base;
-      field_base DDS_INIT_2_F;
-      field_base DDS_INCR_2_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DDS_INIT_2_F = new("DDS_INIT_2", 31, 16, RW, 'h0, this);
-        this.DDS_INCR_2_F = new("DDS_INCR_2", 15, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_4_CLASS
-
-    class CHAN_CNTRLn_5_CLASS extends register_base;
-      field_base DDS_PATT_2_F;
-      field_base DDS_PATT_1_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DDS_PATT_2_F = new("DDS_PATT_2", 31, 16, RW, 'h0, this);
-        this.DDS_PATT_1_F = new("DDS_PATT_1", 15, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_5_CLASS
-
-    class CHAN_CNTRLn_6_CLASS extends register_base;
-      field_base IQCOR_ENB_F;
-      field_base DAC_LB_OWR_F;
-      field_base DAC_PN_OWR_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.IQCOR_ENB_F = new("IQCOR_ENB", 2, 2, RW, 'h0, this);
-        this.DAC_LB_OWR_F = new("DAC_LB_OWR", 1, 1, RW, 'h0, this);
-        this.DAC_PN_OWR_F = new("DAC_PN_OWR", 0, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_6_CLASS
-
-    class CHAN_CNTRLn_7_CLASS extends register_base;
-      field_base DAC_DDS_SEL_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DAC_DDS_SEL_F = new("DAC_DDS_SEL", 3, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_7_CLASS
-
-    class CHAN_CNTRLn_8_CLASS extends register_base;
       field_base IQCOR_COEFF_1_F;
       field_base IQCOR_COEFF_2_F;
 
@@ -551,9 +541,27 @@ package adi_regmap_dac_pkg;
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: CHAN_CNTRLn_8_CLASS
+    endclass: CHAN_CNTRLn_2_CLASS
 
-    class USR_CNTRLn_3_CLASS extends register_base;
+    class CHAN_CNTRLn_3_CLASS extends register_base;
+      field_base ADC_PN_SEL_F;
+      field_base ADC_DATA_SEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.ADC_PN_SEL_F = new("ADC_PN_SEL", 19, 16, RW, 'h0, this);
+        this.ADC_DATA_SEL_F = new("ADC_DATA_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_CNTRLn_3_CLASS
+
+    class CHAN_USR_CNTRLn_1_CLASS extends register_base;
       field_base USR_DATATYPE_BE_F;
       field_base USR_DATATYPE_SIGNED_F;
       field_base USR_DATATYPE_SHIFT_F;
@@ -567,19 +575,19 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.USR_DATATYPE_BE_F = new("USR_DATATYPE_BE", 25, 25, RW, 'h0, this);
-        this.USR_DATATYPE_SIGNED_F = new("USR_DATATYPE_SIGNED", 24, 24, RW, 'h0, this);
-        this.USR_DATATYPE_SHIFT_F = new("USR_DATATYPE_SHIFT", 23, 16, RW, 'h0, this);
-        this.USR_DATATYPE_TOTAL_BITS_F = new("USR_DATATYPE_TOTAL_BITS", 15, 8, RW, 'h0, this);
-        this.USR_DATATYPE_BITS_F = new("USR_DATATYPE_BITS", 7, 0, RW, 'h0, this);
+        this.USR_DATATYPE_BE_F = new("USR_DATATYPE_BE", 25, 25, RO, 'h0, this);
+        this.USR_DATATYPE_SIGNED_F = new("USR_DATATYPE_SIGNED", 24, 24, RO, 'h0, this);
+        this.USR_DATATYPE_SHIFT_F = new("USR_DATATYPE_SHIFT", 23, 16, RO, 'h0, this);
+        this.USR_DATATYPE_TOTAL_BITS_F = new("USR_DATATYPE_TOTAL_BITS", 15, 8, RO, 'h0, this);
+        this.USR_DATATYPE_BITS_F = new("USR_DATATYPE_BITS", 7, 0, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: USR_CNTRLn_3_CLASS
+    endclass: CHAN_USR_CNTRLn_1_CLASS
 
-    class USR_CNTRLn_4_CLASS extends register_base;
-      field_base USR_INTERPOLATION_M_F;
-      field_base USR_INTERPOLATION_N_F;
+    class CHAN_USR_CNTRLn_2_CLASS extends register_base;
+      field_base USR_DECIMATION_M_F;
+      field_base USR_DECIMATION_N_F;
 
       function new(
         input string name,
@@ -588,16 +596,15 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.USR_INTERPOLATION_M_F = new("USR_INTERPOLATION_M", 31, 16, RW, 'h0, this);
-        this.USR_INTERPOLATION_N_F = new("USR_INTERPOLATION_N", 15, 0, RW, 'h0, this);
+        this.USR_DECIMATION_M_F = new("USR_DECIMATION_M", 31, 16, RW, 'h0, this);
+        this.USR_DECIMATION_N_F = new("USR_DECIMATION_N", 15, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: USR_CNTRLn_4_CLASS
+    endclass: CHAN_USR_CNTRLn_2_CLASS
 
-    class USR_CNTRLn_5_CLASS extends register_base;
-      field_base DAC_IQ_MODE_F;
-      field_base DAC_IQ_SWAP_F;
+    class CHAN_CNTRLn_4_CLASS extends register_base;
+      field_base SOFTSPAN_F;
 
       function new(
         input string name,
@@ -606,83 +613,43 @@ package adi_regmap_dac_pkg;
 
         super.new(name, address, parent);
 
-        this.DAC_IQ_MODE_F = new("DAC_IQ_MODE", 0, 0, RW, 'h0, this);
-        this.DAC_IQ_SWAP_F = new("DAC_IQ_SWAP", 1, 1, RW, 'h0, this);
+        this.SOFTSPAN_F = new("SOFTSPAN", 2, 0, RW, 'h7, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: USR_CNTRLn_5_CLASS
-
-    class CHAN_CNTRLn_9_CLASS extends register_base;
-      field_base DDS_INIT_1_EXTENDED_F;
-      field_base DDS_INCR_1_EXTENDED_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DDS_INIT_1_EXTENDED_F = new("DDS_INIT_1_EXTENDED", 31, 16, RW, 'h0, this);
-        this.DDS_INCR_1_EXTENDED_F = new("DDS_INCR_1_EXTENDED", 15, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_9_CLASS
-
-    class CHAN_CNTRLn_10_CLASS extends register_base;
-      field_base DDS_INIT_2_EXTENDED_F;
-      field_base DDS_INCR_2_EXTENDED_F;
-
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.DDS_INIT_2_EXTENDED_F = new("DDS_INIT_2_EXTENDED", 31, 16, RW, 'h0, this);
-        this.DDS_INCR_2_EXTENDED_F = new("DDS_INCR_2_EXTENDED", 15, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: CHAN_CNTRLn_10_CLASS
+    endclass: CHAN_CNTRLn_4_CLASS
 
     RSTN_CLASS RSTN_R;
-    CNTRL_1_CLASS CNTRL_1_R;
+    CNTRL_CLASS CNTRL_R;
     CNTRL_2_CLASS CNTRL_2_R;
-    RATECNTRL_CLASS RATECNTRL_R;
-    FRAME_CLASS FRAME_R;
-    STATUS1_CLASS STATUS1_R;
-    STATUS2_CLASS STATUS2_R;
-    STATUS3_CLASS STATUS3_R;
-    DAC_CLKSEL_CLASS DAC_CLKSEL_R;
+    CNTRL_3_CLASS CNTRL_3_R;
+    CLK_FREQ_CLASS CLK_FREQ_R;
+    CLK_RATIO_CLASS CLK_RATIO_R;
+    STATUS_CLASS STATUS_R;
     SYNC_STATUS_CLASS SYNC_STATUS_R;
     DRP_CNTRL_CLASS DRP_CNTRL_R;
     DRP_STATUS_CLASS DRP_STATUS_R;
     DRP_WDATA_CLASS DRP_WDATA_R;
     DRP_RDATA_CLASS DRP_RDATA_R;
-    DAC_CUSTOM_RD_CLASS DAC_CUSTOM_RD_R;
-    DAC_CUSTOM_WR_CLASS DAC_CUSTOM_WR_R;
+    ADC_CONFIG_WR_CLASS ADC_CONFIG_WR_R;
+    ADC_CONFIG_RD_CLASS ADC_CONFIG_RD_R;
     UI_STATUS_CLASS UI_STATUS_R;
-    DAC_CUSTOM_CTRL_CLASS DAC_CUSTOM_CTRL_R;
+    ADC_CONFIG_CTRL_CLASS ADC_CONFIG_CTRL_R;
     USR_CNTRL_1_CLASS USR_CNTRL_1_R;
-    DAC_GPIO_IN_CLASS DAC_GPIO_IN_R;
-    DAC_GPIO_OUT_CLASS DAC_GPIO_OUT_R;
+    ADC_START_CODE_CLASS ADC_START_CODE_R;
+    ADC_GPIO_IN_CLASS ADC_GPIO_IN_R;
+    ADC_GPIO_OUT_CLASS ADC_GPIO_OUT_R;
+    PPS_COUNTER_CLASS PPS_COUNTER_R;
+    PPS_STATUS_CLASS PPS_STATUS_R;
+    CHAN_CNTRLn_CLASS CHAN_CNTRLn_R [15:0];
+    CHAN_STATUSn_CLASS CHAN_STATUSn_R [15:0];
+    CHAN_RAW_DATAn_CLASS CHAN_RAW_DATAn_R [15:0];
     CHAN_CNTRLn_1_CLASS CHAN_CNTRLn_1_R [15:0];
     CHAN_CNTRLn_2_CLASS CHAN_CNTRLn_2_R [15:0];
     CHAN_CNTRLn_3_CLASS CHAN_CNTRLn_3_R [15:0];
+    CHAN_USR_CNTRLn_1_CLASS CHAN_USR_CNTRLn_1_R [15:0];
+    CHAN_USR_CNTRLn_2_CLASS CHAN_USR_CNTRLn_2_R [15:0];
     CHAN_CNTRLn_4_CLASS CHAN_CNTRLn_4_R [15:0];
-    CHAN_CNTRLn_5_CLASS CHAN_CNTRLn_5_R [15:0];
-    CHAN_CNTRLn_6_CLASS CHAN_CNTRLn_6_R [15:0];
-    CHAN_CNTRLn_7_CLASS CHAN_CNTRLn_7_R [15:0];
-    CHAN_CNTRLn_8_CLASS CHAN_CNTRLn_8_R [15:0];
-    USR_CNTRLn_3_CLASS USR_CNTRLn_3_R [15:0];
-    USR_CNTRLn_4_CLASS USR_CNTRLn_4_R [15:0];
-    USR_CNTRLn_5_CLASS USR_CNTRLn_5_R [15:0];
-    CHAN_CNTRLn_9_CLASS CHAN_CNTRLn_9_R [15:0];
-    CHAN_CNTRLn_10_CLASS CHAN_CNTRLn_10_R [15:0];
 
     function new(
       input string name,
@@ -692,69 +659,58 @@ package adi_regmap_dac_pkg;
       super.new(name, address, parent);
 
       this.RSTN_R = new("RSTN", 'h40, this);
-      this.CNTRL_1_R = new("CNTRL_1", 'h44, this);
+      this.CNTRL_R = new("CNTRL", 'h44, this);
       this.CNTRL_2_R = new("CNTRL_2", 'h48, this);
-      this.RATECNTRL_R = new("RATECNTRL", 'h4c, this);
-      this.FRAME_R = new("FRAME", 'h50, this);
-      this.STATUS1_R = new("STATUS1", 'h54, this);
-      this.STATUS2_R = new("STATUS2", 'h58, this);
-      this.STATUS3_R = new("STATUS3", 'h5c, this);
-      this.DAC_CLKSEL_R = new("DAC_CLKSEL", 'h60, this);
+      this.CNTRL_3_R = new("CNTRL_3", 'h4c, this);
+      this.CLK_FREQ_R = new("CLK_FREQ", 'h54, this);
+      this.CLK_RATIO_R = new("CLK_RATIO", 'h58, this);
+      this.STATUS_R = new("STATUS", 'h5c, this);
       this.SYNC_STATUS_R = new("SYNC_STATUS", 'h68, this);
       this.DRP_CNTRL_R = new("DRP_CNTRL", 'h70, this);
       this.DRP_STATUS_R = new("DRP_STATUS", 'h74, this);
       this.DRP_WDATA_R = new("DRP_WDATA", 'h78, this);
       this.DRP_RDATA_R = new("DRP_RDATA", 'h7c, this);
-      this.DAC_CUSTOM_RD_R = new("DAC_CUSTOM_RD", 'h80, this);
-      this.DAC_CUSTOM_WR_R = new("DAC_CUSTOM_WR", 'h84, this);
+      this.ADC_CONFIG_WR_R = new("ADC_CONFIG_WR", 'h80, this);
+      this.ADC_CONFIG_RD_R = new("ADC_CONFIG_RD", 'h84, this);
       this.UI_STATUS_R = new("UI_STATUS", 'h88, this);
-      this.DAC_CUSTOM_CTRL_R = new("DAC_CUSTOM_CTRL", 'h8c, this);
+      this.ADC_CONFIG_CTRL_R = new("ADC_CONFIG_CTRL", 'h8c, this);
       this.USR_CNTRL_1_R = new("USR_CNTRL_1", 'ha0, this);
-      this.DAC_GPIO_IN_R = new("DAC_GPIO_IN", 'hb8, this);
-      this.DAC_GPIO_OUT_R = new("DAC_GPIO_OUT", 'hbc, this);
+      this.ADC_START_CODE_R = new("ADC_START_CODE", 'ha4, this);
+      this.ADC_GPIO_IN_R = new("ADC_GPIO_IN", 'hb8, this);
+      this.ADC_GPIO_OUT_R = new("ADC_GPIO_OUT", 'hbc, this);
+      this.PPS_COUNTER_R = new("PPS_COUNTER", 'hc0, this);
+      this.PPS_STATUS_R = new("PPS_STATUS", 'hc4, this);
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_1_R[i] = new($sformatf("CHAN_CNTRL%0d_1", i), 'h400 + 'h22 * i * 4, this);
+        this.CHAN_CNTRLn_R[i] = new($sformatf("CHAN_CNTRL%0d", i), 'h400 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_2_R[i] = new($sformatf("CHAN_CNTRL%0d_2", i), 'h404 + 'h22 * i * 4, this);
+        this.CHAN_STATUSn_R[i] = new($sformatf("CHAN_STATUS%0d", i), 'h404 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_3_R[i] = new($sformatf("CHAN_CNTRL%0d_3", i), 'h408 + 'h22 * i * 4, this);
+        this.CHAN_RAW_DATAn_R[i] = new($sformatf("CHAN_RAW_DATA%0d", i), 'h408 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_4_R[i] = new($sformatf("CHAN_CNTRL%0d_4", i), 'h40c + 'h22 * i * 4, this);
+        this.CHAN_CNTRLn_1_R[i] = new($sformatf("CHAN_CNTRL%0d_1", i), 'h410 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_5_R[i] = new($sformatf("CHAN_CNTRL%0d_5", i), 'h410 + 'h22 * i * 4, this);
+        this.CHAN_CNTRLn_2_R[i] = new($sformatf("CHAN_CNTRL%0d_2", i), 'h414 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_6_R[i] = new($sformatf("CHAN_CNTRL%0d_6", i), 'h414 + 'h22 * i * 4, this);
+        this.CHAN_CNTRLn_3_R[i] = new($sformatf("CHAN_CNTRL%0d_3", i), 'h418 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_7_R[i] = new($sformatf("CHAN_CNTRL%0d_7", i), 'h418 + 'h22 * i * 4, this);
+        this.CHAN_USR_CNTRLn_1_R[i] = new($sformatf("CHAN_USR_CNTRL%0d_1", i), 'h420 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_8_R[i] = new($sformatf("CHAN_CNTRL%0d_8", i), 'h41c + 'h22 * i * 4, this);
+        this.CHAN_USR_CNTRLn_2_R[i] = new($sformatf("CHAN_USR_CNTRL%0d_2", i), 'h424 + 'h22 * i * 4, this);
       end
       for (int i=0; i<16; i++) begin
-        this.USR_CNTRLn_3_R[i] = new($sformatf("USR_CNTRL%0d_3", i), 'h420 + 'h22 * i * 4, this);
-      end
-      for (int i=0; i<16; i++) begin
-        this.USR_CNTRLn_4_R[i] = new($sformatf("USR_CNTRL%0d_4", i), 'h424 + 'h22 * i * 4, this);
-      end
-      for (int i=0; i<16; i++) begin
-        this.USR_CNTRLn_5_R[i] = new($sformatf("USR_CNTRL%0d_5", i), 'h428 + 'h22 * i * 4, this);
-      end
-      for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_9_R[i] = new($sformatf("CHAN_CNTRL%0d_9", i), 'h42c + 'h22 * i * 4, this);
-      end
-      for (int i=0; i<16; i++) begin
-        this.CHAN_CNTRLn_10_R[i] = new($sformatf("CHAN_CNTRL%0d_10", i), 'h430 + 'h22 * i * 4, this);
+        this.CHAN_CNTRLn_4_R[i] = new($sformatf("CHAN_CNTRL%0d_4", i), 'h428 + 'h22 * i * 4, this);
       end
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_dac
+  endclass: adi_regmap_axi_adc_template
 
-endpackage: adi_regmap_dac_pkg
+endpackage: adi_regmap_axi_adc_template_pkg

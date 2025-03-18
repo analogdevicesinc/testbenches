@@ -33,271 +33,589 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Wed Jan 29 16:40:28 2025 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_spi_engine_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_spi_engine extends adi_regmap;
 
-/* SPI Engine (axi_spi_engine) */
+    /* SPI Engine (axi_spi_engine) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_MAJOR_F;
+      field_base VERSION_MINOR_F;
+      field_base VERSION_PATCH_F;
 
-  const reg_t AXI_SPI_ENGINE_VERSION = '{ 'h0000, "VERSION" , '{
-    "VERSION_MAJOR": '{ 31, 16, RO, 'h00000001 },
-    "VERSION_MINOR": '{ 15, 8, RO, 'h00000004 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h00000001 }}};
-  `define SET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) SetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
-  `define GET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) GetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
-  `define DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR GetResetValue(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR")
-  `define UPDATE_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x,y) UpdateField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x,y)
-  `define SET_AXI_SPI_ENGINE_VERSION_VERSION_MINOR(x) SetField(AXI_SPI_ENGINE_VERSION,"VERSION_MINOR",x)
-  `define GET_AXI_SPI_ENGINE_VERSION_VERSION_MINOR(x) GetField(AXI_SPI_ENGINE_VERSION,"VERSION_MINOR",x)
-  `define DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR GetResetValue(AXI_SPI_ENGINE_VERSION,"VERSION_MINOR")
-  `define UPDATE_AXI_SPI_ENGINE_VERSION_VERSION_MINOR(x,y) UpdateField(AXI_SPI_ENGINE_VERSION,"VERSION_MINOR",x,y)
-  `define SET_AXI_SPI_ENGINE_VERSION_VERSION_PATCH(x) SetField(AXI_SPI_ENGINE_VERSION,"VERSION_PATCH",x)
-  `define GET_AXI_SPI_ENGINE_VERSION_VERSION_PATCH(x) GetField(AXI_SPI_ENGINE_VERSION,"VERSION_PATCH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH GetResetValue(AXI_SPI_ENGINE_VERSION,"VERSION_PATCH")
-  `define UPDATE_AXI_SPI_ENGINE_VERSION_VERSION_PATCH(x,y) UpdateField(AXI_SPI_ENGINE_VERSION,"VERSION_PATCH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_SPI_ENGINE_PERIPHERAL_ID = '{ 'h0004, "PERIPHERAL_ID" , '{
-    "PERIPHERAL_ID": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_PERIPHERAL_ID_PERIPHERAL_ID(x) SetField(AXI_SPI_ENGINE_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define GET_AXI_SPI_ENGINE_PERIPHERAL_ID_PERIPHERAL_ID(x) GetField(AXI_SPI_ENGINE_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define DEFAULT_AXI_SPI_ENGINE_PERIPHERAL_ID_PERIPHERAL_ID GetResetValue(AXI_SPI_ENGINE_PERIPHERAL_ID,"PERIPHERAL_ID")
-  `define UPDATE_AXI_SPI_ENGINE_PERIPHERAL_ID_PERIPHERAL_ID(x,y) UpdateField(AXI_SPI_ENGINE_PERIPHERAL_ID,"PERIPHERAL_ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_SPI_ENGINE_SCRATCH = '{ 'h0008, "SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_SCRATCH_SCRATCH(x) SetField(AXI_SPI_ENGINE_SCRATCH,"SCRATCH",x)
-  `define GET_AXI_SPI_ENGINE_SCRATCH_SCRATCH(x) GetField(AXI_SPI_ENGINE_SCRATCH,"SCRATCH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SCRATCH_SCRATCH GetResetValue(AXI_SPI_ENGINE_SCRATCH,"SCRATCH")
-  `define UPDATE_AXI_SPI_ENGINE_SCRATCH_SCRATCH(x,y) UpdateField(AXI_SPI_ENGINE_SCRATCH,"SCRATCH",x,y)
+        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
+        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h4, this);
+        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h0, this);
 
-  const reg_t AXI_SPI_ENGINE_DATA_WIDTH = '{ 'h000c, "DATA_WIDTH" , '{
-    "NUM_OF_SDI": '{ 7, 4, RO, 0 },
-    "DATA_WIDTH": '{ 3, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x) SetField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI",x)
-  `define GET_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x) GetField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI",x)
-  `define DEFAULT_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI GetResetValue(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI")
-  `define UPDATE_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x,y) UpdateField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI",x,y)
-  `define SET_AXI_SPI_ENGINE_DATA_WIDTH_DATA_WIDTH(x) SetField(AXI_SPI_ENGINE_DATA_WIDTH,"DATA_WIDTH",x)
-  `define GET_AXI_SPI_ENGINE_DATA_WIDTH_DATA_WIDTH(x) GetField(AXI_SPI_ENGINE_DATA_WIDTH,"DATA_WIDTH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_DATA_WIDTH_DATA_WIDTH GetResetValue(AXI_SPI_ENGINE_DATA_WIDTH,"DATA_WIDTH")
-  `define UPDATE_AXI_SPI_ENGINE_DATA_WIDTH_DATA_WIDTH(x,y) UpdateField(AXI_SPI_ENGINE_DATA_WIDTH,"DATA_WIDTH",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
 
-  const reg_t AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH = '{ 'h0010, "OFFLOAD_MEM_ADDR_WIDTH" , '{
-    "SDO_MEM_ADDRESS_WIDTH": '{ 15, 8, RO, 'h00000004 },
-    "CMD_MEM_ADDRESS_WIDTH": '{ 7, 0, RO, 'h00000004 }}};
-  `define SET_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_SDO_MEM_ADDRESS_WIDTH(x) SetField(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"SDO_MEM_ADDRESS_WIDTH",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_SDO_MEM_ADDRESS_WIDTH(x) GetField(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"SDO_MEM_ADDRESS_WIDTH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_SDO_MEM_ADDRESS_WIDTH GetResetValue(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"SDO_MEM_ADDRESS_WIDTH")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_SDO_MEM_ADDRESS_WIDTH(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"SDO_MEM_ADDRESS_WIDTH",x,y)
-  `define SET_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_CMD_MEM_ADDRESS_WIDTH(x) SetField(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"CMD_MEM_ADDRESS_WIDTH",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_CMD_MEM_ADDRESS_WIDTH(x) GetField(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"CMD_MEM_ADDRESS_WIDTH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_CMD_MEM_ADDRESS_WIDTH GetResetValue(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"CMD_MEM_ADDRESS_WIDTH")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH_CMD_MEM_ADDRESS_WIDTH(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD_MEM_ADDR_WIDTH,"CMD_MEM_ADDRESS_WIDTH",x,y)
+    class PERIPHERAL_ID_CLASS extends register_base;
+      field_base PERIPHERAL_ID_F;
 
-  const reg_t AXI_SPI_ENGINE_FIFO_ADDR_WIDTH = '{ 'h0014, "FIFO_ADDR_WIDTH" , '{
-    "SDI_FIFO_ADDRESS_WIDTH": '{ 31, 24, RO, 'h00000005 },
-    "SDO_FIFO_ADDRESS_WIDTH": '{ 23, 16, RO, 'h00000005 },
-    "SYNC_FIFO_ADDRESS_WIDTH": '{ 15, 8, RO, 'h00000004 },
-    "CMD_FIFO_ADDRESS_WIDTH": '{ 7, 0, RO, 'h00000004 }}};
-  `define SET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDI_FIFO_ADDRESS_WIDTH(x) SetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDI_FIFO_ADDRESS_WIDTH",x)
-  `define GET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDI_FIFO_ADDRESS_WIDTH(x) GetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDI_FIFO_ADDRESS_WIDTH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDI_FIFO_ADDRESS_WIDTH GetResetValue(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDI_FIFO_ADDRESS_WIDTH")
-  `define UPDATE_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDI_FIFO_ADDRESS_WIDTH(x,y) UpdateField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDI_FIFO_ADDRESS_WIDTH",x,y)
-  `define SET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDO_FIFO_ADDRESS_WIDTH(x) SetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDO_FIFO_ADDRESS_WIDTH",x)
-  `define GET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDO_FIFO_ADDRESS_WIDTH(x) GetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDO_FIFO_ADDRESS_WIDTH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDO_FIFO_ADDRESS_WIDTH GetResetValue(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDO_FIFO_ADDRESS_WIDTH")
-  `define UPDATE_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SDO_FIFO_ADDRESS_WIDTH(x,y) UpdateField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SDO_FIFO_ADDRESS_WIDTH",x,y)
-  `define SET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SYNC_FIFO_ADDRESS_WIDTH(x) SetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SYNC_FIFO_ADDRESS_WIDTH",x)
-  `define GET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SYNC_FIFO_ADDRESS_WIDTH(x) GetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SYNC_FIFO_ADDRESS_WIDTH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SYNC_FIFO_ADDRESS_WIDTH GetResetValue(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SYNC_FIFO_ADDRESS_WIDTH")
-  `define UPDATE_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_SYNC_FIFO_ADDRESS_WIDTH(x,y) UpdateField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"SYNC_FIFO_ADDRESS_WIDTH",x,y)
-  `define SET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_CMD_FIFO_ADDRESS_WIDTH(x) SetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"CMD_FIFO_ADDRESS_WIDTH",x)
-  `define GET_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_CMD_FIFO_ADDRESS_WIDTH(x) GetField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"CMD_FIFO_ADDRESS_WIDTH",x)
-  `define DEFAULT_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_CMD_FIFO_ADDRESS_WIDTH GetResetValue(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"CMD_FIFO_ADDRESS_WIDTH")
-  `define UPDATE_AXI_SPI_ENGINE_FIFO_ADDR_WIDTH_CMD_FIFO_ADDRESS_WIDTH(x,y) UpdateField(AXI_SPI_ENGINE_FIFO_ADDR_WIDTH,"CMD_FIFO_ADDRESS_WIDTH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input int ID,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_SPI_ENGINE_ENABLE = '{ 'h0040, "ENABLE" , '{
-    "ENABLE": '{ 31, 0, RW, 'h00000001 }}};
-  `define SET_AXI_SPI_ENGINE_ENABLE_ENABLE(x) SetField(AXI_SPI_ENGINE_ENABLE,"ENABLE",x)
-  `define GET_AXI_SPI_ENGINE_ENABLE_ENABLE(x) GetField(AXI_SPI_ENGINE_ENABLE,"ENABLE",x)
-  `define DEFAULT_AXI_SPI_ENGINE_ENABLE_ENABLE GetResetValue(AXI_SPI_ENGINE_ENABLE,"ENABLE")
-  `define UPDATE_AXI_SPI_ENGINE_ENABLE_ENABLE(x,y) UpdateField(AXI_SPI_ENGINE_ENABLE,"ENABLE",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_SPI_ENGINE_IRQ_MASK = '{ 'h0080, "IRQ_MASK" , '{
-    "CMD_ALMOST_EMPTY": '{ 0, 0, RW, 'h00000000 },
-    "SDO_ALMOST_EMPTY": '{ 1, 1, RW, 'h00000000 },
-    "SDI_ALMOST_FULL": '{ 2, 2, RW, 'h00000000 },
-    "SYNC_EVENT": '{ 3, 3, RW, 'h00000000 },
-    "OFFLOAD_SYNC_ID_PENDING": '{ 4, 4, RW, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_IRQ_MASK_CMD_ALMOST_EMPTY(x) SetField(AXI_SPI_ENGINE_IRQ_MASK,"CMD_ALMOST_EMPTY",x)
-  `define GET_AXI_SPI_ENGINE_IRQ_MASK_CMD_ALMOST_EMPTY(x) GetField(AXI_SPI_ENGINE_IRQ_MASK,"CMD_ALMOST_EMPTY",x)
-  `define DEFAULT_AXI_SPI_ENGINE_IRQ_MASK_CMD_ALMOST_EMPTY GetResetValue(AXI_SPI_ENGINE_IRQ_MASK,"CMD_ALMOST_EMPTY")
-  `define UPDATE_AXI_SPI_ENGINE_IRQ_MASK_CMD_ALMOST_EMPTY(x,y) UpdateField(AXI_SPI_ENGINE_IRQ_MASK,"CMD_ALMOST_EMPTY",x,y)
-  `define SET_AXI_SPI_ENGINE_IRQ_MASK_SDO_ALMOST_EMPTY(x) SetField(AXI_SPI_ENGINE_IRQ_MASK,"SDO_ALMOST_EMPTY",x)
-  `define GET_AXI_SPI_ENGINE_IRQ_MASK_SDO_ALMOST_EMPTY(x) GetField(AXI_SPI_ENGINE_IRQ_MASK,"SDO_ALMOST_EMPTY",x)
-  `define DEFAULT_AXI_SPI_ENGINE_IRQ_MASK_SDO_ALMOST_EMPTY GetResetValue(AXI_SPI_ENGINE_IRQ_MASK,"SDO_ALMOST_EMPTY")
-  `define UPDATE_AXI_SPI_ENGINE_IRQ_MASK_SDO_ALMOST_EMPTY(x,y) UpdateField(AXI_SPI_ENGINE_IRQ_MASK,"SDO_ALMOST_EMPTY",x,y)
-  `define SET_AXI_SPI_ENGINE_IRQ_MASK_SDI_ALMOST_FULL(x) SetField(AXI_SPI_ENGINE_IRQ_MASK,"SDI_ALMOST_FULL",x)
-  `define GET_AXI_SPI_ENGINE_IRQ_MASK_SDI_ALMOST_FULL(x) GetField(AXI_SPI_ENGINE_IRQ_MASK,"SDI_ALMOST_FULL",x)
-  `define DEFAULT_AXI_SPI_ENGINE_IRQ_MASK_SDI_ALMOST_FULL GetResetValue(AXI_SPI_ENGINE_IRQ_MASK,"SDI_ALMOST_FULL")
-  `define UPDATE_AXI_SPI_ENGINE_IRQ_MASK_SDI_ALMOST_FULL(x,y) UpdateField(AXI_SPI_ENGINE_IRQ_MASK,"SDI_ALMOST_FULL",x,y)
-  `define SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(x) SetField(AXI_SPI_ENGINE_IRQ_MASK,"SYNC_EVENT",x)
-  `define GET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(x) GetField(AXI_SPI_ENGINE_IRQ_MASK,"SYNC_EVENT",x)
-  `define DEFAULT_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT GetResetValue(AXI_SPI_ENGINE_IRQ_MASK,"SYNC_EVENT")
-  `define UPDATE_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(x,y) UpdateField(AXI_SPI_ENGINE_IRQ_MASK,"SYNC_EVENT",x,y)
-  `define SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(x) SetField(AXI_SPI_ENGINE_IRQ_MASK,"OFFLOAD_SYNC_ID_PENDING",x)
-  `define GET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(x) GetField(AXI_SPI_ENGINE_IRQ_MASK,"OFFLOAD_SYNC_ID_PENDING",x)
-  `define DEFAULT_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING GetResetValue(AXI_SPI_ENGINE_IRQ_MASK,"OFFLOAD_SYNC_ID_PENDING")
-  `define UPDATE_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(x,y) UpdateField(AXI_SPI_ENGINE_IRQ_MASK,"OFFLOAD_SYNC_ID_PENDING",x,y)
+        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
 
-  const reg_t AXI_SPI_ENGINE_IRQ_PENDING = '{ 'h0084, "IRQ_PENDING" , '{
-    "IRQ_PENDING": '{ 31, 0, RW1C, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_IRQ_PENDING_IRQ_PENDING(x) SetField(AXI_SPI_ENGINE_IRQ_PENDING,"IRQ_PENDING",x)
-  `define GET_AXI_SPI_ENGINE_IRQ_PENDING_IRQ_PENDING(x) GetField(AXI_SPI_ENGINE_IRQ_PENDING,"IRQ_PENDING",x)
-  `define DEFAULT_AXI_SPI_ENGINE_IRQ_PENDING_IRQ_PENDING GetResetValue(AXI_SPI_ENGINE_IRQ_PENDING,"IRQ_PENDING")
-  `define UPDATE_AXI_SPI_ENGINE_IRQ_PENDING_IRQ_PENDING(x,y) UpdateField(AXI_SPI_ENGINE_IRQ_PENDING,"IRQ_PENDING",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PERIPHERAL_ID_CLASS
 
-  const reg_t AXI_SPI_ENGINE_IRQ_SOURCE = '{ 'h0088, "IRQ_SOURCE" , '{
-    "IRQ_SOURCE": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_IRQ_SOURCE_IRQ_SOURCE(x) SetField(AXI_SPI_ENGINE_IRQ_SOURCE,"IRQ_SOURCE",x)
-  `define GET_AXI_SPI_ENGINE_IRQ_SOURCE_IRQ_SOURCE(x) GetField(AXI_SPI_ENGINE_IRQ_SOURCE,"IRQ_SOURCE",x)
-  `define DEFAULT_AXI_SPI_ENGINE_IRQ_SOURCE_IRQ_SOURCE GetResetValue(AXI_SPI_ENGINE_IRQ_SOURCE,"IRQ_SOURCE")
-  `define UPDATE_AXI_SPI_ENGINE_IRQ_SOURCE_IRQ_SOURCE(x,y) UpdateField(AXI_SPI_ENGINE_IRQ_SOURCE,"IRQ_SOURCE",x,y)
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
 
-  const reg_t AXI_SPI_ENGINE_SYNC_ID = '{ 'h00c0, "SYNC_ID" , '{
-    "SYNC_ID": '{ 31, 0, RO, 'h00 }}};
-  `define SET_AXI_SPI_ENGINE_SYNC_ID_SYNC_ID(x) SetField(AXI_SPI_ENGINE_SYNC_ID,"SYNC_ID",x)
-  `define GET_AXI_SPI_ENGINE_SYNC_ID_SYNC_ID(x) GetField(AXI_SPI_ENGINE_SYNC_ID,"SYNC_ID",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SYNC_ID_SYNC_ID GetResetValue(AXI_SPI_ENGINE_SYNC_ID,"SYNC_ID")
-  `define UPDATE_AXI_SPI_ENGINE_SYNC_ID_SYNC_ID(x,y) UpdateField(AXI_SPI_ENGINE_SYNC_ID,"SYNC_ID",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_SPI_ENGINE_OFFLOAD_SYNC_ID = '{ 'h00c4, "OFFLOAD_SYNC_ID" , '{
-    "OFFLOAD_SYNC_ID": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_OFFLOAD_SYNC_ID_OFFLOAD_SYNC_ID(x) SetField(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID,"OFFLOAD_SYNC_ID",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD_SYNC_ID_OFFLOAD_SYNC_ID(x) GetField(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID,"OFFLOAD_SYNC_ID",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD_SYNC_ID_OFFLOAD_SYNC_ID GetResetValue(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID,"OFFLOAD_SYNC_ID")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD_SYNC_ID_OFFLOAD_SYNC_ID(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID,"OFFLOAD_SYNC_ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_SPI_ENGINE_CMD_FIFO_ROOM = '{ 'h00d0, "CMD_FIFO_ROOM" , '{
-    "CMD_FIFO_ROOM": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_CMD_FIFO_ROOM_CMD_FIFO_ROOM(x) SetField(AXI_SPI_ENGINE_CMD_FIFO_ROOM,"CMD_FIFO_ROOM",x)
-  `define GET_AXI_SPI_ENGINE_CMD_FIFO_ROOM_CMD_FIFO_ROOM(x) GetField(AXI_SPI_ENGINE_CMD_FIFO_ROOM,"CMD_FIFO_ROOM",x)
-  `define DEFAULT_AXI_SPI_ENGINE_CMD_FIFO_ROOM_CMD_FIFO_ROOM GetResetValue(AXI_SPI_ENGINE_CMD_FIFO_ROOM,"CMD_FIFO_ROOM")
-  `define UPDATE_AXI_SPI_ENGINE_CMD_FIFO_ROOM_CMD_FIFO_ROOM(x,y) UpdateField(AXI_SPI_ENGINE_CMD_FIFO_ROOM,"CMD_FIFO_ROOM",x,y)
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
 
-  const reg_t AXI_SPI_ENGINE_SDO_FIFO_ROOM = '{ 'h00d4, "SDO_FIFO_ROOM" , '{
-    "SDO_FIFO_ROOM": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_SDO_FIFO_ROOM_SDO_FIFO_ROOM(x) SetField(AXI_SPI_ENGINE_SDO_FIFO_ROOM,"SDO_FIFO_ROOM",x)
-  `define GET_AXI_SPI_ENGINE_SDO_FIFO_ROOM_SDO_FIFO_ROOM(x) GetField(AXI_SPI_ENGINE_SDO_FIFO_ROOM,"SDO_FIFO_ROOM",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SDO_FIFO_ROOM_SDO_FIFO_ROOM GetResetValue(AXI_SPI_ENGINE_SDO_FIFO_ROOM,"SDO_FIFO_ROOM")
-  `define UPDATE_AXI_SPI_ENGINE_SDO_FIFO_ROOM_SDO_FIFO_ROOM(x,y) UpdateField(AXI_SPI_ENGINE_SDO_FIFO_ROOM,"SDO_FIFO_ROOM",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
 
-  const reg_t AXI_SPI_ENGINE_SDI_FIFO_LEVEL = '{ 'h00d8, "SDI_FIFO_LEVEL" , '{
-    "SDI_FIFO_LEVEL": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL(x) SetField(AXI_SPI_ENGINE_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL",x)
-  `define GET_AXI_SPI_ENGINE_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL(x) GetField(AXI_SPI_ENGINE_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL GetResetValue(AXI_SPI_ENGINE_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL")
-  `define UPDATE_AXI_SPI_ENGINE_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL(x,y) UpdateField(AXI_SPI_ENGINE_SDI_FIFO_LEVEL,"SDI_FIFO_LEVEL",x,y)
+    class DATA_WIDTH_CLASS extends register_base;
+      field_base NUM_OF_SDI_F;
+      field_base DATA_WIDTH_F;
 
-  const reg_t AXI_SPI_ENGINE_CMD_FIFO = '{ 'h00e0, "CMD_FIFO" , '{
-    "CMD_FIFO": '{ 31, 0, WO, 'h00 }}};
-  `define SET_AXI_SPI_ENGINE_CMD_FIFO_CMD_FIFO(x) SetField(AXI_SPI_ENGINE_CMD_FIFO,"CMD_FIFO",x)
-  `define GET_AXI_SPI_ENGINE_CMD_FIFO_CMD_FIFO(x) GetField(AXI_SPI_ENGINE_CMD_FIFO,"CMD_FIFO",x)
-  `define DEFAULT_AXI_SPI_ENGINE_CMD_FIFO_CMD_FIFO GetResetValue(AXI_SPI_ENGINE_CMD_FIFO,"CMD_FIFO")
-  `define UPDATE_AXI_SPI_ENGINE_CMD_FIFO_CMD_FIFO(x,y) UpdateField(AXI_SPI_ENGINE_CMD_FIFO,"CMD_FIFO",x,y)
+      function new(
+        input string name,
+        input int address,
+        input int DATA_WIDTH,
+        input int NUM_OF_SDI,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_SPI_ENGINE_SDO_FIFO = '{ 'h00e4, "SDO_FIFO" , '{
-    "SDO_FIFO": '{ 31, 0, WO, 'h00 }}};
-  `define SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(x) SetField(AXI_SPI_ENGINE_SDO_FIFO,"SDO_FIFO",x)
-  `define GET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(x) GetField(AXI_SPI_ENGINE_SDO_FIFO,"SDO_FIFO",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO GetResetValue(AXI_SPI_ENGINE_SDO_FIFO,"SDO_FIFO")
-  `define UPDATE_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(x,y) UpdateField(AXI_SPI_ENGINE_SDO_FIFO,"SDO_FIFO",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_SPI_ENGINE_SDI_FIFO = '{ 'h00e8, "SDI_FIFO" , '{
-    "SDI_FIFO": '{ 31, 0, RO, 'h00 }}};
-  `define SET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(x) SetField(AXI_SPI_ENGINE_SDI_FIFO,"SDI_FIFO",x)
-  `define GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(x) GetField(AXI_SPI_ENGINE_SDI_FIFO,"SDI_FIFO",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO GetResetValue(AXI_SPI_ENGINE_SDI_FIFO,"SDI_FIFO")
-  `define UPDATE_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(x,y) UpdateField(AXI_SPI_ENGINE_SDI_FIFO,"SDI_FIFO",x,y)
+        this.NUM_OF_SDI_F = new("NUM_OF_SDI", 7, 4, RO, NUM_OF_SDI, this);
+        this.DATA_WIDTH_F = new("DATA_WIDTH", 3, 0, RO, DATA_WIDTH, this);
 
-  const reg_t AXI_SPI_ENGINE_SDI_FIFO_MSB = '{ 'h00ec, "SDI_FIFO_MSB" , '{
-    "SDI_FIFO_MSB": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB(x) SetField(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB",x)
-  `define GET_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB(x) GetField(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB GetResetValue(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB")
-  `define UPDATE_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB(x,y) UpdateField(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DATA_WIDTH_CLASS
 
-  const reg_t AXI_SPI_ENGINE_SDI_FIFO_PEEK = '{ 'h00f0, "SDI_FIFO_PEEK" , '{
-    "SDI_FIFO_PEEK": '{ 31, 0, RO, 'h00 }}};
-  `define SET_AXI_SPI_ENGINE_SDI_FIFO_PEEK_SDI_FIFO_PEEK(x) SetField(AXI_SPI_ENGINE_SDI_FIFO_PEEK,"SDI_FIFO_PEEK",x)
-  `define GET_AXI_SPI_ENGINE_SDI_FIFO_PEEK_SDI_FIFO_PEEK(x) GetField(AXI_SPI_ENGINE_SDI_FIFO_PEEK,"SDI_FIFO_PEEK",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SDI_FIFO_PEEK_SDI_FIFO_PEEK GetResetValue(AXI_SPI_ENGINE_SDI_FIFO_PEEK,"SDI_FIFO_PEEK")
-  `define UPDATE_AXI_SPI_ENGINE_SDI_FIFO_PEEK_SDI_FIFO_PEEK(x,y) UpdateField(AXI_SPI_ENGINE_SDI_FIFO_PEEK,"SDI_FIFO_PEEK",x,y)
+    class OFFLOAD_MEM_ADDR_WIDTH_CLASS extends register_base;
+      field_base SDO_MEM_ADDRESS_WIDTH_F;
+      field_base CMD_MEM_ADDRESS_WIDTH_F;
 
-  const reg_t AXI_SPI_ENGINE_OFFLOAD0_EN = '{ 'h0100, "OFFLOAD0_EN" , '{
-    "OFFLOAD0_EN": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(x) SetField(AXI_SPI_ENGINE_OFFLOAD0_EN,"OFFLOAD0_EN",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(x) GetField(AXI_SPI_ENGINE_OFFLOAD0_EN,"OFFLOAD0_EN",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN GetResetValue(AXI_SPI_ENGINE_OFFLOAD0_EN,"OFFLOAD0_EN")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD0_EN,"OFFLOAD0_EN",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_SPI_ENGINE_OFFLOAD0_STATUS = '{ 'h0104, "OFFLOAD0_STATUS" , '{
-    "OFFLOAD0_STATUS": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_OFFLOAD0_STATUS_OFFLOAD0_STATUS(x) SetField(AXI_SPI_ENGINE_OFFLOAD0_STATUS,"OFFLOAD0_STATUS",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD0_STATUS_OFFLOAD0_STATUS(x) GetField(AXI_SPI_ENGINE_OFFLOAD0_STATUS,"OFFLOAD0_STATUS",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD0_STATUS_OFFLOAD0_STATUS GetResetValue(AXI_SPI_ENGINE_OFFLOAD0_STATUS,"OFFLOAD0_STATUS")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD0_STATUS_OFFLOAD0_STATUS(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD0_STATUS,"OFFLOAD0_STATUS",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET = '{ 'h0108, "OFFLOAD0_MEM_RESET" , '{
-    "OFFLOAD0_MEM_RESET": '{ 31, 0, WO, 'h00000000 }}};
-  `define SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(x) SetField(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET,"OFFLOAD0_MEM_RESET",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(x) GetField(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET,"OFFLOAD0_MEM_RESET",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET GetResetValue(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET,"OFFLOAD0_MEM_RESET")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET,"OFFLOAD0_MEM_RESET",x,y)
+        this.SDO_MEM_ADDRESS_WIDTH_F = new("SDO_MEM_ADDRESS_WIDTH", 15, 8, RO, 'h4, this);
+        this.CMD_MEM_ADDRESS_WIDTH_F = new("CMD_MEM_ADDRESS_WIDTH", 7, 0, RO, 'h4, this);
 
-  const reg_t AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO = '{ 'h0110, "OFFLOAD0_CDM_FIFO" , '{
-    "OFFLOAD0_CDM_FIFO": '{ 31, 0, WO, 'h00 }}};
-  `define SET_AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO_OFFLOAD0_CDM_FIFO(x) SetField(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO,"OFFLOAD0_CDM_FIFO",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO_OFFLOAD0_CDM_FIFO(x) GetField(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO,"OFFLOAD0_CDM_FIFO",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO_OFFLOAD0_CDM_FIFO GetResetValue(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO,"OFFLOAD0_CDM_FIFO")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO_OFFLOAD0_CDM_FIFO(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO,"OFFLOAD0_CDM_FIFO",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD_MEM_ADDR_WIDTH_CLASS
 
-  const reg_t AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO = '{ 'h0114, "OFFLOAD0_SDO_FIFO" , '{
-    "OFFLOAD0_SDO_FIFO": '{ 31, 0, WO, 'h00 }}};
-  `define SET_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(x) SetField(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO,"OFFLOAD0_SDO_FIFO",x)
-  `define GET_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(x) GetField(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO,"OFFLOAD0_SDO_FIFO",x)
-  `define DEFAULT_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO GetResetValue(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO,"OFFLOAD0_SDO_FIFO")
-  `define UPDATE_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(x,y) UpdateField(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO,"OFFLOAD0_SDO_FIFO",x,y)
+    class FIFO_ADDR_WIDTH_CLASS extends register_base;
+      field_base SDI_FIFO_ADDRESS_WIDTH_F;
+      field_base SDO_FIFO_ADDRESS_WIDTH_F;
+      field_base SYNC_FIFO_ADDRESS_WIDTH_F;
+      field_base CMD_FIFO_ADDRESS_WIDTH_F;
 
-  const reg_t AXI_SPI_ENGINE_CFG_INFO_0 = '{ 'h0200, "CFG_INFO_0" , '{
-    "CFG_INFO_0": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_CFG_INFO_0_CFG_INFO_0(x) SetField(AXI_SPI_ENGINE_CFG_INFO_0,"CFG_INFO_0",x)
-  `define GET_AXI_SPI_ENGINE_CFG_INFO_0_CFG_INFO_0(x) GetField(AXI_SPI_ENGINE_CFG_INFO_0,"CFG_INFO_0",x)
-  `define DEFAULT_AXI_SPI_ENGINE_CFG_INFO_0_CFG_INFO_0 GetResetValue(AXI_SPI_ENGINE_CFG_INFO_0,"CFG_INFO_0")
-  `define UPDATE_AXI_SPI_ENGINE_CFG_INFO_0_CFG_INFO_0(x,y) UpdateField(AXI_SPI_ENGINE_CFG_INFO_0,"CFG_INFO_0",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_SPI_ENGINE_CFG_INFO_1 = '{ 'h0204, "CFG_INFO_1" , '{
-    "CFG_INFO_1": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_CFG_INFO_1_CFG_INFO_1(x) SetField(AXI_SPI_ENGINE_CFG_INFO_1,"CFG_INFO_1",x)
-  `define GET_AXI_SPI_ENGINE_CFG_INFO_1_CFG_INFO_1(x) GetField(AXI_SPI_ENGINE_CFG_INFO_1,"CFG_INFO_1",x)
-  `define DEFAULT_AXI_SPI_ENGINE_CFG_INFO_1_CFG_INFO_1 GetResetValue(AXI_SPI_ENGINE_CFG_INFO_1,"CFG_INFO_1")
-  `define UPDATE_AXI_SPI_ENGINE_CFG_INFO_1_CFG_INFO_1(x,y) UpdateField(AXI_SPI_ENGINE_CFG_INFO_1,"CFG_INFO_1",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_SPI_ENGINE_CFG_INFO_2 = '{ 'h0208, "CFG_INFO_2" , '{
-    "CFG_INFO_2": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_CFG_INFO_2_CFG_INFO_2(x) SetField(AXI_SPI_ENGINE_CFG_INFO_2,"CFG_INFO_2",x)
-  `define GET_AXI_SPI_ENGINE_CFG_INFO_2_CFG_INFO_2(x) GetField(AXI_SPI_ENGINE_CFG_INFO_2,"CFG_INFO_2",x)
-  `define DEFAULT_AXI_SPI_ENGINE_CFG_INFO_2_CFG_INFO_2 GetResetValue(AXI_SPI_ENGINE_CFG_INFO_2,"CFG_INFO_2")
-  `define UPDATE_AXI_SPI_ENGINE_CFG_INFO_2_CFG_INFO_2(x,y) UpdateField(AXI_SPI_ENGINE_CFG_INFO_2,"CFG_INFO_2",x,y)
+        this.SDI_FIFO_ADDRESS_WIDTH_F = new("SDI_FIFO_ADDRESS_WIDTH", 31, 24, RO, 'h5, this);
+        this.SDO_FIFO_ADDRESS_WIDTH_F = new("SDO_FIFO_ADDRESS_WIDTH", 23, 16, RO, 'h5, this);
+        this.SYNC_FIFO_ADDRESS_WIDTH_F = new("SYNC_FIFO_ADDRESS_WIDTH", 15, 8, RO, 'h4, this);
+        this.CMD_FIFO_ADDRESS_WIDTH_F = new("CMD_FIFO_ADDRESS_WIDTH", 7, 0, RO, 'h4, this);
 
-  const reg_t AXI_SPI_ENGINE_CFG_INFO_3 = '{ 'h020c, "CFG_INFO_3" , '{
-    "CFG_INFO_4": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_CFG_INFO_3_CFG_INFO_4(x) SetField(AXI_SPI_ENGINE_CFG_INFO_3,"CFG_INFO_4",x)
-  `define GET_AXI_SPI_ENGINE_CFG_INFO_3_CFG_INFO_4(x) GetField(AXI_SPI_ENGINE_CFG_INFO_3,"CFG_INFO_4",x)
-  `define DEFAULT_AXI_SPI_ENGINE_CFG_INFO_3_CFG_INFO_4 GetResetValue(AXI_SPI_ENGINE_CFG_INFO_3,"CFG_INFO_4")
-  `define UPDATE_AXI_SPI_ENGINE_CFG_INFO_3_CFG_INFO_4(x,y) UpdateField(AXI_SPI_ENGINE_CFG_INFO_3,"CFG_INFO_4",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FIFO_ADDR_WIDTH_CLASS
 
+    class ENABLE_CLASS extends register_base;
+      field_base ENABLE_F;
 
-endpackage
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.ENABLE_F = new("ENABLE", 31, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ENABLE_CLASS
+
+    class IRQ_MASK_CLASS extends register_base;
+      field_base CMD_ALMOST_EMPTY_F;
+      field_base SDO_ALMOST_EMPTY_F;
+      field_base SDI_ALMOST_FULL_F;
+      field_base SYNC_EVENT_F;
+      field_base OFFLOAD_SYNC_ID_PENDING_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CMD_ALMOST_EMPTY_F = new("CMD_ALMOST_EMPTY", 0, 0, RW, 'h0, this);
+        this.SDO_ALMOST_EMPTY_F = new("SDO_ALMOST_EMPTY", 1, 1, RW, 'h0, this);
+        this.SDI_ALMOST_FULL_F = new("SDI_ALMOST_FULL", 2, 2, RW, 'h0, this);
+        this.SYNC_EVENT_F = new("SYNC_EVENT", 3, 3, RW, 'h0, this);
+        this.OFFLOAD_SYNC_ID_PENDING_F = new("OFFLOAD_SYNC_ID_PENDING", 4, 4, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_MASK_CLASS
+
+    class IRQ_PENDING_CLASS extends register_base;
+      field_base IRQ_PENDING_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IRQ_PENDING_F = new("IRQ_PENDING", 31, 0, RW1C, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_PENDING_CLASS
+
+    class IRQ_SOURCE_CLASS extends register_base;
+      field_base IRQ_SOURCE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IRQ_SOURCE_F = new("IRQ_SOURCE", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_SOURCE_CLASS
+
+    class SYNC_ID_CLASS extends register_base;
+      field_base SYNC_ID_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SYNC_ID_F = new("SYNC_ID", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYNC_ID_CLASS
+
+    class OFFLOAD_SYNC_ID_CLASS extends register_base;
+      field_base OFFLOAD_SYNC_ID_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD_SYNC_ID_F = new("OFFLOAD_SYNC_ID", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD_SYNC_ID_CLASS
+
+    class CMD_FIFO_ROOM_CLASS extends register_base;
+      field_base CMD_FIFO_ROOM_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int CMD_FIFO_ADDRESS_WIDTH,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CMD_FIFO_ROOM_F = new("CMD_FIFO_ROOM", 31, 0, RO, $clog2((2**CMD_FIFO_ADDRESS_WIDTH)-1), this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CMD_FIFO_ROOM_CLASS
+
+    class SDO_FIFO_ROOM_CLASS extends register_base;
+      field_base SDO_FIFO_ROOM_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int SDO_FIFO_ADDRESS_WIDTH,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDO_FIFO_ROOM_F = new("SDO_FIFO_ROOM", 31, 0, RO, $clog2((2**SDO_FIFO_ADDRESS_WIDTH)-1), this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDO_FIFO_ROOM_CLASS
+
+    class SDI_FIFO_LEVEL_CLASS extends register_base;
+      field_base SDI_FIFO_LEVEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDI_FIFO_LEVEL_F = new("SDI_FIFO_LEVEL", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDI_FIFO_LEVEL_CLASS
+
+    class CMD_FIFO_CLASS extends register_base;
+      field_base CMD_FIFO_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CMD_FIFO_F = new("CMD_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CMD_FIFO_CLASS
+
+    class SDO_FIFO_CLASS extends register_base;
+      field_base SDO_FIFO_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDO_FIFO_F = new("SDO_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDO_FIFO_CLASS
+
+    class SDI_FIFO_CLASS extends register_base;
+      field_base SDI_FIFO_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDI_FIFO_F = new("SDI_FIFO", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDI_FIFO_CLASS
+
+    class SDI_FIFO_MSB_CLASS extends register_base;
+      field_base SDI_FIFO_MSB_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDI_FIFO_MSB_F = new("SDI_FIFO_MSB", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDI_FIFO_MSB_CLASS
+
+    class SDI_FIFO_PEEK_CLASS extends register_base;
+      field_base SDI_FIFO_PEEK_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SDI_FIFO_PEEK_F = new("SDI_FIFO_PEEK", 31, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SDI_FIFO_PEEK_CLASS
+
+    class OFFLOAD0_EN_CLASS extends register_base;
+      field_base OFFLOAD0_EN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD0_EN_F = new("OFFLOAD0_EN", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD0_EN_CLASS
+
+    class OFFLOAD0_STATUS_CLASS extends register_base;
+      field_base OFFLOAD0_STATUS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD0_STATUS_F = new("OFFLOAD0_STATUS", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD0_STATUS_CLASS
+
+    class OFFLOAD0_MEM_RESET_CLASS extends register_base;
+      field_base OFFLOAD0_MEM_RESET_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD0_MEM_RESET_F = new("OFFLOAD0_MEM_RESET", 31, 0, WO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD0_MEM_RESET_CLASS
+
+    class OFFLOAD0_CDM_FIFO_CLASS extends register_base;
+      field_base OFFLOAD0_CDM_FIFO_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD0_CDM_FIFO_F = new("OFFLOAD0_CDM_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD0_CDM_FIFO_CLASS
+
+    class OFFLOAD0_SDO_FIFO_CLASS extends register_base;
+      field_base OFFLOAD0_SDO_FIFO_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OFFLOAD0_SDO_FIFO_F = new("OFFLOAD0_SDO_FIFO", 31, 0, WO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OFFLOAD0_SDO_FIFO_CLASS
+
+    class CFG_INFO_0_CLASS extends register_base;
+      field_base CFG_INFO_0_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int CFG_INFO_0,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CFG_INFO_0_F = new("CFG_INFO_0", 31, 0, RO, CFG_INFO_0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CFG_INFO_0_CLASS
+
+    class CFG_INFO_1_CLASS extends register_base;
+      field_base CFG_INFO_1_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int CFG_INFO_1,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CFG_INFO_1_F = new("CFG_INFO_1", 31, 0, RO, CFG_INFO_1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CFG_INFO_1_CLASS
+
+    class CFG_INFO_2_CLASS extends register_base;
+      field_base CFG_INFO_2_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int CFG_INFO_2,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CFG_INFO_2_F = new("CFG_INFO_2", 31, 0, RO, CFG_INFO_2, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CFG_INFO_2_CLASS
+
+    class CFG_INFO_3_CLASS extends register_base;
+      field_base CFG_INFO_4_F;
+
+      function new(
+        input string name,
+        input int address,
+        input int CFG_INFO_3,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CFG_INFO_4_F = new("CFG_INFO_4", 31, 0, RO, CFG_INFO_3, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CFG_INFO_3_CLASS
+
+    VERSION_CLASS VERSION_R;
+    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    DATA_WIDTH_CLASS DATA_WIDTH_R;
+    OFFLOAD_MEM_ADDR_WIDTH_CLASS OFFLOAD_MEM_ADDR_WIDTH_R;
+    FIFO_ADDR_WIDTH_CLASS FIFO_ADDR_WIDTH_R;
+    ENABLE_CLASS ENABLE_R;
+    IRQ_MASK_CLASS IRQ_MASK_R;
+    IRQ_PENDING_CLASS IRQ_PENDING_R;
+    IRQ_SOURCE_CLASS IRQ_SOURCE_R;
+    SYNC_ID_CLASS SYNC_ID_R;
+    OFFLOAD_SYNC_ID_CLASS OFFLOAD_SYNC_ID_R;
+    CMD_FIFO_ROOM_CLASS CMD_FIFO_ROOM_R;
+    SDO_FIFO_ROOM_CLASS SDO_FIFO_ROOM_R;
+    SDI_FIFO_LEVEL_CLASS SDI_FIFO_LEVEL_R;
+    CMD_FIFO_CLASS CMD_FIFO_R;
+    SDO_FIFO_CLASS SDO_FIFO_R;
+    SDI_FIFO_CLASS SDI_FIFO_R;
+    SDI_FIFO_MSB_CLASS SDI_FIFO_MSB_R;
+    SDI_FIFO_PEEK_CLASS SDI_FIFO_PEEK_R;
+    OFFLOAD0_EN_CLASS OFFLOAD0_EN_R;
+    OFFLOAD0_STATUS_CLASS OFFLOAD0_STATUS_R;
+    OFFLOAD0_MEM_RESET_CLASS OFFLOAD0_MEM_RESET_R;
+    OFFLOAD0_CDM_FIFO_CLASS OFFLOAD0_CDM_FIFO_R;
+    OFFLOAD0_SDO_FIFO_CLASS OFFLOAD0_SDO_FIFO_R;
+    CFG_INFO_0_CLASS CFG_INFO_0_R;
+    CFG_INFO_1_CLASS CFG_INFO_1_R;
+    CFG_INFO_2_CLASS CFG_INFO_2_R;
+    CFG_INFO_3_CLASS CFG_INFO_3_R;
+
+    function new(
+      input string name,
+      input int address,
+      input int CFG_INFO_0,
+      input int CFG_INFO_1,
+      input int CFG_INFO_2,
+      input int CFG_INFO_3,
+      input int CMD_FIFO_ADDRESS_WIDTH,
+      input int DATA_WIDTH,
+      input int ID,
+      input int NUM_OF_SDI,
+      input int SDO_FIFO_ADDRESS_WIDTH,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, ID, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.DATA_WIDTH_R = new("DATA_WIDTH", 'hc, DATA_WIDTH, NUM_OF_SDI, this);
+      this.OFFLOAD_MEM_ADDR_WIDTH_R = new("OFFLOAD_MEM_ADDR_WIDTH", 'h10, this);
+      this.FIFO_ADDR_WIDTH_R = new("FIFO_ADDR_WIDTH", 'h14, this);
+      this.ENABLE_R = new("ENABLE", 'h40, this);
+      this.IRQ_MASK_R = new("IRQ_MASK", 'h80, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88, this);
+      this.SYNC_ID_R = new("SYNC_ID", 'hc0, this);
+      this.OFFLOAD_SYNC_ID_R = new("OFFLOAD_SYNC_ID", 'hc4, this);
+      this.CMD_FIFO_ROOM_R = new("CMD_FIFO_ROOM", 'hd0, CMD_FIFO_ADDRESS_WIDTH, this);
+      this.SDO_FIFO_ROOM_R = new("SDO_FIFO_ROOM", 'hd4, SDO_FIFO_ADDRESS_WIDTH, this);
+      this.SDI_FIFO_LEVEL_R = new("SDI_FIFO_LEVEL", 'hd8, this);
+      this.CMD_FIFO_R = new("CMD_FIFO", 'he0, this);
+      this.SDO_FIFO_R = new("SDO_FIFO", 'he4, this);
+      this.SDI_FIFO_R = new("SDI_FIFO", 'he8, this);
+      this.SDI_FIFO_MSB_R = new("SDI_FIFO_MSB", 'hec, this);
+      this.SDI_FIFO_PEEK_R = new("SDI_FIFO_PEEK", 'hf0, this);
+      this.OFFLOAD0_EN_R = new("OFFLOAD0_EN", 'h100, this);
+      this.OFFLOAD0_STATUS_R = new("OFFLOAD0_STATUS", 'h104, this);
+      this.OFFLOAD0_MEM_RESET_R = new("OFFLOAD0_MEM_RESET", 'h108, this);
+      this.OFFLOAD0_CDM_FIFO_R = new("OFFLOAD0_CDM_FIFO", 'h110, this);
+      this.OFFLOAD0_SDO_FIFO_R = new("OFFLOAD0_SDO_FIFO", 'h114, this);
+      this.CFG_INFO_0_R = new("CFG_INFO_0", 'h200, CFG_INFO_0, this);
+      this.CFG_INFO_1_R = new("CFG_INFO_1", 'h204, CFG_INFO_1, this);
+      this.CFG_INFO_2_R = new("CFG_INFO_2", 'h208, CFG_INFO_2, this);
+      this.CFG_INFO_3_R = new("CFG_INFO_3", 'h20c, CFG_INFO_3, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_spi_engine
+
+endpackage: adi_regmap_spi_engine_pkg

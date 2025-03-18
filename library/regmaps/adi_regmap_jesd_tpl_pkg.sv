@@ -33,61 +33,111 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_jesd_tpl_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_jesd_tpl extends adi_regmap;
 
-/* JESD TPL (up_tpl_common) */
+    /* JESD TPL (up_tpl_common) */
+    class TPL_CNTRL_CLASS extends register_base;
+      field_base PROFILE_SEL_F;
 
-  const reg_t JESD_TPL_REG_TPL_CNTRL = '{ 'h0200, "REG_TPL_CNTRL" , '{
-    "PROFILE_SEL": '{ 3, 0, RW, 'h00 }}};
-  `define SET_JESD_TPL_REG_TPL_CNTRL_PROFILE_SEL(x) SetField(JESD_TPL_REG_TPL_CNTRL,"PROFILE_SEL",x)
-  `define GET_JESD_TPL_REG_TPL_CNTRL_PROFILE_SEL(x) GetField(JESD_TPL_REG_TPL_CNTRL,"PROFILE_SEL",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_CNTRL_PROFILE_SEL GetResetValue(JESD_TPL_REG_TPL_CNTRL,"PROFILE_SEL")
-  `define UPDATE_JESD_TPL_REG_TPL_CNTRL_PROFILE_SEL(x,y) UpdateField(JESD_TPL_REG_TPL_CNTRL,"PROFILE_SEL",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t JESD_TPL_REG_TPL_STATUS = '{ 'h0204, "REG_TPL_STATUS" , '{
-    "PROFILE_NUM": '{ 3, 0, RO, 'h00 }}};
-  `define SET_JESD_TPL_REG_TPL_STATUS_PROFILE_NUM(x) SetField(JESD_TPL_REG_TPL_STATUS,"PROFILE_NUM",x)
-  `define GET_JESD_TPL_REG_TPL_STATUS_PROFILE_NUM(x) GetField(JESD_TPL_REG_TPL_STATUS,"PROFILE_NUM",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_STATUS_PROFILE_NUM GetResetValue(JESD_TPL_REG_TPL_STATUS,"PROFILE_NUM")
-  `define UPDATE_JESD_TPL_REG_TPL_STATUS_PROFILE_NUM(x,y) UpdateField(JESD_TPL_REG_TPL_STATUS,"PROFILE_NUM",x,y)
+        super.new(name, address, parent);
 
-  const reg_t JESD_TPL_REG_TPL_DESCRIPTOR_1 = '{ 'h0240, "REG_TPL_DESCRIPTOR_1" , '{
-    "JESD_F": '{ 31, 24, RO, 'h00 },
-    "JESD_S": '{ 23, 16, RO, 'h00 },
-    "JESD_L": '{ 15, 8, RO, 'h00 },
-    "JESD_M": '{ 7, 0, RO, 'h00 }}};
-  `define SET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_F(x) SetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_F",x)
-  `define GET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_F(x) GetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_F",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_F GetResetValue(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_F")
-  `define UPDATE_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_F(x,y) UpdateField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_F",x,y)
-  `define SET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_S(x) SetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_S",x)
-  `define GET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_S(x) GetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_S",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_S GetResetValue(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_S")
-  `define UPDATE_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_S(x,y) UpdateField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_S",x,y)
-  `define SET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_L(x) SetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_L",x)
-  `define GET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_L(x) GetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_L",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_L GetResetValue(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_L")
-  `define UPDATE_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_L(x,y) UpdateField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_L",x,y)
-  `define SET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_M(x) SetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_M",x)
-  `define GET_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_M(x) GetField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_M",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_M GetResetValue(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_M")
-  `define UPDATE_JESD_TPL_REG_TPL_DESCRIPTOR_1_JESD_M(x,y) UpdateField(JESD_TPL_REG_TPL_DESCRIPTOR_1,"JESD_M",x,y)
+        this.PROFILE_SEL_F = new("PROFILE_SEL", 3, 0, RW, 'hXXXXXXXX, this);
 
-  const reg_t JESD_TPL_REG_TPL_DESCRIPTOR_2 = '{ 'h0244, "REG_TPL_DESCRIPTOR_2" , '{
-    "JESD_N": '{ 7, 0, RO, 'h00 },
-    "JESD_NP": '{ 15, 8, RO, 'h00 }}};
-  `define SET_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_N(x) SetField(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_N",x)
-  `define GET_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_N(x) GetField(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_N",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_N GetResetValue(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_N")
-  `define UPDATE_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_N(x,y) UpdateField(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_N",x,y)
-  `define SET_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_NP(x) SetField(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_NP",x)
-  `define GET_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_NP(x) GetField(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_NP",x)
-  `define DEFAULT_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_NP GetResetValue(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_NP")
-  `define UPDATE_JESD_TPL_REG_TPL_DESCRIPTOR_2_JESD_NP(x,y) UpdateField(JESD_TPL_REG_TPL_DESCRIPTOR_2,"JESD_NP",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TPL_CNTRL_CLASS
 
+    class TPL_STATUS_CLASS extends register_base;
+      field_base PROFILE_NUM_F;
 
-endpackage
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PROFILE_NUM_F = new("PROFILE_NUM", 3, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TPL_STATUS_CLASS
+
+    class TPL_DESCRIPTORn_1_CLASS extends register_base;
+      field_base JESD_F_F;
+      field_base JESD_S_F;
+      field_base JESD_L_F;
+      field_base JESD_M_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.JESD_F_F = new("JESD_F", 31, 24, RO, 'hXXXXXXXX, this);
+        this.JESD_S_F = new("JESD_S", 23, 16, RO, 'hXXXXXXXX, this);
+        this.JESD_L_F = new("JESD_L", 15, 8, RO, 'hXXXXXXXX, this);
+        this.JESD_M_F = new("JESD_M", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TPL_DESCRIPTORn_1_CLASS
+
+    class TPL_DESCRIPTORn_2_CLASS extends register_base;
+      field_base JESD_N_F;
+      field_base JESD_NP_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.JESD_N_F = new("JESD_N", 7, 0, RO, 'hXXXXXXXX, this);
+        this.JESD_NP_F = new("JESD_NP", 15, 8, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: TPL_DESCRIPTORn_2_CLASS
+
+    TPL_CNTRL_CLASS TPL_CNTRL_R;
+    TPL_STATUS_CLASS TPL_STATUS_R;
+    TPL_DESCRIPTORn_1_CLASS TPL_DESCRIPTORn_1_R [2:0];
+    TPL_DESCRIPTORn_2_CLASS TPL_DESCRIPTORn_2_R [2:0];
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.TPL_CNTRL_R = new("TPL_CNTRL", 'h200, this);
+      this.TPL_STATUS_R = new("TPL_STATUS", 'h204, this);
+      for (int i=0; i<3; i++) begin
+        this.TPL_DESCRIPTORn_1_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_1", i), 'h240 + 'h2 * i * 4, this);
+      end
+      for (int i=0; i<3; i++) begin
+        this.TPL_DESCRIPTORn_2_R[i] = new($sformatf("TPL_DESCRIPTOR%0d_2", i), 'h244 + 'h2 * i * 4, this);
+      end
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_jesd_tpl
+
+endpackage: adi_regmap_jesd_tpl_pkg

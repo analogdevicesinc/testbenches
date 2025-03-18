@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -35,17 +35,15 @@
 /* Auto generated Register Map */
 /* Feb 07 14:25:05 2025 v0.4.1 */
 
-package adi_regmap_system_id_pkg;
+package adi_regmap_axi_ad3552r_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
 
-  class adi_regmap_system_id extends adi_regmap;
+  class adi_regmap_axi_ad3552r extends adi_regmap;
 
-    /* System ID (axi_system_id) */
-    class VERSION_CLASS extends register_base;
-      field_base VERSION_MAJOR_F;
-      field_base VERSION_MINOR_F;
-      field_base VERSION_PATCH_F;
+    /* AXI AD3552R DAC Common (axi_ad3552r_dac_common) */
+    class CNTRL_1_CLASS extends register_base;
+      field_base EXT_SYNC_ARM_F;
 
       function new(
         input string name,
@@ -54,33 +52,15 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
-        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h0, this);
-        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
+        this.EXT_SYNC_ARM_F = new("EXT_SYNC_ARM", 1, 1, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: VERSION_CLASS
+    endclass: CNTRL_1_CLASS
 
-    class PERIPHERAL_ID_CLASS extends register_base;
-      field_base PERIPHERAL_ID_F;
-
-      function new(
-        input string name,
-        input int address,
-        input int ID,
-        input adi_regmap parent = null);
-
-        super.new(name, address, parent);
-
-        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, ID, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: PERIPHERAL_ID_CLASS
-
-    class SCRATCH_CLASS extends register_base;
-      field_base SCRATCH_F;
+    class CNTRL_2_CLASS extends register_base;
+      field_base SDR_DDR_N_F;
+      field_base SYMB_8_16B_F;
 
       function new(
         input string name,
@@ -89,14 +69,15 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+        this.SDR_DDR_N_F = new("SDR_DDR_N", 16, 16, RW, 'h0, this);
+        this.SYMB_8_16B_F = new("SYMB_8_16B", 14, 14, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: SCRATCH_CLASS
+    endclass: CNTRL_2_CLASS
 
-    class IDENTIFICATION_CLASS extends register_base;
-      field_base IDENTIFICATION_F;
+    class DAC_CUSTOM_WR_CLASS extends register_base;
+      field_base DATA_WRITE_F;
 
       function new(
         input string name,
@@ -105,14 +86,14 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h53594944, this);
+        this.DATA_WRITE_F = new("DATA_WRITE", 23, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: IDENTIFICATION_CLASS
+    endclass: DAC_CUSTOM_WR_CLASS
 
-    class SYSROM_START_CLASS extends register_base;
-      field_base SYSROM_START_F;
+    class UI_STATUS_CLASS extends register_base;
+      field_base IF_BUSY_F;
 
       function new(
         input string name,
@@ -121,14 +102,16 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+        this.IF_BUSY_F = new("IF_BUSY", 4, 4, RO, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: SYSROM_START_CLASS
+    endclass: UI_STATUS_CLASS
 
-    class PRROM_START_CLASS extends register_base;
-      field_base SYSROM_START_F;
+    class DAC_CUSTOM_CTRL_CLASS extends register_base;
+      field_base ADDRESS_F;
+      field_base STREAM_F;
+      field_base TRANSFER_DATA_F;
 
       function new(
         input string name,
@@ -137,37 +120,73 @@ package adi_regmap_system_id_pkg;
 
         super.new(name, address, parent);
 
-        this.SYSROM_START_F = new("SYSROM_START", 31, 0, RO, 'hXXXXXXXX, this);
+        this.ADDRESS_F = new("ADDRESS", 31, 24, RW, 'h0, this);
+        this.STREAM_F = new("STREAM", 1, 1, RW, 'h0, this);
+        this.TRANSFER_DATA_F = new("TRANSFER_DATA", 0, 0, RW, 'h0, this);
 
         this.initialization_done = 1;
       endfunction: new
-    endclass: PRROM_START_CLASS
+    endclass: DAC_CUSTOM_CTRL_CLASS
 
-    VERSION_CLASS VERSION_R;
-    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
-    SCRATCH_CLASS SCRATCH_R;
-    IDENTIFICATION_CLASS IDENTIFICATION_R;
-    SYSROM_START_CLASS SYSROM_START_R;
-    PRROM_START_CLASS PRROM_START_R;
+    /* AXI AD3552R DAC Channel (axi_ad3552r_dac_channel) */
+    class CHAN_CNTRL0_7_CLASS extends register_base;
+      field_base DAC_DDS_SEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DAC_DDS_SEL_F = new("DAC_DDS_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_CNTRL0_7_CLASS
+
+    class CHAN_CNTRL1_7_CLASS extends register_base;
+      field_base DAC_DDS_SEL_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DAC_DDS_SEL_F = new("DAC_DDS_SEL", 3, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CHAN_CNTRL1_7_CLASS
+
+    CNTRL_1_CLASS CNTRL_1_R;
+    CNTRL_2_CLASS CNTRL_2_R;
+    DAC_CUSTOM_WR_CLASS DAC_CUSTOM_WR_R;
+    UI_STATUS_CLASS UI_STATUS_R;
+    DAC_CUSTOM_CTRL_CLASS DAC_CUSTOM_CTRL_R;
+    CHAN_CNTRL0_7_CLASS CHAN_CNTRL0_7_R;
+    CHAN_CNTRL1_7_CLASS CHAN_CNTRL1_7_R;
 
     function new(
       input string name,
       input int address,
-      input int ID,
       input adi_api parent = null);
 
       super.new(name, address, parent);
 
-      this.VERSION_R = new("VERSION", 'h0, this);
-      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, ID, this);
-      this.SCRATCH_R = new("SCRATCH", 'h8, this);
-      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
-      this.SYSROM_START_R = new("SYSROM_START", 'h800, this);
-      this.PRROM_START_R = new("PRROM_START", 'h1000, this);
+      this.CNTRL_1_R = new("CNTRL_1", 'h44, this);
+      this.CNTRL_2_R = new("CNTRL_2", 'h48, this);
+      this.DAC_CUSTOM_WR_R = new("DAC_CUSTOM_WR", 'h84, this);
+      this.UI_STATUS_R = new("UI_STATUS", 'h88, this);
+      this.DAC_CUSTOM_CTRL_R = new("DAC_CUSTOM_CTRL", 'h8c, this);
+      this.CHAN_CNTRL0_7_R = new("CHAN_CNTRL0_7", 'h400, this);
+      this.CHAN_CNTRL1_7_R = new("CHAN_CNTRL1_7", 'h458, this);
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_system_id
+  endclass: adi_regmap_axi_ad3552r
 
-endpackage: adi_regmap_system_id_pkg
+endpackage: adi_regmap_axi_ad3552r_pkg

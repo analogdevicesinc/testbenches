@@ -33,153 +33,119 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_clock_monitor_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_clock_monitor extends adi_regmap;
 
-/* Clock Monitor (axi_clock_monitor) */
+    /* Clock Monitor (axi_clock_monitor) */
+    class PCORE_VERSION_CLASS extends register_base;
+      field_base PCORE_VERSION_F;
 
-  const reg_t axi_clock_monitor_PCORE_VERSION = '{ 'h0000, "PCORE_VERSION" , '{
-    "PCORE_VERSION": '{ 31, 0, RO, 'h00000001 }}};
-  `define SET_axi_clock_monitor_PCORE_VERSION_PCORE_VERSION(x) SetField(axi_clock_monitor_PCORE_VERSION,"PCORE_VERSION",x)
-  `define GET_axi_clock_monitor_PCORE_VERSION_PCORE_VERSION(x) GetField(axi_clock_monitor_PCORE_VERSION,"PCORE_VERSION",x)
-  `define DEFAULT_axi_clock_monitor_PCORE_VERSION_PCORE_VERSION GetResetValue(axi_clock_monitor_PCORE_VERSION,"PCORE_VERSION")
-  `define UPDATE_axi_clock_monitor_PCORE_VERSION_PCORE_VERSION(x,y) UpdateField(axi_clock_monitor_PCORE_VERSION,"PCORE_VERSION",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t axi_clock_monitor_ID = '{ 'h0004, "ID" , '{
-    "ID": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_axi_clock_monitor_ID_ID(x) SetField(axi_clock_monitor_ID,"ID",x)
-  `define GET_axi_clock_monitor_ID_ID(x) GetField(axi_clock_monitor_ID,"ID",x)
-  `define DEFAULT_axi_clock_monitor_ID_ID GetResetValue(axi_clock_monitor_ID,"ID")
-  `define UPDATE_axi_clock_monitor_ID_ID(x,y) UpdateField(axi_clock_monitor_ID,"ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t axi_clock_monitor_NUM_OF_CLOCKS = '{ 'h000c, "NUM_OF_CLOCKS" , '{
-    "NUM_OF_CLOCKS": '{ 31, 0, RW, 'h00000008 }}};
-  `define SET_axi_clock_monitor_NUM_OF_CLOCKS_NUM_OF_CLOCKS(x) SetField(axi_clock_monitor_NUM_OF_CLOCKS,"NUM_OF_CLOCKS",x)
-  `define GET_axi_clock_monitor_NUM_OF_CLOCKS_NUM_OF_CLOCKS(x) GetField(axi_clock_monitor_NUM_OF_CLOCKS,"NUM_OF_CLOCKS",x)
-  `define DEFAULT_axi_clock_monitor_NUM_OF_CLOCKS_NUM_OF_CLOCKS GetResetValue(axi_clock_monitor_NUM_OF_CLOCKS,"NUM_OF_CLOCKS")
-  `define UPDATE_axi_clock_monitor_NUM_OF_CLOCKS_NUM_OF_CLOCKS(x,y) UpdateField(axi_clock_monitor_NUM_OF_CLOCKS,"NUM_OF_CLOCKS",x,y)
+        this.PCORE_VERSION_F = new("PCORE_VERSION", 31, 0, RO, 'h1, this);
 
-  const reg_t axi_clock_monitor_OUT_RESET = '{ 'h0010, "OUT_RESET" , '{
-    "reset": '{ 0x0, 0x0, RW, 'h00 }}};
-  `define SET_axi_clock_monitor_OUT_RESET_reset(x) SetField(axi_clock_monitor_OUT_RESET,"reset",x)
-  `define GET_axi_clock_monitor_OUT_RESET_reset(x) GetField(axi_clock_monitor_OUT_RESET,"reset",x)
-  `define DEFAULT_axi_clock_monitor_OUT_RESET_reset GetResetValue(axi_clock_monitor_OUT_RESET,"reset")
-  `define UPDATE_axi_clock_monitor_OUT_RESET_reset(x,y) UpdateField(axi_clock_monitor_OUT_RESET,"reset",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PCORE_VERSION_CLASS
 
-  const reg_t axi_clock_monitor_CLOCK_0 = '{ 'h0040, "CLOCK_0" , '{
-    "clock_0": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_0_clock_0(x) SetField(axi_clock_monitor_CLOCK_0,"clock_0",x)
-  `define GET_axi_clock_monitor_CLOCK_0_clock_0(x) GetField(axi_clock_monitor_CLOCK_0,"clock_0",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_0_clock_0 GetResetValue(axi_clock_monitor_CLOCK_0,"clock_0")
-  `define UPDATE_axi_clock_monitor_CLOCK_0_clock_0(x,y) UpdateField(axi_clock_monitor_CLOCK_0,"clock_0",x,y)
+    class ID_CLASS extends register_base;
+      field_base ID_F;
 
-  const reg_t axi_clock_monitor_CLOCK_1 = '{ 'h0044, "CLOCK_1" , '{
-    "clock_1": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_1_clock_1(x) SetField(axi_clock_monitor_CLOCK_1,"clock_1",x)
-  `define GET_axi_clock_monitor_CLOCK_1_clock_1(x) GetField(axi_clock_monitor_CLOCK_1,"clock_1",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_1_clock_1 GetResetValue(axi_clock_monitor_CLOCK_1,"clock_1")
-  `define UPDATE_axi_clock_monitor_CLOCK_1_clock_1(x,y) UpdateField(axi_clock_monitor_CLOCK_1,"clock_1",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t axi_clock_monitor_CLOCK_2 = '{ 'h0048, "CLOCK_2" , '{
-    "clock_2": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_2_clock_2(x) SetField(axi_clock_monitor_CLOCK_2,"clock_2",x)
-  `define GET_axi_clock_monitor_CLOCK_2_clock_2(x) GetField(axi_clock_monitor_CLOCK_2,"clock_2",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_2_clock_2 GetResetValue(axi_clock_monitor_CLOCK_2,"clock_2")
-  `define UPDATE_axi_clock_monitor_CLOCK_2_clock_2(x,y) UpdateField(axi_clock_monitor_CLOCK_2,"clock_2",x,y)
+        super.new(name, address, parent);
 
-  const reg_t axi_clock_monitor_CLOCK_3 = '{ 'h004c, "CLOCK_3" , '{
-    "clock_3": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_3_clock_3(x) SetField(axi_clock_monitor_CLOCK_3,"clock_3",x)
-  `define GET_axi_clock_monitor_CLOCK_3_clock_3(x) GetField(axi_clock_monitor_CLOCK_3,"clock_3",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_3_clock_3 GetResetValue(axi_clock_monitor_CLOCK_3,"clock_3")
-  `define UPDATE_axi_clock_monitor_CLOCK_3_clock_3(x,y) UpdateField(axi_clock_monitor_CLOCK_3,"clock_3",x,y)
+        this.ID_F = new("ID", 31, 0, RW, 'h0, this);
 
-  const reg_t axi_clock_monitor_CLOCK_4 = '{ 'h0050, "CLOCK_4" , '{
-    "clock_4": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_4_clock_4(x) SetField(axi_clock_monitor_CLOCK_4,"clock_4",x)
-  `define GET_axi_clock_monitor_CLOCK_4_clock_4(x) GetField(axi_clock_monitor_CLOCK_4,"clock_4",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_4_clock_4 GetResetValue(axi_clock_monitor_CLOCK_4,"clock_4")
-  `define UPDATE_axi_clock_monitor_CLOCK_4_clock_4(x,y) UpdateField(axi_clock_monitor_CLOCK_4,"clock_4",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ID_CLASS
 
-  const reg_t axi_clock_monitor_CLOCK_5 = '{ 'h0054, "CLOCK_5" , '{
-    "clock_5": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_5_clock_5(x) SetField(axi_clock_monitor_CLOCK_5,"clock_5",x)
-  `define GET_axi_clock_monitor_CLOCK_5_clock_5(x) GetField(axi_clock_monitor_CLOCK_5,"clock_5",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_5_clock_5 GetResetValue(axi_clock_monitor_CLOCK_5,"clock_5")
-  `define UPDATE_axi_clock_monitor_CLOCK_5_clock_5(x,y) UpdateField(axi_clock_monitor_CLOCK_5,"clock_5",x,y)
+    class NUM_OF_CLOCKS_CLASS extends register_base;
+      field_base NUM_OF_CLOCKS_F;
 
-  const reg_t axi_clock_monitor_CLOCK_6 = '{ 'h0058, "CLOCK_6" , '{
-    "clock_6": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_6_clock_6(x) SetField(axi_clock_monitor_CLOCK_6,"clock_6",x)
-  `define GET_axi_clock_monitor_CLOCK_6_clock_6(x) GetField(axi_clock_monitor_CLOCK_6,"clock_6",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_6_clock_6 GetResetValue(axi_clock_monitor_CLOCK_6,"clock_6")
-  `define UPDATE_axi_clock_monitor_CLOCK_6_clock_6(x,y) UpdateField(axi_clock_monitor_CLOCK_6,"clock_6",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t axi_clock_monitor_CLOCK_7 = '{ 'h005c, "CLOCK_7" , '{
-    "clock_7": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_7_clock_7(x) SetField(axi_clock_monitor_CLOCK_7,"clock_7",x)
-  `define GET_axi_clock_monitor_CLOCK_7_clock_7(x) GetField(axi_clock_monitor_CLOCK_7,"clock_7",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_7_clock_7 GetResetValue(axi_clock_monitor_CLOCK_7,"clock_7")
-  `define UPDATE_axi_clock_monitor_CLOCK_7_clock_7(x,y) UpdateField(axi_clock_monitor_CLOCK_7,"clock_7",x,y)
+        super.new(name, address, parent);
 
-  const reg_t axi_clock_monitor_CLOCK_8 = '{ 'h0060, "CLOCK_8" , '{
-    "clock_8": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_8_clock_8(x) SetField(axi_clock_monitor_CLOCK_8,"clock_8",x)
-  `define GET_axi_clock_monitor_CLOCK_8_clock_8(x) GetField(axi_clock_monitor_CLOCK_8,"clock_8",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_8_clock_8 GetResetValue(axi_clock_monitor_CLOCK_8,"clock_8")
-  `define UPDATE_axi_clock_monitor_CLOCK_8_clock_8(x,y) UpdateField(axi_clock_monitor_CLOCK_8,"clock_8",x,y)
+        this.NUM_OF_CLOCKS_F = new("NUM_OF_CLOCKS", 31, 0, RW, 'h8, this);
 
-  const reg_t axi_clock_monitor_CLOCK_9 = '{ 'h0064, "CLOCK_9" , '{
-    "clock_9": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_9_clock_9(x) SetField(axi_clock_monitor_CLOCK_9,"clock_9",x)
-  `define GET_axi_clock_monitor_CLOCK_9_clock_9(x) GetField(axi_clock_monitor_CLOCK_9,"clock_9",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_9_clock_9 GetResetValue(axi_clock_monitor_CLOCK_9,"clock_9")
-  `define UPDATE_axi_clock_monitor_CLOCK_9_clock_9(x,y) UpdateField(axi_clock_monitor_CLOCK_9,"clock_9",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: NUM_OF_CLOCKS_CLASS
 
-  const reg_t axi_clock_monitor_CLOCK_10 = '{ 'h0068, "CLOCK_10" , '{
-    "clock_10": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_10_clock_10(x) SetField(axi_clock_monitor_CLOCK_10,"clock_10",x)
-  `define GET_axi_clock_monitor_CLOCK_10_clock_10(x) GetField(axi_clock_monitor_CLOCK_10,"clock_10",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_10_clock_10 GetResetValue(axi_clock_monitor_CLOCK_10,"clock_10")
-  `define UPDATE_axi_clock_monitor_CLOCK_10_clock_10(x,y) UpdateField(axi_clock_monitor_CLOCK_10,"clock_10",x,y)
+    class OUT_RESET_CLASS extends register_base;
+      field_base RESET_F;
 
-  const reg_t axi_clock_monitor_CLOCK_11 = '{ 'h006c, "CLOCK_11" , '{
-    "clock_11": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_11_clock_11(x) SetField(axi_clock_monitor_CLOCK_11,"clock_11",x)
-  `define GET_axi_clock_monitor_CLOCK_11_clock_11(x) GetField(axi_clock_monitor_CLOCK_11,"clock_11",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_11_clock_11 GetResetValue(axi_clock_monitor_CLOCK_11,"clock_11")
-  `define UPDATE_axi_clock_monitor_CLOCK_11_clock_11(x,y) UpdateField(axi_clock_monitor_CLOCK_11,"clock_11",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t axi_clock_monitor_CLOCK_12 = '{ 'h0070, "CLOCK_12" , '{
-    "clock_12": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_12_clock_12(x) SetField(axi_clock_monitor_CLOCK_12,"clock_12",x)
-  `define GET_axi_clock_monitor_CLOCK_12_clock_12(x) GetField(axi_clock_monitor_CLOCK_12,"clock_12",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_12_clock_12 GetResetValue(axi_clock_monitor_CLOCK_12,"clock_12")
-  `define UPDATE_axi_clock_monitor_CLOCK_12_clock_12(x,y) UpdateField(axi_clock_monitor_CLOCK_12,"clock_12",x,y)
+        super.new(name, address, parent);
 
-  const reg_t axi_clock_monitor_CLOCK_13 = '{ 'h0074, "CLOCK_13" , '{
-    "clock_13": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_13_clock_13(x) SetField(axi_clock_monitor_CLOCK_13,"clock_13",x)
-  `define GET_axi_clock_monitor_CLOCK_13_clock_13(x) GetField(axi_clock_monitor_CLOCK_13,"clock_13",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_13_clock_13 GetResetValue(axi_clock_monitor_CLOCK_13,"clock_13")
-  `define UPDATE_axi_clock_monitor_CLOCK_13_clock_13(x,y) UpdateField(axi_clock_monitor_CLOCK_13,"clock_13",x,y)
+        this.RESET_F = new("RESET", 0, 0, RW, 'h0, this);
 
-  const reg_t axi_clock_monitor_CLOCK_14 = '{ 'h0078, "CLOCK_14" , '{
-    "clock_14": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_14_clock_14(x) SetField(axi_clock_monitor_CLOCK_14,"clock_14",x)
-  `define GET_axi_clock_monitor_CLOCK_14_clock_14(x) GetField(axi_clock_monitor_CLOCK_14,"clock_14",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_14_clock_14 GetResetValue(axi_clock_monitor_CLOCK_14,"clock_14")
-  `define UPDATE_axi_clock_monitor_CLOCK_14_clock_14(x,y) UpdateField(axi_clock_monitor_CLOCK_14,"clock_14",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: OUT_RESET_CLASS
 
-  const reg_t axi_clock_monitor_CLOCK_15 = '{ 'h007c, "CLOCK_15" , '{
-    "clock_15": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_axi_clock_monitor_CLOCK_15_clock_15(x) SetField(axi_clock_monitor_CLOCK_15,"clock_15",x)
-  `define GET_axi_clock_monitor_CLOCK_15_clock_15(x) GetField(axi_clock_monitor_CLOCK_15,"clock_15",x)
-  `define DEFAULT_axi_clock_monitor_CLOCK_15_clock_15 GetResetValue(axi_clock_monitor_CLOCK_15,"clock_15")
-  `define UPDATE_axi_clock_monitor_CLOCK_15_clock_15(x,y) UpdateField(axi_clock_monitor_CLOCK_15,"clock_15",x,y)
+    class CLOCK_n_CLASS extends register_base;
+      field_base CLOCK_n_F;
 
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-endpackage
+        super.new(name, address, parent);
+
+        this.CLOCK_n_F = new("CLOCK_n", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CLOCK_n_CLASS
+
+    PCORE_VERSION_CLASS PCORE_VERSION_R;
+    ID_CLASS ID_R;
+    NUM_OF_CLOCKS_CLASS NUM_OF_CLOCKS_R;
+    OUT_RESET_CLASS OUT_RESET_R;
+    CLOCK_n_CLASS CLOCK_n_R [15:0];
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.PCORE_VERSION_R = new("PCORE_VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.NUM_OF_CLOCKS_R = new("NUM_OF_CLOCKS", 'hc, this);
+      this.OUT_RESET_R = new("OUT_RESET", 'h10, this);
+      for (int i=0; i<16; i++) begin
+        this.CLOCK_n_R[i] = new($sformatf("CLOCK_%0d", i), 'h40 + 'h1 * i * 4, this);
+      end
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_clock_monitor
+
+endpackage: adi_regmap_clock_monitor_pkg

@@ -33,48 +33,127 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_gpreg_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_gpreg extends adi_regmap;
 
-/* General Purpose Registers (axi_gpreg) */
+    /* General Purpose Registers (axi_gpreg) */
+    class IO_ENBn_CLASS extends register_base;
+      field_base IO_ENB_F;
 
-  const reg_t AXI_GPREG_REG_IO_ENB = '{ 'h0400, "REG_IO_ENB" , '{
-    "IO_ENB": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_IO_ENB_IO_ENB(x) SetField(AXI_GPREG_REG_IO_ENB,"IO_ENB",x)
-  `define GET_AXI_GPREG_REG_IO_ENB_IO_ENB(x) GetField(AXI_GPREG_REG_IO_ENB,"IO_ENB",x)
-  `define DEFAULT_AXI_GPREG_REG_IO_ENB_IO_ENB GetResetValue(AXI_GPREG_REG_IO_ENB,"IO_ENB")
-  `define UPDATE_AXI_GPREG_REG_IO_ENB_IO_ENB(x,y) UpdateField(AXI_GPREG_REG_IO_ENB,"IO_ENB",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t AXI_GPREG_REG_IO_OUT = '{ 'h0404, "REG_IO_OUT" , '{
-    "IO_ENB": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_IO_OUT_IO_ENB(x) SetField(AXI_GPREG_REG_IO_OUT,"IO_ENB",x)
-  `define GET_AXI_GPREG_REG_IO_OUT_IO_ENB(x) GetField(AXI_GPREG_REG_IO_OUT,"IO_ENB",x)
-  `define DEFAULT_AXI_GPREG_REG_IO_OUT_IO_ENB GetResetValue(AXI_GPREG_REG_IO_OUT,"IO_ENB")
-  `define UPDATE_AXI_GPREG_REG_IO_OUT_IO_ENB(x,y) UpdateField(AXI_GPREG_REG_IO_OUT,"IO_ENB",x,y)
+        super.new(name, address, parent);
 
-  const reg_t AXI_GPREG_REG_IO_IN = '{ 'h0408, "REG_IO_IN" , '{
-    "IO_IN": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_IO_IN_IO_IN(x) SetField(AXI_GPREG_REG_IO_IN,"IO_IN",x)
-  `define GET_AXI_GPREG_REG_IO_IN_IO_IN(x) GetField(AXI_GPREG_REG_IO_IN,"IO_IN",x)
-  `define DEFAULT_AXI_GPREG_REG_IO_IN_IO_IN GetResetValue(AXI_GPREG_REG_IO_IN,"IO_IN")
-  `define UPDATE_AXI_GPREG_REG_IO_IN_IO_IN(x,y) UpdateField(AXI_GPREG_REG_IO_IN,"IO_IN",x,y)
+        this.IO_ENB_F = new("IO_ENB", 31, 0, RW, 'h0, this);
 
-  const reg_t AXI_GPREG_REG_CM_RESET = '{ 'h0800, "REG_CM_RESET" , '{
-    "CM_RESET_N": '{ 0, 0, RW, 'h0 }}};
-  `define SET_AXI_GPREG_REG_CM_RESET_CM_RESET_N(x) SetField(AXI_GPREG_REG_CM_RESET,"CM_RESET_N",x)
-  `define GET_AXI_GPREG_REG_CM_RESET_CM_RESET_N(x) GetField(AXI_GPREG_REG_CM_RESET,"CM_RESET_N",x)
-  `define DEFAULT_AXI_GPREG_REG_CM_RESET_CM_RESET_N GetResetValue(AXI_GPREG_REG_CM_RESET,"CM_RESET_N")
-  `define UPDATE_AXI_GPREG_REG_CM_RESET_CM_RESET_N(x,y) UpdateField(AXI_GPREG_REG_CM_RESET,"CM_RESET_N",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IO_ENBn_CLASS
 
-  const reg_t AXI_GPREG_REG_CM_COUNT = '{ 'h0808, "REG_CM_COUNT" , '{
-    "CM_CLK_COUNT": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT(x) SetField(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT",x)
-  `define GET_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT(x) GetField(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT",x)
-  `define DEFAULT_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT GetResetValue(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT")
-  `define UPDATE_AXI_GPREG_REG_CM_COUNT_CM_CLK_COUNT(x,y) UpdateField(AXI_GPREG_REG_CM_COUNT,"CM_CLK_COUNT",x,y)
+    class IO_OUTn_CLASS extends register_base;
+      field_base IO_OUT_F;
 
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-endpackage
+        super.new(name, address, parent);
+
+        this.IO_OUT_F = new("IO_OUT", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IO_OUTn_CLASS
+
+    class IO_INn_CLASS extends register_base;
+      field_base IO_IN_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IO_IN_F = new("IO_IN", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IO_INn_CLASS
+
+    class CM_RESETn_CLASS extends register_base;
+      field_base CM_RESET_N_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CM_RESET_N_F = new("CM_RESET_N", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CM_RESETn_CLASS
+
+    class CM_COUNTn_CLASS extends register_base;
+      field_base CM_CLK_COUNT_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CM_CLK_COUNT_F = new("CM_CLK_COUNT", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CM_COUNTn_CLASS
+
+    IO_ENBn_CLASS IO_ENBn_R [15:0];
+    IO_OUTn_CLASS IO_OUTn_R [15:0];
+    IO_INn_CLASS IO_INn_R [15:0];
+    CM_RESETn_CLASS CM_RESETn_R [15:0];
+    CM_COUNTn_CLASS CM_COUNTn_R [15:0];
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      for (int i=0; i<16; i++) begin
+        this.IO_ENBn_R[i] = new($sformatf("IO_ENB%0d", i), 'h400 + 'h22 * i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.IO_OUTn_R[i] = new($sformatf("IO_OUT%0d", i), 'h404 + 'h22 * i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.IO_INn_R[i] = new($sformatf("IO_IN%0d", i), 'h408 + 'h22 * i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.CM_RESETn_R[i] = new($sformatf("CM_RESET%0d", i), 'h800 + 'h22 * i * 4, this);
+      end
+      for (int i=0; i<16; i++) begin
+        this.CM_COUNTn_R[i] = new($sformatf("CM_COUNT%0d", i), 'h808 + 'h22 * i * 4, this);
+      end
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_gpreg
+
+endpackage: adi_regmap_gpreg_pkg

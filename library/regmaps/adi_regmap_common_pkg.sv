@@ -33,125 +33,163 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_common_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_common extends adi_regmap;
 
-/* Base (common to all cores) */
+    /* Base (common to all cores) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_F;
 
-  const reg_t COMMON_REG_VERSION = '{ 'h0000, "REG_VERSION" , '{
-    "VERSION": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_COMMON_REG_VERSION_VERSION(x) SetField(COMMON_REG_VERSION,"VERSION",x)
-  `define GET_COMMON_REG_VERSION_VERSION(x) GetField(COMMON_REG_VERSION,"VERSION",x)
-  `define DEFAULT_COMMON_REG_VERSION_VERSION GetResetValue(COMMON_REG_VERSION,"VERSION")
-  `define UPDATE_COMMON_REG_VERSION_VERSION(x,y) UpdateField(COMMON_REG_VERSION,"VERSION",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t COMMON_REG_ID = '{ 'h0004, "REG_ID" , '{
-    "ID": '{ 31, 0, RO, 'h00000000 }}};
-  `define SET_COMMON_REG_ID_ID(x) SetField(COMMON_REG_ID,"ID",x)
-  `define GET_COMMON_REG_ID_ID(x) GetField(COMMON_REG_ID,"ID",x)
-  `define DEFAULT_COMMON_REG_ID_ID GetResetValue(COMMON_REG_ID,"ID")
-  `define UPDATE_COMMON_REG_ID_ID(x,y) UpdateField(COMMON_REG_ID,"ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t COMMON_REG_SCRATCH = '{ 'h0008, "REG_SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_COMMON_REG_SCRATCH_SCRATCH(x) SetField(COMMON_REG_SCRATCH,"SCRATCH",x)
-  `define GET_COMMON_REG_SCRATCH_SCRATCH(x) GetField(COMMON_REG_SCRATCH,"SCRATCH",x)
-  `define DEFAULT_COMMON_REG_SCRATCH_SCRATCH GetResetValue(COMMON_REG_SCRATCH,"SCRATCH")
-  `define UPDATE_COMMON_REG_SCRATCH_SCRATCH(x,y) UpdateField(COMMON_REG_SCRATCH,"SCRATCH",x,y)
+        this.VERSION_F = new("VERSION", 31, 0, RO, 'h0, this);
 
-  const reg_t COMMON_REG_CONFIG = '{ 'h000c, "REG_CONFIG" , '{
-    "IQCORRECTION_DISABLE": '{ 0, 0, RO, 'h0 },
-    "DCFILTER_DISABLE": '{ 1, 1, RO, 'h0 },
-    "DATAFORMAT_DISABLE": '{ 2, 2, RO, 'h0 },
-    "USERPORTS_DISABLE": '{ 3, 3, RO, 'h0 },
-    "MODE_1R1T": '{ 4, 4, RO, 'h0 },
-    "DELAY_CONTROL_DISABLE": '{ 5, 5, RO, 'h0 },
-    "DDS_DISABLE": '{ 6, 6, RO, 'h0 },
-    "CMOS_OR_LVDS_N": '{ 7, 7, RO, 'h0 },
-    "PPS_RECEIVER_ENABLE": '{ 8, 8, RO, 'h0 },
-    "SCALECORRECTION_ONLY": '{ 9, 9, RO, 'h0 },
-    "EXT_SYNC": '{ 12, 12, RO, 'h0 },
-    "RD_RAW_DATA": '{ 13, 13, RO, 'h0 }}};
-  `define SET_COMMON_REG_CONFIG_IQCORRECTION_DISABLE(x) SetField(COMMON_REG_CONFIG,"IQCORRECTION_DISABLE",x)
-  `define GET_COMMON_REG_CONFIG_IQCORRECTION_DISABLE(x) GetField(COMMON_REG_CONFIG,"IQCORRECTION_DISABLE",x)
-  `define DEFAULT_COMMON_REG_CONFIG_IQCORRECTION_DISABLE GetResetValue(COMMON_REG_CONFIG,"IQCORRECTION_DISABLE")
-  `define UPDATE_COMMON_REG_CONFIG_IQCORRECTION_DISABLE(x,y) UpdateField(COMMON_REG_CONFIG,"IQCORRECTION_DISABLE",x,y)
-  `define SET_COMMON_REG_CONFIG_DCFILTER_DISABLE(x) SetField(COMMON_REG_CONFIG,"DCFILTER_DISABLE",x)
-  `define GET_COMMON_REG_CONFIG_DCFILTER_DISABLE(x) GetField(COMMON_REG_CONFIG,"DCFILTER_DISABLE",x)
-  `define DEFAULT_COMMON_REG_CONFIG_DCFILTER_DISABLE GetResetValue(COMMON_REG_CONFIG,"DCFILTER_DISABLE")
-  `define UPDATE_COMMON_REG_CONFIG_DCFILTER_DISABLE(x,y) UpdateField(COMMON_REG_CONFIG,"DCFILTER_DISABLE",x,y)
-  `define SET_COMMON_REG_CONFIG_DATAFORMAT_DISABLE(x) SetField(COMMON_REG_CONFIG,"DATAFORMAT_DISABLE",x)
-  `define GET_COMMON_REG_CONFIG_DATAFORMAT_DISABLE(x) GetField(COMMON_REG_CONFIG,"DATAFORMAT_DISABLE",x)
-  `define DEFAULT_COMMON_REG_CONFIG_DATAFORMAT_DISABLE GetResetValue(COMMON_REG_CONFIG,"DATAFORMAT_DISABLE")
-  `define UPDATE_COMMON_REG_CONFIG_DATAFORMAT_DISABLE(x,y) UpdateField(COMMON_REG_CONFIG,"DATAFORMAT_DISABLE",x,y)
-  `define SET_COMMON_REG_CONFIG_USERPORTS_DISABLE(x) SetField(COMMON_REG_CONFIG,"USERPORTS_DISABLE",x)
-  `define GET_COMMON_REG_CONFIG_USERPORTS_DISABLE(x) GetField(COMMON_REG_CONFIG,"USERPORTS_DISABLE",x)
-  `define DEFAULT_COMMON_REG_CONFIG_USERPORTS_DISABLE GetResetValue(COMMON_REG_CONFIG,"USERPORTS_DISABLE")
-  `define UPDATE_COMMON_REG_CONFIG_USERPORTS_DISABLE(x,y) UpdateField(COMMON_REG_CONFIG,"USERPORTS_DISABLE",x,y)
-  `define SET_COMMON_REG_CONFIG_MODE_1R1T(x) SetField(COMMON_REG_CONFIG,"MODE_1R1T",x)
-  `define GET_COMMON_REG_CONFIG_MODE_1R1T(x) GetField(COMMON_REG_CONFIG,"MODE_1R1T",x)
-  `define DEFAULT_COMMON_REG_CONFIG_MODE_1R1T GetResetValue(COMMON_REG_CONFIG,"MODE_1R1T")
-  `define UPDATE_COMMON_REG_CONFIG_MODE_1R1T(x,y) UpdateField(COMMON_REG_CONFIG,"MODE_1R1T",x,y)
-  `define SET_COMMON_REG_CONFIG_DELAY_CONTROL_DISABLE(x) SetField(COMMON_REG_CONFIG,"DELAY_CONTROL_DISABLE",x)
-  `define GET_COMMON_REG_CONFIG_DELAY_CONTROL_DISABLE(x) GetField(COMMON_REG_CONFIG,"DELAY_CONTROL_DISABLE",x)
-  `define DEFAULT_COMMON_REG_CONFIG_DELAY_CONTROL_DISABLE GetResetValue(COMMON_REG_CONFIG,"DELAY_CONTROL_DISABLE")
-  `define UPDATE_COMMON_REG_CONFIG_DELAY_CONTROL_DISABLE(x,y) UpdateField(COMMON_REG_CONFIG,"DELAY_CONTROL_DISABLE",x,y)
-  `define SET_COMMON_REG_CONFIG_DDS_DISABLE(x) SetField(COMMON_REG_CONFIG,"DDS_DISABLE",x)
-  `define GET_COMMON_REG_CONFIG_DDS_DISABLE(x) GetField(COMMON_REG_CONFIG,"DDS_DISABLE",x)
-  `define DEFAULT_COMMON_REG_CONFIG_DDS_DISABLE GetResetValue(COMMON_REG_CONFIG,"DDS_DISABLE")
-  `define UPDATE_COMMON_REG_CONFIG_DDS_DISABLE(x,y) UpdateField(COMMON_REG_CONFIG,"DDS_DISABLE",x,y)
-  `define SET_COMMON_REG_CONFIG_CMOS_OR_LVDS_N(x) SetField(COMMON_REG_CONFIG,"CMOS_OR_LVDS_N",x)
-  `define GET_COMMON_REG_CONFIG_CMOS_OR_LVDS_N(x) GetField(COMMON_REG_CONFIG,"CMOS_OR_LVDS_N",x)
-  `define DEFAULT_COMMON_REG_CONFIG_CMOS_OR_LVDS_N GetResetValue(COMMON_REG_CONFIG,"CMOS_OR_LVDS_N")
-  `define UPDATE_COMMON_REG_CONFIG_CMOS_OR_LVDS_N(x,y) UpdateField(COMMON_REG_CONFIG,"CMOS_OR_LVDS_N",x,y)
-  `define SET_COMMON_REG_CONFIG_PPS_RECEIVER_ENABLE(x) SetField(COMMON_REG_CONFIG,"PPS_RECEIVER_ENABLE",x)
-  `define GET_COMMON_REG_CONFIG_PPS_RECEIVER_ENABLE(x) GetField(COMMON_REG_CONFIG,"PPS_RECEIVER_ENABLE",x)
-  `define DEFAULT_COMMON_REG_CONFIG_PPS_RECEIVER_ENABLE GetResetValue(COMMON_REG_CONFIG,"PPS_RECEIVER_ENABLE")
-  `define UPDATE_COMMON_REG_CONFIG_PPS_RECEIVER_ENABLE(x,y) UpdateField(COMMON_REG_CONFIG,"PPS_RECEIVER_ENABLE",x,y)
-  `define SET_COMMON_REG_CONFIG_SCALECORRECTION_ONLY(x) SetField(COMMON_REG_CONFIG,"SCALECORRECTION_ONLY",x)
-  `define GET_COMMON_REG_CONFIG_SCALECORRECTION_ONLY(x) GetField(COMMON_REG_CONFIG,"SCALECORRECTION_ONLY",x)
-  `define DEFAULT_COMMON_REG_CONFIG_SCALECORRECTION_ONLY GetResetValue(COMMON_REG_CONFIG,"SCALECORRECTION_ONLY")
-  `define UPDATE_COMMON_REG_CONFIG_SCALECORRECTION_ONLY(x,y) UpdateField(COMMON_REG_CONFIG,"SCALECORRECTION_ONLY",x,y)
-  `define SET_COMMON_REG_CONFIG_EXT_SYNC(x) SetField(COMMON_REG_CONFIG,"EXT_SYNC",x)
-  `define GET_COMMON_REG_CONFIG_EXT_SYNC(x) GetField(COMMON_REG_CONFIG,"EXT_SYNC",x)
-  `define DEFAULT_COMMON_REG_CONFIG_EXT_SYNC GetResetValue(COMMON_REG_CONFIG,"EXT_SYNC")
-  `define UPDATE_COMMON_REG_CONFIG_EXT_SYNC(x,y) UpdateField(COMMON_REG_CONFIG,"EXT_SYNC",x,y)
-  `define SET_COMMON_REG_CONFIG_RD_RAW_DATA(x) SetField(COMMON_REG_CONFIG,"RD_RAW_DATA",x)
-  `define GET_COMMON_REG_CONFIG_RD_RAW_DATA(x) GetField(COMMON_REG_CONFIG,"RD_RAW_DATA",x)
-  `define DEFAULT_COMMON_REG_CONFIG_RD_RAW_DATA GetResetValue(COMMON_REG_CONFIG,"RD_RAW_DATA")
-  `define UPDATE_COMMON_REG_CONFIG_RD_RAW_DATA(x,y) UpdateField(COMMON_REG_CONFIG,"RD_RAW_DATA",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
 
-  const reg_t COMMON_REG_PPS_IRQ_MASK = '{ 'h0010, "REG_PPS_IRQ_MASK" , '{
-    "PPS_IRQ_MASK": '{ 0, 0, RW, 'h1 }}};
-  `define SET_COMMON_REG_PPS_IRQ_MASK_PPS_IRQ_MASK(x) SetField(COMMON_REG_PPS_IRQ_MASK,"PPS_IRQ_MASK",x)
-  `define GET_COMMON_REG_PPS_IRQ_MASK_PPS_IRQ_MASK(x) GetField(COMMON_REG_PPS_IRQ_MASK,"PPS_IRQ_MASK",x)
-  `define DEFAULT_COMMON_REG_PPS_IRQ_MASK_PPS_IRQ_MASK GetResetValue(COMMON_REG_PPS_IRQ_MASK,"PPS_IRQ_MASK")
-  `define UPDATE_COMMON_REG_PPS_IRQ_MASK_PPS_IRQ_MASK(x,y) UpdateField(COMMON_REG_PPS_IRQ_MASK,"PPS_IRQ_MASK",x,y)
+    class ID_CLASS extends register_base;
+      field_base ID_F;
 
-  const reg_t COMMON_REG_FPGA_INFO = '{ 'h001c, "REG_FPGA_INFO" , '{
-    "FPGA_TECHNOLOGY": '{ 31, 24, RO, 'h0 },
-    "FPGA_FAMILY": '{ 23, 16, RO, 'h0 },
-    "SPEED_GRADE": '{ 15, 8, RO, 'h0 },
-    "DEV_PACKAGE": '{ 7, 0, RO, 'h0 }}};
-  `define SET_COMMON_REG_FPGA_INFO_FPGA_TECHNOLOGY(x) SetField(COMMON_REG_FPGA_INFO,"FPGA_TECHNOLOGY",x)
-  `define GET_COMMON_REG_FPGA_INFO_FPGA_TECHNOLOGY(x) GetField(COMMON_REG_FPGA_INFO,"FPGA_TECHNOLOGY",x)
-  `define DEFAULT_COMMON_REG_FPGA_INFO_FPGA_TECHNOLOGY GetResetValue(COMMON_REG_FPGA_INFO,"FPGA_TECHNOLOGY")
-  `define UPDATE_COMMON_REG_FPGA_INFO_FPGA_TECHNOLOGY(x,y) UpdateField(COMMON_REG_FPGA_INFO,"FPGA_TECHNOLOGY",x,y)
-  `define SET_COMMON_REG_FPGA_INFO_FPGA_FAMILY(x) SetField(COMMON_REG_FPGA_INFO,"FPGA_FAMILY",x)
-  `define GET_COMMON_REG_FPGA_INFO_FPGA_FAMILY(x) GetField(COMMON_REG_FPGA_INFO,"FPGA_FAMILY",x)
-  `define DEFAULT_COMMON_REG_FPGA_INFO_FPGA_FAMILY GetResetValue(COMMON_REG_FPGA_INFO,"FPGA_FAMILY")
-  `define UPDATE_COMMON_REG_FPGA_INFO_FPGA_FAMILY(x,y) UpdateField(COMMON_REG_FPGA_INFO,"FPGA_FAMILY",x,y)
-  `define SET_COMMON_REG_FPGA_INFO_SPEED_GRADE(x) SetField(COMMON_REG_FPGA_INFO,"SPEED_GRADE",x)
-  `define GET_COMMON_REG_FPGA_INFO_SPEED_GRADE(x) GetField(COMMON_REG_FPGA_INFO,"SPEED_GRADE",x)
-  `define DEFAULT_COMMON_REG_FPGA_INFO_SPEED_GRADE GetResetValue(COMMON_REG_FPGA_INFO,"SPEED_GRADE")
-  `define UPDATE_COMMON_REG_FPGA_INFO_SPEED_GRADE(x,y) UpdateField(COMMON_REG_FPGA_INFO,"SPEED_GRADE",x,y)
-  `define SET_COMMON_REG_FPGA_INFO_DEV_PACKAGE(x) SetField(COMMON_REG_FPGA_INFO,"DEV_PACKAGE",x)
-  `define GET_COMMON_REG_FPGA_INFO_DEV_PACKAGE(x) GetField(COMMON_REG_FPGA_INFO,"DEV_PACKAGE",x)
-  `define DEFAULT_COMMON_REG_FPGA_INFO_DEV_PACKAGE GetResetValue(COMMON_REG_FPGA_INFO,"DEV_PACKAGE")
-  `define UPDATE_COMMON_REG_FPGA_INFO_DEV_PACKAGE(x,y) UpdateField(COMMON_REG_FPGA_INFO,"DEV_PACKAGE",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
+        super.new(name, address, parent);
 
-endpackage
+        this.ID_F = new("ID", 31, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: ID_CLASS
+
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
+
+    class CONFIG_CLASS extends register_base;
+      field_base IQCORRECTION_DISABLE_F;
+      field_base DCFILTER_DISABLE_F;
+      field_base DATAFORMAT_DISABLE_F;
+      field_base USERPORTS_DISABLE_F;
+      field_base MODE_1R1T_F;
+      field_base DELAY_CONTROL_DISABLE_F;
+      field_base DDS_DISABLE_F;
+      field_base CMOS_OR_LVDS_N_F;
+      field_base PPS_RECEIVER_ENABLE_F;
+      field_base SCALECORRECTION_ONLY_F;
+      field_base EXT_SYNC_F;
+      field_base RD_RAW_DATA_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IQCORRECTION_DISABLE_F = new("IQCORRECTION_DISABLE", 0, 0, RO, 'h0, this);
+        this.DCFILTER_DISABLE_F = new("DCFILTER_DISABLE", 1, 1, RO, 'h0, this);
+        this.DATAFORMAT_DISABLE_F = new("DATAFORMAT_DISABLE", 2, 2, RO, 'h0, this);
+        this.USERPORTS_DISABLE_F = new("USERPORTS_DISABLE", 3, 3, RO, 'h0, this);
+        this.MODE_1R1T_F = new("MODE_1R1T", 4, 4, RO, 'h0, this);
+        this.DELAY_CONTROL_DISABLE_F = new("DELAY_CONTROL_DISABLE", 5, 5, RO, 'h0, this);
+        this.DDS_DISABLE_F = new("DDS_DISABLE", 6, 6, RO, 'h0, this);
+        this.CMOS_OR_LVDS_N_F = new("CMOS_OR_LVDS_N", 7, 7, RO, 'h0, this);
+        this.PPS_RECEIVER_ENABLE_F = new("PPS_RECEIVER_ENABLE", 8, 8, RO, 'h0, this);
+        this.SCALECORRECTION_ONLY_F = new("SCALECORRECTION_ONLY", 9, 9, RO, 'h0, this);
+        this.EXT_SYNC_F = new("EXT_SYNC", 12, 12, RO, 'h0, this);
+        this.RD_RAW_DATA_F = new("RD_RAW_DATA", 13, 13, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: CONFIG_CLASS
+
+    class PPS_IRQ_MASK_CLASS extends register_base;
+      field_base PPS_IRQ_MASK_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.PPS_IRQ_MASK_F = new("PPS_IRQ_MASK", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PPS_IRQ_MASK_CLASS
+
+    class FPGA_INFO_CLASS extends register_base;
+      field_base FPGA_TECHNOLOGY_F;
+      field_base FPGA_FAMILY_F;
+      field_base SPEED_GRADE_F;
+      field_base DEV_PACKAGE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.FPGA_TECHNOLOGY_F = new("FPGA_TECHNOLOGY", 31, 24, RO, 'h0, this);
+        this.FPGA_FAMILY_F = new("FPGA_FAMILY", 23, 16, RO, 'h0, this);
+        this.SPEED_GRADE_F = new("SPEED_GRADE", 15, 8, RO, 'h0, this);
+        this.DEV_PACKAGE_F = new("DEV_PACKAGE", 7, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: FPGA_INFO_CLASS
+
+    VERSION_CLASS VERSION_R;
+    ID_CLASS ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    CONFIG_CLASS CONFIG_R;
+    PPS_IRQ_MASK_CLASS PPS_IRQ_MASK_R;
+    FPGA_INFO_CLASS FPGA_INFO_R;
+
+    function new(
+      input string name,
+      input int address,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.ID_R = new("ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.CONFIG_R = new("CONFIG", 'hc, this);
+      this.PPS_IRQ_MASK_R = new("PPS_IRQ_MASK", 'h10, this);
+      this.FPGA_INFO_R = new("FPGA_INFO", 'h1c, this);
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_common
+
+endpackage: adi_regmap_common_pkg

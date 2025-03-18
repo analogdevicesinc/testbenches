@@ -33,358 +33,755 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
+/* Feb 07 14:25:05 2025 v0.4.1 */
 
 package adi_regmap_jesd_tx_pkg;
-  import adi_regmap_pkg::*;
+  import logger_pkg::*;
+  import adi_api_pkg::*;
 
+  class adi_regmap_jesd_tx extends adi_regmap;
 
-/* JESD204 TX (axi_jesd204_tx) */
+    /* JESD204 TX (axi_jesd204_tx) */
+    class VERSION_CLASS extends register_base;
+      field_base VERSION_MAJOR_F;
+      field_base VERSION_MINOR_F;
+      field_base VERSION_PATCH_F;
 
-  const reg_t JESD_TX_VERSION = '{ 'h0000, "VERSION" , '{
-    "VERSION_MAJOR": '{ 31, 16, RO, 'h0001 },
-    "VERSION_MINOR": '{ 15, 8, RO, 'h03 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h61 }}};
-  `define SET_JESD_TX_VERSION_VERSION_MAJOR(x) SetField(JESD_TX_VERSION,"VERSION_MAJOR",x)
-  `define GET_JESD_TX_VERSION_VERSION_MAJOR(x) GetField(JESD_TX_VERSION,"VERSION_MAJOR",x)
-  `define DEFAULT_JESD_TX_VERSION_VERSION_MAJOR GetResetValue(JESD_TX_VERSION,"VERSION_MAJOR")
-  `define UPDATE_JESD_TX_VERSION_VERSION_MAJOR(x,y) UpdateField(JESD_TX_VERSION,"VERSION_MAJOR",x,y)
-  `define SET_JESD_TX_VERSION_VERSION_MINOR(x) SetField(JESD_TX_VERSION,"VERSION_MINOR",x)
-  `define GET_JESD_TX_VERSION_VERSION_MINOR(x) GetField(JESD_TX_VERSION,"VERSION_MINOR",x)
-  `define DEFAULT_JESD_TX_VERSION_VERSION_MINOR GetResetValue(JESD_TX_VERSION,"VERSION_MINOR")
-  `define UPDATE_JESD_TX_VERSION_VERSION_MINOR(x,y) UpdateField(JESD_TX_VERSION,"VERSION_MINOR",x,y)
-  `define SET_JESD_TX_VERSION_VERSION_PATCH(x) SetField(JESD_TX_VERSION,"VERSION_PATCH",x)
-  `define GET_JESD_TX_VERSION_VERSION_PATCH(x) GetField(JESD_TX_VERSION,"VERSION_PATCH",x)
-  `define DEFAULT_JESD_TX_VERSION_VERSION_PATCH GetResetValue(JESD_TX_VERSION,"VERSION_PATCH")
-  `define UPDATE_JESD_TX_VERSION_VERSION_PATCH(x,y) UpdateField(JESD_TX_VERSION,"VERSION_PATCH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t JESD_TX_PERIPHERAL_ID = '{ 'h0004, "PERIPHERAL_ID" , '{
-    "PERIPHERAL_ID": '{ 31, 0, RO, 'h???????? }}};
-  `define SET_JESD_TX_PERIPHERAL_ID_PERIPHERAL_ID(x) SetField(JESD_TX_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define GET_JESD_TX_PERIPHERAL_ID_PERIPHERAL_ID(x) GetField(JESD_TX_PERIPHERAL_ID,"PERIPHERAL_ID",x)
-  `define DEFAULT_JESD_TX_PERIPHERAL_ID_PERIPHERAL_ID GetResetValue(JESD_TX_PERIPHERAL_ID,"PERIPHERAL_ID")
-  `define UPDATE_JESD_TX_PERIPHERAL_ID_PERIPHERAL_ID(x,y) UpdateField(JESD_TX_PERIPHERAL_ID,"PERIPHERAL_ID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t JESD_TX_SCRATCH = '{ 'h0008, "SCRATCH" , '{
-    "SCRATCH": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_JESD_TX_SCRATCH_SCRATCH(x) SetField(JESD_TX_SCRATCH,"SCRATCH",x)
-  `define GET_JESD_TX_SCRATCH_SCRATCH(x) GetField(JESD_TX_SCRATCH,"SCRATCH",x)
-  `define DEFAULT_JESD_TX_SCRATCH_SCRATCH GetResetValue(JESD_TX_SCRATCH,"SCRATCH")
-  `define UPDATE_JESD_TX_SCRATCH_SCRATCH(x,y) UpdateField(JESD_TX_SCRATCH,"SCRATCH",x,y)
+        this.VERSION_MAJOR_F = new("VERSION_MAJOR", 31, 16, RO, 'h1, this);
+        this.VERSION_MINOR_F = new("VERSION_MINOR", 15, 8, RO, 'h3, this);
+        this.VERSION_PATCH_F = new("VERSION_PATCH", 7, 0, RO, 'h61, this);
 
-  const reg_t JESD_TX_IDENTIFICATION = '{ 'h000c, "IDENTIFICATION" , '{
-    "IDENTIFICATION": '{ 31, 0, RO, 'h32303454 }}};
-  `define SET_JESD_TX_IDENTIFICATION_IDENTIFICATION(x) SetField(JESD_TX_IDENTIFICATION,"IDENTIFICATION",x)
-  `define GET_JESD_TX_IDENTIFICATION_IDENTIFICATION(x) GetField(JESD_TX_IDENTIFICATION,"IDENTIFICATION",x)
-  `define DEFAULT_JESD_TX_IDENTIFICATION_IDENTIFICATION GetResetValue(JESD_TX_IDENTIFICATION,"IDENTIFICATION")
-  `define UPDATE_JESD_TX_IDENTIFICATION_IDENTIFICATION(x,y) UpdateField(JESD_TX_IDENTIFICATION,"IDENTIFICATION",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: VERSION_CLASS
 
-  const reg_t JESD_TX_SYNTH_NUM_LANES = '{ 'h0010, "SYNTH_NUM_LANES" , '{
-    "SYNTH_NUM_LANES": '{ 31, 0, RO, 'h???????? }}};
-  `define SET_JESD_TX_SYNTH_NUM_LANES_SYNTH_NUM_LANES(x) SetField(JESD_TX_SYNTH_NUM_LANES,"SYNTH_NUM_LANES",x)
-  `define GET_JESD_TX_SYNTH_NUM_LANES_SYNTH_NUM_LANES(x) GetField(JESD_TX_SYNTH_NUM_LANES,"SYNTH_NUM_LANES",x)
-  `define DEFAULT_JESD_TX_SYNTH_NUM_LANES_SYNTH_NUM_LANES GetResetValue(JESD_TX_SYNTH_NUM_LANES,"SYNTH_NUM_LANES")
-  `define UPDATE_JESD_TX_SYNTH_NUM_LANES_SYNTH_NUM_LANES(x,y) UpdateField(JESD_TX_SYNTH_NUM_LANES,"SYNTH_NUM_LANES",x,y)
+    class PERIPHERAL_ID_CLASS extends register_base;
+      field_base PERIPHERAL_ID_F;
 
-  const reg_t JESD_TX_SYNTH_DATA_PATH_WIDTH = '{ 'h0014, "SYNTH_DATA_PATH_WIDTH" , '{
-    "TPL_DATA_PATH_WIDTH": '{ 15, 8, RO, 'h00000002 },
-    "SYNTH_DATA_PATH_WIDTH": '{ 7, 0, RO, 'h00000002 }}};
-  `define SET_JESD_TX_SYNTH_DATA_PATH_WIDTH_TPL_DATA_PATH_WIDTH(x) SetField(JESD_TX_SYNTH_DATA_PATH_WIDTH,"TPL_DATA_PATH_WIDTH",x)
-  `define GET_JESD_TX_SYNTH_DATA_PATH_WIDTH_TPL_DATA_PATH_WIDTH(x) GetField(JESD_TX_SYNTH_DATA_PATH_WIDTH,"TPL_DATA_PATH_WIDTH",x)
-  `define DEFAULT_JESD_TX_SYNTH_DATA_PATH_WIDTH_TPL_DATA_PATH_WIDTH GetResetValue(JESD_TX_SYNTH_DATA_PATH_WIDTH,"TPL_DATA_PATH_WIDTH")
-  `define UPDATE_JESD_TX_SYNTH_DATA_PATH_WIDTH_TPL_DATA_PATH_WIDTH(x,y) UpdateField(JESD_TX_SYNTH_DATA_PATH_WIDTH,"TPL_DATA_PATH_WIDTH",x,y)
-  `define SET_JESD_TX_SYNTH_DATA_PATH_WIDTH_SYNTH_DATA_PATH_WIDTH(x) SetField(JESD_TX_SYNTH_DATA_PATH_WIDTH,"SYNTH_DATA_PATH_WIDTH",x)
-  `define GET_JESD_TX_SYNTH_DATA_PATH_WIDTH_SYNTH_DATA_PATH_WIDTH(x) GetField(JESD_TX_SYNTH_DATA_PATH_WIDTH,"SYNTH_DATA_PATH_WIDTH",x)
-  `define DEFAULT_JESD_TX_SYNTH_DATA_PATH_WIDTH_SYNTH_DATA_PATH_WIDTH GetResetValue(JESD_TX_SYNTH_DATA_PATH_WIDTH,"SYNTH_DATA_PATH_WIDTH")
-  `define UPDATE_JESD_TX_SYNTH_DATA_PATH_WIDTH_SYNTH_DATA_PATH_WIDTH(x,y) UpdateField(JESD_TX_SYNTH_DATA_PATH_WIDTH,"SYNTH_DATA_PATH_WIDTH",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t JESD_TX_SYNTH_REG_1 = '{ 'h0018, "SYNTH_REG_1" , '{
-    "ENABLE_CHAR_REPLACE": '{ 18, 18, RO, 'h00 },
-    "ASYNC_CLK": '{ 12, 12, RO, 0 },
-    "ENCODER": '{ 9, 8, RO, 'h?? },
-    "NUM_LINKS": '{ 7, 0, RO, 'h?? }}};
-  `define SET_JESD_TX_SYNTH_REG_1_ENABLE_CHAR_REPLACE(x) SetField(JESD_TX_SYNTH_REG_1,"ENABLE_CHAR_REPLACE",x)
-  `define GET_JESD_TX_SYNTH_REG_1_ENABLE_CHAR_REPLACE(x) GetField(JESD_TX_SYNTH_REG_1,"ENABLE_CHAR_REPLACE",x)
-  `define DEFAULT_JESD_TX_SYNTH_REG_1_ENABLE_CHAR_REPLACE GetResetValue(JESD_TX_SYNTH_REG_1,"ENABLE_CHAR_REPLACE")
-  `define UPDATE_JESD_TX_SYNTH_REG_1_ENABLE_CHAR_REPLACE(x,y) UpdateField(JESD_TX_SYNTH_REG_1,"ENABLE_CHAR_REPLACE",x,y)
-  `define SET_JESD_TX_SYNTH_REG_1_ASYNC_CLK(x) SetField(JESD_TX_SYNTH_REG_1,"ASYNC_CLK",x)
-  `define GET_JESD_TX_SYNTH_REG_1_ASYNC_CLK(x) GetField(JESD_TX_SYNTH_REG_1,"ASYNC_CLK",x)
-  `define DEFAULT_JESD_TX_SYNTH_REG_1_ASYNC_CLK GetResetValue(JESD_TX_SYNTH_REG_1,"ASYNC_CLK")
-  `define UPDATE_JESD_TX_SYNTH_REG_1_ASYNC_CLK(x,y) UpdateField(JESD_TX_SYNTH_REG_1,"ASYNC_CLK",x,y)
-  `define SET_JESD_TX_SYNTH_REG_1_ENCODER(x) SetField(JESD_TX_SYNTH_REG_1,"ENCODER",x)
-  `define GET_JESD_TX_SYNTH_REG_1_ENCODER(x) GetField(JESD_TX_SYNTH_REG_1,"ENCODER",x)
-  `define DEFAULT_JESD_TX_SYNTH_REG_1_ENCODER GetResetValue(JESD_TX_SYNTH_REG_1,"ENCODER")
-  `define UPDATE_JESD_TX_SYNTH_REG_1_ENCODER(x,y) UpdateField(JESD_TX_SYNTH_REG_1,"ENCODER",x,y)
-  `define SET_JESD_TX_SYNTH_REG_1_NUM_LINKS(x) SetField(JESD_TX_SYNTH_REG_1,"NUM_LINKS",x)
-  `define GET_JESD_TX_SYNTH_REG_1_NUM_LINKS(x) GetField(JESD_TX_SYNTH_REG_1,"NUM_LINKS",x)
-  `define DEFAULT_JESD_TX_SYNTH_REG_1_NUM_LINKS GetResetValue(JESD_TX_SYNTH_REG_1,"NUM_LINKS")
-  `define UPDATE_JESD_TX_SYNTH_REG_1_NUM_LINKS(x,y) UpdateField(JESD_TX_SYNTH_REG_1,"NUM_LINKS",x,y)
+        super.new(name, address, parent);
 
-  const reg_t JESD_TX_IRQ_ENABLE = '{ 'h0080, "IRQ_ENABLE" , '{
-    "IRQ_ENABLE": '{ 31, 0, RW, 'h00000000 }}};
-  `define SET_JESD_TX_IRQ_ENABLE_IRQ_ENABLE(x) SetField(JESD_TX_IRQ_ENABLE,"IRQ_ENABLE",x)
-  `define GET_JESD_TX_IRQ_ENABLE_IRQ_ENABLE(x) GetField(JESD_TX_IRQ_ENABLE,"IRQ_ENABLE",x)
-  `define DEFAULT_JESD_TX_IRQ_ENABLE_IRQ_ENABLE GetResetValue(JESD_TX_IRQ_ENABLE,"IRQ_ENABLE")
-  `define UPDATE_JESD_TX_IRQ_ENABLE_IRQ_ENABLE(x,y) UpdateField(JESD_TX_IRQ_ENABLE,"IRQ_ENABLE",x,y)
+        this.PERIPHERAL_ID_F = new("PERIPHERAL_ID", 31, 0, RO, 'hXXXXXXXX, this);
 
-  const reg_t JESD_TX_IRQ_PENDING = '{ 'h0084, "IRQ_PENDING" , '{
-    "IRQ_PENDING": '{ 31, 0, RW1CV, 'h00000000 }}};
-  `define SET_JESD_TX_IRQ_PENDING_IRQ_PENDING(x) SetField(JESD_TX_IRQ_PENDING,"IRQ_PENDING",x)
-  `define GET_JESD_TX_IRQ_PENDING_IRQ_PENDING(x) GetField(JESD_TX_IRQ_PENDING,"IRQ_PENDING",x)
-  `define DEFAULT_JESD_TX_IRQ_PENDING_IRQ_PENDING GetResetValue(JESD_TX_IRQ_PENDING,"IRQ_PENDING")
-  `define UPDATE_JESD_TX_IRQ_PENDING_IRQ_PENDING(x,y) UpdateField(JESD_TX_IRQ_PENDING,"IRQ_PENDING",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: PERIPHERAL_ID_CLASS
 
-  const reg_t JESD_TX_IRQ_SOURCE = '{ 'h0088, "IRQ_SOURCE" , '{
-    "IRQ_SOURCE": '{ 31, 0, RW1CV, 'h00000000 }}};
-  `define SET_JESD_TX_IRQ_SOURCE_IRQ_SOURCE(x) SetField(JESD_TX_IRQ_SOURCE,"IRQ_SOURCE",x)
-  `define GET_JESD_TX_IRQ_SOURCE_IRQ_SOURCE(x) GetField(JESD_TX_IRQ_SOURCE,"IRQ_SOURCE",x)
-  `define DEFAULT_JESD_TX_IRQ_SOURCE_IRQ_SOURCE GetResetValue(JESD_TX_IRQ_SOURCE,"IRQ_SOURCE")
-  `define UPDATE_JESD_TX_IRQ_SOURCE_IRQ_SOURCE(x,y) UpdateField(JESD_TX_IRQ_SOURCE,"IRQ_SOURCE",x,y)
+    class SCRATCH_CLASS extends register_base;
+      field_base SCRATCH_F;
 
-  const reg_t JESD_TX_LINK_DISABLE = '{ 'h00c0, "LINK_DISABLE" , '{
-    "LINK_DISABLE": '{ 0, 0, RW, 'h1 }}};
-  `define SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(x) SetField(JESD_TX_LINK_DISABLE,"LINK_DISABLE",x)
-  `define GET_JESD_TX_LINK_DISABLE_LINK_DISABLE(x) GetField(JESD_TX_LINK_DISABLE,"LINK_DISABLE",x)
-  `define DEFAULT_JESD_TX_LINK_DISABLE_LINK_DISABLE GetResetValue(JESD_TX_LINK_DISABLE,"LINK_DISABLE")
-  `define UPDATE_JESD_TX_LINK_DISABLE_LINK_DISABLE(x,y) UpdateField(JESD_TX_LINK_DISABLE,"LINK_DISABLE",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t JESD_TX_LINK_STATE = '{ 'h00c4, "LINK_STATE" , '{
-    "EXTERNAL_RESET": '{ 1, 1, RO, 'h? },
-    "LINK_STATE": '{ 0, 0, RO, 'h1 }}};
-  `define SET_JESD_TX_LINK_STATE_EXTERNAL_RESET(x) SetField(JESD_TX_LINK_STATE,"EXTERNAL_RESET",x)
-  `define GET_JESD_TX_LINK_STATE_EXTERNAL_RESET(x) GetField(JESD_TX_LINK_STATE,"EXTERNAL_RESET",x)
-  `define DEFAULT_JESD_TX_LINK_STATE_EXTERNAL_RESET GetResetValue(JESD_TX_LINK_STATE,"EXTERNAL_RESET")
-  `define UPDATE_JESD_TX_LINK_STATE_EXTERNAL_RESET(x,y) UpdateField(JESD_TX_LINK_STATE,"EXTERNAL_RESET",x,y)
-  `define SET_JESD_TX_LINK_STATE_LINK_STATE(x) SetField(JESD_TX_LINK_STATE,"LINK_STATE",x)
-  `define GET_JESD_TX_LINK_STATE_LINK_STATE(x) GetField(JESD_TX_LINK_STATE,"LINK_STATE",x)
-  `define DEFAULT_JESD_TX_LINK_STATE_LINK_STATE GetResetValue(JESD_TX_LINK_STATE,"LINK_STATE")
-  `define UPDATE_JESD_TX_LINK_STATE_LINK_STATE(x,y) UpdateField(JESD_TX_LINK_STATE,"LINK_STATE",x,y)
+        super.new(name, address, parent);
 
-  const reg_t JESD_TX_LINK_CLK_FREQ = '{ 'h00c8, "LINK_CLK_FREQ" , '{
-    "LINK_CLK_FREQ": '{ 31, 0, ROV, 'h????????? }}};
-  `define SET_JESD_TX_LINK_CLK_FREQ_LINK_CLK_FREQ(x) SetField(JESD_TX_LINK_CLK_FREQ,"LINK_CLK_FREQ",x)
-  `define GET_JESD_TX_LINK_CLK_FREQ_LINK_CLK_FREQ(x) GetField(JESD_TX_LINK_CLK_FREQ,"LINK_CLK_FREQ",x)
-  `define DEFAULT_JESD_TX_LINK_CLK_FREQ_LINK_CLK_FREQ GetResetValue(JESD_TX_LINK_CLK_FREQ,"LINK_CLK_FREQ")
-  `define UPDATE_JESD_TX_LINK_CLK_FREQ_LINK_CLK_FREQ(x,y) UpdateField(JESD_TX_LINK_CLK_FREQ,"LINK_CLK_FREQ",x,y)
+        this.SCRATCH_F = new("SCRATCH", 31, 0, RW, 'h0, this);
 
-  const reg_t JESD_TX_DEVICE_CLK_FREQ = '{ 'h00cc, "DEVICE_CLK_FREQ" , '{
-    "DEVICE_CLK_FREQ": '{ 20, 0, ROV, 'h????????? }}};
-  `define SET_JESD_TX_DEVICE_CLK_FREQ_DEVICE_CLK_FREQ(x) SetField(JESD_TX_DEVICE_CLK_FREQ,"DEVICE_CLK_FREQ",x)
-  `define GET_JESD_TX_DEVICE_CLK_FREQ_DEVICE_CLK_FREQ(x) GetField(JESD_TX_DEVICE_CLK_FREQ,"DEVICE_CLK_FREQ",x)
-  `define DEFAULT_JESD_TX_DEVICE_CLK_FREQ_DEVICE_CLK_FREQ GetResetValue(JESD_TX_DEVICE_CLK_FREQ,"DEVICE_CLK_FREQ")
-  `define UPDATE_JESD_TX_DEVICE_CLK_FREQ_DEVICE_CLK_FREQ(x,y) UpdateField(JESD_TX_DEVICE_CLK_FREQ,"DEVICE_CLK_FREQ",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SCRATCH_CLASS
 
-  const reg_t JESD_TX_SYSREF_CONF = '{ 'h0100, "SYSREF_CONF" , '{
-    "SYSREF_ONESHOT": '{ 1, 1, RW, 'h0 },
-    "SYSREF_DISABLE": '{ 0, 0, RW, 'h0 }}};
-  `define SET_JESD_TX_SYSREF_CONF_SYSREF_ONESHOT(x) SetField(JESD_TX_SYSREF_CONF,"SYSREF_ONESHOT",x)
-  `define GET_JESD_TX_SYSREF_CONF_SYSREF_ONESHOT(x) GetField(JESD_TX_SYSREF_CONF,"SYSREF_ONESHOT",x)
-  `define DEFAULT_JESD_TX_SYSREF_CONF_SYSREF_ONESHOT GetResetValue(JESD_TX_SYSREF_CONF,"SYSREF_ONESHOT")
-  `define UPDATE_JESD_TX_SYSREF_CONF_SYSREF_ONESHOT(x,y) UpdateField(JESD_TX_SYSREF_CONF,"SYSREF_ONESHOT",x,y)
-  `define SET_JESD_TX_SYSREF_CONF_SYSREF_DISABLE(x) SetField(JESD_TX_SYSREF_CONF,"SYSREF_DISABLE",x)
-  `define GET_JESD_TX_SYSREF_CONF_SYSREF_DISABLE(x) GetField(JESD_TX_SYSREF_CONF,"SYSREF_DISABLE",x)
-  `define DEFAULT_JESD_TX_SYSREF_CONF_SYSREF_DISABLE GetResetValue(JESD_TX_SYSREF_CONF,"SYSREF_DISABLE")
-  `define UPDATE_JESD_TX_SYSREF_CONF_SYSREF_DISABLE(x,y) UpdateField(JESD_TX_SYSREF_CONF,"SYSREF_DISABLE",x,y)
+    class IDENTIFICATION_CLASS extends register_base;
+      field_base IDENTIFICATION_F;
 
-  const reg_t JESD_TX_SYSREF_LMFC_OFFSET = '{ 'h0104, "SYSREF_LMFC_OFFSET" , '{
-    "SYSREF_LMFC_OFFSET": '{ 9, 0, RW, 'h00 }}};
-  `define SET_JESD_TX_SYSREF_LMFC_OFFSET_SYSREF_LMFC_OFFSET(x) SetField(JESD_TX_SYSREF_LMFC_OFFSET,"SYSREF_LMFC_OFFSET",x)
-  `define GET_JESD_TX_SYSREF_LMFC_OFFSET_SYSREF_LMFC_OFFSET(x) GetField(JESD_TX_SYSREF_LMFC_OFFSET,"SYSREF_LMFC_OFFSET",x)
-  `define DEFAULT_JESD_TX_SYSREF_LMFC_OFFSET_SYSREF_LMFC_OFFSET GetResetValue(JESD_TX_SYSREF_LMFC_OFFSET,"SYSREF_LMFC_OFFSET")
-  `define UPDATE_JESD_TX_SYSREF_LMFC_OFFSET_SYSREF_LMFC_OFFSET(x,y) UpdateField(JESD_TX_SYSREF_LMFC_OFFSET,"SYSREF_LMFC_OFFSET",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t JESD_TX_SYSREF_STATUS = '{ 'h0108, "SYSREF_STATUS" , '{
-    "SYSREF_ALIGNMENT_ERROR": '{ 1, 1, RW1CV, 'h0 },
-    "SYSREF_DETECTED": '{ 0, 0, RW1CV, 'h0 }}};
-  `define SET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(x) SetField(JESD_TX_SYSREF_STATUS,"SYSREF_ALIGNMENT_ERROR",x)
-  `define GET_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(x) GetField(JESD_TX_SYSREF_STATUS,"SYSREF_ALIGNMENT_ERROR",x)
-  `define DEFAULT_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR GetResetValue(JESD_TX_SYSREF_STATUS,"SYSREF_ALIGNMENT_ERROR")
-  `define UPDATE_JESD_TX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(x,y) UpdateField(JESD_TX_SYSREF_STATUS,"SYSREF_ALIGNMENT_ERROR",x,y)
-  `define SET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(x) SetField(JESD_TX_SYSREF_STATUS,"SYSREF_DETECTED",x)
-  `define GET_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(x) GetField(JESD_TX_SYSREF_STATUS,"SYSREF_DETECTED",x)
-  `define DEFAULT_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED GetResetValue(JESD_TX_SYSREF_STATUS,"SYSREF_DETECTED")
-  `define UPDATE_JESD_TX_SYSREF_STATUS_SYSREF_DETECTED(x,y) UpdateField(JESD_TX_SYSREF_STATUS,"SYSREF_DETECTED",x,y)
+        super.new(name, address, parent);
 
-  const reg_t JESD_TX_LANES_DISABLE = '{ 'h0200, "LANES_DISABLE" , '{
-    "LANE_DISABLEn": '{ n, n, RW, 'h0 }}};
-  `define SET_JESD_TX_LANES_DISABLE_LANE_DISABLEn(x) SetField(JESD_TX_LANES_DISABLE,"LANE_DISABLEn",x)
-  `define GET_JESD_TX_LANES_DISABLE_LANE_DISABLEn(x) GetField(JESD_TX_LANES_DISABLE,"LANE_DISABLEn",x)
-  `define DEFAULT_JESD_TX_LANES_DISABLE_LANE_DISABLEn GetResetValue(JESD_TX_LANES_DISABLE,"LANE_DISABLEn")
-  `define UPDATE_JESD_TX_LANES_DISABLE_LANE_DISABLEn(x,y) UpdateField(JESD_TX_LANES_DISABLE,"LANE_DISABLEn",x,y)
+        this.IDENTIFICATION_F = new("IDENTIFICATION", 31, 0, RO, 'h32303454, this);
 
-  const reg_t JESD_TX_LINK_CONF0 = '{ 'h0210, "LINK_CONF0" , '{
-    "OCTETS_PER_FRAME": '{ 18, 16, RW, 'h00 },
-    "OCTETS_PER_MULTIFRAME": '{ 9, 0, RW, 'h03 }}};
-  `define SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(x) SetField(JESD_TX_LINK_CONF0,"OCTETS_PER_FRAME",x)
-  `define GET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(x) GetField(JESD_TX_LINK_CONF0,"OCTETS_PER_FRAME",x)
-  `define DEFAULT_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME GetResetValue(JESD_TX_LINK_CONF0,"OCTETS_PER_FRAME")
-  `define UPDATE_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(x,y) UpdateField(JESD_TX_LINK_CONF0,"OCTETS_PER_FRAME",x,y)
-  `define SET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(x) SetField(JESD_TX_LINK_CONF0,"OCTETS_PER_MULTIFRAME",x)
-  `define GET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(x) GetField(JESD_TX_LINK_CONF0,"OCTETS_PER_MULTIFRAME",x)
-  `define DEFAULT_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME GetResetValue(JESD_TX_LINK_CONF0,"OCTETS_PER_MULTIFRAME")
-  `define UPDATE_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(x,y) UpdateField(JESD_TX_LINK_CONF0,"OCTETS_PER_MULTIFRAME",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IDENTIFICATION_CLASS
 
-  const reg_t JESD_TX_LINK_CONF1 = '{ 'h0214, "LINK_CONF1" , '{
-    "CHAR_REPLACEMENT_DISABLE": '{ 1, 1, RW, 'h0 },
-    "SCRAMBLER_DISABLE": '{ 0, 0, RW, 'h0 }}};
-  `define SET_JESD_TX_LINK_CONF1_CHAR_REPLACEMENT_DISABLE(x) SetField(JESD_TX_LINK_CONF1,"CHAR_REPLACEMENT_DISABLE",x)
-  `define GET_JESD_TX_LINK_CONF1_CHAR_REPLACEMENT_DISABLE(x) GetField(JESD_TX_LINK_CONF1,"CHAR_REPLACEMENT_DISABLE",x)
-  `define DEFAULT_JESD_TX_LINK_CONF1_CHAR_REPLACEMENT_DISABLE GetResetValue(JESD_TX_LINK_CONF1,"CHAR_REPLACEMENT_DISABLE")
-  `define UPDATE_JESD_TX_LINK_CONF1_CHAR_REPLACEMENT_DISABLE(x,y) UpdateField(JESD_TX_LINK_CONF1,"CHAR_REPLACEMENT_DISABLE",x,y)
-  `define SET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(x) SetField(JESD_TX_LINK_CONF1,"SCRAMBLER_DISABLE",x)
-  `define GET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(x) GetField(JESD_TX_LINK_CONF1,"SCRAMBLER_DISABLE",x)
-  `define DEFAULT_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE GetResetValue(JESD_TX_LINK_CONF1,"SCRAMBLER_DISABLE")
-  `define UPDATE_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(x,y) UpdateField(JESD_TX_LINK_CONF1,"SCRAMBLER_DISABLE",x,y)
+    class SYNTH_NUM_LANES_CLASS extends register_base;
+      field_base SYNTH_NUM_LANES_F;
 
-  const reg_t JESD_TX_MULTI_LINK_DISABLE = '{ 'h0218, "MULTI_LINK_DISABLE" , '{
-    "LINK_DISABLEn": '{ n, n, RW, 'h0 }}};
-  `define SET_JESD_TX_MULTI_LINK_DISABLE_LINK_DISABLEn(x) SetField(JESD_TX_MULTI_LINK_DISABLE,"LINK_DISABLEn",x)
-  `define GET_JESD_TX_MULTI_LINK_DISABLE_LINK_DISABLEn(x) GetField(JESD_TX_MULTI_LINK_DISABLE,"LINK_DISABLEn",x)
-  `define DEFAULT_JESD_TX_MULTI_LINK_DISABLE_LINK_DISABLEn GetResetValue(JESD_TX_MULTI_LINK_DISABLE,"LINK_DISABLEn")
-  `define UPDATE_JESD_TX_MULTI_LINK_DISABLE_LINK_DISABLEn(x,y) UpdateField(JESD_TX_MULTI_LINK_DISABLE,"LINK_DISABLEn",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t JESD_TX_LINK_CONF4 = '{ 'h021c, "LINK_CONF4" , '{
-    "TPL_BEATS_PER_MULTIFRAME": '{ 7, 0, RW, 'h00 }}};
-  `define SET_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME(x) SetField(JESD_TX_LINK_CONF4,"TPL_BEATS_PER_MULTIFRAME",x)
-  `define GET_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME(x) GetField(JESD_TX_LINK_CONF4,"TPL_BEATS_PER_MULTIFRAME",x)
-  `define DEFAULT_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME GetResetValue(JESD_TX_LINK_CONF4,"TPL_BEATS_PER_MULTIFRAME")
-  `define UPDATE_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME(x,y) UpdateField(JESD_TX_LINK_CONF4,"TPL_BEATS_PER_MULTIFRAME",x,y)
+        super.new(name, address, parent);
 
-  const reg_t JESD_TX_LINK_CONF2 = '{ 'h0240, "LINK_CONF2" , '{
-    "SKIP_ILAS": '{ 2, 2, RW, 'h0 },
-    "CONTINUOUS_ILAS": '{ 1, 1, RW, 'h0 },
-    "CONTINUOUS_CGS": '{ 0, 0, RW, 'h0 }}};
-  `define SET_JESD_TX_LINK_CONF2_SKIP_ILAS(x) SetField(JESD_TX_LINK_CONF2,"SKIP_ILAS",x)
-  `define GET_JESD_TX_LINK_CONF2_SKIP_ILAS(x) GetField(JESD_TX_LINK_CONF2,"SKIP_ILAS",x)
-  `define DEFAULT_JESD_TX_LINK_CONF2_SKIP_ILAS GetResetValue(JESD_TX_LINK_CONF2,"SKIP_ILAS")
-  `define UPDATE_JESD_TX_LINK_CONF2_SKIP_ILAS(x,y) UpdateField(JESD_TX_LINK_CONF2,"SKIP_ILAS",x,y)
-  `define SET_JESD_TX_LINK_CONF2_CONTINUOUS_ILAS(x) SetField(JESD_TX_LINK_CONF2,"CONTINUOUS_ILAS",x)
-  `define GET_JESD_TX_LINK_CONF2_CONTINUOUS_ILAS(x) GetField(JESD_TX_LINK_CONF2,"CONTINUOUS_ILAS",x)
-  `define DEFAULT_JESD_TX_LINK_CONF2_CONTINUOUS_ILAS GetResetValue(JESD_TX_LINK_CONF2,"CONTINUOUS_ILAS")
-  `define UPDATE_JESD_TX_LINK_CONF2_CONTINUOUS_ILAS(x,y) UpdateField(JESD_TX_LINK_CONF2,"CONTINUOUS_ILAS",x,y)
-  `define SET_JESD_TX_LINK_CONF2_CONTINUOUS_CGS(x) SetField(JESD_TX_LINK_CONF2,"CONTINUOUS_CGS",x)
-  `define GET_JESD_TX_LINK_CONF2_CONTINUOUS_CGS(x) GetField(JESD_TX_LINK_CONF2,"CONTINUOUS_CGS",x)
-  `define DEFAULT_JESD_TX_LINK_CONF2_CONTINUOUS_CGS GetResetValue(JESD_TX_LINK_CONF2,"CONTINUOUS_CGS")
-  `define UPDATE_JESD_TX_LINK_CONF2_CONTINUOUS_CGS(x,y) UpdateField(JESD_TX_LINK_CONF2,"CONTINUOUS_CGS",x,y)
+        this.SYNTH_NUM_LANES_F = new("SYNTH_NUM_LANES", 31, 0, RO, 'hXXXXXXXX, this);
 
-  const reg_t JESD_TX_LINK_CONF3 = '{ 'h0244, "LINK_CONF3" , '{
-    "MFRAMES_PER_ILAS": '{ 7, 0, RW, 'h03 }}};
-  `define SET_JESD_TX_LINK_CONF3_MFRAMES_PER_ILAS(x) SetField(JESD_TX_LINK_CONF3,"MFRAMES_PER_ILAS",x)
-  `define GET_JESD_TX_LINK_CONF3_MFRAMES_PER_ILAS(x) GetField(JESD_TX_LINK_CONF3,"MFRAMES_PER_ILAS",x)
-  `define DEFAULT_JESD_TX_LINK_CONF3_MFRAMES_PER_ILAS GetResetValue(JESD_TX_LINK_CONF3,"MFRAMES_PER_ILAS")
-  `define UPDATE_JESD_TX_LINK_CONF3_MFRAMES_PER_ILAS(x,y) UpdateField(JESD_TX_LINK_CONF3,"MFRAMES_PER_ILAS",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYNTH_NUM_LANES_CLASS
 
-  const reg_t JESD_TX_MANUAL_SYNC_REQUEST = '{ 'h0248, "MANUAL_SYNC_REQUEST" , '{
-    "MANUAL_SYNC_REQUEST": '{ 0, 0, W1S, 'h0 }}};
-  `define SET_JESD_TX_MANUAL_SYNC_REQUEST_MANUAL_SYNC_REQUEST(x) SetField(JESD_TX_MANUAL_SYNC_REQUEST,"MANUAL_SYNC_REQUEST",x)
-  `define GET_JESD_TX_MANUAL_SYNC_REQUEST_MANUAL_SYNC_REQUEST(x) GetField(JESD_TX_MANUAL_SYNC_REQUEST,"MANUAL_SYNC_REQUEST",x)
-  `define DEFAULT_JESD_TX_MANUAL_SYNC_REQUEST_MANUAL_SYNC_REQUEST GetResetValue(JESD_TX_MANUAL_SYNC_REQUEST,"MANUAL_SYNC_REQUEST")
-  `define UPDATE_JESD_TX_MANUAL_SYNC_REQUEST_MANUAL_SYNC_REQUEST(x,y) UpdateField(JESD_TX_MANUAL_SYNC_REQUEST,"MANUAL_SYNC_REQUEST",x,y)
+    class SYNTH_DATA_PATH_WIDTH_CLASS extends register_base;
+      field_base TPL_DATA_PATH_WIDTH_F;
+      field_base SYNTH_DATA_PATH_WIDTH_F;
 
-  const reg_t JESD_TX_LINK_STATUS = '{ 'h0280, "LINK_STATUS" , '{
-    "STATUS_SYNC": '{ 11, 4, ROV, 'h?? },
-    "STATUS_STATE": '{ 1, 0, ROV, 'h00 }}};
-  `define SET_JESD_TX_LINK_STATUS_STATUS_SYNC(x) SetField(JESD_TX_LINK_STATUS,"STATUS_SYNC",x)
-  `define GET_JESD_TX_LINK_STATUS_STATUS_SYNC(x) GetField(JESD_TX_LINK_STATUS,"STATUS_SYNC",x)
-  `define DEFAULT_JESD_TX_LINK_STATUS_STATUS_SYNC GetResetValue(JESD_TX_LINK_STATUS,"STATUS_SYNC")
-  `define UPDATE_JESD_TX_LINK_STATUS_STATUS_SYNC(x,y) UpdateField(JESD_TX_LINK_STATUS,"STATUS_SYNC",x,y)
-  `define SET_JESD_TX_LINK_STATUS_STATUS_STATE(x) SetField(JESD_TX_LINK_STATUS,"STATUS_STATE",x)
-  `define GET_JESD_TX_LINK_STATUS_STATUS_STATE(x) GetField(JESD_TX_LINK_STATUS,"STATUS_STATE",x)
-  `define DEFAULT_JESD_TX_LINK_STATUS_STATUS_STATE GetResetValue(JESD_TX_LINK_STATUS,"STATUS_STATE")
-  `define UPDATE_JESD_TX_LINK_STATUS_STATUS_STATE(x,y) UpdateField(JESD_TX_LINK_STATUS,"STATUS_STATE",x,y)
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
 
-  const reg_t JESD_TX_LANEn_ILAS0 = '{ 'h0310 + 'h20*n, "LANEn_ILAS0" , '{
-    "BID": '{ 27, 24, RW, 'h0 },
-    "DID": '{ 23, 16, RW, 'h00 }}};
-  `define SET_JESD_TX_LANEn_ILAS0_BID(x) SetField(JESD_TX_LANEn_ILAS0,"BID",x)
-  `define GET_JESD_TX_LANEn_ILAS0_BID(x) GetField(JESD_TX_LANEn_ILAS0,"BID",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS0_BID GetResetValue(JESD_TX_LANEn_ILAS0,"BID")
-  `define UPDATE_JESD_TX_LANEn_ILAS0_BID(x,y) UpdateField(JESD_TX_LANEn_ILAS0,"BID",x,y)
-  `define SET_JESD_TX_LANEn_ILAS0_DID(x) SetField(JESD_TX_LANEn_ILAS0,"DID",x)
-  `define GET_JESD_TX_LANEn_ILAS0_DID(x) GetField(JESD_TX_LANEn_ILAS0,"DID",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS0_DID GetResetValue(JESD_TX_LANEn_ILAS0,"DID")
-  `define UPDATE_JESD_TX_LANEn_ILAS0_DID(x,y) UpdateField(JESD_TX_LANEn_ILAS0,"DID",x,y)
+        super.new(name, address, parent);
 
-  const reg_t JESD_TX_LANEn_ILAS1 = '{ 'h0314 + 'h20*n, "LANEn_ILAS1" , '{
-    "K": '{ 28, 24, RW, 'h00 },
-    "F": '{ 23, 16, RW, 'h00 },
-    "SCR": '{ 15, 15, RW, 'h0 },
-    "L": '{ 12, 8, RW, 'h00 },
-    "LID": '{ 4, 0, RW, 'h00 }}};
-  `define SET_JESD_TX_LANEn_ILAS1_K(x) SetField(JESD_TX_LANEn_ILAS1,"K",x)
-  `define GET_JESD_TX_LANEn_ILAS1_K(x) GetField(JESD_TX_LANEn_ILAS1,"K",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS1_K GetResetValue(JESD_TX_LANEn_ILAS1,"K")
-  `define UPDATE_JESD_TX_LANEn_ILAS1_K(x,y) UpdateField(JESD_TX_LANEn_ILAS1,"K",x,y)
-  `define SET_JESD_TX_LANEn_ILAS1_F(x) SetField(JESD_TX_LANEn_ILAS1,"F",x)
-  `define GET_JESD_TX_LANEn_ILAS1_F(x) GetField(JESD_TX_LANEn_ILAS1,"F",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS1_F GetResetValue(JESD_TX_LANEn_ILAS1,"F")
-  `define UPDATE_JESD_TX_LANEn_ILAS1_F(x,y) UpdateField(JESD_TX_LANEn_ILAS1,"F",x,y)
-  `define SET_JESD_TX_LANEn_ILAS1_SCR(x) SetField(JESD_TX_LANEn_ILAS1,"SCR",x)
-  `define GET_JESD_TX_LANEn_ILAS1_SCR(x) GetField(JESD_TX_LANEn_ILAS1,"SCR",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS1_SCR GetResetValue(JESD_TX_LANEn_ILAS1,"SCR")
-  `define UPDATE_JESD_TX_LANEn_ILAS1_SCR(x,y) UpdateField(JESD_TX_LANEn_ILAS1,"SCR",x,y)
-  `define SET_JESD_TX_LANEn_ILAS1_L(x) SetField(JESD_TX_LANEn_ILAS1,"L",x)
-  `define GET_JESD_TX_LANEn_ILAS1_L(x) GetField(JESD_TX_LANEn_ILAS1,"L",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS1_L GetResetValue(JESD_TX_LANEn_ILAS1,"L")
-  `define UPDATE_JESD_TX_LANEn_ILAS1_L(x,y) UpdateField(JESD_TX_LANEn_ILAS1,"L",x,y)
-  `define SET_JESD_TX_LANEn_ILAS1_LID(x) SetField(JESD_TX_LANEn_ILAS1,"LID",x)
-  `define GET_JESD_TX_LANEn_ILAS1_LID(x) GetField(JESD_TX_LANEn_ILAS1,"LID",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS1_LID GetResetValue(JESD_TX_LANEn_ILAS1,"LID")
-  `define UPDATE_JESD_TX_LANEn_ILAS1_LID(x,y) UpdateField(JESD_TX_LANEn_ILAS1,"LID",x,y)
+        this.TPL_DATA_PATH_WIDTH_F = new("TPL_DATA_PATH_WIDTH", 15, 8, RO, 'h2, this);
+        this.SYNTH_DATA_PATH_WIDTH_F = new("SYNTH_DATA_PATH_WIDTH", 7, 0, RO, 'h2, this);
 
-  const reg_t JESD_TX_LANEn_ILAS2 = '{ 'h0318 + 'h20*n, "LANEn_ILAS2" , '{
-    "JESDV": '{ 31, 29, RW, 'h0 },
-    "S": '{ 28, 24, RW, 'h00 },
-    "SUBCLASSV": '{ 23, 21, RW, 'h0 },
-    "NP": '{ 20, 16, RW, 'h00 },
-    "CS": '{ 15, 14, RW, 'h0 },
-    "N": '{ 12, 8, RW, 'h00 },
-    "M": '{ 7, 0, RW, 'h00 }}};
-  `define SET_JESD_TX_LANEn_ILAS2_JESDV(x) SetField(JESD_TX_LANEn_ILAS2,"JESDV",x)
-  `define GET_JESD_TX_LANEn_ILAS2_JESDV(x) GetField(JESD_TX_LANEn_ILAS2,"JESDV",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS2_JESDV GetResetValue(JESD_TX_LANEn_ILAS2,"JESDV")
-  `define UPDATE_JESD_TX_LANEn_ILAS2_JESDV(x,y) UpdateField(JESD_TX_LANEn_ILAS2,"JESDV",x,y)
-  `define SET_JESD_TX_LANEn_ILAS2_S(x) SetField(JESD_TX_LANEn_ILAS2,"S",x)
-  `define GET_JESD_TX_LANEn_ILAS2_S(x) GetField(JESD_TX_LANEn_ILAS2,"S",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS2_S GetResetValue(JESD_TX_LANEn_ILAS2,"S")
-  `define UPDATE_JESD_TX_LANEn_ILAS2_S(x,y) UpdateField(JESD_TX_LANEn_ILAS2,"S",x,y)
-  `define SET_JESD_TX_LANEn_ILAS2_SUBCLASSV(x) SetField(JESD_TX_LANEn_ILAS2,"SUBCLASSV",x)
-  `define GET_JESD_TX_LANEn_ILAS2_SUBCLASSV(x) GetField(JESD_TX_LANEn_ILAS2,"SUBCLASSV",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS2_SUBCLASSV GetResetValue(JESD_TX_LANEn_ILAS2,"SUBCLASSV")
-  `define UPDATE_JESD_TX_LANEn_ILAS2_SUBCLASSV(x,y) UpdateField(JESD_TX_LANEn_ILAS2,"SUBCLASSV",x,y)
-  `define SET_JESD_TX_LANEn_ILAS2_NP(x) SetField(JESD_TX_LANEn_ILAS2,"NP",x)
-  `define GET_JESD_TX_LANEn_ILAS2_NP(x) GetField(JESD_TX_LANEn_ILAS2,"NP",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS2_NP GetResetValue(JESD_TX_LANEn_ILAS2,"NP")
-  `define UPDATE_JESD_TX_LANEn_ILAS2_NP(x,y) UpdateField(JESD_TX_LANEn_ILAS2,"NP",x,y)
-  `define SET_JESD_TX_LANEn_ILAS2_CS(x) SetField(JESD_TX_LANEn_ILAS2,"CS",x)
-  `define GET_JESD_TX_LANEn_ILAS2_CS(x) GetField(JESD_TX_LANEn_ILAS2,"CS",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS2_CS GetResetValue(JESD_TX_LANEn_ILAS2,"CS")
-  `define UPDATE_JESD_TX_LANEn_ILAS2_CS(x,y) UpdateField(JESD_TX_LANEn_ILAS2,"CS",x,y)
-  `define SET_JESD_TX_LANEn_ILAS2_N(x) SetField(JESD_TX_LANEn_ILAS2,"N",x)
-  `define GET_JESD_TX_LANEn_ILAS2_N(x) GetField(JESD_TX_LANEn_ILAS2,"N",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS2_N GetResetValue(JESD_TX_LANEn_ILAS2,"N")
-  `define UPDATE_JESD_TX_LANEn_ILAS2_N(x,y) UpdateField(JESD_TX_LANEn_ILAS2,"N",x,y)
-  `define SET_JESD_TX_LANEn_ILAS2_M(x) SetField(JESD_TX_LANEn_ILAS2,"M",x)
-  `define GET_JESD_TX_LANEn_ILAS2_M(x) GetField(JESD_TX_LANEn_ILAS2,"M",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS2_M GetResetValue(JESD_TX_LANEn_ILAS2,"M")
-  `define UPDATE_JESD_TX_LANEn_ILAS2_M(x,y) UpdateField(JESD_TX_LANEn_ILAS2,"M",x,y)
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYNTH_DATA_PATH_WIDTH_CLASS
 
-  const reg_t JESD_TX_LANEn_ILAS3 = '{ 'h031c + 'h20*n, "LANEn_ILAS3" , '{
-    "FCHK": '{ 31, 24, RW, 'h00 },
-    "HD": '{ 7, 7, RW, 'h0 },
-    "CF": '{ 4, 0, RO, 'h00 }}};
-  `define SET_JESD_TX_LANEn_ILAS3_FCHK(x) SetField(JESD_TX_LANEn_ILAS3,"FCHK",x)
-  `define GET_JESD_TX_LANEn_ILAS3_FCHK(x) GetField(JESD_TX_LANEn_ILAS3,"FCHK",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS3_FCHK GetResetValue(JESD_TX_LANEn_ILAS3,"FCHK")
-  `define UPDATE_JESD_TX_LANEn_ILAS3_FCHK(x,y) UpdateField(JESD_TX_LANEn_ILAS3,"FCHK",x,y)
-  `define SET_JESD_TX_LANEn_ILAS3_HD(x) SetField(JESD_TX_LANEn_ILAS3,"HD",x)
-  `define GET_JESD_TX_LANEn_ILAS3_HD(x) GetField(JESD_TX_LANEn_ILAS3,"HD",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS3_HD GetResetValue(JESD_TX_LANEn_ILAS3,"HD")
-  `define UPDATE_JESD_TX_LANEn_ILAS3_HD(x,y) UpdateField(JESD_TX_LANEn_ILAS3,"HD",x,y)
-  `define SET_JESD_TX_LANEn_ILAS3_CF(x) SetField(JESD_TX_LANEn_ILAS3,"CF",x)
-  `define GET_JESD_TX_LANEn_ILAS3_CF(x) GetField(JESD_TX_LANEn_ILAS3,"CF",x)
-  `define DEFAULT_JESD_TX_LANEn_ILAS3_CF GetResetValue(JESD_TX_LANEn_ILAS3,"CF")
-  `define UPDATE_JESD_TX_LANEn_ILAS3_CF(x,y) UpdateField(JESD_TX_LANEn_ILAS3,"CF",x,y)
+    class SYNTH_1_CLASS extends register_base;
+      field_base ENABLE_CHAR_REPLACE_F;
+      field_base ASYNC_CLK_F;
+      field_base ENCODER_F;
+      field_base NUM_LINKS_F;
 
+      function new(
+        input string name,
+        input int address,
+        input int ASYNC_CLK,
+        input adi_regmap parent = null);
 
-endpackage
+        super.new(name, address, parent);
+
+        this.ENABLE_CHAR_REPLACE_F = new("ENABLE_CHAR_REPLACE", 18, 18, RO, 'h0, this);
+        this.ASYNC_CLK_F = new("ASYNC_CLK", 12, 12, RO, ASYNC_CLK, this);
+        this.ENCODER_F = new("ENCODER", 9, 8, RO, 'hXXXXXXXX, this);
+        this.NUM_LINKS_F = new("NUM_LINKS", 7, 0, RO, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYNTH_1_CLASS
+
+    class IRQ_ENABLE_CLASS extends register_base;
+      field_base IRQ_ENABLE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IRQ_ENABLE_F = new("IRQ_ENABLE", 31, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_ENABLE_CLASS
+
+    class IRQ_PENDING_CLASS extends register_base;
+      field_base IRQ_PENDING_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IRQ_PENDING_F = new("IRQ_PENDING", 31, 0, RW1CV, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_PENDING_CLASS
+
+    class IRQ_SOURCE_CLASS extends register_base;
+      field_base IRQ_SOURCE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.IRQ_SOURCE_F = new("IRQ_SOURCE", 31, 0, RW1CV, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: IRQ_SOURCE_CLASS
+
+    class LINK_DISABLE_CLASS extends register_base;
+      field_base LINK_DISABLE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.LINK_DISABLE_F = new("LINK_DISABLE", 0, 0, RW, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_DISABLE_CLASS
+
+    class LINK_STATE_CLASS extends register_base;
+      field_base EXTERNAL_RESET_F;
+      field_base LINK_STATE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.EXTERNAL_RESET_F = new("EXTERNAL_RESET", 1, 1, RO, 'hXXXXXXXX, this);
+        this.LINK_STATE_F = new("LINK_STATE", 0, 0, RO, 'h1, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_STATE_CLASS
+
+    class LINK_CLK_FREQ_CLASS extends register_base;
+      field_base LINK_CLK_FREQ_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.LINK_CLK_FREQ_F = new("LINK_CLK_FREQ", 31, 0, ROV, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_CLK_FREQ_CLASS
+
+    class DEVICE_CLK_FREQ_CLASS extends register_base;
+      field_base DEVICE_CLK_FREQ_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.DEVICE_CLK_FREQ_F = new("DEVICE_CLK_FREQ", 20, 0, ROV, 'hXXXXXXXX, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: DEVICE_CLK_FREQ_CLASS
+
+    class SYSREF_CONF_CLASS extends register_base;
+      field_base SYSREF_ONESHOT_F;
+      field_base SYSREF_DISABLE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SYSREF_ONESHOT_F = new("SYSREF_ONESHOT", 1, 1, RW, 'h0, this);
+        this.SYSREF_DISABLE_F = new("SYSREF_DISABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYSREF_CONF_CLASS
+
+    class SYSREF_LMFC_OFFSET_CLASS extends register_base;
+      field_base SYSREF_LMFC_OFFSET_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SYSREF_LMFC_OFFSET_F = new("SYSREF_LMFC_OFFSET", 9, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYSREF_LMFC_OFFSET_CLASS
+
+    class SYSREF_STATUS_CLASS extends register_base;
+      field_base SYSREF_ALIGNMENT_ERROR_F;
+      field_base SYSREF_DETECTED_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SYSREF_ALIGNMENT_ERROR_F = new("SYSREF_ALIGNMENT_ERROR", 1, 1, RW1CV, 'h0, this);
+        this.SYSREF_DETECTED_F = new("SYSREF_DETECTED", 0, 0, RW1CV, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: SYSREF_STATUS_CLASS
+
+    class LANES_DISABLE_CLASS extends register_base;
+      field_base LANE_DISABLE0_F;
+      field_base LANE_DISABLE1_F;
+      field_base LANE_DISABLE2_F;
+      field_base LANE_DISABLE3_F;
+      field_base LANE_DISABLE4_F;
+      field_base LANE_DISABLE5_F;
+      field_base LANE_DISABLE6_F;
+      field_base LANE_DISABLE7_F;
+      field_base LANE_DISABLE8_F;
+      field_base LANE_DISABLE9_F;
+      field_base LANE_DISABLE10_F;
+      field_base LANE_DISABLE11_F;
+      field_base LANE_DISABLE12_F;
+      field_base LANE_DISABLE13_F;
+      field_base LANE_DISABLE14_F;
+      field_base LANE_DISABLE15_F;
+      field_base LANE_DISABLE16_F;
+      field_base LANE_DISABLE17_F;
+      field_base LANE_DISABLE18_F;
+      field_base LANE_DISABLE19_F;
+      field_base LANE_DISABLE20_F;
+      field_base LANE_DISABLE21_F;
+      field_base LANE_DISABLE22_F;
+      field_base LANE_DISABLE23_F;
+      field_base LANE_DISABLE24_F;
+      field_base LANE_DISABLE25_F;
+      field_base LANE_DISABLE26_F;
+      field_base LANE_DISABLE27_F;
+      field_base LANE_DISABLE28_F;
+      field_base LANE_DISABLE29_F;
+      field_base LANE_DISABLE30_F;
+      field_base LANE_DISABLE31_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.LANE_DISABLE0_F = new("LANE_DISABLE0", 0, 0, RW, 'h0, this);
+        this.LANE_DISABLE1_F = new("LANE_DISABLE1", 1, 1, RW, 'h0, this);
+        this.LANE_DISABLE2_F = new("LANE_DISABLE2", 2, 2, RW, 'h0, this);
+        this.LANE_DISABLE3_F = new("LANE_DISABLE3", 3, 3, RW, 'h0, this);
+        this.LANE_DISABLE4_F = new("LANE_DISABLE4", 4, 4, RW, 'h0, this);
+        this.LANE_DISABLE5_F = new("LANE_DISABLE5", 5, 5, RW, 'h0, this);
+        this.LANE_DISABLE6_F = new("LANE_DISABLE6", 6, 6, RW, 'h0, this);
+        this.LANE_DISABLE7_F = new("LANE_DISABLE7", 7, 7, RW, 'h0, this);
+        this.LANE_DISABLE8_F = new("LANE_DISABLE8", 8, 8, RW, 'h0, this);
+        this.LANE_DISABLE9_F = new("LANE_DISABLE9", 9, 9, RW, 'h0, this);
+        this.LANE_DISABLE10_F = new("LANE_DISABLE10", 10, 10, RW, 'h0, this);
+        this.LANE_DISABLE11_F = new("LANE_DISABLE11", 11, 11, RW, 'h0, this);
+        this.LANE_DISABLE12_F = new("LANE_DISABLE12", 12, 12, RW, 'h0, this);
+        this.LANE_DISABLE13_F = new("LANE_DISABLE13", 13, 13, RW, 'h0, this);
+        this.LANE_DISABLE14_F = new("LANE_DISABLE14", 14, 14, RW, 'h0, this);
+        this.LANE_DISABLE15_F = new("LANE_DISABLE15", 15, 15, RW, 'h0, this);
+        this.LANE_DISABLE16_F = new("LANE_DISABLE16", 16, 16, RW, 'h0, this);
+        this.LANE_DISABLE17_F = new("LANE_DISABLE17", 17, 17, RW, 'h0, this);
+        this.LANE_DISABLE18_F = new("LANE_DISABLE18", 18, 18, RW, 'h0, this);
+        this.LANE_DISABLE19_F = new("LANE_DISABLE19", 19, 19, RW, 'h0, this);
+        this.LANE_DISABLE20_F = new("LANE_DISABLE20", 20, 20, RW, 'h0, this);
+        this.LANE_DISABLE21_F = new("LANE_DISABLE21", 21, 21, RW, 'h0, this);
+        this.LANE_DISABLE22_F = new("LANE_DISABLE22", 22, 22, RW, 'h0, this);
+        this.LANE_DISABLE23_F = new("LANE_DISABLE23", 23, 23, RW, 'h0, this);
+        this.LANE_DISABLE24_F = new("LANE_DISABLE24", 24, 24, RW, 'h0, this);
+        this.LANE_DISABLE25_F = new("LANE_DISABLE25", 25, 25, RW, 'h0, this);
+        this.LANE_DISABLE26_F = new("LANE_DISABLE26", 26, 26, RW, 'h0, this);
+        this.LANE_DISABLE27_F = new("LANE_DISABLE27", 27, 27, RW, 'h0, this);
+        this.LANE_DISABLE28_F = new("LANE_DISABLE28", 28, 28, RW, 'h0, this);
+        this.LANE_DISABLE29_F = new("LANE_DISABLE29", 29, 29, RW, 'h0, this);
+        this.LANE_DISABLE30_F = new("LANE_DISABLE30", 30, 30, RW, 'h0, this);
+        this.LANE_DISABLE31_F = new("LANE_DISABLE31", 31, 31, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LANES_DISABLE_CLASS
+
+    class LINK_CONF0_CLASS extends register_base;
+      field_base OCTETS_PER_FRAME_F;
+      field_base OCTETS_PER_MULTIFRAME_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.OCTETS_PER_FRAME_F = new("OCTETS_PER_FRAME", 18, 16, RW, 'h0, this);
+        this.OCTETS_PER_MULTIFRAME_F = new("OCTETS_PER_MULTIFRAME", 9, 0, RW, 'h3, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_CONF0_CLASS
+
+    class LINK_CONF1_CLASS extends register_base;
+      field_base CHAR_REPLACEMENT_DISABLE_F;
+      field_base SCRAMBLER_DISABLE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.CHAR_REPLACEMENT_DISABLE_F = new("CHAR_REPLACEMENT_DISABLE", 1, 1, RW, 'h0, this);
+        this.SCRAMBLER_DISABLE_F = new("SCRAMBLER_DISABLE", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_CONF1_CLASS
+
+    class MULTI_LINK_DISABLE_CLASS extends register_base;
+      field_base LINK_DISABLE0_F;
+      field_base LINK_DISABLE1_F;
+      field_base LINK_DISABLE2_F;
+      field_base LINK_DISABLE3_F;
+      field_base LINK_DISABLE4_F;
+      field_base LINK_DISABLE5_F;
+      field_base LINK_DISABLE6_F;
+      field_base LINK_DISABLE7_F;
+      field_base LINK_DISABLE8_F;
+      field_base LINK_DISABLE9_F;
+      field_base LINK_DISABLE10_F;
+      field_base LINK_DISABLE11_F;
+      field_base LINK_DISABLE12_F;
+      field_base LINK_DISABLE13_F;
+      field_base LINK_DISABLE14_F;
+      field_base LINK_DISABLE15_F;
+      field_base LINK_DISABLE16_F;
+      field_base LINK_DISABLE17_F;
+      field_base LINK_DISABLE18_F;
+      field_base LINK_DISABLE19_F;
+      field_base LINK_DISABLE20_F;
+      field_base LINK_DISABLE21_F;
+      field_base LINK_DISABLE22_F;
+      field_base LINK_DISABLE23_F;
+      field_base LINK_DISABLE24_F;
+      field_base LINK_DISABLE25_F;
+      field_base LINK_DISABLE26_F;
+      field_base LINK_DISABLE27_F;
+      field_base LINK_DISABLE28_F;
+      field_base LINK_DISABLE29_F;
+      field_base LINK_DISABLE30_F;
+      field_base LINK_DISABLE31_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.LINK_DISABLE0_F = new("LINK_DISABLE0", 0, 0, RW, 'h0, this);
+        this.LINK_DISABLE1_F = new("LINK_DISABLE1", 1, 1, RW, 'h0, this);
+        this.LINK_DISABLE2_F = new("LINK_DISABLE2", 2, 2, RW, 'h0, this);
+        this.LINK_DISABLE3_F = new("LINK_DISABLE3", 3, 3, RW, 'h0, this);
+        this.LINK_DISABLE4_F = new("LINK_DISABLE4", 4, 4, RW, 'h0, this);
+        this.LINK_DISABLE5_F = new("LINK_DISABLE5", 5, 5, RW, 'h0, this);
+        this.LINK_DISABLE6_F = new("LINK_DISABLE6", 6, 6, RW, 'h0, this);
+        this.LINK_DISABLE7_F = new("LINK_DISABLE7", 7, 7, RW, 'h0, this);
+        this.LINK_DISABLE8_F = new("LINK_DISABLE8", 8, 8, RW, 'h0, this);
+        this.LINK_DISABLE9_F = new("LINK_DISABLE9", 9, 9, RW, 'h0, this);
+        this.LINK_DISABLE10_F = new("LINK_DISABLE10", 10, 10, RW, 'h0, this);
+        this.LINK_DISABLE11_F = new("LINK_DISABLE11", 11, 11, RW, 'h0, this);
+        this.LINK_DISABLE12_F = new("LINK_DISABLE12", 12, 12, RW, 'h0, this);
+        this.LINK_DISABLE13_F = new("LINK_DISABLE13", 13, 13, RW, 'h0, this);
+        this.LINK_DISABLE14_F = new("LINK_DISABLE14", 14, 14, RW, 'h0, this);
+        this.LINK_DISABLE15_F = new("LINK_DISABLE15", 15, 15, RW, 'h0, this);
+        this.LINK_DISABLE16_F = new("LINK_DISABLE16", 16, 16, RW, 'h0, this);
+        this.LINK_DISABLE17_F = new("LINK_DISABLE17", 17, 17, RW, 'h0, this);
+        this.LINK_DISABLE18_F = new("LINK_DISABLE18", 18, 18, RW, 'h0, this);
+        this.LINK_DISABLE19_F = new("LINK_DISABLE19", 19, 19, RW, 'h0, this);
+        this.LINK_DISABLE20_F = new("LINK_DISABLE20", 20, 20, RW, 'h0, this);
+        this.LINK_DISABLE21_F = new("LINK_DISABLE21", 21, 21, RW, 'h0, this);
+        this.LINK_DISABLE22_F = new("LINK_DISABLE22", 22, 22, RW, 'h0, this);
+        this.LINK_DISABLE23_F = new("LINK_DISABLE23", 23, 23, RW, 'h0, this);
+        this.LINK_DISABLE24_F = new("LINK_DISABLE24", 24, 24, RW, 'h0, this);
+        this.LINK_DISABLE25_F = new("LINK_DISABLE25", 25, 25, RW, 'h0, this);
+        this.LINK_DISABLE26_F = new("LINK_DISABLE26", 26, 26, RW, 'h0, this);
+        this.LINK_DISABLE27_F = new("LINK_DISABLE27", 27, 27, RW, 'h0, this);
+        this.LINK_DISABLE28_F = new("LINK_DISABLE28", 28, 28, RW, 'h0, this);
+        this.LINK_DISABLE29_F = new("LINK_DISABLE29", 29, 29, RW, 'h0, this);
+        this.LINK_DISABLE30_F = new("LINK_DISABLE30", 30, 30, RW, 'h0, this);
+        this.LINK_DISABLE31_F = new("LINK_DISABLE31", 31, 31, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: MULTI_LINK_DISABLE_CLASS
+
+    class LINK_CONF4_CLASS extends register_base;
+      field_base TPL_BEATS_PER_MULTIFRAME_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.TPL_BEATS_PER_MULTIFRAME_F = new("TPL_BEATS_PER_MULTIFRAME", 7, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_CONF4_CLASS
+
+    class LINK_CONF2_CLASS extends register_base;
+      field_base SKIP_ILAS_F;
+      field_base CONTINUOUS_ILAS_F;
+      field_base CONTINUOUS_CGS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.SKIP_ILAS_F = new("SKIP_ILAS", 2, 2, RW, 'h0, this);
+        this.CONTINUOUS_ILAS_F = new("CONTINUOUS_ILAS", 1, 1, RW, 'h0, this);
+        this.CONTINUOUS_CGS_F = new("CONTINUOUS_CGS", 0, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_CONF2_CLASS
+
+    class LINK_CONF3_CLASS extends register_base;
+      field_base MFRAMES_PER_ILAS_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.MFRAMES_PER_ILAS_F = new("MFRAMES_PER_ILAS", 7, 0, RW, 'h3, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_CONF3_CLASS
+
+    class MANUAL_SYNC_REQUEST_CLASS extends register_base;
+      field_base MANUAL_SYNC_REQUEST_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.MANUAL_SYNC_REQUEST_F = new("MANUAL_SYNC_REQUEST", 0, 0, W1S, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: MANUAL_SYNC_REQUEST_CLASS
+
+    class LINK_STATUS_CLASS extends register_base;
+      field_base STATUS_SYNC_F;
+      field_base STATUS_STATE_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.STATUS_SYNC_F = new("STATUS_SYNC", 11, 4, ROV, 'hXXXXXXXX, this);
+        this.STATUS_STATE_F = new("STATUS_STATE", 1, 0, ROV, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LINK_STATUS_CLASS
+
+    class LANEn_ILAS0_CLASS extends register_base;
+      field_base BID_F;
+      field_base DID_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.BID_F = new("BID", 27, 24, RW, 'h0, this);
+        this.DID_F = new("DID", 23, 16, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LANEn_ILAS0_CLASS
+
+    class LANEn_ILAS1_CLASS extends register_base;
+      field_base K_F;
+      field_base F_F;
+      field_base SCR_F;
+      field_base L_F;
+      field_base LID_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.K_F = new("K", 28, 24, RW, 'h0, this);
+        this.F_F = new("F", 23, 16, RW, 'h0, this);
+        this.SCR_F = new("SCR", 15, 15, RW, 'h0, this);
+        this.L_F = new("L", 12, 8, RW, 'h0, this);
+        this.LID_F = new("LID", 4, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LANEn_ILAS1_CLASS
+
+    class LANEn_ILAS2_CLASS extends register_base;
+      field_base JESDV_F;
+      field_base S_F;
+      field_base SUBCLASSV_F;
+      field_base NP_F;
+      field_base CS_F;
+      field_base N_F;
+      field_base M_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.JESDV_F = new("JESDV", 31, 29, RW, 'h0, this);
+        this.S_F = new("S", 28, 24, RW, 'h0, this);
+        this.SUBCLASSV_F = new("SUBCLASSV", 23, 21, RW, 'h0, this);
+        this.NP_F = new("NP", 20, 16, RW, 'h0, this);
+        this.CS_F = new("CS", 15, 14, RW, 'h0, this);
+        this.N_F = new("N", 12, 8, RW, 'h0, this);
+        this.M_F = new("M", 7, 0, RW, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LANEn_ILAS2_CLASS
+
+    class LANEn_ILAS3_CLASS extends register_base;
+      field_base FCHK_F;
+      field_base HD_F;
+      field_base CF_F;
+
+      function new(
+        input string name,
+        input int address,
+        input adi_regmap parent = null);
+
+        super.new(name, address, parent);
+
+        this.FCHK_F = new("FCHK", 31, 24, RW, 'h0, this);
+        this.HD_F = new("HD", 7, 7, RW, 'h0, this);
+        this.CF_F = new("CF", 4, 0, RO, 'h0, this);
+
+        this.initialization_done = 1;
+      endfunction: new
+    endclass: LANEn_ILAS3_CLASS
+
+    VERSION_CLASS VERSION_R;
+    PERIPHERAL_ID_CLASS PERIPHERAL_ID_R;
+    SCRATCH_CLASS SCRATCH_R;
+    IDENTIFICATION_CLASS IDENTIFICATION_R;
+    SYNTH_NUM_LANES_CLASS SYNTH_NUM_LANES_R;
+    SYNTH_DATA_PATH_WIDTH_CLASS SYNTH_DATA_PATH_WIDTH_R;
+    SYNTH_1_CLASS SYNTH_1_R;
+    IRQ_ENABLE_CLASS IRQ_ENABLE_R;
+    IRQ_PENDING_CLASS IRQ_PENDING_R;
+    IRQ_SOURCE_CLASS IRQ_SOURCE_R;
+    LINK_DISABLE_CLASS LINK_DISABLE_R;
+    LINK_STATE_CLASS LINK_STATE_R;
+    LINK_CLK_FREQ_CLASS LINK_CLK_FREQ_R;
+    DEVICE_CLK_FREQ_CLASS DEVICE_CLK_FREQ_R;
+    SYSREF_CONF_CLASS SYSREF_CONF_R;
+    SYSREF_LMFC_OFFSET_CLASS SYSREF_LMFC_OFFSET_R;
+    SYSREF_STATUS_CLASS SYSREF_STATUS_R;
+    LANES_DISABLE_CLASS LANES_DISABLE_R;
+    LINK_CONF0_CLASS LINK_CONF0_R;
+    LINK_CONF1_CLASS LINK_CONF1_R;
+    MULTI_LINK_DISABLE_CLASS MULTI_LINK_DISABLE_R;
+    LINK_CONF4_CLASS LINK_CONF4_R;
+    LINK_CONF2_CLASS LINK_CONF2_R;
+    LINK_CONF3_CLASS LINK_CONF3_R;
+    MANUAL_SYNC_REQUEST_CLASS MANUAL_SYNC_REQUEST_R;
+    LINK_STATUS_CLASS LINK_STATUS_R;
+    LANEn_ILAS0_CLASS LANEn_ILAS0_R [31:0];
+    LANEn_ILAS1_CLASS LANEn_ILAS1_R [31:0];
+    LANEn_ILAS2_CLASS LANEn_ILAS2_R [31:0];
+    LANEn_ILAS3_CLASS LANEn_ILAS3_R [31:0];
+
+    function new(
+      input string name,
+      input int address,
+      input int ASYNC_CLK,
+      input adi_api parent = null);
+
+      super.new(name, address, parent);
+
+      this.VERSION_R = new("VERSION", 'h0, this);
+      this.PERIPHERAL_ID_R = new("PERIPHERAL_ID", 'h4, this);
+      this.SCRATCH_R = new("SCRATCH", 'h8, this);
+      this.IDENTIFICATION_R = new("IDENTIFICATION", 'hc, this);
+      this.SYNTH_NUM_LANES_R = new("SYNTH_NUM_LANES", 'h10, this);
+      this.SYNTH_DATA_PATH_WIDTH_R = new("SYNTH_DATA_PATH_WIDTH", 'h14, this);
+      this.SYNTH_1_R = new("SYNTH_1", 'h18, ASYNC_CLK, this);
+      this.IRQ_ENABLE_R = new("IRQ_ENABLE", 'h80, this);
+      this.IRQ_PENDING_R = new("IRQ_PENDING", 'h84, this);
+      this.IRQ_SOURCE_R = new("IRQ_SOURCE", 'h88, this);
+      this.LINK_DISABLE_R = new("LINK_DISABLE", 'hc0, this);
+      this.LINK_STATE_R = new("LINK_STATE", 'hc4, this);
+      this.LINK_CLK_FREQ_R = new("LINK_CLK_FREQ", 'hc8, this);
+      this.DEVICE_CLK_FREQ_R = new("DEVICE_CLK_FREQ", 'hcc, this);
+      this.SYSREF_CONF_R = new("SYSREF_CONF", 'h100, this);
+      this.SYSREF_LMFC_OFFSET_R = new("SYSREF_LMFC_OFFSET", 'h104, this);
+      this.SYSREF_STATUS_R = new("SYSREF_STATUS", 'h108, this);
+      this.LANES_DISABLE_R = new("LANES_DISABLE", 'h200, this);
+      this.LINK_CONF0_R = new("LINK_CONF0", 'h210, this);
+      this.LINK_CONF1_R = new("LINK_CONF1", 'h214, this);
+      this.MULTI_LINK_DISABLE_R = new("MULTI_LINK_DISABLE", 'h218, this);
+      this.LINK_CONF4_R = new("LINK_CONF4", 'h21c, this);
+      this.LINK_CONF2_R = new("LINK_CONF2", 'h240, this);
+      this.LINK_CONF3_R = new("LINK_CONF3", 'h244, this);
+      this.MANUAL_SYNC_REQUEST_R = new("MANUAL_SYNC_REQUEST", 'h248, this);
+      this.LINK_STATUS_R = new("LINK_STATUS", 'h280, this);
+      for (int i=0; i<32; i++) begin
+        this.LANEn_ILAS0_R[i] = new($sformatf("LANE%0d_ILAS0", i), 'h310 + 'h8 * i * 4, this);
+      end
+      for (int i=0; i<32; i++) begin
+        this.LANEn_ILAS1_R[i] = new($sformatf("LANE%0d_ILAS1", i), 'h314 + 'h8 * i * 4, this);
+      end
+      for (int i=0; i<32; i++) begin
+        this.LANEn_ILAS2_R[i] = new($sformatf("LANE%0d_ILAS2", i), 'h318 + 'h8 * i * 4, this);
+      end
+      for (int i=0; i<32; i++) begin
+        this.LANEn_ILAS3_R[i] = new($sformatf("LANE%0d_ILAS3", i), 'h31c + 'h8 * i * 4, this);
+      end
+
+      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
+    endfunction: new
+
+  endclass: adi_regmap_jesd_tx
+
+endpackage: adi_regmap_jesd_tx_pkg

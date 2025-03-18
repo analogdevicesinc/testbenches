@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014 - 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -35,45 +35,22 @@
 /* Auto generated Register Map */
 /* Feb 07 14:25:05 2025 v0.4.1 */
 
-package adi_regmap_iodelay_pkg;
-  import logger_pkg::*;
-  import adi_api_pkg::*;
+`timescale 1ns/1ps
 
-  class adi_regmap_iodelay extends adi_regmap;
+`ifndef _ADI_REGMAP_AXI_LASER_DRIVER_PKG_DEFINITIONS_SVH_
+`define _ADI_REGMAP_AXI_LASER_DRIVER_PKG_DEFINITIONS_SVH_
 
-    /* IO Delay Control (axi_ad*) */
-    class DELAY_CONTROL_n_CLASS extends register_base;
-      field_base DELAY_CONTROL_IO_n_F;
+// Help build VIP Interface parameters name
+`define ADI_REGMAP_AXI_LASER_DRIVER_PKG_PARAM_IMPORT(n)  n``.inst.ID, \
+  n``.inst.PULSE_PERIOD, \
+  n``.inst.PULSE_WIDTH
 
-      function new(
-        input string name,
-        input int address,
-        input adi_regmap parent = null);
+`define ADI_REGMAP_AXI_LASER_DRIVER_PKG_PARAM_DECL int  ID, \
+  PULSE_PERIOD, \
+  PULSE_WIDTH
 
-        super.new(name, address, parent);
+`define ADI_REGMAP_AXI_LASER_DRIVER_PKG_PARAM_ORDER  ID, \
+  PULSE_PERIOD, \
+  PULSE_WIDTH
 
-        this.DELAY_CONTROL_IO_n_F = new("DELAY_CONTROL_IO_n", 4, 0, RW, 'h0, this);
-
-        this.initialization_done = 1;
-      endfunction: new
-    endclass: DELAY_CONTROL_n_CLASS
-
-    DELAY_CONTROL_n_CLASS DELAY_CONTROL_n_R [15:0];
-
-    function new(
-      input string name,
-      input int address,
-      input adi_api parent = null);
-
-      super.new(name, address, parent);
-
-      for (int i=0; i<16; i++) begin
-        this.DELAY_CONTROL_n_R[i] = new($sformatf("DELAY_CONTROL_%0d", i), 'h0 + 'h1 * i * 4, this);
-      end
-
-      this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
-    endfunction: new
-
-  endclass: adi_regmap_iodelay
-
-endpackage: adi_regmap_iodelay_pkg
+`endif

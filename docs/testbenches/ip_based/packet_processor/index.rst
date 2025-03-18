@@ -62,16 +62,6 @@ Available configurations & tests combinations
 
 The test program is compatible with the configuration.
 
-CPU/Memory interconnects addresses
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Irrelevant for this testbench.
-
-Interrupts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Irrelevant for this testbench.
-
 Test stimulus
 -------------------------------------------------------------------------------
 
@@ -92,9 +82,9 @@ The steps of the environment bringup are:
 Packet processing testing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Processing classes are implemented which are application specific
-* Before the resets are asserted, the processors are instantiated
-* The processors are connected with the publisher processors
+* Processing class is implemented which is simple data processor
+* Before the resets are asserted, the processor is instantiated
+* The processor is connected with the publisher processors
 * The master and slave sequencers are configured and then the resets are
   asserted
 * The scoreboard is subscribed to the master and slave sequencers' publisher

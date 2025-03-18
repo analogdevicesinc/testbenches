@@ -45,20 +45,19 @@ package adi_axi_agent_pkg;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
   import adi_axi_monitor_pkg::*;
+  import vip_agent_typedef_pkg::*;
 
-  typedef enum {MASTER, SLAVE, PASSTHROUGH} axi_agent_typedef;
-  
   class adi_axi_agent_base extends adi_agent;
 
     m_axi_sequencer_base master_sequencer;
     s_axi_sequencer_base slave_sequencer;
     adi_axi_monitor_base monitor;
 
-    local axi_agent_typedef agent_type;
+    local agent_typedef agent_type;
 
     function new(
       input string name,
-      input axi_agent_typedef agent_type,
+      input agent_typedef agent_type,
       input adi_environment parent = null);
 
       super.new(name, parent);
@@ -71,19 +70,19 @@ package adi_axi_agent_pkg;
         this.fatal($sformatf("Agent is in slave mode!"));
       end
     endtask: start_master
-    
+
     virtual task start_slave();
       if (agent_type == MASTER) begin
         this.fatal($sformatf("Agent is in master mode!"));
       end
     endtask: start_slave
-    
+
     virtual task start_monitor();
       if (agent_type != PASSTHROUGH) begin
         this.fatal($sformatf("Agent is not in passthrough mode!"));
       end
     endtask: start_monitor
-    
+
     virtual task stop_master();
       if (agent_type == SLAVE) begin
         this.fatal($sformatf("Agent is in slave mode!"));
@@ -101,7 +100,7 @@ package adi_axi_agent_pkg;
         this.fatal($sformatf("Agent is not in passthrough mode!"));
       end
     endtask: stop_monitor
-    
+
   endclass: adi_axi_agent_base
 
 

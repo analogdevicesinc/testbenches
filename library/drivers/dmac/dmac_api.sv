@@ -180,11 +180,14 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
-    task set_flags(input bit[3:0] flags);
+    task set_flags(
+      input bit cyclic,
+      input bit tlast,
+      input bit partial_reporting_en);
       this.axi_write(GetAddrs(DMAC_FLAGS),
-                     `SET_DMAC_FLAGS_CYCLIC(flags[0]) |
-                     `SET_DMAC_FLAGS_TLAST(flags[1]) |
-                     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
+                     `SET_DMAC_FLAGS_CYCLIC(cyclic) |
+                     `SET_DMAC_FLAGS_TLAST(tlast) |
+                     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(partial_reporting_en));
     endtask : set_flags
 
     // -----------------
@@ -216,7 +219,7 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
-    task transfer_start;
+    task transfer_start();
       this.axi_write(GetAddrs(DMAC_TRANSFER_SUBMIT),
                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       this.info($sformatf("Transfer start"), ADI_VERBOSITY_MEDIUM);

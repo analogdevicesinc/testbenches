@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,18 +38,18 @@
 package xcvr_api_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
+  import adi_api_pkg::*;
   import adi_regmap_xcvr_pkg::*;
   import adi_regmap_pkg::*;
-  import reg_accessor_pkg::*;
+  import m_axi_sequencer_pkg::*;
 
-  class xcvr_api extends adi_peripheral;
+  class xcvr_api extends adi_api;
 
     protected logic [31:0] val;
 
     function new(
       input string name,
-      input reg_accessor bus,
+      input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
       input adi_component parent = null);
 
@@ -68,8 +68,8 @@ package xcvr_api_pkg;
     endtask
 
     task reset(
-      input logic bufstatus_rst,
-      input logic resetn);
+      input bit bufstatus_rst,
+      input bit resetn);
 
       this.axi_write(GetAddrs(XCVR_RESETN),
         `SET_XCVR_RESETN_BUFSTATUS_RST(bufstatus_rst) |
@@ -90,10 +90,10 @@ package xcvr_api_pkg;
     endtask
 
     task set_control(
-      input logic lpm_dfe_n,
-      input logic [2:0] rate,
-      input logic [1:0] sysclk_sel,
-      input logic [2:0] outclk_sel);
+      input bit lpm_dfe_n,
+      input bit [2:0] rate,
+      input bit [1:0] sysclk_sel,
+      input bit [2:0] outclk_sel);
 
       this.axi_write(GetAddrs(XCVR_CONTROL),
         `SET_XCVR_CONTROL_LPM_DFE_N(lpm_dfe_n) |

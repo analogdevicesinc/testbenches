@@ -384,9 +384,9 @@ package adi_xcvr_pkg;
     // -----------------
     task drp_cm_read(input bit [7:0] sel,
                      input bit [11:0] addr,
-                     output bit [15:0] rdata);
+                     output logic [15:0] rdata);
 
-      bit [16:0] val = {1'b1, 16'b0};
+      logic [16:0] val = {1'b1, 16'b0};
 
       this.bus.RegWrite32(this.base_address + GetAddrs(XCVR_CM_SEL),
                           `SET_XCVR_CM_SEL_CM_SEL(sel));
@@ -447,9 +447,9 @@ package adi_xcvr_pkg;
     // -----------------
     task drp_ch_read(input bit [7:0] sel,
                      input bit [11:0] addr,
-                     output bit [15:0] rdata);
+                     output logic [15:0] rdata);
 
-      bit [16:0] val = {1'b1, 16'b0};
+      logic [16:0] val = {1'b1, 16'b0};
 
       this.bus.RegWrite32(this.base_address + GetAddrs(XCVR_CH_SEL),
                           `SET_XCVR_CH_SEL_CH_SEL(sel));

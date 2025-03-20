@@ -180,7 +180,7 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
-    task set_flags(input bit[3:0] flags);
+    task set_flags(input bit[2:0] flags);
       this.axi_write(GetAddrs(DMAC_FLAGS),
                      `SET_DMAC_FLAGS_CYCLIC(flags[0]) |
                      `SET_DMAC_FLAGS_TLAST(flags[1]) |
@@ -312,7 +312,7 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
-    task transfer_id_get(output bit [3:0] transfer_id);
+    task transfer_id_get(output logic [3:0] transfer_id);
       this.axi_read(GetAddrs(DMAC_TRANSFER_ID), transfer_id);
       this.info($sformatf("Found transfer ID = %0d", transfer_id), ADI_VERBOSITY_MEDIUM);
     endtask : transfer_id_get

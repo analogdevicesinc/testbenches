@@ -99,6 +99,15 @@ package spi_engine_api_pkg;
       data = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);
     endtask
 
+    task offload_mem_assert_reset();
+      this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(1));
+    endtask
+
+    task offload_mem_deassert_reset();
+      this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(0));
+    endtask
+
+
     task start_offload();
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     endtask

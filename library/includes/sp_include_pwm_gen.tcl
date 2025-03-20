@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -37,7 +37,6 @@ source $ad_tb_dir/library/includes/sp_include_regmap.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "$ad_tb_dir/library/regmaps/adi_regmap_tdd_gen_pkg.sv" \
-  "$ad_tb_dir/library/regmaps/adi_regmap_tdd_trans_pkg.sv" \
-  "$ad_tb_dir/library/drivers/tdd_api_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
+  "$ad_tb_dir/library/drivers/pwm_gen_api_pkg.sv" \
 ]

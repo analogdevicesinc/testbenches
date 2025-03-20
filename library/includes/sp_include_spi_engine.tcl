@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,6 +38,7 @@ source $ad_tb_dir/library/includes/sp_include_regmap.tcl
 # Add test files to the project
 adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/adi/spi_vip/adi_spi_vip_pkg.sv" \
+  "$ad_tb_dir/library/drivers/spi_engine/spi_engine_api_pkg.sv" \
   "$ad_tb_dir/library/drivers/spi_engine/spi_engine_instr_pkg.sv" \
   "$ad_tb_dir/library/regmaps/adi_regmap_spi_engine_pkg.sv" \
 ]

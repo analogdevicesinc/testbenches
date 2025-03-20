@@ -38,18 +38,21 @@
 package dac_api_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
+  // import adi_peripheral_pkg::*;
   import adi_regmap_dac_pkg::*;
   import adi_regmap_pkg::*;
-  import reg_accessor_pkg::*;
+  // import reg_accessor_pkg::*;
 
-  class dac_api extends adi_peripheral;
+  import adi_api_pkg::*;
+  import m_axi_sequencer_pkg::*;
+
+  class dac_api extends adi_api;
 
     protected logic [31:0] val;
 
     function new(
       input string name,
-      input reg_accessor bus,
+      input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
       input adi_component parent = null);
 
@@ -57,9 +60,9 @@ package dac_api_pkg;
     endfunction
 
     task reset(
-      input logic ce_n,
-      input logic mmcm_rstn,
-      input logic rstn);
+      input bit ce_n,
+      input bit mmcm_rstn,
+      input bit rstn);
 
       this.axi_write(GetAddrs(DAC_COMMON_REG_RSTN),
         `SET_DAC_COMMON_REG_RSTN_CE_N(ce_n) |
@@ -68,10 +71,10 @@ package dac_api_pkg;
     endtask
 
     task set_common_control_1(
-      input logic sync,
-      input logic ext_sync_arm,
-      input logic ext_sync_disarm,
-      input logic manual_sync_request);
+      input bit sync,
+      input bit ext_sync_arm,
+      input bit ext_sync_disarm,
+      input bit manual_sync_request);
 
       this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_1),
         `SET_DAC_COMMON_REG_CNTRL_1_SYNC(sync) |
@@ -81,14 +84,14 @@ package dac_api_pkg;
     endtask
 
     task set_common_control_2(
-      input logic data_format,
-      input logic [4:0] num_lanes,
-      input logic par_enb,
-      input logic par_type,
-      input logic r1_mode,
-      input logic sdr_ddr_n,
-      input logic symb_8_16b,
-      input logic symb_op);
+      input bit data_format,
+      input bit [4:0] num_lanes,
+      input bit par_enb,
+      input bit par_type,
+      input bit r1_mode,
+      input bit sdr_ddr_n,
+      input bit symb_8_16b,
+      input bit symb_op);
 
       this.axi_write(GetAddrs(DAC_COMMON_REG_CNTRL_2),
         `SET_DAC_COMMON_REG_CNTRL_2_DATA_FORMAT(data_format) |
@@ -108,7 +111,7 @@ package dac_api_pkg;
 
     task set_channel_control_1(
       input bit [7:0] channel,
-      input logic [15:0] dds_scale_1);
+      input bit [15:0] dds_scale_1);
 
       this.axi_write(channel * 'h40 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
         `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(dds_scale_1));
@@ -116,8 +119,8 @@ package dac_api_pkg;
 
     task set_channel_control_2(
       input bit [7:0] channel,
-      input logic [15:0] dds_init_1,
-      input logic [15:0] dds_incr_1);
+      input bit [15:0] dds_init_1,
+      input bit [15:0] dds_incr_1);
 
       this.axi_write(channel * 'h40 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
         `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INIT_1(dds_init_1) |
@@ -126,13 +129,13 @@ package dac_api_pkg;
 
     task set_channel_control_7(
       input bit [7:0] channel,
-      input logic [3:0] dds_sel);
+      input bit [3:0] dds_sel);
 
       this.axi_write(channel * 'h40 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7), `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(dds_sel));
     endtask
 
-    task set_rate(input logic [7:0] rate);
-      this.axi_write(GetAddrs(DAC_COMMON_REG_RATECNTRL), `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate-1));
+    task set_rate(input bit [7:0] rate);
+      this.axi_write(GetAddrs(DAC_COMMON_REG_RATECNTRL), `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate));
     endtask
 
   endclass

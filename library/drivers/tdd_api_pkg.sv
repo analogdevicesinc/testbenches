@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,18 +38,18 @@
 package tdd_api_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
+  import adi_api_pkg::*;
   import adi_regmap_tdd_gen_pkg::*;
   import adi_regmap_pkg::*;
-  import reg_accessor_pkg::*;
+  import m_axi_sequencer_pkg::*;
 
-  class tdd_api extends adi_peripheral;
+  class tdd_api extends adi_api;
 
     protected logic [31:0] val;
 
     function new(
       input string name,
-      input reg_accessor bus,
+      input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
       input adi_component parent = null);
 
@@ -76,7 +76,7 @@ package tdd_api_pkg;
       this.axi_read(GetAddrs(TDDN_CNTRL_INTERFACE_DESCRIPTION), description);
     endtask
 
-    task set_channel_enable(input logic [31:0] enable);
+    task set_channel_enable(input bit [31:0] enable);
       this.axi_write(GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE), `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(enable));
     endtask
 
@@ -85,7 +85,7 @@ package tdd_api_pkg;
       enable = `GET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(val);
     endtask
 
-    task set_channel_polarity(input logic [31:0] polarity);
+    task set_channel_polarity(input bit [31:0] polarity);
       this.axi_write(GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), `SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(polarity));
     endtask
 
@@ -94,7 +94,7 @@ package tdd_api_pkg;
       polarity = `GET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(val);
     endtask
 
-    task set_burst_count(input logic [31:0] count);
+    task set_burst_count(input bit [31:0] count);
       this.axi_write(GetAddrs(TDDN_CNTRL_BURST_COUNT), `SET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(count+1));
     endtask
 
@@ -103,7 +103,7 @@ package tdd_api_pkg;
       count = `GET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(val) + 1;
     endtask
 
-    task set_startup_delay(input logic [31:0] delay);
+    task set_startup_delay(input bit [31:0] delay);
       this.axi_write(GetAddrs(TDDN_CNTRL_STARTUP_DELAY), `SET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(delay));
     endtask
 
@@ -112,7 +112,7 @@ package tdd_api_pkg;
       delay = `GET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(val);
     endtask
 
-    task set_frame_length(input logic [31:0] length);
+    task set_frame_length(input bit [31:0] length);
       this.axi_write(GetAddrs(TDDN_CNTRL_FRAME_LENGTH), `SET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(length));
     endtask
 
@@ -121,7 +121,7 @@ package tdd_api_pkg;
       length = `GET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(val);
     endtask
 
-    task set_sync_counter_low(input logic [31:0] counter);
+    task set_sync_counter_low(input bit [31:0] counter);
       this.axi_write(GetAddrs(TDDN_CNTRL_SYNC_COUNTER_LOW), `SET_TDDN_CNTRL_SYNC_COUNTER_LOW_SYNC_COUNTER_LOW(counter));
     endtask
 
@@ -130,7 +130,7 @@ package tdd_api_pkg;
       counter = `GET_TDDN_CNTRL_SYNC_COUNTER_LOW_SYNC_COUNTER_LOW(val);
     endtask
 
-    task set_sync_counter_high(input logic [31:0] counter);
+    task set_sync_counter_high(input bit [31:0] counter);
       this.axi_write(GetAddrs(TDDN_CNTRL_SYNC_COUNTER_HIGH), `SET_TDDN_CNTRL_SYNC_COUNTER_HIGH_SYNC_COUNTER_HIGH(counter));
     endtask
 
@@ -140,8 +140,8 @@ package tdd_api_pkg;
     endtask
 
     task set_sync_counter(
-      input logic [31:0] counter_low,
-      input logic [31:0] counter_high);
+      input bit [31:0] counter_low,
+      input bit [31:0] counter_high);
 
       this.set_sync_counter_low(counter_low);
       this.set_sync_counter_high(counter_high);
@@ -153,11 +153,11 @@ package tdd_api_pkg;
     endtask
 
     task set_control(
-      input logic sync_soft,
-      input logic sync_ext,
-      input logic sync_int,
-      input logic sync_rst,
-      input logic enable);
+      input bit sync_soft,
+      input bit sync_ext,
+      input bit sync_int,
+      input bit sync_rst,
+      input bit enable);
 
       this.axi_write(GetAddrs(TDDN_CNTRL_CONTROL),
         `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(sync_soft) |

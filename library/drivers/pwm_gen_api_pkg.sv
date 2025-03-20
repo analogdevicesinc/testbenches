@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,18 +38,18 @@
 package pwm_gen_api_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
+  import adi_api_pkg::*;
   import adi_regmap_pwm_gen_pkg::*;
   import adi_regmap_pkg::*;
-  import reg_accessor_pkg::*;
+  import m_axi_sequencer_pkg::*;
 
-  class pwm_gen_api extends adi_peripheral;
+  class pwm_gen_api extends adi_api;
 
     bit reset_state;
 
     function new(
       input string name,
-      input reg_accessor bus,
+      input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
       input adi_component parent = null);
 
@@ -87,9 +87,9 @@ package pwm_gen_api_pkg;
 
     task pulse_config(
       input bit [7:0] channel,
-      input logic [31:0] period,
-      input logic [31:0] width,
-      input logic [31:0] offset);
+      input bit [31:0] period,
+      input bit [31:0] width,
+      input bit [31:0] offset);
 
       this.pulse_period_config(channel, period);
       this.pulse_width_config(channel, width);
@@ -98,23 +98,23 @@ package pwm_gen_api_pkg;
 
     task pulse_period_config(
       input bit [7:0] channel,
-      input logic [31:0] period);
+      input bit [31:0] period);
 
-      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_0_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_0_PERIOD_PULSE_0_PERIOD(period));
+      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(period));
     endtask
 
     task pulse_width_config(
       input bit [7:0] channel,
-      input logic [31:0] width);
+      input bit [31:0] width);
 
-      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_0_WIDTH), `SET_AXI_PWM_GEN_REG_PULSE_0_WIDTH_PULSE_0_WIDTH(width));
+      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH), `SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH(width));
     endtask
 
     task pulse_offset_config(
       input bit [7:0] channel,
-      input logic [31:0] offset);
+      input bit [31:0] offset);
 
-      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_0_OFFSET), `SET_AXI_PWM_GEN_REG_PULSE_0_OFFSET_PULSE_0_OFFSET(offset));
+      this.axi_write(channel * 'h4 + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_OFFSET), `SET_AXI_PWM_GEN_REG_PULSE_X_OFFSET_PULSE_X_OFFSET(offset));
     endtask
 
   endclass

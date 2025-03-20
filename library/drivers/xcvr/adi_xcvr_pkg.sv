@@ -384,7 +384,7 @@ package adi_xcvr_pkg;
     // -----------------
     task drp_cm_read(input bit [7:0] sel,
                      input bit [11:0] addr,
-                     output bit [15:0] rdata);
+                     output logic [15:0] rdata);
 
       bit [16:0] val = {1'b1, 16'b0};
 
@@ -447,7 +447,7 @@ package adi_xcvr_pkg;
     // -----------------
     task drp_ch_read(input bit [7:0] sel,
                      input bit [11:0] addr,
-                     output bit [15:0] rdata);
+                     output logic [15:0] rdata);
 
       bit [16:0] val = {1'b1, 16'b0};
 

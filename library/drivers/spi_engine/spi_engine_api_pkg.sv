@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,18 +38,18 @@
 package spi_engine_api_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
+  import adi_api_pkg::*;
   import adi_regmap_spi_engine_pkg::*;
   import adi_regmap_pkg::*;
-  import reg_accessor_pkg::*;
+  import m_axi_sequencer_pkg::*;
 
-  class spi_engine_api extends adi_peripheral;
+  class spi_engine_api extends adi_api;
 
     protected logic [31:0] val;
 
     function new(
       input string name,
-      input reg_accessor bus,
+      input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
       input adi_component parent = null);
 
@@ -78,21 +78,25 @@ package spi_engine_api_pkg;
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(1));
     endtask
 
-    task fifo_command(input logic [31:0] cmd);
+    task fifo_command(input bit [31:0] cmd);
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_AXI_SPI_ENGINE_CMD_FIFO_CMD_FIFO(cmd));
     endtask
 
-    task fifo_offload_command(input logic [31:0] cmd);
+    task fifo_offload_command(input bit [31:0] cmd);
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO_OFFLOAD0_CDM_FIFO(cmd));
     endtask
 
-    task set_sdo_fifo_control(input logic [31:0] control);
-      this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), `SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(control));
+    task sdo_offload_fifo_write(input bit [31:0] data);
+      this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(data));
     endtask
 
-    task get_sdi_fifo_control(output logic [31:0] control);
+    task sdo_fifo_write(input bit [31:0] data);
+      this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), `SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(data));
+    endtask
+
+    task sdi_fifo_read(output logic [31:0] data);
       this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), val);
-      control = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);
+      data = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);
     endtask
 
     task start_offload();
@@ -113,16 +117,16 @@ package spi_engine_api_pkg;
       irq_pending = `GET_AXI_SPI_ENGINE_IRQ_PENDING_IRQ_PENDING(val);
     endtask
 
-    task clear_irq_pending(input logic [31:0] irq_pending);
+    task clear_irq_pending(input bit [31:0] irq_pending);
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), `SET_AXI_SPI_ENGINE_IRQ_PENDING_IRQ_PENDING(irq_pending));
     endtask
 
     task set_interrup_mask(
-      input logic cmd_almost_empty = 1'b0,
-      input logic sdo_almost_empty = 1'b0,
-      input logic sdi_almost_full = 1'b0,
-      input logic sync_event = 1'b0,
-      input logic offload_sync_id_pending = 1'b0);
+      input bit cmd_almost_empty = 1'b0,
+      input bit sdo_almost_empty = 1'b0,
+      input bit sdi_almost_full = 1'b0,
+      input bit sync_event = 1'b0,
+      input bit offload_sync_id_pending = 1'b0);
 
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
         `SET_AXI_SPI_ENGINE_IRQ_MASK_CMD_ALMOST_EMPTY(cmd_almost_empty) |
@@ -131,6 +135,26 @@ package spi_engine_api_pkg;
         `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(sync_event) |
         `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(offload_sync_id_pending));
     endtask
+
+    function bit[31:0] check_irq_cmd_almost_empty(input bit[31:0] irq_pending);
+      return `SET_AXI_SPI_ENGINE_IRQ_MASK_CMD_ALMOST_EMPTY(irq_pending);
+    endfunction
+
+    function bit[31:0] check_irq_sdo_almost_empty(input bit[31:0] irq_pending);
+      return `SET_AXI_SPI_ENGINE_IRQ_MASK_SDO_ALMOST_EMPTY(irq_pending);
+    endfunction
+
+    function bit[31:0] check_irq_sdi_almost_full(input bit[31:0] irq_pending);
+      return `SET_AXI_SPI_ENGINE_IRQ_MASK_SDI_ALMOST_FULL(irq_pending);
+    endfunction
+
+    function bit[31:0] check_irq_sync_event(input bit[31:0] irq_pending);
+      return `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(irq_pending);
+    endfunction
+
+    function bit[31:0] check_irq_offload_sync_id_pending(input bit[31:0] irq_pending);
+      return `GET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(irq_pending);
+    endfunction
 
     task peek_sdi_fifo(output logic [31:0] data);
       this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), val);

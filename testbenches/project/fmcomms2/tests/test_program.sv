@@ -179,6 +179,13 @@ program test_program;
     // TODO: Rewrite sanity test
     // tx_common_api.sanity_test();
     // rx_common_api.sanity_test();
+
+    // //check ADC VERSION
+    // axi_read_v (RX1_COMMON + GetAddrs(COMMON_REG_VERSION),
+    //            `SET_COMMON_REG_VERSION_VERSION('h000a0300));
+    // //check DAC VERSION
+    // axi_read_v (TX1_COMMON + GetAddrs(COMMON_REG_VERSION),
+    //            `SET_COMMON_REG_VERSION_VERSION('h00090262));
   endtask
 
   // --------------------------
@@ -209,9 +216,15 @@ program test_program;
     tx_dac_common_api.set_rate(rate-1);
 
     // pull out RX of reset
-    rx_adc_common_api.reset(0, 0, 1);
+    rx_adc_common_api.reset(
+      .ce_n(0),
+      .mmcm_rstn(0),
+      .rstn(1));
     // pull out TX of reset
-    tx_dac_common_api.reset(0, 0, 1);
+    tx_dac_common_api.reset(
+      .ce_n(0),
+      .mmcm_rstn(0),
+      .rstn(1));
   endtask
 
   // --------------------------
@@ -219,9 +232,15 @@ program test_program;
   // --------------------------
   task link_down();
     // put RX in reset
-    rx_adc_common_api.reset(0, 0, 0);
+    rx_adc_common_api.reset(
+      .ce_n(0),
+      .mmcm_rstn(0),
+      .rstn(0));
     // put TX in reset
-    tx_dac_common_api.reset(0, 0, 0);
+    tx_dac_common_api.reset(
+      .ce_n(0),
+      .mmcm_rstn(0),
+      .rstn(0));
     #1000;
   endtask
 
@@ -234,19 +253,39 @@ program test_program;
     link_setup();
 
     // enable test data for TX1
-    tx_channel_dac_api.set_channel_control_7(CH0, 4'h9);
-    tx_channel_dac_api.set_channel_control_7(CH1, 4'h9);
+    tx_channel_dac_api.set_channel_control_7(
+      .channel(CH0),
+      .dds_sel(4'h9));
+    tx_channel_dac_api.set_channel_control_7(
+      .channel(CH1),
+      .dds_sel(4'h9));
     if (R1_MODE==0) begin
-      tx_channel_dac_api.set_channel_control_7(CH2, 4'h9);
-      tx_channel_dac_api.set_channel_control_7(CH3, 4'h9);
+      tx_channel_dac_api.set_channel_control_7(
+        .channel(CH2),
+        .dds_sel(4'h9));
+      tx_channel_dac_api.set_channel_control_7(
+        .channel(CH3),
+        .dds_sel(4'h9));
     end
 
     // enable test data check for RX1
-    rx_channel_adc_api.set_channel_control_3(CH0, 4'h9, 4'h0);
-    rx_channel_adc_api.set_channel_control_3(CH1, 4'h9, 4'h0);
+    rx_channel_adc_api.set_channel_control_3(
+      .channel(CH0),
+      .pn_sel(4'h9),
+      .data_sel(4'h0));
+    rx_channel_adc_api.set_channel_control_3(
+      .channel(CH1),
+      .pn_sel(4'h9),
+      .data_sel(4'h0));
     if (R1_MODE==0) begin
-      rx_channel_adc_api.set_channel_control_3(CH2, 4'h9, 4'h0);
-      rx_channel_adc_api.set_channel_control_3(CH3, 4'h9, 4'h0);
+      rx_channel_adc_api.set_channel_control_3(
+        .channel(CH2),
+        .pn_sel(4'h9),
+        .data_sel(4'h0));
+      rx_channel_adc_api.set_channel_control_3(
+        .channel(CH3),
+        .pn_sel(4'h9),
+        .data_sel(4'h0));
     end
 
     // SYNC DAC channels
@@ -300,33 +339,73 @@ program test_program;
     link_setup();
 
     // Select DDS as source
-    tx_channel_dac_api.set_channel_control_7(CH0, 4'h0);
-    tx_channel_dac_api.set_channel_control_7(CH1, 4'h0);
+    tx_channel_dac_api.set_channel_control_7(
+      .channel(CH0),
+      .dds_sel(4'h0));
+    tx_channel_dac_api.set_channel_control_7(
+      .channel(CH1),
+      .dds_sel(4'h0));
     if (R1_MODE==0) begin
-      tx_channel_dac_api.set_channel_control_7(CH2, 4'h0);
-      tx_channel_dac_api.set_channel_control_7(CH3, 4'h0);
+      tx_channel_dac_api.set_channel_control_7(
+        .channel(CH2),
+        .dds_sel(4'h0));
+      tx_channel_dac_api.set_channel_control_7(
+        .channel(CH3),
+        .dds_sel(4'h0));
     end
 
     // enable normal data path for RX1
-    rx_channel_adc_api.set_channel_control_3(CH0, 4'h0, 4'h0);
-    rx_channel_adc_api.set_channel_control_3(CH1, 4'h0, 4'h0);
+    rx_channel_adc_api.set_channel_control_3(
+      .channel(CH0),
+      .pn_sel(4'h0),
+      .data_sel(4'h0));
+    rx_channel_adc_api.set_channel_control_3(
+      .channel(CH1),
+      .pn_sel(4'h0),
+      .data_sel(4'h0));
     if (R1_MODE==0) begin
-      rx_channel_adc_api.set_channel_control_3(CH2, 4'h0, 4'h0);
-      rx_channel_adc_api.set_channel_control_3(CH3, 4'h0, 4'h0);
+      rx_channel_adc_api.set_channel_control_3(
+        .channel(CH2),
+        .pn_sel(4'h0),
+        .data_sel(4'h0));
+      rx_channel_adc_api.set_channel_control_3(
+        .channel(CH3),
+        .pn_sel(4'h0),
+        .data_sel(4'h0));
     end
 
     // Configure tone amplitude and frequency
-    tx_channel_dac_api.set_channel_control_1(CH0, 16'h0fff);
-    tx_channel_dac_api.set_channel_control_1(CH1, 16'h07ff);
+    tx_channel_dac_api.set_channel_control_1(
+      .channel(CH0),
+      .dds_scale_1(16'h0fff));
+    tx_channel_dac_api.set_channel_control_1(
+      .channel(CH1),
+      .dds_scale_1(16'h07ff));
     if (R1_MODE==0) begin
-      tx_channel_dac_api.set_channel_control_1(CH2, 16'h03ff);
-      tx_channel_dac_api.set_channel_control_1(CH3, 16'h01ff);
+      tx_channel_dac_api.set_channel_control_1(
+        .channel(CH2),
+        .dds_scale_1(16'h03ff));
+      tx_channel_dac_api.set_channel_control_1(
+        .channel(CH3),
+        .dds_scale_1(16'h01ff));
     end
-    tx_channel_dac_api.set_channel_control_2(CH0, 16'h0, 16'h0100);
-    tx_channel_dac_api.set_channel_control_2(CH1, 16'h0, 16'h0200);
+    tx_channel_dac_api.set_channel_control_2(
+      .channel(CH0),
+      .dds_init_1(16'h0),
+      .dds_incr_1(16'h0100));
+    tx_channel_dac_api.set_channel_control_2(
+      .channel(CH1),
+      .dds_init_1(16'h0),
+      .dds_incr_1(16'h0200));
     if (R1_MODE==0) begin
-      tx_channel_dac_api.set_channel_control_2(CH2, 16'h0, 16'h0400);
-      tx_channel_dac_api.set_channel_control_2(CH3, 16'h0, 16'h0800);
+      tx_channel_dac_api.set_channel_control_2(
+        .channel(CH2),
+        .dds_init_1(16'h0),
+        .dds_incr_1(16'h0400));
+      tx_channel_dac_api.set_channel_control_2(
+        .channel(CH3),
+        .dds_init_1(16'h0),
+        .dds_incr_1(16'h0800));
     end
 
     // Enable Rx channel, enable sign extension
@@ -413,25 +492,50 @@ program test_program;
 
     // Configure TX DMA
     tx_dmac_api.enable_dma();
-    tx_dmac_api.set_lengths(32'h00000FFF, 32'h0);
-    tx_dmac_api.set_flags(1, 0, 0);
+    tx_dmac_api.set_lengths(
+      .xfer_length_x(32'h00000FFF),
+      .xfer_length_y(32'h0));
+    tx_dmac_api.set_flags(
+      .cyclic(1'b1),
+      .tlast(1'b0),
+      .partial_reporting_en(1'b0));
     tx_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
     tx_dmac_api.transfer_start();
 
     // Select DMA as source
-    tx_channel_dac_api.set_channel_control_7(CH0, 4'h2);
-    tx_channel_dac_api.set_channel_control_7(CH1, 4'h2);
+    tx_channel_dac_api.set_channel_control_7(
+      .channel(CH0),
+      .dds_sel(4'h2));
+    tx_channel_dac_api.set_channel_control_7(
+      .channel(CH1),
+      .dds_sel(4'h2));
     if (R1_MODE==0) begin
-      tx_channel_dac_api.set_channel_control_7(CH2, 4'h2);
-      tx_channel_dac_api.set_channel_control_7(CH3, 4'h2);
+      tx_channel_dac_api.set_channel_control_7(
+        .channel(CH2),
+        .dds_sel(4'h2));
+      tx_channel_dac_api.set_channel_control_7(
+        .channel(CH3),
+        .dds_sel(4'h2));
     end
 
     // enable normal data path for RX1
-    rx_channel_adc_api.set_channel_control_3(CH0, 4'h0, 4'h0);
-    rx_channel_adc_api.set_channel_control_3(CH1, 4'h0, 4'h0);
+    rx_channel_adc_api.set_channel_control_3(
+      .channel(CH0),
+      .pn_sel(4'h0),
+      .data_sel(4'h0));
+    rx_channel_adc_api.set_channel_control_3(
+      .channel(CH1),
+      .pn_sel(4'h0),
+      .data_sel(4'h0));
     if (R1_MODE==0) begin
-      rx_channel_adc_api.set_channel_control_3(CH2, 4'h0, 4'h0);
-      rx_channel_adc_api.set_channel_control_3(CH3, 4'h0, 4'h0);
+      rx_channel_adc_api.set_channel_control_3(
+        .channel(CH2),
+        .pn_sel(4'h0),
+        .data_sel(4'h0));
+      rx_channel_adc_api.set_channel_control_3(
+        .channel(CH3),
+        .pn_sel(4'h0),
+        .data_sel(4'h0));
     end
 
     // Enable Rx channel, enable sign extension
@@ -504,8 +608,13 @@ program test_program;
 
     // Configure RX DMA
     rx_dmac_api.enable_dma();
-    rx_dmac_api.set_flags(0, 1, 0);
-    rx_dmac_api.set_lengths(32'h00000FFF, 32'h0);
+    rx_dmac_api.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b0));
+    rx_dmac_api.set_lengths(
+      .xfer_length_x(32'h00000FFF),
+      .xfer_length_y(32'h0));
     rx_dmac_api.set_dest_addr(`DDR_BA+32'h00002000);
     rx_dmac_api.transfer_start();
 

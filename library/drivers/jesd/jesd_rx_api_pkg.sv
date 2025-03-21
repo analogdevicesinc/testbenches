@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2018 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,18 +38,18 @@
 package jesd_rx_api_pkg;
 
   import logger_pkg::*;
-  import adi_peripheral_pkg::*;
+  import adi_api_pkg::*;
   import adi_regmap_jesd_rx_pkg::*;
   import adi_regmap_pkg::*;
-  import reg_accessor_pkg::*;
+  import m_axi_sequencer_pkg::*;
 
-  class jesd_rx_api extends adi_peripheral;
+  class jesd_rx_api extends adi_api;
 
     protected logic [31:0] val;
 
     function new(
       input string name,
-      input reg_accessor bus,
+      input m_axi_sequencer_base bus,
       input bit [31:0] base_address,
       input adi_component parent = null);
 
@@ -94,8 +94,8 @@ package jesd_rx_api_pkg;
     endtask
 
     task set_link_conf0(
-      input logic [2:0] octets_per_frame,
-      input logic [7:0] octets_per_multiframe);
+      input bit [2:0] octets_per_frame,
+      input bit [7:0] octets_per_multiframe);
 
       this.axi_write(GetAddrs(JESD_RX_LINK_CONF0),
         `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME(octets_per_frame) |
@@ -103,8 +103,8 @@ package jesd_rx_api_pkg;
     endtask
 
     task set_link_conf1(
-      input logic char_replacement_disable,
-      input logic descrambler_disable);
+      input bit char_replacement_disable,
+      input bit descrambler_disable);
 
       this.axi_write(GetAddrs(JESD_RX_LINK_CONF1),
         `SET_JESD_RX_LINK_CONF1_CHAR_REPLACEMENT_DISABLE(char_replacement_disable) |
@@ -112,15 +112,15 @@ package jesd_rx_api_pkg;
     endtask
 
     task set_link_conf2(
-      input logic buffer_early_release,
-      input logic [9:0] buffer_delay);
+      input bit buffer_early_release,
+      input bit [9:0] buffer_delay);
 
       this.axi_write(GetAddrs(JESD_RX_LINK_CONF2),
         `SET_JESD_RX_LINK_CONF2_BUFFER_EARLY_RELEASE(buffer_early_release) |
         `SET_JESD_RX_LINK_CONF2_BUFFER_DEALY(buffer_delay));
     endtask
 
-    task set_link_conf4(input logic [7:0] tpl_beats_per_multiframe);
+    task set_link_conf4(input bit [7:0] tpl_beats_per_multiframe);
       this.axi_write(GetAddrs(JESD_RX_LINK_CONF4), `SET_JESD_RX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME(tpl_beats_per_multiframe));
     endtask
 

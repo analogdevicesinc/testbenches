@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>I3C Controller &#8212; Testbenches  documentation</title>
+    <title>Util AXIS FIFO Asymmetric &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=cad18f0a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -16,8 +16,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Util AXIS FIFO Asymmetric" href="../util_axis_fifo_asym/index.html" />
-    <link rel="prev" title="DMA Framelock" href="../dma_flock/index.html" />
+    <link rel="next" title="Util Pack" href="../util_pack/index.html" />
+    <link rel="prev" title="I3C Controller" href="../i3c_controller/index.html" />
    
   
   <meta name="repository" content="testbenches">
@@ -89,7 +89,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">I3C Controller</a><ul>
+<li><a class="reference internal" href="#">Util AXIS FIFO Asymmetric</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -100,17 +100,16 @@
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
-<li><a class="reference internal" href="#interrupts">Interrupts</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
-<li><a class="reference internal" href="#environment-bring-up">Environment Bring up</a></li>
-<li><a class="reference internal" href="#i3c-controller-testing">I3C Controller testing</a></li>
+<li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
+<li><a class="reference internal" href="#fifo-testing">FIFO testing</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
+<li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
 <li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#hdl-related-dependencies">HDL related dependencies</a></li>
 <li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
 </ul>
 </li>
@@ -208,8 +207,8 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../axis_sequencers/index.html">AXIS Sequencers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dma_flock/index.html">DMA Framelock</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">I3C Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Util AXIS FIFO Asymmetric</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../util_pack/index.html">Util Pack</a></li>
 </ul>
 </li>
@@ -238,40 +237,56 @@ Content on this topic
         <div class="bodywrapper" id="top-anchor">
           <div class="body" role="main">
             
-  <section id="i3c-controller">
-<span id="id1"></span><h1>I3C Controller<a class="headerlink" href="#i3c-controller" title="Link to this heading"></a></h1>
+  <section id="util-axis-fifo-asymmetric">
+<span id="util-axis-fifo-asym"></span><h1>Util AXIS FIFO Asymmetric<a class="headerlink" href="#util-axis-fifo-asymmetric" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The purpose of this testbench is to test the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/i3c_controller">library/i3c_controller</a>.</p>
-<p>The I3C Controller IP cores implement a subset of the I3C-basic specification to
-interface peripherals through I3C.</p>
-<p>The entire HDL documentation can be found at
-<a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/i3c_controller/index.html#i3c-controller" title="(in HDL)"><span>I3C Controller</span></a>.</p>
+<p>The purpose of this testbench is to validate the FIFO functionality of the
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_axis_fifo_asym">library/util_axis_fifo_asym</a> IP core.</p>
+<p>The entire HDL documentation can be found
+<a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/util_axis_fifo_asym/index.html#util-axis-fifo-asym" title="(in HDL)"><span class="xref std std-ref">here</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The block design is based on the test harness with the addition of the
-I3C Controller Host Interface and I3C Controller Core, and a DMA for offload
-transfers testing.</p>
+<p>The block design is based on the test harness with the Util AXIS FIFO Asymmetric
+IP and other auxiliary modules. For the <code class="docutils literal notranslate"><span class="pre">util_axis_fifo_asym</span></code> IP testing, the
+auxiliary modules are a master and a slave AXI4 Stream VIP. The AXIS VIP is used
+to generate data for the DUT IP. The util_axis_fifo_asym IP stores the data and
+then sends it to the slave AXIS VIP for verification.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
-<a class="reference internal image-reference" href="../../../_images/block_diagram1.svg"><img alt="I3C Controller/Testbench block diagram" class="align-center" src="../../../_images/block_diagram1.svg" style="width: 500px;" />
+<a class="reference internal image-reference" href="../../../_images/util_axis_fifo_asym.svg"><img alt="Util_AXIS_FIFO_Asym/Testbench block diagram" class="align-center" src="../../../_images/util_axis_fifo_asym.svg" style="width: 800px;" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
-<p>The following parameter of this project that can be configured:</p>
+<p>The following parameters of this project that can be configured:</p>
 <ul class="simple">
-<li><p>CLK_MOD: defines the I3C Controller Core clock cycles per bus bit.</p></li>
+<li><p>ASYNC_CLK: defines the input and output clock relationship
+Options: 0 for Synchronous or 1 for Asynchronous</p></li>
+<li><p>TKEEP_EN: enable tkeep signals</p></li>
+<li><p>TLAST_EN: enable tlast signal</p></li>
+<li><p>INPUT_WIDTH: input data width
+Options: Power of 2, min 8, max 1024</p></li>
+<li><p>OUTPUT_WIDTH: output data width
+Options: Power of 2, min 8, max 1024</p></li>
+<li><p>FIFO_LIMITED: specifies if the FIFO size can be reduced
+Options: 0 for reduced, 1 for not reduced</p></li>
+<li><p>ADDRESS_WIDTH: address width
+Options: (0 to 4) + log2(width_ratio)</p></li>
+<li><p>INPUT_CLK: input clock period in ns
+Options: 1 to 9</p></li>
+<li><p>OUTPUT_CLK: output clock period in ns
+Options: 1 to 9</p></li>
 </ul>
 <section id="build-parameters">
 <h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading"></a></h4>
-<p>The parameter mentioned above can be configured when starting the build, like
+<p>The parameters mentioned above can be configured when starting the build, like
 in the following example:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CLK_MOD</span><span class="o">=</span><span class="m">1</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">ASYNC_CLK</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">TKEEP_EN</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">TLAST_EN</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">INPUT_WIDTH</span><span class="o">=</span><span class="m">16</span><span class="w"> </span><span class="nv">OUTPUT_WIDTH</span><span class="o">=</span><span class="m">32</span><span class="w"> </span><span class="nv">FIFO_LIMITED</span><span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="nv">ADDRESS_WIDTH</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">INPUT_CLK</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">OUTPUT_CLK</span><span class="o">=</span><span class="m">3</span>
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
@@ -281,18 +296,37 @@ in the following example:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
-<th class="head"><p>Parameters</p></th>
-</tr>
-<tr class="row-even"><th class="head"><p>CLK_MOD</p></th>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>cfg_rand</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-odd"><td><p>cfg1</p></td>
-<td><p>0</p></td>
+<tr class="row-even"><td><p>ASYNC_CLK</p></td>
+<td><p>random</p></td>
 </tr>
-<tr class="row-even"><td><p>cfg2</p></td>
-<td><p>1</p></td>
+<tr class="row-odd"><td><p>TKEEP_EN</p></td>
+<td><p>random</p></td>
+</tr>
+<tr class="row-even"><td><p>TLAST_EN</p></td>
+<td><p>random</p></td>
+</tr>
+<tr class="row-odd"><td><p>INPUT_WIDTH</p></td>
+<td><p>random</p></td>
+</tr>
+<tr class="row-even"><td><p>OUTPUT_WIDTH</p></td>
+<td><p>random</p></td>
+</tr>
+<tr class="row-odd"><td><p>FIFO_LIMITED</p></td>
+<td><p>random</p></td>
+</tr>
+<tr class="row-even"><td><p>ADDRESS_WIDTH</p></td>
+<td><p>random</p></td>
+</tr>
+<tr class="row-odd"><td><p>INPUT_CLK</p></td>
+<td><p>random</p></td>
+</tr>
+<tr class="row-even"><td><p>OUTPUT_CLK</p></td>
+<td><p>random</p></td>
 </tr>
 </tbody>
 </table>
@@ -310,7 +344,7 @@ in the following example:</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Test the I3C Controller core.</p></td>
+<td><p>Tests the FIFO module.</p></td>
 </tr>
 </tbody>
 </table>
@@ -318,55 +352,17 @@ in the following example:</p>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
-<p>The cfg1 and cf2 are compatible with test_program.</p>
+<p>The test program is compatible with the above-mentioned configuration.</p>
 </section>
-</section>
-<section id="cpu-memory-interconnects-addresses">
-<h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading"></a></h3>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Instance</p></th>
-<th class="head"><p>Address</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>ddr_axi_vip</p></td>
-<td><p>0x8000_0000</p></td>
-</tr>
-<tr class="row-odd"><td><p>i3c_controller</p></td>
-<td><p>0x44A0_0000</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="interrupts">
-<h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Instance name</p></th>
-<th class="head"><p>HDL</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>i3c</p></td>
-<td><p>12</p></td>
-</tr>
-</tbody>
-</table>
-</div>
 </section>
 </section>
 <section id="test-stimulus">
 <h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
-<p>The test program provides the instructions, test data
-and I3C Bus stimulus directly.
-There is no I3C Bus VIP or I3C API in the testbench.</p>
-<section id="environment-bring-up">
-<h3>Environment Bring up<a class="headerlink" href="#environment-bring-up" title="Link to this heading"></a></h3>
-<p>The steps of the environment bring up are:</p>
+<p>The test program is responsible for verifying the FIFO in different
+configurations.</p>
+<section id="environment-bringup">
+<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
+<p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
 <li><p>Start the environment</p></li>
@@ -374,31 +370,19 @@ There is no I3C Bus VIP or I3C API in the testbench.</p>
 <li><p>Assert the resets</p></li>
 </ul>
 </section>
-<section id="i3c-controller-testing">
-<h3>I3C Controller testing<a class="headerlink" href="#i3c-controller-testing" title="Link to this heading"></a></h3>
+<section id="fifo-testing">
+<h3>FIFO testing<a class="headerlink" href="#fifo-testing" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Initializes the sequencers, monitors and scoreboards.</p></li>
-<li><p>Do sanity test on I3C Controller’s version, ID, and scratch register.</p></li>
-<li><p>Enable I3C Controller.</p></li>
-<li><p>Write device characteristics to the I3C Controller memory
-(in hardware handled by the software driver).</p></li>
-<li><p>Test individual I3C transfers:</p>
-<ul>
-<li><p>Dynamic Address Assignment (DAA).</p></li>
-<li><p>Common Command Codes (CCC).</p></li>
-<li><p>Private I3C transfer.</p></li>
-<li><p>Private I2C transfer (backwards compatibility).</p></li>
-<li><p>Offload operation (SDI data is streamed to the DMA).</p></li>
-<li><p>In-band interrupt (IBI)</p></li>
+<li><p>Configure and start the sequencers</p></li>
+<li><p>Configure and start the watchdog</p></li>
+<li><p>Sends some randomized data and verify all</p></li>
+<li><p>Wait for scoreboard to complete checking</p></li>
+<li><p>Stop simulation</p></li>
 </ul>
-</li>
-</ul>
-<p>Due to the lack of an I3C Controller VIP, the bus functions are implemented in
-the <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code>.</p>
 </section>
 </section>
-<section id="building-the-testbench">
-<h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
+<section id="building-the-test-bench">
+<h2>Building the test bench<a class="headerlink" href="#building-the-test-bench" title="Link to this heading"></a></h2>
 <p>The testbench is built upon ADI’s generic HDL reference design framework.
 ADI does not distribute compiled files of these projects so they must be built
 from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">here</a>,
@@ -412,10 +396,10 @@ the HDL repository, and then build the project as follows:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/i3c_controller
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/util_axis_fifo_asym
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/i3c_controller$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/util_axis_fifo_asym$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
@@ -427,10 +411,10 @@ launch Vivado, will run the simulation and display the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/i3c_controller
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/util_axis_fifo_asym
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/i3c_controller$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/util_axis_fifo_asym$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -443,28 +427,27 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/dma_flock
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/util_axis_fifo_asym
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/dma_flock$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/util_axis_fifo_asym$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_rand<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
 specific build has its own folder named after the configuration file’s name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):</p>
-<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg1</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_rand</span></code></p>
 <p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
-<p><code class="docutils literal notranslate"><span class="pre">cfg1</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg_rand</span></code></p>
 </section>
 <section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
-<section id="testbenches-related-dependencies">
-<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
-<p>HDL dependencies:</p>
+<section id="hdl-related-dependencies">
+<h3>HDL related dependencies<a class="headerlink" href="#hdl-related-dependencies" title="Link to this heading"></a></h3>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
@@ -479,17 +462,16 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>I3C Host Interface</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/i3c_controller/i3c_controller_host_interface">library/i3c_controller/i3c_controller_host_interface</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/i3c_controller/i3c_controller_host_interface.html#i3c-controller-host-interface" title="(in HDL)"><span>I3C Controller Host Interface</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>I3C Core</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/i3c_controller/i3c_controller_core">library/i3c_controller/i3c_controller_core</a></p></td>
-<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/i3c_controller/i3c_controller_core.html#i3c-controller-core" title="(in HDL)"><span>I3C Controller Core</span></a></p></td>
+<tr class="row-even"><td><p>UTIL_AXIS_FIFO_ASYM</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_axis_fifo_asym">library/util_axis_fifo_asym</a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/util_axis_fifo_asym/index.html#util-axis-fifo-asym" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
 </tbody>
 </table>
 </div>
+</section>
+<section id="testbenches-related-dependencies">
+<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
 <p>Common with most testbenches:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
@@ -536,7 +518,36 @@ clean folder (no runs folder available):</p>
 </tbody>
 </table>
 </div>
-<p>There are no dependencies specific to this testbench.</p>
+<p>Testbench specific dependencies:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>M_AXIS_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axis_sequencer.sv">library/vip/amd/m_axis_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>S_AXIS_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axis_sequencer.sv">library/vip/amd/s_axis_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>SCOREBOARD</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/common/scoreboard.sv">library/drivers/common/scoreboard.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 </section>
 <section id="more-information">
@@ -559,8 +570,8 @@ are, the lower the chances to receive support from <a class="reference external"
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../dma_flock/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">DMA Framelock</a>
-    <a href="../util_axis_fifo_asym/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Util AXIS FIFO Asymmetric</a>
+    <a href="../i3c_controller/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">I3C Controller</a>
+    <a href="../util_pack/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Util Pack</a>
               </div>
           
         </div>

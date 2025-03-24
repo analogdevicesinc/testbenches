@@ -179,10 +179,16 @@ program test_program;
     dma_flock_env.src_axis_agent.sequencer.start();
 
     m_dmac_api.set_control('b1001);
-    m_dmac_api.set_flags('b111);
+    m_dmac_api.set_flags(
+      .cyclic(1'b1),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1));
 
     s_dmac_api.set_control('b1001);
-    s_dmac_api.set_flags('b111);
+    s_dmac_api.set_flags(
+      .cyclic(1'b1),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1));
 
     // Submit transfers to DMACs
     m_dmac_api.submit_transfer(m_seg, m_tid);

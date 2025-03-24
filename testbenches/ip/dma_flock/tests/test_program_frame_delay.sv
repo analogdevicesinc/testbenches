@@ -223,10 +223,16 @@ program test_program_frame_delay;
 
     if (has_autorun == 0) begin
       m_dmac_api.set_control('b1001);
-      m_dmac_api.set_flags('b111);
+      m_dmac_api.set_flags(
+        .cyclic(1'b1),
+        .tlast(1'b1),
+        .partial_reporting_en(1'b1));
 
       s_dmac_api.set_control('b1001);
-      s_dmac_api.set_flags('b111);
+      s_dmac_api.set_flags(
+        .cyclic(1'b1),
+        .tlast(1'b1),
+        .partial_reporting_en(1'b1));
     end
 
     // Submit transfers to DMACs

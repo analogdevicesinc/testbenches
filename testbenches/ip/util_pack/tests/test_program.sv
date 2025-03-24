@@ -144,7 +144,10 @@ program test_program;
   task rx_dma_transfer(
     input int xfer_length);
 
-    dmac_rx.set_flags('b110);
+    dmac_rx.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1));
     dmac_rx.set_lengths(xfer_length - 1, 0);
     dmac_rx.transfer_start();
   endtask
@@ -152,7 +155,10 @@ program test_program;
   task tx_dma_transfer(
     input int xfer_length);
 
-    dmac_tx.set_flags('b010);
+    dmac_rx.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b0));
     dmac_tx.set_lengths(xfer_length - 1, 0);
     dmac_tx.transfer_start();
   endtask

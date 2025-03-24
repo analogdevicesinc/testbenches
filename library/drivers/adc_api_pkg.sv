@@ -186,19 +186,28 @@ package adc_api_pkg;
       this.axi_write(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(0));
     endtask
 
-    task get_status(
-      output logic adc_ctrl_status,
-      output logic status,
-      output logic over_range,
-      output logic pn_oos,
-      output logic pn_err);
+    task get_status(output logic status);
+      this.axi_read(GetAddrs(ADC_COMMON_REG_STATUS), val);
+      status = `GET_ADC_COMMON_REG_STATUS_STATUS(val);
+    endtask
 
+    task get_adc_ctrl_status(output logic adc_ctrl_status);
       this.axi_read(GetAddrs(ADC_COMMON_REG_STATUS), val);
       adc_ctrl_status = `GET_ADC_COMMON_REG_STATUS_ADC_CTRL_STATUS(val);
-      status = `GET_ADC_COMMON_REG_STATUS_PN_ERR(val);
-      over_range = `GET_ADC_COMMON_REG_STATUS_PN_OOS(val);
-      pn_oos = `GET_ADC_COMMON_REG_STATUS_OVER_RANGE(val);
-      pn_err = `GET_ADC_COMMON_REG_STATUS_STATUS(val);
+    endtask
+
+    task get_over_range_status(output logic over_range);
+      this.axi_read(GetAddrs(ADC_COMMON_REG_STATUS), val);
+      over_range = `GET_ADC_COMMON_REG_STATUS_OVER_RANGE(val);
+    endtask
+
+    task get_pn_oos_status(output logic pn_oos);
+      this.axi_read(GetAddrs(ADC_COMMON_REG_STATUS), val);
+      pn_oos = `GET_ADC_COMMON_REG_STATUS_PN_OOS(val);
+    endtask
+
+    task get_pn_err_status(output logic pn_err);
+      pn_err = `GET_ADC_COMMON_REG_STATUS_PN_ERR(val);
     endtask
 
   endclass

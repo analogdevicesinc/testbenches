@@ -67,7 +67,7 @@ package common_api_pkg;
       this.axi_verify(GetAddrs(COMMON_REG_SCRATCH), `SET_COMMON_REG_SCRATCH_SCRATCH(data));
     endtask
 
-    task set_config(
+    task get_config(
       output logic rd_raw_data,
       output logic ext_sync,
       output logic scalecorrection_only,
@@ -94,6 +94,39 @@ package common_api_pkg;
       rd_raw_data = `GET_COMMON_REG_CONFIG_RD_RAW_DATA(val);
       scalecorrection_only = `GET_COMMON_REG_CONFIG_SCALECORRECTION_ONLY(val);
       userports_disable = `GET_COMMON_REG_CONFIG_USERPORTS_DISABLE(val);
+    endtask
+
+    task verify_config(
+      input bit rd_raw_data,
+      input bit ext_sync,
+      input bit scalecorrection_only,
+      input bit pps_receiver_enable,
+      input bit cmos_or_lvds_n,
+      input bit dds_disable,
+      input bit delay_control_disable,
+      input bit mode_1r1t,
+      input bit userports_disable,
+      input bit dataformat_disable,
+      input bit dcfilter_disable,
+      input bit iqcorrection_disable);
+
+      bit [31:0] configuration = 32'h0;
+
+      configuration =
+        `SET_COMMON_REG_CONFIG_CMOS_OR_LVDS_N(cmos_or_lvds_n) |
+        `SET_COMMON_REG_CONFIG_DATAFORMAT_DISABLE(dataformat_disable) |
+        `SET_COMMON_REG_CONFIG_DCFILTER_DISABLE(dcfilter_disable) |
+        `SET_COMMON_REG_CONFIG_DDS_DISABLE(dds_disable) |
+        `SET_COMMON_REG_CONFIG_DELAY_CONTROL_DISABLE(delay_control_disable) |
+        `SET_COMMON_REG_CONFIG_EXT_SYNC(ext_sync) |
+        `SET_COMMON_REG_CONFIG_IQCORRECTION_DISABLE(iqcorrection_disable) |
+        `SET_COMMON_REG_CONFIG_MODE_1R1T(mode_1r1t) |
+        `SET_COMMON_REG_CONFIG_PPS_RECEIVER_ENABLE(pps_receiver_enable) |
+        `SET_COMMON_REG_CONFIG_RD_RAW_DATA(rd_raw_data) |
+        `SET_COMMON_REG_CONFIG_SCALECORRECTION_ONLY(scalecorrection_only) |
+        `SET_COMMON_REG_CONFIG_USERPORTS_DISABLE(userports_disable);
+
+      this.axi_verify(GetAddrs(COMMON_REG_CONFIG), configuration);
     endtask
 
   endclass

@@ -116,10 +116,16 @@ program test_program;
     int m_tid, s_tid;
 
     m_dmac_api.enable_dma();
-    m_dmac_api.set_flags(0);
+    m_dmac_api.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b0),
+      .partial_reporting_en(1'b0));
 
     s_dmac_api.enable_dma();
-    s_dmac_api.set_flags(0);
+    s_dmac_api.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b0),
+      .partial_reporting_en(1'b0));
 
     m_seg = new(m_dmac_api.get_params());
     m_seg.length = length;

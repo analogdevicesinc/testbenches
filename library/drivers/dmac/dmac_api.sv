@@ -180,17 +180,45 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
-    task set_flags(input bit[2:0] flags);
+    task set_flags(
+      input bit cyclic,
+      input bit tlast,
+      input bit partial_reporting_en);
+
       this.axi_write(GetAddrs(DMAC_FLAGS),
-                     `SET_DMAC_FLAGS_CYCLIC(flags[0]) |
-                     `SET_DMAC_FLAGS_TLAST(flags[1]) |
-                     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(flags[2]));
+                     `SET_DMAC_FLAGS_CYCLIC(cyclic) |
+                     `SET_DMAC_FLAGS_TLAST(tlast) |
+                     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(partial_reporting_en));
     endtask : set_flags
 
     // -----------------
     //
     // -----------------
-    task wait_transfer_submission;
+    task set_irq_mask(
+      input bit transfer_completed,
+      input bit transfer_queued);
+
+      this.axi_write(GetAddrs(DMAC_IRQ_MASK),
+                     `SET_DMAC_IRQ_MASK_TRANSFER_COMPLETED(transfer_completed) |
+                     `SET_DMAC_IRQ_MASK_TRANSFER_QUEUED(transfer_queued));
+    endtask : set_irq_mask
+
+    // -----------------
+    //
+    // -----------------
+    task clear_irq_pending(
+      input bit transfer_completed,
+      input bit transfer_queued);
+
+      this.axi_write(GetAddrs(DMAC_IRQ_PENDING),
+                     `SET_DMAC_IRQ_PENDING_TRANSFER_COMPLETED(transfer_completed) |
+                     `SET_DMAC_IRQ_PENDING_TRANSFER_QUEUED(transfer_queued));
+    endtask : clear_irq_pending
+
+    // -----------------
+    //
+    // -----------------
+    task wait_transfer_submission();
       bit [31:0] regData = 'h0;
       bit timeout;
 
@@ -216,7 +244,7 @@ package dmac_api_pkg;
     // -----------------
     //
     // -----------------
-    task transfer_start;
+    task transfer_start();
       this.axi_write(GetAddrs(DMAC_TRANSFER_SUBMIT),
                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       this.info($sformatf("Transfer start"), ADI_VERBOSITY_MEDIUM);
@@ -244,6 +272,7 @@ package dmac_api_pkg;
     task set_lengths(
       input int xfer_length_x,
       input int xfer_length_y);
+
       this.axi_write(GetAddrs(DMAC_X_LENGTH),
                      `SET_DMAC_X_LENGTH_X_LENGTH(xfer_length_x));
       this.axi_write(GetAddrs(DMAC_Y_LENGTH),
@@ -257,6 +286,7 @@ package dmac_api_pkg;
                             input bit partial_segment = 0,
                             input int segment_length = 0,
                             input int timeut_in_us = 2000);
+
       bit [31:0] regData = 'h0;
       bit timeout;
       int segment_length_found,id_found;

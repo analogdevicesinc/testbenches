@@ -504,7 +504,10 @@ program test_slowdata (
 
     //Configure DMA
     dma_api.enable_dma();
-    dma_api.set_flags(3'b110); // PARTIAL_REPORTING=1,TLAST=1,CYCLIC=0
+    dma_api.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1));
     dma_api.set_lengths(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1,0);
     dma_api.set_dest_addr(`DDR_BA);
     dma_api.transfer_start();

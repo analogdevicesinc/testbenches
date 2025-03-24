@@ -163,7 +163,10 @@ program test_program;
     input dmac_api dmac,
     input int xfer_addr,
     input int xfer_length);
-    dmac.set_flags('b110);
+    dmac.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1));
     dmac.set_dest_addr(xfer_addr);
     dmac.set_lengths(xfer_length - 1, 0);
     dmac.transfer_start();
@@ -174,7 +177,10 @@ program test_program;
     input dmac_api dmac,
     input int xfer_addr,
     input int xfer_length);
-    dmac.set_flags('b010); // enable TLAST, CYCLIC
+    dmac.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b0));
     dmac.set_src_addr(xfer_addr);
     dmac.set_lengths(xfer_length - 1, 0);
     dmac.transfer_start();

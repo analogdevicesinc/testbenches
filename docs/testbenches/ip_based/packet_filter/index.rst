@@ -82,7 +82,7 @@ The steps of the environment bringup are:
 Packet filtering testing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Filter class are implemented which is a simple data filter
+* Filter class is implemented which is a simple data filter
 * Before the resets are asserted, the filter is instantiated
 * The filter is connected with the publisher filters
 * The master and slave sequencers are configured and then the resets are

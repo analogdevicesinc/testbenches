@@ -39,7 +39,7 @@ package adi_regmap_pkg;
 
   import logger_pkg::*;
 
-  typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S, WO} acc_t;
+  typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S, WO, W} acc_t;
 
   // Used in generic definitions
   const int n = 0;

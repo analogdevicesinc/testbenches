@@ -43,6 +43,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import i3c_controller_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -147,36 +148,7 @@ program test_program (
   output offload_trigger);
 
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-
-//---------------------------------------------------------------------------
-// Wrapper function for AXI read verify using dword
-//---------------------------------------------------------------------------
-task axi_read_v(
-    input   [31:0]  baddr,
-    input   [13:0]  raddr,
-    input   [31:0]  vdata);
-
-  base_env.mng.sequencer.RegReadVerify32(baddr+{raddr,2'b00},vdata);
-endtask
-
-task axi_read(
-    input   [31:0]  baddr,
-    input   [13:0]  raddr,
-    output  [31:0]  data);
-
-  base_env.mng.sequencer.RegRead32(baddr+{raddr,2'b00},data);
-endtask
-
-//---------------------------------------------------------------------------
-// Wrapper function for AXI write using dword
-//---------------------------------------------------------------------------
-task axi_write(
-  input [31:0]  baddr,
-  input [13:0]  waddr,
-  input [31:0]  wdata);
-
-  base_env.mng.sequencer.RegWrite32(baddr+{waddr,2'b00},wdata);
-endtask
+i3c_controller_api i3c_controller;
 
 //---------------------------------------------------------------------------
 // Port drivers
@@ -261,6 +233,11 @@ initial begin
                   `TH.`MNG_AXI.inst.IF,
                   `TH.`DDR_AXI.inst.IF);
 
+  i3c_controller = new(
+    "I3C Controller API",
+    base_env.mng.sequencer,
+    `I3C_CONTROLLER_BA);
+
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
   base_env.start();
@@ -269,9 +246,13 @@ initial begin
   sanity_test();
 
   // Enable I3C Controller
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_ENABLE, 0);
+  i3c_controller.enable_controller();
   // Set speed grade to 3.12 MHz
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_OPS, {2'b01, 4'd0, 1'b0});
+  i3c_controller.set_ops(
+    .status_nop(1'b0),
+    .speed_grade(2'b01),
+    .offload_length(4'd0),
+    .mode(1'b0));
 
   // Must occur before any other task, since the written data is later used
   dev_char_i3c_test();
@@ -303,7 +284,7 @@ initial begin
   while (1) begin
     @(posedge i3c_irq);
     // read pending IRQs
-    axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
+    i3c_controller.get_irq_pending(irq_pending);
 
     if (irq_pending & (1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING)) begin
       `INFO(("[%t] NOTE: Got CMDR IRQ", $time), ADI_VERBOSITY_LOW);
@@ -321,12 +302,7 @@ end
 // Sanity test reg interface
 //---------------------------------------------------------------------------
 task sanity_test();
-  `INFO(("Sanity Started"), ADI_VERBOSITY_LOW);
-  axi_read_v (`I3C_CONTROLLER_BA, `I3C_REGMAP_VERSION,       I3C_VERSION_CHECK);
-  axi_read_v (`I3C_CONTROLLER_BA, `I3C_REGMAP_DEVICE_ID,     I3C_DEVICE_ID_CHECK);
-  axi_write  (`I3C_CONTROLLER_BA, `I3C_REGMAP_SCRATCH,       I3C_SCRATCH_CHECK);
-  axi_read_v (`I3C_CONTROLLER_BA, `I3C_REGMAP_SCRATCH,       I3C_SCRATCH_CHECK);
-  `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
+  i3c_controller.sanity_test();
 endtask
 
 //---------------------------------------------------------------------------
@@ -341,49 +317,59 @@ task ccc_i3c_test;
   auto_ack <= 1'b1;
 
   // Disable IBI
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b00);
+  i3c_controller.configure_ibi(
+    .listen(1'b0),
+    .enable(1'b0));
 
   // Unmask CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h20);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b1),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
 
   // Test #1, CCC without payload
   `INFO(("CCC I3C Test #1"), ADI_VERBOSITY_LOW);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_CMD_RSTDAA); // CCC, length 0
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_RSTDAA);
+  i3c_controller.set_cmd_fifo(I3C_CCC_CMD_RSTDAA); // CCC, length 0
+  i3c_controller.set_cmd_fifo(I3C_CCC_RSTDAA);
   @(posedge i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 0)
     `FATAL(("CMD -> CMDR read length test FAILED"));
 
   // Test #2, CCC with length 1 write payload
   `INFO(("CCC I3C Test #2"), ADI_VERBOSITY_LOW);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000000b); // See DISEC spec. for +info
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_CMD_DISEC); // CCC, length tx 1
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_DISEC);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'h0000000b); // See DISEC spec. for +info
+  i3c_controller.set_cmd_fifo(I3C_CCC_CMD_DISEC); // CCC, length tx 1
+  i3c_controller.set_cmd_fifo(I3C_CCC_DISEC);
   @(posedge i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 1)
     `FATAL(("CMD -> CMDR write length test FAILED"));
 
   // Test #3, CCC with length 6 read payload but DA is unknown
   `INFO(("CCC I3C Test #3"), ADI_VERBOSITY_LOW);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETPID_UDA); // CCC, length rx 6
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETPID);
+  i3c_controller.set_cmd_fifo(I3C_CMD_GETPID_UDA); // CCC, length rx 6
+  i3c_controller.set_cmd_fifo(I3C_CCC_GETPID);
   wait (i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[23:20] != 8)
     `FATAL(("#4: CMD -> CMDR UDA_ERROR assertion FAILED"));
 
   // Test #4, CCC with length 6 read payload, DA is known
   `INFO(("CCC I3C Test #4"), ADI_VERBOSITY_LOW);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETPID); // CCC, length rx 6
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETPID);
+  i3c_controller.set_cmd_fifo(I3C_CMD_GETPID); // CCC, length rx 6
+  i3c_controller.set_cmd_fifo(I3C_CCC_GETPID);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
   i3c_dev_sda <= 1'bZ;
@@ -393,16 +379,16 @@ task ccc_i3c_test;
   i3c_dev_sda <= 1'bZ;
   auto_ack <= 1'b1;
   @(posedge i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 6)
     `FATAL(("CMD -> CMDR read length test FAILED"));
 
   // Test #5, CCC with length 1 read payload, DA is known
   `INFO(("CCC I3C Test #5"), ADI_VERBOSITY_LOW);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_GETDCR); // CCC, length rx 1
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_GETDCR);
+  i3c_controller.set_cmd_fifo(I3C_CMD_GETDCR); // CCC, length rx 1
+  i3c_controller.set_cmd_fifo(I3C_CCC_GETDCR);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
   auto_ack <= 1'b0;
   i3c_dev_sda <= 1'b0;
@@ -410,15 +396,23 @@ task ccc_i3c_test;
   i3c_dev_sda <= 1'bZ;
   auto_ack <= 1'b1;
   @(posedge i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 1)
     `FATAL(("CMD -> CMDR read length test FAILED"));
   // Mask CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h00);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b0),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
   // Clear all pending IRQs
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
+  i3c_controller.set_irq_pending(irq_pending);
 
   `INFO(("CCC I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
@@ -430,22 +424,36 @@ task priv_i3c_test();
   `INFO(("Private Transfer I3C Started"), ADI_VERBOSITY_LOW);
 
   // Disable IBI
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b00);
+  i3c_controller.configure_ibi(
+    .listen(1'b0),
+    .enable(1'b0));
 
   // Change speed grade to 12.5 MHz
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_OPS, {2'b11, 4'd0, 1'b0});
+  i3c_controller.set_ops(
+    .status_nop(1'b0),
+    .speed_grade(2'b11),
+    .offload_length(4'd0),
+    .mode(1'b0));
 
   // Unmask CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h20);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b1),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
 
   // Test #1, controller does private write transfer that is ACK
   `INFO(("PRIV I3C Test #1"), ADI_VERBOSITY_LOW);
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
+  i3c_controller.set_cmd_fifo(I3C_CMD_1);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   `WAIT (`DUT_I3C_BIT_MOD.nop == 1, 100000);
 
@@ -453,9 +461,13 @@ task priv_i3c_test();
   `INFO(("PRIV I3C Test #2"), ADI_VERBOSITY_LOW);
 
   // Change speed grade to 6.25 MHz
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_OPS, {2'b10, 4'd0, 1'b0});
+  i3c_controller.set_ops(
+    .status_nop(1'b0),
+    .speed_grade(2'b10),
+    .offload_length(4'd0),
+    .mode(1'b0));
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_3);
+  i3c_controller.set_cmd_fifo(I3C_CMD_3);
 
   // Dummy HIGH peripheral write + T_bit continue
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
@@ -471,7 +483,7 @@ task priv_i3c_test();
   `INFO(("PRIV I3C Test #3"), ADI_VERBOSITY_LOW);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_3);
+  i3c_controller.set_cmd_fifo(I3C_CMD_3);
 
   // Dummy LOW peripheral write + T_bit stop
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
@@ -488,20 +500,20 @@ task priv_i3c_test();
   `INFO(("PRIV I3C Test #4"), ADI_VERBOSITY_LOW);
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_4);
+  i3c_controller.set_cmd_fifo(I3C_CMD_4);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Test #5, controller does private read transfer that is NACK
   `INFO(("PRIV I3C Test #5"), ADI_VERBOSITY_LOW);
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
+  i3c_controller.set_cmd_fifo(I3C_CMD_1);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   auto_ack <= 1'b0;
   wait (`DUT_I3C_BIT_MOD.nop == 1);
@@ -512,7 +524,7 @@ task priv_i3c_test();
   `INFO(("PRIV I3C Test #6"), ADI_VERBOSITY_LOW);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_5);
+  i3c_controller.set_cmd_fifo(I3C_CMD_5);
 
   // Dummy HIGH peripheral write + T_bit continue
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
@@ -526,42 +538,42 @@ task priv_i3c_test();
 
   if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_CMDR_PENDING])
     `FATAL(("#0: IRQ CMDR FAILED"));
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8]) // Wrote all bytes
     `FATAL(("#1: CMD -> CMDR write length test FAILED"));
   if (cmdr_fifo_data[23:20] != 0)
     `FATAL(("#1: CMD -> CMDR NO_ERROR assertion FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != I3C_CMD_3[19:8]) // Read all bytes
     `FATAL(("#2: CMD -> CMDR read length test FAILED"));
   if (cmdr_fifo_data[23:20] != 0)
     `FATAL(("#2: CMD -> CMDR NO_ERROR assertion FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 1) // Read one byte
     `FATAL(("#3: CMD -> CMDR read length test FAILED"));
   if (cmdr_fifo_data[23:20] != 6)
     `FATAL(("#3: CMD -> CMDR NACK_RESP assertion FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[23:20] != 8)
     `FATAL(("#4: CMD -> CMDR UDA_ERROR assertion FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 0) // Wrote no bytes
     `FATAL(("#5: CMD -> CMDR write length test FAILED"));
   if (cmdr_fifo_data[23:20] != 4)
     `FATAL(("#5: CMD -> CMDR CEO_ERROR assertion FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != I3C_CMD_5[19:8]) // Read all bytes
     `FATAL(("#6: CMD -> CMDR read length test FAILED"));
@@ -569,9 +581,17 @@ task priv_i3c_test();
     `FATAL(("#6: CMD -> CMDR NO_ERROR assertion FAILED"));
 
   // Mask CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h00);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b0),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
   // Clear all pending IRQs
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
+  i3c_controller.set_irq_pending(irq_pending);
 
   `INFO(("Private Transfer I3C Ended"), ADI_VERBOSITY_LOW);
 endtask
@@ -583,7 +603,15 @@ task priv_i2c_test();
   `INFO(("Private Transfer I2C Started"), ADI_VERBOSITY_LOW);
 
   // Unmask CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h20);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b1),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
 
   // Test #1, controller does private write transfer that is ACK and SR
   // Test #2, controller does private read transfer and ACKs all receiving
@@ -592,11 +620,11 @@ task priv_i2c_test();
   auto_ack <= 1'b1;
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000_00EF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_00EF);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_1);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_2);
+  i3c_controller.set_cmd_fifo(I2C_CMD_1);
+  i3c_controller.set_cmd_fifo(I2C_CMD_2);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Assert is in I²C mode
   if (`DUT_I3C_BIT_MOD.i2c_mode !== 1)
@@ -619,17 +647,17 @@ task priv_i2c_test();
   auto_ack <= 1'b1;
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_3);
+  i3c_controller.set_cmd_fifo(I2C_CMD_3);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Wait a while to write second payload, stalling the bus
   wait (`DUT_I3C_BIT_MOD.sm == 1);
   #10000ns
   if (i3c_scl !== 0)
     `FATAL(("Bus is not stalled (SCL != 0)"));
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000_00DE);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_00DE);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
   // Test #4, controller does private write transfer that is NACK
@@ -637,9 +665,9 @@ task priv_i2c_test();
   auto_ack <= 1'b0;
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'h0000_00EF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_00EF);
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I2C_CMD_4);
+  i3c_controller.set_cmd_fifo(I2C_CMD_4);
 
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
@@ -648,24 +676,24 @@ task priv_i2c_test();
 
   if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_CMDR_PENDING])
     `FATAL(("#0: IRQ CMDR FAILED"));
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != I2C_CMD_1[19:8]) // Wrote all bytes
     `FATAL(("#1: CMD -> CMDR write length test FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[23:20] == 4'd1)
     `FATAL(("#2: CMD -> CMDR CE0_ERROR check FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 12'd6) // Wrote 6 bytes
     `FATAL(("#3: CMD -> CMDR write length test FAILED"));
 
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 12'd0) // Wrote 0 bytes
     `ERROR(("#4: CMD -> CMDR write length test FAILED"));
@@ -673,12 +701,20 @@ task priv_i2c_test();
     `ERROR(("#4: CMD -> CMDR NACK_RESP check FAILED"));
 
   // Mask CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h00);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b0),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
   // Clear all pending IRQs
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
+  i3c_controller.set_irq_pending(irq_pending);
   // Clear any sdi data from the cmd
   while(`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level) begin
-    axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
+    i3c_controller.read_sdi_fifo(sdi_fifo_data);
   end
 
   `INFO(("Private Transfer I2C Ended"), ADI_VERBOSITY_LOW);
@@ -695,10 +731,20 @@ task ibi_i3c_test();
   `INFO(("IBI I3C Test Started"), ADI_VERBOSITY_LOW);
 
   // Unask IBI, CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h60);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b1),
+    .cmdr_pending(1'b1),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
 
   // Listen & Enable IBI
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b11);
+  i3c_controller.configure_ibi(
+    .listen(1'b1),
+    .enable(1'b1));
 
   // Test #1, peripheral does IBI request by pulling SDA low
   // Expected result: the controller accepts the IBI by driving SCL,
@@ -708,11 +754,11 @@ task ibi_i3c_test();
   write_ibi_da(DEVICE_DA1);
 
   @(posedge i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_FIFO, ibi_fifo_data);
+  i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi(ibi_fifo_data);
   if (ibi_fifo_data[23:17] != DEVICE_DA1)
     `FATAL(("Wrong IBI DA"));
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
 
   // Test #2, peripheral does an IBI request by sending its DA during broadcast
   // address.
@@ -721,10 +767,10 @@ task ibi_i3c_test();
 
   `INFO(("IBI I3C Test #2"), ADI_VERBOSITY_LOW);
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
+  i3c_controller.set_cmd_fifo(I3C_CMD_1);
 
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Write DA during low during broadcast address
@@ -734,15 +780,15 @@ task ibi_i3c_test();
   // Enable ACK during the cmd transfer
   auto_ack <= 1'b1;
   wait (i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_FIFO, ibi_fifo_data);
+  i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi (ibi_fifo_data);
   if (ibi_fifo_data[23:17] != DEVICE_DA1)
     `FATAL(("Wrong IBI DA"));
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
 
   wait (i3c_irq); // cmdr_irq
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8])
     `FATAL(("CMD transfer after resolving IBI FAILED"));
@@ -769,10 +815,10 @@ task ibi_i3c_test();
   #12000ns
   `INFO(("IBI I3C Test #4"), ADI_VERBOSITY_LOW);
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, 32'hDEAD_BEEF);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CMD_1);
+  i3c_controller.set_cmd_fifo(I3C_CMD_1);
 
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Write DA during low during broadcast address
@@ -780,8 +826,8 @@ task ibi_i3c_test();
   // Enable ACK during the cmd transfer
   auto_ack <= 1'b1;
   @(posedge i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8])
     `FATAL(("CMD transfer after resolving IBI FAILED"));
@@ -799,11 +845,11 @@ task ibi_i3c_test();
   write_ibi_da(DEVICE_DA1+1);
 
   wait (i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_FIFO, ibi_fifo_data);
+  i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi(ibi_fifo_data);
   if (ibi_fifo_data[23:17] != DEVICE_DA1+1)
     `FATAL(("Wrong IBI DA"));
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
 
   // Test #6, peripheral does IBI request by pulling SDA low, but
   // IBI is disabled while listening to them.
@@ -811,7 +857,9 @@ task ibi_i3c_test();
   // request. No ibi is written to the FIFO.
 
   // Listen & Disable IBI
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b10);
+  i3c_controller.configure_ibi(
+    .listen(1'b1),
+    .enable(1'b0));
 
   #12000ns
   `INFO(("IBI I3C Test #6"), ADI_VERBOSITY_LOW);
@@ -826,12 +874,20 @@ task ibi_i3c_test();
 
   // Clear any sdi data from the cmd
   while(`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level) begin
-    axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
+    i3c_controller.read_sdi_fifo(sdi_fifo_data);
   end
   // Mask IBI and CMDR interrupt
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h00);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b0),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
   // Clear all pending IRQs
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
+  i3c_controller.set_irq_pending(irq_pending);
 
   `INFO(("IBI I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
@@ -843,22 +899,32 @@ task daa_i3c_test();
   `INFO(("DAA I3C Started"), ADI_VERBOSITY_LOW);
 
   // Unmask the CMDR and DAA interrupt
-  axi_write (`I3C_CONTROLLER_BA,`I3C_REGMAP_IRQ_MASK, 32'ha0);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b1),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b1),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
 
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level)
     `FATAL(("SDI FIFO must be empty for the DAA procedure"));
 
   auto_ack <= 1'b1;
   // Disable IBI
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IBI_CONFIG, 2'b00);
+  i3c_controller.configure_ibi(
+    .listen(1'b0),
+    .enable(1'b0));
 
   // Test #1, controller does the DAA until no peripherals ACKs or there is
   // no slots left.
   // Note: this is a long procedure that must occur in open-drain mode.
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_CMD_ENTDAA);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMD_FIFO, I3C_CCC_ENTDAA);
+  i3c_controller.set_cmd_fifo(I3C_CCC_CMD_ENTDAA);
+  i3c_controller.set_cmd_fifo(I3C_CCC_ENTDAA);
   `WAIT (`DUT_I3C_FRAMING.st == `CMDW_START, 10000);
 
   @(posedge i3c_irq);
@@ -866,15 +932,19 @@ task daa_i3c_test();
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
     `FATAL(("Wrong SDI FIFO level"));
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
+  i3c_controller.read_sdi_fifo(sdi_fifo_data);
+  i3c_controller.read_sdi_fifo(sdi_fifo_data);
   // Assert that irq won't be cleared if SDO is empty
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
   if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_DAA_PENDING])
     `FATAL(("DAA IRQ should not have been cleared"));
   `INFO(("Writing DA 1"), ADI_VERBOSITY_LOW);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, {24'h0, DEVICE_DA1, ~^DEVICE_DA1[6:0]});
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
+  i3c_controller.write_sdo_fifo_data_4_byte(
+    .data0({DEVICE_DA1, ~^DEVICE_DA1[6:0]}),
+    .data1(8'h0),
+    .data2(8'h0),
+    .data3(8'h0));
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
 
   // Write DEV_CHAR_2 all Low for the second peripheral,
   // so BCR[2] is Low (used in the ibi_i3c_test).
@@ -885,25 +955,37 @@ task daa_i3c_test();
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
     `FATAL(("Wrong SDI FIFO level"));
   dev_char_state <= 1'b1;
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDI_FIFO, sdi_fifo_data);
+  i3c_controller.read_sdi_fifo(sdi_fifo_data);
+  i3c_controller.read_sdi_fifo(sdi_fifo_data);
 
   `INFO(("Writing DA 2"), ADI_VERBOSITY_LOW);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_SDO_FIFO, {24'h0, DEVICE_DA2, ~^DEVICE_DA2[6:0]});
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
+  i3c_controller.write_sdo_fifo_data_4_byte(
+    .data0({DEVICE_DA2, ~^DEVICE_DA2[6:0]}),
+    .data1(8'h0),
+    .data2(8'h0),
+    .data3(8'h0));
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
 
   // Wait next start, do not ACK to exit DAA (no other dev on bus needs addr)
   `WAIT (`DUT_I3C_WORD.st == `CMDW_START, 100000);
   #10ns auto_ack <= 1'b0;
   @(posedge i3c_irq);
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_CMDR_FIFO, cmdr_fifo_data);
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, 1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
 
   // Mask the DAA interrupt
-  axi_write (`I3C_CONTROLLER_BA,`I3C_REGMAP_IRQ_MASK, 32'h20);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b1),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
   // Clear all pending IRQs
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_PENDING, irq_pending);
+  i3c_controller.set_irq_pending(irq_pending);
 
   `INFO(("DAA I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
@@ -922,20 +1004,56 @@ bit [31:0] dev_char_data = 0;
 task dev_char_i3c_test();
   `INFO(("Device Characteristics I3C Test Started"), ADI_VERBOSITY_LOW);
   // Write DEV_CHAR of four devices
-  axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1, 1'b1, 4'h0, dev_char_0});
-  axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA2, 1'b1, 4'h0, dev_char_1});
-  axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_SA1, 1'b1, 4'h0, dev_char_2});
-  axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_SA2, 1'b1, 4'h0, dev_char_3});
+  i3c_controller.set_dev_char(
+    .addr(DEVICE_DA1),
+    .wen(1'b1),
+    .has_ibi_mdb(dev_char_0[3]),
+    .is_ibi_capable(dev_char_0[2]),
+    .is_attached(dev_char_0[1]),
+    .is_i2c(dev_char_0[0]));
+  i3c_controller.set_dev_char(
+    .addr(DEVICE_DA2),
+    .wen(1'b1),
+    .has_ibi_mdb(dev_char_1[3]),
+    .is_ibi_capable(dev_char_1[2]),
+    .is_attached(dev_char_1[1]),
+    .is_i2c(dev_char_1[0]));
+  i3c_controller.set_dev_char(
+    .addr(DEVICE_SA1),
+    .wen(1'b1),
+    .has_ibi_mdb(dev_char_2[3]),
+    .is_ibi_capable(dev_char_2[2]),
+    .is_attached(dev_char_2[1]),
+    .is_i2c(dev_char_2[0]));
+  i3c_controller.set_dev_char(
+    .addr(DEVICE_SA2),
+    .wen(1'b1),
+    .has_ibi_mdb(dev_char_3[3]),
+    .is_ibi_capable(dev_char_3[2]),
+    .is_attached(dev_char_3[1]),
+    .is_i2c(dev_char_3[0]));
 
   // Read first and check value
-  axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA1 , 9'h0});
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, dev_char_data);
+  i3c_controller.set_dev_char(
+    .addr(DEVICE_DA1),
+    .wen(1'b0),
+    .has_ibi_mdb(1'b0),
+    .is_ibi_capable(1'b0),
+    .is_attached(1'b0),
+    .is_i2c(1'b0));
+  i3c_controller.read_dev_char(dev_char_data);
   `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_LOW);
   if (dev_char_data[3:0] != dev_char_0 || dev_char_data[15:9] != DEVICE_DA1)
     `FATAL(("DEV_CHAR_0 FAILED"));
   // Read second and check value
-  axi_write(`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, {DEVICE_DA2, 9'h0});
-  axi_read (`I3C_CONTROLLER_BA, `I3C_REGMAP_DEV_CHAR, dev_char_data);
+  i3c_controller.set_dev_char(
+    .addr(DEVICE_DA2),
+    .wen(1'b0),
+    .has_ibi_mdb(1'b0),
+    .is_ibi_capable(1'b0),
+    .is_attached(1'b0),
+    .is_i2c(1'b0));
+  i3c_controller.read_dev_char(dev_char_data);
   `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_LOW);
   if (dev_char_data[3:0] != dev_char_1 || dev_char_data[15:9] != DEVICE_DA2)
     `FATAL(("DEV_CHAR_0 FAILED"));
@@ -952,21 +1070,39 @@ task offload_i3c_test();
   #10000ns
 
   // Mask all interrupts
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_IRQ_MASK, 32'h00);
+  i3c_controller.set_irq_mask(
+    .daa_pending(1'b0),
+    .ibi_pending(1'b0),
+    .cmdr_pending(1'b0),
+    .ibi_almost_full(1'b0),
+    .sdi_almost_full(1'b0),
+    .sdo_almost_empty(1'b0),
+    .cmdr_almost_full(1'b0),
+    .cmd_almost_empty(1'b0));
 
   `INFO(("Offload I3C Test Started"), ADI_VERBOSITY_LOW);
 
   offload_trigger_l = 1'b0;
 
   // Write SDO payload
-  axi_write (`I3C_CONTROLLER_BA, {`I3C_REGMAP_OFFLOAD_SDO_, 4'h0}, 32'hDEAD_BEEF);
+  i3c_controller.write_offload_cmd(
+    .channel(4'h0),
+    .data(32'hDEAD_BEEF));
 
   // Write CMD instruction
-  axi_write (`I3C_CONTROLLER_BA, {`I3C_REGMAP_OFFLOAD_CMD_, 4'h0}, I3C_CMD_1);
-  axi_write (`I3C_CONTROLLER_BA, {`I3C_REGMAP_OFFLOAD_CMD_, 4'h1}, I3C_CMD_3);
+  i3c_controller.write_offload_sdo(
+    .channel(4'h0),
+    .data(I3C_CMD_1));
+  i3c_controller.write_offload_sdo(
+    .channel(4'h1),
+    .data(I3C_CMD_3));
 
   // Set offload length and enter offload mode
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_OPS, {2'b11, 4'd2, 1'b1});
+  i3c_controller.set_ops(
+    .status_nop(1'b0),
+    .speed_grade(2'b11),
+    .offload_length(4'd2),
+    .mode(1'b1));
 
   auto_ack <= 1'b1;
   offload_trigger_l = 1'b1;
@@ -984,7 +1120,11 @@ task offload_i3c_test();
   #200ns
 
   // Exit offload mode
-  axi_write (`I3C_CONTROLLER_BA, `I3C_REGMAP_OPS, {4'd0, 1'b0});
+  i3c_controller.set_ops(
+    .status_nop(1'b0),
+    .speed_grade(2'b00),
+    .offload_length(4'd0),
+    .mode(1'b0));
   offload_trigger_l = 1'b1;
   #10ns offload_trigger_l = 1'b0;
 

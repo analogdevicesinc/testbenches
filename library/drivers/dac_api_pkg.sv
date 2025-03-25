@@ -132,7 +132,7 @@ package dac_api_pkg;
     endtask
 
     task set_rate(input bit [7:0] rate);
-      this.axi_write(GetAddrs(DAC_COMMON_REG_RATECNTRL), `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate-1));
+      this.axi_write(GetAddrs(DAC_COMMON_REG_RATECNTRL), `SET_DAC_COMMON_REG_RATECNTRL_RATE(rate));
     endtask
 
   endclass

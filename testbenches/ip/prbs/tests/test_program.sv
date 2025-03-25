@@ -58,7 +58,12 @@ program test_program;
 
   io_vip_if_base ready_vip_if;
   io_vip_if_base rstn_vip_if;
-  io_vip_if_base error_vip_if;
+
+  io_vip_if_base error_sample_vip_if;
+  io_vip_if_base oos_sample_vip_if;
+
+  io_vip_if_base error_bit_vip_if;
+  io_vip_if_base oos_bit_vip_if;
 
   localparam MAX_WIDTH = `MAX(`DATA_WIDTH, `POLYNOMIAL_WIDTH);
 
@@ -102,12 +107,38 @@ program test_program;
 
     ready_vip_if = `TH.`READY_VIP.inst.inst.IF.vif;
     rstn_vip_if = `TH.`RSTN_VIP.inst.inst.IF.vif;
-    error_vip_if = `TH.`ERROR_VIP.inst.inst.IF.vif;
+
+    error_sample_vip_if = `TH.`ERROR_SAMPLE_VIP.inst.inst.IF.vif;
+    oos_sample_vip_if = `TH.`OOS_SAMPLE_VIP.inst.inst.IF.vif;
+
+    error_bit_vip_if = `TH.`ERROR_BIT_VIP.inst.inst.IF.vif;
+    oos_bit_vip_if = `TH.`OOS_BIT_VIP.inst.inst.IF.vif;
 
     base_env.start();
     base_env.sys_reset();
 
-    // verification on negedge
+    verification_on_negedge();
+
+    #1ns;
+
+    verification_on_posedge();
+
+    gen_mon_verification();
+
+    error_insertion_verification();
+
+    resync_verification_sample();
+
+    resync_verification_bit();
+
+    base_env.stop();
+
+    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
+    $finish();
+
+  end
+
+  task verification_on_negedge();
     polynomial = $urandom();
     polynomial_vip_if.set_io(polynomial);
 
@@ -137,10 +168,9 @@ program test_program;
 
       input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data};
     end
+  endtask
 
-    #1ns;
-
-    // verification on posedge
+  task verification_on_posedge();
     polynomial = $urandom();
     polynomial_vip_if.set_io(polynomial);
 
@@ -170,8 +200,9 @@ program test_program;
 
       input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data};
     end
+  endtask
 
-    // gen-mon verification
+  task gen_mon_verification();
     polynomial = $urandom();
     polynomial_vip_if.set_io(polynomial);
 
@@ -191,18 +222,121 @@ program test_program;
     ready_vip_if.wait_posedge_clk();
 
     repeat(100) begin
-      error_vip_if.wait_negedge_clk();
-      if (error_vip_if.get_io()) begin
+      error_sample_vip_if.wait_negedge_clk();
+      if (error_sample_vip_if.get_io()) begin
         `ERROR(("PRBS check failed!"));
       end
       polynomial_vip_if.wait_posedge_clk();
     end
+  endtask
 
-    base_env.stop();
+  task error_insertion_verification();
+    `INFO(("Generator-monitor error insertion"), ADI_VERBOSITY_LOW);
 
-    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
-    $finish();
+    fork
+      begin
+        force `TH.prbs_mon_dut_sample.input_data = $urandom();
+        repeat(1) begin
+          polynomial_vip_if.wait_posedge_clk();
+        end
+        release `TH.prbs_mon_dut_sample.input_data;
+        polynomial_vip_if.wait_posedge_clk();
+      end
+      begin
+        error_sample_vip_if.wait_io_change();
+        if (error_sample_vip_if.get_io()) begin
+          `INFO(("PRBS check: error detected"), ADI_VERBOSITY_LOW);
+        end
+        polynomial_vip_if.wait_posedge_clk();
+      end
+      begin
+        fork
+          oos_sample_vip_if.wait_io_change();
+          if (oos_sample_vip_if.get_io()) begin
+            `ERROR(("PRBS check: out of sync triggered!"));
+          end
+        join_none
+      end
+    join
+    disable fork;
 
-  end
+    repeat(100) begin
+      error_sample_vip_if.wait_negedge_clk();
+      if (error_sample_vip_if.get_io()) begin
+        `ERROR(("PRBS check failed!"));
+      end
+      polynomial_vip_if.wait_posedge_clk();
+    end
+  endtask
+
+  task resync_verification_sample();
+    `INFO(("Generator-monitor transmission error simulation and resynchronization verification"), ADI_VERBOSITY_LOW);
+
+    fork
+      begin
+        force `TH.prbs_mon_dut_sample.input_data = $urandom();
+        repeat(20) begin
+          polynomial_vip_if.wait_posedge_clk();
+        end
+        release `TH.prbs_mon_dut_sample.input_data;
+        polynomial_vip_if.wait_posedge_clk();
+      end
+      begin
+        oos_sample_vip_if.wait_io_change();
+        if (oos_sample_vip_if.get_io()) begin
+          `INFO(("PRBS check: out of sync"), ADI_VERBOSITY_LOW);
+        end
+      end
+    join
+
+    oos_sample_vip_if.wait_io_change();
+    if (oos_sample_vip_if.get_io()) begin
+      `INFO(("PRBS resynchronization after transmission is fixed"), ADI_VERBOSITY_LOW);
+    end
+    oos_sample_vip_if.wait_io_change();
+
+    repeat(100) begin
+      error_sample_vip_if.wait_negedge_clk();
+      if (error_sample_vip_if.get_io()) begin
+        `ERROR(("PRBS check failed!"));
+      end
+      polynomial_vip_if.wait_posedge_clk();
+    end
+  endtask
+
+  task resync_verification_bit();
+    `INFO(("Generator-monitor transmission error simulation and resynchronization verification"), ADI_VERBOSITY_LOW);
+
+    fork
+      begin
+        force `TH.prbs_mon_dut_bit.input_data = $urandom();
+        repeat(75) begin
+          polynomial_vip_if.wait_posedge_clk();
+        end
+        release `TH.prbs_mon_dut_bit.input_data;
+        polynomial_vip_if.wait_posedge_clk();
+      end
+      begin
+        oos_bit_vip_if.wait_io_change();
+        if (oos_bit_vip_if.get_io()) begin
+          `INFO(("PRBS check: out of sync"), ADI_VERBOSITY_LOW);
+        end
+      end
+    join
+
+    oos_bit_vip_if.wait_io_change();
+    if (oos_bit_vip_if.get_io()) begin
+      `INFO(("PRBS resynchronization after transmission is fixed"), ADI_VERBOSITY_LOW);
+    end
+    oos_bit_vip_if.wait_io_change();
+
+    repeat(100) begin
+      error_bit_vip_if.wait_negedge_clk();
+      if (error_bit_vip_if.get_io()) begin
+        `ERROR(("PRBS check failed!"));
+      end
+      polynomial_vip_if.wait_posedge_clk();
+    end
+  endtask
 
 endprogram

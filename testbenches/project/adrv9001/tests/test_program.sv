@@ -93,19 +93,15 @@ program test_program;
 
   dmac_api tx1_dmac_api;
   dmac_api rx1_dmac_api;
-  dac_api tx1_dac_common_api;
-  adc_api rx1_adc_common_api;
-  dac_api tx1_channel_dac_api;
-  adc_api rx1_channel_adc_api;
+  dac_api tx1_dac_api;
+  adc_api rx1_adc_api;
   common_api tx1_common_api;
   common_api rx1_common_api;
 
   dmac_api tx2_dmac_api;
   dmac_api rx2_dmac_api;
-  dac_api tx2_dac_common_api;
-  adc_api rx2_adc_common_api;
-  dac_api tx2_channel_dac_api;
-  adc_api rx2_channel_adc_api;
+  dac_api tx2_dac_api;
+  adc_api rx2_adc_api;
   common_api tx2_common_api;
   common_api rx2_common_api;
 
@@ -152,23 +148,13 @@ program test_program;
       base_env.mng.sequencer,
       `RX1_DMA_BA);
 
-    tx1_dac_common_api = new(
+    tx1_dac_api = new(
       "TX1 DAC Common API",
       base_env.mng.sequencer,
       TX1_COMMON);
 
-    rx1_adc_common_api = new(
+    rx1_adc_api = new(
       "RX1 ADC Common API",
-      base_env.mng.sequencer,
-      RX1_COMMON);
-
-    tx1_channel_dac_api = new(
-      "TX1 DAC API",
-      base_env.mng.sequencer,
-      TX1_COMMON);
-
-    rx1_channel_adc_api = new(
-      "RX1 ADC API",
       base_env.mng.sequencer,
       RX1_COMMON);
 
@@ -192,23 +178,13 @@ program test_program;
       base_env.mng.sequencer,
       `RX2_DMA_BA);
 
-    tx2_dac_common_api = new(
+    tx2_dac_api = new(
       "TX2 DAC Common API",
       base_env.mng.sequencer,
       TX2_COMMON);
 
-    rx2_adc_common_api = new(
+    rx2_adc_api = new(
       "RX2 ADC Common API",
-      base_env.mng.sequencer,
-      RX2_COMMON);
-
-    tx2_channel_dac_api = new(
-      "TX2 DAC API",
-      base_env.mng.sequencer,
-      TX2_COMMON);
-
-    rx2_channel_adc_api = new(
-      "RX2 ADC API",
       base_env.mng.sequencer,
       RX2_COMMON);
 
@@ -253,12 +229,12 @@ program test_program;
     // independent R1T1 tests
     R1_MODE = 1;
     // enable normal data path for RX2
-    rx2_channel_adc_api.set_channel_control_3(
+    rx2_adc_api.set_channel_control_3(
       .channel(CH0),
       .pn_sel(4'h0),
       .data_sel(4'h0));
     if (!SYMB_OP[0]) begin
-      rx2_channel_adc_api.set_channel_control_3(
+      rx2_adc_api.set_channel_control_3(
         .channel(CH1),
         .pn_sel(4'h0),
         .data_sel(4'h0));
@@ -269,11 +245,11 @@ program test_program;
     // Test internal loopback DAC2->ADC2
     // Enable internal loopback
     if (!(SYMB_OP[0] & SYMB_8_16B[0])) begin
-      rx2_channel_adc_api.set_channel_control_3(
+      rx2_adc_api.set_channel_control_3(
         .channel(CH0),
         .pn_sel(4'h0),
         .data_sel(4'h1));
-      rx2_channel_adc_api.set_channel_control_3(
+      rx2_adc_api.set_channel_control_3(
         .channel(CH1),
         .pn_sel(4'h0),
         .data_sel(4'h1));
@@ -354,7 +330,7 @@ program test_program;
                   bit tx2_en = 1);
 
     // Configure Rx interface
-    rx1_adc_common_api.set_common_control(
+    rx1_adc_api.set_common_control(
       .pin_mode(1'b0),
       .ddr_edgesel(1'b0),
       .r1_mode(R1_MODE),
@@ -363,7 +339,7 @@ program test_program;
       .symb_8_16b(SYMB_8_16B),
       .symb_op(SYMB_OP),
       .sdr_ddr_n(SDR_DDR_N));
-    rx2_adc_common_api.set_common_control(
+    rx2_adc_api.set_common_control(
       .pin_mode(1'b0),
       .ddr_edgesel(1'b0),
       .r1_mode(R1_MODE),
@@ -373,7 +349,7 @@ program test_program;
       .symb_op(SYMB_OP),
       .sdr_ddr_n(SDR_DDR_N));
     // Configure Tx interface
-    tx1_dac_common_api.set_common_control_2(
+    tx1_dac_api.set_common_control_2(
       .data_format(1'b0),
       .num_lanes(SINGLE_LANE),
       .par_enb(1'b0),
@@ -382,7 +358,7 @@ program test_program;
       .sdr_ddr_n(SDR_DDR_N),
       .symb_8_16b(SYMB_8_16B),
       .symb_op(SYMB_OP));
-    tx2_dac_common_api.set_common_control_2(
+    tx2_dac_api.set_common_control_2(
       .data_format(1'b0),
       .num_lanes(SINGLE_LANE),
       .par_enb(1'b0),
@@ -391,15 +367,15 @@ program test_program;
       .sdr_ddr_n(SDR_DDR_N),
       .symb_8_16b(SYMB_8_16B),
       .symb_op(SYMB_OP));
-    tx1_dac_common_api.set_rate(rate-1);
-    tx2_dac_common_api.set_rate(rate-1);
+    tx1_dac_api.set_rate(rate-1);
+    tx2_dac_api.set_rate(rate-1);
 
     // pull out TX of reset
-    tx1_dac_common_api.reset(
+    tx1_dac_api.reset(
       .ce_n(0),
       .mmcm_rstn(tx1_en),
       .rstn(tx1_en));
-    tx2_dac_common_api.reset(
+    tx2_dac_api.reset(
       .ce_n(0),
       .mmcm_rstn(tx2_en),
       .rstn(tx2_en));
@@ -407,11 +383,11 @@ program test_program;
     gen_mssi_sync();
 
     // pull out RX of reset
-    rx1_adc_common_api.reset(
+    rx1_adc_api.reset(
       .ce_n(0),
       .mmcm_rstn(rx1_en),
       .rstn(rx1_en));
-    rx2_adc_common_api.reset(
+    rx2_adc_api.reset(
       .ce_n(0),
       .mmcm_rstn(rx2_en),
       .rstn(rx2_en));
@@ -422,20 +398,20 @@ program test_program;
   // --------------------------
   task link_down();
     // put RX in reset
-    rx1_adc_common_api.reset(
+    rx1_adc_api.reset(
       .ce_n(0),
       .mmcm_rstn(0),
       .rstn(0));
-    rx2_adc_common_api.reset(
+    rx2_adc_api.reset(
       .ce_n(0),
       .mmcm_rstn(0),
       .rstn(0));
     // put TX in reset
-    tx1_dac_common_api.reset(
+    tx1_dac_api.reset(
       .ce_n(0),
       .mmcm_rstn(0),
       .rstn(0));
-    tx2_dac_common_api.reset(
+    tx2_dac_api.reset(
       .ce_n(0),
       .mmcm_rstn(0),
       .rstn(0));
@@ -464,36 +440,36 @@ program test_program;
 
     link_setup();
     // enable test data for TX1
-    tx1_channel_dac_api.set_channel_control_7(
+    tx1_dac_api.set_channel_control_7(
       .channel(CH0),
       .dds_sel(tx_pattern_map[pattern]));
-    tx1_channel_dac_api.set_channel_control_7(
+    tx1_dac_api.set_channel_control_7(
       .channel(CH2),
       .dds_sel(tx_pattern_map[pattern]));
     if (!SYMB_OP[0]) begin
-      tx1_channel_dac_api.set_channel_control_7(
+      tx1_dac_api.set_channel_control_7(
         .channel(CH1),
         .dds_sel(tx_pattern_map[pattern]));
-      tx1_channel_dac_api.set_channel_control_7(
+      tx1_dac_api.set_channel_control_7(
         .channel(CH3),
         .dds_sel(tx_pattern_map[pattern]));
     end
 
     // enable test data check for RX1
-    rx1_channel_adc_api.set_channel_control_3(
+    rx1_adc_api.set_channel_control_3(
       .channel(CH0),
       .pn_sel(rx_pattern_map[pattern]),
       .data_sel(4'h0));
-    rx1_channel_adc_api.set_channel_control_3(
+    rx1_adc_api.set_channel_control_3(
       .channel(CH2),
       .pn_sel(rx_pattern_map[pattern]),
       .data_sel(4'h0));
     if (!SYMB_OP[0]) begin
-      rx1_channel_adc_api.set_channel_control_3(
+      rx1_adc_api.set_channel_control_3(
         .channel(CH1),
         .pn_sel(rx_pattern_map[pattern]),
         .data_sel(4'h0));
-      rx1_channel_adc_api.set_channel_control_3(
+      rx1_adc_api.set_channel_control_3(
         .channel(CH3),
         .pn_sel(rx_pattern_map[pattern]),
         .data_sel(4'h0));
@@ -503,17 +479,17 @@ program test_program;
     #15000;
 
     // clear PN OOS and PN ERR
-    rx1_channel_adc_api.clear_channel_status(CH0);
-    rx1_channel_adc_api.clear_channel_status(CH2);
+    rx1_adc_api.clear_channel_status(CH0);
+    rx1_adc_api.clear_channel_status(CH2);
     if (!SYMB_OP[0]) begin
-      rx1_channel_adc_api.clear_channel_status(CH1);
-      rx1_channel_adc_api.clear_channel_status(CH3);
+      rx1_adc_api.clear_channel_status(CH1);
+      rx1_adc_api.clear_channel_status(CH3);
     end
 
     #10000;
 
     // check PN OOS and PN ERR flags
-    rx1_adc_common_api.get_status(status);
+    rx1_adc_api.get_status(status);
     if (status != 1'b1) begin
       `ERROR(("ADC Common Status error!"));
     end
@@ -533,77 +509,77 @@ program test_program;
     link_setup();
 
     // Select DDS as source
-    tx1_channel_dac_api.set_channel_control_7(
+    tx1_dac_api.set_channel_control_7(
       .channel(CH0),
       .dds_sel(4'h0));
-    tx1_channel_dac_api.set_channel_control_7(
+    tx1_dac_api.set_channel_control_7(
       .channel(CH2),
       .dds_sel(4'h0));
     if (!SYMB_OP[0]) begin
-      tx1_channel_dac_api.set_channel_control_7(
+      tx1_dac_api.set_channel_control_7(
         .channel(CH1),
         .dds_sel(4'h0));
-      tx1_channel_dac_api.set_channel_control_7(
+      tx1_dac_api.set_channel_control_7(
         .channel(CH3),
         .dds_sel(4'h0));
     end
 
     // enable normal data path for RX1
-    rx1_channel_adc_api.set_channel_control_3(
+    rx1_adc_api.set_channel_control_3(
       .channel(CH0),
       .pn_sel(4'h0),
       .data_sel(4'h0));
-    rx1_channel_adc_api.set_channel_control_3(
+    rx1_adc_api.set_channel_control_3(
       .channel(CH2),
       .pn_sel(4'h0),
       .data_sel(4'h0));
     if (!SYMB_OP[0]) begin
-      rx1_channel_adc_api.set_channel_control_3(
+      rx1_adc_api.set_channel_control_3(
         .channel(CH1),
         .pn_sel(4'h0),
         .data_sel(4'h0));
-      rx1_channel_adc_api.set_channel_control_3(
+      rx1_adc_api.set_channel_control_3(
         .channel(CH3),
         .pn_sel(4'h0),
         .data_sel(4'h0));
     end
 
     // Configure tone amplitude and frequency
-    tx1_channel_dac_api.set_channel_control_1(
+    tx1_dac_api.set_channel_control_1(
       .channel(CH0),
       .dds_scale_1(16'h0fff));
-    tx1_channel_dac_api.set_channel_control_1(
+    tx1_dac_api.set_channel_control_1(
       .channel(CH2),
       .dds_scale_1(16'h07ff));
     if (!SYMB_OP[0]) begin
-      tx1_channel_dac_api.set_channel_control_1(
+      tx1_dac_api.set_channel_control_1(
         .channel(CH1),
         .dds_scale_1(16'h03ff));
-      tx1_channel_dac_api.set_channel_control_1(
+      tx1_dac_api.set_channel_control_1(
         .channel(CH3),
         .dds_scale_1(16'h01ff));
     end
-    tx1_channel_dac_api.set_channel_control_2(
+    tx1_dac_api.set_channel_control_2(
       .channel(CH0),
       .dds_init_1(16'h0),
       .dds_incr_1(16'h0100));
-    tx1_channel_dac_api.set_channel_control_2(
+    tx1_dac_api.set_channel_control_2(
       .channel(CH2),
       .dds_init_1(16'h0),
       .dds_incr_1(16'h0200));
     if (!SYMB_OP[0]) begin
-      tx1_channel_dac_api.set_channel_control_2(
+      tx1_dac_api.set_channel_control_2(
         .channel(CH1),
         .dds_init_1(16'h0),
         .dds_incr_1(16'h0400));
-      tx1_channel_dac_api.set_channel_control_2(
+      tx1_dac_api.set_channel_control_2(
         .channel(CH3),
         .dds_init_1(16'h0),
         .dds_incr_1(16'h0800));
     end
 
     // Enable Rx channel, enable sign extension
-    rx1_channel_adc_api.set_channel_control(
+    rx1_adc_api.set_channel_control(
       .channel(CH0),
       .adc_lb_owr(1'b0),
       .adc_pn_sel_owr(1'b0),
@@ -614,7 +590,7 @@ program test_program;
       .format_enable(1'b1),
       .adc_pn_type_owr(1'b0),
       .enable(1'b1));
-    rx1_channel_adc_api.set_channel_control(
+    rx1_adc_api.set_channel_control(
       .channel(CH2),
       .adc_lb_owr(1'b0),
       .adc_pn_sel_owr(1'b0),
@@ -626,7 +602,7 @@ program test_program;
       .adc_pn_type_owr(1'b0),
       .enable(1'b1));
     if (!SYMB_OP[0]) begin
-      rx1_channel_adc_api.set_channel_control(
+      rx1_adc_api.set_channel_control(
         .channel(CH1),
         .adc_lb_owr(1'b0),
         .adc_pn_sel_owr(1'b0),
@@ -637,7 +613,7 @@ program test_program;
         .format_enable(1'b1),
         .adc_pn_type_owr(1'b0),
         .enable(1'b1));
-      rx1_channel_adc_api.set_channel_control(
+      rx1_adc_api.set_channel_control(
         .channel(CH3),
         .adc_lb_owr(1'b0),
         .adc_pn_sel_owr(1'b0),
@@ -651,7 +627,7 @@ program test_program;
     end
 
     // SYNC DAC channels
-    tx1_dac_common_api.set_common_control_1(
+    tx1_dac_api.set_common_control_1(
       .sync(1'b1),
       .ext_sync_arm(1'b0),
       .ext_sync_disarm(1'b0),
@@ -695,43 +671,43 @@ program test_program;
     tx1_dmac_api.transfer_start();
 
     // Select DMA as source
-    tx1_channel_dac_api.set_channel_control_7(
+    tx1_dac_api.set_channel_control_7(
       .channel(CH0),
       .dds_sel(4'h2));
-    tx1_channel_dac_api.set_channel_control_7(
+    tx1_dac_api.set_channel_control_7(
       .channel(CH2),
       .dds_sel(4'h2));
     if (!SYMB_OP[0]) begin
-      tx1_channel_dac_api.set_channel_control_7(
+      tx1_dac_api.set_channel_control_7(
         .channel(CH1),
         .dds_sel(4'h2));
-      tx1_channel_dac_api.set_channel_control_7(
+      tx1_dac_api.set_channel_control_7(
         .channel(CH3),
         .dds_sel(4'h2));
     end
 
     // enable normal data path for RX1
-    rx1_channel_adc_api.set_channel_control_3(
+    rx1_adc_api.set_channel_control_3(
       .channel(CH0),
       .pn_sel(4'h0),
       .data_sel(4'h0));
-    rx1_channel_adc_api.set_channel_control_3(
+    rx1_adc_api.set_channel_control_3(
       .channel(CH2),
       .pn_sel(4'h0),
       .data_sel(4'h0));
     if (!SYMB_OP[0]) begin
-      rx1_channel_adc_api.set_channel_control_3(
+      rx1_adc_api.set_channel_control_3(
         .channel(CH1),
         .pn_sel(4'h0),
         .data_sel(4'h0));
-      rx1_channel_adc_api.set_channel_control_3(
+      rx1_adc_api.set_channel_control_3(
         .channel(CH3),
         .pn_sel(4'h0),
         .data_sel(4'h0));
     end
 
     // Enable Rx channel, enable sign extension
-    rx1_channel_adc_api.set_channel_control(
+    rx1_adc_api.set_channel_control(
       .channel(CH0),
       .adc_lb_owr(1'b0),
       .adc_pn_sel_owr(1'b0),
@@ -742,7 +718,7 @@ program test_program;
       .format_enable(1'b1),
       .adc_pn_type_owr(1'b0),
       .enable(1'b1));
-    rx1_channel_adc_api.set_channel_control(
+    rx1_adc_api.set_channel_control(
       .channel(CH2),
       .adc_lb_owr(1'b0),
       .adc_pn_sel_owr(1'b0),
@@ -754,7 +730,7 @@ program test_program;
       .adc_pn_type_owr(1'b0),
       .enable(1'b1));
     if (!SYMB_OP[0]) begin
-      rx1_channel_adc_api.set_channel_control(
+      rx1_adc_api.set_channel_control(
         .channel(CH1),
         .adc_lb_owr(1'b0),
         .adc_pn_sel_owr(1'b0),
@@ -765,7 +741,7 @@ program test_program;
         .format_enable(1'b1),
         .adc_pn_type_owr(1'b0),
         .enable(1'b1));
-      rx1_channel_adc_api.set_channel_control(
+      rx1_adc_api.set_channel_control(
         .channel(CH3),
         .adc_lb_owr(1'b0),
         .adc_pn_sel_owr(1'b0),
@@ -779,7 +755,7 @@ program test_program;
     end
 
     // SYNC DAC channels
-    tx1_dac_common_api.set_common_control_1(
+    tx1_dac_api.set_common_control_1(
       .sync(1'b1),
       .ext_sync_arm(1'b0),
       .ext_sync_disarm(1'b0),
@@ -852,17 +828,17 @@ program test_program;
     tx2_dmac_api.transfer_start();
 
     // Select DDS as source
-    tx2_channel_dac_api.set_channel_control_7(
+    tx2_dac_api.set_channel_control_7(
       .channel(CH0),
       .dds_sel(4'h2));
     if (!SYMB_OP[0]) begin
-      tx2_channel_dac_api.set_channel_control_7(
+      tx2_dac_api.set_channel_control_7(
         .channel(CH1),
         .dds_sel(4'h2));
     end
 
     // Enable Rx channel, enable sign extension
-    rx2_channel_adc_api.set_channel_control(
+    rx2_adc_api.set_channel_control(
       .channel(CH0),
       .adc_lb_owr(1'b0),
       .adc_pn_sel_owr(1'b0),
@@ -874,7 +850,7 @@ program test_program;
       .adc_pn_type_owr(1'b0),
       .enable(1'b1));
     if (!SYMB_OP[0]) begin
-      rx2_channel_adc_api.set_channel_control(
+      rx2_adc_api.set_channel_control(
         .channel(CH1),
         .adc_lb_owr(1'b0),
         .adc_pn_sel_owr(1'b0),
@@ -888,7 +864,7 @@ program test_program;
     end
 
     // SYNC DAC channels
-    tx2_dac_common_api.set_common_control_1(
+    tx2_dac_api.set_common_control_1(
       .sync(1'b1),
       .ext_sync_arm(1'b0),
       .ext_sync_disarm(1'b0),

@@ -31,14 +31,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="8.376001 us"></ZoomEndTime>
-      <Cursor1Time time="5.305000 us"></Cursor1Time>
+      <ZoomEndTime time="8.088001 us"></ZoomEndTime>
+      <Cursor1Time time="8.088000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="145"></NameColumnWidth>
+      <NameColumnWidth column_width="137"></NameColumnWidth>
       <ValueColumnWidth column_width="60"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="9" />
+   <WVObjectSize size="8" />
    <wvobject type="logic" fp_name="/system_tb/test_harness/input_vip/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -90,6 +90,10 @@
          <obj_property name="ElementShortName">rstn</obj_property>
          <obj_property name="ObjectShortName">rstn</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_gen_dut/init">
+         <obj_property name="ElementShortName">init</obj_property>
+         <obj_property name="ObjectShortName">init</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_gen_dut/inst/input_ready">
          <obj_property name="ElementShortName">input_ready</obj_property>
          <obj_property name="ObjectShortName">input_ready</obj_property>
@@ -114,92 +118,56 @@
          <obj_property name="ElementShortName">initial_value[31:0]</obj_property>
          <obj_property name="ObjectShortName">initial_value[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_gen_dut/inst/internal_data">
-         <obj_property name="ElementShortName">internal_data[31:0]</obj_property>
-         <obj_property name="ObjectShortName">internal_data[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_gen_dut/inst/calculated_prbs_data">
-         <obj_property name="ElementShortName">calculated_prbs_data[31:0]</obj_property>
-         <obj_property name="ObjectShortName">calculated_prbs_data[31:0]</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group39">
       <obj_property name="label">PRBS_MON_SAMPLE</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/clk">
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut/clk">
          <obj_property name="ElementShortName">clk</obj_property>
          <obj_property name="ObjectShortName">clk</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/rstn">
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut/rstn">
          <obj_property name="ElementShortName">rstn</obj_property>
          <obj_property name="ObjectShortName">rstn</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/input_data">
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut/init">
+         <obj_property name="ElementShortName">init</obj_property>
+         <obj_property name="ObjectShortName">init</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut/input_data">
          <obj_property name="ElementShortName">input_data[31:0]</obj_property>
          <obj_property name="ObjectShortName">input_data[31:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/input_valid">
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut/input_valid">
          <obj_property name="ElementShortName">input_valid</obj_property>
          <obj_property name="ObjectShortName">input_valid</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/error">
-         <obj_property name="ElementShortName">error[0:0]</obj_property>
-         <obj_property name="ObjectShortName">error[0:0]</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut/error_sample">
+         <obj_property name="ElementShortName">error_sample</obj_property>
+         <obj_property name="ObjectShortName">error_sample</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/out_of_sync">
-         <obj_property name="ElementShortName">out_of_sync</obj_property>
-         <obj_property name="ObjectShortName">out_of_sync</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/polynomial">
-         <obj_property name="ElementShortName">polynomial[30:0]</obj_property>
-         <obj_property name="ObjectShortName">polynomial[30:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_sample/inverted">
-         <obj_property name="ElementShortName">inverted</obj_property>
-         <obj_property name="ObjectShortName">inverted</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group48">
-      <obj_property name="label">PRBS_MON_BIT</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/clk">
-         <obj_property name="ElementShortName">clk</obj_property>
-         <obj_property name="ObjectShortName">clk</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/rstn">
-         <obj_property name="ElementShortName">rstn</obj_property>
-         <obj_property name="ObjectShortName">rstn</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/input_data">
-         <obj_property name="ElementShortName">input_data[31:0]</obj_property>
-         <obj_property name="ObjectShortName">input_data[31:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/input_valid">
-         <obj_property name="ElementShortName">input_valid</obj_property>
-         <obj_property name="ObjectShortName">input_valid</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/error">
-         <obj_property name="ElementShortName">error[5:0]</obj_property>
-         <obj_property name="ObjectShortName">error[5:0]</obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut/error_bit">
+         <obj_property name="ElementShortName">error_bit[5:0]</obj_property>
+         <obj_property name="ObjectShortName">error_bit[5:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/out_of_sync">
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut/out_of_sync">
          <obj_property name="ElementShortName">out_of_sync</obj_property>
          <obj_property name="ObjectShortName">out_of_sync</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/polynomial">
+      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut/inst/out_of_sync_total_error_bit">
+         <obj_property name="ElementShortName">out_of_sync_total_error_bit[23:0]</obj_property>
+         <obj_property name="ObjectShortName">out_of_sync_total_error_bit[23:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/prbs_mon_dut/polynomial">
          <obj_property name="ElementShortName">polynomial[30:0]</obj_property>
          <obj_property name="ObjectShortName">polynomial[30:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/inverted">
+      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut/inverted">
          <obj_property name="ElementShortName">inverted</obj_property>
          <obj_property name="ObjectShortName">inverted</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/prbs_mon_dut_bit/inst/state">
-         <obj_property name="ElementShortName">state</obj_property>
-         <obj_property name="ObjectShortName">state</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

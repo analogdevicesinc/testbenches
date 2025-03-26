@@ -58,12 +58,11 @@ program test_program;
 
   io_vip_if_base ready_vip_if;
   io_vip_if_base rstn_vip_if;
+  io_vip_if_base init_vip_if;
 
   io_vip_if_base error_sample_vip_if;
-  io_vip_if_base oos_sample_vip_if;
-
   io_vip_if_base error_bit_vip_if;
-  io_vip_if_base oos_bit_vip_if;
+  io_vip_if_base oos_vip_if;
 
   localparam MAX_WIDTH = `MAX(`DATA_WIDTH, `POLYNOMIAL_WIDTH);
 
@@ -107,12 +106,13 @@ program test_program;
 
     ready_vip_if = `TH.`READY_VIP.inst.inst.IF.vif;
     rstn_vip_if = `TH.`RSTN_VIP.inst.inst.IF.vif;
+    init_vip_if = `TH.`INIT_VIP.inst.inst.IF.vif;
 
     error_sample_vip_if = `TH.`ERROR_SAMPLE_VIP.inst.inst.IF.vif;
-    oos_sample_vip_if = `TH.`OOS_SAMPLE_VIP.inst.inst.IF.vif;
-
     error_bit_vip_if = `TH.`ERROR_BIT_VIP.inst.inst.IF.vif;
-    oos_bit_vip_if = `TH.`OOS_BIT_VIP.inst.inst.IF.vif;
+    oos_vip_if = `TH.`OOS_VIP.inst.inst.IF.vif;
+
+    init_vip_if.set_io(1'b0);
 
     base_env.start();
     base_env.sys_reset();
@@ -127,9 +127,9 @@ program test_program;
 
     error_insertion_verification();
 
-    resync_verification_sample();
+    resync_verification();
 
-    resync_verification_bit();
+    reinitialization_verification();
 
     base_env.stop();
 
@@ -235,11 +235,11 @@ program test_program;
 
     fork
       begin
-        force `TH.prbs_mon_dut_sample.input_data = $urandom();
+        force `TH.prbs_mon_dut.input_data = $urandom();
         repeat(1) begin
           polynomial_vip_if.wait_posedge_clk();
         end
-        release `TH.prbs_mon_dut_sample.input_data;
+        release `TH.prbs_mon_dut.input_data;
         polynomial_vip_if.wait_posedge_clk();
       end
       begin
@@ -251,8 +251,8 @@ program test_program;
       end
       begin
         fork
-          oos_sample_vip_if.wait_io_change();
-          if (oos_sample_vip_if.get_io()) begin
+          oos_vip_if.wait_io_change();
+          if (oos_vip_if.get_io()) begin
             `ERROR(("PRBS check: out of sync triggered!"));
           end
         join_none
@@ -269,74 +269,67 @@ program test_program;
     end
   endtask
 
-  task resync_verification_sample();
+  task resync_verification();
     `INFO(("Generator-monitor transmission error simulation and resynchronization verification"), ADI_VERBOSITY_LOW);
 
     fork
       begin
-        force `TH.prbs_mon_dut_sample.input_data = $urandom();
-        repeat(20) begin
+        force `TH.prbs_mon_dut.input_data = $urandom();
+        repeat(75) begin
           polynomial_vip_if.wait_posedge_clk();
         end
-        release `TH.prbs_mon_dut_sample.input_data;
+        release `TH.prbs_mon_dut.input_data;
         polynomial_vip_if.wait_posedge_clk();
       end
       begin
-        oos_sample_vip_if.wait_io_change();
-        if (oos_sample_vip_if.get_io()) begin
-          `INFO(("PRBS check: out of sync"), ADI_VERBOSITY_LOW);
+        oos_vip_if.wait_io_change();
+        if (oos_vip_if.get_io()) begin
+          `INFO(("PRBS check: forced out of sync"), ADI_VERBOSITY_LOW);
         end
       end
     join
 
-    oos_sample_vip_if.wait_io_change();
-    if (oos_sample_vip_if.get_io()) begin
+    oos_vip_if.wait_io_change();
+    if (oos_vip_if.get_io()) begin
       `INFO(("PRBS resynchronization after transmission is fixed"), ADI_VERBOSITY_LOW);
     end
-    oos_sample_vip_if.wait_io_change();
+    oos_vip_if.wait_io_change();
 
     repeat(100) begin
       error_sample_vip_if.wait_negedge_clk();
       if (error_sample_vip_if.get_io()) begin
         `ERROR(("PRBS check failed!"));
       end
-      polynomial_vip_if.wait_posedge_clk();
-    end
-  endtask
-
-  task resync_verification_bit();
-    `INFO(("Generator-monitor transmission error simulation and resynchronization verification"), ADI_VERBOSITY_LOW);
-
-    fork
-      begin
-        force `TH.prbs_mon_dut_bit.input_data = $urandom();
-        repeat(75) begin
-          polynomial_vip_if.wait_posedge_clk();
-        end
-        release `TH.prbs_mon_dut_bit.input_data;
-        polynomial_vip_if.wait_posedge_clk();
-      end
-      begin
-        oos_bit_vip_if.wait_io_change();
-        if (oos_bit_vip_if.get_io()) begin
-          `INFO(("PRBS check: out of sync"), ADI_VERBOSITY_LOW);
-        end
-      end
-    join
-
-    oos_bit_vip_if.wait_io_change();
-    if (oos_bit_vip_if.get_io()) begin
-      `INFO(("PRBS resynchronization after transmission is fixed"), ADI_VERBOSITY_LOW);
-    end
-    oos_bit_vip_if.wait_io_change();
-
-    repeat(100) begin
-      error_bit_vip_if.wait_negedge_clk();
       if (error_bit_vip_if.get_io()) begin
         `ERROR(("PRBS check failed!"));
       end
       polynomial_vip_if.wait_posedge_clk();
     end
+  endtask
+
+  task reinitialization_verification();
+    `INFO(("Generator-monitor reinitialization verification"), ADI_VERBOSITY_LOW);
+
+    fork
+      begin
+        init_vip_if.wait_posedge_clk();
+        init_vip_if.set_io(1'b1);
+        init_vip_if.wait_posedge_clk();
+        init_vip_if.set_io(1'b0);
+      end
+      begin
+        repeat(100) begin
+          error_sample_vip_if.wait_negedge_clk();
+          if (error_sample_vip_if.get_io()) begin
+            `ERROR(("PRBS check failed!"));
+          end
+          if (error_bit_vip_if.get_io()) begin
+            `ERROR(("PRBS check failed!"));
+          end
+          polynomial_vip_if.wait_posedge_clk();
+        end
+      end
+    join
   endtask
 
 endprogram

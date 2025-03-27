@@ -52,10 +52,6 @@ program test_program;
 
   parameter R1_MODE = 0;
 
-  // parameter CH0 = 8'h00 * 4;
-  // parameter CH1 = 8'h10 * 4;
-  // parameter CH2 = 8'h20 * 4;
-  // parameter CH3 = 8'h30 * 4;
   parameter CH0 = 8'h0;
   parameter CH1 = 8'h1;
   parameter CH2 = 8'h2;
@@ -308,7 +304,7 @@ program test_program;
 
     // check PN OOS and PN ERR flags
     rx_adc_api.get_status(status);
-    if (status != 1'b1) begin
+    if (status !== 1'b1) begin
       `ERROR(("ADC Common Status error!"));
     end
     link_down();
@@ -601,7 +597,7 @@ program test_program;
       .tlast(1'b1),
       .partial_reporting_en(1'b0));
     rx_dmac_api.set_lengths(
-      .xfer_length_x(32'h00000FFF),
+      .xfer_length_x(32'h000003FF),
       .xfer_length_y(32'h0));
     rx_dmac_api.set_dest_addr(`DDR_BA+32'h00002000);
     rx_dmac_api.transfer_start();

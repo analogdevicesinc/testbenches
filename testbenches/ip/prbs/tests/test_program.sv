@@ -54,6 +54,7 @@ program test_program;
 
   io_vip_if_base input_vip_if;
   io_vip_if_base output_vip_if;
+  io_vip_if_base state_vip_if;
   io_vip_if_base polynomial_vip_if;
 
   io_vip_if_base ready_vip_if;
@@ -61,7 +62,7 @@ program test_program;
   io_vip_if_base init_vip_if;
 
   io_vip_if_base error_sample_vip_if;
-  io_vip_if_base error_bit_vip_if;
+  io_vip_if_base error_bits_vip_if;
   io_vip_if_base oos_vip_if;
 
   localparam MAX_WIDTH = `MAX(`DATA_WIDTH, `POLYNOMIAL_WIDTH);
@@ -70,6 +71,7 @@ program test_program;
   logic [`DATA_WIDTH-1:0] output_data;
   logic [`DATA_WIDTH-1:0] calculated_data = 'h0;
   logic [`POLYNOMIAL_WIDTH-1:0] processed_data = 'h0;
+  logic [`POLYNOMIAL_WIDTH-1:0] state = 'h0;
 
   logic [`POLYNOMIAL_WIDTH-1:0] polynomial;
 
@@ -102,6 +104,7 @@ program test_program;
 
     input_vip_if = `TH.`INPUT_VIP.inst.inst.IF.vif;
     output_vip_if = `TH.`OUTPUT_VIP.inst.inst.IF.vif;
+    state_vip_if = `TH.`STATE_VIP.inst.inst.IF.vif;
     polynomial_vip_if = `TH.`POLYNOMIAL_VIP.inst.inst.IF.vif;
 
     ready_vip_if = `TH.`READY_VIP.inst.inst.IF.vif;
@@ -109,7 +112,7 @@ program test_program;
     init_vip_if = `TH.`INIT_VIP.inst.inst.IF.vif;
 
     error_sample_vip_if = `TH.`ERROR_SAMPLE_VIP.inst.inst.IF.vif;
-    error_bit_vip_if = `TH.`ERROR_BIT_VIP.inst.inst.IF.vif;
+    error_bits_vip_if = `TH.`ERROR_BITS_VIP.inst.inst.IF.vif;
     oos_vip_if = `TH.`OOS_VIP.inst.inst.IF.vif;
 
     init_vip_if.set_io(1'b0);
@@ -118,8 +121,6 @@ program test_program;
     base_env.sys_reset();
 
     verification_on_negedge();
-
-    #1ns;
 
     verification_on_posedge();
 
@@ -143,10 +144,11 @@ program test_program;
     polynomial_vip_if.set_io(polynomial);
 
     input_data = $urandom();
-    processed_data = {{MAX_WIDTH-`DATA_WIDTH{1'b0}}, input_data};
+    processed_data = input_data[`POLYNOMIAL_WIDTH-1:0];
 
     `INFO(("Negative edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_negative_edge();
+    state_vip_if.set_negative_edge();
     repeat(100) begin
       polynomial_vip_if.wait_posedge_clk();
 
@@ -155,18 +157,19 @@ program test_program;
       polynomial_vip_if.wait_negedge_clk();
 
       output_data = output_vip_if.get_io();
+      state = state_vip_if.get_io();
 
       // calculate PRBS
       for(int i=0; i<`DATA_WIDTH; i=i+1) begin
-        calculated_data[`DATA_WIDTH-i-1] = processed_data[`POLYNOMIAL_WIDTH-1];
         processed_data = {processed_data[`POLYNOMIAL_WIDTH-2:0], ^(polynomial & processed_data)};
+        calculated_data[`DATA_WIDTH-i-1] = processed_data[0];
       end
 
       if (output_data !== calculated_data) begin
         `ERROR(("Output PRBS: %0h | Calculated PRBS: %0h", output_data, calculated_data));
       end
 
-      input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data};
+      input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, state};
     end
   endtask
 
@@ -175,10 +178,11 @@ program test_program;
     polynomial_vip_if.set_io(polynomial);
 
     input_data = $urandom();
-    processed_data = {{MAX_WIDTH-`DATA_WIDTH{1'b0}}, input_data};
+    processed_data = input_data[`POLYNOMIAL_WIDTH-1:0];
 
     `INFO(("Positive edge verification"), ADI_VERBOSITY_LOW);
     output_vip_if.set_positive_edge();
+    state_vip_if.set_positive_edge();
     repeat(100) begin
       polynomial_vip_if.wait_negedge_clk();
 
@@ -187,18 +191,19 @@ program test_program;
       polynomial_vip_if.wait_posedge_clk();
 
       output_data = output_vip_if.get_io();
+      state = state_vip_if.get_io();
 
       // calculate PRBS
       for(int i=0; i<`DATA_WIDTH; i=i+1) begin
-        calculated_data[`DATA_WIDTH-i-1] = processed_data[`POLYNOMIAL_WIDTH-1];
         processed_data = {processed_data[`POLYNOMIAL_WIDTH-2:0], ^(polynomial & processed_data)};
+        calculated_data[`DATA_WIDTH-i-1] = processed_data[0];
       end
 
       if (output_data !== calculated_data) begin
         `ERROR(("Output PRBS: %0h | Calculated PRBS: %0h", output_data, calculated_data));
       end
 
-      input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, processed_data};
+      input_data = {{MAX_WIDTH-`POLYNOMIAL_WIDTH{1'b0}}, state};
     end
   endtask
 
@@ -207,7 +212,6 @@ program test_program;
     polynomial_vip_if.set_io(polynomial);
 
     input_data = $urandom();
-    processed_data = {{MAX_WIDTH-`DATA_WIDTH{1'b0}}, input_data};
 
     `INFO(("Generator-monitor verification"), ADI_VERBOSITY_LOW);
 
@@ -300,7 +304,7 @@ program test_program;
       if (error_sample_vip_if.get_io()) begin
         `ERROR(("PRBS check failed!"));
       end
-      if (error_bit_vip_if.get_io()) begin
+      if (error_bits_vip_if.get_io()) begin
         `ERROR(("PRBS check failed!"));
       end
       polynomial_vip_if.wait_posedge_clk();
@@ -323,7 +327,7 @@ program test_program;
           if (error_sample_vip_if.get_io()) begin
             `ERROR(("PRBS check failed!"));
           end
-          if (error_bit_vip_if.get_io()) begin
+          if (error_bits_vip_if.get_io()) begin
             `ERROR(("PRBS check failed!"));
           end
           polynomial_vip_if.wait_posedge_clk();

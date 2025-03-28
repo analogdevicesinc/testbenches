@@ -40,8 +40,6 @@ set POLYNOMIAL_WIDTH $ad_project_params(POLYNOMIAL_WIDTH)
 
 # Add design sources to the project
 add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs.v"
-add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs_gen.v"
-add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs_mon.v"
 
 create_bd_cell -type module -reference prbs prbs_dut
 
@@ -70,6 +68,17 @@ adi_sim_add_define "OUTPUT_VIP=output_vip"
 ad_connect output_vip/clk sys_cpu_clk
 ad_connect output_vip/i prbs_dut/output_data
 
+# create state VIP
+ad_ip_instance io_vip state_vip [ list \
+  MODE 0 \
+  WIDTH $POLYNOMIAL_WIDTH \
+  ASYNC 0 \
+]
+adi_sim_add_define "STATE_VIP=state_vip"
+
+ad_connect state_vip/clk sys_cpu_clk
+ad_connect state_vip/i prbs_dut/state
+
 # create polynomial VIP
 ad_ip_instance io_vip polynomial_vip [ list \
   MODE 1 \
@@ -84,12 +93,16 @@ ad_connect polynomial_vip/o prbs_dut/polynomial
 ad_connect GND prbs_dut/inverted
 
 # generator
+add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs_gen.v"
+
 create_bd_cell -type module -reference prbs_gen prbs_gen_dut
 
 ad_ip_parameter prbs_gen_dut CONFIG.DATA_WIDTH $DATA_WIDTH
 ad_ip_parameter prbs_gen_dut CONFIG.POLYNOMIAL_WIDTH $POLYNOMIAL_WIDTH
 
 # monitor
+add_files -norecurse "$ad_hdl_dir/library/corundum/application_core/prbs_mon.v"
+
 create_bd_cell -type module -reference prbs_mon prbs_mon_dut
 
 ad_ip_parameter prbs_mon_dut CONFIG.DATA_WIDTH $DATA_WIDTH
@@ -136,12 +149,12 @@ ad_ip_instance io_vip oos_vip [ list \
 adi_sim_add_define "OOS_VIP=oos_vip"
 
 # create error VIP
-ad_ip_instance io_vip error_bit_vip [ list \
+ad_ip_instance io_vip error_bits_vip [ list \
   MODE 0 \
   WIDTH 1 \
   ASYNC 0 \
 ]
-adi_sim_add_define "ERROR_BIT_VIP=error_bit_vip"
+adi_sim_add_define "ERROR_BITS_VIP=error_bits_vip"
 
 ad_connect prbs_gen_dut/clk sys_cpu_clk
 ad_connect prbs_mon_dut/clk sys_cpu_clk
@@ -149,13 +162,13 @@ ad_connect ready_vip/clk sys_cpu_clk
 ad_connect rstn_vip/clk sys_cpu_clk
 ad_connect init_vip/clk sys_cpu_clk
 ad_connect error_sample_vip/clk sys_cpu_clk
-ad_connect error_bit_vip/clk sys_cpu_clk
+ad_connect error_bits_vip/clk sys_cpu_clk
 ad_connect oos_vip/clk sys_cpu_clk
 
 ad_connect ready_vip/o prbs_gen_dut/input_ready
 ad_connect input_vip/o prbs_gen_dut/initial_value
 ad_connect error_sample_vip/i prbs_mon_dut/error_sample
-ad_connect error_bit_vip/i prbs_mon_dut/error_bit
+ad_connect error_bits_vip/i prbs_mon_dut/error_bits
 ad_connect oos_vip/i prbs_mon_dut/out_of_sync
 
 ad_connect prbs_gen_dut/output_valid prbs_mon_dut/input_valid

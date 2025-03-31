@@ -339,7 +339,7 @@ ad_ip_instance io_vip enable_io_vip [list \
 ]
 adi_sim_add_define "EN_IO=enable_io_vip"
 
-ad_ip_instance axi4stream_vip src_axis [list \
+ad_ip_instance axi4stream_vip jesd_tx_axis [list \
   INTERFACE_MODE {MASTER} \
   HAS_TREADY 0 \
   HAS_TLAST 0 \
@@ -348,12 +348,12 @@ ad_ip_instance axi4stream_vip src_axis [list \
   TDEST_WIDTH 0 \
   TID_WIDTH 0 \
 ]
-adi_sim_add_define "SRC_AXIS=src_axis"
+adi_sim_add_define "JESD_TX_AXIS=jesd_tx_axis"
 
-ad_connect input_clk src_axis/aclk
-ad_connect input_resetn src_axis/aresetn
+ad_connect input_clk jesd_tx_axis/aclk
+ad_connect input_resetn jesd_tx_axis/aresetn
 
-ad_ip_instance axi4stream_vip os_axis [list \
+ad_ip_instance axi4stream_vip os_tx_axis [list \
   INTERFACE_MODE {MASTER} \
   HAS_TREADY 1 \
   HAS_TLAST 1 \
@@ -362,18 +362,26 @@ ad_ip_instance axi4stream_vip os_axis [list \
   TDEST_WIDTH 0 \
   TID_WIDTH 0 \
 ]
-adi_sim_add_define "OS_AXIS=os_axis"
+adi_sim_add_define "OS_TX_AXIS=os_tx_axis"
 
-ad_connect corundum_clk os_axis/aclk
-ad_connect corundum_resetn os_axis/aresetn
+ad_connect corundum_clk os_tx_axis/aclk
+ad_connect corundum_resetn os_tx_axis/aresetn
 
-ad_ip_instance axi4stream_vip dst_axis [list \
+ad_ip_instance axi4stream_vip jesd_rx_axis [list \
   INTERFACE_MODE {SLAVE} \
 ]
-adi_sim_add_define "DST_AXIS=dst_axis"
+adi_sim_add_define "JESD_RX_AXIS=jesd_rx_axis"
 
-ad_connect corundum_clk dst_axis/aclk
-ad_connect corundum_resetn dst_axis/aresetn
+ad_connect input_clk jesd_rx_axis/aclk
+ad_connect input_resetn jesd_rx_axis/aresetn
+
+ad_ip_instance axi4stream_vip os_rx_axis [list \
+  INTERFACE_MODE {SLAVE} \
+]
+adi_sim_add_define "OS_RX_AXIS=os_rx_axis"
+
+ad_connect corundum_clk os_rx_axis/aclk
+ad_connect corundum_resetn os_rx_axis/aresetn
 
 ad_ip_instance util_cpack2 input_cpack [ list \
   NUM_OF_CHANNELS $INPUT_CHANNELS \
@@ -402,11 +410,11 @@ for {set i 0} {$i < $INPUT_CHANNELS} {incr i} {
     DOUT_WIDTH [expr $INPUT_WIDTH/$INPUT_CHANNELS] \
   ]
 
-  ad_connect data_slice_${i}/Din src_axis/m_axis_tdata
+  ad_connect data_slice_${i}/Din jesd_tx_axis/m_axis_tdata
   ad_connect data_slice_${i}/Dout input_cpack/fifo_wr_data_${i}
 }
 
-ad_connect input_cpack/fifo_wr_en src_axis/m_axis_tvalid
+ad_connect input_cpack/fifo_wr_en jesd_tx_axis/m_axis_tvalid
 
 # Application connections
 
@@ -429,8 +437,13 @@ ad_connect application_core/input_axis_tdata input_cpack/packed_fifo_wr_data
 ad_connect application_core/input_axis_tvalid input_cpack/packed_fifo_wr_en
 ad_connect application_core/input_axis_tready input_cpack/packed_fifo_wr_overflow
 
-ad_connect application_core/m_axis_sync_tx dst_axis/S_AXIS
-ad_connect application_core/s_axis_sync_tx os_axis/M_AXIS
+ad_connect application_core/s_axis_sync_tx os_tx_axis/M_AXIS
+ad_connect application_core/m_axis_sync_tx application_core/s_axis_direct_tx
+ad_connect application_core/m_axis_direct_tx application_core/s_axis_direct_rx
+ad_connect application_core/m_axis_direct_rx application_core/s_axis_sync_rx
+ad_connect application_core/m_axis_sync_rx os_rx_axis/S_AXIS
+
+ad_connect application_core/output_axis jesd_rx_axis/S_AXIS
 
 ad_connect enable_io_vip/clk input_clk
 ad_connect enable_io_vip/out application_core/input_enable

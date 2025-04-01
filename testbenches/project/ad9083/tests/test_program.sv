@@ -72,7 +72,7 @@ program test_program;
 
   initial begin
 
-    //creating environment
+    // Create environment
     base_env = new("Base Environment",
                     `TH.`SYS_CLK.inst.IF,
                     `TH.`DMA_CLK.inst.IF,
@@ -109,7 +109,7 @@ program test_program;
     // Configure Transport Layer for DDS
     //
 
-    // Enable Rx channel
+    // Enable RX channel
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
                        `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
 
@@ -123,7 +123,7 @@ program test_program;
                        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INIT_1(16'h0000)|
                        `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
 
-    // Pull out TPL cores from reset
+    // Pull TPL cores out of reset
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_RSTN),
                        `SET_DAC_COMMON_REG_RSTN_MMCM_RSTN(1)|
                        `SET_DAC_COMMON_REG_RSTN_RSTN(1));
@@ -139,25 +139,25 @@ program test_program;
     // Configure TX Link Layer
     //
 
-    //LINK DISABLE
+    // LINK DISABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_DISABLE),
                        `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(1));
 
-    //SYSREFCONF
+    // SYSREFCONF
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_SYSREF_CONF),
                        `SET_JESD_TX_SYSREF_CONF_SYSREF_DISABLE(0)); // Enable SYSREF handling
 
-    //CONF0
+    // CONF0
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_CONF0),
                        `SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(`TX_JESD_F-1)|
                        `SET_JESD_TX_LINK_CONF0_OCTETS_PER_MULTIFRAME(`TX_JESD_F*`TX_JESD_K-1));
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_CONF4),
                        `SET_JESD_TX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`TX_JESD_F*`TX_JESD_K)/TX_OUT_BYTES-1));
-    //CONF1
+    // CONF1
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_CONF1),
                        `SET_JESD_TX_LINK_CONF1_SCRAMBLER_DISABLE(0)); // Scrambler enable
 
-    //LINK ENABLE
+    // LINK ENABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_DISABLE),
                        `SET_JESD_TX_LINK_DISABLE_LINK_DISABLE(0));
 
@@ -165,30 +165,30 @@ program test_program;
     // Configure RX Link Layer
     //
 
-    //LINK DISABLE
+    // LINK DISABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(1));
 
-    //SYSREFCONF
+    // SYSREFCONF
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_SYSREF_CONF),
                        `SET_JESD_RX_SYSREF_CONF_SYSREF_DISABLE(0)); // Enable SYSREF handling
 
-    //CONF0
+    // CONF0
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_CONF0),
                        `SET_JESD_RX_LINK_CONF0_OCTETS_PER_FRAME(`RX_JESD_F-1)|
                        `SET_JESD_RX_LINK_CONF0_OCTETS_PER_MULTIFRAME(`RX_JESD_F*`RX_JESD_K-1));
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_CONF4),
                        `SET_JESD_RX_LINK_CONF4_TPL_BEATS_PER_MULTIFRAME((`RX_JESD_F*`RX_JESD_K)/RX_OUT_BYTES-1)); // Beats per multiframe
-    //CONF1
+    // CONF1
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_CONF1),
                        `SET_JESD_RX_LINK_CONF1_DESCRAMBLER_DISABLE(0)); // Scrambler enable
 
-    //LINK ENABLE
+    // LINK ENABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
 
-    //XCVR INIT
-    //REG CTRL
+    // XCVR INIT
+    // REG CTRL
     base_env.mng.sequencer.RegWrite32(`RX_XCVR_BA + GetAddrs(XCVR_CONTROL),
                        `SET_XCVR_CONTROL_LPM_DFE_N(1)|
                        `SET_XCVR_CONTROL_OUTCLK_SEL(4)); // RXOUTCLK uses DIV2
@@ -204,7 +204,7 @@ program test_program;
     // Give time the PLLs to lock
     #50us;
 
-    //Read status back
+    // Read status back
     // Check SYSREF_STATUS
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_SYSREF_STATUS),
                             `SET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(1));
@@ -218,7 +218,7 @@ program test_program;
                             `SET_JESD_TX_LINK_STATUS_STATUS_SYNC(1)|
                             `SET_JESD_TX_LINK_STATUS_STATUS_STATE(3));
 
-    //LINK DISABLE
+    // LINK DISABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(1));
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_DISABLE),
@@ -244,7 +244,7 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_MMCM_RSTN(1)|
                        `SET_ADC_COMMON_REG_RSTN_RSTN(0));
-    // Pull out TPL cores from reset
+    // Pull TPL cores out of reset
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_RSTN),
                        `SET_DAC_COMMON_REG_RSTN_MMCM_RSTN(1)|
                        `SET_DAC_COMMON_REG_RSTN_RSTN(1));
@@ -285,7 +285,7 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer
 
-    //LINK ENABLE
+    // LINK ENABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_DISABLE),
@@ -293,7 +293,7 @@ program test_program;
 
     #25us;
 
-    //Read status back
+    // Read status back
     // Check SYSREF_STATUS
     base_env.mng.sequencer.RegReadVerify32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_SYSREF_STATUS),
                             `SET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(1));
@@ -322,7 +322,7 @@ program test_program;
     );
 
 
-    //LINK DISABLE
+    // LINK DISABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(1));
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_DISABLE),
@@ -358,7 +358,7 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                        `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
-    //LINK ENABLE
+    // LINK ENABLE
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_RX_BA + GetAddrs(JESD_RX_LINK_DISABLE),
                        `SET_JESD_RX_LINK_DISABLE_LINK_DISABLE(0));
     base_env.mng.sequencer.RegWrite32(`AXI_JESD_TX_BA + GetAddrs(JESD_TX_LINK_DISABLE),

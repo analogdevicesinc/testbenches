@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2018 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2018, 2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -237,10 +237,21 @@ ad_connect vip_device_clk dac_jesd204_transport/link_clk
 
 make_bd_pins_external  [get_bd_pins /dac_jesd204_transport/dac_dunf]
 
-ad_cpu_interconnect 0x44b60000 dac_jesd204_xcvr
-ad_cpu_interconnect 0x44b90000 dac_jesd204_link
-ad_cpu_interconnect 0x44b10000 dac_jesd204_transport
-ad_cpu_interconnect 0x7c430000 axi_ad9083_tx_dma
+set TX_XCVR 0x44B60000
+ad_cpu_interconnect $TX_XCVR dac_jesd204_xcvr
+adi_sim_add_define "TX_XCVR_BA=[format "%d" ${TX_XCVR}]"
+
+set AXI_JESD_TX 0x44B90000
+ad_cpu_interconnect $AXI_JESD_TX dac_jesd204_link
+adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
+
+set DAC_TPL 0x44B10000
+ad_cpu_interconnect $DAC_TPL dac_jesd204_transport
+adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"
+
+set TX_DMA 0x7C430000
+ad_cpu_interconnect $TX_DMA axi_ad9083_tx_dma
+adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
 
 #
 #  Block design under test
@@ -264,18 +275,3 @@ set ADC_TPL 0x44A00000
 set_property offset $ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_ad9083_tpl_core}]
 adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
 
-set TX_DMA 0x7C430000
-set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad9083_tx_dma}]
-adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
-
-set TX_XCVR 0x44B60000
-set_property offset $TX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_xcvr}]
-adi_sim_add_define "TX_XCVR_BA=[format "%d" ${TX_XCVR}]"
-
-set AXI_JESD_TX 0x44B90000
-set_property offset $AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_link}]
-adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
-
-set DAC_TPL 0x44B10000
-set_property offset $DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dac_jesd204_transport}]
-adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"

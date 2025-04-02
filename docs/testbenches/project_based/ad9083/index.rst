@@ -35,10 +35,12 @@ Configuration parameters and modes
 The following parameters of this testbench that can be configured:
 
 - JESD_MODE: used link layer encoder mode
+
   - 64B66B - 64b66b link layer defined in JESD204C, uses AMD IP as Physical
     Layer
   - 8B10B - 8b10b link layer defined in JESD204B, uses ADI IP as Physical
     Layer
+
 - REF_CLK_RATE: the rate of the reference clock
 - RX_RATE: lane rate of the Rx link (to FPGA)
 - TX_RATE: lane rate of the Tx link (from FPGA)
@@ -71,58 +73,58 @@ The following configuration file is available:
    * - cfg1
      - JESD_MODE
      - 8B10B
-   * - 
+   * -
      - REF_CLK_RATE
      - 500
-   * - 
+   * -
      - RX_RATE
      - 10
-   * - 
+   * -
      - TX_RATE
      - 10
-   * - 
+   * -
      - RX_NUM_LINKS
      - 1
-   * - 
+   * -
      - RX_JESD_M
-     - 16                  
-   * - 
+     - 16
+   * -
      - RX_JESD_L
      - 4
-   * - 
+   * -
      - RX_JESD_S
      - 1
-   * - 
+   * -
      - RX_JESD_NP
-     - 16                  
-   * - 
+     - 16
+   * -
      - RX_JESD_F
      - 8
-   * - 
+   * -
      - RX_JESD_K
      - 32
-   * - 
+   * -
      - TX_NUM_LINKS
      - 1
-   * - 
+   * -
      - TX_JESD_M
-     - 16                  
-   * - 
+     - 16
+   * -
      - TX_JESD_L
      - 4
-   * - 
+   * -
      - TX_JESD_S
      - 1
-   * - 
+   * -
      - TX_JESD_NP
-     - 16                  
-   * - 
+     - 16
+   * -
      - TX_JESD_F
      - 8
-   * - 
+   * -
      - TX_JESD_K
-     - 32                   
-   
+     - 32
+
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -220,7 +222,7 @@ The steps of this test are:
     * Read status back
         * Check ``SYSREF_STATUS``
         * Check if the link is in ``DATA`` state and ``SYNC`` is 1
-    * Link disable    
+    * Link disable
 
 Test DAC FIFO path and RX DMA capture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -337,7 +339,7 @@ HDL related dependencies
    * - JESD204_TPL_ADC
      - :git-hdl:`library/jesd204/ad_ip_jesd204_tpl_adc`
      - :external+hdl:ref:`ad_ip_jesd204_tpl_adc`
-          
+
 Auxiliary HDL dependencies instantiated only in the testbench
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -357,10 +359,10 @@ Auxiliary HDL dependencies instantiated only in the testbench
    * - UTIL_ADCFIFO
      - :git-hdl:`library/util_adcfifo`
      - ---
-    * - UTIL_DACFIFO
+   * - UTIL_DACFIFO
      - :git-hdl:`library/util_dacfifo`
-     - ---    
-          
+     - ---
+
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -392,7 +394,7 @@ Testbench specific dependencies:
      - ---
    * - ADI_REGMAP_JESD_RX_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_jesd_rx_pkg.sv`
-     - ---     
+     - ---
    * - ADI_REGMAP_JESD_TX_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_jesd_tx_pkg.sv`
      - ---
@@ -404,7 +406,7 @@ Testbench specific dependencies:
      - ---
    * - ADI_XCVR_PKG
      - :git-testbenches:`library/drivers/xcvr/adi_xcvr_pkg.sv`
-     - ---        
+     - ---
    * - DMA_TRANS
      - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
      - ---

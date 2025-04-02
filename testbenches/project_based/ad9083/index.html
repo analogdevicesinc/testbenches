@@ -276,13 +276,11 @@ VIPs used for clocking, reset, PS and DDR simulations.</p>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
 <p>The following parameters of this testbench that can be configured:</p>
-<ul>
-<li><p>JESD_MODE: used link layer encoder mode
-- 64B66B - 64b66b link layer defined in JESD204C, uses AMD IP as Physical</p>
-<blockquote>
-<div><p>Layer</p>
-</div></blockquote>
 <ul class="simple">
+<li><p>JESD_MODE: used link layer encoder mode</p>
+<ul>
+<li><p>64B66B - 64b66b link layer defined in JESD204C, uses AMD IP as Physical
+Layer</p></li>
 <li><p>8B10B - 8b10b link layer defined in JESD204B, uses ADI IP as Physical
 Layer</p></li>
 </ul>
@@ -698,6 +696,39 @@ clean folder (no runs folder available):</p>
 </section>
 <section id="auxiliary-hdl-dependencies-instantiated-only-in-the-testbench">
 <h3>Auxiliary HDL dependencies instantiated only in the testbench<a class="headerlink" href="#auxiliary-hdl-dependencies-instantiated-only-in-the-testbench" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IP name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AXI_JESD204_TX</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/axi_jesd204_tx">library/jesd204/axi_jesd204_tx</a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/axi_jesd204_tx/index.html#axi-jesd204-tx" title="(in HDL)"><span>JESD204B/C Link Transmit Peripheral</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>JESD204_TPL_DAC</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/ad_ip_jesd204_tpl_dac">library/jesd204/ad_ip_jesd204_tpl_dac</a></p></td>
+<td><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/ad_ip_jesd204_tpl_dac/index.html#ad-ip-jesd204-tpl-dac" title="(in HDL)"><span>DAC JESD204B/C Transport Peripheral</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>UTIL_ADCFIFO</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_adcfifo">library/util_adcfifo</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>UTIL_DACFIFO</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_dacfifo">library/util_dacfifo</a></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 <section id="testbenches-related-dependencies">
 <h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>

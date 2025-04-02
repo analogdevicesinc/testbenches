@@ -100,6 +100,47 @@ The following are available configurations for the testbench:
    | cfg_cm1_sdi8_cz2_ddr1 | 1        | 8          | 2            | 1      |
    +-----------------------+----------+------------+--------------+--------+
 
+\**\* ALTERNATIVE VERSION IN CASE THE TABLE EXPANDS HORIZONTALLY FOR TOO LONG \**\*
+
+.. list-table::
+   :header-rows: 2
+
+   * - Configuration file
+     - Parameter
+     -
+     -
+     -
+   * -
+     - CLK_MODE
+     - NUM_OF_SDI
+     - CAPTURE_ZONE
+     - DDR_EN
+   * - cfg_cm0_sdi2_cz1_ddr0
+     - 0
+     - 2
+     - 1
+     - 0
+   * - cfg_cm0_sdi2_cz2_ddr0
+     - 0
+     - 2
+     - 2
+     - 0
+   * - cfg_cm0_sdi4_cz2_ddr0
+     - 0
+     - 4
+     - 2
+     - 0
+   * - cfg_cm0_sdi8_cz2_ddr0
+     - 0
+     - 8
+     - 2
+     - 0
+   * - cfg_cm1_sdi1_cz2_ddr0
+     - 1
+     - 1
+     - 2
+     - 0
+
 \**\* IF THERE ARE TOO MANY PARAMETERS AND THE TABLE DOESN'T LOOK GOOD WHEN
 BUILT, CONSIDER TRANSPOSING THE TABLE \**\*
 
@@ -331,6 +372,7 @@ HDL related dependencies
      - :external+hdl:ref:`axi_pwm_gen`
    * - AXI_SPDIF_TX
      - :git-hdl:`library/axi_spdif_tx <library/axi_spdif_tx>`
+     - ---
    * - AXI_SPI_ENGINE
      - :git-hdl:`library/spi_engine/axi_spi_engine <library/spi_engine/axi_spi_engine>`  **
      - :external+hdl:ref:`spi_engine axi`

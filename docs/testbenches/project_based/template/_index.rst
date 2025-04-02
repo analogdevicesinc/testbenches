@@ -177,13 +177,13 @@ Interrupts
 
 Below are the Programmable Logic interrupts used in this project:
 
-\**\* ADDRESS SPACE MUST BE SORTED ASCENDING BY BASE ADDRESS VALUE \**\*
+\**\* INTERRUPTS LIST MUST BE SORTED DESCENDING BY POSITION \**\*
 
 ===============  ===
 Instance name    HDL
 ===============  ===
-spi_ad7606 *     12
 axi_ad7606_dma   13
+spi_ad7606 *     12
 ===============  ===
 
 \**\* IN THE CASE OF MULTIPLE BLOCK DESIGNS WHERE INTERRUPT LOCATIONS CHANGE,

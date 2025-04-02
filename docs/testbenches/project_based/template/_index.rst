@@ -48,7 +48,7 @@ Configuration parameters and modes
 
 \**\* THIS IS JUST AN EXAMPLE \**\*
 
-The following parameter of this project that can be configured:
+The following parameters of this project that can be configured:
 
 -  CLK_MODE: defines clocking mode of the device's digital interface:
    Options: 0 - SPI mode, 1 - Echo-clock or Master clock mode
@@ -100,7 +100,8 @@ The following are available configurations for the testbench:
    | cfg_cm1_sdi8_cz2_ddr1 | 1        | 8          | 2            | 1      |
    +-----------------------+----------+------------+--------------+--------+
 
-\**\* IF THERE ARE TOO MANY PARAMETERS, CONSIDER TRANSPOSING THE TABLE \**\*
+\**\* IF THERE ARE TOO MANY PARAMETERS AND THE TABLE DOESN'T LOOK GOOD WHEN
+BUILT, CONSIDER TRANSPOSING THE TABLE \**\*
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -212,6 +213,13 @@ The steps of the environment bringup are:
 * Start the clocks
 * Assert the resets
 
+Sanity test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This test is used to check the communication with the AXI REGMAP module of the
+AD7606 SPI Engine interface, by reading the core VERSION register, along with
+writing and reading the SCRATCH register.
+
 Data acquisition test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -222,13 +230,6 @@ Data acquisition test
 * Submit a DMA transfer
 * Stop the PWM generator
 * Capture and compare the data
-
-Sanity test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This test is used to check the communication with the AXI REGMAP module of the
-AD7606 SPI Engine interface, by reading the core VERSION register, along with
-writing and reading the SCRATCH register.
 
 Building the testbench
 -------------------------------------------------------------------------------

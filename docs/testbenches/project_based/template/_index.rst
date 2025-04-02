@@ -15,7 +15,7 @@ page.**\ \*
 Block design
 -------------------------------------------------------------------------------
 
-**\*Mention the HDL and SV components of the testbench .**\ \*
+**\*Mention the HDL and SV source components that the testbench is using.**\ \*
 
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +38,7 @@ The data path and clock domains are depicted in the below diagram:
 
 \*\* MUST: Use SVG format for the diagram \*\*
 
-\*\* TIP: Block diagrams should contain subtitles only if there are at least two
+\*\* TIP: Block diagrams must contain subtitles only if there are at least two
 different diagrams \*\*
 
 Configuration parameters and modes
@@ -46,12 +46,9 @@ Configuration parameters and modes
 
 \**\* MENTION IF THERE ARE ANY CONFIGURATION PARAMETERS AND/OR MODES \**\*
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 \**\* THIS IS JUST AN EXAMPLE \**\*
 
-The following are the parameters of this project that can be configured:
+The following parameter of this project that can be configured:
 
 -  CLK_MODE: defines clocking mode of the device's digital interface:
    Options: 0 - SPI mode, 1 - Echo-clock or Master clock mode
@@ -69,7 +66,7 @@ The following are the parameters of this project that can be configured:
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-\**\* MENTION IF ANY CONFIGURATION FILES ARE AVAILABLE\**\*
+\**\* MENTION IF ANY CONFIGURATION FILES ARE AVAILABLE \**\*
 
 \**\* THIS IS JUST AN EXAMPLE \**\*
 
@@ -103,11 +100,12 @@ The following are available configurations for the testbench:
    | cfg_cm1_sdi8_cz2_ddr1 | 1        | 8          | 2            | 1      |
    +-----------------------+----------+------------+--------------+--------+
 
+\**\* IF THERE ARE TOO MANY PARAMETERS, CONSIDER TRANSPOSING THE TABLE \**\*
+
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-..
-   MENTION IF ANY MODES ARE AVAILABLE FOR TESTS
+\**\* THIS IS JUST AN EXAMPLE \**\*
 
 The following test program files are available:
 
@@ -121,6 +119,14 @@ test_program_pi Tests the serial interface capabilities.
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+\**\* THIS IS JUST AN EXAMPLE \**\*
+
+\**\* CASE 1: EVERY CONFIGURATION AND TEST PROGRAM PAIR IS COMPATIBLE \**\*
+
+The test program is compatible with all of the above mentioned configurations.
+
+\**\* CASE 2: THERE ARE INCOMPATIBLE PAIRS \**\*
+
 ============= =============== ===================================
 Configuration Test            Build command
 ============= =============== ===================================
@@ -128,15 +134,12 @@ cfg_si        test_program_si make CFG=cfg_si TST=test_program_si
 cfg_pi        test_program_pi make CFG=cfg_pi TST=test_program_pi
 ============= =============== ===================================
 
+\**\* IF THERE ARE INCOMPATIBLE PAIRS, THE WARNING MESSAGE MUST BE PRESENT \**\*
+
 .. warning::
 
     Mixing a wrong pair of CFG and TST will result in a building errror.
     Please checkout the proposed combinations before running a custom test.
-
-Clock scheme
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-\**\* MENTION IF ANY CLOCKING CONFIGURATIONS ARE BEING USED\**\*
 
 CPU/Memory interconnects addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,14 +148,26 @@ CPU/Memory interconnects addresses
 
 Below are the CPU/Memory interconnect addresses used in this project:
 
+\**\* ADDRESS SPACE MUST BE SORTED ASCENDING BY BASE ADDRESS VALUE \**\*
+
 =====================  ===========
 Instance               Address
 =====================  ===========
+axi_intc               0x4120_0000
 spi_ad7616_axi_regmap  0x44A0_0000
-axi_ad7606x_dma        0x44A3_0000
-spi_clkgen             0x44A7_0000
+axi_ad7606x_dma *      0x44A3_0000
+spi_clkgen **          0x44A7_0000
 ad7606_pwm_gen         0x44B0_0000
 =====================  ===========
+
+\**\* IN THE CASE OF MULTIPLE BLOCK DESIGNS WHERE ADDRESS SPACE CHANGES,
+LEGEND MUST BE USED \**\*
+
+.. admonition:: Legend
+   :class: note
+
+   - ``*`` instantiated only for parallel interface
+   - ``**`` instantiated only for serial interface
 
 Interrupts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -161,17 +176,27 @@ Interrupts
 
 Below are the Programmable Logic interrupts used in this project:
 
+\**\* ADDRESS SPACE MUST BE SORTED ASCENDING BY BASE ADDRESS VALUE \**\*
+
 ===============  ===
 Instance name    HDL
 ===============  ===
+spi_ad7606 *     12
 axi_ad7606_dma   13
-spi_ad7606       12
 ===============  ===
+
+\**\* IN THE CASE OF MULTIPLE BLOCK DESIGNS WHERE INTERRUPT LOCATIONS CHANGE,
+LEGEND MUST BE USED \**\*
+
+.. admonition:: Legend
+   :class: note
+
+   - ``*`` instantiated only for parallel interface
 
 Test stimulus
 -------------------------------------------------------------------------------
 
-\**\* LIST AND EXPLAIN ALL THE TESTS COMPRISED IN THE test_program FILE \**\*
+\**\* LIST AND EXPLAIN ALL THE TESTS DONE IN ALL TEST PROGRAMS \**\*
 
 \**\* THIS IS JUST AND EXAMPLE \**\*
 
@@ -186,6 +211,17 @@ The steps of the environment bringup are:
 * Start the environment
 * Start the clocks
 * Assert the resets
+
+Data acquisition test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Start the SPI clock generator (axi_clkgen)
+* Configure the PWM generator (axi_pwmgen)
+* Configure the DMA
+* Configure the axi_ad7616 IP
+* Submit a DMA transfer
+* Stop the PWM generator
+* Capture and compare the data
 
 Sanity test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -294,10 +330,6 @@ HDL related dependencies
      - :external+hdl:ref:`axi_pwm_gen`
    * - AXI_SPDIF_TX
      - :git-hdl:`library/axi_spdif_tx <library/axi_spdif_tx>`
-     - ---
-   * - AXI_SYSID
-     - :git-hdl:`library/axi_sysid <library/axi_sysid>`
-     - :external+hdl:ref:`axi_sysid`
    * - AXI_SPI_ENGINE
      - :git-hdl:`library/spi_engine/axi_spi_engine <library/spi_engine/axi_spi_engine>`  **
      - :external+hdl:ref:`spi_engine axi`
@@ -310,15 +342,15 @@ HDL related dependencies
    * - SPI_ENGINE_OFFLOAD
      - :git-hdl:`library/spi_engine/spi_engine_offload <library/spi_engine/spi_engine_offload>` **
      - :external+hdl:ref:`spi_engine offload`
-   * - SYSID_ROM
-     - :git-hdl:`library/sysid_rom <library/sysid_rom>`
-     - :external+hdl:ref:`axi_sysid`
    * - UTIL_I2C_MIXER
      - :git-hdl:`library/util_i2c_mixer <library/util_i2c_mixer>`
      - ---
    * - UTIL_CPACK2
      - :git-hdl:`library/util_pack/util_cpack2 <library/util_pack/util_cpack2>` *
      - :external+hdl:ref:`util_cpack2`
+
+\**\* IN THE CASE OF MULTIPLE BLOCK DESIGNS WHERE THE IPS USED CHANGE, LEGEND
+MUST BE USED \**\*
 
 .. admonition:: Legend
    :class: note
@@ -343,12 +375,21 @@ Testbench specific dependencies:
    * - SV dependency name
      - Source code link
      - Documentation link
-   * - ADI_REGMAP_CLKGEN_PKG
+   * - ADI_REGMAP_CLKGEN_PKG *
      - :git-testbenches:`library/regmaps/adi_regmap_clkgen_pkg.sv`
      - ---
-   * - ADI_REGMAP_DMAC_PKG
+   * - ADI_REGMAP_DMAC_PKG **
      - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
      - ---
+
+\**\* IN THE CASE OF MULTIPLE TEST PROGRAMS WHERE THE MODULES USED CHANGE,
+LEGEND MUST BE USED \**\*
+
+.. admonition:: Legend
+   :class: note
+
+   - ``*`` used only for parallel interface
+   - ``**`` used only for serial interface
 
 .. include:: ../../../common/more_information.rst
 

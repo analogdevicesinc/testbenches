@@ -179,6 +179,21 @@ program test_program();
     base_env.mng.master_sequencer.RegRead32('h50000000+'h21*4, error_bits_total[31:0]);
     base_env.mng.master_sequencer.RegRead32('h50000000+'h22*4, out_of_sync_total);
 
+    // start-stop BER
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h1);
+    #10us;
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h23*4, 32'h1);
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h23*4, 32'h0);
+    #10us;
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h0);
+
+    // read BER registers
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h1E*4, total_bits[63:32]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h1F*4, total_bits[31:0]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h20*4, error_bits_total[63:32]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h21*4, error_bits_total[31:0]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h22*4, out_of_sync_total);
+
     base_env.stop();
 
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);

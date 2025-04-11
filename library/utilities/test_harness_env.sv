@@ -88,8 +88,8 @@ package test_harness_env_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      this.mng.agent.start_master();
-      this.ddr.agent.start_slave();
+      this.mng.start_master();
+      this.ddr.start_slave();
 
       this.sys_clk_vip_if.start_clock();
       this.dma_clk_vip_if.start_clock();
@@ -100,8 +100,8 @@ package test_harness_env_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.mng.agent.stop_master();
-      this.ddr.agent.stop_slave();
+      this.mng.stop_master();
+      this.ddr.stop_slave();
 
       this.sys_clk_vip_if.stop_clock();
       this.dma_clk_vip_if.stop_clock();

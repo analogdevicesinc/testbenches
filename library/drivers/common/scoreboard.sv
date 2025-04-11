@@ -168,12 +168,13 @@ package scoreboard_pkg;
       data_type source_byte;
       data_type sink_byte;
 
+      this.byte_streams_empty_sig = 0;
+
       if (this.enabled == 0)
         return;
 
       while ((this.subscriber_source.get_size() > 0) &&
             (this.subscriber_sink.get_size() > 0)) begin
-        byte_streams_empty_sig = 0;
         source_byte = this.subscriber_source.get_data();
         if (this.sink_type == CYCLIC)
           this.subscriber_source.put_data(source_byte);

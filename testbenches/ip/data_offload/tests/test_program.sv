@@ -77,11 +77,11 @@ program test_program;
                   `TH.`ADC_SRC_AXIS.inst.IF,
                   `TH.`DAC_DST_AXIS.inst.IF);
 
-    dmac_tx = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA);
-    dmac_rx = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA);
+    dmac_tx = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA);
+    dmac_rx = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA);
 
-    do_tx = new("Data Offload TX 0", base_env.mng.sequencer, `TX_DOFF_BA);
-    do_rx = new("Data Offload RX 0", base_env.mng.sequencer, `RX_DOFF_BA);
+    do_tx = new("Data Offload TX 0", base_env.mng.master_sequencer, `TX_DOFF_BA);
+    do_rx = new("Data Offload RX 0", base_env.mng.master_sequencer, `RX_DOFF_BA);
 
     //=========================================================================
     // Setup generator/monitor stubs
@@ -109,21 +109,21 @@ program test_program;
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
 
     // Start the ADC/DAC stubs
-    `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
+    `INFO(("Call the run()"), ADI_VERBOSITY_LOW);
     scb_env.run();
 
-    scb_env.adc_src_axis_agent.sequencer.start();
+    scb_env.adc_src_axis_agent.master_sequencer.start();
 
     // Generate DMA transfers
-    `INFO(("Start RX DMA ..."), ADI_VERBOSITY_LOW);
+    `INFO(("Start RX DMA"), ADI_VERBOSITY_LOW);
     rx_dma_transfer(dmac_rx, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
     scb_env.scoreboard_rx.wait_until_complete();
 
-    `INFO(("Initialize the memory ..."), ADI_VERBOSITY_LOW);
+    `INFO(("Initialize the memory"), ADI_VERBOSITY_LOW);
     init_mem_64(32'h80000000, 1024);
 
-    `INFO(("Start TX DMA ..."), ADI_VERBOSITY_LOW);
+    `INFO(("Start TX DMA"), ADI_VERBOSITY_LOW);
     tx_dma_transfer(dmac_tx, 32'h80000000, 1024);
 
     #1us;
@@ -192,7 +192,7 @@ program test_program;
     input int byte_length);
     `INFO(("Initial address: %x", addr), ADI_VERBOSITY_LOW);
     for (int i=0; i<byte_length; i=i+8) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(addr + i*8, i, 255);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(addr + i*8, i, 255);
     end
     `INFO(("Final address: %x", addr + byte_length*8), ADI_VERBOSITY_LOW);
   endtask

@@ -102,7 +102,7 @@ program test_program;
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+    base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   // --------------------------
@@ -112,7 +112,7 @@ program test_program;
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    base_env.mng.sequencer.RegWrite32(waddr,wdata);
+    base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
   endtask
 
   integer rate;
@@ -472,20 +472,20 @@ program test_program;
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
       if (SYMB_OP[0] & SYMB_8_16B[0]) begin
-        base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
+        base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
       end else begin
-        base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),((i+1) << 16) | i,15);
+        base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+i*2),((i+1) << 16) | i,15);
       end
       // Clear destination region
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+'h2000+i*2),'hBEEF,15);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+'h2000+i*2),'hBEEF,15);
     end
 
     // Configure TX DMA
-    base_env.mng.sequencer.RegWrite32(`TX1_DMA_BA+32'h400, 32'h00000001); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`TX1_DMA_BA+32'h40c, 32'h00000001); // use CYCLIC
-    base_env.mng.sequencer.RegWrite32(`TX1_DMA_BA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
-    base_env.mng.sequencer.RegWrite32(`TX1_DMA_BA+32'h414, `DDR_BA+32'h00000000); // SRC_ADDRESS
-    base_env.mng.sequencer.RegWrite32(`TX1_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
+    base_env.mng.master_sequencer.RegWrite32(`TX1_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    base_env.mng.master_sequencer.RegWrite32(`TX1_DMA_BA+32'h40c, 32'h00000001); // use CYCLIC
+    base_env.mng.master_sequencer.RegWrite32(`TX1_DMA_BA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
+    base_env.mng.master_sequencer.RegWrite32(`TX1_DMA_BA+32'h414, `DDR_BA+32'h00000000); // SRC_ADDRESS
+    base_env.mng.master_sequencer.RegWrite32(`TX1_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Select DMA as source
     axi_write (TX1_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -540,16 +540,16 @@ program test_program;
     #20us;
 
     // Configure RX DMA
-    base_env.mng.sequencer.RegWrite32(`RX1_DMA_BA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
-    base_env.mng.sequencer.RegWrite32(`RX1_DMA_BA+32'h400, 32'h00000001); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`RX1_DMA_BA+32'h40c, 32'h00000006); // use TLAST
-    base_env.mng.sequencer.RegWrite32(`RX1_DMA_BA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
-    base_env.mng.sequencer.RegWrite32(`RX1_DMA_BA+32'h410, `DDR_BA+32'h00002000); // DEST_ADDRESS
-    base_env.mng.sequencer.RegWrite32(`RX1_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
+    base_env.mng.master_sequencer.RegWrite32(`RX1_DMA_BA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
+    base_env.mng.master_sequencer.RegWrite32(`RX1_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    base_env.mng.master_sequencer.RegWrite32(`RX1_DMA_BA+32'h40c, 32'h00000006); // use TLAST
+    base_env.mng.master_sequencer.RegWrite32(`RX1_DMA_BA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
+    base_env.mng.master_sequencer.RegWrite32(`RX1_DMA_BA+32'h410, `DDR_BA+32'h00002000); // DEST_ADDRESS
+    base_env.mng.master_sequencer.RegWrite32(`RX1_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     @(posedge system_tb.test_harness.axi_adrv9001_rx1_dma.irq);
     //Clear interrupt
-    base_env.mng.sequencer.RegWrite32(`RX1_DMA_BA+32'h084, 32'h00000002);
+    base_env.mng.master_sequencer.RegWrite32(`RX1_DMA_BA+32'h084, 32'h00000002);
 
     check_captured_data(
       .address (`DDR_BA+'h00002000),
@@ -571,20 +571,20 @@ program test_program;
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
       if (SYMB_OP[0] & SYMB_8_16B[0]) begin
-        base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
+        base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<8) << 16) | i<<8 ,15);// (<< 8) - 8 LSBs are dropped in 8 bit data symbol format
       end else begin
-        base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),((i+1) << 16) | i,15);
+        base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+i*2),((i+1) << 16) | i,15);
       end
       // Clear destination region
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+'h2000+i*2),'hBEEF,15);
+      base_env.ddr.slave_sequencer.set_reg_data_in_mem(xil_axi_uint'(`DDR_BA+'h2000+i*2),'hBEEF,15);
     end
 
     // Configure TX DMA
-    base_env.mng.sequencer.RegWrite32(`TX2_DMA_BA+32'h400, 32'h00000001); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`TX2_DMA_BA+32'h40c, 32'h00000001); // use CYCLIC
-    base_env.mng.sequencer.RegWrite32(`TX2_DMA_BA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
-    base_env.mng.sequencer.RegWrite32(`TX2_DMA_BA+32'h414, `DDR_BA+32'h00000000); // SRC_ADDRESS
-    base_env.mng.sequencer.RegWrite32(`TX2_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
+    base_env.mng.master_sequencer.RegWrite32(`TX2_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    base_env.mng.master_sequencer.RegWrite32(`TX2_DMA_BA+32'h40c, 32'h00000001); // use CYCLIC
+    base_env.mng.master_sequencer.RegWrite32(`TX2_DMA_BA+32'h418, 32'h00000FFF); // X_LENGHT = 4k
+    base_env.mng.master_sequencer.RegWrite32(`TX2_DMA_BA+32'h414, `DDR_BA+32'h00000000); // SRC_ADDRESS
+    base_env.mng.master_sequencer.RegWrite32(`TX2_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     // Select DDS as source
     axi_write (TX2_CHANNEL + CH0 + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -615,16 +615,16 @@ program test_program;
     #20us;
 
     // Configure RX DMA
-    base_env.mng.sequencer.RegWrite32(`RX2_DMA_BA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
-    base_env.mng.sequencer.RegWrite32(`RX2_DMA_BA+32'h400, 32'h00000001); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`RX2_DMA_BA+32'h40c, 32'h00000006); // use TLAST
-    base_env.mng.sequencer.RegWrite32(`RX2_DMA_BA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
-    base_env.mng.sequencer.RegWrite32(`RX2_DMA_BA+32'h410, `DDR_BA+32'h00002000); // DEST_ADDRESS
-    base_env.mng.sequencer.RegWrite32(`RX2_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
+    base_env.mng.master_sequencer.RegWrite32(`RX2_DMA_BA+32'h080, 32'h00000001); // Mask SOT IRQ, Enable EOT IRQ
+    base_env.mng.master_sequencer.RegWrite32(`RX2_DMA_BA+32'h400, 32'h00000001); // Enable DMA
+    base_env.mng.master_sequencer.RegWrite32(`RX2_DMA_BA+32'h40c, 32'h00000006); // use TLAST
+    base_env.mng.master_sequencer.RegWrite32(`RX2_DMA_BA+32'h418, 32'h000003FF); // X_LENGHTH = 1024-1
+    base_env.mng.master_sequencer.RegWrite32(`RX2_DMA_BA+32'h410, `DDR_BA+32'h00002000); // DEST_ADDRESS
+    base_env.mng.master_sequencer.RegWrite32(`RX2_DMA_BA+32'h408, 32'h00000001); // Submit transfer DMA
 
     @(posedge system_tb.test_harness.axi_adrv9001_rx2_dma.irq);
     //Clear interrupt
-    base_env.mng.sequencer.RegWrite32(`RX2_DMA_BA+32'h084, 32'h00000002);
+    base_env.mng.master_sequencer.RegWrite32(`RX2_DMA_BA+32'h084, 32'h00000002);
 
     check_captured_data(
       .address (`DDR_BA+'h00002000),
@@ -649,7 +649,7 @@ program test_program;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_address);
+      captured_word = base_env.ddr.slave_sequencer.get_reg_data_from_mem(current_address);
       if (SYMB_OP[0] & SYMB_8_16B[0]) begin
         captured_word = captured_word & 32'h00ff00ff;
       end

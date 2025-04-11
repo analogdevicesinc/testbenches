@@ -6,7 +6,7 @@ set ad_project_params(ASYNC_SPI_CLK)        1
 set ad_project_params(NUM_OF_CS)            1
 set ad_project_params(NUM_OF_SDI)           1
 set ad_project_params(NUM_OF_SDO)           1
-set ad_project_params(SDI_DELAY)            1
+set ad_project_params(SDI_DELAY)            0
 set ad_project_params(ECHO_SCLK)            0
 set ad_project_params(CMD_MEM_ADDR_WIDTH)   4
 set ad_project_params(DATA_MEM_ADDR_WIDTH)  4
@@ -27,7 +27,7 @@ set ad_project_params(SLAVE_TOUT)           0
 set ad_project_params(MASTER_TIN)           0
 set ad_project_params(MASTER_TOUT)          0
 set ad_project_params(CS_TO_MISO)           0
-set ad_project_params(CLOCK_DIVIDER)        2
+set ad_project_params(CLOCK_DIVIDER)        0
 set ad_project_params(NUM_OF_WORDS)         5
 set ad_project_params(NUM_OF_TRANSFERS)     5
 set ad_project_params(CS_ACTIVE_HIGH)       0

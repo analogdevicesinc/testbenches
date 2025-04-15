@@ -58,11 +58,11 @@ program test_program;
   event dummy_api_event;
 
   reg [31:0] data;
-  
+
 
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     current_process = process::self();
     current_process_random_state = current_process.get_randstate();
@@ -100,11 +100,14 @@ program test_program;
       end
     join_none
 
+    `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b0);
+
     #1us;
 
     // trigger the IRQ
+    `TH.`IRQ_TEST.inst.inst.IF.vif.wait_posedge_clk();
     `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b1);
-    #10ns;
+    `TH.`IRQ_TEST.inst.inst.IF.vif.wait_posedge_clk();
     `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b0);
 
     #1us;
@@ -128,9 +131,9 @@ program test_program;
     join
 
     #10us;
-        
+
     base_env.stop();
-    
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 

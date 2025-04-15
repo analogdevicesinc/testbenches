@@ -45,8 +45,6 @@ interface io_vip_if #(
 
   wire [WIDTH-1:0] IO;
 
-  logic [WIDTH-1:0] io = {WIDTH{1'b0}};
-
   logic intf_is_master = 0;
   logic intf_is_slave = 0;
   logic edge_case = 1'b1;
@@ -66,8 +64,6 @@ interface io_vip_if #(
     intf_is_slave = 0;
   endfunction: set_intf_monitor
 
-  assign IO = (intf_is_master) ? io : {WIDTH{1'bz}};
-
   class io_vip_if_class #(int WIDTH = 1) extends io_vip_if_base;
 
     function new();
@@ -75,7 +71,11 @@ interface io_vip_if #(
 
     virtual function void set_io(logic [1023:0] o);
       if (intf_is_master) begin
-        io <= o[WIDTH-1:0];
+        if (edge_case) begin
+          cb_p.IO <= o[WIDTH-1:0];
+        end else begin
+          cb_n.IO <= o[WIDTH-1:0];
+        end
       end else begin
         $fatal(0, "Supported only in runtime master mode");
       end

@@ -63,11 +63,11 @@
       <obj_property name="label">RX_DO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/RX_DUT_0/s_axis">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/RX_DUT/s_axis">
          <obj_property name="ElementShortName">s_axis</obj_property>
          <obj_property name="ObjectShortName">s_axis</obj_property>
       </wvobject>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/RX_DUT_0/m_axis">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/RX_DUT/m_axis">
          <obj_property name="ElementShortName">m_axis</obj_property>
          <obj_property name="ObjectShortName">m_axis</obj_property>
       </wvobject>
@@ -76,11 +76,11 @@
       <obj_property name="label">RX_DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_dmac_0/s_axis">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_dmac/s_axis">
          <obj_property name="ElementShortName">s_axis</obj_property>
          <obj_property name="ObjectShortName">s_axis</obj_property>
       </wvobject>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_dmac_0/m_dest_axi">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_dmac/m_dest_axi">
          <obj_property name="ElementShortName">m_dest_axi</obj_property>
          <obj_property name="ObjectShortName">m_dest_axi</obj_property>
       </wvobject>
@@ -93,11 +93,11 @@
       <obj_property name="label">TX_DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_dmac_0/m_src_axi">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_dmac/m_src_axi">
          <obj_property name="ElementShortName">m_src_axi</obj_property>
          <obj_property name="ObjectShortName">m_src_axi</obj_property>
       </wvobject>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_dmac_0/m_axis">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_dmac/m_axis">
          <obj_property name="ElementShortName">m_axis</obj_property>
          <obj_property name="ObjectShortName">m_axis</obj_property>
       </wvobject>
@@ -106,11 +106,11 @@
       <obj_property name="label">TX_DO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/TX_DUT_0/s_axis">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/TX_DUT/s_axis">
          <obj_property name="ElementShortName">s_axis</obj_property>
          <obj_property name="ObjectShortName">s_axis</obj_property>
       </wvobject>
-      <wvobject type="protoinst" fp_name="/system_tb/test_harness/TX_DUT_0/m_axis">
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/TX_DUT/m_axis">
          <obj_property name="ElementShortName">m_axis</obj_property>
          <obj_property name="ObjectShortName">m_axis</obj_property>
       </wvobject>

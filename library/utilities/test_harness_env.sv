@@ -43,7 +43,7 @@ package test_harness_env_pkg;
   import adi_axi_agent_pkg::*;
 
 
-  class test_harness_env #(int `AXI_VIP_PARAM_ORDER(mng), int `AXI_VIP_PARAM_ORDER(ddr)) extends adi_environment;
+  class test_harness_env #(`AXI_VIP_PARAM_DECL(mng), `AXI_VIP_PARAM_DECL(ddr)) extends adi_environment;
 
     // Agents
     adi_axi_master_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng;

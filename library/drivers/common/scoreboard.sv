@@ -61,11 +61,12 @@ package scoreboard_pkg;
 
       virtual function void update(input data_type data [$]);
         this.info($sformatf("Data received: %d", data.size()), ADI_VERBOSITY_MEDIUM);
-        while (data.size()) begin
-          this.byte_stream.push_back(data.pop_front());
-        end
 
         if (this.scoreboard_ref.get_enabled()) begin
+          while (data.size()) begin
+            this.byte_stream.push_back(data.pop_front());
+          end
+
           this.scoreboard_ref.compare_transaction();
         end
       endfunction: update

@@ -156,7 +156,7 @@ task axi_read_v(
     input   [13:0]  raddr,
     input   [31:0]  vdata);
 
-  base_env.mng.sequencer.RegReadVerify32(baddr+{raddr,2'b00},vdata);
+  base_env.mng.master_sequencer.RegReadVerify32(baddr+{raddr,2'b00},vdata);
 endtask
 
 task axi_read(
@@ -164,7 +164,7 @@ task axi_read(
     input   [13:0]  raddr,
     output  [31:0]  data);
 
-  base_env.mng.sequencer.RegRead32(baddr+{raddr,2'b00},data);
+  base_env.mng.master_sequencer.RegRead32(baddr+{raddr,2'b00},data);
 endtask
 
 //---------------------------------------------------------------------------
@@ -175,7 +175,7 @@ task axi_write(
   input [13:0]  waddr,
   input [31:0]  wdata);
 
-  base_env.mng.sequencer.RegWrite32(baddr+{waddr,2'b00},wdata);
+  base_env.mng.master_sequencer.RegWrite32(baddr+{waddr,2'b00},wdata);
 endtask
 
 //---------------------------------------------------------------------------

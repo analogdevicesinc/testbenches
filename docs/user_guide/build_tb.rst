@@ -36,12 +36,12 @@ Set up the Testbenches repository
    #. :external+hdl:ref:`Set up the HDL repository <build_hdl>`
 
 
-The :git-testbenches:`Testbenches repository </>` has to be cloned under the
-:git-hdl:`HDL repository </>` as follows:
+The :git-testbenches:`Testbenches repository </>` can be cloned anywhere
+relative to the :git-hdl:`HDL repository </>`. Our recommendation is to clone
+the testbenches repository next to the HDL repository:
 
 .. shell::
 
-   $cd hdl
    $git clone git@github.com:analogdevicesinc/testbenches.git
 
 The above command clones the **default** branch, which is the **main** for
@@ -55,17 +55,80 @@ want to switch to any other branch you need to checkout that branch:
    $git branch
    $git checkout 2022_r2
 
+Environment
+-------------------------------------------------------------------------------
+
+Our recommended build flow is to use ``make`` and the command line version of
+the tools. This method facilitates our overall build and release process as it
+automatically builds the required libraries and dependencies. Before running
+any testbench, the environment in which your working must be prepared.
+
+Linux environment setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All major distributions should have ``make`` installed by default. If not,
+if you try the command, it should tell you how to install it with the
+package name.
+
+You may have to install ``git`` (``sudo apt-get install git``)
+and the AMD tools. These tools come with certain **settings*.sh** scripts that
+you may source in your **.bashrc** file to set up the environment.
+You may also do this manually (for better or worse); the following snippet is
+from a **.bashrc** file. Please note that unless you are an expert at manipulating
+these things, it is best to leave it to the tools to set up the environment.
+
+.. shell::
+
+   $export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
+
+Windows environment setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The best option on Windows is to use
+`Cygwin <https://www.cygwin.com>`__. When installing it, select the
+``make`` and ``git`` packages. You should do changes to your **.bashrc** in a
+similar manner to the Linux environment.
+
+.. shell::
+
+   $export PATH=$PATH:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
+
+A very good alternative to Cygwin is
+`WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__. The
+manual changes to your **.bashrc** should look like:
+
+.. shell::
+
+   $export PATH=$PATH:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
+
+If you do not want to install Cygwin, there might still be some
+alternative. There are ``make`` alternatives for **Windows Command
+Prompt**, minimalist GNU for Windows (**MinGW**), or the **Cygwin
+variations** installed by the tools itself.
+
+Some of these may not be fully functional with our scripts and/or projects.
+If you are an AMD user, use the **gnuwin** installed as part of the SDK,
+usually at ``C:\Xilinx\Vitis\202x.x\gnuwin\bin``.
+
+Repository path setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The make script must know where the cloned HDL and Testbenches repositories are
+located. Two variables must be exported, which specify the target directories:
+
+.. shell::
+
+   $export ADI_HDL_DIR=<path to cloned HDL directory>
+   $export ADI_TB_DIR=<path to cloned Testbenches directory>
+
 Building a testbench
 -------------------------------------------------------------------------------
 
 .. caution::
 
    Before building any testbench, you must have the environment prepared each
-   time a new terminal session is started:
-
-   #. Set the HDL repository path with ``export ADI_HDL_DIR=<path to dir>``.
-
-   #. Set the Testbenches repository path with ``export ADI_TB_DIR=<path to dir>``.
+   time a new terminal session is started, following the environment setup guide
+   from above!
 
 The way of building a testbench in Cygwin and WSL is almost the same.
 In this example, it is building the **AD7616** testbench.
@@ -126,61 +189,6 @@ for restarting it.
   and start the simulation. This is needed when project simulation parameters
   are changed after the build was created or when the block design is changed
   manually. When the simulation seed is hard coded, this option must be used.
-
-Environment
--------------------------------------------------------------------------------
-
-As mentioned above, our recommended build flow is to use ``make`` and the
-command line version of the tools. This method facilitates our
-overall build and release process as it automatically builds the
-required libraries and dependencies.
-
-Linux environment setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-All major distributions should have ``make`` installed by default. If not,
-if you try the command, it should tell you how to install it with the
-package name.
-
-You may have to install ``git`` (``sudo apt-get install git``)
-and the AMD tools. These tools come with certain **settings*.sh** scripts that
-you may source in your **.bashrc** file to set up the environment.
-You may also do this manually (for better or worse); the following snippet is
-from a **.bashrc** file. Please note that unless you are an expert at manipulating
-these things, it is best to leave it to the tools to set up the environment.
-
-.. shell::
-
-   $export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
-
-Windows environment setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The best option on Windows is to use
-`Cygwin <https://www.cygwin.com>`__. When installing it, select the
-``make`` and ``git`` packages. You should do changes to your **.bashrc** in a
-similar manner to the Linux environment.
-
-.. shell::
-
-   $export PATH=$PATH:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
-
-A very good alternative to Cygwin is
-`WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__. The
-manual changes to your **.bashrc** should look like:
-
-.. shell::
-
-   $export PATH=$PATH:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
-
-If you do not want to install Cygwin, there might still be some
-alternative. There are ``make`` alternatives for **Windows Command
-Prompt**, minimalist GNU for Windows (**MinGW**), or the **Cygwin
-variations** installed by the tools itself.
-
-Some of these may not be fully functional with our scripts and/or projects.
-If you are an AMD user, use the **gnuwin** installed as part of the SDK,
-usually at ``C:\Xilinx\Vitis\202x.x\gnuwin\bin``.
 
 Opening a testbench
 -------------------------------------------------------------------------------

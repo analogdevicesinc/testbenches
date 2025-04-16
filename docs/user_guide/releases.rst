@@ -61,11 +61,17 @@ Release branches
      - AMD Xilinx
      - Release notes
    * - :git-testbenches:`main <main:/>`
-     - Vivado 2023.1
+     - Vivado 2023.2
      -
+   * - :git-testbenches:`2023_r2 <2023_r2:/>`
+     - Vivado 2023.2
+     - `Release notes 2023_R2 <https://github.com/analogdevicesinc/testbenches/releases/tag/2023_r2>`_
    * - :git-testbenches:`2022_r2 <2022_r2:/>`
      - Vivado 2022.2
-     - `Release notes 2022_R2 <https://github.com/analogdevicesinc/testbenches/releases/tag/2022_R2>`_
+     - `Release notes 2022_R2 <https://github.com/analogdevicesinc/testbenches/releases/tag/2022_r2>`_
+   * - :git-testbenches:`2021_r2 <2021_r2:/>`
+     - Vivado 2021.2
+     - `Release notes 2021_R2 <https://github.com/analogdevicesinc/testbenches/releases/tag/2021_r2>`_
 
 
 About the tools we use

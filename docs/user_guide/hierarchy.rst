@@ -1,6 +1,6 @@
-.. _architecture:
+.. _hierarchy:
 
-Testbenches Architecture
+Repository hierarchy
 ===============================================================================
 
 File structure of a project

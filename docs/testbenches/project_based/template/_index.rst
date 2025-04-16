@@ -272,6 +272,11 @@ Data acquisition test
 * Stop the PWM generator
 * Capture and compare the data
 
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Stop the clocks
+
 Building the testbench
 -------------------------------------------------------------------------------
 
@@ -334,7 +339,7 @@ Then the subfolder under ``runs`` name will be:
 Resources
 -------------------------------------------------------------------------------
 
-HDL related dependencies
+HDL related dependencies forming the DUT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \**\* THIS IS JUST AND EXAMPLE \**\*

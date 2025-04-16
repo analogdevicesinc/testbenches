@@ -8,7 +8,7 @@ Overview
 
 The purpose of this testbench is to test the JESD framework in loopback mode.
 
-The entire HDL documentation can be found at :external+hdl:ref:`jesd204`. 
+The entire HDL documentation can be found at :external+hdl:ref:`jesd204`.
 
 Block design
 -------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ files:
 -  PROGDIVCLK: defines the usage of PROGDIVCLK; constant value: 5
 
 The following parameters of this project can be configured:
-	
+
 -  LINK_MODE: used link layer encoder mode;
    Options: 1 - JESD_8B10B, 2 - JESD_64B66B
 -  JESD_M: number of converters per link;
@@ -55,7 +55,7 @@ The following parameters of this project can be configured:
    Options: 1/2/3/4/6/8/64
 -  JESD_K: number of samples stored in internal buffers in kilosamples per
    converter (M);
-   Options: 32/256 
+   Options: 32/256
 -  JESD_S: number of samples per frame;
    Options: 1/2/4
 -  JESD_NP: number of bits per sample;
@@ -182,11 +182,11 @@ The steps of the JESD link test are:
             * Select DDS as source
             * Configure tone amplitude and frequency
             * Sync DDS cores
-        * If DMA is used:  
+        * If DMA is used:
            * Set DMA as source for DAC TPL
 * Get TX link up
 * Initialize RX PHY
-* Configure ADC TPL    
+* Configure ADC TPL
 * Get RX link up
 * Wait for the TX & RX links to be up
 * Arm external sync
@@ -198,7 +198,7 @@ The steps of the JESD link test are:
     * Check SYSREF alignment ERROR
     * Invert SYSREF
     * Check SYSREF alignment ERROR
-* Get RX & TX XCVRs down  
+* Get RX & TX XCVRs down
 
 Check link restart counter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,6 +216,10 @@ The steps of TPL SYNC control are:
 Stop the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* Simulation waits for the stop condition, depending on the packet generation
+  mode
+* Stop the watchdog
+* Stop the clocks
 * Finish the simulation
 
 Building the testbench

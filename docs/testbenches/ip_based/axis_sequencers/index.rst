@@ -119,9 +119,14 @@ Sequencer testing
 * Some of the parameters for the packet sizes are hardcoded, these can be
   changed to test some more specific use-cases
 * The watchdog and the sequencers are started at the same time
+
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Simulation waits for the stop condition, depending on the packet generation
   mode
-* Stops watchdog
+* Stop the watchdog
+* Stop the clocks
 
 .. warning::
 

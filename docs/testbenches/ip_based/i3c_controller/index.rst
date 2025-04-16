@@ -134,6 +134,11 @@ I3C Controller testing
 Due to the lack of an I3C Controller VIP, the bus functions are implemented in
 the ``test_program.sv``.
 
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Stop the clocks
+
 Building the testbench
 -------------------------------------------------------------------------------
 
@@ -197,7 +202,7 @@ Resources
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-HDL dependencies:
+HDL related dependencies forming the DUT
 
 .. list-table::
    :widths: 30 45 25

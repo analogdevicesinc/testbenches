@@ -122,7 +122,12 @@ FIFO testing
 * Configure and start the watchdog
 * Sends some randomized data and verify all
 * Wait for scoreboard to complete checking
-* Stop simulation
+
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Stop the watchdog
+* Stop the clocks
 
 Building the test bench
 -------------------------------------------------------------------------------
@@ -184,7 +189,7 @@ Then the subfolder under ``runs`` name will be:
 Resources
 -------------------------------------------------------------------------------
 
-HDL related dependencies
+HDL related dependencies forming the DUT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::

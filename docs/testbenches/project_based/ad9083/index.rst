@@ -249,6 +249,8 @@ The steps of this test are:
 Stop the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* Stop the clocks
+
 Building the testbench
 -------------------------------------------------------------------------------
 
@@ -311,7 +313,7 @@ Then the subfolder under ``runs`` name will be:
 Resources
 -------------------------------------------------------------------------------
 
-HDL related dependencies
+HDL related dependencies forming the DUT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
@@ -340,7 +342,7 @@ HDL related dependencies
      - :git-hdl:`library/jesd204/ad_ip_jesd204_tpl_adc`
      - :external+hdl:ref:`ad_ip_jesd204_tpl_adc`
 
-Auxiliary HDL dependencies instantiated only in the testbench
+Auxiliary HDL dependencies used as helper IPs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::

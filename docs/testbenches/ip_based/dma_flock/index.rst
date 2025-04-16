@@ -205,6 +205,11 @@ Then asserts if all bytes in the frame are equal to the first byte.
    accessed by the writer if the number of frames and distance are close enough
    to cause the reader to be the total number of frames behind.
 
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Stop the clocks
+
 Building the testbench
 -------------------------------------------------------------------------------
 
@@ -268,7 +273,7 @@ Resources
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-HDL dependencies:
+HDL related dependencies forming the DUT
 
 .. list-table::
    :widths: 30 45 25

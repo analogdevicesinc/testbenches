@@ -88,7 +88,11 @@ The steps of the environment bringup are:
 * Start the environment
 * Start the clocks
 * Assert the resets
-* Stop the environment
+
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Stop the clocks
 
 Building the test bench
 -------------------------------------------------------------------------------

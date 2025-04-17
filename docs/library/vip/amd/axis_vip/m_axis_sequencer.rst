@@ -85,17 +85,23 @@ sent, so the sequencer can be safely disabled.
 function void set_stop_policy(input stop_policy_t stop_policy);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sets the stop policy to data beat, packet or queue finished. If the sequencer
-is already enabled, it will throw an error message.
+Sets the stop policy to data beat, packet or queue finished.
+
+.. error::
+
+   The sequencer must be disabled before changing stop policy!
 
 function void set_data_gen_mode(input data_gen_mode_t data_gen_mode);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sets the data generation mode. It can be a ramp, randomly generated data, or
-user specified data. If the sequencer is already enabled, it will throw an
-error message.
+user specified data.
 
-.. caution::
+.. error::
+
+   The sequencer must be disabled before changing data generation mode!
+
+.. important::
 
    If the data is user specified, the user must make sure that the packetizer
    is fed with enough data to complete a packet, otherwise the packet will not
@@ -106,8 +112,12 @@ function void set_descriptor_gen_mode(input bit descriptor_gen_mode);
 
 Sets the packet generation mode. If set to 0, it will only create the packets
 that are in the queue. If set to 1, it will repeat all of the packets that are
-in the queue in a round-robin mode. If the sequencer is already enabled, it
-will throw an error message.
+in the queue in a round-robin mode.
+
+.. error::
+
+   The sequencer must be disabled before chaning packet descriptor generation
+   mode!
 
 function void set_data_beat_delay(input int data_beat_delay);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,14 +134,20 @@ function void set_keep_all();
 
 Sets the generated data to be all valid bytes. Automatically adjusts the packet
 length, increasing its size, if the specified number of bytes don't fill all
-samples with data. If the sequencer is already enabled, it will throw an error
-message.
+samples with data.
+
+.. error::
+
+   The sequencer must be disabled before changing the byte keep setting!
 
 function void set_keep_some();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sets the generated data to have not valid bytes. If the sequencer is already
-enabled, it will throw an error message.
+Sets the generated data to have not valid bytes.
+
+.. error::
+
+   The sequencer must be disabled before changing the byte keep setting!
 
 function void add_xfer_descriptor(...);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

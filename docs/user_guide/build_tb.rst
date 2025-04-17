@@ -21,7 +21,7 @@ use **Cygwin**.
 Set up the Testbenches repository
 -------------------------------------------------------------------------------
 
-.. caution::
+.. important::
 
    Before building any testbench, you **must**:
 
@@ -58,7 +58,7 @@ want to switch to any other branch you need to checkout that branch:
 Building a testbench
 -------------------------------------------------------------------------------
 
-.. caution::
+.. important::
 
    Before building any testbench, you must have the environment prepared each
    time a new terminal session is started:

@@ -1,13 +1,8 @@
 Testbenches
 ===============================================================================
 
-.. note::
-
-   This page lists only testbenches that have been ported to the new
-   documentation format.
-
-Contents
--------------------------------------------------------------------------------
+This page lists the different levels of testbenches that are created to verify
+IPs and projects from the HDL repository.
 
 IP Based Testbenches
 -------------------------------------------------------------------------------
@@ -24,4 +19,3 @@ Project Based Testbenches
    :maxdepth: 1
 
    project_based/index
-

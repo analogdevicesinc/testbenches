@@ -178,7 +178,7 @@ cfg_pi        test_program_pi make CFG=cfg_pi TST=test_program_pi
 
 \**\* IF THERE ARE INCOMPATIBLE PAIRS, THE WARNING MESSAGE MUST BE PRESENT \**\*
 
-.. warning::
+.. error::
 
     Mixing a wrong pair of CFG and TST will result in a building errror.
     Please checkout the proposed combinations before running a custom test.

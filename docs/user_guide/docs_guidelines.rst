@@ -49,6 +49,27 @@ They are inserted like this:
 
 And they will be rendered as sections of the page.
 
+Warnings and messages
+--------------------------------------------------------------------------------
+
+The warning and message directives are used for information highlighting. The
+different types of warnings and messages are listed and explained on the
+`Sphinx Directives documentation page <https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#admonitions-messages-and-warnings>`_.
+
+Here are a couple of examples:
+
+.. code-block::
+
+   .. note::
+
+      This is a note.
+
+   .. important::
+
+      This is an important message!
+
+And they will be rendered as sections of the page.
+
 Class hierarchy
 --------------------------------------------------------------------------------
 

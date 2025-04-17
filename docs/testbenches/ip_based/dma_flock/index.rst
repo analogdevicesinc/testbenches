@@ -197,7 +197,7 @@ Then asserts if all bytes in the frame are equal to the first byte.
    The testbench may end before the last frame is fully transferred at the
    reader stream interface.
 
-.. warning::
+.. caution::
 
    Not all values yield valid configuration.
 

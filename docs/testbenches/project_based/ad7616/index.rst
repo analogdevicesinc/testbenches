@@ -98,7 +98,7 @@ cfg_pi        test_program_pi make CFG=cfg_pi TST=test_program_pi
 cfg_si        test_program_si make CFG=cfg_si TST=test_program_si
 ============= =============== ===================================
 
-.. warning::
+.. error::
 
     Mixing a wrong pair of CFG and TST will result in a simulation errror.
     Please check out the proposed combinations before running a custom test.

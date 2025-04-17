@@ -123,7 +123,7 @@ Sequencer testing
   mode
 * Stops watchdog
 
-.. warning::
+.. danger::
 
    Depending on the configuration parameters and/or changed hardcoded values,
    the watchdog may trigger prematurely!

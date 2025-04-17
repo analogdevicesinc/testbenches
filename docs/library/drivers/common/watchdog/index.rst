@@ -77,25 +77,28 @@ Basic usage of the watchdog timer:
 * Add test stimulus that needs to be timed by the watchdog timer
 * Stop the watchdog timer if the stimulus finished the process
 
-.. important::
+.. attention::
 
-  * The watchdog timer value must be set higher than the time the stimulus needs
-    to finish the execution of the process. At the initial development of the
-    test stimulus, this value should be oversized by a couple times the estimated
-    value, to ensure that the test case has enough time to complete the process
-    in case the original execution time is well underestimated. After a couple of
-    iterations when the process execution time bounds are known, the watchdog
-    timer should be reduced to the value that is: highest execution time for the
-    process +20-30% of this time to ensure that the process can terminate
-    properly.
-  * Multiple instances of the same watchdog timer object should not be started,
-    before the previous one is stopped. This will cause multiple instances of the
-    same watchdog to be started in separate threads. When the stop function is
-    called for this watchdog timer object, it will stop all currently active
-    watchdog timers. To use multiple watchdog timers all at the same  time,
-    multiple watchdog timer objects need to be created, each with its own message
-    and timer value. This will allow each one of these to be controlled
-    independently.
+  The watchdog timer value must be set higher than the time the stimulus needs
+  to finish the execution of the process. At the initial development of the
+  test stimulus, this value should be oversized by a couple times the estimated
+  value, to ensure that the test case has enough time to complete the process
+  in case the original execution time is well underestimated. After a couple of
+  iterations when the process execution time bounds are known, the watchdog
+  timer should be reduced to the value that is: highest execution time for the
+  process +20-30% of this time to ensure that the process can terminate
+  properly.
+
+.. danger::
+
+  Multiple instances of the same watchdog timer object should not be started,
+  before the previous one is stopped. This will cause multiple instances of the
+  same watchdog to be started in separate threads. When the stop function is
+  called for this watchdog timer object, it will stop all currently active
+  watchdog timer threads. To use multiple watchdog timers all at the same time,
+  multiple watchdog timer objects need to be created, each with its own message
+  and timer value. This will allow each one of these to be controlled
+  independently.
 
 Other use-cases for the watchdog timer:
 

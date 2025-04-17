@@ -1,7 +1,7 @@
 HDL Testbenches
 ===============================================================================
 
-.. attention::
+.. important::
 
    Work-in-progress, not all content has been included yet.
 

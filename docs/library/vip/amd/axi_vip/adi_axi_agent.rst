@@ -69,7 +69,7 @@ Used to start the master or slave agent when not in passthrough mode. In
 passthrough mode it throws a warning, since in the passthrough agent can only
 work in master, slave or passthrough mode at a given time.
 
-.. important::
+.. note::
 
    This warning message can be ommitted, as this causes no harm during
    simulation. Its main use is to notify the user that the VIP in passthrough

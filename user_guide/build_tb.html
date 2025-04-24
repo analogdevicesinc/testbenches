@@ -91,12 +91,13 @@
           <ul>
 <li><a class="reference internal" href="#">Build a testbench</a><ul>
 <li><a class="reference internal" href="#set-up-the-testbenches-repository">Set up the Testbenches repository</a></li>
-<li><a class="reference internal" href="#building-a-testbench">Building a testbench</a></li>
 <li><a class="reference internal" href="#environment">Environment</a><ul>
 <li><a class="reference internal" href="#linux-environment-setup">Linux environment setup</a></li>
 <li><a class="reference internal" href="#windows-environment-setup">Windows environment setup</a></li>
+<li><a class="reference internal" href="#repository-path-setup">Repository path setup</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#building-a-testbench">Building a testbench</a></li>
 <li><a class="reference internal" href="#opening-a-testbench">Opening a testbench</a></li>
 </ul>
 </li>
@@ -258,15 +259,10 @@ before building the project. Otherwise your project will fail.</p></li>
 <li><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/user_guide/build_hdl.html#build-hdl" title="(in HDL)"><span class="xref std std-ref">Set up the HDL repository</span></a></p></li>
 </ol>
 </div>
-<p>The <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">Testbenches repository</a> has to be cloned under the
-<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">HDL repository</a> as follows:</p>
+<p>The <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">Testbenches repository</a> can be cloned anywhere
+relative to the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">HDL repository</a>. Our recommendation is to clone
+the testbenches repository next to the HDL repository:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>hdl
-</pre></div>
-</div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~/hdl$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:analogdevicesinc/testbenches.git
@@ -295,16 +291,84 @@ want to switch to any other branch you need to checkout that branch:</p>
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div></section>
+<section id="environment">
+<h2>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h2>
+<p>Our recommended build flow is to use <code class="docutils literal notranslate"><span class="pre">make</span></code> and the command line version of
+the tools. This method facilitates our overall build and release process as it
+automatically builds the required libraries and dependencies. Before running
+any testbench, the environment in which your working must be prepared.</p>
+<section id="linux-environment-setup">
+<h3>Linux environment setup<a class="headerlink" href="#linux-environment-setup" title="Link to this heading"></a></h3>
+<p>All major distributions should have <code class="docutils literal notranslate"><span class="pre">make</span></code> installed by default. If not,
+if you try the command, it should tell you how to install it with the
+package name.</p>
+<p>You may have to install <code class="docutils literal notranslate"><span class="pre">git</span></code> (<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">git</span></code>)
+and the AMD tools. These tools come with certain <strong>settings*.sh</strong> scripts that
+you may source in your <strong>.bashrc</strong> file to set up the environment.
+You may also do this manually (for better or worse); the following snippet is
+from a <strong>.bashrc</strong> file. Please note that unless you are an expert at manipulating
+these things, it is best to leave it to the tools to set up the environment.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+<section id="windows-environment-setup">
+<h3>Windows environment setup<a class="headerlink" href="#windows-environment-setup" title="Link to this heading"></a></h3>
+<p>The best option on Windows is to use
+<a class="reference external" href="https://www.cygwin.com">Cygwin</a>. When installing it, select the
+<code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> packages. You should do changes to your <strong>.bashrc</strong> in a
+similar manner to the Linux environment.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>A very good alternative to Cygwin is
+<a class="reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install/">WSL</a>. The
+manual changes to your <strong>.bashrc</strong> should look like:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>If you do not want to install Cygwin, there might still be some
+alternative. There are <code class="docutils literal notranslate"><span class="pre">make</span></code> alternatives for <strong>Windows Command
+Prompt</strong>, minimalist GNU for Windows (<strong>MinGW</strong>), or the <strong>Cygwin
+variations</strong> installed by the tools itself.</p>
+<p>Some of these may not be fully functional with our scripts and/or projects.
+If you are an AMD user, use the <strong>gnuwin</strong> installed as part of the SDK,
+usually at <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\Vitis\202x.x\gnuwin\bin</span></code>.</p>
+</section>
+<section id="repository-path-setup">
+<h3>Repository path setup<a class="headerlink" href="#repository-path-setup" title="Link to this heading"></a></h3>
+<p>The make script must know where the cloned HDL and Testbenches repositories are
+located. Two variables must be exported, which specify the target directories:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ADI_HDL_DIR</span><span class="o">=</span>&lt;path<span class="w"> </span>to<span class="w"> </span>cloned<span class="w"> </span>HDL<span class="w"> </span>directory&gt;
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ADI_TB_DIR</span><span class="o">=</span>&lt;path<span class="w"> </span>to<span class="w"> </span>cloned<span class="w"> </span>Testbenches<span class="w"> </span>directory&gt;
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+</section>
 <section id="building-a-testbench">
 <h2>Building a testbench<a class="headerlink" href="#building-a-testbench" title="Link to this heading"></a></h2>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>Before building any testbench, you must have the environment prepared each
-time a new terminal session is started:</p>
-<ol class="arabic simple">
-<li><p>Set the HDL repository path with <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_HDL_DIR=&lt;path</span> <span class="pre">to</span> <span class="pre">dir&gt;</span></code>.</p></li>
-<li><p>Set the Testbenches repository path with <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_TB_DIR=&lt;path</span> <span class="pre">to</span> <span class="pre">dir&gt;</span></code>.</p></li>
-</ol>
+time a new terminal session is started, following the environment setup guide
+from above!</p>
 </div>
 <p>The way of building a testbench in Cygwin and WSL is almost the same.
 In this example, it is building the <strong>AD7616</strong> testbench.</p>
@@ -370,60 +434,6 @@ and start the simulation. This is needed when project simulation parameters
 are changed after the build was created or when the block design is changed
 manually. When the simulation seed is hard coded, this option must be used.</p></li>
 </ul>
-</section>
-<section id="environment">
-<h2>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h2>
-<p>As mentioned above, our recommended build flow is to use <code class="docutils literal notranslate"><span class="pre">make</span></code> and the
-command line version of the tools. This method facilitates our
-overall build and release process as it automatically builds the
-required libraries and dependencies.</p>
-<section id="linux-environment-setup">
-<h3>Linux environment setup<a class="headerlink" href="#linux-environment-setup" title="Link to this heading"></a></h3>
-<p>All major distributions should have <code class="docutils literal notranslate"><span class="pre">make</span></code> installed by default. If not,
-if you try the command, it should tell you how to install it with the
-package name.</p>
-<p>You may have to install <code class="docutils literal notranslate"><span class="pre">git</span></code> (<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">git</span></code>)
-and the AMD tools. These tools come with certain <strong>settings*.sh</strong> scripts that
-you may source in your <strong>.bashrc</strong> file to set up the environment.
-You may also do this manually (for better or worse); the following snippet is
-from a <strong>.bashrc</strong> file. Please note that unless you are an expert at manipulating
-these things, it is best to leave it to the tools to set up the environment.</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
-</pre></div>
-</div>
-<div class="clear-left"></div></div></div></section>
-<section id="windows-environment-setup">
-<h3>Windows environment setup<a class="headerlink" href="#windows-environment-setup" title="Link to this heading"></a></h3>
-<p>The best option on Windows is to use
-<a class="reference external" href="https://www.cygwin.com">Cygwin</a>. When installing it, select the
-<code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> packages. You should do changes to your <strong>.bashrc</strong> in a
-similar manner to the Linux environment.</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
-</pre></div>
-</div>
-<div class="clear-left"></div></div></div><p>A very good alternative to Cygwin is
-<a class="reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install/">WSL</a>. The
-manual changes to your <strong>.bashrc</strong> should look like:</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
-</pre></div>
-</div>
-<div class="clear-left"></div></div></div><p>If you do not want to install Cygwin, there might still be some
-alternative. There are <code class="docutils literal notranslate"><span class="pre">make</span></code> alternatives for <strong>Windows Command
-Prompt</strong>, minimalist GNU for Windows (<strong>MinGW</strong>), or the <strong>Cygwin
-variations</strong> installed by the tools itself.</p>
-<p>Some of these may not be fully functional with our scripts and/or projects.
-If you are an AMD user, use the <strong>gnuwin</strong> installed as part of the SDK,
-usually at <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\Vitis\202x.x\gnuwin\bin</span></code>.</p>
-</section>
 </section>
 <section id="opening-a-testbench">
 <h2>Opening a testbench<a class="headerlink" href="#opening-a-testbench" title="Link to this heading"></a></h2>

@@ -107,6 +107,7 @@
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
 <li><a class="reference internal" href="#environment-bring-up">Environment Bring up</a></li>
 <li><a class="reference internal" href="#i3c-controller-testing">I3C Controller testing</a></li>
+<li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
@@ -408,6 +409,12 @@ There is no I3C Bus VIP or I3C API in the testbench.</p>
 <p>Due to the lack of an I3C Controller VIP, the bus functions are implemented in
 the <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code>.</p>
 </section>
+<section id="stop-the-environment">
+<h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Stop the clocks</p></li>
+</ul>
+</section>
 </section>
 <section id="building-the-testbench">
 <h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
@@ -476,7 +483,7 @@ clean folder (no runs folder available):</p>
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
 <section id="testbenches-related-dependencies">
 <h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
-<p>HDL dependencies:</p>
+<p>HDL related dependencies forming the DUT</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>

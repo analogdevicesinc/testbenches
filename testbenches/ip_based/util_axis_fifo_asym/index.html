@@ -105,11 +105,12 @@
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
 <li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
 <li><a class="reference internal" href="#fifo-testing">FIFO testing</a></li>
+<li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
 <li><a class="reference internal" href="#resources">Resources</a><ul>
-<li><a class="reference internal" href="#hdl-related-dependencies">HDL related dependencies</a></li>
+<li><a class="reference internal" href="#hdl-related-dependencies-forming-the-dut">HDL related dependencies forming the DUT</a></li>
 <li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
 </ul>
 </li>
@@ -389,7 +390,13 @@ configurations.</p>
 <li><p>Configure and start the watchdog</p></li>
 <li><p>Sends some randomized data and verify all</p></li>
 <li><p>Wait for scoreboard to complete checking</p></li>
-<li><p>Stop simulation</p></li>
+</ul>
+</section>
+<section id="stop-the-environment">
+<h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Stop the watchdog</p></li>
+<li><p>Stop the clocks</p></li>
 </ul>
 </section>
 </section>
@@ -458,8 +465,8 @@ clean folder (no runs folder available):</p>
 </section>
 <section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
-<section id="hdl-related-dependencies">
-<h3>HDL related dependencies<a class="headerlink" href="#hdl-related-dependencies" title="Link to this heading"></a></h3>
+<section id="hdl-related-dependencies-forming-the-dut">
+<h3>HDL related dependencies forming the DUT<a class="headerlink" href="#hdl-related-dependencies-forming-the-dut" title="Link to this heading"></a></h3>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>

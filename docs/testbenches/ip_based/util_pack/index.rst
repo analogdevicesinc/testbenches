@@ -138,12 +138,17 @@ Packer testing
 * Configures the watchdog
 * Starts the data transmission and the watchdog
 * Waits for scoreboard to check all the data
-* Stops the watchdog
 
 .. warning::
 
    Increasing the hardcoded value for the data length might cause the watchdog
    timer to trigger prematurely!
+
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Stop the watchdog
+* Stop the clocks
 
 Building the test bench
 -------------------------------------------------------------------------------
@@ -205,7 +210,7 @@ Then the subfolder under ``runs`` name will be:
 Resources
 -------------------------------------------------------------------------------
 
-HDL related dependencies
+HDL related dependencies forming the DUT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::

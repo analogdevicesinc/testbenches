@@ -10,7 +10,7 @@ User Guide
    Git repository <git_repository>
    Releases <releases>
    Build a testbench <build_tb>
-   Testbenches architecture <architecture>
+   Repository hierarchy <hierarchy>
    Creation and editing of HDL testbenches <create_edit_tb>
    Testbenches coding guidelines <coding_guidelines>
    Documentation guidelines <docs_guidelines>
@@ -29,7 +29,7 @@ Contents
 #. :ref:`git_repository`: Our Testbenches GitHub repository
 #. :ref:`releases`: Releases and supported tool versions
 #. :ref:`build_tb`: Building and generating the programming files
-#. :ref:`architecture`: HDL testbench architecture explained
+#. :ref:`hierarchy`: Repository hierarchy explained
 #. :ref:`create_edit_tb`: Creation and editing of HDL testbenches
 #. :ref:`coding_guidelines`: The System Verilog coding guidelines
    that the HDL team follows

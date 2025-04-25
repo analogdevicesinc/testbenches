@@ -32,24 +32,13 @@ Block diagram
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following parameter of this project that can be configured:
-
-- CLK_MOD: defines the I3C Controller Core clock cycles per bus bit.
+There are no parameters on this project.
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The following configuration files are available:
-
-+-----------------------+------------+
-| Configuration mode    | Parameters |
-|                       +------------+
-|                       | CLK_MOD    |
-+=======================+============+
-| cfg1                  | 0          |
-+-----------------------+------------+
-| cfg2                  | 1          |
-+-----------------------+------------+
+The testbench has an empty configuration file included in the file structure
+which allows the testbench to be built and run by default.
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

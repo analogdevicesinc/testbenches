@@ -35,6 +35,9 @@
 
 source ../../scripts/adi_env.tcl
 
+# system level parameters
+set BUFMRCE_EN $ad_project_params(BUFMRCE_EN)
+
 global ad_project_params
 
 #
@@ -42,3 +45,5 @@ global ad_project_params
 #
 #
 source $ad_hdl_dir/projects/ada4355_fmc/common/ada4355_fmc_bd.tcl
+
+#ad_ip_parameter axi_ada4355 CONFIG.BUFMRCE_EN $BUFMRCE_EN

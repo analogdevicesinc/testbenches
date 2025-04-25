@@ -56,7 +56,7 @@ module system_tb #(
   reg enable_pattern = 1'b0;
   reg dco_p = 1'b0;
   reg dco_n = 1'b1;
-  reg [7:0] frame_control = 8'b0;
+  //reg [7:0] frame_control = 8'b0;
   reg frame_clock_p = 1'b0;
   reg frame_clock_n = 1'b0;
   reg late_signal_p = 1'b0;
@@ -68,14 +68,14 @@ module system_tb #(
 
     .dco_p (dco_p),
     .dco_n (dco_n),
-    .da_p (da_p),
-    .da_n (da_n),
-    .db_p (db_p),
-    .db_n (db_n),
+    .d0a_p (da_p),
+    .d0a_n (da_n),
+    .d1a_p (db_p),
+    .d1a_n (db_n),
     .sync_n (sync_n),
-    .frame_control (frame_control),
-    .frame_clock_p (frame_clock_p),
-    .frame_clock_n (frame_clock_n)
+    //.frame_control (frame_control),
+    .frame_p (frame_clock_p),
+    .frame_n (frame_clock_n)
   );
 
   reg sync_n_d = 1'b0;

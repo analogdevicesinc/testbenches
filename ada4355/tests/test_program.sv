@@ -68,6 +68,8 @@ program test_program;
   parameter TX1_COMMON  = BASE + 'h10_00 * 4;
   parameter TX1_CHANNEL = BASE + 32'h0000_4000;
 
+  parameter REGMAP_ENABLE = BASE + 'h00C8;
+
   test_harness_env env;
   bit [31:0] val;
 
@@ -129,6 +131,9 @@ program test_program;
     sanity_test;
 
     dma_test;
+
+    #1000
+    ada4355_regmap;
 
     #7000
     misaligned_frame;
@@ -214,6 +219,17 @@ begin
 end
 endtask
 
+task ada4355_regmap;
+begin
+    int read_regmap = 0;
+ `INFO(("Inside ada4355_regmap task"));
+  axi_write (REGMAP_ENABLE,4);
+  `INFO(("After axi_write ada4355_regmap task"));
+  axi_read(REGMAP_ENABLE, read_regmap);
+  `INFO(("Regmap Value 0x%h ", read_regmap));
+end
+endtask
+
   // --------------------------
 // Enable pattern
 // --------------------------
@@ -229,8 +245,8 @@ begin
 
   axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status);
   `INFO(("Before while sync_status == 0"));
-  while(sync_status == 31'b0)
-    axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status);
+ /* while(sync_status == 31'b0)
+    axi_read(RX1_COMMON+ GetAddrs(ADC_COMMON_REG_SYNC_STATUS), sync_status); */
 
   force system_tb.enable_pattern = 1'b0;
   `INFO(("Force enable_pattern = 0"));

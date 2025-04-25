@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -52,12 +52,11 @@ create_bd_port -dir I offload_trigger
 source $ad_hdl_dir/library/i3c_controller/scripts/i3c_controller_bd.tcl
 
 set async_clk 0
-set clk_mod $ad_project_params(CLK_MOD)
 set i2c_mod 1
 set offload 1
 set max_devs 16
 
-i3c_controller_create i3c $async_clk $clk_mod $i2c_mod $offload $max_devs
+i3c_controller_create i3c $async_clk $i2c_mod $offload $max_devs
 
 ad_connect i3c/m_i3c i3c
 ad_connect i3c/offload_sdi offload_sdi

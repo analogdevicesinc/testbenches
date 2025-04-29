@@ -65,7 +65,7 @@ Process:
 Creating a modified block design in the same project folder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. warning::
+.. caution::
 
    Advanced, not all configurations are compatible with the test programs.
 
@@ -169,7 +169,7 @@ And for a specific file:
    $    -i ../../../utilities/ \
    $    my_vip_pkg.sv
 
-.. note::
+.. attention::
 
    Ensure to call xvlog in the correct compilation order,
    to add them to ``xil_defaultlib``, otherwise call ``*_vlog.prj`` first.

@@ -21,7 +21,7 @@ use **Cygwin**.
 Set up the Testbenches repository
 -------------------------------------------------------------------------------
 
-.. caution::
+.. important::
 
    Before building any testbench, you **must**:
 
@@ -124,7 +124,7 @@ located. Two variables must be exported, which specify the target directories:
 Building a testbench
 -------------------------------------------------------------------------------
 
-.. caution::
+.. important::
 
    Before building any testbench, you must have the environment prepared each
    time a new terminal session is started, following the environment setup guide

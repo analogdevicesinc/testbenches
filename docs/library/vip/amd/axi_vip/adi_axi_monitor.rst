@@ -36,10 +36,14 @@ can only reference an adi_agent.
 task run();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Used to start up the monitor. If a monitor instance is already running, it will
-throw an error message and continues the simulation.
+Used to start up the monitor.
 
-.. important::
+.. error::
+
+   If a monitor instance is already running, it will throw an error message and
+   continues the simulation.
+
+.. attention::
 
    This error message can be ommitted, as this causes no harm during simulation.
    However, it is highly recommended to review the simulation stimulus and

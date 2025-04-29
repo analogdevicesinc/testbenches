@@ -128,7 +128,7 @@ Stop the environment
 * Stop the watchdog
 * Stop the clocks
 
-.. warning::
+.. danger::
 
    Depending on the configuration parameters and/or changed hardcoded values,
    the watchdog may trigger prematurely!

@@ -23,7 +23,7 @@ the repository, how to check its
 `switch <https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging>`__
 between branches.
 
-.. note::
+.. attention::
 
    A basic git knowledge is required in order to work with these source files,
    if you do not have any, don't worry!
@@ -93,7 +93,7 @@ support the latest tools and get additional new features. \*\* The
 main branch is always synchronized with the latest release. \*\* If you
 are in doubt, ask us on :ez:`fpga`.
 
-.. note::
+.. tip::
 
    You can find the release notes on of the repositories at:
 

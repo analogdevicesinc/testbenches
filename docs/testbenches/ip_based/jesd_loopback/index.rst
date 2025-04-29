@@ -65,7 +65,7 @@ The following parameters of this project can be configured:
 -  LANE_RATE: lane rate of the RX/TX links;
    Options: 5/8.25/10
 
-.. note::
+.. tip::
 
   For other JESD parameter configurations, take a look at the :external+hdl:ref:`jesd204`.
 

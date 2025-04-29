@@ -48,7 +48,7 @@ The following parameters of this project that can be configured:
 -  WIDTH: defines the valid delays between packets:
    Options: 8, 16, 32, 64
 
-.. note::
+.. hint::
 
    The max width is calculated with: CHANNELS*SAMPLES*WIDTH and it cannot
    exceed 2048.
@@ -139,7 +139,7 @@ Packer testing
 * Starts the data transmission and the watchdog
 * Waits for scoreboard to check all the data
 
-.. warning::
+.. caution::
 
    Increasing the hardcoded value for the data length might cause the watchdog
    timer to trigger prematurely!

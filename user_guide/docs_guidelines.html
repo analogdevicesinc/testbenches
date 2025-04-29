@@ -92,6 +92,7 @@
 <li><a class="reference internal" href="#">Documentation guidelines</a><ul>
 <li><a class="reference internal" href="#templates">Templates</a></li>
 <li><a class="reference internal" href="#common-sections">Common sections</a></li>
+<li><a class="reference internal" href="#warnings-and-messages">Warnings and messages</a></li>
 <li><a class="reference internal" href="#class-hierarchy">Class hierarchy</a></li>
 </ul>
 </li>
@@ -263,6 +264,23 @@ they’re not included in any toctree.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">include</span><span class="p">::</span> <span class="o">../</span><span class="n">projects</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">more_information</span><span class="o">.</span><span class="n">rst</span>
 
 <span class="o">..</span> <span class="n">include</span><span class="p">::</span> <span class="o">../</span><span class="n">projects</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">support</span><span class="o">.</span><span class="n">rst</span>
+</pre></div>
+</div>
+<p>And they will be rendered as sections of the page.</p>
+</section>
+<section id="warnings-and-messages">
+<h2>Warnings and messages<a class="headerlink" href="#warnings-and-messages" title="Link to this heading"></a></h2>
+<p>The warning and message directives are used for information highlighting. The
+different types of warnings and messages are listed and explained on the
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#admonitions-messages-and-warnings">Sphinx Directives documentation page</a>.</p>
+<p>Here are a couple of examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.. note::
+
+   This is a note.
+
+.. important::
+
+   This is an important message!
 </pre></div>
 </div>
 <p>And they will be rendered as sections of the page.</p>

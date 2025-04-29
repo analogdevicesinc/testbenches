@@ -266,10 +266,14 @@ can only reference an adi_agent.</p>
 </section>
 <section id="task-run">
 <h3>task run();<a class="headerlink" href="#task-run" title="Link to this heading"></a></h3>
-<p>Used to start up the monitor. If a monitor instance is already running, it will
-throw an error message and continues the simulation.</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
+<p>Used to start up the monitor.</p>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>If a monitor instance is already running, it will throw an error message and
+continues the simulation.</p>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
 <p>This error message can be ommitted, as this causes no harm during simulation.
 However, it is highly recommended to review the simulation stimulus and
 correct this error.</p>

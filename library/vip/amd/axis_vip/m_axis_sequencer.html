@@ -329,16 +329,22 @@ sent, so the sequencer can be safely disabled.</p>
 </section>
 <section id="function-void-set-stop-policy-input-stop-policy-t-stop-policy">
 <h3>function void set_stop_policy(input stop_policy_t stop_policy);<a class="headerlink" href="#function-void-set-stop-policy-input-stop-policy-t-stop-policy" title="Link to this heading"></a></h3>
-<p>Sets the stop policy to data beat, packet or queue finished. If the sequencer
-is already enabled, it will throw an error message.</p>
+<p>Sets the stop policy to data beat, packet or queue finished.</p>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>The sequencer must be disabled before changing stop policy!</p>
+</div>
 </section>
 <section id="function-void-set-data-gen-mode-input-data-gen-mode-t-data-gen-mode">
 <h3>function void set_data_gen_mode(input data_gen_mode_t data_gen_mode);<a class="headerlink" href="#function-void-set-data-gen-mode-input-data-gen-mode-t-data-gen-mode" title="Link to this heading"></a></h3>
 <p>Sets the data generation mode. It can be a ramp, randomly generated data, or
-user specified data. If the sequencer is already enabled, it will throw an
-error message.</p>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
+user specified data.</p>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>The sequencer must be disabled before changing data generation mode!</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
 <p>If the data is user specified, the user must make sure that the packetizer
 is fed with enough data to complete a packet, otherwise the packet will not
 be transfered to the driver.</p>
@@ -348,8 +354,12 @@ be transfered to the driver.</p>
 <h3>function void set_descriptor_gen_mode(input bit descriptor_gen_mode);<a class="headerlink" href="#function-void-set-descriptor-gen-mode-input-bit-descriptor-gen-mode" title="Link to this heading"></a></h3>
 <p>Sets the packet generation mode. If set to 0, it will only create the packets
 that are in the queue. If set to 1, it will repeat all of the packets that are
-in the queue in a round-robin mode. If the sequencer is already enabled, it
-will throw an error message.</p>
+in the queue in a round-robin mode.</p>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>The sequencer must be disabled before chaning packet descriptor generation
+mode!</p>
+</div>
 </section>
 <section id="function-void-set-data-beat-delay-input-int-data-beat-delay">
 <h3>function void set_data_beat_delay(input int data_beat_delay);<a class="headerlink" href="#function-void-set-data-beat-delay-input-int-data-beat-delay" title="Link to this heading"></a></h3>
@@ -363,13 +373,19 @@ will throw an error message.</p>
 <h3>function void set_keep_all();<a class="headerlink" href="#function-void-set-keep-all" title="Link to this heading"></a></h3>
 <p>Sets the generated data to be all valid bytes. Automatically adjusts the packet
 length, increasing its size, if the specified number of bytes don’t fill all
-samples with data. If the sequencer is already enabled, it will throw an error
-message.</p>
+samples with data.</p>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>The sequencer must be disabled before changing the byte keep setting!</p>
+</div>
 </section>
 <section id="function-void-set-keep-some">
 <h3>function void set_keep_some();<a class="headerlink" href="#function-void-set-keep-some" title="Link to this heading"></a></h3>
-<p>Sets the generated data to have not valid bytes. If the sequencer is already
-enabled, it will throw an error message.</p>
+<p>Sets the generated data to have not valid bytes.</p>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>The sequencer must be disabled before changing the byte keep setting!</p>
+</div>
 </section>
 <section id="function-void-add-xfer-descriptor">
 <h3>function void add_xfer_descriptor(…);<a class="headerlink" href="#function-void-add-xfer-descriptor" title="Link to this heading"></a></h3>

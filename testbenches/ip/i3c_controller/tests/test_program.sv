@@ -190,6 +190,7 @@ endtask
 //---------------------------------------------------------------------------
 // Enable/disable auto acknowledge
 //---------------------------------------------------------------------------
+logic auto_ack = 1'b1;
 task set_auto_ack(input bit enable);
   auto_ack <= enable;
   if (!enable) begin
@@ -204,7 +205,6 @@ endtask
 // every byte transferred.
 logic do_ack = 1'b1;
 logic do_rx_t = 1'b1;
-logic auto_ack = 1'b1;
 logic dev_char_state = 1'b1;
 initial begin
   while (1) begin

@@ -188,12 +188,20 @@ task print_ibi(input int data);
 endtask
 
 //---------------------------------------------------------------------------
+// Enable/disable auto acknowledge
+//---------------------------------------------------------------------------
+task set_auto_ack(input bit enable);
+  auto_ack <= enable;
+  if (!enable) begin
+    i3c_dev_sda <= 1'bZ;
+  end
+endtask
+
+//---------------------------------------------------------------------------
 // Peripheral ACK & Stop RX
 //---------------------------------------------------------------------------
 // Mock acknowledge by the peripheral without having to make a method call for
 // every byte transferred.
-// Limitation: If on do_ack or CMDW_DAA_DEV_CHAR, do_ack <= 1'b0 will not
-// release the sdi
 logic do_ack = 1'b1;
 logic do_rx_t = 1'b1;
 logic auto_ack = 1'b1;
@@ -314,7 +322,7 @@ bit   [31:0]  sdi_fifo_data = 0;
 task ccc_i3c_test;
   `INFO(("CCC I3C Started"), ADI_VERBOSITY_LOW);
 
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
 
   // Disable IBI
   i3c_controller.configure_ibi(
@@ -371,13 +379,13 @@ task ccc_i3c_test;
   i3c_controller.set_cmd_fifo(I3C_CMD_GETPID); // CCC, length rx 6
   i3c_controller.set_cmd_fifo(I3C_CCC_GETPID);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   i3c_dev_sda <= 1'bZ;
   repeat (6) @(posedge `DUT_I3C_WORD.sdi_valid);
   i3c_dev_sda <= 1'b0;
   wait (`STOP);
   i3c_dev_sda <= 1'bZ;
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   @(posedge i3c_irq);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
@@ -390,11 +398,11 @@ task ccc_i3c_test;
   i3c_controller.set_cmd_fifo(I3C_CMD_GETDCR); // CCC, length rx 1
   i3c_controller.set_cmd_fifo(I3C_CCC_GETDCR);
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   i3c_dev_sda <= 1'b0;
   wait (`STOP);
   i3c_dev_sda <= 1'bZ;
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   @(posedge i3c_irq);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
@@ -449,6 +457,8 @@ task priv_i3c_test();
   // Test #1, controller does private write transfer that is ACK
   `INFO(("PRIV I3C Test #1"), ADI_VERBOSITY_LOW);
 
+  set_auto_ack(1);
+
   // Write SDO payload
   i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
 
@@ -471,10 +481,10 @@ task priv_i3c_test();
 
   // Dummy HIGH peripheral write + T_bit continue
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   i3c_dev_sda <= 1'bZ;
   wait (`STOP);
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
@@ -487,11 +497,11 @@ task priv_i3c_test();
 
   // Dummy LOW peripheral write + T_bit stop
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   i3c_dev_sda <= 1'b0;
   wait (`STOP);
   i3c_dev_sda <= 1'bZ;
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
@@ -515,9 +525,9 @@ task priv_i3c_test();
   // Write CMD instruction
   i3c_controller.set_cmd_fifo(I3C_CMD_1);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
 
   // Test #6, controller does private read transfer that is ACK,
   // no broadcast address.
@@ -528,9 +538,9 @@ task priv_i3c_test();
 
   // Dummy HIGH peripheral write + T_bit continue
   wait (`DUT_I3C_WORD.st == `CMDW_MSG_RX);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   wait (`STOP);
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
@@ -617,7 +627,7 @@ task priv_i2c_test();
   // Test #2, controller does private read transfer and ACKs all receiving
   // Mocks a Write address then read transfer.
   `INFO(("PRIV I2C Test #1, #2"), ADI_VERBOSITY_LOW);
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
 
   // Write SDO payload
   i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_00EF);
@@ -631,7 +641,7 @@ task priv_i2c_test();
    `ERROR(("Not in I2C mode!"));
   // Dummy LOW peripheral write + ACK continue
   wait (`DUT_I3C_WORD.st == `CMDW_I2C_RX);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   i3c_dev_sda <= 1'b0;
   // Count n ACK-bit asserted low by the controller (sampling before
   // tri-state)
@@ -640,11 +650,11 @@ task priv_i2c_test();
 
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
 
   // Test #3, controller does private write transfer that stalls for a while
   `INFO(("PRIV I2C Test #3"), ADI_VERBOSITY_LOW);
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
 
   // Write SDO payload
   i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
@@ -662,7 +672,7 @@ task priv_i2c_test();
 
   // Test #4, controller does private write transfer that is NACK
   `INFO(("PRIV I2C Test #4"), ADI_VERBOSITY_LOW);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
 
   // Write SDO payload
   i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_00EF);
@@ -726,7 +736,7 @@ endtask
 bit   [31:0]  ibi_fifo_data = 0;
 
 task ibi_i3c_test();
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
 
   `INFO(("IBI I3C Test Started"), ADI_VERBOSITY_LOW);
 
@@ -778,7 +788,7 @@ task ibi_i3c_test();
   wait (`DUT_I3C_WORD.st == `CMDW_IBI_MDB);
   wait (`DUT_I3C_WORD.st == `CMDW_SR);
   // Enable ACK during the cmd transfer
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   wait (i3c_irq);
   i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi (ibi_fifo_data);
@@ -799,7 +809,7 @@ task ibi_i3c_test();
   // request. No ibi is written to the FIFO.
 
   `INFO(("IBI I3C Test #3"), ADI_VERBOSITY_LOW);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   write_ibi_da(START_DA);
 
   #10000ns
@@ -824,7 +834,7 @@ task ibi_i3c_test();
   // Write DA during low during broadcast address
   write_ibi_da(START_DA-1);
   // Enable ACK during the cmd transfer
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   @(posedge i3c_irq);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
@@ -841,7 +851,7 @@ task ibi_i3c_test();
 
   #12000ns
   `INFO(("IBI I3C Test #5"), ADI_VERBOSITY_LOW);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   write_ibi_da(DEVICE_DA1+1);
 
   wait (i3c_irq);
@@ -863,14 +873,14 @@ task ibi_i3c_test();
 
   #12000ns
   `INFO(("IBI I3C Test #6"), ADI_VERBOSITY_LOW);
-  auto_ack <= 1'b0;
+  set_auto_ack(0);
   write_ibi_da(DEVICE_DA1+1);
 
   #10000ns
   if (`DUT_I3C_REGMAP.ibi_fifo_valid)
     `FATAL(("IBI should not have thrown IBI"));
 
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
 
   // Clear any sdi data from the cmd
   while(`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level) begin
@@ -912,7 +922,7 @@ task daa_i3c_test();
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level)
     `FATAL(("SDI FIFO must be empty for the DAA procedure"));
 
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   // Disable IBI
   i3c_controller.configure_ibi(
     .listen(1'b0),
@@ -966,9 +976,9 @@ task daa_i3c_test();
     .data3(8'h0));
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
 
-  // Wait next start, do not ACK to exit DAA (no other dev on bus needs addr)
-  `WAIT (`DUT_I3C_WORD.st == `CMDW_START, 100000);
-  #10ns auto_ack <= 1'b0;
+  // Wait next 7E_W1, do not ACK to exit DAA (no other dev on bus needs addr)
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_BCAST_7E_W1, 100000);
+  set_auto_ack(0);
   @(posedge i3c_irq);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
@@ -1108,7 +1118,7 @@ task offload_i3c_test();
     .offload_length(4'd2),
     .mode(1'b1));
 
-  auto_ack <= 1'b1;
+  set_auto_ack(1);
   offload_trigger_l = 1'b1;
   #10ns offload_trigger_l = 1'b0;
 

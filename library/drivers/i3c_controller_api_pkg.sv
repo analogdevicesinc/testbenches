@@ -189,17 +189,17 @@ package i3c_controller_api_pkg;
     endtask
 
     task write_offload_cmd(
-      input bit [3:0] channel,
+      input bit [3:0] slot,
       input bit [31:0] data);
 
-      this.axi_write(GetAddrs(i3c_controller_host_interface_OFFLOAD_CMD_n) + 'h4 * channel, data);
+      this.axi_write(GetAddrs(i3c_controller_host_interface_OFFLOAD_CMD_n) + 'h4 * slot, data);
     endtask
 
     task write_offload_sdo(
-      input bit [3:0] channel,
+      input bit [3:0] slot,
       input bit [31:0] data);
 
-      this.axi_write(GetAddrs(i3c_controller_host_interface_OFFLOAD_SDO_n) + 'h4 * channel, data);
+      this.axi_write(GetAddrs(i3c_controller_host_interface_OFFLOAD_SDO_n) + 'h4 * slot, data);
     endtask
 
   endclass

@@ -1066,6 +1066,10 @@ endtask
 //---------------------------------------------------------------------------
 task offload_i3c_test();
   // Test #1, controller does offload transfer
+  // The commands and SDO payloads are stored into a dual access block ram,
+  // consumed cyclically by the core.
+  // After the slots are written to, the length of commands are written
+  // (so the core knows the number of slots used), and enter offload mode.
 
   #10000ns
 
@@ -1085,16 +1089,16 @@ task offload_i3c_test();
   offload_trigger_l = 1'b0;
 
   // Write SDO payload
-  i3c_controller.write_offload_cmd(
-    .channel(4'h0),
+  i3c_controller.write_offload_sdo(
+    .slot(4'h0),
     .data(32'hDEAD_BEEF));
 
   // Write CMD instruction
-  i3c_controller.write_offload_sdo(
-    .channel(4'h0),
+  i3c_controller.write_offload_cmd(
+    .slot(4'h0),
     .data(I3C_CMD_1));
-  i3c_controller.write_offload_sdo(
-    .channel(4'h1),
+  i3c_controller.write_offload_cmd(
+    .slot(4'h1),
     .data(I3C_CMD_3));
 
   // Set offload length and enter offload mode

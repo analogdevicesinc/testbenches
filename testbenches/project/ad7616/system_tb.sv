@@ -40,14 +40,14 @@
 module system_tb();
     generate
     if (`INTF == 1) begin //serial interface
-      wire       ad7616_spi_sclk;
-      wire       ad7616_spi_sdo;
-      wire [1:0] ad7616_spi_sdi;
-      wire       ad7616_spi_cs;
-      wire       adc_busy;
-      wire       adc_cnvst;
-      wire       spi_clk;
-      wire       ad7616_irq;
+      wire                       ad7616_spi_sclk;
+      wire                       ad7616_spi_sdo;
+      wire [(`NUM_OF_SDI - 1):0] ad7616_spi_sdi;
+      wire                       ad7616_spi_cs;
+      wire                       adc_busy;
+      wire                       adc_cnvst;
+      wire                       spi_clk;
+      wire                       ad7616_irq;
 
     `TEST_PROGRAM test(
       .spi_clk (spi_clk),

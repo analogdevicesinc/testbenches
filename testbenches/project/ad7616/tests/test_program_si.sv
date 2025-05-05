@@ -95,15 +95,15 @@ localparam INST_SLEEP                 = 32'h0000_3100;
 `define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
 
 program test_program_si (
-  input       spi_clk,
-  input       ad7616_irq,
-  input       ad7616_spi_sclk,
-  input       ad7616_spi_sdo,
-  input [1:0] ad7616_spi_sdi,
-  input       ad7616_spi_cs,
-  input       rx_cnvst,
-  output      rx_busy);
-
+  input                        spi_clk,
+  input                        ad7616_irq,
+  input                        ad7616_spi_sclk,
+  input                        ad7616_spi_sdo,
+  input  [(`NUM_OF_SDI - 1):0] ad7616_spi_sdi,
+  input                        ad7616_spi_cs,
+  input                        rx_cnvst,
+  output                       rx_busy
+  );
 
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
@@ -277,7 +277,6 @@ wire          m_spi_csn_negedge_s;
 wire          m_spi_csn_int_s = ad7616_spi_cs;
 bit           m_spi_csn_int_d = 0;
 bit   [15:0]  sdi_shiftreg;
-wire  [15:0]  sdi_shiftreg2;
 bit   [7:0]   rx_sclk_pos_counter = 0;
 bit   [7:0]   rx_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
@@ -292,8 +291,10 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-assign ad7616_spi_sdi[0] = sdi_shiftreg2[15];
-assign ad7616_spi_sdi[1] = sdi_shiftreg[15];
+genvar i;
+for (i = 0; i < `NUM_OF_SDI; i++) begin
+  assign ad7616_spi_sdi[i] = sdi_shiftreg[15]; // all SDI lanes got the same data
+end
 
 assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_pos_counter == 16) :
@@ -353,12 +354,9 @@ initial begin
       if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
       sdi_shiftreg <= {sdi_shiftreg[15:0], 1'b0};
-      //sdi_shiftreg2 <= {sdi_shiftreg2[15:0], 1'b0};
     end
   end
 end
-
-assign sdi_shiftreg2 = {sdi_shiftreg[14:0], 1'b0};
 
 //---------------------------------------------------------------------------
 // Storing SDI Data for later comparison
@@ -382,11 +380,11 @@ initial begin
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg2;
+          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg;
           offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg;
       end else begin
         sdi_fifo_data_store[31:16] = sdi_shiftreg;
-        sdi_fifo_data_store[15:0] = sdi_shiftreg2;
+        sdi_fifo_data_store[15:0] = sdi_shiftreg;
       end
       shiftreg_sampled <= 'h1;
     end

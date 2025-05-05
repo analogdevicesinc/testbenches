@@ -41,18 +41,21 @@ LIB_DEPS += util_pack/util_cpack2
 # Format is:  <configuration>:<test name>
 #TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 
+# Parallel interface configurations
 TESTS += cfg_pi:test_program_pi
-TESTS += cfg_si:test_program_si
+
+# Serial interface configurations
+TESTS += cfg_si_sdi2:test_program_si
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 
 # usage :
 #
 # run specific test on a specific configuration in gui mode
-# 	make CFG=cfg_si TST=test_program_si MODE=gui
+# 	make CFG=cfg_si_sdi2 TST=test_program_si MODE=gui
 #
 # run all test from a configuration
-# 	make cfg_si
+# 	make cfg_si_sdi2
 
 ####################################################################################
 ####################################################################################

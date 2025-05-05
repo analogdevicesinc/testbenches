@@ -42,7 +42,7 @@ module system_tb();
     if (`INTF == 1) begin //serial interface
       wire       ad7616_spi_sclk;
       wire       ad7616_spi_sdo;
-      wire [1:0] ad7616_spi_sdi;
+      wire [`NUM_OF_SDI-1:0] ad7616_spi_sdi;
       wire       ad7616_spi_cs;
       wire       adc_busy;
       wire       adc_cnvst;

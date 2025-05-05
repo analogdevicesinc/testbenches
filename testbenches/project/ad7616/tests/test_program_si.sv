@@ -99,7 +99,7 @@ program test_program_si (
   input       ad7616_irq,
   input       ad7616_spi_sclk,
   input       ad7616_spi_sdo,
-  input [1:0] ad7616_spi_sdi,
+  input [`NUM_OF_SDI-1:0] ad7616_spi_sdi,
   input       ad7616_spi_cs,
   input       rx_cnvst,
   output      rx_busy);
@@ -292,8 +292,14 @@ end
 
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
-assign ad7616_spi_sdi[0] = sdi_shiftreg2[15];
-assign ad7616_spi_sdi[1] = sdi_shiftreg[15];
+//assign ad7616_spi_sdi[0] = sdi_shiftreg2[15];
+//assign ad7616_spi_sdi[1] = sdi_shiftreg[15];
+
+
+genvar i;
+for (i = 0; i < `NUM_OF_SDI; i++) begin
+  assign ad7616_spi_sdi[i] = sdi_shiftreg[15]; // all SDI lanes got the same data
+end
 
 assign end_of_word = (CPOL ^ CPHA) ?
                      (rx_sclk_pos_counter == 16) :
@@ -358,7 +364,7 @@ initial begin
   end
 end
 
-assign sdi_shiftreg2 = {sdi_shiftreg[14:0], 1'b0};
+//assign sdi_shiftreg2 = {sdi_shiftreg[14:0], 1'b0};
 
 //---------------------------------------------------------------------------
 // Storing SDI Data for later comparison
@@ -371,6 +377,8 @@ bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
 
+assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[15:1]};
+
 initial begin
   forever begin
     @(posedge rx_sclk_bfm);
@@ -382,11 +390,16 @@ initial begin
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg2;
-          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg;
+        if (`NUM_OF_SDI == 1) begin
+            offload_sdi_data_store_arr[sdi_store_cnt] = sdi_shiftreg;
+        end else if (`NUM_OF_SDI == 2) begin
+            offload_sdi_data_store_arr [0+(2*sdi_store_cnt)] = sdi_shiftreg;
+            offload_sdi_data_store_arr [1+(2*sdi_store_cnt)] = sdi_shiftreg;
+        end
       end else begin
-        sdi_fifo_data_store[31:16] = sdi_shiftreg;
-        sdi_fifo_data_store[15:0] = sdi_shiftreg2;
+       // sdi_fifo_data_store[31:16] = sdi_shiftreg;
+       // sdi_fifo_data_store[15:0] = sdi_shiftreg2;
+        sdi_fifo_data_store = sdi_shiftreg;
       end
       shiftreg_sampled <= 'h1;
     end
@@ -410,7 +423,7 @@ end
 // Offload SPI Test
 //---------------------------------------------------------------------------
 
-bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] offload_captured_word_arr [(`NUM_OF_SDI * NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test();
     // Configure pwm
@@ -425,7 +438,7 @@ task offload_spi_test();
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*`NUM_OF_SDI)-1)); // X_LENGHTH = 1024-1
     base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
     base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
@@ -454,7 +467,7 @@ task offload_spi_test();
 
     #2000
 
-    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
+    for (int i=0; i<=((`NUM_OF_SDI * NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
       offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end

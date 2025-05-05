@@ -37,6 +37,7 @@ global ad_project_params
 
 # system level parameters
 set INTF  $ad_project_params(INTF)
+set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
 
 adi_project_files [list \
 	"$ad_hdl_dir/library/common/ad_edge_detect.v" \

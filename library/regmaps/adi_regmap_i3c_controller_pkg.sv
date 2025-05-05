@@ -322,7 +322,7 @@ package adi_regmap_i3c_controller_pkg;
     "DEV_CHAR_HAS_IBI_MDB": '{ 3, 3, RW, 'h0 },
     "DEV_CHAR_IS_IBI_CAPABLE": '{ 2, 2, RW, 'h0 },
     "DEV_CHAR_IS_ATTACHED": '{ 1, 1, RW, 'h0 },
-    "DEV_CHAR_IS_ATTACHED": '{ 1, 1, RW, 'h0 }}};
+    "DEV_CHAR_IS_I2C": '{ 0, 0, RW, 'h0 }}};
   `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_ADDR(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_ADDR",x)
   `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_ADDR(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_ADDR",x)
   `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_ADDR GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_ADDR")
@@ -343,19 +343,19 @@ package adi_regmap_i3c_controller_pkg;
   `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x)
   `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED")
   `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x,y)
-  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x)
-  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x)
-  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED")
-  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_ATTACHED(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_ATTACHED",x,y)
+  `define SET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_I2C(x) SetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_I2C",x)
+  `define GET_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_I2C(x) GetField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_I2C",x)
+  `define DEFAULT_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_I2C GetResetValue(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_I2C")
+  `define UPDATE_i3c_controller_host_interface_DEV_CHAR_DEV_CHAR_IS_I2C(x,y) UpdateField(i3c_controller_host_interface_DEV_CHAR,"DEV_CHAR_IS_I2C",x,y)
 
-  const reg_t i3c_controller_host_interface_OFFLOAD_CMD_n = '{ 'h02c0 + 'h04*n, "OFFLOAD_CMD_n" , '{
+  const reg_t i3c_controller_host_interface_OFFLOAD_CMD_n = '{ 'h02c0, "OFFLOAD_CMD_n" , '{
     "OFFLOAD_CMD": '{ 31, 0, RW, 'h00 }}};
   `define SET_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD(x) SetField(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD",x)
   `define GET_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD(x) GetField(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD",x)
   `define DEFAULT_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD GetResetValue(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD")
   `define UPDATE_i3c_controller_host_interface_OFFLOAD_CMD_n_OFFLOAD_CMD(x,y) UpdateField(i3c_controller_host_interface_OFFLOAD_CMD_n,"OFFLOAD_CMD",x,y)
 
-  const reg_t i3c_controller_host_interface_OFFLOAD_SDO_n = '{ 'h0300 + 'h04*n, "OFFLOAD_SDO_n" , '{
+  const reg_t i3c_controller_host_interface_OFFLOAD_SDO_n = '{ 'h0300, "OFFLOAD_SDO_n" , '{
     "OFFLOAD_SDO_BYTE_3": '{ 31, 24, RO, 'h00 },
     "OFFLOAD_SDO_BYTE_2": '{ 23, 16, RO, 'h00 },
     "OFFLOAD_SDO_BYTE_1": '{ 15, 8, RO, 'h00 },

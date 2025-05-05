@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,34 +33,10 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../../scripts/adi_sim.tcl
-
-if {$argc < 1} {
-  puts "Expecting at least one argument that specifies the test configuration"
-  exit 1
-} else {
-  set cfg_file [lindex $argv 0]
-}
-
-# Read common config file
-source "cfgs/${cfg_file}"
-
-# Set the project name
-set project_name [file rootname $cfg_file]
-
-# Create the project
-adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
-
-source $ad_tb_dir/library/includes/sp_include_i3c_controller.tcl
+source $ad_tb_dir/library/includes/sp_include_regmap.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "$ad_hdl_dir/library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh" \
-  "$ad_hdl_dir/library/i3c_controller/i3c_controller_core/i3c_controller_word.vh" \
-  "tests/test_program.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_i3c_controller_pkg.sv" \
+  "$ad_tb_dir/library/drivers/i3c_controller_api_pkg.sv" \
 ]
-
-#set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_program"
-
-adi_sim_generate $project_name

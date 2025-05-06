@@ -104,7 +104,7 @@ program test_program();
 
     jesd_tx_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
     jesd_tx_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-    jesd_tx_axis_agent.master_sequencer.add_xfer_descriptor_sample_count(32'd8192/jesd_tx_axis_agent.agent.C_XIL_AXI4STREAM_DATA_WIDTH, 0, 0);
+    jesd_tx_axis_agent.master_sequencer.add_xfer_descriptor_sample_count(32'd12288/jesd_tx_axis_agent.agent.C_XIL_AXI4STREAM_DATA_WIDTH, 0, 0);
 
     os_tx_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
     os_tx_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
@@ -121,11 +121,14 @@ program test_program();
     jesd_rx_axis_agent.slave_sequencer.start();
     os_rx_axis_agent.slave_sequencer.start();
 
-    base_env.mng.master_sequencer.RegWrite32('h50000000+'h6*4, 32'd1024);
+    // base_env.mng.master_sequencer.RegWrite32('h50000000+'h6*4, 32'd1024);
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd64);
 
     // Start-stop
     for (int i=0; i<8; i++) begin
       `TH.`EN_IO.inst.IF.set_io(8'hFF >> i);
+
+      base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd64 * int'(8/(8-i)));
 
       base_env.mng.master_sequencer.RegWrite32('h50000000+'h5*4, 32'h1);
       #2us;
@@ -146,30 +149,49 @@ program test_program();
     #2us;
 
     `TH.`EN_IO.inst.IF.set_io(8'hFF);
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd64);
 
+    // --- 1s packet counter testing ---
     // start transmission
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h5*4, 32'h1);
     #2us;
 
     // start counter
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h2*4, 32'h1);
-    base_env.mng.master_sequencer.RegWrite32('h50000000+'h2*4, 32'h0);
-    #100us;
+    #10us;
 
     // stop transmission
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h5*4, 32'h0);
     #2us;
 
+    // restart transmission to check if counter is reset
+    // start counter
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h2*4, 32'h1);
+
+    // --- BER testing ---
     // reset and start BER
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h1D*4, 32'h1);
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h1);
-    #50us;
+    #10us;
     // 3 bit error insertion
     repeat (3) begin
       base_env.mng.master_sequencer.RegWrite32('h50000000+'h23*4, 32'h1);
-      base_env.mng.master_sequencer.RegWrite32('h50000000+'h23*4, 32'h0);
     end
-    #50us;
+    #10us;
+    @(posedge `TH.application_core.direct_tx_clk);
+    repeat (5) begin
+      force `TH.application_core.s_axis_direct_rx_tready = 'h0;
+      force `TH.application_core.s_axis_direct_rx_tvalid = 'h0;
+      repeat (3) begin
+        @(posedge `TH.application_core.direct_tx_clk);
+      end
+      release `TH.application_core.s_axis_direct_rx_tready;
+      release `TH.application_core.s_axis_direct_rx_tvalid;
+      repeat (3) begin
+        @(posedge `TH.application_core.direct_tx_clk);
+      end
+    end
+    #10us;
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h0);
 
     // read BER registers
@@ -182,8 +204,21 @@ program test_program();
     // start-stop BER
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h1);
     #10us;
-    base_env.mng.master_sequencer.RegWrite32('h50000000+'h23*4, 32'h1);
-    base_env.mng.master_sequencer.RegWrite32('h50000000+'h23*4, 32'h0);
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h0);
+
+    // read BER registers
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h1E*4, total_bits[63:32]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h1F*4, total_bits[31:0]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h20*4, error_bits_total[63:32]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h21*4, error_bits_total[31:0]);
+    base_env.mng.master_sequencer.RegRead32('h50000000+'h22*4, out_of_sync_total);
+
+    // forced errors BER
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h1);
+    #10us;
+    force `TH.application_core.s_axis_direct_rx_tdata = 'h0;
+    #10us;
+    release `TH.application_core.s_axis_direct_rx_tdata;
     #10us;
     base_env.mng.master_sequencer.RegWrite32('h50000000+'h1C*4, 32'h0);
 

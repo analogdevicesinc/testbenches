@@ -188,8 +188,8 @@ set ad_project_params(AXIS_IF_TX_USER_WIDTH) 17
 set ad_project_params(AXIS_IF_RX_USER_WIDTH) 49
 
 set ad_project_params(INPUT_CHANNELS) 8
-set ad_project_params(INPUT_SAMPLES_PER_CHANNEL) 1
+set ad_project_params(INPUT_SAMPLES_PER_CHANNEL) 16
 set ad_project_params(INPUT_SAMPLE_DATA_WIDTH) 16
 
-set ad_project_params(OUTPUT_WIDTH) 128
+set ad_project_params(OUTPUT_WIDTH) 2048
 set ad_project_params(OUTPUT_CHANNELS) 8

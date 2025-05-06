@@ -223,10 +223,13 @@ set AXIS_IF_TX_DEST_WIDTH $ad_project_params(AXIS_IF_TX_DEST_WIDTH)
 set AXIS_IF_RX_DEST_WIDTH $ad_project_params(AXIS_IF_RX_DEST_WIDTH)
 set AXIS_IF_TX_USER_WIDTH $ad_project_params(AXIS_IF_TX_USER_WIDTH)
 set AXIS_IF_RX_USER_WIDTH $ad_project_params(AXIS_IF_RX_USER_WIDTH)
-set INPUT_WIDTH $ad_project_params(INPUT_WIDTH)
 set INPUT_CHANNELS $ad_project_params(INPUT_CHANNELS)
+set INPUT_SAMPLES_PER_CHANNEL $ad_project_params(INPUT_SAMPLES_PER_CHANNEL)
+set INPUT_SAMPLE_DATA_WIDTH $ad_project_params(INPUT_SAMPLE_DATA_WIDTH)
 set OUTPUT_WIDTH $ad_project_params(OUTPUT_WIDTH)
 set OUTPUT_CHANNELS $ad_project_params(OUTPUT_CHANNELS)
+
+set INPUT_WIDTH [expr $INPUT_CHANNELS*$INPUT_SAMPLES_PER_CHANNEL*$INPUT_SAMPLE_DATA_WIDTH]
 
 ad_ip_instance application_core application_core [list \
   IF_COUNT $IF_COUNT \
@@ -295,8 +298,9 @@ ad_ip_instance application_core application_core [list \
   AXIS_IF_RX_USER_WIDTH $AXIS_IF_RX_USER_WIDTH \
   STAT_INC_WIDTH $STAT_INC_WIDTH \
   STAT_ID_WIDTH $STAT_ID_WIDTH \
-  INPUT_WIDTH $INPUT_WIDTH \
   INPUT_CHANNELS $INPUT_CHANNELS \
+  INPUT_SAMPLES_PER_CHANNEL $INPUT_SAMPLES_PER_CHANNEL \
+  INPUT_SAMPLE_DATA_WIDTH $INPUT_SAMPLE_DATA_WIDTH \
   OUTPUT_WIDTH $OUTPUT_WIDTH \
   OUTPUT_CHANNELS $OUTPUT_CHANNELS \
 ]
@@ -385,33 +389,46 @@ ad_connect corundum_resetn os_rx_axis/aresetn
 
 ad_ip_instance util_cpack2 input_cpack [ list \
   NUM_OF_CHANNELS $INPUT_CHANNELS \
-  SAMPLE_DATA_WIDTH [expr $INPUT_WIDTH/$INPUT_CHANNELS] \
-  SAMPLES_PER_CHANNEL 1 \
+  SAMPLE_DATA_WIDTH $INPUT_SAMPLE_DATA_WIDTH \
+  SAMPLES_PER_CHANNEL $INPUT_SAMPLES_PER_CHANNEL \
 ]
 
 ad_connect input_cpack/clk input_clk
 ad_connect input_cpack/reset input_reset
 
+create_bd_cell -type hier slicer_hier
+
+create_bd_pin -dir I -from [expr {$INPUT_CHANNELS-1}] -to 0 slicer_hier/input_enable
+create_bd_pin -dir I -from [expr {$INPUT_WIDTH-1}] -to 0 slicer_hier/input_data
+
+ad_connect enable_io_vip/out slicer_hier/input_enable
+ad_connect jesd_tx_axis/m_axis_tdata slicer_hier/input_data
+
 for {set i 0} {$i < $INPUT_CHANNELS} {incr i} {
-  ad_ip_instance xlslice enable_slice_${i} [ list \
+  create_bd_pin -dir O slicer_hier/input_enable_${i}
+  create_bd_pin -dir O -from [expr {$INPUT_WIDTH/$INPUT_CHANNELS-1}] -to 0 slicer_hier/input_data_${i}
+
+  ad_ip_instance xlslice slicer_hier/enable_slice_${i} [list \
     DIN_WIDTH $INPUT_CHANNELS \
     DIN_FROM $i \
     DIN_TO $i \
     DOUT_WIDTH 1 \
   ]
 
-  ad_connect enable_slice_${i}/Din enable_io_vip/out
-  ad_connect enable_slice_${i}/Dout input_cpack/enable_${i}
+  ad_connect slicer_hier/input_enable slicer_hier/enable_slice_${i}/Din
+  ad_connect slicer_hier/enable_slice_${i}/Dout slicer_hier/input_enable_${i}
+  ad_connect slicer_hier/input_enable_${i} input_cpack/enable_${i}
 
-  ad_ip_instance xlslice data_slice_${i} [ list \
+  ad_ip_instance xlslice slicer_hier/data_slice_${i} [list \
     DIN_WIDTH $INPUT_WIDTH \
     DIN_FROM [expr $INPUT_WIDTH/$INPUT_CHANNELS*($i+1)-1] \
     DIN_TO [expr $INPUT_WIDTH/$INPUT_CHANNELS*$i] \
     DOUT_WIDTH [expr $INPUT_WIDTH/$INPUT_CHANNELS] \
   ]
 
-  ad_connect data_slice_${i}/Din jesd_tx_axis/m_axis_tdata
-  ad_connect data_slice_${i}/Dout input_cpack/fifo_wr_data_${i}
+  ad_connect slicer_hier/input_data slicer_hier/data_slice_${i}/Din
+  ad_connect slicer_hier/data_slice_${i}/Dout slicer_hier/input_data_${i}
+  ad_connect slicer_hier/input_data_${i} input_cpack/fifo_wr_data_${i}
 }
 
 ad_connect input_cpack/fifo_wr_en jesd_tx_axis/m_axis_tvalid
@@ -435,7 +452,6 @@ ad_cpu_interconnect 0x50000000 application_core
 
 ad_connect application_core/input_axis_tdata input_cpack/packed_fifo_wr_data
 ad_connect application_core/input_axis_tvalid input_cpack/packed_fifo_wr_en
-ad_connect application_core/input_axis_tready input_cpack/packed_fifo_wr_overflow
 
 ad_connect application_core/s_axis_sync_tx os_tx_axis/M_AXIS
 ad_connect application_core/m_axis_sync_tx application_core/s_axis_direct_tx

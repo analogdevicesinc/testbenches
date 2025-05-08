@@ -41,6 +41,7 @@ package test_harness_env_pkg;
   import logger_pkg::*;
   import adi_environment_pkg::*;
   import adi_axi_agent_pkg::*;
+  import watchdog_pkg::*;
 
 
   class test_harness_env #(int `AXI_VIP_PARAM_ORDER(mng), int `AXI_VIP_PARAM_ORDER(ddr)) extends adi_environment;
@@ -54,6 +55,8 @@ package test_harness_env_pkg;
     virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if;
 
     virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if;
+
+    watchdog simulation_watchdog;
 
     //============================================================================
     // Constructor
@@ -72,6 +75,8 @@ package test_harness_env_pkg;
 
       super.new(name);
 
+      this.simulation_watchdog = new("Simulation watchdog", 10**6, "Simulation might be hanging!");
+
       this.sys_clk_vip_if = sys_clk_vip_if;
       this.dma_clk_vip_if = dma_clk_vip_if;
       this.ddr_clk_vip_if = ddr_clk_vip_if;
@@ -88,6 +93,8 @@ package test_harness_env_pkg;
     //   - Start the agents
     //============================================================================
     task start();
+      this.simulation_watchdog.start();
+
       this.mng.agent.start_master();
       this.ddr.agent.start_slave();
 
@@ -106,6 +113,8 @@ package test_harness_env_pkg;
       this.sys_clk_vip_if.stop_clock();
       this.dma_clk_vip_if.stop_clock();
       this.ddr_clk_vip_if.stop_clock();
+
+      this.simulation_watchdog.stop();
     endtask
 
     //============================================================================

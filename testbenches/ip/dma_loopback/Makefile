@@ -7,7 +7,6 @@
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_axis.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
 
 # Remaining test-bench dependencies except test programs
@@ -24,10 +23,6 @@ CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
-#TESTS += cfg1_mm2mm_default:directed_test
-#TESTS += cfg1:test_program
-#TESTS += cfg2_fsync:test_program
-#TESTS += cfg2_fsync:test_frame_delay
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 

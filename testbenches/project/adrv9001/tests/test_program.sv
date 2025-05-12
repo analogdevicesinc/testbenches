@@ -827,7 +827,7 @@ program test_program;
     tx2_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
     tx2_dmac_api.transfer_start();
 
-    // Select DDS as source
+    // Select DMA as source
     tx2_dac_api.set_channel_control_7(
       .channel(CH0),
       .dds_sel(4'h2));

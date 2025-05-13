@@ -13,6 +13,7 @@ User Guide
    Repository hierarchy <hierarchy>
    Creation and editing of HDL testbenches <create_edit_tb>
    Testbenches coding guidelines <coding_guidelines>
+   Debugging a testbench <debug_tb>
    Documentation guidelines <docs_guidelines>
 
 `Analog Devices, Inc.`_ provides testbenches to evaluate our FPGA reference
@@ -31,8 +32,9 @@ Contents
 #. :ref:`build_tb`: Building and generating the programming files
 #. :ref:`hierarchy`: Repository hierarchy explained
 #. :ref:`create_edit_tb`: Creation and editing of HDL testbenches
-#. :ref:`coding_guidelines`: The System Verilog coding guidelines
-   that the HDL team follows
+#. :ref:`coding_guidelines`: The System Verilog coding guidelines that the HDL
+   team follows
+#. :ref:`debug_tb`: Debugging a testbench
 #. :ref:`docs_guidelines`: Documentation guidelines
 #. :dokuwiki:`Reference designs using AMD Xilinx hardware <resources/alliances/xilinx>`
 

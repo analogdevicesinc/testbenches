@@ -44,7 +44,7 @@ package test_harness_env_pkg;
   import watchdog_pkg::*;
 
 
-  class test_harness_env #(int `AXI_VIP_PARAM_ORDER(mng), int `AXI_VIP_PARAM_ORDER(ddr)) extends adi_environment;
+  class test_harness_env #(`AXI_VIP_PARAM_DECL(mng), `AXI_VIP_PARAM_DECL(ddr)) extends adi_environment;
 
     // Agents
     adi_axi_master_agent #(`AXI_VIP_PARAM_ORDER(mng)) mng;
@@ -95,8 +95,8 @@ package test_harness_env_pkg;
     task start();
       this.simulation_watchdog.start();
 
-      this.mng.agent.start_master();
-      this.ddr.agent.start_slave();
+      this.mng.start_master();
+      this.ddr.start_slave();
 
       this.sys_clk_vip_if.start_clock();
       this.dma_clk_vip_if.start_clock();
@@ -107,8 +107,8 @@ package test_harness_env_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.mng.agent.stop_master();
-      this.ddr.agent.stop_slave();
+      this.mng.stop_master();
+      this.ddr.stop_slave();
 
       this.sys_clk_vip_if.stop_clock();
       this.dma_clk_vip_if.stop_clock();

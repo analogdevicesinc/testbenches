@@ -35,6 +35,7 @@
 
 # Add test files to the project
 adi_sim_project_files [list \
+  "$ad_tb_dir/library/vip/vip_agent_typedef_pkg.sv" \
   "$ad_tb_dir/library/vip/amd/axis/adi_axis_agent.sv" \
   "$ad_tb_dir/library/vip/amd/axis/m_axis_sequencer.sv" \
   "$ad_tb_dir/library/vip/amd/axis/s_axis_sequencer.sv" \

@@ -51,13 +51,16 @@ package environment_pkg;
   import adi_axi_agent_pkg::*;
   import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
+  import vip_agent_typedef_pkg::*;
 
 
-  class scoreboard_environment #(`AXIS_VIP_PARAM_DECL(adc_src), `AXIS_VIP_PARAM_DECL(dac_dst)) extends adi_environment;
+  class scoreboard_environment extends adi_environment;
 
     // Agents
-    adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(adc_src)) adc_src_axis_agent;
-    adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(dac_dst)) dac_dst_axis_agent;
+    adi_axis_agent_base adc_src_axis_agent;
+    adi_axis_agent_base dac_dst_axis_agent;
+    adi_axi_agent_base adc_dst_axi_pt_agent;
+    adi_axi_agent_base dac_src_axi_pt_agent;
 
     scoreboard #(logic [7:0]) scoreboard_tx;
     scoreboard #(logic [7:0]) scoreboard_rx;
@@ -67,15 +70,15 @@ package environment_pkg;
     //============================================================================
     function new (
       input string name,
-
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(adc_src)) adc_src_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(dac_dst)) dac_dst_axis_vip_if);
+      input adi_environment parent = null);
 
       // creating the agents
-      super.new(name);
+      super.new(name, parent);
 
-      this.adc_src_axis_agent = new("ADC Source AXI Stream Agent", adc_src_axis_vip_if, this);
-      this.dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", dac_dst_axis_vip_if, this);
+      this.adc_src_axis_agent = new("ADC Source AXI Stream Agent", MASTER, this);
+      this.dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", SLAVE, this);
+      this.adc_dst_axi_pt_agent = new("ADC Destination AXI Agent", PASSTHROUGH, this);
+      this.dac_src_axi_pt_agent = new("DAC Source AXI Agent", PASSTHROUGH, this);
 
       this.scoreboard_tx = new("Data Offload TX Scoreboard", this);
       this.scoreboard_rx = new("Data Offload RX Scoreboard", this);
@@ -87,11 +90,11 @@ package environment_pkg;
     //============================================================================
     task configure(int bytes_to_generate);
       // ADC stub
-      this.adc_src_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.adc_src_axis_agent.sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
+      this.adc_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.adc_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
 
       // DAC stub
-      this.dac_dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      this.dac_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask
 
     //============================================================================
@@ -100,8 +103,8 @@ package environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      this.adc_src_axis_agent.agent.start_master();
-      this.dac_dst_axis_agent.agent.start_slave();
+      this.adc_src_axis_agent.start_master();
+      this.dac_dst_axis_agent.start_slave();
 
       this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
@@ -113,11 +116,8 @@ package environment_pkg;
     //============================================================================
     task run();
       fork
-        this.adc_src_axis_agent.sequencer.run();
-        this.dac_dst_axis_agent.sequencer.run();
-
-        this.adc_src_axis_agent.monitor.run();
-        this.dac_dst_axis_agent.monitor.run();
+        this.adc_src_axis_agent.master_sequencer.start();
+        this.dac_dst_axis_agent.slave_sequencer.start();
 
         this.scoreboard_tx.run();
         this.scoreboard_rx.run();
@@ -128,9 +128,8 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.adc_src_axis_agent.sequencer.stop();
-      this.adc_src_axis_agent.agent.stop_master();
-      this.dac_dst_axis_agent.agent.stop_slave();
+      this.adc_src_axis_agent.stop_master();
+      this.dac_dst_axis_agent.stop_slave();
     endtask
 
   endclass

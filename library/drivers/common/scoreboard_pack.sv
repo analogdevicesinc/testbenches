@@ -82,12 +82,13 @@ package scoreboard_pack_pkg;
       int outer_loop = (this.mode == CPACK) ? this.channels : this.samples;
       int inner_loop = (this.mode == CPACK) ? this.samples : this.channels;
 
+      this.byte_streams_empty_sig = 0;
+
       if (this.enabled == 0)
         return;
 
       while ((this.subscriber_source.get_size() > 0) &&
             (this.subscriber_sink.get_size() >= this.channels*this.samples*this.width/8)) begin
-        byte_streams_empty_sig = 0;
         for (int i=0; i<this.channels*this.samples*this.width/8; i++) begin
           sink_byte_stream_block[i] = this.subscriber_sink.get_data();
         end

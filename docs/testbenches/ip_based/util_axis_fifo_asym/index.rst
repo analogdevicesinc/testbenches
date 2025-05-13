@@ -42,8 +42,8 @@ The following parameters of this project that can be configured:
    Options: Power of 2, min 8, max 1024
 -  OUTPUT_WIDTH: output data width
    Options: Power of 2, min 8, max 1024
--  FIFO_LIMITED: specifies if the FIFO size can be reduced
-   Options: 0 for reduced, 1 for not reduced
+-  REDUCED_FIFO: specifies if the FIFO size can be reduced
+   Options: 1 for reduced, 0 for not reduced
 -  ADDRESS_WIDTH: address width
    Options: (0 to 4) + log2(width_ratio)
 -  INPUT_CLK: input clock period in ns
@@ -60,7 +60,7 @@ in the following example:
 .. shell::
    :showuser:
 
-   $make ASYNC_CLK=1 TKEEP_EN=1 TLAST_EN=1 INPUT_WIDTH=16 OUTPUT_WIDTH=32 FIFO_LIMITED=0 ADDRESS_WIDTH=3 INPUT_CLK=1 OUTPUT_CLK=3
+   $make ASYNC_CLK=1 TKEEP_EN=1 TLAST_EN=1 INPUT_WIDTH=16 OUTPUT_WIDTH=32 REDUCED_FIFO=0 ADDRESS_WIDTH=3 INPUT_CLK=1 OUTPUT_CLK=3
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -82,7 +82,7 @@ The following configuration files are available:
      - random
    * - OUTPUT_WIDTH
      - random
-   * - FIFO_LIMITED
+   * - REDUCED_FIFO
      - random
    * - ADDRESS_WIDTH
      - random

@@ -131,6 +131,9 @@ ad_ip_instance axi4stream_vip adc_src_axis [list \
 ]
 adi_sim_add_define "ADC_SRC_AXIS=adc_src_axis"
 
+ad_ip_instance axi_vip adc_dst_axi
+adi_sim_add_define "ADC_DST_AXI=adc_dst_axi"
+
 ad_connect adc_src_axis/m_axis RX_DUT/s_axis
 ad_connect RX_DUT/m_axis i_rx_dmac/s_axis
 
@@ -149,7 +152,11 @@ ad_connect sys_mem_resetn i_rx_dmac/m_dest_axi_aresetn
 ad_connect i_rx_dmac/s_axis_xfer_req RX_DUT/init_req
 ad_connect gnd RX_DUT/sync_ext
 
-ad_mem_hp0_interconnect sys_mem_clk i_rx_dmac/m_dest_axi
+ad_connect sys_mem_clk adc_dst_axi/aclk
+ad_connect sys_mem_resetn adc_dst_axi/aresetn
+ad_connect adc_dst_axi/S_AXI i_rx_dmac/m_dest_axi
+
+ad_mem_hp0_interconnect sys_mem_clk adc_dst_axi/M_AXI
 
 ad_ip_instance axi4stream_vip dac_dst_axis [list \
   INTERFACE_MODE {SLAVE} \
@@ -158,6 +165,9 @@ ad_ip_instance axi4stream_vip dac_dst_axis [list \
   HAS_TKEEP {0} \
 ]
 adi_sim_add_define "DAC_DST_AXIS=dac_dst_axis"
+
+ad_ip_instance axi_vip dac_src_axi
+adi_sim_add_define "DAC_SRC_AXI=dac_src_axi"
 
 ad_connect sys_dma_clk dac_dst_axis/aclk
 ad_connect sys_dma_resetn dac_dst_axis/aresetn
@@ -177,7 +187,11 @@ ad_connect TX_DUT/s_axis i_tx_dmac/m_axis
 ad_connect i_tx_dmac/m_axis_xfer_req TX_DUT/init_req
 ad_connect gnd TX_DUT/sync_ext
 
-ad_mem_hp0_interconnect sys_mem_clk i_tx_dmac/m_src_axi
+ad_connect sys_mem_clk dac_src_axi/aclk
+ad_connect sys_mem_resetn dac_src_axi/aresetn
+ad_connect dac_src_axi/S_AXI i_tx_dmac/m_src_axi
+
+ad_mem_hp0_interconnect sys_mem_clk dac_src_axi/M_AXI
 
 if {$adc_offload_mem_type} {
   set plddr_iname "RX_DUT"

@@ -263,7 +263,7 @@ initial begin
 
   i3c_controller = new(
     "I3C Controller API",
-    base_env.mng.sequencer,
+    base_env.mng.master_sequencer,
     `I3C_CONTROLLER_BA);
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);

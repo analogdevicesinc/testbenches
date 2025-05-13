@@ -42,10 +42,8 @@ package adi_axi_monitor_pkg;
   import adi_vip_pkg::*;
   import pub_sub_pkg::*;
 
-  class adi_axi_monitor #(int `AXI_VIP_PARAM_ORDER(axi)) extends adi_monitor;
 
-    // analysis port from the monitor
-    protected axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor;
+  class adi_axi_monitor_base extends adi_monitor;
 
     adi_publisher #(logic [7:0]) publisher_tx;
     adi_publisher #(logic [7:0]) publisher_rx;
@@ -56,12 +54,9 @@ package adi_axi_monitor_pkg;
     // constructor
     function new(
       input string name,
-      input axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor,
       input adi_agent parent = null);
 
       super.new(name, parent);
-
-      this.monitor = monitor;
 
       this.publisher_tx = new("Publisher TX", this);
       this.publisher_rx = new("Publisher RX", this);
@@ -69,7 +64,7 @@ package adi_axi_monitor_pkg;
       this.enabled = 0;
     endfunction
 
-    task run();
+    task start();
       if (this.enabled) begin
         this.error($sformatf("Monitor is already running!"));
         return;
@@ -89,16 +84,38 @@ package adi_axi_monitor_pkg;
           disable fork;
         end
       join_none
-    endtask: run
+    endtask: start
 
     function void stop();
       this.enabled = 0;
       -> enable_ev;
     endfunction: stop
 
+    virtual task get_transaction();
+    endtask: get_transaction
+
+  endclass: adi_axi_monitor_base
+
+
+  class adi_axi_monitor #(int `AXI_VIP_PARAM_ORDER(axi)) extends adi_axi_monitor_base;
+
+    // analysis port from the monitor
+    protected axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor;
+
+    // constructor
+    function new(
+      input string name,
+      input axi_monitor #(`AXI_VIP_PARAM_ORDER(axi)) monitor,
+      input adi_agent parent = null);
+
+      super.new(name, parent);
+
+      this.monitor = monitor;
+    endfunction
+
     // collect data from the DDR interface, all WRITE transaction are coming
     // from the ADC and all READ transactions are going to the DAC
-    task get_transaction();
+    virtual task get_transaction();
       axi_monitor_transaction transaction;
       xil_axi_data_beat data_beat;
       xil_axi_strb_beat strb_beat;

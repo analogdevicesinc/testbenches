@@ -17,10 +17,10 @@ set random_width [expr int(8*pow(2, int(7.0*rand()+1)))]
 set OUTPUT_WIDTH $random_width
 set ad_project_params(OUTPUT_WIDTH) $OUTPUT_WIDTH
 
-set fifo_limited [expr int(rand()*2)]
-set ad_project_params(FIFO_LIMITED) $fifo_limited
+set reduced_fifo [expr int(rand()*2)]
+set ad_project_params(REDUCED_FIFO) $reduced_fifo
 
-if {$fifo_limited} {
+if {$reduced_fifo} {
     if {$INPUT_WIDTH > $OUTPUT_WIDTH} {
         set RATIO $INPUT_WIDTH/$OUTPUT_WIDTH
     } else {

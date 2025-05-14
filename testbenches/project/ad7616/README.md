@@ -32,5 +32,5 @@ make <name of cfg>
 
 Where:
 
- * <name of cfg> is a file from the cfgs directory without the tcl extension of format cfg\*
- * <name of test> is a file from the tests directory without the tcl extension
+ * \<name of cfg\> is a file from the cfgs directory without the tcl extension of format cfg\*
+ * \<name of test\> is a file from the tests directory without the tcl extension

@@ -34,11 +34,6 @@ Configuration parameters and modes
 There are no project parameters that can be configured in the testbench
 configuration files.
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-There are no build parameters for this testbench.
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

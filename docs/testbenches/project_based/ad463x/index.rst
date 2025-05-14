@@ -46,20 +46,6 @@ The following parameters of this project that can be configured:
    the SDI lines can have Single or Double Data Rates.
    Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameters mentioned above can be configured when starting the build, like in
-the following example:
-
-.. shell::
-   :showuser:
-
-   $make CLK_MODE=0 NUM_OF_SDI=2 CAPTURE_ZONE=1 DDR_EN=0
-
-but we recommend using the already tested build configuration modes, that can be
-found in the ``cfg`` section.
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

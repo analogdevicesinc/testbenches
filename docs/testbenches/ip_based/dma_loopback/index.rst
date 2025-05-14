@@ -55,13 +55,12 @@ TX DMA:
 -  DMA_DATA_WIDTH_SRC: data path width of the source interface in bits;
    Options: 16, 32, 64, 128, 256, 512, 1024, 2048
 -  DMA_DATA_WIDTH_DEST: data path width of the destination interface in bits;
-   Options: 16, 32, 64, 128, 256, 512, 1024, 2048    
+   Options: 16, 32, 64, 128, 256, 512, 1024, 2048
 
 .. tip::
 
   For other DMA parameter configurations, take a look at the
   :external+hdl:ref:`axi_dmac`.
-
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -77,7 +76,7 @@ The following configuration files are available:
 +=====================+========+=================+
 | DMA_TYPE_SRC        | 1      | 0               |
 +---------------------+--------+-----------------+
-| DMA_TYPE_DEST       | 0      | 1               | 
+| DMA_TYPE_DEST       | 0      | 1               |
 +---------------------+--------+-----------------+
 | ID                  | 0      | 0               |
 +---------------------+--------+-----------------+
@@ -227,7 +226,7 @@ Then the subfolder under ``runs`` name will be:
 Resources
 -------------------------------------------------------------------------------
 
-HDL related dependencies
+HDL related dependencies forming the DUT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
@@ -267,7 +266,7 @@ Testbench specific dependencies:
    * - DMA_TRANS_PKG
      - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
      - ---
-         
+
 .. include:: ../../../common/more_information.rst
 
 .. include:: ../../../common/support.rst

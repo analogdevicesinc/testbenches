@@ -53,11 +53,6 @@ The following parameters of this testbench that can be configured:
 Other JESD204B output configuration modes can be found in the :adi:`AD9083`
 data sheet, at Table 24.
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-There are no build parameters for this testbench.
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

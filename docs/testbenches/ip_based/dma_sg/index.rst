@@ -72,7 +72,6 @@ TX DMA:
   For other DMA parameter configurations, take a look at the
   :external+hdl:ref:`axi_dmac`.
 
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -262,7 +261,7 @@ Then the subfolder under ``runs`` name will be:
 Resources
 -------------------------------------------------------------------------------
 
-HDL related dependencies
+HDL related dependencies forming the DUT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
@@ -302,7 +301,7 @@ Testbench specific dependencies:
    * - DMA_TRANS_PKG
      - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
      - ---
-         
+
 .. include:: ../../../common/more_information.rst
 
 .. include:: ../../../common/support.rst

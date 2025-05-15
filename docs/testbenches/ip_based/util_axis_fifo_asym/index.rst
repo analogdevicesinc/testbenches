@@ -51,17 +51,6 @@ The following parameters of this project that can be configured:
 -  OUTPUT_CLK: output clock period in ns
    Options: 1 to 9
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameters mentioned above can be configured when starting the build, like
-in the following example:
-
-.. shell::
-   :showuser:
-
-   $make ASYNC_CLK=1 TKEEP_EN=1 TLAST_EN=1 INPUT_WIDTH=16 OUTPUT_WIDTH=32 FIFO_LIMITED=0 ADDRESS_WIDTH=3 INPUT_CLK=1 OUTPUT_CLK=3
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

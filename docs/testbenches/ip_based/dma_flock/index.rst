@@ -50,17 +50,6 @@ The following parameters of this project that can be configured:
 - SRC/DST_AXIS_VIP_CFG_TDATA_NUM_BYTES: defines the ``axi4stream_vip`` TDATA_NUM_BYTES
   and is also used to compute the time in cycles for a frame duration.
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameters mentioned above can be configured when starting the build, like
-in the following example:
-
-.. shell::
-   :showuser:
-
-   $make M_DMA_CFG_USE_EXT_SYNC=1 M_DMA_CFG_MAX_NUM_FRAMES=3
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -36,17 +36,6 @@ The following parameter of this project that can be configured:
 
 - CLK_MOD: defines the I3C Controller Core clock cycles per bus bit.
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameter mentioned above can be configured when starting the build, like
-in the following example:
-
-.. shell::
-   :showuser:
-
-   $make CLK_MOD=1
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

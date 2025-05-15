@@ -49,17 +49,6 @@ The following parameters of this project that can be configured:
 -  DEST_BEAT_DELAY_LOW: defines the low time of the ready signal:
    Integer, non-0 value
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameters mentioned above can be configured when starting the build, like
-in the following example:
-
-.. shell::
-   :showuser:
-
-   $make SRC_DESCRIPTORS=3 SRC_BEAT_DELAY=0 SRC_DESCRIPTOR_DELAY=0 DEST_BACKPRESSURE=2 DEST_BEAT_DELAY_HIGH=1 DEST_BEAT_DELAY_LOW=5
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

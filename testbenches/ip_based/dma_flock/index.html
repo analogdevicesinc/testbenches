@@ -7,9 +7,9 @@
 
     <title>DMA Framelock &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=47649d88" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
-    <script defer="" src="../../../_static/app.umd.js?v=9e881883"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=8984ea49"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -90,7 +90,6 @@
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
 <li><a class="reference internal" href="#configuration-parameters-and-modes">Configuration parameters and modes</a><ul>
-<li><a class="reference internal" href="#build-parameters">Build parameters</a></li>
 <li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
 <li><a class="reference internal" href="#tests">Tests</a></li>
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
@@ -289,17 +288,6 @@ Valid values are between 2 (4 buffers) and 5 (32 buffers).</p></li>
 <li><p>SRC/DST_AXIS_VIP_CFG_TDATA_NUM_BYTES: defines the <code class="docutils literal notranslate"><span class="pre">axi4stream_vip</span></code> TDATA_NUM_BYTES
 and is also used to compute the time in cycles for a frame duration.</p></li>
 </ul>
-<section id="build-parameters">
-<h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading"></a></h4>
-<p>The parameters mentioned above can be configured when starting the build, like
-in the following example:</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">M_DMA_CFG_USE_EXT_SYNC</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">M_DMA_CFG_MAX_NUM_FRAMES</span><span class="o">=</span><span class="m">3</span>
-</pre></div>
-</div>
-<div class="clear-left"></div></div></div></section>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
 <p>The following are the available configuration files along with their

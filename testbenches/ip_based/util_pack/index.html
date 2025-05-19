@@ -7,9 +7,9 @@
 
     <title>Util Pack &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=47649d88" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
-    <script defer="" src="../../../_static/app.umd.js?v=9e881883"></script>
+    <script defer="" src="../../../_static/app.umd.js?v=8984ea49"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -90,7 +90,6 @@
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
 <li><a class="reference internal" href="#configuration-parameters-and-modes">Configuration parameters and modes</a><ul>
-<li><a class="reference internal" href="#build-parameters">Build parameters</a></li>
 <li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
 <li><a class="reference internal" href="#tests">Tests</a></li>
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
@@ -294,17 +293,6 @@ Options: 8, 16, 32, 64</p></li>
 <p>The max width is calculated with: CHANNELS*SAMPLES*WIDTH and it cannot
 exceed 2048.</p>
 </div>
-<section id="build-parameters">
-<h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading"></a></h4>
-<p>The parameters mentioned above can be configured when starting the build, like
-in the following example:</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CHANNELS</span><span class="o">=</span><span class="m">3</span><span class="w"> </span><span class="nv">SAMPLES</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="nv">WIDTH</span><span class="o">=</span><span class="m">16</span>
-</pre></div>
-</div>
-<div class="clear-left"></div></div></div></section>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
 <p>The following configuration files are available:</p>

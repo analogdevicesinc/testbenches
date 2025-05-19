@@ -47,20 +47,6 @@ The following parameter of this project that can be configured:
 -  INTF: defines the device's interface:
    Options: 0 - Parallel, 1 - Serial
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameter mentioned above can be configured when starting the build, like in
-the following example:
-
-.. shell::
-   :showuser:
-
-   $make INTF=0
-
-but we recommend using the already tested build configuration modes, that can be
-found in the ``cfg`` section.
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

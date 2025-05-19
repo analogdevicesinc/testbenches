@@ -40,20 +40,6 @@ The following parameters of this project that can be configured:
    Options: 1 - Interleaved mode, 2 - 1 lane per channel,
    4 - 2 lanes per channel
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameters mentioned above can be configured when starting the build, like in
-the following example:
-
-.. shell::
-   :showuser:
-
-   $make ALERT_SPI_N=0 NUM_OF_SDI=2
-
-but we recommend using the already tested build configuration modes, that can be
-found in the ``cfg`` section.
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

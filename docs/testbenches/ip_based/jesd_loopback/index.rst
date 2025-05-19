@@ -69,17 +69,6 @@ The following parameters of this project can be configured:
 
   For other JESD parameter configurations, take a look at the :external+hdl:ref:`jesd204`.
 
-Build parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The parameters mentioned above can be configured when starting the build, like
-in the following example:
-
-.. shell::
-   :showuser:
-
-   $make LINK_MODE=1 JESD_M=1 JESD_L=1 JESD_F=1 JESD_K=32 JESD_S=1 JESD_NP=16 REF_CLK-RATE=250 LANE_RATE=5
-
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -282,7 +271,7 @@ Then the subfolder under ``runs`` name will be:
 Resources
 -------------------------------------------------------------------------------
 
-HDL related dependencies
+HDL related dependencies forming the DUT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::

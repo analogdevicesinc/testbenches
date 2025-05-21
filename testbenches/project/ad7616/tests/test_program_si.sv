@@ -36,7 +36,6 @@
 //
 
 `include "utils.svh"
-`include "axi_definitions.svh"
 
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -56,7 +55,7 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 //---------------------------------------------------------------------------
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
-localparam DATA_WIDTH                 = 16;
+localparam DATA_WIDTH                 = 32;
 localparam DATA_DLENGTH               = 16;
 localparam ECHO_SCLK                  = 0;
 localparam SDI_PHY_DELAY              = 18;
@@ -108,7 +107,7 @@ program test_program_si (
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
 // --------------------------
-// Wrapper function for AXI read verif
+// Wrapper function for AXI read verify
 // --------------------------
 task axi_read_v(
     input   [31:0]  raddr,
@@ -274,9 +273,9 @@ end
 wire          end_of_word;
 wire          rx_sclk_bfm = ad7616_echo_sclk;
 wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = ad7616_spi_cs;
+wire          m_spi_csn_int_s = &ad7616_spi_cs;
 bit           m_spi_csn_int_d = 0;
-bit   [15:0]  sdi_shiftreg;
+bit   [31:0]  sdi_shiftreg;
 bit   [7:0]   rx_sclk_pos_counter = 0;
 bit   [7:0]   rx_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
@@ -293,12 +292,12 @@ assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
 for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign ad7616_spi_sdi[i] = sdi_shiftreg[15]; // all SDI lanes got the same data
+  assign ad7616_spi_sdi[i] = sdi_shiftreg[DATA_DLENGTH-1]; // all SDI lanes got the same data
 end
 
 assign end_of_word = (CPOL ^ CPHA) ?
-                     (rx_sclk_pos_counter == 16) :
-                     (rx_sclk_neg_counter == 16);
+                     (rx_sclk_pos_counter == DATA_DLENGTH) :
+                     (rx_sclk_neg_counter == DATA_DLENGTH);
 
 initial begin
   forever begin
@@ -306,7 +305,7 @@ initial begin
     if (m_spi_csn_negedge_s) begin
       rx_sclk_pos_counter <= 8'b0;
     end else begin
-      rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH*2) ? 0 : rx_sclk_pos_counter+1;
+      rx_sclk_pos_counter <= (rx_sclk_pos_counter == DATA_DLENGTH) ? 0 : rx_sclk_pos_counter+1;
     end
   end
 end
@@ -317,7 +316,7 @@ initial begin
     if (m_spi_csn_negedge_s) begin
       rx_sclk_neg_counter <= 8'b0;
     end else begin
-      rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH*2) ? 0 : rx_sclk_neg_counter+1;
+      rx_sclk_neg_counter <= (rx_sclk_neg_counter == DATA_DLENGTH) ? 0 : rx_sclk_neg_counter+1;
     end
   end
 end
@@ -353,7 +352,7 @@ initial begin
       end
       if (m_spi_csn_negedge_s) @(posedge rx_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdi_shiftreg <= {sdi_shiftreg[15:0], 1'b0};
+      sdi_shiftreg <= {sdi_shiftreg[DATA_DLENGTH-2:0], 1'b0};
     end
   end
 end
@@ -367,12 +366,12 @@ bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
 bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
-bit [31:0]  sdi_data_store;
+bit [DATA_DLENGTH-1:0]  sdi_data_store;
 
 initial begin
   forever begin
     @(posedge rx_sclk_bfm);
-    sdi_data_store <= {sdi_shiftreg[13:0], 2'b00};
+    sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
@@ -380,11 +379,11 @@ initial begin
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-          offload_sdi_data_store_arr [sdi_store_cnt] [15:0] = sdi_shiftreg;
-          offload_sdi_data_store_arr [sdi_store_cnt] [31:16] = sdi_shiftreg;
+          offload_sdi_data_store_arr [sdi_store_cnt][15:0] = sdi_shiftreg;
+          offload_sdi_data_store_arr [sdi_store_cnt][31:16] = sdi_shiftreg;
       end else begin
-        sdi_fifo_data_store[31:16] = sdi_shiftreg;
         sdi_fifo_data_store[15:0] = sdi_shiftreg;
+        sdi_fifo_data_store[31:16] = sdi_shiftreg;
       end
       shiftreg_sampled <= 'h1;
     end
@@ -411,11 +410,6 @@ end
 bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test();
-    // Configure pwm
-    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
-    axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
 
     //Configure DMA
     base_env.mng.sequencer.RegWrite32(`AD7616_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
@@ -435,7 +429,6 @@ task offload_spi_test();
     axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_RD);
     axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_OFF);
     axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_SYNC | 2);
-    axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), 16'hBEAF << (DATA_WIDTH - DATA_DLENGTH));
 
     offload_status = 1;
 
@@ -450,7 +443,7 @@ task offload_spi_test();
 
     `INFO(("Offload stopped"), ADI_VERBOSITY_LOW);
 
-    #2000
+    #3000
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
@@ -471,6 +464,12 @@ endtask
 bit   [31:0]  sdi_fifo_data = 0;
 
 task fifo_spi_test();
+
+    // Configure pwm
+  axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
+  axi_write (`AD7616_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
   // Enable SPI Engine
   axi_write (`SPI_AD7616_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 

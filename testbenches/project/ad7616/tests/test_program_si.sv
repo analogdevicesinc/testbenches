@@ -450,7 +450,7 @@ task offload_spi_test();
 
     `INFO(("Offload stopped"), ADI_VERBOSITY_LOW);
 
-    #2000
+    #3000
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1

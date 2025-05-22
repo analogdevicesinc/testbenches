@@ -66,7 +66,7 @@ configuration files:
 -  TEST_DATA_MODE: selects the method for generating the test data. Options:
    DATA_MODE_RANDOM - generates random data, DATA_MODE_RAMP - generates a ramp
    pattern (incrementing counter), DATA_MODE_PATTERN - sends a fixed pattern
-   (h1A50F), DEFAULT - sends a 'ones' pattern ('b1).
+   ('h1A50F), DEFAULT - sends a 'ones' pattern ('b1).
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -124,7 +124,7 @@ test_program    Tests the serial interface capabilities.
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The test program is compatible with all of the above mentioned configurations.
+The test program is compatible with the above mentioned configuration.
 
 CPU/Memory interconnects addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -302,16 +302,12 @@ HDL related dependencies forming the DUT
      - :git-hdl:`library/sysid_rom`
      - :external+hdl:ref:`axi_sysid`
 
-
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. include:: ../../common/dependency_common.rst
 
 Testbench specific dependencies:
-
-.. Unsure how the below interacts with the new Makeinclude infrastructure
-.. Nor how to list the VIP
 
 .. list-table::
    :widths: 30 45 25

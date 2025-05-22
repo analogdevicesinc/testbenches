@@ -1,0 +1,407 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsibilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
+`include "utils.svh"
+
+import logger_pkg::*;
+import test_harness_env_pkg::*;
+import adi_regmap_pkg::*;
+import adi_regmap_adc_pkg::*;
+import adi_regmap_common_pkg::*;
+import adi_regmap_dmac_pkg::*;
+import adi_regmap_pwm_gen_pkg::*;
+import axi_vip_pkg::*;
+import axi4stream_vip_pkg::*;
+import dmac_api_pkg::*;
+import pwm_gen_api_pkg::*;
+import cn0577_environment_pkg::*;
+
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+localparam NUM_OF_TRANSFERS = 16;
+
+//---------------------------------------------------------------------------
+// SPI Engine configuration parameters
+//---------------------------------------------------------------------------
+
+program test_program (
+  input           ref_clk,
+  input           clk_gate,
+  input           dco_in,
+  output          da_n,
+  output          da_p,
+  output          db_n,
+  output          db_p,
+  output reg      dco_p,
+  output reg      dco_n,
+  output          cnv);
+
+timeunit 1ns;
+timeprecision 1ps;
+
+typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
+
+test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+
+// set to active debug messages
+localparam bit DEBUG = 1;
+
+// dco delay compared to the reference clk
+localparam DCO_DELAY = 12;
+
+pwm_gen_api pwm_api;
+dmac_api dma_api;
+
+// dma interface
+wire                   adc_valid;
+wire  [`ADC_RES-1:0]   adc_data;
+reg                    adc_dovf = 1'b0;
+
+// --------------------------
+// Wrapper function for AXI read verif
+// --------------------------
+task axi_read_v(
+    input   [31:0]  raddr,
+    input   [31:0]  vdata);
+
+  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+endtask
+
+task axi_read(
+    input   [31:0]  raddr,
+    output  [31:0]  data);
+
+  base_env.mng.sequencer.RegRead32(raddr,data);
+endtask
+
+// --------------------------
+// Wrapper function for AXI write
+// --------------------------
+task axi_write(
+  input [31:0]  waddr,
+  input [31:0]  wdata);
+
+  base_env.mng.sequencer.RegWrite32(waddr,wdata);
+endtask
+
+// --------------------------
+// Main procedure
+// --------------------------
+
+initial begin
+
+  //creating environment
+  base_env = new("Base Environment",
+                  `TH.`SYS_CLK.inst.IF,
+                  `TH.`DMA_CLK.inst.IF,
+                  `TH.`DDR_CLK.inst.IF,
+                  `TH.`SYS_RST.inst.IF,
+                  `TH.`MNG_AXI.inst.IF,
+                  `TH.`DDR_AXI.inst.IF);
+
+  pwm_api = new(
+      "AXI PWM GEN API",
+      base_env.mng.sequencer,
+      `AXI_PWM_GEN_BA);
+
+  dma_api = new("DMA API",
+      base_env.mng.sequencer,
+      `AXI_LTC2387_DMA_BA);
+
+  setLoggerVerbosity(ADI_VERBOSITY_LOW);
+
+  base_env.start();
+  base_env.sys_reset();
+
+  sanity_test();
+
+  #100
+
+  data_acquisition_test();
+
+  base_env.stop();
+
+  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+  $finish();
+
+end
+
+bit [31:0]  dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
+bit transfer_status = 0;
+bit [31:0] transfer_cnt;
+
+//---------------------------------------------------------------------------
+// Transfer Counter
+//---------------------------------------------------------------------------
+
+initial begin
+  transfer_cnt = 0;
+  forever begin
+    @(posedge cnv);
+     if (transfer_status) begin
+      transfer_cnt = transfer_cnt + 1;
+    end
+    @(negedge cnv);
+  end
+end
+
+//---------------------------------------------------------------------------
+// Clk_gate shifted copy
+//---------------------------------------------------------------------------
+
+localparam int N = (`TWOLANES == 0 && `ADC_RES == 16) ? 16 :
+                   (`TWOLANES == 0 && `ADC_RES == 18) ? 18 :
+                   (`TWOLANES == 1 && `ADC_RES == 16) ? 8 :
+                   (`TWOLANES == 1 && `ADC_RES == 18) ? 10 :
+                   -1; // Error case
+parameter int num_of_dco = N / 2;
+
+initial begin
+  forever begin
+    @(posedge dco_in, negedge dco_in) begin
+      #1
+      dco_p <= dco_in;
+      dco_n <= ~dco_in;
+    end
+  end
+ end
+
+//---------------------------------------------------------------------------
+// Data store
+//---------------------------------------------------------------------------
+
+reg   [`ADC_RES-1:0]  data_gen = 'h3a5a5;
+reg   [`ADC_RES-1:0]  data_shift = 'h0;
+
+reg                     r_da_p = 1'b0;
+reg                     r_da_n = 1'b0;
+reg                     r_db_p = 1'b0;
+reg                     r_db_n = 1'b0;
+
+assign da_p = r_da_p;
+assign da_n = r_da_n;
+assign db_p = r_db_p;
+assign db_n = r_db_n;
+
+// ---------------------------------------------------------------------------
+// Output data ready
+// ---------------------------------------------------------------------------
+
+initial begin
+  forever begin
+    @ (posedge dco_in, negedge dco_in) begin
+      if (`TWOLANES == 1) begin
+        r_da_p = data_shift[`ADC_RES - 1];
+        r_da_n = ~data_shift[`ADC_RES - 1];
+        r_db_p = data_shift[`ADC_RES - 2];
+        r_db_n = ~data_shift[`ADC_RES - 2];
+        data_shift = data_shift << 2;
+      end else begin
+        r_da_p = data_shift[`ADC_RES - 1];
+        r_da_n = ~data_shift[`ADC_RES - 1];
+        data_shift = data_shift << 1;
+      end
+    end
+  end
+end
+
+initial begin
+  forever begin
+    @ (posedge cnv) begin
+      data_shift = data_gen;
+    end
+  end
+end
+
+// ---------------------------------------------------------------------------
+// Generating expected data
+// ---------------------------------------------------------------------------
+
+initial begin
+  forever begin
+    @(posedge dco_in);
+    if (transfer_status) begin
+      if (`ADC_RES == 16) begin
+        if (`TWOLANES == 0) begin
+          if (transfer_cnt[0]) begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen;
+          end else begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
+          end
+        end else begin
+          if (transfer_cnt[0]) begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen;
+          end else begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
+          end
+        end
+      end else if (`ADC_RES == 18) begin
+        if (`TWOLANES == 0) begin
+          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
+        end else begin
+          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
+        end
+      end
+    end
+    @(negedge dco_in);
+  end
+end
+
+//---------------------------------------------------------------------------
+// Sanity test reg interface
+//---------------------------------------------------------------------------
+
+task sanity_test();
+    axi_write (`AXI_LTC2387_BA + GetAddrs(COMMON_REG_SCRATCH), `SET_COMMON_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
+    axi_read_v (`AXI_LTC2387_BA + GetAddrs(COMMON_REG_SCRATCH), `SET_COMMON_REG_SCRATCH_SCRATCH(32'hDEADBEEF));
+    `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
+endtask
+
+//---------------------------------------------------------------------------
+// Data Acquisition Test
+//---------------------------------------------------------------------------
+
+reg [31:0] rdata_reg;
+bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
+bit [31:0] config_wr_SIMPLE = 'h0; // write request sent result
+bit [31:0] config_SIMPLE = 'h0; // channel static data setup
+
+task data_acquisition_test();
+
+    // Enable all ADC channels
+    for (int i = 0; i < 4; i=i+1) begin
+        axi_write (`AXI_LTC2387_BA + i*'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL), `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(32'h00000001));
+    end
+
+    // Configure AXI PWM GEN
+    pwm_api.reset(); // PWM_GEN reset in regmap (ACTIVE HIGH)
+
+    pwm_api.pulse_period_config(
+      .channel(8'h00),
+      .period(32'h1A));
+
+    pwm_api.pulse_width_config(
+      .channel(8'h00),
+      .width(32'h01));
+
+    pwm_api.pulse_period_config(
+      .channel(8'h01),
+      .period(32'h1A));
+
+    pwm_api.pulse_width_config(
+      .channel(8'h01),
+      .width(num_of_dco));
+
+    pwm_api.pulse_offset_config(
+      .channel(8'h01),
+      .offset(32'h03));
+
+    pwm_api.load_config(); // load AXI_PWM_GEN configuration
+    pwm_api.start();
+    `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
+
+    // Configure DMA
+    dma_api.enable_dma();
+
+    dma_api.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1));
+
+    dma_api.set_lengths(((NUM_OF_TRANSFERS)*4)-1,0);
+
+    dma_api.set_dest_addr(`DDR_BA);
+
+    // Configure AXI_LTC2387
+    axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(0));
+    #5000
+    axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+
+    @(posedge cnv)
+    #200
+
+    transfer_status = 1;
+
+    dma_api.transfer_start();
+
+    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
+
+    #100
+    @(negedge cnv);
+    @(posedge ref_clk);
+    transfer_status = 0;
+
+    // Stop pwm gen
+    pwm_api.reset();
+    `INFO(("AXI_PWM_GEN stopped"), ADI_VERBOSITY_LOW);
+
+    // Configure axi_ltc2387
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // set static data setup in device's reg 0x21
+    axi_read(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_SIMPLE); // read last config result
+    `INFO(("Config_SIMPLE is set up, ADC_CONFIG_WR contains 0x%h",config_SIMPLE), ADI_VERBOSITY_LOW);
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
+    axi_read(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_SIMPLE); // read last config result
+    `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
+
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+    axi_read(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_SIMPLE); // read last config result
+    `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
+
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000000)); // set exit from register mode sequence
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+
+    //set HDL config mode
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h100); // set default
+
+    #2000
+    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
+      #1
+      captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+    end
+
+    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
+
+    if (captured_word_arr != dma_data_store_arr) begin
+      `ERROR(("Data Acquisition Test FAILED"));
+    end else begin
+      `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_LOW);
+    end
+
+endtask
+
+endprogram

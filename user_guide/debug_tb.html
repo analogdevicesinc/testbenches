@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Introduction &#8212; Testbenches  documentation</title>
+    <title>Debugging a testbench &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="../_static/icon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Testbenches Git repository" href="git_repository.html" />
-    <link rel="prev" title="User Guide" href="index.html" />
+    <link rel="next" title="Documentation guidelines" href="docs_guidelines.html" />
+    <link rel="prev" title="ADI Testbenches coding guidelines" href="coding_guidelines.html" />
    
   
   <meta name="repository" content="testbenches">
@@ -85,7 +85,15 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Introduction</a></li>
+<li><a class="reference internal" href="#">Debugging a testbench</a><ul>
+<li><a class="reference internal" href="#info-message-logging">Info message logging</a><ul>
+<li><a class="reference internal" href="#activating-logger-messages">Activating logger messages</a></li>
+<li><a class="reference internal" href="#adding-additional-logger-messages">Adding additional logger messages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#replicating-a-simulation">Replicating a simulation</a></li>
+</ul>
+</li>
 </ul>
 
         </nav>
@@ -114,14 +122,14 @@ Content on this topic
   <html>
   <body><ul class="current">
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="git_repository.html">Git repository</a></li>
 <li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build_tb.html">Build a testbench</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hierarchy.html">Repository hierarchy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coding_guidelines.html">Testbenches coding guidelines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Debugging a testbench</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs_guidelines.html">Documentation guidelines</a></li>
 </ul>
 </li>
@@ -220,37 +228,78 @@ Content on this topic
 
           <div class="body" role="main">
             
-  <section id="introduction">
-<span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h1>
-<p>The main purpose of this user guide is to help the user understand and use
-(modify or otherwise) the HDL resources provided by <a class="reference external" href="https://www.analog.com/en/index.html">Analog Devices, Inc.</a>,
-and to provide advice and instructions for using these resources.
-These resources are found on the GitHub, the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">ADI HDL repository</a>.</p>
-<p>After reading this guide, the user should be able to build a specific project
-test bench from the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">ADI Testbenches repository</a> and be able to modify it (if so
-desired). Furthermore, all ADI developed and supported IPs are presented in detail.</p>
-<p>At the same time, the user guides are not intended to be a guide for any third
-party tool. To understand and use the HDL framework efficiently the user needs
-to have a <strong>solid understanding on how an FPGA works, to be familiar with all
-the design tools and flows, testbenches, SystemVerilog and object-oriented
-programming (OOP)</strong>. These testbenches are not using UVM, however, some ideas
-are used from the verification standard, meaning that a high level overview
-of UVM can be useful in understanding the design structure.</p>
-<p>If somebody does not have this knowledge we highly recommend to make some
-general research and go through some basic tutorials with the targeted
-development platform. At the vendor’s support pages you can find an abundance
-of information:</p>
+  <section id="debugging-a-testbench">
+<span id="debug-tb"></span><h1>Debugging a testbench<a class="headerlink" href="#debugging-a-testbench" title="Link to this heading"></a></h1>
+<section id="info-message-logging">
+<h2>Info message logging<a class="headerlink" href="#info-message-logging" title="Link to this heading"></a></h2>
+<p>Message logging is similar to the UVM style logging, but it is more primitive
+and does support many features from it. The logger supports multiple levels of
+debug message printing, like UVM, however, it does not follow the debug level
+recommendations. These levels are described in <a class="reference internal" href="coding_guidelines.html#coding-guidelines"><span class="std std-ref">ADI Testbenches coding guidelines</span></a> section
+F5. Similarly to how UVM works, activating a higher debug level will activate
+all debug messages, that are below it as well.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://www.xilinx.com/support.html">AMD Xilinx support</a></p></li>
+<li><p>ADI_VERBOSITY_NONE: only activates the info messages that are set to NONE</p></li>
+<li><p>ADI_VERBOSITY_LOW: activates the info messages that are NONE and LOW</p></li>
+<li><p>ADI_VERBOSITY_MEDIUM: activates the info messages that are NONE, LOW and
+MEDIUM</p></li>
+<li><p>ADI_VERBOSITY_HIGH: activates all info messages</p></li>
 </ul>
+</div>
+<section id="activating-logger-messages">
+<h3>Activating logger messages<a class="headerlink" href="#activating-logger-messages" title="Link to this heading"></a></h3>
+<p>By default, all testbenches are set to report the minimum amount of messages.
+These messages include warning, error, fatal messages, as well as other
+important informations regarding randomization state and a testbench done
+message, if the simulation reached the end of the test. In order to activate
+other messages, look for the <strong>setLoggerVerbosity(…)</strong> function found in the
+test_program in one of the <strong>initial begin</strong> blocks, which starts the
+simulation. Set the verbosity level to what is necessary for the debug sesstion.</p>
+</section>
+<section id="adding-additional-logger-messages">
+<h3>Adding additional logger messages<a class="headerlink" href="#adding-additional-logger-messages" title="Link to this heading"></a></h3>
+<p>Since the logger messages don’t cover every part of the code, it might be
+necessary to add additional logging messages in certain cases to ensure that
+the module is working as expected. In this case, please follow the logger
+verbosity level guide found in <a class="reference internal" href="coding_guidelines.html#coding-guidelines"><span class="std std-ref">ADI Testbenches coding guidelines</span></a> section F5.</p>
+</section>
+</section>
+<section id="replicating-a-simulation">
+<h2>Replicating a simulation<a class="headerlink" href="#replicating-a-simulation" title="Link to this heading"></a></h2>
+<p>In order to replicate a simulation a number of parameters are needed. In order
+to avoid any confusion, here is the complete list of parameters that are needed
+to replicate any testbench simulation.</p>
+<p>Nothing is changed:</p>
+<ul class="simple">
+<li><p>Configuration file used</p></li>
+<li><p>parameters.log, which is found in <strong>&lt;testbench&gt;/runs/&lt;configuration&gt;/</strong></p></li>
+<li><p>Randomization seed value, found in <strong>test_program*.log</strong> or TCL console in GUI
+mode look for: # random sv_seed = &lt;value&gt;; this parameter is set in Vivado,
+Settings, Simulation, Simulation tab, xsim.simulate.xsim.more_options,
+-sv_seed, or in the system_project.tcl file</p></li>
+<li><p>Randomization state, which is used to verify that the correct randomization
+value is set in Vivado at the start of the simulation, found in
+<strong>test_program*.log</strong> or TCL console in GUI mode look for: [INFO] &#64; 0 ns:
+Randomization state: &lt;value&gt;</p></li>
+</ul>
+<p>If there are changes made to the testbench:</p>
+<ul class="simple">
+<li><p>All of the above</p></li>
+<li><p>Configuration used, with all modified parameters, or the custom configuration
+file itself</p></li>
+<li><p>Any changes made to the block design, test program, libraries and/or IPs</p></li>
+</ul>
+</section>
 </section>
 
 
           </div>
               <div class="related">
                 &nbsp;
-    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">User Guide</a>
-    <a href="git_repository.html" title="Next document (Alt+Shift+RightArrow)" class="next">Testbenches Git repository</a>
+    <a href="coding_guidelines.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADI Testbenches coding guidelines</a>
+    <a href="docs_guidelines.html" title="Next document (Alt+Shift+RightArrow)" class="next">Documentation guidelines</a>
               </div>
           
         </div>

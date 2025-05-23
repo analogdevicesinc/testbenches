@@ -134,10 +134,12 @@ Below are the CPU/Memory interconnect addresses used in this project:
 =====================  ===========
 Instance               Address
 =====================  ===========
+axi_intc               0x4120_0000
 spi_ad57xx_axi_regmap  0x44A0_0000
 ad57xx_dma             0x44A4_0000
+axi_ad57xx_clkgen      0x44A7_0000
 trig_gen               0x44B0_0000
-axi_ad57xx_clkgen      0x44B1_0000
+ddr_axi_vip            0x8000_0000
 =====================  ===========
 
 Interrupts
@@ -330,6 +332,9 @@ Testbench specific dependencies:
      - ---
    * - SPI_ENGINE_INSTR_PKG
      - :git-testbenches:`library/drivers/spi_engine/spi_engine_instr_pkg.sv`
+     - :external+hdl:ref:`spi_engine instruction-format`
+   * - ADI SPI VIP
+     - :git-testbenches:`library/vip/adi/spi_vip/adi_spi_vip_pkg.sv`
      - :ref:`spi_vip`
 
 .. include:: ../../../common/more_information.rst

@@ -197,13 +197,15 @@ bit [31:0] transfer_cnt;
 // Creating a "gate" through which the data clock can run (and only then)
 // ---------------------------------------------------------------------------
 
-//always @ (*) begin
-//  if (clk_gate == 1'b1) begin
-//    ref_clk_out = ref_clk;
-//  end else begin
-//    ref_clk_out = 1'b0;
-//  end
-//end
+initial begin
+  forever begin
+    if (clk_gate == 1'b1) begin
+      ref_clk_out = ref_clk;
+    end else begin
+      ref_clk_out = 1'b0;
+    end
+  end
+end
 
 initial begin
   #500
@@ -306,6 +308,41 @@ task data_acquisition_test();
     // Stop pwm gen
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
     `INFO(("AXI_PWM_GEN stopped"), ADI_VERBOSITY_LOW);
+
+    // Configure axi_ltc2387
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // set static data setup in device's reg 0x21
+    axi_read(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_SIMPLE); // read last config result
+    `INFO(("Config_SIMPLE is set up, ADC_CONFIG_WR contains 0x%h",config_SIMPLE), ADI_VERBOSITY_LOW);
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
+    axi_read(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_SIMPLE); // read last config result
+    `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
+
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+    axi_read(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_SIMPLE); // read last config result
+    `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
+
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000000)); // set exit from register mode sequence
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+
+    //set HDL config mode
+    axi_write(`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h100); // set default
+
+    #2000
+    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
+      #1
+      captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+    end
+
+    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
+
+    if (captured_word_arr != dma_data_store_arr) begin
+      `ERROR(("Data Acquisition Test FAILED"));
+    end else begin
+      `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_LOW);
+    end
+
 endtask
 
 endprogram

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -97,6 +97,7 @@ localparam DEVICE_DA1 = START_DA+1; // I3C
 localparam DEVICE_DA2 = START_DA+2; // I3C
 localparam DEVICE_SA1 = START_DA+7; // I2C
 localparam DEVICE_SA2 = START_DA+8; // I2C
+localparam DEVICE_PID_BCR_DCR = 64'h02ee007c0000DEAD;
 
 //---------------------------------------------------------------------------
 // I3C Controller instructions
@@ -174,6 +175,22 @@ task write_ibi_da(input int da);
   end
   @(negedge i3c_scl)
   i3c_dev_sda <= 1'bZ;
+endtask
+
+//---------------------------------------------------------------------------
+// Write a PID BCR DCR to the SDA lane, for DAA request mock
+//---------------------------------------------------------------------------
+task write_daa(input longint daa);
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_DAA_DEV_CHAR, 1000000);
+  @(negedge i3c_scl);
+  set_auto_ack(0);
+  for (int i = 63; i >= 0; i--) begin
+     `INFO(("[%t] writing %b", $time, daa[i]), ADI_VERBOSITY_MEDIUM);
+     i3c_dev_sda <= daa[i] ? 1'bZ : 1'b0;
+     @(negedge i3c_scl);
+  end
+  i3c_dev_sda <= 1'bZ;
+  set_auto_ack(1);
 endtask
 
 //---------------------------------------------------------------------------
@@ -936,6 +953,8 @@ task daa_i3c_test();
   i3c_controller.set_cmd_fifo(I3C_CCC_CMD_ENTDAA);
   i3c_controller.set_cmd_fifo(I3C_CCC_ENTDAA);
   `WAIT (`DUT_I3C_FRAMING.st == `CMDW_START, 10000);
+
+  write_daa(DEVICE_PID_BCR_DCR);
 
   @(posedge i3c_irq);
   `INFO(("GOT DAA IRQ"), ADI_VERBOSITY_LOW);

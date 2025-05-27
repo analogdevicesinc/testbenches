@@ -35,17 +35,21 @@
 
 global ad_project_params
 
+adi_project_files [list \
+	"$ad_hdl_dir/library/common/ad_edge_detect.v" \
+	"$ad_hdl_dir/library/util_cdc/sync_bits.v"]
+
 #
 #  Block design under test
 #
 
-source $ad_hdl_dir/projects/ad738x_fmc/common/ad738x_bd.tcl
+source $ad_hdl_dir/projects/ltc2378_fmc/common/ltc2378_bd.tcl
 
   create_bd_port -dir O ltc2378_spi_clk
   create_bd_port -dir O ltc2378_irq
 
   ad_connect ltc2378_spi_clk spi_clkgen/clk_0
-  ad_connect ltc2378_irq spi_ltc2378_adc/irq
+  ad_connect ltc2378_irq spi_ltc2378/irq
 
 set BA_SPI_REGMAP 0x44A00000
 set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ltc2378_axi_regmap}]

@@ -66,7 +66,7 @@ localparam CPOL                       = 0;
 localparam CPHA                       = 1;
 localparam CLOCK_DIVIDER              = 0;
 localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 10;
+localparam NUM_OF_TRANSFERS           = 4;
 
 //---------------------------------------------------------------------------
 // SPI Engine instructions
@@ -98,12 +98,16 @@ program test_program (
   input ltc2378_irq,
   input ltc2378_spi_sclk,
   input ltc2378_spi_sdi,
-  input ltc2378_spi_cs);
+  input ltc2378_spi_sdo,
+  input ltc2378_spi_cs,
+  input ltc2378_spi_cnv,
+  output ltc2378_spi_busy
+  );
 
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
 // --------------------------
-// Wrapper function for AXI read verif
+// Wrapper function for AXI read verify
 // --------------------------
 task axi_read_v(
     input   [31:0]  raddr,
@@ -143,7 +147,7 @@ initial begin
                   `TH.`MNG_AXI.inst.IF,
                   `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+  setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
   base_env.start();
   base_env.sys_reset();
@@ -177,24 +181,24 @@ task sanity_test();
   axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   axi_read_v (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
+endtask
 
-  //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 // SPI Engine generate transfer
 //---------------------------------------------------------------------------
 
 task generate_transfer_cmd(
-        input [7:0] sync_id);
-     
-         // assert CSN
-         axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_ON);
-         // transfer data
-         axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_WRD);
-         // de-assert CSN
-         axi_write (`SPI_AD738x_REGMAP_BA+ GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_OFF);
-         // SYNC command to generate interrupt
-         axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
-         `INFO(("Transfer generation finished"), ADI_VERBOSITY_LOW);
-     endtask
+  input [7:0] sync_id);
+
+    // assert CSN
+    axi_write (`SPI_LTC2378_REGMAP_BA  + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_ON);
+    // transfer data
+    axi_write (`SPI_LTC2378_REGMAP_BA  + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_WRD);
+    // de-assert CSN
+    axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_OFF);
+    // SYNC command to generate interrupt
+    axi_write (`SPI_LTC2378_REGMAP_BA  + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
+    `INFO(("Transfer generation finished"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -345,7 +349,7 @@ initial begin
       end
       if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
     end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdi_shiftreg <= {sdi_shiftreg[DATA_DLENGTH-2:0], 1'b0};
+      sdi_shiftreg <= {sdi_shiftreg[DATA_DLENGTH-1:0], 1'b0};
     end
   end
 end
@@ -357,7 +361,7 @@ end
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
-bit [31:0]  offload_sdi_data_store_arr;
+bit [31:0]  offload_sdi_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [DATA_DLENGTH-1:0]  sdi_data_store;
 
@@ -372,9 +376,9 @@ initial begin
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-        offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
+        offload_sdi_data_store_arr [sdi_store_cnt] = (sdi_shiftreg >> 1);
       end else begin
-        sdi_fifo_data_store = sdi_shiftreg;
+        sdi_fifo_data_store = (sdi_shiftreg >> 1);
       end
       shiftreg_sampled <= 'h1;
     end
@@ -401,7 +405,8 @@ end
 bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test();
-    //Configure DMA
+
+    // Configure DMA
     base_env.mng.sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
     base_env.mng.sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
@@ -423,7 +428,7 @@ task offload_spi_test();
     offload_status = 1;
 
     // Start the offload
-    #100
+
     axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     `INFO(("Offload started"), ADI_VERBOSITY_LOW);
 
@@ -461,15 +466,16 @@ endtask
 bit   [31:0]  sdi_fifo_data = 0;
 
 task fifo_spi_test();
+
   // Start spi clk generator
   axi_write (`LTC2378_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-    );
+  `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
+  `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
+);
 
   // Config cnv
   axi_write (`LTC2378_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`LTC2378_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d121)); // set PWM period ????
+  axi_write (`LTC2378_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('hB4)); // set PWM period (180MHz)
   axi_write (`LTC2378_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
 
@@ -482,7 +488,7 @@ task fifo_spi_test();
   axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
 
   // Set up the interrupts
-  axi_write (SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+  axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
     `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );

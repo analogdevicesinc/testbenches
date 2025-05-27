@@ -42,7 +42,9 @@ module system_tb();
 wire ltc2378_spi_sclk;
 wire ltc2378_spi_sdo;
 wire ltc2378_spi_sdi;
-wire ad738x_spi_cs;
+wire ltc2378_spi_cs;
+wire ltc2378_spi_busy;
+wire ltc2378_spi_cnv;
 wire ltc2378_spi_clk;
 wire ltc2378_irq;
 
@@ -50,16 +52,20 @@ wire ltc2378_irq;
 .ltc2378_spi_clk (ltc2378_spi_clk),
 .ltc2378_irq (ltc2378_irq),
 .ltc2378_spi_sdi(ltc2378_spi_sdi),
-.ltc2378_spi_cs (ad738x_spi_cs),
+.ltc2378_spi_cs (ltc2378_spi_cs),
 .ltc2378_spi_sclk (ltc2378_spi_sclk));
 
 test_harness `TH (
-.ad738x_spi_clk (ltc2378_spi_clk),
-.irq (),
+.ltc2378_spi_clk (ltc2378_spi_clk),
+//.irq (),
 .ltc2378_irq(ltc2378_irq),
+.ltc2378_spi_busy(ltc2378_spi_busy),
+.ltc2378_spi_cnv(ltc2378_spi_cnv),
 .ltc2378_spi_sdo (ltc2378_spi_sdo),
 .ltc2378_spi_sdi (ltc2378_spi_sdi),
 .ltc2378_spi_cs (ltc2378_spi_cs),
 .ltc2378_spi_sclk (ltc2378_spi_sclk));
+
+assign ltc2378_spi_busy = ltc2378_spi_cnv;
 
 endmodule

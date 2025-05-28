@@ -239,7 +239,6 @@ module system_tb();
        .dco_p (dco_p),
        .dco_n (dco_n),
        .da_p (da_p),
-       .da_p (da_p),
        .da_n (da_n),
        .db_p (db_p),
        .db_n (db_n),

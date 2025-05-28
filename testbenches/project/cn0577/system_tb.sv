@@ -77,6 +77,29 @@ module system_tb();
   wire  [RESOLUTION-1:0]  adc_data;
   reg                     adc_dovf = 1'b0;
 
+  // axi interface
+
+  reg                     s_axi_aclk = 1'b0;
+  reg                     s_axi_aresetn = 1'b0;
+  reg                     s_axi_awvalid = 1'b0;
+  reg        [15:0]       s_axi_awaddr = 16'b0;
+  wire                    s_axi_awready;
+  reg                     s_axi_wvalid = 1'b0;
+  reg        [31:0]       s_axi_wdata = 32'b0;
+  reg        [ 3:0]       s_axi_wstrb = 4'b0;
+  wire                    s_axi_wready;
+  wire                    s_axi_bvalid;
+  wire       [ 1:0]       s_axi_bresp;
+  reg                     s_axi_bready = 1'b0;
+  reg                     s_axi_arvalid = 1'b0;
+  reg        [15:0]       s_axi_araddr = 1'b0;
+  wire                    s_axi_arready;
+  wire                    s_axi_rvalid;
+  wire       [ 1:0]       s_axi_rresp;
+  wire       [31:0]       s_axi_rdata;
+  reg                     s_axi_rready = 1'b0;
+  reg        [ 2:0]       s_axi_awprot = 3'b0;
+  reg        [ 2:0]       s_axi_arprot = 3'b0;
 
   // local wires and registers
 
@@ -107,7 +130,84 @@ module system_tb();
 
   always #2.564 ref_clk = ~ref_clk;
 
-      `TEST_PROGRAM test(
+  // ---------------------------------------------------------------------------
+  // Creating a "gate" through which the data clock can run (and only then)
+  // ---------------------------------------------------------------------------
+  always @ (*) begin
+    if (clk_gate == 1'b1) begin
+      ref_clk_out = ref_clk;
+    end else begin
+      ref_clk_out = 1'b0;
+    end
+  end
+
+  initial begin
+    #500
+    @(posedge ref_clk);
+    while (1) begin
+      if (clk_gate_counter < (clk_gate_period - 1)) begin
+        clk_gate_counter++;
+      end else begin
+        clk_gate_counter = 0;
+      end
+
+      @(posedge ref_clk);
+      if (clk_gate_counter > (clk_gate_low - 1)) begin
+        clk_gate <= 1;
+      end else begin
+        clk_gate <= 0;
+      end
+
+      if (clk_gate_counter == clk_gate_low) begin
+        gate_start <= 1'b1;
+        cnv_out <= 1'b1;
+      end else begin
+        gate_start <= 1'b0;
+        cnv_out <= 1'b0;
+      end
+    end
+  end
+
+  initial begin
+    s_axi_aresetn <= 1'b0;
+    repeat(10) @(posedge s_axi_aclk);
+    s_axi_aresetn <= 1'b1;
+  end
+
+  initial begin
+    dco_p = 0;
+    dco_n = 1;
+  end
+
+  // ---------------------------------------------------------------------------
+  // Data clocks generation
+  // ---------------------------------------------------------------------------
+
+  always @ (ref_clk_out) begin
+    dco_p <= #DCO_DELAY ref_clk_out;
+    dco_n <= #DCO_DELAY ~ref_clk_out;
+  end
+
+  // ---------------------------------------------------------------------------
+  // Output data ready
+  // ---------------------------------------------------------------------------
+
+  always @ (dco_p) begin
+    if (TWOLANES == 1) begin
+      da_p <= data_int[RESOLUTION - 1];
+      da_n <= ~data_int[RESOLUTION - 1];
+      db_p <= data_int[RESOLUTION - 2];
+      db_n <= ~data_int[RESOLUTION - 2];
+      data_int <= data_int << 2;
+    end else begin
+      da_p <= data_int[RESOLUTION - 1];
+      da_n <= ~data_int[RESOLUTION - 1];
+      data_int <= data_int << 1;
+    end
+  end
+
+
+    `TEST_PROGRAM test(
        .dco_p (dco_p),
        .dco_n (dco_n),
        .da_p (da_p),

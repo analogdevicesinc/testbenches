@@ -104,30 +104,6 @@ wire                    adc_valid;
 wire  [RESOLUTION-1:0]  adc_data;
 reg                     adc_dovf = 1'b0;
 
-// local wires and registers
-reg   clk_gate_d = 1'b0;
-reg   [RESOLUTION-1:0]  data = 'h3a5a5;
-reg   [RESOLUTION-1:0]  data_int = 'h0;
-reg   [9:0]  cnv_counter = 9'hd;
-reg   gate_start = 1'b0;
-
-integer clk_gate_counter = 0;
-integer clk_gate_high = (RESOLUTION == 16) ?
-                          (`TWOLANES == 0) ? 8 : 4 :
-                        (RESOLUTION == 18) ?
-                           (`TWOLANES == 0) ? 9 : 5 :
-                         5;
-
-integer clk_gate_low = (RESOLUTION == 16) ?
-                          (`TWOLANES == 0) ? 5 : 9 :
-                       (RESOLUTION == 18) ?
-                          (`TWOLANES == 0) ? 4 : 8 :
-                        8;
-
-integer clk_gate_period = clk_gate_high + clk_gate_low;
-// it takes 1 CNV impulse for the adc_data to be populated at the first run
-integer cnv_count = 0;
-
 // --------------------------
 // Wrapper function for AXI read verif
 // --------------------------
@@ -192,58 +168,6 @@ reg [15:0]  tx_data_buf = 16'h0101;
 bit [31:0]  dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit transfer_status = 0;
 bit [31:0] transfer_cnt;
-
-// ---------------------------------------------------------------------------
-// Creating a "gate" through which the data clock can run (and only then)
-// ---------------------------------------------------------------------------
-
-initial begin
-  forever begin
-    if (clk_gate == 1'b1) begin
-      ref_clk_out = ref_clk;
-    end else begin
-      ref_clk_out = 1'b0;
-    end
-  end
-end
-
-initial begin
-  #500
-  @(posedge ref_clk);
-  while (1) begin
-    if (clk_gate_counter < (clk_gate_period - 1)) begin
-      clk_gate_counter++;
-    end else begin
-      clk_gate_counter = 0;
-    end
-
-    @(posedge ref_clk);
-    if (clk_gate_counter > (clk_gate_low - 1)) begin
-      clk_gate <= 1;
-    end else begin
-      clk_gate <= 0;
-    end
-
-   if (clk_gate_counter == clk_gate_low) begin
-      gate_start <= 1'b1;
-      cnv_out <= 1'b1;
-    end else begin
-      gate_start <= 1'b0;
-      cnv_out <= 1'b0;
-    end
-  end
-end
-
-//initial begin
-//  s_axi_aresetn <= 1'b0;
-//  repeat(10) @(posedge s_axi_aclk);
-//  s_axi_aresetn <= 1'b1;
-//end
-
-initial begin
-  dco_p = 0;
-  dco_n = 1;
-end
 
 //---------------------------------------------------------------------------
 // Sanity test reg interface

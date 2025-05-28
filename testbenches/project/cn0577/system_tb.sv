@@ -206,6 +206,30 @@ module system_tb();
     end
   end
 
+  // ---------------------------------------------------------------------------
+  // Generating expected data
+  // ---------------------------------------------------------------------------
+
+  always @ (posedge cnv_out) begin
+    cnv_count++;
+
+    // at the first entrance in this always, da and db will have the bits from
+    // the first sample of data (which data was initialized with - 3a5a5)
+    // and only afterwards to increment data; otherwise the first sample is lost
+    if (TWOLANES == 1) begin
+      da_p = data[RESOLUTION - 1];
+      da_n = ~data[RESOLUTION - 1];
+      db_p = data[RESOLUTION - 2];
+      db_n = ~data[RESOLUTION - 2];
+      data_int = data << 2;
+    end else begin
+      da_p = data[RESOLUTION - 1];
+      da_n = ~data[RESOLUTION - 1];
+      data_int = data << 1;
+    end
+
+    #tCONV data <= data + 1;
+  end
 
     `TEST_PROGRAM test(
        .dco_p (dco_p),

@@ -155,7 +155,7 @@ initial begin
 
   #100
 
-  //data_acquisition_test();
+  data_acquisition_test();
 
   base_env.stop();
 

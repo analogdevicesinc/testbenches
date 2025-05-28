@@ -232,12 +232,23 @@ module system_tb();
   end
 
     `TEST_PROGRAM test(
+       .ref_clk_p (ref_clk_p),
+       .ref_clk_n (ref_clk_n),
+       .clk_p (clk_p),
+       .clk_n (clk_n),
        .dco_p (dco_p),
        .dco_n (dco_n),
        .da_p (da_p),
+       .da_p (da_p),
        .da_n (da_n),
        .db_p (db_p),
-       .db_n (db_n));
+       .db_n (db_n),
+       .cnv_p (cnv_p),
+       .cnv_n (cnv_n),
+       .cnv_en (cnv_en),
+       .pd_cntrl (pd_cntrl),
+       .testpat_cntrl (testpat_cntrl),
+       .twolanes_cntrl (twolanes_cntrl));
 
      test_harness `TH (
        .ref_clk (ref_clk),

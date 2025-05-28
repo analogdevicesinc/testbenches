@@ -88,16 +88,16 @@ localparam bit DEBUG = 1;
 localparam DCO_DELAY = 0.7;
 
 // reg signals
-reg                     ref_clk = 1'b0;
-reg                     ref_clk_out = 1'b0;
-reg                     cnv_out = 1'b0;
+//reg                     ref_clk = 1'b0;
+//reg                     ref_clk_out = 1'b0;
+//reg                     cnv_out = 1'b0;
 reg                     clk_gate = 1'b0;
-reg                     dco_p = 1'b0;
-reg                     dco_n = 1'b0;
-reg                     da_p = 1'b0;
-reg                     da_n = 1'b0;
-reg                     db_p = 1'b0;
-reg                     db_n = 1'b0;
+//reg                     dco_p = 1'b0;
+//reg                     dco_n = 1'b0;
+//reg                     da_p = 1'b0;
+//reg                     da_n = 1'b0;
+//reg                     db_p = 1'b0;
+//reg                     db_n = 1'b0;
 
 // dma interface
 wire                    adc_valid;
@@ -164,10 +164,25 @@ initial begin
 
 end
 
+
+ 
 reg [15:0]  tx_data_buf = 16'h0101;
 bit [31:0]  dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit transfer_status = 0;
 bit [31:0] transfer_cnt;
+
+//---------------------------------------------------------------------------
+// Transfer Counter
+//---------------------------------------------------------------------------
+
+initial begin
+  forever begin
+    @(posedge cnv_out);
+    if (transfer_status)
+        transfer_cnt <= transfer_cnt + 'h1;
+        @(negedge cnv_out);
+    end
+end
 
 //---------------------------------------------------------------------------
 // Sanity test reg interface
@@ -201,7 +216,7 @@ task data_acquisition_test();
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
 
-     // Configure DMA
+    // Configure DMA
     base_env.mng.sequencer.RegWrite32(`AXI_LTC2387_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
     base_env.mng.sequencer.RegWrite32(`AXI_LTC2387_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
@@ -210,23 +225,24 @@ task data_acquisition_test();
     base_env.mng.sequencer.RegWrite32(`AXI_LTC2387_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
     base_env.mng.sequencer.RegWrite32(`AXI_LTC2387_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
 
-     // Configure AXI_LTC2387
+    // Configure AXI_LTC2387
     axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(0));
     #5000
     axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
-    //@(negedge rx_busy) - TBD!!!
+
+    @(negedge clk_gate) // TBD
     #200
 
     transfer_status = 1;
 
     base_env.mng.sequencer.RegWrite32(`AXI_LTC2387_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
-   // wait(transfer_cnt == 2 * NUM_OF_TRANSFERS ); - TBD!!!
+    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS ); // TBD!!!
 
     #100
-    //@(negedge rx_rd_n_negedge_s); - TBD!!!
-    //@(posedge sys_clk); - TBD!!!
+    //@(negedge dco_n); //TBD
+    //@(posedge ref_clk); //TBD
     transfer_status = 0;
 
     // Stop pwm gen

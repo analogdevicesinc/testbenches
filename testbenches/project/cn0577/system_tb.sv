@@ -46,17 +46,17 @@ module system_tb();
   parameter TWOLANES = 1;
   parameter RESOLUTION = 18;
 
-  parameter tCYC = 66.6;
+  //parameter tCYC = 66.6;
   parameter tCONV = 63;
-  parameter tFIRST_CLK = 65;
-  parameter tLAST_CLK = 49;
-  parameter tACQ = tCYC - 39;
+  //parameter tFIRST_CLK = 65;
+  //parameter tLAST_CLK = 49;
+  //parameter tACQ = tCYC - 39;
 
   // set to active debug messages
-  localparam bit DEBUG = 1;
+  //localparam bit DEBUG = 1;
 
   // dco delay compared to the reference clk
-  localparam DCO_DELAY = 0.7;
+  //localparam DCO_DELAY = 0.7;
 
   // reg signals
 
@@ -109,21 +109,21 @@ module system_tb();
   reg   [9:0]  cnv_counter = 9'hd;
   reg   gate_start = 1'b0;
 
-  integer clk_gate_counter = 0;
-  integer clk_gate_high = (RESOLUTION == 16) ?
-                            (TWOLANES == 0) ? 8 : 4 :
-                          (RESOLUTION == 18) ?
-                             (TWOLANES == 0) ? 9 : 5 :
-                           5;
+//  integer clk_gate_counter = 0;
+//  integer clk_gate_high = (RESOLUTION == 16) ?
+//                            (TWOLANES == 0) ? 8 : 4 :
+//                          (RESOLUTION == 18) ?
+//                             (TWOLANES == 0) ? 9 : 5 :
+//                           5;
 
-  integer clk_gate_low = (RESOLUTION == 16) ?
-                            (TWOLANES == 0) ? 5 : 9 :
-                         (RESOLUTION == 18) ?
-                            (TWOLANES == 0) ? 4 : 8 :
-                          8;
-  integer clk_gate_period = clk_gate_high + clk_gate_low;
+//  integer clk_gate_low = (RESOLUTION == 16) ?
+//                            (TWOLANES == 0) ? 5 : 9 :
+//                         (RESOLUTION == 18) ?
+//                            (TWOLANES == 0) ? 4 : 8 :
+//                          8;
+//  integer clk_gate_period = clk_gate_high + clk_gate_low;
   // it takes 1 CNV impulse for the adc_data to be populated at the first run
-  integer cnv_count = 0;
+//  integer cnv_count = 0;
 
 
   // test bench variables
@@ -133,40 +133,40 @@ module system_tb();
   // ---------------------------------------------------------------------------
   // Creating a "gate" through which the data clock can run (and only then)
   // ---------------------------------------------------------------------------
-  always @ (*) begin
-    if (clk_gate == 1'b1) begin
-      ref_clk_out = ref_clk;
-    end else begin
-      ref_clk_out = 1'b0;
-    end
-  end
+//  always @ (*) begin
+//    if (clk_gate == 1'b1) begin
+//      ref_clk_out = ref_clk;
+//    end else begin
+//      ref_clk_out = 1'b0;
+//    end
+//  end
 
-  initial begin
-    #500
-    @(posedge ref_clk);
-    while (1) begin
-      if (clk_gate_counter < (clk_gate_period - 1)) begin
-        clk_gate_counter++;
-      end else begin
-        clk_gate_counter = 0;
-      end
+//  initial begin
+//    #500
+//    @(posedge ref_clk);
+//    while (1) begin
+//      if (clk_gate_counter < (clk_gate_period - 1)) begin
+//        clk_gate_counter++;
+//      end else begin
+//        clk_gate_counter = 0;
+//      end
 
-      @(posedge ref_clk);
-      if (clk_gate_counter > (clk_gate_low - 1)) begin
-        clk_gate <= 1;
-      end else begin
-        clk_gate <= 0;
-      end
+//      @(posedge ref_clk);
+//      if (clk_gate_counter > (clk_gate_low - 1)) begin
+//        clk_gate <= 1;
+//      end else begin
+//        clk_gate <= 0;
+//      end
 
-      if (clk_gate_counter == clk_gate_low) begin
-        gate_start <= 1'b1;
-        cnv_out <= 1'b1;
-      end else begin
-        gate_start <= 1'b0;
-        cnv_out <= 1'b0;
-      end
-    end
-  end
+//      if (clk_gate_counter == clk_gate_low) begin
+//        gate_start <= 1'b1;
+//        cnv_out <= 1'b1;
+//      end else begin
+//        gate_start <= 1'b0;
+//        cnv_out <= 1'b0;
+//      end
+//    end
+//  end
 
   initial begin
     s_axi_aresetn <= 1'b0;
@@ -183,10 +183,10 @@ module system_tb();
   // Data clocks generation
   // ---------------------------------------------------------------------------
 
-  always @ (ref_clk_out) begin
-    dco_p <= #DCO_DELAY ref_clk_out;
-    dco_n <= #DCO_DELAY ~ref_clk_out;
-  end
+ // always @ (ref_clk_out) begin
+ //   dco_p <= #DCO_DELAY ref_clk_out;
+ //   dco_n <= #DCO_DELAY ~ref_clk_out;
+ // end
 
   // ---------------------------------------------------------------------------
   // Output data ready
@@ -211,7 +211,7 @@ module system_tb();
   // ---------------------------------------------------------------------------
 
   always @ (posedge cnv_out) begin
-    cnv_count++;
+    //cnv_count++;
 
     // at the first entrance in this always, da and db will have the bits from
     // the first sample of data (which data was initialized with - 3a5a5)

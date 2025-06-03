@@ -179,10 +179,8 @@ initial begin
   transfer_cnt = 0;
   forever begin
     @(posedge clk_gate);
-    $display("DEBUG");
-    if (transfer_status) begin
+     if (transfer_status) begin
       transfer_cnt = transfer_cnt + 1;
-      $display("DEBUG: transfer_cnt incremented to %0d at time %0t", transfer_cnt, $time);
     end
     @(negedge clk_gate);
   end
@@ -216,7 +214,7 @@ task data_acquisition_test();
 
     // Configure AXI PWM GEN
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
+    axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h8)); // set PWM period
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
 

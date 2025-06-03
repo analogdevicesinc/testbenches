@@ -59,6 +59,8 @@ localparam RESOLUTION = (`RESOLUTION_16_18N == 1) ? 16 : 18;
 program test_program (
   input           ref_clk_p,
   input           ref_clk_n,
+  input           ref_clk,
+  input           clk_gate,
   output          clk_p,
   output          clk_n,
   input           dco_p,
@@ -91,7 +93,7 @@ localparam DCO_DELAY = 0.7;
 //reg                     ref_clk = 1'b0;
 //reg                     ref_clk_out = 1'b0;
 //reg                     cnv_out = 1'b0;
-reg                     clk_gate = 1'b0;
+//reg                     clk_gate = 1'b0;
 //reg                     dco_p = 1'b0;
 //reg                     dco_n = 1'b0;
 //reg                     da_p = 1'b0;
@@ -164,8 +166,6 @@ initial begin
 
 end
 
-
- 
 reg [15:0]  tx_data_buf = 16'h0101;
 bit [31:0]  dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit transfer_status = 0;
@@ -176,12 +176,16 @@ bit [31:0] transfer_cnt;
 //---------------------------------------------------------------------------
 
 initial begin
+  transfer_cnt = 0;
   forever begin
-    @(posedge cnv_out);
-    if (transfer_status)
-        transfer_cnt <= transfer_cnt + 'h1;
-        @(negedge cnv_out);
+    @(posedge clk_gate);
+    $display("DEBUG");
+    if (transfer_status) begin
+      transfer_cnt = transfer_cnt + 1;
+      $display("DEBUG: transfer_cnt incremented to %0d at time %0t", transfer_cnt, $time);
     end
+    @(negedge clk_gate);
+  end
 end
 
 //---------------------------------------------------------------------------
@@ -231,7 +235,7 @@ task data_acquisition_test();
     axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
 
-    @(negedge clk_gate) // TBD
+    //@(posedge clk_gate) // TBD
     #200
 
     transfer_status = 1;

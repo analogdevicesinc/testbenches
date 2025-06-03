@@ -234,6 +234,8 @@ module system_tb();
     `TEST_PROGRAM test(
        .ref_clk_p (ref_clk_p),
        .ref_clk_n (ref_clk_n),
+       .ref_clk (ref_clk),
+       .clk_gate (clk_gate),
        .clk_p (clk_p),
        .clk_n (clk_n),
        .dco_p (dco_p),

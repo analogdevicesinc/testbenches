@@ -126,19 +126,19 @@ program test_program_8ch (
 
     sanity_test();
 
-    #100 adc_config_number_of_channels();
+    #100ns adc_config_number_of_channels();
 
-    #100 adc_config_SIMPLE_test();
+    #100ns adc_config_SIMPLE_test();
 
-    #200 adc_config_CRC_test();
+    #200ns adc_config_CRC_test();
 
-    #200 adc_config_STATUS_test();
+    #200ns adc_config_STATUS_test();
 
-    #200 adc_config_STATUS_CRC_test();
+    #200ns adc_config_STATUS_CRC_test();
 
-    #200 adc_config_SIMPLE_test();
+    #200ns adc_config_SIMPLE_test();
 
-    #100 db_transmission_test();
+    #100ns db_transmission_test();
 
     base_env.stop();
 

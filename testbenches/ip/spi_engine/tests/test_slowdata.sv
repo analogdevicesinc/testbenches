@@ -68,9 +68,6 @@ program test_slowdata (
   `endif
   inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
 
-  timeunit 1ns;
-  timeprecision 100ps;
-
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   spi_environment spi_env;
   spi_engine_api spi_api;
@@ -160,31 +157,31 @@ program test_slowdata (
 
     init();
 
-    #100ns
+    #100ns;
 
     fifo_init_test();
 
-    #100ns
+    #100ns;
 
     fifo_single_read_test();
 
-    #100ns
+    #100ns;
 
     fifo_double_write_test();
 
-    #100ns
+    #100ns;
 
     fifo_double_read_test();
 
-    #100ns
+    #100ns;
 
     fifo_double_write_test();
 
-    #100ns
+    #100ns;
 
     offload_spi_test();
 
-    #100ns
+    #100ns;
 
     spi_env.stop();
     base_env.stop();
@@ -544,7 +541,7 @@ program test_slowdata (
     end
 
     // Start the offload
-    #100ns
+    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started."), ADI_VERBOSITY_LOW);
 
@@ -554,7 +551,7 @@ program test_slowdata (
 
     `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
 
     if (irq_pending == 'h0) begin
       `FATAL(("IRQ Test FAILED"));

@@ -35,6 +35,8 @@
 
 `include "utils.svh"
 
+`timescale 1ps/1fs
+
 package logger_pkg;
 
   typedef enum {
@@ -69,6 +71,7 @@ package logger_pkg;
 
   function void setLoggerVerbosity(input adi_verbosity_t value);
     verbosity = value;
+    $timeformat(-9, 3, " ns");
   endfunction: setLoggerVerbosity
 
 endpackage

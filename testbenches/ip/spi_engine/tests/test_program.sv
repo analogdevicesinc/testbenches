@@ -68,9 +68,6 @@ program test_program (
   `endif
   inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
 
-  timeunit 1ns;
-  timeprecision 100ps;
-
   // declare the class instances
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   spi_environment spi_env;
@@ -161,11 +158,11 @@ program test_program (
 
     init();
 
-    #100ns
+    #100ns;
 
     fifo_spi_test();
 
-    #100ns
+    #100ns;
 
     offload_spi_test();
 
@@ -318,14 +315,14 @@ program test_program (
       `endif
     end
 
-    #100ns
+    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started."), ADI_VERBOSITY_LOW);
     spi_wait_send();
     spi_api.stop_offload();
     `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
 
     if (irq_pending == 'h0) begin
       `FATAL(("IRQ Test FAILED"));

@@ -147,9 +147,9 @@ package environment_pkg;
           rx_transaction.set_delay(data_rate_ratio - 1);
           src_axis_agent.driver.send(rx_transaction);
           `INFO(("Sent new transaction to ADC driver"), ADI_VERBOSITY_LOW);
-          #0;
+          #0ps;
         end else begin
-          #1;
+          #1step;
         end
       end
 

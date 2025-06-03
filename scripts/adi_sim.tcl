@@ -105,6 +105,9 @@ proc adi_sim_generate {project_name } {
 
   set_property -name {xsim.simulate.runtime} -value {} -objects [get_filesets sim_1]
 
+  # enable fs timeprecision for waveforms
+  set_property -name {xsim.elaborate.xelab.more_options} -value {-timescale 1ps/1fs -override_timeunit -override_timeprecision} -objects [get_filesets sim_1]
+
   # Show all Xilinx primitives e.g GTYE4_COMMON
   set_property -name {xsim.elaborate.debug_level} -value {all} -objects [get_filesets sim_1]
   # Log all waves

@@ -664,7 +664,7 @@ task priv_i2c_test();
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Wait a while to write second payload, stalling the bus
   wait (`DUT_I3C_BIT_MOD.sm == 1);
-  #10000ns
+  #10000ns;
   if (i3c_scl !== 0)
     `FATAL(("Bus is not stalled (SCL != 0)"));
   i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_00DE);
@@ -812,7 +812,7 @@ task ibi_i3c_test();
   set_auto_ack(0);
   write_ibi_da(START_DA);
 
-  #10000ns
+  #10000ns;
   if (`DUT_I3C_REGMAP.ibi_fifo_valid)
     `FATAL(("IBI should not have thrown IBI"));
 
@@ -822,7 +822,7 @@ task ibi_i3c_test();
   // request. No ibi is written to the FIFO. Then continue the request
   // after resolving the IBI request.
 
-  #12000ns
+  #12000ns;
   `INFO(("IBI I3C Test #4"), ADI_VERBOSITY_LOW);
   // Write SDO payload
   i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
@@ -849,7 +849,7 @@ task ibi_i3c_test();
   // Expected result: the controller accepts the IBI by driving SCL,
   // ACKs the IBI and follows with a Stop.
 
-  #12000ns
+  #12000ns;
   `INFO(("IBI I3C Test #5"), ADI_VERBOSITY_LOW);
   set_auto_ack(0);
   write_ibi_da(DEVICE_DA1+1);
@@ -871,12 +871,12 @@ task ibi_i3c_test();
     .listen(1'b1),
     .enable(1'b0));
 
-  #12000ns
+  #12000ns;
   `INFO(("IBI I3C Test #6"), ADI_VERBOSITY_LOW);
   set_auto_ack(0);
   write_ibi_da(DEVICE_DA1+1);
 
-  #10000ns
+  #10000ns;
   if (`DUT_I3C_REGMAP.ibi_fifo_valid)
     `FATAL(("IBI should not have thrown IBI"));
 
@@ -1081,7 +1081,7 @@ task offload_i3c_test();
   // After the slots are written to, the length of commands are written
   // (so the core knows the number of slots used), and enter offload mode.
 
-  #10000ns
+  #10000ns;
 
   // Mask all interrupts
   i3c_controller.set_irq_mask(
@@ -1125,13 +1125,13 @@ task offload_i3c_test();
   // Wait 2 offload_sdi_valid, that means, the 5 bytes from I3C_CMD_3
   repeat (2) @(posedge offload_sdi_valid);
 
-  #200ns
+  #200ns;
   offload_trigger_l = 1'b1;
   #10ns offload_trigger_l = 1'b0;
 
   repeat (2) @(posedge offload_sdi_valid);
 
-  #200ns
+  #200ns;
 
   // Exit offload mode
   i3c_controller.set_ops(

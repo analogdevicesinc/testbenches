@@ -56,7 +56,7 @@ module system_tb();
   //localparam bit DEBUG = 1;
 
   // dco delay compared to the reference clk
-  //localparam DCO_DELAY = 0.7;
+  localparam DCO_DELAY = 0.7;
 
   // reg signals
 
@@ -123,7 +123,7 @@ module system_tb();
 //                          8;
 //  integer clk_gate_period = clk_gate_high + clk_gate_low;
   // it takes 1 CNV impulse for the adc_data to be populated at the first run
-//  integer cnv_count = 0;
+  integer cnv_count = 0;
 
 
   // test bench variables
@@ -133,13 +133,13 @@ module system_tb();
   // ---------------------------------------------------------------------------
   // Creating a "gate" through which the data clock can run (and only then)
   // ---------------------------------------------------------------------------
-//  always @ (*) begin
-//    if (clk_gate == 1'b1) begin
-//      ref_clk_out = ref_clk;
-//    end else begin
-//      ref_clk_out = 1'b0;
-//    end
-//  end
+  always @ (*) begin
+    if (clk_gate == 1'b1) begin
+      ref_clk_out = ref_clk;
+    end else begin
+      ref_clk_out = 1'b0;
+    end
+  end
 
 //  initial begin
 //    #500
@@ -183,10 +183,18 @@ module system_tb();
   // Data clocks generation
   // ---------------------------------------------------------------------------
 
- // always @ (ref_clk_out) begin
- //   dco_p <= #DCO_DELAY ref_clk_out;
- //   dco_n <= #DCO_DELAY ~ref_clk_out;
- // end
+  always @ (ref_clk_out) begin
+    dco_p <= #DCO_DELAY ref_clk_out;
+    dco_n <= #DCO_DELAY ~ref_clk_out;
+  end
+
+
+  always @(posedge clk_gate) begin  
+      cnv_out <= 1'b1;
+  end
+  always @(negedge clk_gate) begin
+      cnv_out <= 1'b0;
+  end
 
   // ---------------------------------------------------------------------------
   // Output data ready
@@ -211,8 +219,8 @@ module system_tb();
   // ---------------------------------------------------------------------------
 
   always @ (posedge cnv_out) begin
-    //cnv_count++;
-
+    cnv_count++;
+    
     // at the first entrance in this always, da and db will have the bits from
     // the first sample of data (which data was initialized with - 3a5a5)
     // and only afterwards to increment data; otherwise the first sample is lost

@@ -61,14 +61,15 @@ program test_program (
   input           ref_clk_n,
   input           ref_clk,
   input           clk_gate,
+  input           data,
   output          clk_p,
   output          clk_n,
   input           dco_p,
   input           dco_n,
-  input           da_n,
-  input           da_p,
-  input           db_n,
-  input           db_p,
+  output           da_n,
+  output           da_p,
+  output           db_n,
+  output           db_p,
   output          cnv_p,
   output          cnv_n,
   output          cnv_en,
@@ -88,18 +89,6 @@ localparam bit DEBUG = 1;
 
 // dco delay compared to the reference clk
 localparam DCO_DELAY = 0.7;
-
-// reg signals
-//reg                     ref_clk = 1'b0;
-//reg                     ref_clk_out = 1'b0;
-//reg                     cnv_out = 1'b0;
-//reg                     clk_gate = 1'b0;
-//reg                     dco_p = 1'b0;
-//reg                     dco_n = 1'b0;
-//reg                     da_p = 1'b0;
-//reg                     da_n = 1'b0;
-//reg                     db_p = 1'b0;
-//reg                     db_n = 1'b0;
 
 // dma interface
 wire                    adc_valid;
@@ -148,7 +137,7 @@ initial begin
                   `TH.`MNG_AXI.inst.IF,
                   `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+  setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
   base_env.start();
   base_env.sys_reset();
@@ -166,7 +155,7 @@ initial begin
 
 end
 
-reg [15:0]  tx_data_buf = 16'h0101;
+
 bit [31:0]  dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit transfer_status = 0;
 bit [31:0] transfer_cnt;
@@ -183,6 +172,99 @@ initial begin
       transfer_cnt = transfer_cnt + 1;
     end
     @(negedge clk_gate);
+  end
+end
+
+//---------------------------------------------------------------------------
+// Data store
+//---------------------------------------------------------------------------
+
+reg   [RESOLUTION-1:0]  data = 'h3a5a5;
+reg   [RESOLUTION-1:0]  data_int = 'h0;
+reg                     r_da_p = 1'b0;
+reg                     r_da_n = 1'b0;
+reg                     r_db_p = 1'b0;
+reg                     r_db_n = 1'b0;
+reg                     cnv_out = 1'b0;
+
+ 
+assign da_p = r_da_p;
+assign da_n = r_da_n;
+assign db_p = r_db_p;
+assign db_n = r_db_n;
+
+integer cnv_count = 0;
+  // ---------------------------------------------------------------------------
+  // Output data ready
+  // ---------------------------------------------------------------------------
+
+initial begin
+  forever begin
+    @(posedge clk_gate) begin  
+      cnv_out <= 1'b1;
+    end
+    @(negedge clk_gate) begin
+      cnv_out <= 1'b0;
+    end  
+  end
+end
+  
+  
+initial begin
+  forever begin
+    @ (posedge dco_p) begin
+      if (`TWOLANES == 1) begin
+        r_da_p = data_int[RESOLUTION - 1];
+        r_da_n = ~data_int[RESOLUTION - 1];
+        r_db_p = data_int[RESOLUTION - 2];
+        r_db_n = ~data_int[RESOLUTION - 2];
+        data_int = data_int << 2;
+      end else begin
+        r_da_p = data_int[RESOLUTION - 1];
+        r_da_n = ~data_int[RESOLUTION - 1];
+        data_int = data_int << 1;
+      end
+    end
+  end
+end
+
+
+
+initial begin
+  forever begin
+    @ (posedge cnv_out) begin
+      cnv_count++;
+      // at the first entrance in this always, da and db will have the bits from
+      // the first sample of data (which data was initialized with - 3a5a5)
+      // and only afterwards to increment data; otherwise the first sample is lost
+      if (`TWOLANES == 1) begin
+        r_da_p = data[RESOLUTION - 1];
+        r_da_n = ~data[RESOLUTION - 1];
+        r_db_p = data[RESOLUTION - 2];
+        r_db_n = ~data[RESOLUTION - 2];
+        data_int = data << 2;
+      end else begin
+        r_da_p = data[RESOLUTION - 1];
+        r_da_n = ~data[RESOLUTION - 1];
+        data_int = data << 1;
+      end
+      //#tCONV data <= data + 1;
+      data <= data + 1;
+    end
+  end
+ end
+  
+initial begin
+  forever begin
+    @(negedge dco_n);
+      if (transfer_status)
+        if (transfer_cnt[0]) begin
+          dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = data - 16'h0001;
+        end else begin
+          dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = data - 16'h0001;
+        end
+        data <= data + 16'h0001;
+      @(posedge dco_n);
   end
 end
 
@@ -243,8 +325,8 @@ task data_acquisition_test();
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
     #100
-    //@(negedge dco_n); //TBD
-    //@(posedge ref_clk); //TBD
+    @(negedge clk_gate); //TBD
+    @(posedge ref_clk); //TBD
     transfer_status = 0;
 
     // Stop pwm gen

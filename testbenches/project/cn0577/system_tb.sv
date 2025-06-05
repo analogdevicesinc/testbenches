@@ -104,6 +104,7 @@ module system_tb();
   // local wires and registers
 
   reg   clk_gate_d = 1'b0;
+  //reg   [RESOLUTION-1:0]  data = 'h0;
   reg   [RESOLUTION-1:0]  data = 'h3a5a5;
   reg   [RESOLUTION-1:0]  data_int = 'h0;
   reg   [9:0]  cnv_counter = 9'hd;
@@ -189,61 +190,62 @@ module system_tb();
   end
 
 
-  always @(posedge clk_gate) begin  
-      cnv_out <= 1'b1;
-  end
-  always @(negedge clk_gate) begin
-      cnv_out <= 1'b0;
-  end
+//  always @(posedge clk_gate) begin  
+//      cnv_out <= 1'b1;
+//  end
+//  always @(negedge clk_gate) begin
+//      cnv_out <= 1'b0;
+//  end
 
   // ---------------------------------------------------------------------------
   // Output data ready
   // ---------------------------------------------------------------------------
 
-  always @ (dco_p) begin
-    if (TWOLANES == 1) begin
-      da_p <= data_int[RESOLUTION - 1];
-      da_n <= ~data_int[RESOLUTION - 1];
-      db_p <= data_int[RESOLUTION - 2];
-      db_n <= ~data_int[RESOLUTION - 2];
-      data_int <= data_int << 2;
-    end else begin
-      da_p <= data_int[RESOLUTION - 1];
-      da_n <= ~data_int[RESOLUTION - 1];
-      data_int <= data_int << 1;
-    end
-  end
+//  always @ (dco_p) begin
+//    if (TWOLANES == 1) begin
+//      da_p <= data_int[RESOLUTION - 1];
+//      da_n <= ~data_int[RESOLUTION - 1];
+//      db_p <= data_int[RESOLUTION - 2];
+//      db_n <= ~data_int[RESOLUTION - 2];
+//      data_int <= data_int << 2;
+//    end else begin
+//      da_p <= data_int[RESOLUTION - 1];
+//      da_n <= ~data_int[RESOLUTION - 1];
+//      data_int <= data_int << 1;
+//    end
+//  end
 
   // ---------------------------------------------------------------------------
   // Generating expected data
   // ---------------------------------------------------------------------------
 
-  always @ (posedge cnv_out) begin
-    cnv_count++;
+//  always @ (posedge cnv_out) begin
+//    cnv_count++;
     
-    // at the first entrance in this always, da and db will have the bits from
-    // the first sample of data (which data was initialized with - 3a5a5)
-    // and only afterwards to increment data; otherwise the first sample is lost
-    if (TWOLANES == 1) begin
-      da_p = data[RESOLUTION - 1];
-      da_n = ~data[RESOLUTION - 1];
-      db_p = data[RESOLUTION - 2];
-      db_n = ~data[RESOLUTION - 2];
-      data_int = data << 2;
-    end else begin
-      da_p = data[RESOLUTION - 1];
-      da_n = ~data[RESOLUTION - 1];
-      data_int = data << 1;
-    end
+//    // at the first entrance in this always, da and db will have the bits from
+//    // the first sample of data (which data was initialized with - 3a5a5)
+//    // and only afterwards to increment data; otherwise the first sample is lost
+//    if (TWOLANES == 1) begin
+//      da_p = data[RESOLUTION - 1];
+//      da_n = ~data[RESOLUTION - 1];
+//      db_p = data[RESOLUTION - 2];
+//      db_n = ~data[RESOLUTION - 2];
+//      data_int = data << 2;
+//    end else begin
+//      da_p = data[RESOLUTION - 1];
+//      da_n = ~data[RESOLUTION - 1];
+//      data_int = data << 1;
+//    end
 
-    //#tCONV data <= data + 1;
-     data <= data + 1;
-  end
+//    //#tCONV data <= data + 1;
+//     data <= data + 1;
+//  end
 
     `TEST_PROGRAM test(
        .ref_clk_p (ref_clk_p),
        .ref_clk_n (ref_clk_n),
        .ref_clk (ref_clk),
+       .data (data),
        .clk_gate (clk_gate),
        .clk_p (clk_p),
        .clk_n (clk_n),

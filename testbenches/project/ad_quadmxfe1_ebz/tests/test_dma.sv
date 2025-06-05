@@ -116,7 +116,7 @@ program test_dma;
     //asserts all the resets for 100 ns
     `TH.`SYS_RST.inst.IF.assert_reset();
 
-    #100
+    #100ns;
     `TH.`SYS_RST.inst.IF.deassert_reset();
 
     #1us;

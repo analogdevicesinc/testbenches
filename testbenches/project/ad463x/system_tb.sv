@@ -33,8 +33,6 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`timescale 1ns/1ps
-
 `include "utils.svh"
 
 module system_tb();
@@ -88,7 +86,7 @@ module system_tb();
   end
   assign ad463x_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
 
-  always #0.5       delay_clk = ~delay_clk;
-  always #5         ad463x_ext_clk = ~ad463x_ext_clk;
+  always #0.5ns       delay_clk = ~delay_clk;
+  always #5ns         ad463x_ext_clk = ~ad463x_ext_clk;
 
 endmodule

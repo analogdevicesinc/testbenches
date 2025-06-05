@@ -415,7 +415,7 @@ program test_program;
       .ce_n(0),
       .mmcm_rstn(0),
       .rstn(0));
-    #1000;
+    #1000ns;
   endtask
 
   // --------------------------
@@ -476,7 +476,7 @@ program test_program;
     end
 
     // Allow initial OOS to propagate
-    #15000;
+    #15000ns;
 
     // clear PN OOS and PN ERR
     rx1_adc_api.clear_channel_status(CH0);
@@ -486,7 +486,7 @@ program test_program;
       rx1_adc_api.clear_channel_status(CH3);
     end
 
-    #10000;
+    #10000ns;
 
     // check PN OOS and PN ERR flags
     rx1_adc_api.get_status(status);
@@ -633,7 +633,7 @@ program test_program;
       .ext_sync_disarm(1'b0),
       .manual_sync_request(1'b0));
 
-    #20000;
+    #20000ns;
 
     link_down();
   endtask

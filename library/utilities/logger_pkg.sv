@@ -69,6 +69,22 @@ package logger_pkg;
 
   function void setLoggerVerbosity(input adi_verbosity_t value);
     verbosity = value;
+    setLoggerTimeFormat("ns", 3);
   endfunction: setLoggerVerbosity
+
+  function void setLoggerTimeFormat(
+    input string format,
+    input int fraction);
+
+    case (format)
+      "s": $timeformat(0, fraction, " s");
+      "ms": $timeformat(-3, fraction, " ms");
+      "us": $timeformat(-6, fraction, " us");
+      "ns": $timeformat(-9, fraction, " ns");
+      "ps": $timeformat(-12, fraction, " ps");
+      "fs": $timeformat(-15, fraction, " fs");
+      default: `ERROR(("Unsupported format!"));
+    endcase
+  endfunction: setLoggerTimeFormat
 
 endpackage

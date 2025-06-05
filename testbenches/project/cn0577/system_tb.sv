@@ -47,7 +47,7 @@ module system_tb();
   parameter RESOLUTION = 18;
 
   //parameter tCYC = 66.6;
-  parameter tCONV = 63;
+  //parameter tCONV = 63;
   //parameter tFIRST_CLK = 65;
   //parameter tLAST_CLK = 49;
   //parameter tACQ = tCYC - 39;
@@ -236,7 +236,8 @@ module system_tb();
       data_int = data << 1;
     end
 
-    #tCONV data <= data + 1;
+    //#tCONV data <= data + 1;
+     data <= data + 1;
   end
 
     `TEST_PROGRAM test(

@@ -233,14 +233,14 @@ task data_acquisition_test();
     axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
 
-    //@(posedge clk_gate) // TBD
+    @(posedge clk_gate) // TBD
     #200
 
     transfer_status = 1;
 
     base_env.mng.sequencer.RegWrite32(`AXI_LTC2387_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
-    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS ); // TBD!!!
+    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
     #100
     //@(negedge dco_n); //TBD
@@ -277,7 +277,8 @@ task data_acquisition_test();
       captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
-    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
+    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_HIGH);
+     //`INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
 
     if (captured_word_arr != dma_data_store_arr) begin
       `ERROR(("Data Acquisition Test FAILED"));

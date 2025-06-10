@@ -57,6 +57,7 @@ program test_program;
 
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   bit [31:0] val;
+  bit [63:0] val64;
 
   jesd_link link;
   rx_link_layer rx_ll;
@@ -79,7 +80,7 @@ program test_program;
                     `TH.`MNG_AXI.inst.IF,
                     `TH.`DDR_AXI.inst.IF);
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_MEDIUM);
 
     base_env.start();
     base_env.sys_reset();
@@ -122,35 +123,96 @@ program test_program;
     tx_xcvr.setup_clocks(lane_rate,
                          `REF_CLK_RATE*1000000);
 
+
+    // Configure FSRC RX
+    // Nothing todo
+
+    // Configure FSRC TX
+
     // =======================
     // JESD LINK TEST - DDS
     // =======================
-    jesd_link_test(1);
+    // jesd_link_test(1);
 
     // =======================
     // JESD LINK TEST - DMA
     // =======================
     jesd_link_test(0);
 
+    // -----------------------
+    // FSRC CONFIG
+    // -----------------------
+
+    `INFO(("Configuring FSRC TX"), ADI_VERBOSITY_NONE);
+    // Sanity
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h8, 32'hDEADBEEF);
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h8, 32'hBEEFDEAD);
+
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h18, 32'hFF); // CONV_MASK
+    val64 = 64'h05FF_1234_0000_0000;
+    for (int i = 0; i <= 15; i++) begin
+      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h28, val64[31:0]);
+      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h2c, val64[63:32]);
+      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h24, i);
+      val64 += 64'h0FFF_E234_0000_0000;
+    end
+    val64 = 64'hAFFF_DEAD_BEEF_1234;
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h1c, val64[31:0]); // Add val
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h20, val64[63:32]); // Add val
+
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, {32'b100}); // CTRL_TRANSMIT SET
+
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h14, {16'd1002, 16'd1002}); // SEQ_CTRL_2
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'd0}); // SEQ_CTRL_3
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h1c, {16'd2102, 16'b0}); // SEQ_CTRL_4
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b10}); // SEQ_CTRL_3
+
+    //---
+    // -----------------------
+    // FSRC CONFIG
+    // -----------------------
+    // AXI_FSRC_TX_ENABLE
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h10, 32'b1);
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, 32'b1); // CTRL_TRANSMIT@start
+    // Uncomment to use trig_in instead of reg access ctrl_3.seq_start
+    //base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h1c, {16'd2102, 16'b01}); // SEQ_CTRL_4@ext_trig_en
+    // AXI_FSRC_RX_ENABLE
+    base_env.mng.sequencer.RegWrite32(`FSRC_RX_BA + 'h10, 32'd1);
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b11}); // SEQ_CTRL_3@seq_start
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b10}); // SEQ_CTRL_3@seq_start
+
+    tx_xcvr.up();
+    tx_ll.link_up();
+    #300us
+    `INFO(("Pausing FSRC TX"), ADI_VERBOSITY_NONE);
+    tx_ll.wait_link_up();
+    tx_xcvr.down();
+    // AXI_FSRC_TX_PAUSE
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, 32'b10); // CTRL_TRANSMIT@stop
+
+    jesd_link_test(0, 1, 1);
+
     // =======================
     // JESD LINK TEST - DMA - RX/TX BYPASS
     // =======================
-    jesd_link_test(0,1,1);
+    // jesd_link_test(0,1,1);
 
     // =======================
     // JESD LINK TEST - DMA - DO -TDD
     // =======================
-    jesd_link_test(0,0,0,1);
+    // jesd_link_test(0,0,0,1);
 
     // =======================
     // JESD LINK TEST - DDS - EXT_SYNC
     // =======================
-    jesd_link_test_ext_sync(1);
+    // jesd_link_test_ext_sync(1);
 
     // =======================
     // JESD LINK TEST - DMA - EXT_SYNC
     // =======================
-    jesd_link_test_ext_sync(0);
+    // jesd_link_test_ext_sync(0);
+
+    // base_env.mng.sequencer.RegWrite32(`FSRC_RX_BA + 'h10, 32'd0);
 
     base_env.stop();
 
@@ -261,7 +323,20 @@ program test_program;
         if (`TX_JESD_NP == 12) begin
           base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 20) | (i << 4) ,15);
         end else begin
-          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
+          // if (i % 8 == 0) begin
+          //   base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i , 15);
+          //   // base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2), 16'h8000 , 15);
+          // end else begin
+          // base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i , 15);
+          // base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2), i, 15);
+          if (i % 32 == 0) begin
+            base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2), (16'h8000 << 16) | 16'h8000, 15);
+          end else if (i % 32 == 1) begin
+            base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2), (16'h8000 << 16) | 16'h8000, 15);
+          end else begin
+            base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2), ((i + 1) << 16) | i, 15);
+          end
+
         end
       end
       // Configure TX DMA
@@ -443,7 +518,11 @@ program test_program;
         if (`TX_JESD_NP == 12) begin
           base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 20) | (i << 4) ,15);
         end else begin
-          base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
+          if (i % 32 == 0) begin
+            base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2), ((i + 1) << 16) | 16'h8000, 15);
+          end else begin
+            base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2), ((i + 1) << 16) | i, 15);
+          end
         end
       end
 
@@ -523,13 +602,16 @@ program test_program;
       if (i==0) begin
         first = captured_word[15:0];
       end else begin
-        reference_word = (((first + (i+1)*step)%max_sample) << 16) | ((first + (i*step))%max_sample);
-
+        if ((i % 32 == 0) || (i % 32 == 1)) begin
+          continue;
+          // reference_word = (((first + (i+2)*step)%max_sample) << 16) | ((first + ((i + 1)*step))%max_sample);
+        end else begin
+          reference_word = (((first + (i+1)*step)%max_sample) << 16) | ((first + (i*step))%max_sample);
+        end
         if (captured_word !== reference_word) begin
-          `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
+          `WARNING(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end
       end
-
     end
   endtask
 

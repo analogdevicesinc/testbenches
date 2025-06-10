@@ -84,6 +84,7 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 #  Block design under test
 #
 #
+set ENABLE_FSRC 1
 source $ad_hdl_dir/projects/ad9081_fmca_ebz/common/ad9081_fmca_ebz_bd.tcl
 
 #if {$ad_project_params(JESD_MODE) == "8B10B"} {
@@ -141,3 +142,15 @@ adi_sim_add_define "TDD_BA=[format "%d" ${TDD}]"
 if {$TDD_SUPPORT == 1} {
   set_property offset $TDD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_tdd_0}]
 }
+
+set FSRC_RX 0x44500000
+set_property offset $FSRC_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_rx}]
+adi_sim_add_define "FSRC_RX_BA=[format "%d" ${FSRC_RX}]"
+
+set FSRC_TX 0x44510000
+set_property offset $FSRC_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_tx}]
+adi_sim_add_define "FSRC_TX_BA=[format "%d" ${FSRC_TX}]"
+
+set FSRC_CTRL 0x44540000
+set_property offset $FSRC_CTRL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_ctrl}]
+adi_sim_add_define "FSRC_CTRL_BA=[format "%d" ${FSRC_CTRL}]"

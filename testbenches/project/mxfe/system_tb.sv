@@ -42,12 +42,21 @@ module system_tb();
   wire rx_sync_0;
   reg ext_sync = 1'b0;
 
+  wire fsrc_sysref;
+  wire fsrc_trig_in = 1'b0;
+  wire fsrc_trig_out;
+  wire [39:0] fsrc_ctrl;
+
   `TEST_PROGRAM test();
 
   test_harness `TH (
     .ref_clk_out    (ref_clk),
     .device_clk_out (device_clk),
     .sysref_clk_out (sysref),
+
+    .fsrc_trig_in (fsrc_trig_in),
+    .fsrc_trig_out (fsrc_trig_out),
+    .fsrc_ctrl (fsrc_ctrl),
 
     .rx_device_clk  (device_clk),      //-dir I
     .tx_device_clk  (device_clk),      //-dir I

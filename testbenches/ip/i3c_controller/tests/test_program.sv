@@ -362,8 +362,8 @@ task ccc_i3c_test;
   i3c_controller.set_cmd_fifo(I3C_CCC_CMD_RSTDAA); // CCC, length 0
   i3c_controller.set_cmd_fifo(I3C_CCC_RSTDAA);
   @(posedge i3c_irq);
-  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 0)
     `FATAL(("CMD -> CMDR read length test FAILED"));
@@ -374,8 +374,8 @@ task ccc_i3c_test;
   i3c_controller.set_cmd_fifo(I3C_CCC_CMD_DISEC); // CCC, length tx 1
   i3c_controller.set_cmd_fifo(I3C_CCC_DISEC);
   @(posedge i3c_irq);
-  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 1)
     `FATAL(("CMD -> CMDR write length test FAILED"));
@@ -385,8 +385,8 @@ task ccc_i3c_test;
   i3c_controller.set_cmd_fifo(I3C_CMD_GETPID_UDA); // CCC, length rx 6
   i3c_controller.set_cmd_fifo(I3C_CCC_GETPID);
   wait (i3c_irq);
-  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[23:20] != 8)
     `FATAL(("#4: CMD -> CMDR UDA_ERROR assertion FAILED"));
@@ -404,8 +404,8 @@ task ccc_i3c_test;
   i3c_dev_sda <= 1'bZ;
   set_auto_ack(1);
   @(posedge i3c_irq);
-  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 6)
     `FATAL(("CMD -> CMDR read length test FAILED"));
@@ -421,8 +421,8 @@ task ccc_i3c_test;
   i3c_dev_sda <= 1'bZ;
   set_auto_ack(1);
   @(posedge i3c_irq);
-  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 1)
     `FATAL(("CMD -> CMDR read length test FAILED"));
@@ -436,8 +436,6 @@ task ccc_i3c_test;
     .sdo_almost_empty(1'b0),
     .cmdr_almost_full(1'b0),
     .cmd_almost_empty(1'b0));
-  // Clear all pending IRQs
-  i3c_controller.set_irq_pending(irq_pending);
 
   `INFO(("CCC I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
@@ -781,11 +779,11 @@ task ibi_i3c_test();
   write_ibi_da(DEVICE_DA1);
 
   @(posedge i3c_irq);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
   i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi(ibi_fifo_data);
   if (ibi_fifo_data[23:17] != DEVICE_DA1)
     `FATAL(("Wrong IBI DA"));
-  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
 
   // Test #2, peripheral does an IBI request by sending its DA during broadcast
   // address.
@@ -807,15 +805,15 @@ task ibi_i3c_test();
   // Enable ACK during the cmd transfer
   set_auto_ack(1);
   wait (i3c_irq);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
   i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi (ibi_fifo_data);
   if (ibi_fifo_data[23:17] != DEVICE_DA1)
     `FATAL(("Wrong IBI DA"));
-  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
 
   wait (i3c_irq); // cmdr_irq
-  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8])
     `FATAL(("CMD transfer after resolving IBI FAILED"));
@@ -872,11 +870,11 @@ task ibi_i3c_test();
   write_ibi_da(DEVICE_DA1+1);
 
   wait (i3c_irq);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
   i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi(ibi_fifo_data);
   if (ibi_fifo_data[23:17] != DEVICE_DA1+1)
     `FATAL(("Wrong IBI DA"));
-  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
 
   // Test #6, peripheral does IBI request by pulling SDA low, but
   // IBI is disabled while listening to them.
@@ -913,8 +911,6 @@ task ibi_i3c_test();
     .sdo_almost_empty(1'b0),
     .cmdr_almost_full(1'b0),
     .cmd_almost_empty(1'b0));
-  // Clear all pending IRQs
-  i3c_controller.set_irq_pending(irq_pending);
 
   `INFO(("IBI I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
@@ -956,30 +952,30 @@ task daa_i3c_test();
 
   write_daa(DEVICE_PID_BCR_DCR);
 
-  @(posedge i3c_irq);
+  wait (i3c_irq);
   `INFO(("GOT DAA IRQ"), ADI_VERBOSITY_LOW);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
     `FATAL(("Wrong SDI FIFO level"));
   i3c_controller.read_sdi_fifo(sdi_fifo_data);
   i3c_controller.read_sdi_fifo(sdi_fifo_data);
-  // Assert that irq won't be cleared if SDO is empty
-  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
-  if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_DAA_PENDING])
-    `FATAL(("DAA IRQ should not have been cleared"));
+  if (`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_DAA_PENDING])
+    `FATAL(("DAA IRQ should have been cleared"));
   `INFO(("Writing DA 1"), ADI_VERBOSITY_LOW);
   i3c_controller.write_sdo_fifo_data_4_byte(
     .data0({DEVICE_DA1, ~^DEVICE_DA1[6:0]}),
     .data1(8'h0),
     .data2(8'h0),
     .data3(8'h0));
-  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
 
   // Write DEV_CHAR_2 all Low for the second peripheral,
   // so BCR[2] is Low (used in the ibi_i3c_test).
   wait (`DUT_I3C_WORD.st == `CMDW_DAA_DEV_CHAR);
   dev_char_state <= 1'b0;
   @(posedge i3c_irq);
+  #10000ns
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
   if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
     `FATAL(("Wrong SDI FIFO level"));
@@ -999,8 +995,8 @@ task daa_i3c_test();
   `WAIT (`DUT_I3C_WORD.st == `CMDW_BCAST_7E_W1, 100000);
   set_auto_ack(0);
   @(posedge i3c_irq);
-  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
 
   // Mask the DAA interrupt
@@ -1013,8 +1009,6 @@ task daa_i3c_test();
     .sdo_almost_empty(1'b0),
     .cmdr_almost_full(1'b0),
     .cmd_almost_empty(1'b0));
-  // Clear all pending IRQs
-  i3c_controller.set_irq_pending(irq_pending);
 
   `INFO(("DAA I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask

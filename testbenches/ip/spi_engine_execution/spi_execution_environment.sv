@@ -37,86 +37,53 @@
 
 package spi_execution_environment_pkg;
 
-  import axi_vip_pkg::*;
-  import axi4stream_vip_pkg::*;
-  import m_axi_sequencer_pkg::*;
-  import s_axi_sequencer_pkg::*;
-  import s_spi_sequencer_pkg::*;
+  import logger_pkg::*;
+  import adi_environment_pkg::*;
+  import adi_axis_agent_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
+  import axi4stream_vip_pkg::*;
   import adi_spi_vip_pkg::*;
-  import test_harness_env_pkg::*;
-  import `PKGIFY(test_harness, mng_axi_vip)::*;
-  import `PKGIFY(test_harness, ddr_axi_vip)::*;  
-  import `PKGIFY(test_harness, cmd_src)::*;
-  import `PKGIFY(test_harness, sdo_src)::*;
-  import `PKGIFY(test_harness, sdi_sink)::*;
-  import `PKGIFY(test_harness, sync_sink)::*;
-  import `PKGIFY(test_harness, spi_s_vip)::*;
+  import adi_spi_vip_if_base_pkg::*;
+  import watchdog_pkg::*;
 
-  class spi_execution_environment extends test_harness_env;
+  class spi_execution_environment #(
+                                    `AXIS_VIP_PARAM_DECL(cmd_src),
+                                    `AXIS_VIP_PARAM_DECL(sdo_src),
+                                    `AXIS_VIP_PARAM_DECL(sdi_sink),
+                                    `AXIS_VIP_PARAM_DECL(sync_sink)
+                                  ) extends adi_environment;
 
     // Agents
-    adi_spi_agent #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_agent;
-    `AGENT(test_harness, cmd_src, mst_t)    cmd_src_agent;
-    `AGENT(test_harness, sdo_src, mst_t)    sdo_src_agent;
-    `AGENT(test_harness, sdi_sink, slv_t)   sdi_sink_agent;
-    `AGENT(test_harness, sync_sink, slv_t)  sync_sink_agent;
-
-    // Sequencers
-    s_spi_sequencer #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_seq;
-    m_axis_sequencer #(`AGENT(test_harness, cmd_src, mst_t),
-                      `AXIS_VIP_PARAMS(test_harness, cmd_src)
-                      ) cmd_src_seq;
-    m_axis_sequencer #(`AGENT(test_harness, sdo_src, mst_t),
-                      `AXIS_VIP_PARAMS(test_harness, sdo_src)
-                      ) sdo_src_seq;
-    s_axis_sequencer #(`AGENT(test_harness, sdi_sink, slv_t)) sdi_sink_seq;
-    s_axis_sequencer #(`AGENT(test_harness, sync_sink, slv_t)) sync_sink_seq;
+    adi_spi_agent spi_agent;
+    adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(cmd_src))    cmd_src_agent;
+    adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(sdo_src))    sdo_src_agent;
+    adi_axis_slave_agent  #(`AXIS_VIP_PARAM_ORDER(sdi_sink))   sdi_sink_agent;
+    adi_axis_slave_agent  #(`AXIS_VIP_PARAM_ORDER(sync_sink))  sync_sink_agent;
 
     //============================================================================
     // Constructor
     //============================================================================
     function new(
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(10)) sys_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(5)) dma_clk_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(2.5)) ddr_clk_vip_if,
+      input string name,
+      adi_spi_vip_if_base spi_s_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(cmd_src))    cmd_src_axis_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(sdo_src))    sdo_src_axis_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(sdi_sink))   sdi_sink_axis_vip_if,
+      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(sync_sink))  sync_sink_axis_vip_if
+     );
 
-      virtual interface rst_vip_if #(.C_ASYNCHRONOUS(1), .C_RST_POLARITY(1)) sys_rst_vip_if,
-
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, mng_axi_vip)) mng_vip_if,
-      virtual interface axi_vip_if #(`AXI_VIP_IF_PARAMS(test_harness, ddr_axi_vip)) ddr_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, cmd_src)) cmd_src_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, sdo_src)) sdo_src_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, sdi_sink)) sdi_sink_axis_vip_if,
-      virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness, sync_sink)) sync_sink_axis_vip_if,
-      virtual interface spi_vip_if #(`SPI_VIP_PARAMS(test_harness, spi_s_vip)) spi_s_vip_if
-    );
-
-      super.new(sys_clk_vip_if,
-                dma_clk_vip_if,
-                ddr_clk_vip_if,
-                sys_rst_vip_if,
-                mng_vip_if,
-                ddr_vip_if);
+      super.new(name);
 
       // Creating the agents
-      spi_agent = new(spi_s_vip_if);
-      cmd_src_agent   = new("CMD Source AXI Stream Agent", cmd_src_axis_vip_if);
-      sdo_src_agent   = new("SDO Source AXI Stream Agent", sdo_src_axis_vip_if);
-      sdi_sink_agent  = new("SDI Sink AXI Stream Agent", sdi_sink_axis_vip_if);
-      sync_sink_agent = new("SYNC Sink AXI Stream Agent", sync_sink_axis_vip_if);
-      
-      // Creating the sequencers
-      spi_seq = new(spi_agent);
-      cmd_src_seq   = new(cmd_src_agent);
-      sdo_src_seq   = new(sdo_src_agent);
-      sdi_sink_seq  = new(sdi_sink_agent);
-      sync_sink_seq = new(sync_sink_agent);
+      spi_agent = new("SPI VIP Agent", spi_s_vip_if, this);
+      cmd_src_agent   = new("CMD Source AXI Stream Agent", cmd_src_axis_vip_if, this);
+      sdo_src_agent   = new("SDO Source AXI Stream Agent", sdo_src_axis_vip_if, this);
+      sdi_sink_agent  = new("SDI Sink AXI Stream Agent", sdi_sink_axis_vip_if, this);
+      sync_sink_agent = new("SYNC Sink AXI Stream Agent", sync_sink_axis_vip_if, this);
 
-      
       // downgrade reset check: we are currently using a clock generator for the SPI clock,
-      // so it will come a bit after the reset and trigger the default error. 
+      // so it will come a bit after the reset and trigger the default error.
       // This is harmless for this test (we don't want to test any reset scheme)
       cmd_src_axis_vip_if.set_xilinx_reset_check_to_warn();
       sdo_src_axis_vip_if.set_xilinx_reset_check_to_warn();
@@ -135,18 +102,18 @@ package spi_execution_environment_pkg;
       xil_axi4stream_ready_gen_policy_t sync_sink_mode;
 
       // source stub
-      cmd_src_seq.set_stop_policy(STOP_POLICY_PACKET);
-      sdo_src_seq.set_stop_policy(STOP_POLICY_PACKET);
-      cmd_src_seq.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
-      sdo_src_seq.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
-      cmd_src_seq.set_data_beat_delay(`CMD_STREAM_BEAT_DELAY);
-      sdo_src_seq.set_data_beat_delay(`SDO_STREAM_BEAT_DELAY);
+      this.cmd_src_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
+      this.sdo_src_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
+      this.cmd_src_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
+      this.sdo_src_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
+      this.cmd_src_agent.sequencer.set_data_beat_delay(`CMD_STREAM_BEAT_DELAY);
+      this.sdo_src_agent.sequencer.set_data_beat_delay(`SDO_STREAM_BEAT_DELAY);
 
       // destination stub
       sdi_sink_mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
       sync_sink_mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
-      sdi_sink_seq.set_mode(sdi_sink_mode);
-      sync_sink_seq.set_mode(sync_sink_mode);
+      this.sdi_sink_agent.sequencer.set_mode(sdi_sink_mode);
+      this.sync_sink_agent.sequencer.set_mode(sync_sink_mode);
 
     endtask
 
@@ -156,48 +123,34 @@ package spi_execution_environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      super.start();
-      spi_agent.start();
-      cmd_src_agent.start_master();
-      sdo_src_agent.start_master();
-      sdi_sink_agent.start_slave();
-      sync_sink_agent.start_slave();
-    endtask
-
-    //============================================================================
-    // Start the test
-    //   - start the scoreboard
-    //   - start the sequencers
-    //============================================================================
-    task test();
-      super.test();
-      fork
-        cmd_src_seq.run();
-        sdo_src_seq.run();
-        sdi_sink_seq.run();
-        sync_sink_seq.run();
-      join_none
+      this.spi_agent.start();
+      this.cmd_src_agent.start();
+      this.sdo_src_agent.start();
+      this.sdi_sink_agent.start();
+      this.sync_sink_agent.start();
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
     task run;
-      test();
+      fork
+        this.cmd_src_agent.run();
+        this.sdo_src_agent.run();
+        this.sdi_sink_agent.run();
+        this.sync_sink_agent.run();
+      join_none
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
     task stop;
-      spi_agent.stop();
-      super.stop();
-      cmd_src_seq.stop();
-      sdo_src_seq.stop();
-      cmd_src_agent.stop_master();
-      sdo_src_agent.stop_master();
-      sdi_sink_agent.stop_slave();
-      sync_sink_agent.stop_slave();
+      this.spi_agent.stop();
+      this.cmd_src_agent.stop();
+      this.sdo_src_agent.stop();
+      this.sdi_sink_agent.stop();
+      this.sync_sink_agent.stop();
     endtask
 
   endclass

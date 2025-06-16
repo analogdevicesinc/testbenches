@@ -32,14 +32,12 @@
 #
 # ***************************************************************************
 # ***************************************************************************
-source ../../../../scripts/adi_env.tcl
-
 global ad_project_params
 
 adi_project_files [list \
-    "../../../../library/common/ad_edge_detect.v" \
-    "../../../../library/util_cdc/sync_bits.v" \
-    "../../../../library/common/ad_iobuf.v" \
+    "$ad_hdl_dir/library/common/ad_edge_detect.v" \
+    "$ad_hdl_dir/library/util_cdc/sync_bits.v" \
+    "$ad_hdl_dir/library/common/ad_iobuf.v" \
 ]
 
 #
@@ -54,14 +52,7 @@ ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
 adi_sim_add_define "SPI_S=spi_s_vip"
 ad_connect spi_execution/spi spi_s_vip/s_spi
 
-ad_ip_instance axi4stream_vip cmd_src [list \
-  INTERFACE_MODE {MASTER} \
-  HAS_TREADY 1 \
-  HAS_TLAST 0 \
-  TDATA_NUM_BYTES 2 \
-  TDEST_WIDTH 0 \
-  TID_WIDTH 0 \
-]
+ad_ip_instance axi4stream_vip cmd_src $ad_project_params(axis_cmd_src_vip_cfg)
 adi_sim_add_define "CMD_SRC=cmd_src"
 ad_connect spi_clk cmd_src/aclk
 ad_connect sys_cpu_resetn cmd_src/aresetn
@@ -69,14 +60,7 @@ ad_connect cmd_src/m_axis_tdata spi_execution/cmd
 ad_connect cmd_src/m_axis_tvalid spi_execution/cmd_valid
 ad_connect cmd_src/m_axis_tready spi_execution/cmd_ready
 
-ad_ip_instance axi4stream_vip sdo_src [list \
-  INTERFACE_MODE {MASTER} \
-  HAS_TREADY 1 \
-  HAS_TLAST 0 \
-  TDATA_NUM_BYTES [expr $data_width/8] \
-  TDEST_WIDTH 0 \
-  TID_WIDTH 0 \
-]
+ad_ip_instance axi4stream_vip sdo_src $ad_project_params(axis_sdo_src_vip_cfg)
 adi_sim_add_define "SDO_SRC=sdo_src"
 ad_connect spi_clk sdo_src/aclk
 ad_connect sys_cpu_resetn sdo_src/aresetn
@@ -84,14 +68,7 @@ ad_connect sdo_src/m_axis_tdata spi_execution/sdo_data
 ad_connect sdo_src/m_axis_tvalid spi_execution/sdo_data_valid
 ad_connect sdo_src/m_axis_tready spi_execution/sdo_data_ready
 
-ad_ip_instance axi4stream_vip sdi_sink [list \
-  INTERFACE_MODE {SLAVE} \
-  HAS_TREADY 1 \
-  HAS_TLAST 0 \
-  TDATA_NUM_BYTES [expr $num_sdi*$data_width/8] \
-  TDEST_WIDTH 0 \
-  TID_WIDTH 0 \
-]
+ad_ip_instance axi4stream_vip sdi_sink $ad_project_params(axis_sdi_sink_vip_cfg)
 adi_sim_add_define "SDI_SINK=sdi_sink"
 ad_connect spi_clk sdi_sink/aclk
 ad_connect sys_cpu_resetn sdi_sink/aresetn
@@ -99,14 +76,7 @@ ad_connect sdi_sink/s_axis_tdata spi_execution/sdi_data
 ad_connect sdi_sink/s_axis_tvalid spi_execution/sdi_data_valid
 ad_connect sdi_sink/s_axis_tready spi_execution/sdi_data_ready
 
-ad_ip_instance axi4stream_vip sync_sink [list \
-  INTERFACE_MODE {SLAVE} \
-  HAS_TREADY 1 \
-  HAS_TLAST 0 \
-  TDATA_NUM_BYTES 1 \
-  TDEST_WIDTH 0 \
-  TID_WIDTH 0 \
-]
+ad_ip_instance axi4stream_vip sync_sink $ad_project_params(axis_sync_sink_vip_cfg)
 adi_sim_add_define "SYNC_SINK=sync_sink"
 ad_connect spi_clk sync_sink/aclk
 ad_connect sys_cpu_resetn sync_sink/aresetn

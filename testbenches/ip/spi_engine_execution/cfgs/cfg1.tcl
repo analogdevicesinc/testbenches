@@ -40,3 +40,43 @@ set spi_s_vip_cfg [ list \
     DATA_DLENGTH    $ad_project_params(DATA_DLENGTH)    \
 ]
 set ad_project_params(spi_s_vip_cfg) $spi_s_vip_cfg
+
+set axis_cmd_src_vip_cfg [list \
+  INTERFACE_MODE {MASTER} \
+  HAS_TREADY 1 \
+  HAS_TLAST 0 \
+  TDATA_NUM_BYTES 2 \
+  TDEST_WIDTH 0 \
+  TID_WIDTH 0 \
+]
+set ad_project_params(axis_cmd_src_vip_cfg) $axis_cmd_src_vip_cfg
+
+set axis_sdo_src_vip_cfg [list \
+  INTERFACE_MODE {MASTER} \
+  HAS_TREADY 1 \
+  HAS_TLAST 0 \
+  TDATA_NUM_BYTES [expr $ad_project_params(DATA_WIDTH)/8] \
+  TDEST_WIDTH 0 \
+  TID_WIDTH 0 \
+]
+set ad_project_params(axis_sdo_src_vip_cfg) $axis_sdo_src_vip_cfg
+
+set axis_sdi_sink_vip_cfg [list \
+  INTERFACE_MODE {SLAVE} \
+  HAS_TREADY 1 \
+  HAS_TLAST 0 \
+  TDATA_NUM_BYTES [expr $ad_project_params(NUM_OF_SDI)*$ad_project_params(DATA_WIDTH)/8] \
+  TDEST_WIDTH 0 \
+  TID_WIDTH 0 \
+]
+set ad_project_params(axis_sdi_sink_vip_cfg) $axis_sdi_sink_vip_cfg
+
+set axis_sync_sink_vip_cfg [list \
+  INTERFACE_MODE {SLAVE} \
+  HAS_TREADY 1 \
+  HAS_TLAST 0 \
+  TDATA_NUM_BYTES 1 \
+  TDEST_WIDTH 0 \
+  TID_WIDTH 0 \
+]
+set ad_project_params(axis_sync_sink_vip_cfg) $axis_sync_sink_vip_cfg

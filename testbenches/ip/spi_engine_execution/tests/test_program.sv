@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2021 - 2024 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 - 2025 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -36,21 +36,27 @@
 //
 
 `include "utils.svh"
+`include "axis_definitions.svh"
 
-import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
-import m_axis_sequencer_pkg::*;
-import s_axis_sequencer_pkg::*;
-import adi_regmap_pkg::*;
-import adi_regmap_clkgen_pkg::*;
-import adi_regmap_dmac_pkg::*;
-import adi_regmap_pwm_gen_pkg::*;
-import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
+
+import test_harness_env_pkg::*;
 import spi_execution_environment_pkg::*;
+import axi4stream_vip_pkg::*;
+import spi_engine_api_pkg::*;
+import pwm_gen_api_pkg::*;
+import clk_gen_api_pkg::*;
 import spi_engine_instr_pkg::*;
 import adi_spi_vip_pkg::*;
+import axi_vip_pkg::*;
 
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+import `PKGIFY(test_harness, cmd_src)::*;
+import `PKGIFY(test_harness, sdo_src)::*;
+import `PKGIFY(test_harness, sdi_sink)::*;
+import `PKGIFY(test_harness, sync_sink)::*;
 
 program test_program (
   inout spi_execution_spi_sclk,
@@ -65,38 +71,22 @@ program test_program (
 timeunit 1ns;
 timeprecision 100ps;
 
-spi_execution_environment env;
-
-// --------------------------
-// Wrapper function for AXI read verify
-// --------------------------
-task axi_read_v(
-    input   [31:0]  raddr,
-    input   [31:0]  vdata);
-  env.mng.RegReadVerify32(raddr,vdata);
-endtask
-
-task axi_read(
-    input   [31:0]  raddr,
-    output  [31:0]  data);
-  env.mng.RegRead32(raddr,data);
-endtask
-
-// --------------------------
-// Wrapper function for AXI write
-// --------------------------
-task axi_write(
-    input [31:0]  waddr,
-    input [31:0]  wdata);
-  env.mng.RegWrite32(waddr,wdata);
-endtask
+spi_execution_environment #(
+                            `AXIS_VIP_PARAMS(test_harness, cmd_src),
+                            `AXIS_VIP_PARAMS(test_harness, sdo_src),
+                            `AXIS_VIP_PARAMS(test_harness, sdi_sink),
+                            `AXIS_VIP_PARAMS(test_harness, sync_sink)
+                          ) spi_env;
+test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+pwm_gen_api pwm_api;
+clk_gen_api clkgen_api;
 
 // --------------------------
 // Wrapper function for SPI receive (from DUT)
 // --------------------------
 task spi_receive(
     output [`DATA_DLENGTH:0]  data);
-  env.spi_seq.receive_data(data);
+  spi_env.spi_agent.sequencer.receive_data(data);
 endtask
 
 // --------------------------
@@ -104,7 +94,7 @@ endtask
 // --------------------------
 task spi_receive_v(
     input [`DATA_DLENGTH:0]  data);
-  env.spi_seq.receive_data_verify(data);
+  spi_env.spi_agent.sequencer.receive_data_verify(data);
 endtask
 
 
@@ -113,14 +103,14 @@ endtask
 // --------------------------
 task spi_send(
     input [`DATA_DLENGTH:0]  data);
-  env.spi_seq.send_data(data);
+  spi_env.spi_agent.sequencer.send_data(data);
 endtask
 
 // --------------------------
 // Wrapper function for waiting for all SPI
 // --------------------------
 task spi_wait_send();
-  env.spi_seq.flush_send();
+  spi_env.spi_agent.sequencer.flush_send();
 endtask
 
 // --------------------------
@@ -128,40 +118,54 @@ endtask
 // --------------------------
 initial begin
 
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
   //creating environment
-  env = new(`TH.`SYS_CLK.inst.IF,
-            `TH.`DMA_CLK.inst.IF,
-            `TH.`DDR_CLK.inst.IF,
-            `TH.`SYS_RST.inst.IF,
-            `TH.`MNG_AXI.inst.IF,
-            `TH.`DDR_AXI.inst.IF,
-            `TH.`CMD_SRC.inst.IF,
-            `TH.`SDO_SRC.inst.IF,
-            `TH.`SDI_SINK.inst.IF,
-            `TH.`SYNC_SINK.inst.IF,
-            `TH.`SPI_S.inst.IF
-            );
+  base_env = new("Base Environment",
+                 `TH.`SYS_CLK.inst.IF,
+                 `TH.`DMA_CLK.inst.IF,
+                 `TH.`DDR_CLK.inst.IF,
+                 `TH.`SYS_RST.inst.IF,
+                 `TH.`MNG_AXI.inst.IF,
+                 `TH.`DDR_AXI.inst.IF);
 
-  setLoggerVerbosity(6);
-  `INFO(("Test Start"));
-  env.start();
+  spi_env = new( "SPI Execution Environment",
+                `TH.`SPI_S.inst.IF.vif,
+                `TH.`CMD_SRC.inst.IF,
+                `TH.`SDO_SRC.inst.IF,
+                `TH.`SDI_SINK.inst.IF,
+                `TH.`SYNC_SINK.inst.IF);
 
-  env.configure();
+  clkgen_api = new("CLKGEN API",
+                   base_env.mng.sequencer,
+                   `SPI_ENGINE_AXI_CLKGEN_BA);
 
-  env.sys_reset();
+  pwm_api = new("PWM API",
+                base_env.mng.sequencer,
+                `SPI_ENGINE_PWM_GEN_BA);
 
-  env.run();
+  base_env.start();
+  spi_env.start();
 
-  env.spi_seq.set_default_miso_data('h2AA55);
-  
-  env.cmd_src_seq.start(); // start command source (will wait for data enqueued)
-  env.sdo_src_seq.start();
+  base_env.sys_reset();
+
+  spi_env.configure();
+
+  spi_env.run();
+
+  spi_env.spi_agent.sequencer.set_default_miso_data('h2AA55);
+
+  spi_env.cmd_src_agent.sequencer.start(); // start command source (will wait for data enqueued)
+  spi_env.sdo_src_agent.sequencer.start();
 
   #100ns
 
   spi_execution_test();
 
-  `INFO(("Test Done"));
+  spi_env.stop();
+  base_env.stop();
+
+  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
 
   $finish;
 
@@ -174,31 +178,31 @@ end
 task generate_transfer(
     input [7:0] sync_id);
   xil_axi4stream_data_byte cmd[1:0];
-  `INFOV(("Transfer generation waiting for trigger."), 6);
+  `INFO(("Transfer generation waiting for trigger."), ADI_VERBOSITY_LOW);
   @(posedge spi_execution_trigger);
   // assert CS
   cmd[0] = (`SET_CS(8'hFE)) & 8'hFF;
   cmd[1] = ((`SET_CS(8'hFE)) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // transfer data
   cmd[0] = (`INST_WRD) & 8'hFF;
   cmd[1] = ((`INST_WRD) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // de-assert CS
   cmd[0] = (`SET_CS(8'hFF)) & 8'hFF;
   cmd[1] = ((`SET_CS(8'hFF)) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // SYNC command 
   cmd[0] = (`INST_SYNC) & 8'hFF;
   cmd[1] = ((`INST_SYNC) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // generate transfer descriptor
-  env.cmd_src_seq.add_xfer_descriptor(8,0,0);
-  `INFOV(("Transfer generation finished."), 6);
+  spi_env.cmd_src_agent.sequencer.add_xfer_descriptor_byte_count(8,0,0);
+  `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -210,18 +214,18 @@ task configure_spi_execution();
   // write cfg bits
   cmd[0] = (`INST_CFG) & 8'hFF;
   cmd[1] = ((`INST_CFG) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // write prescaler value
   cmd[0] = (`INST_PRESCALE) & 8'hFF;
   cmd[1] = ((`INST_PRESCALE) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // write data length
   cmd[0] = (`INST_DLENGTH) & 8'hFF;
   cmd[1] = ((`INST_DLENGTH) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // write cs inv mask
   if (`CS_ACTIVE_HIGH) begin
     mask = 8'hFF;
@@ -230,10 +234,10 @@ task configure_spi_execution();
   end
   cmd[0] = (`SET_CS_INV_MASK(mask)) & 8'hFF;
   cmd[1] = ((`SET_CS_INV_MASK(mask)) & 16'hFF00) >> 8;
-  env.cmd_src_seq.push_byte_for_stream(cmd[0]);
-  env.cmd_src_seq.push_byte_for_stream(cmd[1]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[0]);
+  spi_env.cmd_src_agent.sequencer.push_byte_for_stream(cmd[1]);
   // generate transfer descriptor
-  env.cmd_src_seq.add_xfer_descriptor(8,0,0);
+  spi_env.cmd_src_agent.sequencer.add_xfer_descriptor_byte_count(8,0,0);
 endtask
 
 //---------------------------------------------------------------------------
@@ -245,9 +249,9 @@ task generate_sdo_data(
   rand_data = $urandom;
   for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
     data[i] = (rand_data & (8'hFF << 8*i)) >> 8*i;
-    env.sdo_src_seq.push_byte_for_stream(data[i]);
+    spi_env.sdo_src_agent.sequencer.push_byte_for_stream(data[i]);
   end
-  env.sdo_src_seq.add_xfer_descriptor((`DATA_WIDTH/8),0,0);
+  spi_env.sdo_src_agent.sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
 endtask
 
 //---------------------------------------------------------------------------
@@ -274,16 +278,13 @@ bit [`DATA_WIDTH:0] data;
 
 task spi_execution_test();
   // Start spi clk generator
-  axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-    );
+  clkgen_api.enable_clkgen();
 
   // Config pwm
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('d1000)); // set PWM period
+  pwm_api.reset();
+  pwm_api.pulse_period_config(0,'d1000); // config channel 0 period
 
-   // Configure the execution module
+  // Configure the spi engine execution module
   configure_spi_execution();
 
   // Enqueue transfer to DUT
@@ -295,42 +296,45 @@ task spi_execution_test();
     sdo_write_data_store[i] = tx_data;
   end
 
-  axi_write (`SPI_ENGINE_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-  `INFOV(("axi_pwm_gen started."),6);
+  pwm_api.load_config();
+  pwm_api.start();
+  `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
 
   for (int i = 0; i<(`NUM_OF_TRANSFERS) ; i=i+1) begin
     generate_transfer(i);
     //#100
   end
 
+  `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
   spi_wait_send();
+  `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
 
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-    env.sdi_sink_seq.get_transfer();
+    spi_env.sdi_sink_agent.sequencer.get_transfer();
     for (int b =0; b<((`DATA_WIDTH+7)/8);b++) begin
-      env.sdi_sink_seq.get_byte(data_byte);
+      spi_env.sdi_sink_agent.sequencer.get_byte(data_byte);
       data[8*b+:8] = data_byte;
     end
     sdi_read_data[i] = data[`DATA_DLENGTH-1:0];
     if (sdi_read_data_store[i] !== sdi_read_data[i]) begin
-      `INFOV(("sdi_read_data[i]: %x; sdi_read_data_store[i]: %x", sdi_read_data[i], sdi_read_data_store[i]),6);
+      `INFO(("sdi_read_data[i]: %x; sdi_read_data_store[i]: %x", sdi_read_data[i], sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
       `ERROR(("SPI Execution Read Test FAILED"));
     end
   end
-  `INFO(("SPI Execution Read Test PASSED"));
+  `INFO(("SPI Execution Read Test PASSED"), ADI_VERBOSITY_LOW);
 
   for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
     spi_receive(sdo_write_data[i]);
     if (sdo_write_data_store[i] !== sdo_write_data[i]) begin
-      `INFOV(("sdo_write_data[i]: %x; sdo_write_data_store[i]: %x", sdo_write_data[i], sdo_write_data_store[i]),6);
+      `INFO(("sdo_write_data[i]: %x; sdo_write_data_store[i]: %x", sdo_write_data[i], sdo_write_data_store[i]), ADI_VERBOSITY_LOW);
       `ERROR(("SPI Execution Write Test FAILED"));
     end
   end
-  `INFO(("SPI Execution Write Test PASSED"));
+  `INFO(("SPI Execution Write Test PASSED"), ADI_VERBOSITY_LOW);
 
   #200ns
 
-  `INFO(("SPI Execution Test PASSED"));
+  `INFO(("SPI Execution Test PASSED"), ADI_VERBOSITY_LOW);
 endtask
 
 endprogram

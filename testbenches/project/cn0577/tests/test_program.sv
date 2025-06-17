@@ -57,25 +57,14 @@ localparam RESOLUTION = (`RESOLUTION_16_18N == 1) ? 16 : 18;
 //---------------------------------------------------------------------------
 
 program test_program (
-  input           ref_clk_p,
-  input           ref_clk_n,
   input           ref_clk,
-  input           clk_gate,
-  input           data,
-  output          clk_p,
-  output          clk_n,
   input           dco_p,
   input           dco_n,
-  output           da_n,
-  output           da_p,
-  output           db_n,
-  output           db_p,
-  output          cnv_p,
-  output          cnv_n,
-  output          cnv_en,
-  output          pd_cntrl,
-  output          testpat_cntrl,
-  output          twolanes_cntrl);
+  output          da_n,
+  output          da_p,
+  output          db_n,
+  output          db_p,
+  output          cnv);
 
 timeunit 1ns;
 timeprecision 100ps;
@@ -167,11 +156,11 @@ bit [31:0] transfer_cnt;
 initial begin
   transfer_cnt = 0;
   forever begin
-    @(posedge clk_gate);
+    @(posedge cnv);
      if (transfer_status) begin
       transfer_cnt = transfer_cnt + 1;
     end
-    @(negedge clk_gate);
+    @(negedge cnv);
   end
 end
 
@@ -179,13 +168,12 @@ end
 // Data store
 //---------------------------------------------------------------------------
 
-reg   [RESOLUTION-1:0]  data = 'h3a5a5;
-reg   [RESOLUTION-1:0]  data_int = 'h0;
+reg   [RESOLUTION-1:0]  data_gen = 'h3a5a5;
+reg   [RESOLUTION-1:0]  data_shift = 'h0;
 reg                     r_da_p = 1'b0;
 reg                     r_da_n = 1'b0;
 reg                     r_db_p = 1'b0;
 reg                     r_db_n = 1'b0;
-reg                     cnv_out = 1'b0;
 
  
 assign da_p = r_da_p;
@@ -193,77 +181,89 @@ assign da_n = r_da_n;
 assign db_p = r_db_p;
 assign db_n = r_db_n;
 
-integer cnv_count = 0;
-  // ---------------------------------------------------------------------------
-  // Output data ready
-  // ---------------------------------------------------------------------------
-
-initial begin
-  forever begin
-    @(posedge clk_gate) begin  
-      cnv_out <= 1'b1;
-    end
-    @(negedge clk_gate) begin
-      cnv_out <= 1'b0;
-    end  
-  end
-end
-  
+// ---------------------------------------------------------------------------
+// Output data ready
+// ---------------------------------------------------------------------------
   
 initial begin
   forever begin
-    @ (posedge dco_p) begin
+    @ (negedge dco_p) begin
       if (`TWOLANES == 1) begin
-        r_da_p = data_int[RESOLUTION - 1];
-        r_da_n = ~data_int[RESOLUTION - 1];
-        r_db_p = data_int[RESOLUTION - 2];
-        r_db_n = ~data_int[RESOLUTION - 2];
-        data_int = data_int << 2;
+        r_da_p = data_shift[RESOLUTION - 1];
+        r_da_n = ~data_shift[RESOLUTION - 1];
+        r_db_p = data_shift[RESOLUTION - 2];
+        r_db_n = ~data_shift[RESOLUTION - 2];
+        data_shift = data_shift << 2;
       end else begin
-        r_da_p = data_int[RESOLUTION - 1];
-        r_da_n = ~data_int[RESOLUTION - 1];
-        data_int = data_int << 1;
+        r_da_p = data_shift[RESOLUTION - 1];
+        r_da_n = ~data_shift[RESOLUTION - 1];
+        data_shift = data_shift << 1;
       end
     end
   end
-end
-
-
+end  
 
 initial begin
-  forever begin
-    @ (posedge cnv_out) begin
-      cnv_count++;
+  forever begin    
+    @ (posedge cnv) begin
       // at the first entrance in this always, da and db will have the bits from
       // the first sample of data (which data was initialized with - 3a5a5)
       // and only afterwards to increment data; otherwise the first sample is lost
       if (`TWOLANES == 1) begin
-        r_da_p = data[RESOLUTION - 1];
-        r_da_n = ~data[RESOLUTION - 1];
-        r_db_p = data[RESOLUTION - 2];
-        r_db_n = ~data[RESOLUTION - 2];
-        data_int = data << 2;
+        r_da_p = data_gen[RESOLUTION - 1];
+        r_da_n = ~data_gen[RESOLUTION - 1];
+        r_db_p = data_gen[RESOLUTION - 2];
+        r_db_n = ~data_gen[RESOLUTION - 2];
+        data_shift = data_gen << 2;
       end else begin
-        r_da_p = data[RESOLUTION - 1];
-        r_da_n = ~data[RESOLUTION - 1];
-        data_int = data << 1;
+        r_da_p = data_gen[RESOLUTION - 1];
+        r_da_n = ~data_gen[RESOLUTION - 1];
+        data_shift = data_gen << 1;
       end
       //#tCONV data <= data + 1;
-      data <= data + 1;
-    end
+      data_gen <= data_gen + 16'h0001;
+    end  
   end
- end
+end
+
+// ---------------------------------------------------------------------------
+// Generating expected data
+// ---------------------------------------------------------------------------
+
+//initial begin
+//  forever begin
+//    @ (posedge cnv_out) begin
+//      cnv_count++;
+//      // at the first entrance in this always, da and db will have the bits from
+//      // the first sample of data (which data was initialized with - 3a5a5)
+//      // and only afterwards to increment data; otherwise the first sample is lost
+//      if (`TWOLANES == 1) begin
+//        r_da_p = data[RESOLUTION - 1];
+//        r_da_n = ~data[RESOLUTION - 1];
+//        r_db_p = data[RESOLUTION - 2];
+//        r_db_n = ~data[RESOLUTION - 2];
+//        data_shift = data << 2;
+//      end else begin
+//        r_da_p = data[RESOLUTION - 1];
+//        r_da_n = ~data[RESOLUTION - 1];
+//        data_shift = data << 1;
+//      end
+//      //#tCONV data <= data + 1;
+//      data <= data + 16'h0001;
+//    end
+//  end
+// end
   
 initial begin
   forever begin
     @(negedge dco_n);
       if (transfer_status)
         if (transfer_cnt[0]) begin
-          dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = data - 16'h0001;
+          dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = data_gen - 16'h0001;
         end else begin
-          dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = data - 16'h0001;
+          dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = data_gen - 16'h0001;
         end
-        data <= data + 16'h0001;
+        //data_gen <= data_gen + 16'h0001;
       @(posedge dco_n);
   end
 end
@@ -315,7 +315,7 @@ task data_acquisition_test();
     axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
 
-    @(posedge clk_gate) // TBD
+    @(posedge cnv) // TBD
     #200
 
     transfer_status = 1;
@@ -325,7 +325,7 @@ task data_acquisition_test();
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
     #100
-    @(negedge clk_gate); //TBD
+    @(negedge cnv); //TBD
     @(posedge ref_clk); //TBD
     transfer_status = 0;
 

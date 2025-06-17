@@ -101,6 +101,9 @@ program test_program (
   input pulsar_adc_spi_clk,
   input [(`NUM_OF_SDI - 1):0] pulsar_adc_spi_sdi);
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
 // --------------------------

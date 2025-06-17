@@ -59,6 +59,9 @@ program test_program (
   inout ad57xx_spi_irq,
   inout ad57xx_spi_clk);
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
 typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
 
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;

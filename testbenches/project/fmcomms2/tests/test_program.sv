@@ -50,6 +50,9 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   parameter R1_MODE = 0;
 
   parameter CH0 = 8'h0;

@@ -68,6 +68,9 @@ program test_slowdata (
   `endif
   inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
 
+  timeunit 1ns;
+  timeprecision 100ps;
+
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   spi_environment spi_env;
   spi_engine_api spi_api;

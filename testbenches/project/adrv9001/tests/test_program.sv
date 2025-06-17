@@ -54,6 +54,9 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   parameter CMOS_LVDS_N = 1;
   parameter SDR_DDR_N = 1;
   parameter SINGLE_LANE = 1;

@@ -100,6 +100,8 @@ program test_program (
   input [(`NUM_OF_SDI - 1):0] ad738x_spi_sdi,
   input ad738x_spi_cs);
 
+  timeunit 1ns;
+  timeprecision 1ps;
 
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 

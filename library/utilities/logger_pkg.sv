@@ -51,7 +51,7 @@ package logger_pkg;
     input adi_verbosity_t msgVerborisity);
 
     if (verbosity >= msgVerborisity) begin
-      $display("[INFO] @ %0t: %s", $time, inStr);
+      $display("[INFO] @ %0t: %s", $realtime, inStr);
     end
   endfunction: PrintInfo
 

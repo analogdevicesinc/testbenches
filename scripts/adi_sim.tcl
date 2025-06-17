@@ -105,9 +105,6 @@ proc adi_sim_generate {project_name } {
 
   set_property -name {xsim.simulate.runtime} -value {} -objects [get_filesets sim_1]
 
-  # default 1ns/1ps timescale for waveforms
-  adi_sim_timescale 1ns 1ps
-
   # Show all Xilinx primitives e.g GTYE4_COMMON
   set_property -name {xsim.elaborate.debug_level} -value {all} -objects [get_filesets sim_1]
   # Log all waves
@@ -122,10 +119,6 @@ proc adi_sim_generate {project_name } {
   set_property include_dirs . [get_filesets sim_1]
 
   set_msg_config -string mb_reset -suppress
-}
-
-proc adi_sim_timescale {timeunit timeprecision} {
-  set_property -name {xsim.elaborate.xelab.more_options} -value "-timescale $timeunit/$timeprecision -override_timeunit -override_timeprecision" -objects [get_filesets sim_1]
 }
 
 proc adi_open_project {project_path} {

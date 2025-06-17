@@ -161,11 +161,11 @@ program test_program (
 
     init();
 
-    #100ns
+    #100ns;
 
     fifo_spi_test();
 
-    #100ns
+    #100ns;
 
     offload_spi_test();
 
@@ -318,14 +318,14 @@ program test_program (
       `endif
     end
 
-    #100ns
+    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started."), ADI_VERBOSITY_LOW);
     spi_wait_send();
     spi_api.stop_offload();
     `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
 
     if (irq_pending == 'h0) begin
       `FATAL(("IRQ Test FAILED"));

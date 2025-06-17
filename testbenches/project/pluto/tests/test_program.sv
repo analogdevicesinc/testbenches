@@ -51,6 +51,9 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   localparam CH0 = 8'h00;
   localparam CH1 = 8'h40;
   localparam CH2 = 8'h80;

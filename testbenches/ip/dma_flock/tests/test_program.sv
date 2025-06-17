@@ -53,6 +53,9 @@ import `PKGIFY(test_harness, dst_axis_vip)::*;
 
 program test_program;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   // declare the class instances
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   dma_flock_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis_vip), `AXIS_VIP_PARAMS(test_harness, dst_axis_vip)) dma_flock_env;

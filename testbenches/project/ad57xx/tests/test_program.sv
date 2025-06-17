@@ -59,8 +59,8 @@ program test_program (
   inout ad57xx_spi_irq,
   inout ad57xx_spi_clk);
 
-timeunit 1ns;
-timeprecision 100ps;
+  timeunit 1ns;
+  timeprecision 1ps;
 
 typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
 
@@ -144,11 +144,11 @@ initial begin
 
   sanity_test();
 
-  #100ns
+  #100ns;
 
   config_spi();
 
-  #100ns
+  #100ns;
 
   offload_spi_test(`TEST_DATA_MODE);
 
@@ -307,7 +307,7 @@ task offload_spi_test(
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
   // Start the offload
-  #100ns
+  #100ns;
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
   `INFO(("Offload started."), ADI_VERBOSITY_LOW);
 
@@ -317,7 +317,7 @@ task offload_spi_test(
 
   `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
-  #2000ns
+  #2000ns;
 
   if (irq_pending == 'h0) begin
     `FATAL(("IRQ Test FAILED"));
@@ -373,7 +373,7 @@ task config_spi();
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );
 
-  #100ns
+  #100ns;
 
   //  Write ad57xx control register
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (24'h200002));

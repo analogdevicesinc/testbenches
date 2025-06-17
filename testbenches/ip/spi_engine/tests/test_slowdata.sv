@@ -160,31 +160,31 @@ program test_slowdata (
 
     init();
 
-    #100ns
+    #100ns;
 
     fifo_init_test();
 
-    #100ns
+    #100ns;
 
     fifo_single_read_test();
 
-    #100ns
+    #100ns;
 
     fifo_double_write_test();
 
-    #100ns
+    #100ns;
 
     fifo_double_read_test();
 
-    #100ns
+    #100ns;
 
     fifo_double_write_test();
 
-    #100ns
+    #100ns;
 
     offload_spi_test();
 
-    #100ns
+    #100ns;
 
     spi_env.stop();
     base_env.stop();
@@ -544,7 +544,7 @@ program test_slowdata (
     end
 
     // Start the offload
-    #100ns
+    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started."), ADI_VERBOSITY_LOW);
 
@@ -554,7 +554,7 @@ program test_slowdata (
 
     `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
 
     if (irq_pending == 'h0) begin
       `FATAL(("IRQ Test FAILED"));

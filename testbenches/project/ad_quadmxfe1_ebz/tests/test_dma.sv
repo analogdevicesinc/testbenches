@@ -59,6 +59,9 @@ parameter TX_OUT_BYTES = (`TX_JESD_F % 3 != 0) ? (`JESD_MODE == "64B66B") ? 8 : 
 
 program test_dma;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
   bit [31:0] val;
@@ -116,7 +119,7 @@ program test_dma;
     //asserts all the resets for 100 ns
     `TH.`SYS_RST.inst.IF.assert_reset();
 
-    #100
+    #100ns;
     `TH.`SYS_RST.inst.IF.deassert_reset();
 
     #1us;

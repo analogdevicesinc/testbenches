@@ -88,7 +88,7 @@ package watchdog_pkg;
             @this.stop_event;
           join_any
           disable fork;
-          this.info($sformatf("Watchdog timer reset. %s", this.message), ADI_VERBOSITY_MEDIUM);
+          this.info($sformatf("Watchdog timer reset."), ADI_VERBOSITY_MEDIUM);
         end
       join_none
     endtask: start

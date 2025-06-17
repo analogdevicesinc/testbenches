@@ -74,6 +74,9 @@ program test_program_6ch (
   output        rx_busy,
   output logic [2:0] adc_config_mode);
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
   // --------------------------
@@ -124,19 +127,19 @@ program test_program_6ch (
 
     sanity_test();
 
-    #100 adc_config_number_of_channels();
+    #100ns adc_config_number_of_channels();
 
-    #100 adc_config_SIMPLE_test();
+    #100ns adc_config_SIMPLE_test();
 
-    #200 adc_config_CRC_test();
+    #200ns adc_config_CRC_test();
 
-    #200 adc_config_STATUS_test();
+    #200ns adc_config_STATUS_test();
 
-    #200 adc_config_STATUS_CRC_test();
+    #200ns adc_config_STATUS_CRC_test();
 
-    #200 adc_config_SIMPLE_test();
+    #200ns adc_config_SIMPLE_test();
 
-    #100 db_transmission_test();
+    #100ns db_transmission_test();
 
     base_env.stop();
 

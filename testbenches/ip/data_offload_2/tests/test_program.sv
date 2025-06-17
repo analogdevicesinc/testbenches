@@ -98,7 +98,6 @@ module test_program(
     start_clocks();
     sys_reset();
 
-    #1
     env.start();
 
     `ifdef HBM_AXI
@@ -108,7 +107,6 @@ module test_program(
     end
     `endif
 
-    #100
     `INFO(("Bring up IP from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
 
@@ -125,11 +123,11 @@ module test_program(
       init_req <= 1'b0;
     end
 
-    #`SRC_TRANSFERS_DELAY
+    #((`SRC_TRANSFERS_DELAY)*1ns);
 
     init_req <= 1'b1;
 
-    #100
+    #100ns;
 
     for (int i = 0; i < `SRC_TRANSFERS_DELAYED_COUNT; i++)
       env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
@@ -139,7 +137,7 @@ module test_program(
       init_req <= 1'b0;
     end
 
-    #`TIME_TO_WAIT
+    #((`TIME_TO_WAIT)*1ns);
 
     env.stop();
 
@@ -151,13 +149,9 @@ module test_program(
   end
 
   task start_clocks();
-    #1
     `TH.`SRC_CLK.inst.IF.start_clock();
-    #1
     `TH.`DST_CLK.inst.IF.start_clock();
-    #1
     `TH.`SYS_CLK.inst.IF.start_clock();
-    #1
     `TH.`MEM_CLK.inst.IF.start_clock();
   endtask
 
@@ -173,7 +167,7 @@ module test_program(
     `TH.`DST_RST.inst.IF.assert_reset();
     `TH.`SYS_RST.inst.IF.assert_reset();
 
-    #500
+    #500ns;
     `TH.`SRC_RST.inst.IF.deassert_reset();
     `TH.`DST_RST.inst.IF.deassert_reset();
     `TH.`SYS_RST.inst.IF.deassert_reset();

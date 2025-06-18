@@ -56,7 +56,7 @@ module system_tb();
   //localparam bit DEBUG = 1;
 
   // dco delay compared to the reference clk
-  localparam DCO_DELAY = 0.7;
+  localparam DCO_DELAY = 1;
 
   // reg signals
 
@@ -110,6 +110,7 @@ module system_tb();
   reg   [9:0]  cnv_counter = 9'hd;
   reg   gate_start = 1'b0;
   wire  cnv;
+  reg  dco = 1'b0;
 
 //  integer clk_gate_counter = 0;
 //  integer clk_gate_high = (RESOLUTION == 16) ?
@@ -186,10 +187,13 @@ module system_tb();
   // ---------------------------------------------------------------------------
 
   always @ (ref_clk_out) begin
-    dco_p <= #DCO_DELAY ref_clk_out;
-    dco_n <= #DCO_DELAY ~ref_clk_out;
+    dco_p <= ref_clk_out;
+    dco_n <= ~ref_clk_out;
   end
 
+  always @ (ref_clk_out) begin
+    dco <= #DCO_DELAY  ref_clk_out;
+  end
 
 //  always @(posedge clk_gate) begin  
 //      cnv_out <= 1'b1;
@@ -244,8 +248,7 @@ module system_tb();
 
     `TEST_PROGRAM test(
        .ref_clk (ref_clk),
-       .dco_p (dco_p),
-       .dco_n (dco_n),
+       .dco (dco),
        .da_p (da_p),
        .da_n (da_n),
        .db_p (db_p),

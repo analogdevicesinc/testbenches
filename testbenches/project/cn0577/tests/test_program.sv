@@ -42,6 +42,7 @@ import adi_regmap_adc_pkg::*;
 import adi_regmap_common_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import adi_regmap_pwm_gen_pkg::*;
+import pwm_gen_api_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import cn0577_environment_pkg::*;
@@ -58,8 +59,7 @@ localparam RESOLUTION = (`RESOLUTION_16_18N == 1) ? 16 : 18;
 
 program test_program (
   input           ref_clk,
-  input           dco_p,
-  input           dco_n,
+  input           dco,
   output          da_n,
   output          da_p,
   output          db_n,
@@ -78,6 +78,8 @@ localparam bit DEBUG = 1;
 
 // dco delay compared to the reference clk
 localparam DCO_DELAY = 0.7;
+
+pwm_gen_api cn0577_pwm_gen_api;
 
 // dma interface
 wire                    adc_valid;
@@ -125,6 +127,11 @@ initial begin
                   `TH.`SYS_RST.inst.IF,
                   `TH.`MNG_AXI.inst.IF,
                   `TH.`DDR_AXI.inst.IF);
+
+  cn0577_pwm_gen_api = new(
+      "CN0577 AXI PWM GEN API",
+      base_env.mng.sequencer,
+      `AXI_PWM_GEN_BA);
 
   setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
@@ -175,7 +182,7 @@ reg                     r_da_n = 1'b0;
 reg                     r_db_p = 1'b0;
 reg                     r_db_n = 1'b0;
 
- 
+
 assign da_p = r_da_p;
 assign da_n = r_da_n;
 assign db_p = r_db_p;
@@ -184,10 +191,10 @@ assign db_n = r_db_n;
 // ---------------------------------------------------------------------------
 // Output data ready
 // ---------------------------------------------------------------------------
-  
+
 initial begin
   forever begin
-    @ (negedge dco_p) begin
+    @ (posedge dco, negedge dco) begin
       if (`TWOLANES == 1) begin
         r_da_p = data_shift[RESOLUTION - 1];
         r_da_n = ~data_shift[RESOLUTION - 1];
@@ -201,31 +208,36 @@ initial begin
       end
     end
   end
-end  
+end
 
 initial begin
-  forever begin    
+  forever begin
     @ (posedge cnv) begin
       // at the first entrance in this always, da and db will have the bits from
       // the first sample of data (which data was initialized with - 3a5a5)
       // and only afterwards to increment data; otherwise the first sample is lost
-      if (`TWOLANES == 1) begin
-        r_da_p = data_gen[RESOLUTION - 1];
-        r_da_n = ~data_gen[RESOLUTION - 1];
-        r_db_p = data_gen[RESOLUTION - 2];
-        r_db_n = ~data_gen[RESOLUTION - 2];
-        data_shift = data_gen << 2;
-      end else begin
-        r_da_p = data_gen[RESOLUTION - 1];
-        r_da_n = ~data_gen[RESOLUTION - 1];
-        data_shift = data_gen << 1;
-      end
-      //#tCONV data <= data + 1;
-      data_gen <= data_gen + 16'h0001;
-    end  
+      data_shift = data_gen;
+    end
   end
 end
 
+initial begin
+  forever begin
+    @ (negedge cnv) begin
+      if (`TWOLANES == 1) begin
+        r_da_p = data_shift[RESOLUTION - 1];
+        r_da_n = ~data_shift[RESOLUTION - 1];
+        r_db_p = data_shift[RESOLUTION - 2];
+        r_db_n = ~data_shift[RESOLUTION - 2];
+        data_shift = data_shift << 2;
+      end else begin
+        r_da_p = data_shift[RESOLUTION - 1];
+        r_da_n = ~data_shift[RESOLUTION - 1];
+        data_shift = data_shift << 1;
+      end
+    end
+  end
+end
 // ---------------------------------------------------------------------------
 // Generating expected data
 // ---------------------------------------------------------------------------
@@ -253,10 +265,10 @@ end
 //    end
 //  end
 // end
-  
+
 initial begin
   forever begin
-    @(negedge dco_n);
+    @(posedge dco);
       if (transfer_status)
         if (transfer_cnt[0]) begin
           dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = data_gen - 16'h0001;
@@ -264,7 +276,7 @@ initial begin
           dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = data_gen - 16'h0001;
         end
         //data_gen <= data_gen + 16'h0001;
-      @(posedge dco_n);
+      @(negedge dco);
   end
 end
 
@@ -296,7 +308,29 @@ task data_acquisition_test();
 
     // Configure AXI PWM GEN
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h8)); // set PWM period
+    //axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h8)); // set PWM period
+
+    cn0577_pwm_gen_api.pulse_period_config(
+      .channel(8'h00),
+      .period(32'h1A));
+
+    cn0577_pwm_gen_api.pulse_width_config(
+      .channel(8'h00),
+      .width(32'h01));
+
+
+    cn0577_pwm_gen_api.pulse_period_config(
+      .channel(8'h01),
+      .period(32'h1A));
+
+    cn0577_pwm_gen_api.pulse_width_config(
+      .channel(8'h01),
+      .width(32'h08));
+      
+    cn0577_pwm_gen_api.pulse_offset_config(
+      .channel(8'h01),
+      .offset(32'h03));  
+
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
 

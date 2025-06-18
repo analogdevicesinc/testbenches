@@ -26,12 +26,12 @@ set use_smartconnect 1
 adi_sim_project_xilinx $project_name "xc7z007sclg400-1"
 
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
+source $ad_tb_dir/library/includes/sp_include_pwm_gen.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
   "$ad_tb_dir/library/regmaps/adi_regmap_adc_pkg.sv" \
   "$ad_tb_dir/library/regmaps/adi_regmap_common_pkg.sv" \
-  "$ad_tb_dir/library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
   "cn0577_environment.sv" \
   "tests/test_program.sv" \
 ]

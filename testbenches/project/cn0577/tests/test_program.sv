@@ -59,6 +59,7 @@ localparam RESOLUTION = (`RESOLUTION_16_18N == 1) ? 16 : 18;
 
 program test_program (
   input           ref_clk,
+  input           clk_gate,
   input           dco,
   output          da_n,
   output          da_p,
@@ -172,6 +173,51 @@ initial begin
 end
 
 //---------------------------------------------------------------------------
+// Clk_gate ending earlier
+//---------------------------------------------------------------------------
+
+reg N = 8'hf;  // total number of dco edges (rising + falling)
+
+reg clk_gate_sh = 1'b0;
+reg [3:0] dco_edge_count = 3'h0;
+reg dco_cp = 1'b0;
+
+initial begin
+  dco_edge_count = 0;
+  forever begin
+    @(posedge dco) begin
+      dco_edge_count <= dco_edge_count + 1;
+    end
+    @(negedge dco) begin
+      dco_edge_count <= dco_edge_count + 1;
+    end
+  end
+end
+
+initial begin
+  forever begin
+   @(ref_clk) begin
+     if (clk_gate == 1'h1) begin
+       if (dco_edge_count < 4'hf && dco_edge_count >= 4'h0)
+         clk_gate_sh <= clk_gate;
+       else
+         clk_gate_sh <= 1'h0;
+       end  
+     end
+   end    
+end
+
+initial begin
+  forever begin
+   @(ref_clk) begin
+     if (clk_gate_sh == 1'h1)
+       dco_cp <= dco;
+     else
+       dco_cp <= 1'h0;
+     end
+   end    
+end
+//---------------------------------------------------------------------------
 // Data store
 //---------------------------------------------------------------------------
 
@@ -194,7 +240,7 @@ assign db_n = r_db_n;
 
 initial begin
   forever begin
-    @ (posedge dco, negedge dco) begin
+    @ (posedge dco_cp, negedge dco_cp) begin
       if (`TWOLANES == 1) begin
         r_da_p = data_shift[RESOLUTION - 1];
         r_da_n = ~data_shift[RESOLUTION - 1];
@@ -268,7 +314,7 @@ end
 
 initial begin
   forever begin
-    @(posedge dco);
+    @(posedge dco_cp);
       if (transfer_status)
         if (transfer_cnt[0]) begin
           dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = data_gen - 16'h0001;

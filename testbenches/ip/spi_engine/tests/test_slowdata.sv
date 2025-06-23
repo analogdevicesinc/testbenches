@@ -125,7 +125,7 @@ program test_slowdata (
   // --------------------------
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
     //creating environment
     base_env = new("Base Environment",

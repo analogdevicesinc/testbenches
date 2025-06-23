@@ -107,7 +107,7 @@ program test_sleep_delay (
   bit [7:0] sdo_lane_mask;
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
     //creating environment
     base_env = new("Base Environment",

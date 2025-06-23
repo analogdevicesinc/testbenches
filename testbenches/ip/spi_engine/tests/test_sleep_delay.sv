@@ -55,7 +55,6 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-
 program test_sleep_delay (
   inout spi_engine_irq,
   inout spi_engine_spi_sclk,
@@ -64,7 +63,7 @@ program test_sleep_delay (
   `ifdef DEF_ECHO_SCLK
     inout spi_engine_echo_sclk,
   `endif
-  inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
+  inout [(`NUM_OF_SDI-1):0] spi_engine_spi_sdi);
 
   timeunit 1ns;
   timeprecision 100ps;
@@ -80,16 +79,16 @@ program test_sleep_delay (
   // --------------------------
   // Wrapper function for SPI receive (from DUT)
   // --------------------------
-  task spi_receive(
-      output [`DATA_DLENGTH:0]  data);
-    spi_env.spi_agent.sequencer.receive_data(data);
+  task automatic spi_receive(
+      ref int unsigned  data[]);
+      spi_env.spi_agent.sequencer.receive_data(data);
   endtask
 
   // --------------------------
   // Wrapper function for SPI send (to DUT)
   // --------------------------
   task spi_send(
-      input [`DATA_DLENGTH:0]  data);
+      input [`DATA_DLENGTH-1:0] data[]);
     spi_env.spi_agent.sequencer.send_data(data);
   endtask
 
@@ -104,6 +103,8 @@ program test_sleep_delay (
   // --------------------------
   // Main procedure
   // --------------------------
+  bit [7:0] sdi_lane_mask;
+  bit [7:0] sdo_lane_mask;
   initial begin
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
@@ -118,10 +119,10 @@ program test_sleep_delay (
                       `TH.`DDR_AXI.inst.IF);
 
     spi_env = new("SPI Engine Environment",
-              `ifdef DEF_SDO_STREAMING
-                `TH.`SDO_SRC.inst.IF,
-              `endif
-              `TH.`SPI_S.inst.IF.vif);
+                  `ifdef DEF_SDO_STREAMING
+                    `TH.`SDO_SRC.inst.IF,
+                  `endif
+                  `TH.`SPI_S.inst.IF.vif);
 
     spi_api = new("SPI Engine API",
                   base_env.mng.sequencer,
@@ -162,7 +163,10 @@ program test_sleep_delay (
     #100ns;
 
     sleep_delay_test(7);
-
+    sdi_lane_mask = (2 ** `NUM_OF_SDI)-1;
+    sdo_lane_mask = (2 ** `NUM_OF_SDO)-1;
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
+    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));//guarantee all SDO lanes must be active
     cs_delay_test(3,3);
 
     spi_env.stop();
@@ -176,7 +180,6 @@ program test_sleep_delay (
   //---------------------------------------------------------------------------
   // IRQ callback
   //---------------------------------------------------------------------------
-
   reg [4:0] irq_pending = 0;
   reg [7:0] sync_id = 0;
 
@@ -351,18 +354,21 @@ program test_sleep_delay (
   //---------------------------------------------------------------------------
   // CS delay Test
   //---------------------------------------------------------------------------
-
-  bit [`DATA_DLENGTH:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
-  bit [`DATA_DLENGTH:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
+  bit [`DATA_DLENGTH-1:0] offload_captured_word_arr[];
+  bit [`DATA_DLENGTH-1:0] offload_sdi_data_store_arr[];
   int cs_activate_time;
   int expected_cs_activate_time;
   int cs_deactivate_time;
   int expected_cs_deactivate_time;
-  bit [`DATA_DLENGTH-1:0] temp_data;
+  bit [`DATA_DLENGTH-1:0] temp_data [];
 
   task cs_delay_test(
       input [1:0] cs_activate_delay,
       input [1:0] cs_deactivate_delay);
+
+    temp_data = new [`NUM_OF_SDO];
+    offload_captured_word_arr  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
+    offload_sdi_data_store_arr = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
 
     //Configure DMA
     dma_api.enable_dma();
@@ -370,7 +376,7 @@ program test_sleep_delay (
       .cyclic(1'b0),
       .tlast(1'b1),
       .partial_reporting_en(1'b1));
-    dma_api.set_lengths(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1,0);
+    dma_api.set_lengths(((`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_SDI) * (`DATA_WIDTH/8))-1,0);
     dma_api.set_dest_addr(`DDR_BA);
     dma_api.transfer_start();
 
@@ -392,10 +398,13 @@ program test_sleep_delay (
     expected_cs_deactivate_time = 2;
 
     // Enqueue transfers to DUT
-    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-      temp_data = $urandom;
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
+      for (int j = 0; j < (`NUM_OF_SDO); j++) begin
+        temp_data[j] = {$urandom};
+        offload_sdi_data_store_arr[i * (`NUM_OF_SDO) + j] = temp_data[j];
+      end
+
       spi_send(temp_data);
-      offload_sdi_data_store_arr[i] = temp_data;
     end
 
     #100ns;
@@ -409,18 +418,20 @@ program test_sleep_delay (
 
     #2000ns;
 
-    for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-    end
-
     if (irq_pending == 'h0) begin
       `FATAL(("IRQ Test FAILED"));
     end else begin
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-      `FATAL(("CS Delay Test FAILED: bad data"));
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)); i++) begin
+      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      if (offload_captured_word_arr[i] !== offload_sdi_data_store_arr[i]) begin //one word at a time comparison
+        `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
+                          i, offload_captured_word_arr[i],
+                          i, offload_sdi_data_store_arr[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("CS Delay Test FAILED: bad data"));
+      end
     end
 
     repeat (`NUM_OF_TRANSFERS) begin
@@ -445,15 +456,18 @@ program test_sleep_delay (
     spi_api.fifo_offload_command(`SET_CS_DELAY(8'hFF,cs_deactivate_delay));
     spi_api.fifo_offload_command(`INST_SYNC | 2);
 
-    // breakdown: cs_activate_delay*(1+`CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
+    // breakdown: cs_activate_delay*(1+`CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 2 cycles for the internal delay
     expected_cs_activate_time = 2+2*cs_activate_delay*(1+`CLOCK_DIVIDER)*2;
     expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+`CLOCK_DIVIDER)*2;
 
     // Enqueue transfers to DUT
-    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-      temp_data = $urandom;
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
+      for (int j = 0; j < (`NUM_OF_SDO); j++) begin
+        temp_data[j] = {$urandom};
+        offload_sdi_data_store_arr[i * (`NUM_OF_SDO) + j] = temp_data[j];
+      end
+
       spi_send(temp_data);
-      offload_sdi_data_store_arr[i] = temp_data;
     end
 
     #100ns;
@@ -467,19 +481,22 @@ program test_sleep_delay (
 
     #2000ns;
 
-    for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-    end
-
     if (irq_pending == 'h0) begin
       `FATAL(("IRQ Test FAILED"));
     end else begin
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-      `FATAL(("CS Delay Test FAILED: bad data"));
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)); i++) begin
+      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      if (offload_captured_word_arr[i] !== offload_sdi_data_store_arr[i]) begin //one word at a time comparison
+        `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
+                          i, offload_captured_word_arr[i],
+                          i, offload_sdi_data_store_arr[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("CS Delay Test FAILED: bad data"));
+      end
     end
+
     repeat (`NUM_OF_TRANSFERS) begin
       cs_activate_time = cs_instr_time.pop_back();
       cs_deactivate_time = cs_instr_time.pop_back();

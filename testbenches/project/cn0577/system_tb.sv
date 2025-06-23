@@ -46,15 +46,6 @@ module system_tb();
   parameter TWOLANES = 1;
   parameter RESOLUTION = 18;
 
-  //parameter tCYC = 66.6;
-  //parameter tCONV = 63;
-  //parameter tFIRST_CLK = 65;
-  //parameter tLAST_CLK = 49;
-  //parameter tACQ = tCYC - 39;
-
-  // set to active debug messages
-  //localparam bit DEBUG = 1;
-
   // dco delay compared to the reference clk
   localparam DCO_DELAY = 1;
 
@@ -103,31 +94,10 @@ module system_tb();
 
   // local wires and registers
 
-  reg   clk_gate_d = 1'b0;
-  //reg   [RESOLUTION-1:0]  data = 'h0;
-  reg   [RESOLUTION-1:0]  data = 'h3a5a5;
-  reg   [RESOLUTION-1:0]  data_int = 'h0;
-  reg   [9:0]  cnv_counter = 9'hd;
-  reg   gate_start = 1'b0;
   wire  cnv;
   reg  dco = 1'b0;
 
-//  integer clk_gate_counter = 0;
-//  integer clk_gate_high = (RESOLUTION == 16) ?
-//                            (TWOLANES == 0) ? 8 : 4 :
-//                          (RESOLUTION == 18) ?
-//                             (TWOLANES == 0) ? 9 : 5 :
-//                           5;
-
-//  integer clk_gate_low = (RESOLUTION == 16) ?
-//                            (TWOLANES == 0) ? 5 : 9 :
-//                         (RESOLUTION == 18) ?
-//                            (TWOLANES == 0) ? 4 : 8 :
-//                          8;
-//  integer clk_gate_period = clk_gate_high + clk_gate_low;
-  // it takes 1 CNV impulse for the adc_data to be populated at the first run
   integer cnv_count = 0;
-
 
   // test bench variables
 
@@ -143,33 +113,6 @@ module system_tb();
       ref_clk_out = 1'b0;
     end
   end
-
-//  initial begin
-//    #500
-//    @(posedge ref_clk);
-//    while (1) begin
-//      if (clk_gate_counter < (clk_gate_period - 1)) begin
-//        clk_gate_counter++;
-//      end else begin
-//        clk_gate_counter = 0;
-//      end
-
-//      @(posedge ref_clk);
-//      if (clk_gate_counter > (clk_gate_low - 1)) begin
-//        clk_gate <= 1;
-//      end else begin
-//        clk_gate <= 0;
-//      end
-
-//      if (clk_gate_counter == clk_gate_low) begin
-//        gate_start <= 1'b1;
-//        cnv_out <= 1'b1;
-//      end else begin
-//        gate_start <= 1'b0;
-//        cnv_out <= 1'b0;
-//      end
-//    end
-//  end
 
   initial begin
     s_axi_aresetn <= 1'b0;
@@ -194,57 +137,6 @@ module system_tb();
   always @ (ref_clk_out) begin
     dco <= #DCO_DELAY  ref_clk_out;
   end
-
-//  always @(posedge clk_gate) begin  
-//      cnv_out <= 1'b1;
-//  end
-//  always @(negedge clk_gate) begin
-//      cnv_out <= 1'b0;
-//  end
-
-  // ---------------------------------------------------------------------------
-  // Output data ready
-  // ---------------------------------------------------------------------------
-
-//  always @ (dco_p) begin
-//    if (TWOLANES == 1) begin
-//      da_p <= data_int[RESOLUTION - 1];
-//      da_n <= ~data_int[RESOLUTION - 1];
-//      db_p <= data_int[RESOLUTION - 2];
-//      db_n <= ~data_int[RESOLUTION - 2];
-//      data_int <= data_int << 2;
-//    end else begin
-//      da_p <= data_int[RESOLUTION - 1];
-//      da_n <= ~data_int[RESOLUTION - 1];
-//      data_int <= data_int << 1;
-//    end
-//  end
-
-  // ---------------------------------------------------------------------------
-  // Generating expected data
-  // ---------------------------------------------------------------------------
-
-//  always @ (posedge cnv_out) begin
-//    cnv_count++;
-    
-//    // at the first entrance in this always, da and db will have the bits from
-//    // the first sample of data (which data was initialized with - 3a5a5)
-//    // and only afterwards to increment data; otherwise the first sample is lost
-//    if (TWOLANES == 1) begin
-//      da_p = data[RESOLUTION - 1];
-//      da_n = ~data[RESOLUTION - 1];
-//      db_p = data[RESOLUTION - 2];
-//      db_n = ~data[RESOLUTION - 2];
-//      data_int = data << 2;
-//    end else begin
-//      da_p = data[RESOLUTION - 1];
-//      da_n = ~data[RESOLUTION - 1];
-//      data_int = data << 1;
-//    end
-
-//    //#tCONV data <= data + 1;
-//     data <= data + 1;
-//  end
 
     `TEST_PROGRAM test(
        .ref_clk (ref_clk),

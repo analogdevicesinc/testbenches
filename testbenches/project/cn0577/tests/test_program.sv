@@ -180,13 +180,20 @@ localparam int N = (`TWOLANES == 0 && `RESOLUTION == 16) ? 16 :
                    (`TWOLANES == 1 && `RESOLUTION == 16) ? 8 :
                    (`TWOLANES == 1 && `RESOLUTION == 18) ? 10 :
                    -1; // Error case
-                   
+parameter int num_of_dco = N / 2;                   
 reg clk_gate_sh = 1'b0;
-reg [3:0] dco_edge_count = 3'h0;
+reg [4:0] dco_edge_count = 3'h0;
 reg dco_cp = 1'b0;
 
 initial begin
-  dco_edge_count = 0;
+  forever begin
+    @(negedge clk_gate)
+      #2
+      dco_edge_count <= 0;  
+    end
+ end
+
+initial begin    
   forever begin
     @(posedge dco) begin
       dco_edge_count <= dco_edge_count + 1;
@@ -201,14 +208,29 @@ initial begin
   forever begin
    @(ref_clk) begin
      if (clk_gate == 1'h1) begin
-       if (dco_edge_count < N && dco_edge_count >= 0)
+       if (dco_edge_count < N-1 && dco_edge_count >= 0)
          clk_gate_sh <= clk_gate;
-       else
+       else 
          clk_gate_sh <= 1'h0;
        end  
      end
    end    
 end
+
+//initial begin
+//  forever begin
+//    @(posedge ref_clk) begin
+//      if (clk_gate == 1'b1 && dco_edge_count > 0 && dco_edge_count <= N)
+//        clk_gate_sh <= 1'b1;
+//      else if (clk_gate == 1'b0 && dco_edge_count == N)
+//        clk_gate_sh <= 1'b1;
+//      else 
+//        clk_gate_sh <= 1'b0;
+//      end    
+//  end
+//end
+
+
 
 initial begin
   forever begin
@@ -328,7 +350,7 @@ task data_acquisition_test();
 
     cn0577_pwm_gen_api.pulse_width_config(
       .channel(8'h01),
-      .width(32'h08));
+      .width(num_of_dco));
       
     cn0577_pwm_gen_api.pulse_offset_config(
       .channel(8'h01),

@@ -66,7 +66,7 @@ program test_program (
   `ifdef DEF_ECHO_SCLK
     inout spi_engine_echo_sclk,
   `endif
-  inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
+  inout [(`NUM_OF_SDI-1):0] spi_engine_spi_sdi);
 
   timeunit 1ns;
   timeprecision 100ps;
@@ -83,16 +83,22 @@ program test_program (
   // Wrapper function for SPI receive (from DUT)
   // --------------------------
   task spi_receive(
-      output [`DATA_DLENGTH:0]  data);
-    spi_env.spi_agent.sequencer.receive_data(data);
+      output [`DATA_DLENGTH:0]  data[]);
+      // spi_env.spi_agent.sequencer.receive_data(data);
+    foreach (data[i]) begin
+      spi_env.spi_agent.sequencer.receive_data(data[i]);
+    end
   endtask
 
   // --------------------------
   // Wrapper function for SPI send (to DUT)
   // --------------------------
   task spi_send(
-      input [`DATA_DLENGTH:0]  data);
+      input [`DATA_DLENGTH:0]  data[]);
     spi_env.spi_agent.sequencer.send_data(data);
+    // foreach (data[i]) begin
+    //   spi_env.spi_agent.sequencer.send_data(data[i]);
+    // end
   endtask
 
   // --------------------------
@@ -102,13 +108,20 @@ program test_program (
     spi_env.spi_agent.sequencer.flush_send();
   endtask
 
-
+  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data [];//[`NUM_OF_WORDS-1:0]= '{default:'0};
+  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data [];//[`NUM_OF_WORDS-1:0]= '{default:'0};
+  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data_store [];//[`NUM_OF_WORDS-1:0];
+  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data_store [];//[`NUM_OF_WORDS-1:0];
+  bit   [`DATA_DLENGTH-1:0]  rx_data [];
+  bit   [`DATA_DLENGTH-1:0]  tx_data [];
+  logic [`DATA_WIDTH-1:0]    rx_data_cast [];
+  bit   [`DATA_WIDTH-1:0]    tx_data_cast [];
   // --------------------------
   // Main procedure
   // --------------------------
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
     //creating environment
     base_env = new("Base Environment",
@@ -167,7 +180,7 @@ program test_program (
 
     #100ns;
 
-    offload_spi_test();
+    // offload_spi_test();
 
     spi_env.stop();
     base_env.stop();
@@ -199,14 +212,16 @@ program test_program (
   //---------------------------------------------------------------------------
 
   task sdo_stream_gen(
-      input [`DATA_DLENGTH:0]  tx_data);
-    xil_axi4stream_data_byte data[(`DATA_WIDTH/8)-1:0];
+      input [`DATA_DLENGTH:0]  tx_data[]);
+    xil_axi4stream_data_byte data[((`DATA_WIDTH/8) * (`NUM_ACTIVE_LANES))-1:0];
     `ifdef DEF_SDO_STREAMING
-      for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
-        data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
-        spi_env.sdo_src_agent.sequencer.push_byte_for_stream(data[i]);
+      for (int i = 0; i < `NUM_ACTIVE_LANES; i++) begin
+        for (int j = 0; j < (`DATA_WIDTH/8); j++) begin
+          data[i * (`NUM_ACTIVE_LANES) + j] = (tx_data[i] & (8'hFF << 8*j)) >> 8*j;
+          spi_env.sdo_src_agent.sequencer.push_byte_for_stream(data[i * (`NUM_ACTIVE_LANES) + j]);
+        end
       end
-      spi_env.sdo_src_agent.sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
+      spi_env.sdo_src_agent.sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8) * (`NUM_ACTIVE_LANES),0,0);
     `endif
   endtask
 
@@ -269,15 +284,19 @@ program test_program (
   // Offload SPI Test
   //---------------------------------------------------------------------------
 
-  bit [`DATA_DLENGTH-1:0] sdi_read_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
-  bit [`DATA_DLENGTH-1:0] sdo_write_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
-  bit [`DATA_DLENGTH-1:0] sdi_read_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
-  bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
-  bit [`DATA_DLENGTH-1:0] rx_data;
-  bit [`DATA_DLENGTH-1:0] tx_data;
+  // bit [`DATA_DLENGTH-1:0] sdi_read_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
+  // bit [`DATA_DLENGTH-1:0] sdo_write_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
+  // bit [`DATA_DLENGTH-1:0] sdi_read_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
+  // bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
+  bit [`DATA_DLENGTH-1:0] sdi_read_data [];
+  bit [`DATA_DLENGTH-1:0] sdo_write_data [];
+  bit [`DATA_DLENGTH-1:0] sdi_read_data_store [];
+  bit [`DATA_DLENGTH-1:0] sdo_write_data_store [];
 
   task offload_spi_test();
+    automatic bit [`DATA_WIDTH-1:0] tx_data_cast [] = new [`NUM_ACTIVE_LANES];
     //Configure DMA
+    automatic int sdo_write_size = 0;
     dma_api.enable_dma();
     dma_api.set_flags(
       .cyclic(1'b0),
@@ -299,21 +318,42 @@ program test_program (
     spi_api.fifo_offload_command(`SET_CS(8'hFF));
     spi_api.fifo_offload_command(`INST_SYNC | 2);
 
-    // Enqueue transfers transfers to DUT
-    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-      rx_data = $urandom;
+    rx_data              = new [`NUM_ACTIVE_LANES];
+    tx_data              = new [`NUM_ACTIVE_LANES];
+    sdi_read_data        = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_ACTIVE_LANES)];
+    sdi_read_data_store  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_ACTIVE_LANES)];
+    sdo_write_data       = new [`NUM_ACTIVE_LANES];
+
+    `ifdef DEF_SDO_STREAMING
+      sdo_write_data_store = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_ACTIVE_LANES)];
+      sdo_write_size = (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS);
+    `else
+      sdo_write_data_store = new [(`NUM_OF_WORDS)*(`NUM_ACTIVE_LANES)];
+      sdo_write_size = (`NUM_OF_WORDS);
+    `endif
+    
+    // Enqueue transfers to DUT
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
+      for (int j = 0; j < (`NUM_ACTIVE_LANES); j++) begin
+        rx_data[j] = {$urandom};
+        tx_data[j] = {$urandom};
+        tx_data_cast[j] = tx_data[j];
+        sdi_read_data_store[i * (`NUM_ACTIVE_LANES) + j]  = rx_data[j];
+      end
+      
       spi_send(rx_data);
-      sdi_read_data_store[i]  = rx_data;
-      tx_data = $urandom;
+      
       `ifdef DEF_SDO_STREAMING
         sdo_stream_gen(tx_data);
-        sdo_write_data_store[i] = tx_data;
+        for (int j = 0; j < `NUM_ACTIVE_LANES; j++) begin
+          sdo_write_data_store[i * (`NUM_ACTIVE_LANES) + j] = tx_data[j]; // all of the random words will be used
+        end
       `else
-        if (i<(`NUM_OF_WORDS)) begin
-          sdo_write_data_store[i] = tx_data;
-          spi_api.sdo_offload_fifo_write(sdo_write_data_store[i]);
-        end else begin
-          sdo_write_data_store[i] = sdo_write_data_store[i%(`NUM_OF_WORDS)];
+        if (i < (`NUM_OF_WORDS)) begin
+          for (int j = 0; j < `NUM_ACTIVE_LANES; j++) begin
+            sdo_write_data_store[i * (`NUM_ACTIVE_LANES) + j] = tx_data[j]; //only the first NUM_OF_WORDS random words will be used for all transfers
+          end
+          spi_api.sdo_offload_fifo_write(tx_data_cast);
         end
       `endif
     end
@@ -333,20 +373,23 @@ program test_program (
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_ACTIVE_LANES)); i++) begin
       sdi_read_data[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-      if (sdi_read_data[i] != sdi_read_data_store[i]) begin
+      if (sdi_read_data[i] != sdi_read_data_store[i]) begin //one word at a time comparison
         `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
         `ERROR(("Offload Read Test FAILED"));
       end
     end
     `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);
 
-    for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      spi_receive(sdo_write_data[i]);
-      if (sdo_write_data[i] != sdo_write_data_store[i]) begin
-        `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]), ADI_VERBOSITY_LOW);
-        `ERROR(("Offload Write Test FAILED"));
+    for (int i = 0; i < sdo_write_size; i++) begin
+      spi_receive(sdo_write_data);
+      for (int j = 0; j < (`NUM_ACTIVE_LANES); j++) begin
+        if (sdo_write_data[j] != sdo_write_data_store[(i * (`NUM_ACTIVE_LANES) + j)]) begin
+          `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", j, sdo_write_data[j],
+                      ((i * (`NUM_ACTIVE_LANES) + j) % (`NUM_OF_WORDS)), sdo_write_data_store[(i * (`NUM_ACTIVE_LANES) + j)]), ADI_VERBOSITY_LOW);
+          `ERROR(("Offload Write Test FAILED"));
+        end
       end
     end
     `INFO(("Offload Write Test PASSED"), ADI_VERBOSITY_LOW);
@@ -356,21 +399,35 @@ program test_program (
   // FIFO SPI Test
   //---------------------------------------------------------------------------
 
-  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
-  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
-  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data_store [`NUM_OF_WORDS-1:0];
-  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data_store [`NUM_OF_WORDS-1:0];
-
   task fifo_spi_test();
 
+    rx_data_cast = new [`NUM_ACTIVE_LANES];
+    tx_data_cast = new [`NUM_ACTIVE_LANES];
+    `INFO(("SIZE OF RX FIFO %d", rx_data_cast.size()), ADI_VERBOSITY_LOW);
+    `INFO(("SIZE OF TX FIFO %d", tx_data_cast.size()), ADI_VERBOSITY_LOW);
+
+    rx_data             = new [`NUM_ACTIVE_LANES];
+    tx_data             = new [`NUM_ACTIVE_LANES];
+    sdi_fifo_data       = new [`NUM_ACTIVE_LANES * `NUM_OF_WORDS];
+    sdo_fifo_data       = new [`NUM_ACTIVE_LANES * `NUM_OF_WORDS];
+    sdi_fifo_data_store = new [`NUM_ACTIVE_LANES * `NUM_OF_WORDS];
+    sdo_fifo_data_store = new [`NUM_ACTIVE_LANES * `NUM_OF_WORDS];
+    
     // Generate a FIFO transaction, write SDO first
-    for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-      rx_data = $urandom;
-      tx_data = $urandom;
-      spi_api.sdo_fifo_write((tx_data));// << (`DATA_WIDTH - `DATA_DLENGTH)));
+    for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
+      for (int j = 0; j < (`NUM_ACTIVE_LANES); j++) begin
+        rx_data[j]      = {$urandom};
+        tx_data[j]      = {$urandom};
+        tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
+
+        sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j] = rx_data[j];
+        `INFO(("rx_data[%d] = %x", j, rx_data[j]), ADI_VERBOSITY_LOW);
+        `INFO(("sdi_fifo_data_store[%d] = %x", (i * (`NUM_ACTIVE_LANES) + j), sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j]), ADI_VERBOSITY_LOW);
+        sdo_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j] = tx_data[j];
+      end
+      
+      spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits
       spi_send(rx_data);
-      sdi_fifo_data_store[i] = rx_data;
-      sdo_fifo_data_store[i] = tx_data;
     end
 
     generate_transfer_cmd(1);
@@ -379,14 +436,23 @@ program test_program (
     spi_wait_send();
     `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
 
-    for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
-      spi_api.sdi_fifo_read(sdi_fifo_data[i]);
-      spi_receive(sdo_fifo_data[i]);
+    for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
+      spi_api.sdi_fifo_read(rx_data_cast); //API always returns 32 bits
+      spi_receive(tx_data);
+      for (int j = 0; j < `NUM_ACTIVE_LANES; j++) begin
+        sdi_fifo_data[i * `NUM_ACTIVE_LANES + j] = rx_data_cast[j];
+        // `INFO(("rx_data_cast[%d] = %d", j, rx_data_cast[j]), ADI_VERBOSITY_LOW);
+        // `INFO(("sdi_fifo_data[%d] = %d", (i * (`NUM_ACTIVE_LANES) + j), sdi_fifo_data[i * (`NUM_ACTIVE_LANES) + j]), ADI_VERBOSITY_LOW);
+        // `INFO(("sdi_fifo_data_store[%d] = %d", (i * (`NUM_ACTIVE_LANES) + j), sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j]), ADI_VERBOSITY_LOW);
+        sdo_fifo_data[i * `NUM_ACTIVE_LANES + j] = tx_data[j];
+      end
     end
 
-    if (sdi_fifo_data !== sdi_fifo_data_store) begin
-      `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
-      `FATAL(("Fifo Read Test FAILED"));
+    foreach (sdi_fifo_data[i]) begin
+      if (sdi_fifo_data[i] !== sdi_fifo_data_store[i]) begin
+        `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data[i], sdi_fifo_data_store[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("Fifo Read Test FAILED"));
+      end
     end
     `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
 

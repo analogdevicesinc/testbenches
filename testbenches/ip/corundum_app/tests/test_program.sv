@@ -129,6 +129,8 @@ program test_program();
       `TH.`EN_IO.inst.IF.set_io(8'hFF >> i);
 
       base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd64 * int'(8/(8-i)));
+      if (8'hFF >> i == 8'h03)
+        base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd16);
 
       base_env.mng.master_sequencer.RegWrite32('h50000000+'h5*4, 32'h1);
       #2us;
@@ -148,8 +150,11 @@ program test_program();
     os_tx_axis_agent.master_sequencer.stop();
     #2us;
 
-    `TH.`EN_IO.inst.IF.set_io(8'hFF);
-    base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd64);
+    // `TH.`EN_IO.inst.IF.set_io(8'hFF);
+    // base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd128);
+    `TH.`EN_IO.inst.IF.set_io(8'h11);
+    // base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd2048);
+    base_env.mng.master_sequencer.RegWrite32('h50000000+'h24*4, 32'd1792);
 
     // --- 1s packet counter testing ---
     // start transmission

@@ -323,7 +323,7 @@ ad_connect corundum_resetn corundum_rstgen/peripheral_aresetn
 
 ad_ip_instance clk_vip input_clk_vip [ list \
   INTERFACE_MODE {MASTER} \
-  FREQ_HZ 200000000 \
+  FREQ_HZ 300000000 \
 ]
 adi_sim_add_define "INPUT_CLK_VIP=input_clk_vip"
 

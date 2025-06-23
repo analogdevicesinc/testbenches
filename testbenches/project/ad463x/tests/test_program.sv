@@ -365,13 +365,17 @@ initial begin
       if (offload_status) begin
         if (`NUM_OF_SDI == 1) begin
           sdi_shiftreg_old <= sdi_shiftreg;
-          if (sdi_store_cnt [0] == 'h1 ) begin
-            for (int i=0; i<16; i=i+1) begin
-              offload_sdi_data_store_arr[sdi_store_cnt-1][16 + i] = sdi_shiftreg[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt-1][i] = sdi_shiftreg_old[2*i+1];
-              offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
-              offload_sdi_data_store_arr[sdi_store_cnt][16 + i] =  sdi_shiftreg[2*i];
+          if (`NO_REORDER == 0) begin
+            if (sdi_store_cnt [0] == 'h1 ) begin
+              for (int i=0; i<16; i=i+1) begin
+                offload_sdi_data_store_arr[sdi_store_cnt-1][16 + i] = sdi_shiftreg[2*i+1];
+                offload_sdi_data_store_arr[sdi_store_cnt-1][i] = sdi_shiftreg_old[2*i+1];
+                offload_sdi_data_store_arr[sdi_store_cnt][i] = sdi_shiftreg_old[2*i];
+                offload_sdi_data_store_arr[sdi_store_cnt][16 + i] =  sdi_shiftreg[2*i];
+              end
             end
+          end else if (`NO_REORDER == 1) begin
+            offload_sdi_data_store_arr[sdi_store_cnt-1] = sdi_shiftreg;
           end
         end else if (`NUM_OF_SDI == 2) begin
           if (`DDR_EN == 1) begin
@@ -453,7 +457,7 @@ task offload_spi_test();
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    base_env.mng.sequencer.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*2)-1)); // X_LENGHTH = 1024-1
+    base_env.mng.sequencer.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((2*NUM_OF_TRANSFERS*4) - 1)); // X_LENGHTH = 1024-1
     base_env.mng.sequencer.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
     base_env.mng.sequencer.RegWrite32(`AD469X_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 

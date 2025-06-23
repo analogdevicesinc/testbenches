@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2014 - 2025 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2014 - 2026 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -86,17 +86,23 @@ package spi_engine_api_pkg;
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO_OFFLOAD0_CDM_FIFO(cmd));
     endtask
 
-    task sdo_offload_fifo_write(input bit [31:0] data);
-      this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(data));
+    task sdo_offload_fifo_write(input bit [31:0] data[]);
+      foreach (data[i]) begin
+        this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(data[i]));
+      end
     endtask
 
-    task sdo_fifo_write(input bit [31:0] data);
-      this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), `SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(data));
+    task sdo_fifo_write(input bit [31:0] data[]);
+      foreach (data[i]) begin
+        this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), `SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(data[i]));
+      end
     endtask
 
-    task sdi_fifo_read(output logic [31:0] data);
-      this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), val);
-      data = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);
+    task sdi_fifo_read(ref logic [31:0] data[]);
+      foreach (data[i]) begin
+        this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), val);
+        data[i] = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);
+      end
     endtask
 
     task offload_mem_assert_reset();

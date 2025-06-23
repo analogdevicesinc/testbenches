@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -34,25 +34,29 @@
 // ***************************************************************************
 
 module adi_spi_vip #(
-  parameter MODE          = 0, // SLAVE=0
-  parameter CPOL          = 0,
-  parameter CPHA          = 0,
-  parameter INV_CS        = 0,
-  parameter DATA_DLENGTH  = 16,
-  parameter SLAVE_TIN     = 0,
-  parameter SLAVE_TOUT    = 0,
-  parameter MASTER_TIN    = 0,
-  parameter MASTER_TOUT   = 0,
-  parameter CS_TO_MISO    = 0,
+  parameter MODE              = 0, // SLAVE=0
+  parameter CPOL              = 0,
+  parameter CPHA              = 0,
+  parameter INV_CS            = 0,
+  parameter DATA_DLENGTH      = 16,
+  parameter NUM_OF_MISO       = 1,
+  parameter NUM_OF_MOSI       = 1,
+  parameter MISO_LANE_MASK    = 8'hFF,
+  parameter MOSI_LANE_MASK    = 8'hFF,
+  parameter SLAVE_TIN         = 0,
+  parameter SLAVE_TOUT        = 0,
+  parameter MASTER_TIN        = 0,
+  parameter MASTER_TOUT       = 0,
+  parameter CS_TO_MISO        = 0,
   parameter DEFAULT_MISO_DATA = 'hCAFE
 )  (
   input   logic s_spi_sclk,
-  input   logic s_spi_mosi,
-  output  wire  s_spi_miso,
+  input   logic [NUM_OF_MOSI-1:0] s_spi_mosi,
+  output  wire  [NUM_OF_MISO-1:0] s_spi_miso,
   input   logic s_spi_cs,
   output  logic m_spi_sclk,
-  output  logic m_spi_mosi,
-  input   wire  m_spi_miso,
+  output  logic [NUM_OF_MOSI-1:0] m_spi_mosi,
+  input   wire  [NUM_OF_MISO-1:0] m_spi_miso,
   output  logic m_spi_cs
 );
 
@@ -66,6 +70,10 @@ module adi_spi_vip #(
     .CPHA               (CPHA),
     .INV_CS             (INV_CS),
     .DATA_DLENGTH       (DATA_DLENGTH),
+    .NUM_OF_MISO        (NUM_OF_MISO),
+    .NUM_OF_MOSI        (NUM_OF_MOSI),
+    .MISO_LANE_MASK     (MISO_LANE_MASK),
+    .MOSI_LANE_MASK     (MOSI_LANE_MASK),
     .SLAVE_TIN          (SLAVE_TIN),
     .SLAVE_TOUT         (SLAVE_TOUT),
     .MASTER_TIN         (MASTER_TIN),

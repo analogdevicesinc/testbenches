@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2023-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -55,7 +55,7 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-program test_slowdata (
+program test_lanes (
   inout spi_engine_irq,
   inout spi_engine_spi_sclk,
   inout [(`NUM_OF_CS - 1):0] spi_engine_spi_cs,
@@ -180,23 +180,7 @@ program test_slowdata (
 
     #100ns;
 
-    fifo_init_test();
-
-    #100ns;
-
-    fifo_single_read_test();
-
-    #100ns;
-
-    fifo_double_write_test();
-
-    #100ns;
-
-    fifo_double_read_test();
-
-    #100ns;
-
-    fifo_double_write_test();
+    fifo_spi_test();
     sdi_lane_mask = (2 ** `NUM_OF_SDI)-1;
     sdo_lane_mask = (2 ** `NUM_OF_SDO)-1;
     spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
@@ -205,8 +189,6 @@ program test_slowdata (
     #100ns;
 
     offload_spi_test();
-
-    #100ns;
 
     spi_env.stop();
     base_env.stop();
@@ -219,109 +201,18 @@ program test_slowdata (
   //---------------------------------------------------------------------------
   // SPI Engine generate transfer
   //---------------------------------------------------------------------------
-  task generate_init_transfer_cmd(
+  task generate_transfer_cmd(
       input [7:0] sync_id,
+      input [7:0] sdi_lane_mask,
       input [7:0] sdo_lane_mask);
-
-    // configure cs
-    if (`CS_ACTIVE_HIGH) begin
-      spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
-    end
+    
     // define spi lane mask
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
-    // write cfg
-    spi_api.fifo_command(`INST_CFG);
     // assert CSN
     spi_api.fifo_command(`SET_CS(8'hFE));
-    // write prescaler
-    spi_api.fifo_command(`INST_PRESCALE);
-    // write dlen
-    spi_api.fifo_command(`INST_DLENGTH);
     // transfer data
-    spi_api.fifo_command(`INST_WR);
-    // de-assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFF));
-    // SYNC command to generate interrupt
-    spi_api.fifo_command(`INST_SYNC | sync_id);
-    `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
-  endtask
-
-  task generate_single_rtransfer_cmd(
-      input [7:0] sync_id,
-      input [7:0] sdo_lane_mask);
-    // configure cs
-    if (`CS_ACTIVE_HIGH) begin
-      spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
-    end
-    // define spi lane mask
-    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
-    // write cfg
-    spi_api.fifo_command(`INST_CFG);
-    // assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFE));
-    // write prescaler
-    spi_api.fifo_command(`INST_PRESCALE);
-    // write dlen
-    spi_api.fifo_command(`INST_DLENGTH);
-    // transfer data
-    spi_api.fifo_command(`INST_RD & 16'hFF00);
-    // de-assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFF));
-    // SYNC command to generate interrupt
-    spi_api.fifo_command(`INST_SYNC | sync_id);
-    `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
-  endtask
-
-
-  task generate_double_rtransfer_cmd(
-     input [7:0] sync_id,
-     input [7:0] sdo_lane_mask);
-    // configure cs
-    if (`CS_ACTIVE_HIGH) begin
-      spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
-    end
-    // define spi lane mask
-    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
-    // write cfg
-    spi_api.fifo_command(`INST_CFG);
-    // assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFE));
-    // write prescaler
-    spi_api.fifo_command(`INST_PRESCALE);
-    // write dlen
-    spi_api.fifo_command(`INST_DLENGTH);
-    // transfer data
-    spi_api.fifo_command(`INST_RD & 16'hFF00);
-    // transfer data
-    spi_api.fifo_command(`INST_RD & 16'hFF00);
-    // de-assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFF));
-    // SYNC command to generate interrupt
-    spi_api.fifo_command(`INST_SYNC | sync_id);
-    `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
-  endtask
-
-  task generate_double_wtransfer_cmd(
-      input [7:0] sync_id,
-      input [7:0] sdo_lane_mask);
-    // configure cs
-    if (`CS_ACTIVE_HIGH) begin
-      spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
-    end
-    // define spi lane mask
-    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
-    // write cfg
-    spi_api.fifo_command(`INST_CFG);
-    // assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFE));
-    // write prescaler
-    spi_api.fifo_command(`INST_PRESCALE);
-    // write dlen
-    spi_api.fifo_command(`INST_DLENGTH);
-    // transfer data
-    spi_api.fifo_command(`INST_WR & 16'hFF00);
-    // transfer data
-    spi_api.fifo_command(`INST_WR & 16'hFF00);
+    spi_api.fifo_command(`INST_WRD);
     // de-assert CSN
     spi_api.fifo_command(`SET_CS(8'hFF));
     // SYNC command to generate interrupt
@@ -416,13 +307,6 @@ program test_slowdata (
       sdo_write_data_store = new [(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
     `endif
 
-    // Config pwm
-    pwm_api.reset();
-    pwm_api.pulse_period_config(0,'d105); // config channel 0 period
-    pwm_api.load_config();
-    pwm_api.start();
-    `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
-
     //Configure DMA
     dma_api.enable_dma();
     dma_api.set_flags(
@@ -449,14 +333,14 @@ program test_slowdata (
     // Enqueue transfers to DUT
     for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
       for (int j = 0; j < (`NUM_OF_SDI); j++) begin
-        rx_data[j] = {$urandom};
+        rx_data[j] = $urandom;
         sdi_read_data_store[i * (`NUM_OF_SDI) + j]  = rx_data[j];
       end
 
       spi_send(rx_data);
 
       for (int j = 0; j < (`NUM_OF_SDO); j++) begin
-        tx_data[j] = {$urandom};
+        tx_data[j] = $urandom;
         tx_data_cast[j] = tx_data[j];
       end
       
@@ -527,25 +411,41 @@ program test_slowdata (
   endtask
 
   //---------------------------------------------------------------------------
-  // FIFO SPI Test - Init Test
+  // FIFO SPI Test
   //---------------------------------------------------------------------------
-  task fifo_init_test();
+  task fifo_spi_test();
 
-    sdo_lane_mask       = (2**`NUM_OF_SDO)-1; //new mask defining the active lanes
+    //This test forces a wrong lane mask, then generates data
+    //and much time later starts execution with the correct lane mask
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(8'hC)); //wrong lane mask on purpose
+    spi_api.fifo_command(`SET_SDO_LANE_MASK(8'hE)); //wrong lane mask on purpose
+    sdi_lane_mask       = 8'h1; //new mask defining the active lanes (right lane mask)
+    sdo_lane_mask       = 8'h8; //new mask defining the active lanes (right lane mask)
+    num_of_active_sdi_lanes = $countones(sdi_lane_mask);
     num_of_active_sdo_lanes = $countones(sdo_lane_mask);
+
+    rx_data_cast        = new [num_of_active_sdi_lanes];
+    rx_data             = new [(`NUM_OF_SDI)];
+    sdi_fifo_data       = new [num_of_active_sdi_lanes * `NUM_OF_WORDS];
+    sdi_fifo_data_store = new [num_of_active_sdi_lanes * `NUM_OF_WORDS];
     tx_data             = new [num_of_active_sdo_lanes];
     tx_data_cast        = new [num_of_active_sdo_lanes];
     receive_data        = new [`NUM_OF_SDO];
     sdo_fifo_data       = new [`NUM_OF_SDO * `NUM_OF_WORDS];
     sdo_fifo_data_store = new [`NUM_OF_SDO * `NUM_OF_WORDS];
-
-    // send cmd before data
-    generate_init_transfer_cmd(1, sdo_lane_mask);
-
-    // write sdo fifo
+    
+    // Generate a FIFO transaction, write SDO first
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
+      for (int j = 0, k = 0; j < (`NUM_OF_SDI); j++) begin
+        rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
+        if (sdi_lane_mask[j]) begin
+          sdi_fifo_data_store[i * num_of_active_sdi_lanes + k] = rx_data[j];
+          k++;
+        end
+      end
+
       for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
-        tx_data[j]      = ((i%6) == 5) ? 8'hFE : 8'hFF;
+        tx_data[j]      = $urandom;
         tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
       end
 
@@ -558,16 +458,36 @@ program test_slowdata (
         end
       end
       
-      spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits
+      spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits, only active lanes are written
+      spi_send(rx_data);
     end
 
-    `INFO(("Wait for SPI VIP receiving data"), ADI_VERBOSITY_LOW);
+    //wait a long time before starting execution with the correct lane mask
+    #500ns;
+    generate_transfer_cmd(1, sdi_lane_mask, sdo_lane_mask); //generate transfer with specific spi lane mask
+
+    `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
+    spi_wait_send();
+    `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
+
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
+      spi_api.sdi_fifo_read(rx_data_cast); //API always returns 32 bits
       spi_receive(receive_data);
+      for (int j = 0; j < num_of_active_sdi_lanes; j++) begin
+        sdi_fifo_data[i * num_of_active_sdi_lanes + j] = rx_data_cast[j];
+      end
       for (int j = 0; j < (`NUM_OF_SDO); j++) begin
         sdo_fifo_data[i * (`NUM_OF_SDO) + j] = receive_data[j];
       end
     end
+
+    foreach (sdi_fifo_data[i]) begin
+      if (sdi_fifo_data[i] !== sdi_fifo_data_store[i]) begin
+        `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data[i], sdi_fifo_data_store[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("Fifo Read Test FAILED"));
+      end
+    end
+    `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
 
     foreach (sdo_fifo_data[i]) begin
       if (sdo_fifo_data[i] !== sdo_fifo_data_store[i]) begin
@@ -579,153 +499,33 @@ program test_slowdata (
   endtask
 
   //---------------------------------------------------------------------------
-  // FIFO SPI Test - Double Write Test
-  //---------------------------------------------------------------------------
-  task fifo_double_write_test();
-
-    sdo_lane_mask           = (2**`NUM_OF_SDO)-1; //new mask defining the active lanes
-    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
-    tx_data                 = new [num_of_active_sdo_lanes];
-    tx_data_cast            = new [num_of_active_sdo_lanes];
-    receive_data            = new [`NUM_OF_SDO];
-    sdo_fifo_data           = new [`NUM_OF_SDO * 2];
-    sdo_fifo_data_store     = new [`NUM_OF_SDO * 2];
-
-    // send cmd before data
-    generate_double_wtransfer_cmd(1, sdo_lane_mask);
-
-    // write sdo fifo
-    for (int i = 0; i < 2; i++) begin
-      for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
-        tx_data[j]      = ((i%6) == 5) ? 8'hFE : 8'hFF;
-        tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
-      end
-
-      for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
-        if (sdo_lane_mask[j]) begin
-          sdo_fifo_data_store[i * `NUM_OF_SDO + j] = tx_data[k];
-          k++;
-        end else begin
-          sdo_fifo_data_store[i * `NUM_OF_SDO + j] = `SDO_IDLE_STATE;
-        end
-      end
-      
-      spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits
-    end
-
-    `INFO(("Wait for SPI VIP receiving data"), ADI_VERBOSITY_LOW);
-    for (int i = 0; i < 2; i++) begin
-      spi_receive(receive_data);
-      for (int j = 0; j < `NUM_OF_SDO; j++) begin
-        sdo_fifo_data[i * `NUM_OF_SDO + j] = receive_data[j];
-      end
-    end
-
-    foreach (sdo_fifo_data[i]) begin
-      if (sdo_fifo_data[i] !== sdo_fifo_data_store[i]) begin
-        `INFO(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data[i], sdo_fifo_data_store[i]), ADI_VERBOSITY_LOW);
-        `FATAL(("Double Write Test FAILED"));
-      end
-    end
-    `INFO(("Double Write Test PASSED"), ADI_VERBOSITY_LOW);
-  endtask
-
-  //---------------------------------------------------------------------------
-  // FIFO SPI Test - Single read Test
-  //---------------------------------------------------------------------------
-  task fifo_single_read_test();
-
-    sdi_lane_mask       = (2**`NUM_OF_SDI)-1; //new mask defining the active lanes
-    sdo_lane_mask       = (2**`NUM_OF_SDO)-1; //new mask defining the active lanes
-    num_of_active_sdi_lanes = $countones(sdi_lane_mask);
-    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
-    tx_data_cast        = new [num_of_active_sdo_lanes];
-    rx_data             = new [`NUM_OF_SDI];
-    rx_data_cast        = new [`NUM_OF_SDI];
-    sdi_fifo_data       = new [`NUM_OF_SDI];
-    sdi_fifo_data_store = new [`NUM_OF_SDI];
-
-    for (int i = 0; i < num_of_active_sdi_lanes; i++) begin
-      rx_data[i]             = {$urandom};
-      sdi_fifo_data_store[i] = rx_data[i];
-    end
-    spi_send(rx_data);
-
-    generate_single_rtransfer_cmd(1, sdo_lane_mask);
-
-    `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
-    spi_wait_send();
-    `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
-
-    spi_receive(tx_data_cast); // dummy tx, just for clearing the VIP queue
-    spi_api.sdi_fifo_read(rx_data_cast);
-
-    foreach (sdi_fifo_data[i]) begin
-      sdi_fifo_data[i] = rx_data_cast[i];
-      if (sdi_fifo_data[i] !== sdi_fifo_data_store[i]) begin
-        `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data[i], sdi_fifo_data_store[i]), ADI_VERBOSITY_LOW);
-        `FATAL(("Single Read Test FAILED"));
-      end
-    end
-    `INFO(("Single Read Test PASSED"), ADI_VERBOSITY_LOW);
-  endtask
-
-  //---------------------------------------------------------------------------
-  // FIFO SPI Test - Double Read Test
-  //---------------------------------------------------------------------------
-  task fifo_double_read_test();
-
-    sdi_lane_mask           = (2**`NUM_OF_SDI)-1; //new mask defining the active lanes
-    sdo_lane_mask           = (2**`NUM_OF_SDO)-1; //new mask defining the active lanes
-    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
-    tx_data_cast            = new [num_of_active_sdo_lanes];
-    rx_data                 = new [`NUM_OF_SDI];
-    rx_data_cast            = new [`NUM_OF_SDI];
-    sdi_fifo_data           = new [`NUM_OF_SDI * 2];
-    sdi_fifo_data_store     = new [`NUM_OF_SDI * 2];
-
-    for (int i = 0; i < 2; i++) begin
-      for (int j = 0; j < (`NUM_OF_SDI); j++) begin
-        rx_data[j]      = {$urandom};
-        sdi_fifo_data_store[i * (`NUM_OF_SDI) + j] = rx_data[j];
-      end
-      
-      spi_send(rx_data);
-    end
-
-    generate_double_rtransfer_cmd(1, sdo_lane_mask);
-
-    `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
-    spi_wait_send();
-    `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
-
-    for (int i = 0; i < 2; i++) begin
-      spi_api.sdi_fifo_read(rx_data_cast); //API always returns 32 bits
-      spi_receive(tx_data_cast); // dummy tx, just for clearing the VIP queue
-      for (int j = 0; j < (`NUM_OF_SDI); j++) begin
-        sdi_fifo_data[i * (`NUM_OF_SDI) + j] = rx_data_cast[j];
-      end
-    end
-
-    foreach (sdi_fifo_data[i]) begin
-      if (sdi_fifo_data[i] !== sdi_fifo_data_store[i]) begin
-        `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data[i], sdi_fifo_data_store[i]), ADI_VERBOSITY_LOW);
-        `FATAL(("Double Read Test FAILED"));
-      end
-    end
-    `INFO(("Double Read Test PASSED"), ADI_VERBOSITY_LOW);
-  endtask
-
-  //---------------------------------------------------------------------------
   // Test initialization
   //---------------------------------------------------------------------------
   task init();
     // Start spi clk generator
     clkgen_api.enable_clkgen();
+
+    // Config pwm
+    pwm_api.reset();
+    pwm_api.pulse_period_config(0,'d121); // config channel 0 period
+    pwm_api.load_config();
+    pwm_api.start();
+    `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
+
     // Enable SPI Engine
     spi_api.enable_spi_engine();
+
+    // Configure the execution module
+    spi_api.fifo_command(`INST_CFG);
+    spi_api.fifo_command(`INST_PRESCALE);
+    spi_api.fifo_command(`INST_DLENGTH);
+    if (`CS_ACTIVE_HIGH) begin
+      spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
+    end
+
     // Set up the interrupts
     spi_api.set_interrup_mask(.sync_event(1'b1),.offload_sync_id_pending(1'b1));
+
   endtask
 
 endprogram

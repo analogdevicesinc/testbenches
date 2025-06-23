@@ -422,7 +422,7 @@ program test_program (
 
         sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j] = rx_data[j];
         `INFO(("rx_data[%d] = %x", j, rx_data[j]), ADI_VERBOSITY_LOW);
-        `INFO(("sdi_fifo_data_store[%d] = %x", (i * (`NUM_ACTIVE_LANES) + j), sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j]), ADI_VERBOSITY_LOW);
+        // `INFO(("sdi_fifo_data_store[%d] = %x", (i * (`NUM_ACTIVE_LANES) + j), sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j]), ADI_VERBOSITY_LOW);
         sdo_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j] = tx_data[j];
       end
       
@@ -451,7 +451,7 @@ program test_program (
     foreach (sdi_fifo_data[i]) begin
       if (sdi_fifo_data[i] !== sdi_fifo_data_store[i]) begin
         `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data[i], sdi_fifo_data_store[i]), ADI_VERBOSITY_LOW);
-        `FATAL(("Fifo Read Test FAILED"));
+        `ERROR(("Fifo Read Test FAILED"));
       end
     end
     `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);

@@ -38,6 +38,10 @@ interface spi_vip_if #(
       CPHA              = 0,
       INV_CS            = 0,
       DATA_DLENGTH      = 16,
+      NUM_OF_SDI        = 1,
+      NUM_OF_SDO        = 1,
+      NUM_ACTIVE_LANES  = 1,
+      MASK_SPI_LANE     = 8'hFF,
       SLAVE_TIN         = 0,
       SLAVE_TOUT        = 0,
       MASTER_TIN        = 0,
@@ -48,19 +52,19 @@ interface spi_vip_if #(
   import adi_spi_vip_if_base_pkg::*;
 
   logic s_sclk;
-  wire  s_miso; // need net types here in case tb wants to tristate this
+  wire  [NUM_OF_SDO-1:0] s_miso; // need net types here in case tb wants to tristate this
   logic s_mosi;
   logic s_cs;
 
   logic m_sclk;
-  wire  m_miso; // need net types here in case tb wants to tristate this
+  wire  [NUM_OF_SDO-1:0] m_miso; // need net types here in case tb wants to tristate this
   logic m_mosi;
   logic m_cs;
 
   // internal
   spi_mode_t spi_mode;
   logic miso_oen;
-  logic miso_drive;
+  logic [NUM_OF_SDO-1:0] miso_drive;
   logic mosi_drive = 1'b0;
   logic cs_drive = 1'b0;
   logic sclk_drive = 1'b0;
@@ -68,7 +72,10 @@ interface spi_vip_if #(
   logic s_mosi_delayed;
   wire sclk;
   wire cs;
+
   localparam CS_ACTIVE_LEVEL = (INV_CS) ? 1'b1 : 1'b0;
+  localparam DEFAULT_MASK_SDI_SPI_LANE = (2 ** NUM_OF_SDI) - 1; //by default all lanes are enabled
+  localparam DEFAULT_MASK_SDO_SPI_LANE = (2 ** NUM_OF_SDO) - 1; //by default all lanes are enabled
 
   // cs, sclk sources
   assign cs = (spi_mode != SPI_MODE_SLAVE)  ? m_cs : s_cs;
@@ -122,6 +129,18 @@ interface spi_vip_if #(
       return DATA_DLENGTH;
     endfunction
 
+    virtual function int get_param_NUM_OF_SDI();
+      return NUM_OF_SDI;
+    endfunction
+
+    virtual function int get_param_NUM_OF_SDO();
+      return NUM_OF_SDO;
+    endfunction
+
+    virtual function int get_param_NUM_ACTIVE_LANES();
+      return NUM_ACTIVE_LANES;
+    endfunction
+
     virtual function int get_param_SLAVE_TIN();
       return SLAVE_TIN;
     endfunction
@@ -158,12 +177,36 @@ interface spi_vip_if #(
       return cs_active;
     endfunction
 
-    virtual task set_miso_drive(bit val);
-      miso_drive <= #(SLAVE_TOUT) val;
+    virtual task set_miso_drive(bit val[]);
+      int j = 0;
+      for (int i = 0; i < NUM_OF_SDO; i++) begin
+        bit mask = (MASK_SPI_LANE >> i) & 1'b1;
+        // $display("[INFO] @ %0t: %s", $time, $sformatf("MASK_SPI_LANE[%d] = %d", i, mask));
+        if (mask) begin
+          miso_drive[i] <= #(SLAVE_TOUT) val[j];
+          j++;
+        end else begin
+          miso_drive[i] <= #(SLAVE_TOUT) 0;
+        end
+        $display("[INFO] @ %0t: %s", $time, $sformatf("val[%d] = %d", i, val[i]));
+        $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
+      end
     endtask
 
-    virtual task set_miso_drive_instantaneous(bit val);
-      miso_drive <= val;
+    virtual task set_miso_drive_instantaneous(bit val[]);
+      int j = 0;
+      for (int i = 0; i < NUM_OF_SDO; i++) begin
+        bit mask = (MASK_SPI_LANE >> i) & 1'b1;
+        // $display("[INFO] @ %0t: %s", $time, $sformatf("MASK_SPI_LANE[%d] = %d", i, mask));
+        if (mask) begin
+          miso_drive[i] <= val[j];
+          j++;
+        end else begin
+          miso_drive[i] <= 0;
+        end
+        $display("[INFO] @ %0t: %s", $time, $sformatf("val[%d] = %d", i, val[i]));
+        $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
+      end
     endtask
 
     virtual task wait_cs_active();

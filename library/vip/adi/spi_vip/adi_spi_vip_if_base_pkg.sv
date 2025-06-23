@@ -35,6 +35,7 @@
 package adi_spi_vip_if_base_pkg;
 
   typedef enum {SPI_MODE_SLAVE, SPI_MODE_MASTER, SPI_MODE_MONITOR} spi_mode_t;
+  typedef logic mosi_array_t [];
 
   virtual class adi_spi_vip_if_base;
 
@@ -50,6 +51,14 @@ package adi_spi_vip_if_base_pkg;
     pure virtual function int get_param_INV_CS();
 
     pure virtual function int get_param_DATA_DLENGTH();
+
+    pure virtual function int get_param_NUM_OF_SDI();
+
+    pure virtual function int get_param_NUM_OF_SDO();
+
+    pure virtual function int get_param_SDI_LANE_MASK();
+
+    pure virtual function int get_param_SDO_LANE_MASK();
 
     pure virtual function int get_param_SLAVE_TIN();
 
@@ -73,11 +82,11 @@ package adi_spi_vip_if_base_pkg;
 
     pure virtual task wait_for_sample_edge();
 
-    pure virtual function logic get_mosi_delayed();
+    pure virtual function mosi_array_t get_mosi_delayed();
 
-    pure virtual task set_miso_drive(bit val);
+    pure virtual task set_miso_drive(bit val[]);
 
-    pure virtual task set_miso_drive_instantaneous(bit val);
+    pure virtual task set_miso_drive_instantaneous(bit val[]);
 
     pure virtual task wait_for_drive_edge();
 

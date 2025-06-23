@@ -217,21 +217,6 @@ initial begin
    end    
 end
 
-//initial begin
-//  forever begin
-//    @(posedge ref_clk) begin
-//      if (clk_gate == 1'b1 && dco_edge_count > 0 && dco_edge_count <= N)
-//        clk_gate_sh <= 1'b1;
-//      else if (clk_gate == 1'b0 && dco_edge_count == N)
-//        clk_gate_sh <= 1'b1;
-//      else 
-//        clk_gate_sh <= 1'b0;
-//      end    
-//  end
-//end
-
-
-
 initial begin
   forever begin
    @(ref_clk) begin
@@ -296,13 +281,18 @@ end
 initial begin
   forever begin
     @(posedge dco_cp);
-      if (transfer_status)
+    if (transfer_status) begin
+      if (`RESOLUTION == 16) begin
         if (transfer_cnt[0]) begin
-          dma_data_store_arr [(transfer_cnt - 1)  >> 1] [15:0] = data_gen - 16'h0001;
+          dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen - 16'h0001;
         end else begin
-          dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = data_gen - 16'h0001;
+          dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen - 16'h0001;
         end
-      @(negedge dco);
+      end else if (`RESOLUTION == 18) begin
+        dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
+      end
+    end  
+    @(negedge dco);
   end
 end
 

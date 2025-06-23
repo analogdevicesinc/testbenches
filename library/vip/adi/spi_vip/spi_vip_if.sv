@@ -188,7 +188,10 @@ interface spi_vip_if #(
         end else begin
           miso_drive[i] <= #(SLAVE_TOUT) 0;
         end
-        $display("[INFO] @ %0t: %s", $time, $sformatf("val[%d] = %d", i, val[i]));
+        $display("[INFO] @ %0t: %s", $time, $sformatf("       val[%d] = %d", i, val[i]));
+      end
+
+      for (int i = 0; i < NUM_OF_SDO; i++) begin
         $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
       end
     endtask
@@ -204,7 +207,9 @@ interface spi_vip_if #(
         end else begin
           miso_drive[i] <= 0;
         end
-        $display("[INFO] @ %0t: %s", $time, $sformatf("val[%d] = %d", i, val[i]));
+        $display("[INFO] @ %0t: %s", $time, $sformatf("       val[%d] = %d", i, val[i]));
+      end
+      for (int i = 0; i < NUM_OF_SDO; i++) begin
         $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
       end
     endtask

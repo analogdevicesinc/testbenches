@@ -121,6 +121,8 @@ package adi_spi_vip_pkg;
         int miso_data[] = new[vif.get_param_NUM_ACTIVE_LANES()];
         bitqueue_t miso_bits [] = new[vif.get_param_NUM_ACTIVE_LANES()];
         bit miso_bits_msb [] = new[vif.get_param_NUM_ACTIVE_LANES()];
+        string bit_str;
+        string str;
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
           vif.wait_cs_active();
@@ -143,6 +145,9 @@ package adi_spi_vip_pkg;
                 miso_mbx[i].try_peek(miso_data[i]);
               end
               // this.info($sformatf("miso_data[%d] = %x", i, miso_data[i]), ADI_VERBOSITY_HIGH);
+              // bit_str = $sformatf("%b", miso_data[i]);
+              // str = bit_str.substr(bit_str.len()-18, bit_str.len()-1);
+              // this.info($sformatf("miso_data[%d] = %s", i, str), ADI_VERBOSITY_HIGH);
               this.info($sformatf("miso_data[%d] = %b", i, miso_data[i]), ADI_VERBOSITY_HIGH);
               miso_bits[i] = int_to_bitqueue(miso_data[i],vif.get_param_DATA_DLENGTH());
               // for (int j = 0; j < vif.get_param_DATA_DLENGTH(); j++) begin
@@ -204,7 +209,7 @@ package adi_spi_vip_pkg;
                 // vif.drive_edge has arrived
                 // don't shift at last edge if CPHA=0
                 if (!(vif.get_param_CPHA() == 0 && i == vif.get_param_DATA_DLENGTH()-1)) begin
-                  vif.set_miso_drive(miso_bits_msb);
+                  vif.set_miso_drive_instantaneous(miso_bits_msb);
                 end
 
                 foreach (miso_mbx[j]) begin
@@ -271,12 +276,16 @@ package adi_spi_vip_pkg;
     endtask
 
     task flush_tx();
-      foreach (miso_mbx[i]) begin
-        fork
-          wait (miso_mbx[i].num() == 0);
-        join_none
-      end
-      wait fork;
+      // fork
+        // begin: isolation_process
+          foreach (miso_mbx[i]) begin
+            // fork
+              wait (miso_mbx[i].num() == 0);
+            // join_none
+          end
+          // wait fork;
+        // end : isolation_process
+      // join
     endtask
 
     task start();

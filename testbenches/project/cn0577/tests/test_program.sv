@@ -134,7 +134,7 @@ initial begin
       base_env.mng.sequencer,
       `AXI_PWM_GEN_BA);
 
-  setLoggerVerbosity(ADI_VERBOSITY_HIGH);
+  setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
   base_env.start();
   base_env.sys_reset();
@@ -172,11 +172,15 @@ initial begin
 end
 
 //---------------------------------------------------------------------------
-// Clk_gate ending earlier
+// Clk_gate shifted copy
 //---------------------------------------------------------------------------
 
-reg N = 8'hf;  // total number of dco edges (rising + falling)
-
+localparam int N = (`TWOLANES == 0 && `RESOLUTION == 16) ? 16 :
+                   (`TWOLANES == 0 && `RESOLUTION == 18) ? 18 :
+                   (`TWOLANES == 1 && `RESOLUTION == 16) ? 8 :
+                   (`TWOLANES == 1 && `RESOLUTION == 18) ? 10 :
+                   -1; // Error case
+                   
 reg clk_gate_sh = 1'b0;
 reg [3:0] dco_edge_count = 3'h0;
 reg dco_cp = 1'b0;
@@ -197,7 +201,7 @@ initial begin
   forever begin
    @(ref_clk) begin
      if (clk_gate == 1'h1) begin
-       if (dco_edge_count < 4'hf && dco_edge_count >= 4'h0)
+       if (dco_edge_count < N && dco_edge_count >= 0)
          clk_gate_sh <= clk_gate;
        else
          clk_gate_sh <= 1'h0;
@@ -216,6 +220,7 @@ initial begin
      end
    end    
 end
+
 //---------------------------------------------------------------------------
 // Data store
 //---------------------------------------------------------------------------
@@ -261,7 +266,6 @@ initial begin
     end
   end
 end
-
 
 // ---------------------------------------------------------------------------
 // Generating expected data
@@ -347,7 +351,7 @@ task data_acquisition_test();
     #5000
     axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
-    @(posedge cnv) // TBD
+    @(posedge cnv)
     #200
 
     transfer_status = 1;
@@ -391,8 +395,7 @@ task data_acquisition_test();
       captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
-    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_HIGH);
-     //`INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
+    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
 
     if (captured_word_arr != dma_data_store_arr) begin
       `ERROR(("Data Acquisition Test FAILED"));

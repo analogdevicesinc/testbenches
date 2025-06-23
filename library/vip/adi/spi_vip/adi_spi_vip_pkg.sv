@@ -49,7 +49,7 @@ package adi_spi_vip_pkg;
 
     typedef bit bitqueue_t [$];
     protected mailbox mosi_mbx;
-    mailbox miso_mbx;
+    mailbox miso_mbx[];
     protected bit active;
     protected bit stop_flag;
     protected int default_miso_data;
@@ -68,7 +68,10 @@ package adi_spi_vip_pkg;
       this.active = 0;
       this.stop_flag = 0;
       this.default_miso_data = vif.get_param_DEFAULT_MISO_DATA();
-      this.miso_mbx = new();
+      this.miso_mbx = new[vif.get_param_NUM_ACTIVE_LANES()];
+      for (int i = 0; i < vif.get_param_NUM_ACTIVE_LANES(); i++) begin
+        this.miso_mbx[i] = new();
+      end
       this.mosi_mbx = new();
     endfunction
 
@@ -115,26 +118,49 @@ package adi_spi_vip_pkg;
     protected task tx_miso();
         bit using_default;
         bit pending_mbx;
-        int miso_data;
-        bitqueue_t miso_bits;
+        int miso_data[] = new[vif.get_param_NUM_ACTIVE_LANES()];
+        bitqueue_t miso_bits [] = new[vif.get_param_NUM_ACTIVE_LANES()];
+        bit miso_bits_msb [] = new[vif.get_param_NUM_ACTIVE_LANES()];
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
           vif.wait_cs_active();
           while (vif.get_cs_active()) begin
             // try to get an item from the mailbox, without popping it
-            if (!miso_mbx.try_peek(miso_data)) begin
-              miso_data = default_miso_data;
-              using_default = 1'b1;
-            end else begin
-              using_default = 1'b0;
+            for (int i = 0; i < vif.get_param_NUM_ACTIVE_LANES(); i++) begin
+              if  (!miso_mbx[i].try_peek(miso_data[i])) begin
+                using_default = 1'b1;
+                break;
+              end else begin
+                using_default = 1'b0;
+              end
             end
-            miso_bits = int_to_bitqueue(miso_data,vif.get_param_DATA_DLENGTH());
-            pending_mbx = 1'b0;
+
+            //if one lane does not have valid data, all of the lanes use default_data
+            for (int i = 0; i < vif.get_param_NUM_ACTIVE_LANES(); i++) begin
+              if (using_default) begin
+                miso_data[i] = default_miso_data;
+              end else begin
+                miso_mbx[i].try_peek(miso_data[i]);
+              end
+              // this.info($sformatf("miso_data[%d] = %x", i, miso_data[i]), ADI_VERBOSITY_HIGH);
+              this.info($sformatf("miso_data[%d] = %b", i, miso_data[i]), ADI_VERBOSITY_HIGH);
+              miso_bits[i] = int_to_bitqueue(miso_data[i],vif.get_param_DATA_DLENGTH());
+              // for (int j = 0; j < vif.get_param_DATA_DLENGTH(); j++) begin
+              //   this.info($sformatf("miso_bits[%d][%d] = %d", i, j, miso_bits[i][j]), ADI_VERBOSITY_HIGH);
+              // end
+              pending_mbx = 1'b0;
+            end
+
             // early drive and shift if CPHA=0
             if (vif.get_param_CPHA() == 0) begin
-              vif.set_miso_drive_instantaneous(bitqueue_pop_msb(miso_bits));
+              for (int i = 0; i < vif.get_param_NUM_ACTIVE_LANES(); i++) begin
+                miso_bits_msb[i] = bitqueue_pop_msb(miso_bits[i]);
+                this.info($sformatf("miso_bits_msb[%d] = %d", i, miso_bits_msb[i]), ADI_VERBOSITY_HIGH);
+              end
+              vif.set_miso_drive_instantaneous(miso_bits_msb);
             end
-            for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
+
+            for (int i = 0; i < vif.get_param_DATA_DLENGTH(); i++) begin
               fork
                 begin
                   fork
@@ -157,25 +183,37 @@ package adi_spi_vip_pkg;
                 if (i != 0) begin
                   this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
                 end
-                miso_bits.delete();
+                foreach (miso_bits[j]) begin
+                  miso_bits[j].delete();
+                end
                 break;
               end else if (pending_mbx) begin
                 // we were going to transmit default data, but new data arrived between the cs edge and vif.drive_edge
                 using_default = 1'b0;
                 pending_mbx = 1'b0;
-                miso_bits.delete();
+                foreach (miso_bits[j]) begin
+                  miso_bits[j].delete();
+                end
                 break;
               end else begin
+                foreach (miso_bits[j]) begin
+                  miso_bits_msb[j] = bitqueue_pop_msb(miso_bits[j]);
+                  this.info($sformatf("miso_bits_msb[%d] = %d", j, miso_bits_msb[j]), ADI_VERBOSITY_HIGH);
+                end
+
                 // vif.drive_edge has arrived
                 // don't shift at last edge if CPHA=0
                 if (!(vif.get_param_CPHA() == 0 && i == vif.get_param_DATA_DLENGTH()-1)) begin
-                  vif.set_miso_drive(bitqueue_pop_msb(miso_bits));
+                  vif.set_miso_drive(miso_bits_msb);
                 end
-                if (i == vif.get_param_DATA_DLENGTH()-1) begin
-                  this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
-                  if (!using_default) begin
-                    // finally pop an item from the mailbox after a complete transfer
-                    miso_mbx.get(miso_data);
+
+                foreach (miso_mbx[j]) begin
+                  if (i == vif.get_param_DATA_DLENGTH()-1) begin
+                    this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
+                    if (!using_default) begin
+                      // finally pop an item from the mailbox after a complete transfer
+                      miso_mbx[j].get(miso_data[j]);
+                    end
                   end
                 end
               end
@@ -219,8 +257,11 @@ package adi_spi_vip_pkg;
     endfunction : set_default_miso_data
 
     task put_tx_data(
-      input int unsigned data);
-      miso_mbx.put(data);
+      input int unsigned data[]);
+      foreach (data[i]) begin
+        miso_mbx[i].put(data[i]);
+      end
+      // miso_mbx.put(data);
       ->tx_mbx_updated;
     endtask
 
@@ -230,7 +271,12 @@ package adi_spi_vip_pkg;
     endtask
 
     task flush_tx();
-      wait (miso_mbx.num()==0);
+      foreach (miso_mbx[i]) begin
+        fork
+          wait (miso_mbx[i].num() == 0);
+        join_none
+      end
+      wait fork;
     endtask
 
     task start();
@@ -277,8 +323,12 @@ package adi_spi_vip_pkg;
 
     automatic function bitqueue_t int_to_bitqueue(int data, int n_bits);
       bitqueue_t bitq;
+      // this.info($sformatf("data = %x", data), ADI_VERBOSITY_HIGH);
+      // this.info($sformatf("data = %b", data), ADI_VERBOSITY_HIGH);
       for (int i =0; i<n_bits; i++) begin
+        // this.info($sformatf("miso_bits[%d] = %d", i, ((data>>i) & 1'b1)), ADI_VERBOSITY_HIGH);
         bitq.push_back((data>>i) & 1'b1);
+        // this.info($sformatf("bitq[%d] = %d", i, bitq[i]), ADI_VERBOSITY_HIGH);
       end
       return bitq;
     endfunction
@@ -309,7 +359,7 @@ package adi_spi_vip_pkg;
       this.driver = driver;
     endfunction: new
 
-    virtual task automatic send_data(input int unsigned data);
+    virtual task automatic send_data(input int unsigned data[]);
       this.driver.put_tx_data(data);
     endtask : send_data
 

@@ -1,5 +1,5 @@
 ###############################################################################
-## Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+## Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 ### SPDX short identifier: ADIBSD
 ###############################################################################
 
@@ -9,8 +9,8 @@ set data_width              $ad_project_params(DATA_WIDTH)
 set async_spi_clk           $ad_project_params(ASYNC_SPI_CLK)
 set offload_en              1; # offload capability is needed for the testbenches
 set num_cs                  $ad_project_params(NUM_OF_CS)
-set num_sdi                 $ad_project_params(NUM_OF_SDI)
-set num_sdo                 $ad_project_params(NUM_OF_SDO)
+set num_sdi                 $ad_project_params(NUM_OF_MISO)
+set num_sdo                 $ad_project_params(NUM_OF_MOSI)
 set sdi_delay               $ad_project_params(SDI_DELAY)
 set echo_sclk               $ad_project_params(ECHO_SCLK)
 set sdo_streaming           $ad_project_params(SDO_STREAMING)
@@ -50,7 +50,7 @@ ad_ip_parameter axi_spi_engine_dma CONFIG.SYNC_TRANSFER_START 0
 ad_ip_parameter axi_spi_engine_dma CONFIG.AXI_SLICE_SRC 0
 ad_ip_parameter axi_spi_engine_dma CONFIG.AXI_SLICE_DEST 1
 ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_2D_TRANSFER 0
-ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_DATA_WIDTH_SRC $data_width
+ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_DATA_WIDTH_SRC [expr {$data_width * $num_sdi}]
 ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_DATA_WIDTH_DEST 64
 
 ad_connect $sys_cpu_clk spi_clkgen/clk

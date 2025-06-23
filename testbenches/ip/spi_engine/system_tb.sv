@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2021-2023 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -36,15 +36,15 @@
 `include "utils.svh"
 
 module system_tb();
-  wire spi_engine_spi_cs;
-  wire spi_engine_spi_sclk;
-  wire spi_engine_spi_clk;
-  wire spi_engine_spi_sdi;
-  wire spi_engine_spi_sdo;
-  wire spi_engine_irq;
-`ifdef DEF_ECHO_SCLK
-  wire spi_engine_echo_sclk;
-`endif
+  wire                     spi_engine_spi_sclk;
+  wire                     spi_engine_spi_clk;
+  wire [(`NUM_OF_CS-1) :0] spi_engine_spi_cs;
+  wire [(`NUM_OF_MISO-1):0] spi_engine_spi_sdi;
+  wire [(`NUM_OF_MOSI-1):0] spi_engine_spi_sdo;
+  wire                     spi_engine_irq;
+  `ifdef DEF_ECHO_SCLK
+  wire                     spi_engine_echo_sclk;
+  `endif
 
   `TEST_PROGRAM test(
     .spi_engine_irq(spi_engine_irq),

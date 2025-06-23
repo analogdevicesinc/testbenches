@@ -152,7 +152,6 @@ initial begin
 
 end
 
-
 bit [31:0]  dma_data_store_arr [(NUM_OF_TRANSFERS) - 1:0];
 bit transfer_status = 0;
 bit [31:0] transfer_cnt;
@@ -228,7 +227,6 @@ reg                     r_da_n = 1'b0;
 reg                     r_db_p = 1'b0;
 reg                     r_db_n = 1'b0;
 
-
 assign da_p = r_da_p;
 assign da_n = r_da_n;
 assign db_p = r_db_p;
@@ -259,58 +257,15 @@ end
 initial begin
   forever begin
     @ (posedge cnv) begin
-      // at the first entrance in this always, da and db will have the bits from
-      // the first sample of data (which data was initialized with - 3a5a5)
-      // and only afterwards to increment data; otherwise the first sample is lost
       data_shift = data_gen;
     end
   end
 end
 
-initial begin
-  forever begin
-    @ (negedge cnv) begin
-      if (`TWOLANES == 1) begin
-        r_da_p = data_shift[RESOLUTION - 1];
-        r_da_n = ~data_shift[RESOLUTION - 1];
-        r_db_p = data_shift[RESOLUTION - 2];
-        r_db_n = ~data_shift[RESOLUTION - 2];
-        data_shift = data_shift << 2;
-      end else begin
-        r_da_p = data_shift[RESOLUTION - 1];
-        r_da_n = ~data_shift[RESOLUTION - 1];
-        data_shift = data_shift << 1;
-      end
-    end
-  end
-end
+
 // ---------------------------------------------------------------------------
 // Generating expected data
 // ---------------------------------------------------------------------------
-
-//initial begin
-//  forever begin
-//    @ (posedge cnv_out) begin
-//      cnv_count++;
-//      // at the first entrance in this always, da and db will have the bits from
-//      // the first sample of data (which data was initialized with - 3a5a5)
-//      // and only afterwards to increment data; otherwise the first sample is lost
-//      if (`TWOLANES == 1) begin
-//        r_da_p = data[RESOLUTION - 1];
-//        r_da_n = ~data[RESOLUTION - 1];
-//        r_db_p = data[RESOLUTION - 2];
-//        r_db_n = ~data[RESOLUTION - 2];
-//        data_shift = data << 2;
-//      end else begin
-//        r_da_p = data[RESOLUTION - 1];
-//        r_da_n = ~data[RESOLUTION - 1];
-//        data_shift = data << 1;
-//      end
-//      //#tCONV data <= data + 1;
-//      data <= data + 16'h0001;
-//    end
-//  end
-// end
 
 initial begin
   forever begin
@@ -321,7 +276,6 @@ initial begin
         end else begin
           dma_data_store_arr [(transfer_cnt - 1) >> 1] [31:16] = data_gen - 16'h0001;
         end
-        //data_gen <= data_gen + 16'h0001;
       @(negedge dco);
   end
 end
@@ -364,7 +318,6 @@ task data_acquisition_test();
       .channel(8'h00),
       .width(32'h01));
 
-
     cn0577_pwm_gen_api.pulse_period_config(
       .channel(8'h01),
       .period(32'h1A));
@@ -394,7 +347,6 @@ task data_acquisition_test();
     #5000
     axi_write (`AXI_LTC2387_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
-
     @(posedge cnv) // TBD
     #200
 
@@ -405,8 +357,8 @@ task data_acquisition_test();
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
     #100
-    @(negedge cnv); //TBD
-    @(posedge ref_clk); //TBD
+    @(negedge cnv);
+    @(posedge ref_clk);
     transfer_status = 0;
 
     // Stop pwm gen

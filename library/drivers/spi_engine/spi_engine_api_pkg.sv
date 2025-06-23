@@ -86,17 +86,30 @@ package spi_engine_api_pkg;
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO_OFFLOAD0_CDM_FIFO(cmd));
     endtask
 
-    task sdo_offload_fifo_write(input bit [31:0] data);
-      this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(data));
+    task sdo_offload_fifo_write(input bit [31:0] data[]);
+      foreach (data[i]) begin
+        this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO), `SET_AXI_SPI_ENGINE_OFFLOAD0_SDO_FIFO_OFFLOAD0_SDO_FIFO(data[i]));
+      end
     endtask
 
-    task sdo_fifo_write(input bit [31:0] data);
-      this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), `SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(data));
+    task sdo_fifo_write(input bit [31:0] data[]);
+    // `INFO(("SIZE OF WRITE FIFO %d", data.size()), ADI_VERBOSITY_LOW);
+      foreach (data[i]) begin
+        this.axi_write(GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), `SET_AXI_SPI_ENGINE_SDO_FIFO_SDO_FIFO(data[i]));
+        // `INFO(("data[%d] = %x", i, data[i]), ADI_VERBOSITY_LOW);
+      end
     endtask
 
-    task sdi_fifo_read(output logic [31:0] data);
-      this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), val);
-      data = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);
+    task sdi_fifo_read(ref logic [31:0] data []);
+    // `INFO(("SIZE OF READ FIFO %d", data.size()), ADI_VERBOSITY_LOW);
+    // `INFO(("data[%d] = %x", 0, data[0]), ADI_VERBOSITY_LOW);
+    // `INFO(("data[%d] = %x", 1, data[1]), ADI_VERBOSITY_LOW);
+      foreach (data[i]) begin
+        this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), val);
+        data[i] = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);
+        // `INFO(("val = %d", val), ADI_VERBOSITY_LOW);
+        // `INFO(("data[%d] = %d", i, data[i]), ADI_VERBOSITY_LOW);
+      end
     endtask
 
     task offload_mem_assert_reset();

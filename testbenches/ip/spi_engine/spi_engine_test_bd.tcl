@@ -48,7 +48,7 @@ ad_ip_parameter axi_spi_engine_dma CONFIG.SYNC_TRANSFER_START 0
 ad_ip_parameter axi_spi_engine_dma CONFIG.AXI_SLICE_SRC 0
 ad_ip_parameter axi_spi_engine_dma CONFIG.AXI_SLICE_DEST 1
 ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_2D_TRANSFER 0
-ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_DATA_WIDTH_SRC $data_width
+ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_DATA_WIDTH_SRC [expr {$data_width * $num_sdi}]
 ad_ip_parameter axi_spi_engine_dma CONFIG.DMA_DATA_WIDTH_DEST 64
 
 ad_connect $sys_cpu_clk spi_clkgen/clk

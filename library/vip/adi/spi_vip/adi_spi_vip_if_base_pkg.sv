@@ -35,6 +35,7 @@
 package adi_spi_vip_if_base_pkg;
 
   typedef enum {SPI_MODE_SLAVE, SPI_MODE_MASTER, SPI_MODE_MONITOR} spi_mode_t;
+  typedef logic [7:0] mosi_array; //max of spi_lanes
 
   virtual class adi_spi_vip_if_base;
 
@@ -79,7 +80,7 @@ package adi_spi_vip_if_base_pkg;
 
     pure virtual task wait_for_sample_edge();
 
-    pure virtual function logic get_mosi_delayed();
+    pure virtual function mosi_array get_mosi_delayed();
 
     pure virtual task set_miso_drive(bit val[]);
 

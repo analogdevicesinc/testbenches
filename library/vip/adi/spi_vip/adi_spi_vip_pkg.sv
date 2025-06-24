@@ -48,7 +48,7 @@ package adi_spi_vip_pkg;
   class adi_spi_driver extends adi_driver;
 
     typedef bit bitqueue_t [$];
-    protected mailbox mosi_mbx;
+    protected mailbox mosi_mbx[];
     mailbox miso_mbx[];
     protected bit active;
     protected bit stop_flag;
@@ -69,10 +69,13 @@ package adi_spi_vip_pkg;
       this.stop_flag = 0;
       this.default_miso_data = vif.get_param_DEFAULT_MISO_DATA();
       this.miso_mbx = new[vif.get_param_NUM_ACTIVE_LANES()];
+      this.mosi_mbx = new[vif.get_param_NUM_OF_SDO()];
       for (int i = 0; i < vif.get_param_NUM_ACTIVE_LANES(); i++) begin
         this.miso_mbx[i] = new();
       end
-      this.mosi_mbx = new();
+      for (int i = 0; i < vif.get_param_NUM_OF_SDO(); i++) begin
+        this.mosi_mbx[i] = new();
+      end
     endfunction
 
 
@@ -89,27 +92,36 @@ package adi_spi_vip_pkg;
     endfunction : clear_active
 
     protected task rx_mosi();
-      bitqueue_t mosi_bits;
-      logic [vif.get_param_NUM_OF_SDO()-1:0] mosi_logic;
-      bit mosi_bit;
+      bitqueue_t mosi_bit_queue[] = new [vif.get_param_NUM_OF_SDO()];
+      mosi_array mosi_logic;
+      bit mosi_bit = 0;
+      int aux = 0;
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
           vif.wait_cs_active();
           while (vif.get_cs_active()) begin
             for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               if (!vif.get_cs_active()) begin
+                foreach(mosi_bit_queue[i]) begin
+                  mosi_bit_queue[i].delete();
+                end
                 break;
-                mosi_bits.delete();
               end
               vif.wait_for_sample_edge();
               mosi_logic = vif.get_mosi_delayed();
-              assert(!$isunknown(mosi_logic))
-              else this.error($sformatf("[SPI VIP] MOSI Rx: unknown mosi bit at sample edge!"));
-              mosi_bit = bit'(mosi_logic);
-              bitqueue_push_lsb(mosi_bits, mosi_bit);
+              
+              for (int j = 0; j < vif.get_param_NUM_OF_SDO(); j++) begin
+                assert(!$isunknown(mosi_logic[j]))
+                else this.error($sformatf("[SPI VIP] MOSI Rx: unknown mosi bit at sample edge!"));
+                mosi_bit = bit'(mosi_logic[j]);
+                bitqueue_push_lsb(mosi_bit_queue[j], mosi_bit);
+              end
             end
-            mosi_mbx.put(bitqueue_to_int(mosi_bits));
-            mosi_bits.delete();
+
+            foreach(mosi_bit_queue[i]) begin
+              mosi_mbx[i].put(bitqueue_to_int(mosi_bit_queue[i]));
+              mosi_bit_queue[i].delete();
+            end
           end
         end
       end
@@ -266,16 +278,17 @@ package adi_spi_vip_pkg;
       foreach (data[i]) begin
         miso_mbx[i].put(data[i]);
       end
-      // miso_mbx.put(data);
       ->tx_mbx_updated;
     endtask
 
     task get_rx_data(
-      output int unsigned data);
-      mosi_mbx.get(data);
+      ref int unsigned data[]);
+      for (int i = 0; i < vif.get_param_NUM_OF_SDO(); i++) begin
+        mosi_mbx[i].get(data[i]);
+      end
     endtask
 
-    task flush_tx();
+    task flush_tx(); //fix it, it is going to cause a deadlock
       // fork
         // begin: isolation_process
           foreach (miso_mbx[i]) begin
@@ -332,12 +345,8 @@ package adi_spi_vip_pkg;
 
     automatic function bitqueue_t int_to_bitqueue(int data, int n_bits);
       bitqueue_t bitq;
-      // this.info($sformatf("data = %x", data), ADI_VERBOSITY_HIGH);
-      // this.info($sformatf("data = %b", data), ADI_VERBOSITY_HIGH);
       for (int i =0; i<n_bits; i++) begin
-        // this.info($sformatf("miso_bits[%d] = %d", i, ((data>>i) & 1'b1)), ADI_VERBOSITY_HIGH);
         bitq.push_back((data>>i) & 1'b1);
-        // this.info($sformatf("bitq[%d] = %d", i, bitq[i]), ADI_VERBOSITY_HIGH);
       end
       return bitq;
     endfunction
@@ -372,15 +381,17 @@ package adi_spi_vip_pkg;
       this.driver.put_tx_data(data);
     endtask : send_data
 
-    virtual task automatic receive_data(output int unsigned data);
+    virtual task automatic receive_data(ref int unsigned data[]);
       this.driver.get_rx_data(data);
     endtask : receive_data
 
-    virtual task automatic receive_data_verify(input int unsigned expected);
-      int unsigned received;
+    virtual task automatic receive_data_verify(input int unsigned expected[]);
+      int unsigned received[] = new[expected.size()];
       this.driver.get_rx_data(received);
-      if (received !== expected) begin
-        this.error($sformatf("Data mismatch. Received : %h; expected %h", received, expected));
+      foreach (received[i]) begin
+        if (received[i] !== expected[i]) begin
+          this.error($sformatf("Data mismatch. Received : %h; expected %h", received[i], expected[i]));
+        end
       end
     endtask : receive_data_verify
 

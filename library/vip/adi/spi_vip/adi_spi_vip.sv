@@ -51,12 +51,12 @@ module adi_spi_vip #(
   parameter DEFAULT_MISO_DATA = 'hCAFE
 )  (
   input   logic s_spi_sclk,
-  input   logic s_spi_mosi,
-  output  wire [NUM_OF_SDO-1:0] s_spi_miso,
+  input   logic [NUM_OF_SDO-1:0] s_spi_mosi,
+  output  wire  [NUM_OF_SDI-1:0] s_spi_miso,
   input   logic s_spi_cs,
   output  logic m_spi_sclk,
-  output  logic m_spi_mosi,
-  input   wire  [NUM_OF_SDO-1:0] m_spi_miso,
+  output  logic [NUM_OF_SDO-1:0] m_spi_mosi,
+  input   wire  [NUM_OF_SDI-1:0] m_spi_miso,
   output  logic m_spi_cs
 );
 

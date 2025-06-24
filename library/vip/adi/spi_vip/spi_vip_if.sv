@@ -52,24 +52,24 @@ interface spi_vip_if #(
   import adi_spi_vip_if_base_pkg::*;
 
   logic s_sclk;
-  wire  [NUM_OF_SDO-1:0] s_miso; // need net types here in case tb wants to tristate this
-  logic s_mosi;
+  wire  [NUM_OF_SDI-1:0] s_miso; // need net types here in case tb wants to tristate this
+  logic [NUM_OF_SDO-1:0] s_mosi;
   logic s_cs;
 
   logic m_sclk;
-  wire  [NUM_OF_SDO-1:0] m_miso; // need net types here in case tb wants to tristate this
-  logic m_mosi;
+  wire  [NUM_OF_SDI-1:0] m_miso; // need net types here in case tb wants to tristate this
+  logic [NUM_OF_SDO-1:0] m_mosi;
   logic m_cs;
 
   // internal
   spi_mode_t spi_mode;
   logic miso_oen;
-  logic [NUM_OF_SDO-1:0] miso_drive;
-  logic mosi_drive = 1'b0;
+  logic [NUM_OF_SDI-1:0] miso_drive;
+  logic [NUM_OF_SDO-1:0] mosi_drive = 1'b0;
   logic cs_drive = 1'b0;
   logic sclk_drive = 1'b0;
   logic cs_active;
-  logic s_mosi_delayed;
+  logic [NUM_OF_SDO-1:0] s_mosi_delayed;
   wire sclk;
   wire cs;
 
@@ -169,7 +169,8 @@ interface spi_vip_if #(
       return spi_mode;
     endfunction
 
-    virtual function logic get_mosi_delayed();
+    typedef logic [NUM_OF_SDO-1:0] mosi_array;
+    virtual function mosi_array get_mosi_delayed();
       return s_mosi_delayed;
     endfunction
 
@@ -179,7 +180,7 @@ interface spi_vip_if #(
 
     virtual task set_miso_drive(bit val[]);
       int j = 0;
-      for (int i = 0; i < NUM_OF_SDO; i++) begin
+      for (int i = 0; i < NUM_OF_SDI; i++) begin
         bit mask = (MASK_SPI_LANE >> i) & 1'b1;
         // $display("[INFO] @ %0t: %s", $time, $sformatf("MASK_SPI_LANE[%d] = %d", i, mask));
         if (mask) begin
@@ -188,30 +189,31 @@ interface spi_vip_if #(
         end else begin
           miso_drive[i] <= #(SLAVE_TOUT) 0;
         end
-        $display("[INFO] @ %0t: %s", $time, $sformatf("       val[%d] = %d", i, val[i]));
+        // $display("[INFO] @ %0t: %s", $time, $sformatf("       val[%d] = %d", i, val[i]));
       end
-
-      for (int i = 0; i < NUM_OF_SDO; i++) begin
-        $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
-      end
+      // $display("");
+      // for (int i = 0; i < NUM_OF_SDO; i++) begin
+      //   $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
+      // end
     endtask
 
     virtual task set_miso_drive_instantaneous(bit val[]);
       int j = 0;
-      for (int i = 0; i < NUM_OF_SDO; i++) begin
+      for (int i = 0; i < NUM_OF_SDI; i++) begin
         bit mask = (MASK_SPI_LANE >> i) & 1'b1;
         // $display("[INFO] @ %0t: %s", $time, $sformatf("MASK_SPI_LANE[%d] = %d", i, mask));
         if (mask) begin
-          miso_drive[i] <= val[j];
+          miso_drive[i] = val[j];
           j++;
         end else begin
-          miso_drive[i] <= 0;
+          miso_drive[i] = 0;
         end
-        $display("[INFO] @ %0t: %s", $time, $sformatf("       val[%d] = %d", i, val[i]));
+        // $display("[INFO] @ %0t: %s", $time, $sformatf("       val[%d] = %d", i, val[i]));
       end
-      for (int i = 0; i < NUM_OF_SDO; i++) begin
-        $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
-      end
+      // $display("");
+      // for (int i = 0; i < NUM_OF_SDO; i++) begin
+      //   $display("[INFO] @ %0t: %s", $time, $sformatf("miso_drive[%d] = %d", i, miso_drive[i]));
+      // end
     endtask
 
     virtual task wait_cs_active();

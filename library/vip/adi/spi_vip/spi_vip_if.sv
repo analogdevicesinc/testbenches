@@ -169,7 +169,6 @@ interface spi_vip_if #(
       return spi_mode;
     endfunction
 
-    typedef logic [NUM_OF_SDO-1:0] mosi_array;
     virtual function mosi_array get_mosi_delayed();
       return s_mosi_delayed;
     endfunction

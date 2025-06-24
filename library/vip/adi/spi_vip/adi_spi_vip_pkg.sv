@@ -90,7 +90,7 @@ package adi_spi_vip_pkg;
 
     protected task rx_mosi();
       bitqueue_t mosi_bits;
-      logic mosi_logic;
+      logic [vif.get_param_NUM_OF_SDO()-1:0] mosi_logic;
       bit mosi_bit;
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
@@ -144,11 +144,9 @@ package adi_spi_vip_pkg;
               end else begin
                 miso_mbx[i].try_peek(miso_data[i]);
               end
-              // this.info($sformatf("miso_data[%d] = %x", i, miso_data[i]), ADI_VERBOSITY_HIGH);
               // bit_str = $sformatf("%b", miso_data[i]);
-              // str = bit_str.substr(bit_str.len()-18, bit_str.len()-1);
-              // this.info($sformatf("miso_data[%d] = %s", i, str), ADI_VERBOSITY_HIGH);
-              this.info($sformatf("miso_data[%d] = %b", i, miso_data[i]), ADI_VERBOSITY_HIGH);
+              // str = bit_str.substr(bit_str.len()-vif.get_param_DATA_DLENGTH(), bit_str.len()-1);
+              // this.info($sformatf("miso_data[%d] = %s = %x", i, str, miso_data[i]), ADI_VERBOSITY_HIGH);
               miso_bits[i] = int_to_bitqueue(miso_data[i],vif.get_param_DATA_DLENGTH());
               // for (int j = 0; j < vif.get_param_DATA_DLENGTH(); j++) begin
               //   this.info($sformatf("miso_bits[%d][%d] = %d", i, j, miso_bits[i][j]), ADI_VERBOSITY_HIGH);
@@ -160,7 +158,7 @@ package adi_spi_vip_pkg;
             if (vif.get_param_CPHA() == 0) begin
               for (int i = 0; i < vif.get_param_NUM_ACTIVE_LANES(); i++) begin
                 miso_bits_msb[i] = bitqueue_pop_msb(miso_bits[i]);
-                this.info($sformatf("miso_bits_msb[%d] = %d", i, miso_bits_msb[i]), ADI_VERBOSITY_HIGH);
+                // this.info($sformatf("miso_bits_msb[%d] = %d", i, miso_bits_msb[i]), ADI_VERBOSITY_HIGH);
               end
               vif.set_miso_drive_instantaneous(miso_bits_msb);
             end
@@ -202,8 +200,10 @@ package adi_spi_vip_pkg;
                 break;
               end else begin
                 foreach (miso_bits[j]) begin
-                  miso_bits_msb[j] = bitqueue_pop_msb(miso_bits[j]);
-                  this.info($sformatf("miso_bits_msb[%d] = %d", j, miso_bits_msb[j]), ADI_VERBOSITY_HIGH);
+                  if (!(vif.get_param_CPHA() == 0 && i == vif.get_param_DATA_DLENGTH()-1)) begin
+                    miso_bits_msb[j] = bitqueue_pop_msb(miso_bits[j]);
+                    // this.info($sformatf("miso_bits_msb[%d] = %d", j, miso_bits_msb[j]), ADI_VERBOSITY_HIGH);
+                  end
                 end
 
                 // vif.drive_edge has arrived

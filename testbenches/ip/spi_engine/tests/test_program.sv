@@ -83,7 +83,7 @@ program test_program (
   // Wrapper function for SPI receive (from DUT)
   // --------------------------
   task spi_receive(
-      output [`DATA_DLENGTH:0]  data[]);
+      output [`DATA_DLENGTH-1:0]  data[]);
       // spi_env.spi_agent.sequencer.receive_data(data);
     foreach (data[i]) begin
       spi_env.spi_agent.sequencer.receive_data(data[i]);
@@ -94,7 +94,7 @@ program test_program (
   // Wrapper function for SPI send (to DUT)
   // --------------------------
   task spi_send(
-      input [`DATA_DLENGTH:0]  data[]);
+      input [`DATA_DLENGTH-1:0]  data[]);
     spi_env.spi_agent.sequencer.send_data(data);
     // foreach (data[i]) begin
     //   spi_env.spi_agent.sequencer.send_data(data[i]);
@@ -403,8 +403,6 @@ program test_program (
 
     rx_data_cast = new [`NUM_ACTIVE_LANES];
     tx_data_cast = new [`NUM_ACTIVE_LANES];
-    `INFO(("SIZE OF RX FIFO %d", rx_data_cast.size()), ADI_VERBOSITY_LOW);
-    `INFO(("SIZE OF TX FIFO %d", tx_data_cast.size()), ADI_VERBOSITY_LOW);
 
     rx_data             = new [`NUM_ACTIVE_LANES];
     tx_data             = new [`NUM_ACTIVE_LANES];
@@ -421,9 +419,12 @@ program test_program (
         tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
 
         sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j] = rx_data[j];
-        `INFO(("rx_data[%d] = %x", j, rx_data[j]), ADI_VERBOSITY_LOW);
+        // `INFO(("rx_data[%d] = %x", j, rx_data[j]), ADI_VERBOSITY_LOW);
         // `INFO(("sdi_fifo_data_store[%d] = %x", (i * (`NUM_ACTIVE_LANES) + j), sdi_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j]), ADI_VERBOSITY_LOW);
         sdo_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j] = tx_data[j];
+        // `INFO(("tx_data[%d] = %x", j, tx_data[j]), ADI_VERBOSITY_LOW);
+        // `INFO(("tx_data_cast[%d] = %x", j, tx_data_cast[j]), ADI_VERBOSITY_LOW);
+        // `INFO(("sdo_fifo_data_store[%d] = %x", (i * (`NUM_ACTIVE_LANES) + j), sdo_fifo_data_store[i * (`NUM_ACTIVE_LANES) + j]), ADI_VERBOSITY_LOW);
       end
       
       spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits
@@ -456,9 +457,11 @@ program test_program (
     end
     `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
 
-    if (sdo_fifo_data !== sdo_fifo_data_store) begin
-      `INFO(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data, sdo_fifo_data_store), ADI_VERBOSITY_LOW);
-      `FATAL(("Fifo Write Test FAILED"));
+    foreach (sdo_fifo_data[i]) begin
+      if (sdo_fifo_data[i] !== sdo_fifo_data_store[i]) begin
+        `INFO(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data[i], sdo_fifo_data_store[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("Fifo Write Test FAILED"));
+      end
     end
     `INFO(("Fifo Write Test PASSED"), ADI_VERBOSITY_LOW);
   endtask

@@ -463,6 +463,7 @@ ad_connect application_core/output_axis jesd_rx_axis/S_AXIS
 
 ad_connect enable_io_vip/clk input_clk
 ad_connect enable_io_vip/out application_core/input_enable
+ad_connect enable_io_vip/out application_core/output_enable
 
 ad_connect application_core/jtag_tdi GND
 ad_connect application_core/jtag_tms GND

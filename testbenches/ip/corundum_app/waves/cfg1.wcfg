@@ -389,6 +389,10 @@
       <obj_property name="label">Direct</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/application_core/s_axis_direct_tx">
+         <obj_property name="ElementShortName">s_axis_direct_tx</obj_property>
+         <obj_property name="ObjectShortName">s_axis_direct_tx</obj_property>
+      </wvobject>
       <wvobject type="protoinst" fp_name="/system_tb/test_harness/application_core/m_axis_direct_tx">
          <obj_property name="ElementShortName">m_axis_direct_tx</obj_property>
          <obj_property name="ObjectShortName">m_axis_direct_tx</obj_property>
@@ -409,9 +413,30 @@
          <obj_property name="ElementShortName">s_axis_direct_rx</obj_property>
          <obj_property name="ObjectShortName">s_axis_direct_rx</obj_property>
       </wvobject>
+      <wvobject type="protoinst" fp_name="/system_tb/test_harness/application_core/m_axis_direct_rx">
+         <obj_property name="ElementShortName">m_axis_direct_rx</obj_property>
+         <obj_property name="ObjectShortName">m_axis_direct_rx</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/datapath_switch">
          <obj_property name="ElementShortName">datapath_switch</obj_property>
          <obj_property name="ObjectShortName">datapath_switch</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group300">
+      <obj_property name="label">JESD Output</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/application_core/output_axis_tdata">
+         <obj_property name="ElementShortName">output_axis_tdata[2047:0]</obj_property>
+         <obj_property name="ObjectShortName">output_axis_tdata[2047:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/output_axis_tvalid">
+         <obj_property name="ElementShortName">output_axis_tvalid</obj_property>
+         <obj_property name="ObjectShortName">output_axis_tvalid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/application_core/output_axis_tready">
+         <obj_property name="ElementShortName">output_axis_tready</obj_property>
+         <obj_property name="ObjectShortName">output_axis_tready</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider141" type="divider">
@@ -421,6 +446,10 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/input_enable">
       <obj_property name="ElementShortName">input_enable[7:0]</obj_property>
       <obj_property name="ObjectShortName">input_enable[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/application_core/output_enable">
+      <obj_property name="ElementShortName">output_enable[7:0]</obj_property>
+      <obj_property name="ObjectShortName">output_enable[7:0]</obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group149">
       <obj_property name="label">Sample counter</obj_property>
@@ -432,33 +461,33 @@
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/input_sample_total_requested">
-         <obj_property name="ElementShortName">input_sample_total_requested[15:0]</obj_property>
-         <obj_property name="ObjectShortName">input_sample_total_requested[15:0]</obj_property>
+         <obj_property name="ElementShortName">input_sample_total_requested[31:0]</obj_property>
+         <obj_property name="ObjectShortName">input_sample_total_requested[31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/input_count_requested">
-         <obj_property name="ElementShortName">input_count_requested[15:0]</obj_property>
-         <obj_property name="ObjectShortName">input_count_requested[15:0]</obj_property>
+         <obj_property name="ElementShortName">input_count_requested[31:0]</obj_property>
+         <obj_property name="ObjectShortName">input_count_requested[31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/input_counter">
-         <obj_property name="ElementShortName">input_counter[15:0]</obj_property>
-         <obj_property name="ObjectShortName">input_counter[15:0]</obj_property>
+         <obj_property name="ElementShortName">input_counter[31:0]</obj_property>
+         <obj_property name="ObjectShortName">input_counter[31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/output_count_requested">
-         <obj_property name="ElementShortName">output_count_requested[15:0]</obj_property>
-         <obj_property name="ObjectShortName">output_count_requested[15:0]</obj_property>
+         <obj_property name="ElementShortName">output_count_requested[31:0]</obj_property>
+         <obj_property name="ObjectShortName">output_count_requested[31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/output_count_requested_max">
-         <obj_property name="ElementShortName">output_count_requested_max[15:0]</obj_property>
-         <obj_property name="ObjectShortName">output_count_requested_max[15:0]</obj_property>
+         <obj_property name="ElementShortName">output_count_requested_max[31:0]</obj_property>
+         <obj_property name="ObjectShortName">output_count_requested_max[31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/system_tb/test_harness/application_core/inst/application_tx_inst/output_counter">
-         <obj_property name="ElementShortName">output_counter[15:0]</obj_property>
-         <obj_property name="ObjectShortName">output_counter[15:0]</obj_property>
+         <obj_property name="ElementShortName">output_counter[31:0]</obj_property>
+         <obj_property name="ObjectShortName">output_counter[31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
    </wvobject>

@@ -133,8 +133,6 @@ package adi_spi_vip_pkg;
         int miso_data[] = new[vif.get_param_NUM_ACTIVE_LANES()];
         bitqueue_t miso_bits [] = new[vif.get_param_NUM_ACTIVE_LANES()];
         bit miso_bits_msb [] = new[vif.get_param_NUM_ACTIVE_LANES()];
-        string bit_str;
-        string str;
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
           vif.wait_cs_active();
@@ -156,13 +154,7 @@ package adi_spi_vip_pkg;
               end else begin
                 miso_mbx[i].try_peek(miso_data[i]);
               end
-              // bit_str = $sformatf("%b", miso_data[i]);
-              // str = bit_str.substr(bit_str.len()-vif.get_param_DATA_DLENGTH(), bit_str.len()-1);
-              // this.info($sformatf("miso_data[%d] = %s = %x", i, str, miso_data[i]), ADI_VERBOSITY_HIGH);
               miso_bits[i] = int_to_bitqueue(miso_data[i],vif.get_param_DATA_DLENGTH());
-              // for (int j = 0; j < vif.get_param_DATA_DLENGTH(); j++) begin
-              //   this.info($sformatf("miso_bits[%d][%d] = %d", i, j, miso_bits[i][j]), ADI_VERBOSITY_HIGH);
-              // end
               pending_mbx = 1'b0;
             end
 
@@ -170,7 +162,6 @@ package adi_spi_vip_pkg;
             if (vif.get_param_CPHA() == 0) begin
               for (int i = 0; i < vif.get_param_NUM_ACTIVE_LANES(); i++) begin
                 miso_bits_msb[i] = bitqueue_pop_msb(miso_bits[i]);
-                // this.info($sformatf("miso_bits_msb[%d] = %d", i, miso_bits_msb[i]), ADI_VERBOSITY_HIGH);
               end
               vif.set_miso_drive_instantaneous(miso_bits_msb);
             end
@@ -214,7 +205,6 @@ package adi_spi_vip_pkg;
                 foreach (miso_bits[j]) begin
                   if (!(vif.get_param_CPHA() == 0 && i == vif.get_param_DATA_DLENGTH()-1)) begin
                     miso_bits_msb[j] = bitqueue_pop_msb(miso_bits[j]);
-                    // this.info($sformatf("miso_bits_msb[%d] = %d", j, miso_bits_msb[j]), ADI_VERBOSITY_HIGH);
                   end
                 end
 

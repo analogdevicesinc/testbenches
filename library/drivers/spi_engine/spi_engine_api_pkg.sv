@@ -98,7 +98,7 @@ package spi_engine_api_pkg;
       end
     endtask
 
-    task sdi_fifo_read(ref logic [31:0] data []);
+    task sdi_fifo_read(ref logic [31:0] data[]);
       foreach (data[i]) begin
         this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO), val);
         data[i] = `GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(val);

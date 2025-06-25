@@ -10,8 +10,8 @@ set ad_project_params(SDI_DELAY)            0
 set ad_project_params(ECHO_SCLK)            0
 set ad_project_params(CMD_MEM_ADDR_WIDTH)   4
 set ad_project_params(DATA_MEM_ADDR_WIDTH)  4
-set ad_project_params(SDI_FIFO_ADDR_WIDTH)  5
-set ad_project_params(SDO_FIFO_ADDR_WIDTH)  5
+set ad_project_params(SDI_FIFO_ADDR_WIDTH)  7
+set ad_project_params(SDO_FIFO_ADDR_WIDTH)  7
 set ad_project_params(SYNC_FIFO_ADDR_WIDTH) 4
 set ad_project_params(CMD_FIFO_ADDR_WIDTH)  4
 set ad_project_params(SDO_STREAMING)        0
@@ -28,7 +28,7 @@ set ad_project_params(MASTER_TIN)           0
 set ad_project_params(MASTER_TOUT)          0
 set ad_project_params(CS_TO_MISO)           0
 set ad_project_params(CLOCK_DIVIDER)        2
-set ad_project_params(NUM_OF_WORDS)         6
+set ad_project_params(NUM_OF_WORDS)         3
 set ad_project_params(NUM_OF_TRANSFERS)     5
 set ad_project_params(NUM_ACTIVE_LANES)     4
 set ad_project_params(MASK_SPI_LANE)        15

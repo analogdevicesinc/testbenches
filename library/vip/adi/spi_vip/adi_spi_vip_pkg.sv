@@ -68,12 +68,12 @@ package adi_spi_vip_pkg;
       this.active = 0;
       this.stop_flag = 0;
       this.default_miso_data = vif.get_param_DEFAULT_MISO_DATA();
-      this.miso_mbx = new[$countones(vif.get_param_SPI_LANE_MASK)];
+      this.miso_mbx = new[vif.get_param_NUM_OF_SDI()];
       this.mosi_mbx = new[vif.get_param_NUM_OF_SDO()];
-      for (int i = 0; i < $countones(vif.get_param_SPI_LANE_MASK); i++) begin
+      foreach (miso_mbx[i]) begin
         this.miso_mbx[i] = new();
       end
-      for (int i = 0; i < vif.get_param_NUM_OF_SDO(); i++) begin
+      foreach (mosi_mbx[i]) begin
         this.mosi_mbx[i] = new();
       end
     endfunction
@@ -130,15 +130,15 @@ package adi_spi_vip_pkg;
     protected task tx_miso();
         bit using_default;
         bit pending_mbx;
-        int miso_data[] = new[$countones(vif.get_param_SPI_LANE_MASK)];
-        bitqueue_t miso_bits [] = new[$countones(vif.get_param_SPI_LANE_MASK)];
-        bit miso_bits_msb [] = new[$countones(vif.get_param_SPI_LANE_MASK)];
+        int miso_data[] = new[vif.get_param_NUM_OF_SDI()];
+        bitqueue_t miso_bits [] = new[vif.get_param_NUM_OF_SDI()];
+        bit miso_bits_msb [] = new[vif.get_param_NUM_OF_SDI()];
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
           vif.wait_cs_active();
           while (vif.get_cs_active()) begin
             // try to get an item from the mailbox, without popping it
-            for (int i = 0; i < $countones(vif.get_param_SPI_LANE_MASK); i++) begin
+            foreach (miso_mbx[i]) begin
               if  (!miso_mbx[i].try_peek(miso_data[i])) begin
                 using_default = 1'b1;
                 break;
@@ -148,7 +148,7 @@ package adi_spi_vip_pkg;
             end
 
             //if one lane does not have valid data, all of the lanes use default_data
-            for (int i = 0; i < $countones(vif.get_param_SPI_LANE_MASK); i++) begin
+            foreach (miso_mbx[i]) begin
               if (using_default) begin
                 miso_data[i] = default_miso_data;
               end else begin
@@ -278,17 +278,20 @@ package adi_spi_vip_pkg;
       end
     endtask
 
-    task flush_tx(); //fix it, it is going to cause a deadlock
-      // fork
-        // begin: isolation_process
+    task flush_tx();
+      fork
+        begin: isolation_process
           foreach (miso_mbx[i]) begin
-            // fork
-              wait (miso_mbx[i].num() == 0);
-            // join_none
+            fork
+              automatic int k = i; 
+              begin
+                wait (miso_mbx[k].num() == 0);
+              end
+            join_none
           end
-          // wait fork;
-        // end : isolation_process
-      // join
+          wait fork;
+        end : isolation_process
+      join
     endtask
 
     task start();

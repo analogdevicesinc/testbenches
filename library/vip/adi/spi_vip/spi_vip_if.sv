@@ -177,28 +177,14 @@ interface spi_vip_if #(
     endfunction
 
     virtual task set_miso_drive(bit val[]);
-      int j = 0;
-      for (int i = 0; i < NUM_OF_SDI; i++) begin
-        bit mask = (SPI_LANE_MASK >> i) & 1'b1;
-        if (mask) begin
-          miso_drive[i] <= #(SLAVE_TOUT) val[j];
-          j++;
-        end else begin
-          miso_drive[i] <= #(SLAVE_TOUT) 0;
-        end
+      foreach (val[i]) begin
+        miso_drive[i] <= #(SLAVE_TOUT) val[i];
       end
     endtask
 
     virtual task set_miso_drive_instantaneous(bit val[]);
-      int j = 0;
-      for (int i = 0; i < NUM_OF_SDI; i++) begin
-        bit mask = (SPI_LANE_MASK >> i) & 1'b1;
-        if (mask) begin
-          miso_drive[i] = val[j];
-          j++;
-        end else begin
-          miso_drive[i] = 0;
-        end
+      foreach (val[i]) begin
+        miso_drive[i] = val[i];
       end
     endtask
 

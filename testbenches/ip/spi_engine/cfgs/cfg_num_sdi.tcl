@@ -30,8 +30,7 @@ set ad_project_params(CS_TO_MISO)           0
 set ad_project_params(CLOCK_DIVIDER)        2
 set ad_project_params(NUM_OF_WORDS)         3
 set ad_project_params(NUM_OF_TRANSFERS)     5
-set ad_project_params(NUM_ACTIVE_LANES)     4
-set ad_project_params(MASK_SPI_LANE)        15
+set ad_project_params(SPI_LANE_MASK)        15
 set ad_project_params(CS_ACTIVE_HIGH)       0
 set ad_project_params(ECHO_SCLK_DELAY)      0.1
 
@@ -47,10 +46,9 @@ set spi_s_vip_cfg [ list \
     MASTER_TOUT      $ad_project_params(MASTER_TOUT)      \
     CS_TO_MISO       $ad_project_params(CS_TO_MISO)       \
     DATA_DLENGTH     $ad_project_params(DATA_DLENGTH)     \
-    NUM_ACTIVE_LANES $ad_project_params(NUM_ACTIVE_LANES) \
     NUM_OF_SDI       $ad_project_params(NUM_OF_SDI)       \
     NUM_OF_SDO       $ad_project_params(NUM_OF_SDO)       \
-    MASK_SPI_LANE    $ad_project_params(MASK_SPI_LANE)    \
+    SPI_LANE_MASK    $ad_project_params(SPI_LANE_MASK)    \
 ]
 set ad_project_params(spi_s_vip_cfg) $spi_s_vip_cfg
 

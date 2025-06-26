@@ -56,7 +56,7 @@ package adi_spi_vip_if_base_pkg;
 
     pure virtual function int get_param_NUM_OF_SDO();
 
-    pure virtual function int get_param_NUM_ACTIVE_LANES();
+    pure virtual function int get_param_SPI_LANE_MASK();
 
     pure virtual function int get_param_SLAVE_TIN();
 

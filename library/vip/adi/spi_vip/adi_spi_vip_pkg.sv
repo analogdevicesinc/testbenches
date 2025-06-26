@@ -41,6 +41,8 @@ package adi_spi_vip_pkg;
   import adi_vip_pkg::*;
   import adi_environment_pkg::*;
   import adi_spi_vip_if_base_pkg::*;
+  import pub_sub_pkg::*;
+  import adi_datatypes_pkg::*;
 
   // forward declaration to avoid errors
   typedef class adi_spi_agent;
@@ -49,10 +51,12 @@ package adi_spi_vip_pkg;
 
     typedef bit bitqueue_t [$];
     protected mailbox mosi_mbx;
+    protected mailbox mosi_monitor_mbx;
     mailbox miso_mbx;
+    protected mailbox miso_monitor_mbx;
     protected bit active;
     protected bit stop_flag;
-    protected int default_miso_data;
+    protected adi_fifo #(bit) default_miso_data;
     protected event tx_mbx_updated;
 
     adi_spi_vip_if_base vif;
@@ -67,9 +71,10 @@ package adi_spi_vip_pkg;
       this.vif = intf;
       this.active = 0;
       this.stop_flag = 0;
-      this.default_miso_data = vif.get_param_DEFAULT_MISO_DATA();
       this.miso_mbx = new();
       this.mosi_mbx = new();
+      //this.default_miso_data = new("default MISO data",32);
+      this.set_default_miso_data(vif.get_param_DEFAULT_MISO_DATA());
     endfunction
 
 
@@ -86,7 +91,7 @@ package adi_spi_vip_pkg;
     endfunction : clear_active
 
     protected task rx_mosi();
-      bitqueue_t mosi_bits;
+      adi_fifo #(bit) mosi_bits = new("MOSI bits",32); // max DATA_DLENGTH=32
       logic mosi_logic;
       bit mosi_bit;
       forever begin
@@ -96,17 +101,18 @@ package adi_spi_vip_pkg;
             for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               if (!vif.get_cs_active()) begin
                 break;
-                mosi_bits.delete();
+                mosi_bits.clear();
               end
               vif.wait_for_sample_edge();
               mosi_logic = vif.get_mosi_delayed();
               assert(!$isunknown(mosi_logic))
-              else this.error($sformatf("[SPI VIP] MOSI Rx: unknown mosi bit at sample edge!"));
+              else this.error($sformatf("MOSI Rx: unknown MOSI bit at sample edge!"));
               mosi_bit = bit'(mosi_logic);
-              bitqueue_push_lsb(mosi_bits, mosi_bit);
+              mosi_bits.push(mosi_bit);
             end
-            mosi_mbx.put(bitqueue_to_int(mosi_bits));
-            mosi_bits.delete();
+            mosi_mbx.put(mosi_bits);
+            mosi_monitor_mbx.put(mosi_bits);
+            mosi_bits.clear();
           end
         end
       end
@@ -115,24 +121,24 @@ package adi_spi_vip_pkg;
     protected task tx_miso();
         bit using_default;
         bit pending_mbx;
-        int miso_data;
-        bitqueue_t miso_bits;
+        //int miso_data;
+        //bitqueue_t miso_bits;
+        adi_fifo #(bit) miso_bits; // max DATA_DLENGTH=32
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
           vif.wait_cs_active();
           while (vif.get_cs_active()) begin
             // try to get an item from the mailbox, without popping it
-            if (!miso_mbx.try_peek(miso_data)) begin
-              miso_data = default_miso_data;
+            if (!miso_mbx.try_peek(miso_bits)) begin
+              miso_bits = new default_miso_data;
               using_default = 1'b1;
             end else begin
               using_default = 1'b0;
             end
-            miso_bits = int_to_bitqueue(miso_data,vif.get_param_DATA_DLENGTH());
             pending_mbx = 1'b0;
             // early drive and shift if CPHA=0
             if (vif.get_param_CPHA() == 0) begin
-              vif.set_miso_drive_instantaneous(bitqueue_pop_msb(miso_bits));
+              vif.set_miso_drive_instantaneous(miso_bits.pop());
             end
             for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               fork
@@ -157,19 +163,19 @@ package adi_spi_vip_pkg;
                 if (i != 0) begin
                   this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
                 end
-                miso_bits.delete();
+                miso_bits.clear();
                 break;
               end else if (pending_mbx) begin
                 // we were going to transmit default data, but new data arrived between the cs edge and vif.drive_edge
                 using_default = 1'b0;
                 pending_mbx = 1'b0;
-                miso_bits.delete();
+                miso_bits.clear();
                 break;
               end else begin
                 // vif.drive_edge has arrived
                 // don't shift at last edge if CPHA=0
                 if (!(vif.get_param_CPHA() == 0 && i == vif.get_param_DATA_DLENGTH()-1)) begin
-                  vif.set_miso_drive(bitqueue_pop_msb(miso_bits));
+                  vif.set_miso_drive(miso_bits.pop());
                 end
                 if (i == vif.get_param_DATA_DLENGTH()-1) begin
                   this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
@@ -215,18 +221,32 @@ package adi_spi_vip_pkg;
     function void set_default_miso_data(
       input bit [vif.get_param_DATA_DLENGTH()-1:0] default_data
     );
-      this.default_miso_data = default_data;
+      adi_fifo #(bit) default_bits = new("default bits",32); // max DATA_DLENGTH=32
+      for (int i=vif.get_param_DATA_DLENGTH()-1, i>=0,) begin
+        default_bits.push(default_data[i]);
+      end
+      this.default_miso_data = default_bits;
     endfunction : set_default_miso_data
 
     task put_tx_data(
-      input int unsigned data);
+      input adi_fifo #(bit) data);
       miso_mbx.put(data);
       ->tx_mbx_updated;
     endtask
 
     task get_rx_data(
-      output int unsigned data);
+      output adi_fifo #(bit) data);
       mosi_mbx.get(data);
+    endtask
+
+    task get_mosi_transaction(
+      output adi_fifo #(bit) data);
+      mosi_monitor_mbx.get(data);
+    endtask
+
+    task get_miso_transaction(
+      output adi_fifo #(bit) data);
+      miso_monitor_mbx.get(data);
     endtask
 
     task flush_tx();
@@ -265,33 +285,6 @@ package adi_spi_vip_pkg;
       end
     endtask
 
-    automatic function int bitqueue_to_int(bitqueue_t bitq);
-      int idx = 0;
-      int data = 0;
-      while (bitq.size() != 0) begin
-        data |= (bitq.pop_front() << idx);
-        idx++;
-      end
-      return data;
-    endfunction
-
-    automatic function bitqueue_t int_to_bitqueue(int data, int n_bits);
-      bitqueue_t bitq;
-      for (int i =0; i<n_bits; i++) begin
-        bitq.push_back((data>>i) & 1'b1);
-      end
-      return bitq;
-    endfunction
-
-    automatic function bit bitqueue_pop_msb(ref bitqueue_t bitq);
-      bit data;
-      data = bitq.pop_back();
-      return data;
-    endfunction
-
-    automatic function void bitqueue_push_lsb(ref bitqueue_t bitq, bit lsb);
-      bitq.push_front(lsb);
-    endfunction
   endclass
 
 
@@ -309,16 +302,34 @@ package adi_spi_vip_pkg;
       this.driver = driver;
     endfunction: new
 
+    // TODO: decide whether this is better with an int unsigned or bit fifo parameter
+    // bit fifo, while cleaner, would force whoever uses this class to be aware of the datatypes
     virtual task automatic send_data(input int unsigned data);
-      this.driver.put_tx_data(data);
+      adi_fifo #(bit) tx_data = new("tx data",32);
+      for (int i=driver.vif.get_param_DATA_DLENGTH()-1, i>=0,) begin
+        tx_data.push((data>>i)&1);
+      end
+      this.driver.put_tx_data(tx_data);
     endtask : send_data
 
+    // TODO: decide whether this is better with an int unsigned or bit fifo parameter
+    // bit fifo, while cleaner, would force whoever uses this class to be aware of the datatypes
     virtual task automatic receive_data(output int unsigned data);
-      this.driver.get_rx_data(data);
+      adi_fifo #(bit) rx_data;
+      this.driver.get_rx_data(rx_data);
+      data = 0;
+      for (int i=driver.vif.get_param_DATA_DLENGTH()-1, i>=0,) begin
+        data = ((data<<1) & rx_data.pop());
+      end
     endtask : receive_data
 
+    // TODO: does this task make sense with the new infrastructure?
     virtual task automatic receive_data_verify(input int unsigned expected);
       int unsigned received;
+      adi_fifo #(bit) expected_data = new("expected data",32);
+      for (int i=driver.vif.get_param_DATA_DLENGTH()-1, i>=0,) begin
+        expected_data.push((expected>>i)&1);
+      end
       this.driver.get_rx_data(received);
       if (received !== expected) begin
         this.error($sformatf("Data mismatch. Received : %h; expected %h", received, expected));
@@ -335,11 +346,101 @@ package adi_spi_vip_pkg;
 
   endclass
 
+  class adi_spi_monitor extends adi_monitor;
+
+    unsigned int mosi_publisher; // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
+    unsigned int miso_publisher; // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
+    protected adi_spi_driver driver;
+    protected bit enabled;
+    protected bit stop_flag;
+
+    function new(
+      input string name,
+      input adi_spi_driver driver,
+      input adi_spi_agent parent = null);
+
+      super.new(name, parent);
+      this.driver = driver;
+      this.mosi_publisher = new("MOSI Publisher", this);
+      this.miso_publisher = new("MISO Publisher", this);
+    endfunction: new
+
+    task run();
+      if (this.enabled) begin
+        this.error($sformatf("Monitor is already running!");
+        return;
+      end
+
+      this.enabled = 1;
+      this.info($sformatf("Monitor enabled"), ADI_VERBOSITY_MEDIUM);
+
+      fork begin
+        fork
+          begin
+            this.get_transaction();
+          end
+          begin
+            @(posedge this.stop_flag);
+            this.stop_flag = 0;
+            disable fork;
+          end
+        join_none
+      end join
+    endtask: run
+
+    function void stop();
+      if (this.get_active()) begin
+        this.stop_flag = 1;
+      end else begin
+        this.error($sformatf("Already inactive!"));
+      end
+    endfunction: stop
+
+    task get_transaction();
+      adi_fifo #(bit) mosi_transaction;
+      adi_fifo #(bit) miso_transaction;
+      // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
+      int unsigned mosi_word;
+      int unsigned miso_word;
+      int unsigned word_len = driver.vif.get_param_DATA_DLENGTH();
+      fork
+        begin
+          forever begin
+            this.driver.get_mosi_transaction(mosi_transaction);
+            this.info($sformatf("Caught a MOSI SPI transaction: %d bits", mosi_transaction.size()), ADI_VERBOSITY_MEDIUM);
+            // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
+            mosi_word = 0;
+            for (int i=word_len-1, i>=0,) begin
+              mosi_word = ((mosi_word<<1) & mosi_transaction.pop());
+            end
+            this.mosi_publisher.notify(mosi_word);
+            mosi_transaction.clear();
+          end
+        end
+        begin
+          forever begin
+            this.driver.get_miso_transaction(miso_transaction);
+            this.info($sformatf("Caught a MISO SPI transaction: %d bits", miso_transaction.size()), ADI_VERBOSITY_MEDIUM);
+            // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
+            miso_word = 0;
+            for (int i=word_len-1, i>=0,) begin
+              miso_word = ((miso_word<<1) & miso_transaction.pop());
+            end
+            this.miso_publisher.notify(miso_transaction);
+            miso_transaction.clear();
+          end
+        end
+      join
+    endtask: get_transaction
+
+  endclass
+
 
   class adi_spi_agent extends adi_agent;
 
     protected adi_spi_driver driver;
     adi_spi_sequencer sequencer;
+    adi_spi_monitor monitor;
 
     function new(
       input string name,
@@ -350,16 +451,19 @@ package adi_spi_vip_pkg;
 
       this.driver = new("Driver", intf, this);
       this.sequencer = new("Sequencer", this.driver, this);
+      this.monitor = new("Monitor", this.driver, this);
     endfunction
 
     virtual task start();
       fork
         this.driver.start();
+        this.monitor.start();
       join_none
     endtask : start
 
     virtual task stop();
       this.driver.stop();
+      this.monitor.stop();
     endtask : stop
 
   endclass

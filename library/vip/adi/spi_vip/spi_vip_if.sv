@@ -40,8 +40,7 @@ interface spi_vip_if #(
       DATA_DLENGTH      = 16,
       NUM_OF_SDI        = 1,
       NUM_OF_SDO        = 1,
-      NUM_ACTIVE_LANES  = 1,
-      MASK_SPI_LANE     = 8'hFF,
+      SPI_LANE_MASK     = 8'hFF,
       SLAVE_TIN         = 0,
       SLAVE_TOUT        = 0,
       MASTER_TIN        = 0,
@@ -74,8 +73,8 @@ interface spi_vip_if #(
   wire cs;
 
   localparam CS_ACTIVE_LEVEL = (INV_CS) ? 1'b1 : 1'b0;
-  localparam DEFAULT_MASK_SDI_SPI_LANE = (2 ** NUM_OF_SDI) - 1; //by default all lanes are enabled
-  localparam DEFAULT_MASK_SDO_SPI_LANE = (2 ** NUM_OF_SDO) - 1; //by default all lanes are enabled
+  // localparam DEFAULT_MASK_SDI_SPI_LANE = (2 ** NUM_OF_SDI) - 1; //by default all lanes are enabled
+  // localparam DEFAULT_MASK_SDO_SPI_LANE = (2 ** NUM_OF_SDO) - 1; //by default all lanes are enabled
 
   // cs, sclk sources
   assign cs = (spi_mode != SPI_MODE_SLAVE)  ? m_cs : s_cs;
@@ -137,8 +136,8 @@ interface spi_vip_if #(
       return NUM_OF_SDO;
     endfunction
 
-    virtual function int get_param_NUM_ACTIVE_LANES();
-      return NUM_ACTIVE_LANES;
+    virtual function int get_param_SPI_LANE_MASK();
+      return SPI_LANE_MASK;
     endfunction
 
     virtual function int get_param_SLAVE_TIN();
@@ -180,7 +179,7 @@ interface spi_vip_if #(
     virtual task set_miso_drive(bit val[]);
       int j = 0;
       for (int i = 0; i < NUM_OF_SDI; i++) begin
-        bit mask = (MASK_SPI_LANE >> i) & 1'b1;
+        bit mask = (SPI_LANE_MASK >> i) & 1'b1;
         if (mask) begin
           miso_drive[i] <= #(SLAVE_TOUT) val[j];
           j++;
@@ -193,7 +192,7 @@ interface spi_vip_if #(
     virtual task set_miso_drive_instantaneous(bit val[]);
       int j = 0;
       for (int i = 0; i < NUM_OF_SDI; i++) begin
-        bit mask = (MASK_SPI_LANE >> i) & 1'b1;
+        bit mask = (SPI_LANE_MASK >> i) & 1'b1;
         if (mask) begin
           miso_drive[i] = val[j];
           j++;

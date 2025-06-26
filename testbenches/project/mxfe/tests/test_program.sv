@@ -69,6 +69,11 @@ program test_program;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
+  localparam TX_FSRC_ACCUM_WIDTH = 64;
+  localparam TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO = 0.6666667;
+  localparam logic [TX_FSRC_ACCUM_WIDTH:0] ONE_FIXED = {1'b1, {TX_FSRC_ACCUM_WIDTH{1'b0}}};
+  localparam logic [TX_FSRC_ACCUM_WIDTH-1:0] TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED = ONE_FIXED * TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO;
+
   initial begin
 
     //creating environment
@@ -148,15 +153,16 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h8, 32'hDEADBEEF);
     base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h8, 32'hBEEFDEAD);
 
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h18, 32'hFF); // CONV_MASK
-    val64 = 64'h05FF_1234_0000_0000;
+    // NS is 0 (NS_PARAM = 0)
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h18, 32'hFF); // CONV_MAS
     for (int i = 0; i <= 15; i++) begin
+      val64 = (~TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED + 64'b1) + (i * TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED);
       base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h28, val64[31:0]);
       base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h2c, val64[63:32]);
       base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h24, i);
       val64 += 64'h0FFF_E234_0000_0000;
     end
-    val64 = 64'hAFFF_DEAD_BEEF_1234;
+    val64 = TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED;
     base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h1c, val64[31:0]); // Add val
     base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h20, val64[63:32]); // Add val
 

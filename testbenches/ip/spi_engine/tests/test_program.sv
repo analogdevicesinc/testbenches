@@ -197,6 +197,9 @@ program test_program (
   //---------------------------------------------------------------------------
   task generate_transfer_cmd(
       input [7:0] sync_id);
+    
+    // define spi lane mask
+    spi_api.fifo_command(`INST_SPI_LANE_MASK);
     // assert CSN
     spi_api.fifo_command(`SET_CS(8'hFE));
     // transfer data
@@ -307,6 +310,7 @@ program test_program (
     dma_api.transfer_start();
 
     // Configure the Offload module
+    // spi_api.fifo_offload_command(`INST_SPI_LANE_MASK);
     spi_api.fifo_offload_command(`INST_CFG);
     spi_api.fifo_offload_command(`INST_PRESCALE);
     spi_api.fifo_offload_command(`INST_DLENGTH);
@@ -382,7 +386,7 @@ program test_program (
                         j, sdo_write_data[j],
                         (i * `NUM_OF_SDO + j),
                         sdo_write_data_store[(i * `NUM_OF_SDO + j)]), ADI_VERBOSITY_LOW);
-            `ERROR(("Offload Write Test FAILED"));
+            `FATAL(("Offload Write Test FAILED"));
           end
         `else
           if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_SDO + j) % (`NUM_OF_WORDS * `NUM_OF_SDO)]) begin

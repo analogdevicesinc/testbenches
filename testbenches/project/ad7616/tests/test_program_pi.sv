@@ -65,6 +65,9 @@ program test_program_pi (
   input         sys_clk,
   input         rx_busy);
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
 // --------------------------
@@ -115,7 +118,7 @@ initial begin
 
   sanity_test();
 
-  #100
+  #100ns;
 
   data_acquisition_test();
 
@@ -221,11 +224,11 @@ task data_acquisition_test();
 
      // Configure AXI_AD7616
     axi_write (`AXI_AD7616_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(0));
-    #5000
+    #5000ns;
     axi_write (`AXI_AD7616_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
 
     @(negedge rx_busy)
-    #200
+    #200ns;
 
     transfer_status = 1;
 
@@ -233,7 +236,7 @@ task data_acquisition_test();
 
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
-    #100
+    #100ns;
     @(negedge rx_rd_n_negedge_s);
     @(posedge sys_clk);
     transfer_status = 0;
@@ -264,10 +267,9 @@ task data_acquisition_test();
     //set HDL config mode
     axi_write(`AXI_AD7616_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h100); // set default
 
-    #2000
+    #2000ns;
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
-      #1
       captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end
 

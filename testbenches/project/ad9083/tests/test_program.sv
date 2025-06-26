@@ -58,6 +58,9 @@ parameter TX_OUT_BYTES = 8;
 
 program test_program;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
   bit [31:0] val;

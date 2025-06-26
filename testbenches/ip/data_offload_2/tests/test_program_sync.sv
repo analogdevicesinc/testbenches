@@ -88,10 +88,8 @@ module test_program_sync (
     start_clocks();
     sys_reset();
 
-    #1
     env.start();
 
-    #100
     `INFO(("Bring up IP from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
 
@@ -105,26 +103,26 @@ module test_program_sync (
 
     // @env.src_axis_seq.queue_empty;
     // init_req <= 1'b0;
-    #100
+    #100ns;
 
 
     sync_ext <= 1'b1;
     @(posedge `TH.`DST_CLK.clk_out);
     @(posedge `TH.`DST_CLK.clk_out);
     sync_ext <= 1'b0;
-    # 1000
+    #1000ns;
 
     sync_ext <= 1'b1;
     @(posedge `TH.`DST_CLK.clk_out);
     @(posedge `TH.`DST_CLK.clk_out);
     sync_ext <= 1'b0;
-    # 1000
+    #1000ns;
 
     sync_ext <= 1'b1;
     @(posedge `TH.`DST_CLK.clk_out);
     @(posedge `TH.`DST_CLK.clk_out);
     sync_ext <= 1'b0;
-    # 1000
+    #1000ns;
 
     // init_req <= 1'b1;
 
@@ -133,24 +131,24 @@ module test_program_sync (
     @(posedge `TH.`DST_CLK.clk_out);
 
     sync_ext <= 1'b0;
-    # 1000
+    #1000ns;
 
-    #`SRC_TRANSFERS_DELAY
+    #((`SRC_TRANSFERS_DELAY)*1ns);
 
 
     //init_req <= 1'b1;
-    #100
+    #100ns;
     // env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
 
     // @env.src_axis_seq.queue_empty;
     // init_req <= 1'b0;
 
-    #300
+    #300ns;
     sync_ext <= 1'b1;
     @(posedge `TH.`DST_CLK.clk_out);
     sync_ext <= 1'b0;
 
-    #`TIME_TO_WAIT
+    #((`TIME_TO_WAIT)*1ns);
 
     env.stop();
 
@@ -162,11 +160,8 @@ module test_program_sync (
   end
 
   task start_clocks();
-    #1
     `TH.`SRC_CLK.inst.IF.start_clock();
-    #1
     `TH.`DST_CLK.inst.IF.start_clock();
-    #1
     `TH.`SYS_CLK.inst.IF.start_clock();
   endtask
 
@@ -181,7 +176,7 @@ module test_program_sync (
     `TH.`DST_RST.inst.IF.assert_reset();
     `TH.`SYS_RST.inst.IF.assert_reset();
 
-    #500
+    #500ns;
     `TH.`SRC_RST.inst.IF.deassert_reset();
     `TH.`DST_RST.inst.IF.deassert_reset();
     `TH.`SYS_RST.inst.IF.deassert_reset();

@@ -52,6 +52,9 @@ import `PKGIFY(test_harness, dac_dst_axis)::*;
 
 program test_program;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   // declare the class instances
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   scoreboard_environment #(`AXIS_VIP_PARAMS(test_harness, adc_src_axis), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis)) scb_env;

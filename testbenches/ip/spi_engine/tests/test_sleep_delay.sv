@@ -159,7 +159,7 @@ program test_sleep_delay (
 
     init();
 
-    #100ns
+    #100ns;
 
     sleep_delay_test(7);
 
@@ -329,7 +329,7 @@ program test_sleep_delay (
     // Start the test
     spi_api.fifo_command(`SLEEP(sleep_param));
 
-    #2000ns
+    #2000ns;
     sleep_time = sleep_instr_time.pop_back();
     if ((sleep_time != expected_sleep_time)) begin
       `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
@@ -338,9 +338,9 @@ program test_sleep_delay (
     spi_api.fifo_command(`INST_DLENGTH);
     spi_api.fifo_command(`SLEEP(sleep_param));
     spi_api.fifo_command(`INST_SYNC | 1);
-    #2000ns
+    #2000ns;
     sleep_time = sleep_instr_time.pop_back();
-    #100ns
+    #100ns;
     if ((sleep_time != expected_sleep_time)) begin
       `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
     end else begin
@@ -398,7 +398,7 @@ program test_sleep_delay (
       offload_sdi_data_store_arr[i] = temp_data;
     end
 
-    #100ns
+    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started (no delay on CS change)."), ADI_VERBOSITY_LOW);
 
@@ -407,7 +407,7 @@ program test_sleep_delay (
     spi_api.stop_offload();
     `INFO(("Offload stopped (no delay on CS change)."), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
 
     for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
       offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
@@ -435,7 +435,7 @@ program test_sleep_delay (
     end
     `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
     dma_api.transfer_start();
 
     spi_api.offload_mem_assert_reset();
@@ -456,7 +456,7 @@ program test_sleep_delay (
       offload_sdi_data_store_arr[i] = temp_data;
     end
 
-    #100ns
+    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started (with delay on CS change)."), ADI_VERBOSITY_LOW);
 
@@ -465,7 +465,7 @@ program test_sleep_delay (
     spi_api.stop_offload();
     `INFO(("Offload stopped (with delay on CS change)."), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
 
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
       offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));

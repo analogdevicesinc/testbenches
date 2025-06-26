@@ -154,7 +154,7 @@ package do_scoreboard_pkg;
           else
             this.transfer_size++;
         end
-        #1;
+        #1step;
       end
 
     endtask /* get_tx_sink_transaction */
@@ -195,7 +195,7 @@ package do_scoreboard_pkg;
             end;
           end
         end
-        #1;
+        #1step;
       end
 
     endtask /* get_rx_source_transaction */

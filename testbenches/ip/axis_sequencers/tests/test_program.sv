@@ -51,6 +51,9 @@ import `PKGIFY(test_harness, dst_axis)::*;
 
 program test_program;
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
   // declare the class instances
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   axis_sequencer_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis), `AXIS_VIP_PARAMS(test_harness, dst_axis)) axis_seq_env;

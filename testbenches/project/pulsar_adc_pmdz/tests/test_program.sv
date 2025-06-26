@@ -101,6 +101,9 @@ program test_program (
   input pulsar_adc_spi_clk,
   input [(`NUM_OF_SDI - 1):0] pulsar_adc_spi_sdi);
 
+  timeunit 1ns;
+  timeprecision 1ps;
+
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
 // --------------------------
@@ -151,11 +154,11 @@ initial begin
 
   sanity_test();
 
-  #100
+  #100ns;
 
   fifo_spi_test();
 
-  #100
+  #100ns;
 
   offload_spi_test();
 
@@ -259,7 +262,7 @@ end
 
 initial begin
   forever begin
-    #0.5   delay_clk = ~delay_clk;
+    #0.5ns   delay_clk = ~delay_clk;
   end
 end
 
@@ -338,7 +341,7 @@ initial begin
           sdi_preg.push_front($urandom);
           sdi_nreg.push_front($urandom);
         end
-        #1; // prevent race condition
+        #1step; // prevent race condition
         sdi_shiftreg <= (CPOL ^ CPHA) ?
                         sdi_preg[$] :
                         sdi_nreg[$];
@@ -427,7 +430,7 @@ task offload_spi_test();
     offload_status = 1;
 
     // Start the offload
-    #100
+    #100ns;
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     `INFO(("Offload started"), ADI_VERBOSITY_LOW);
 
@@ -438,10 +441,9 @@ task offload_spi_test();
 
     `INFO(("Offload stopped"), ADI_VERBOSITY_LOW);
 
-    #2000
+    #2000ns;
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
-      #1
       offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
@@ -491,7 +493,7 @@ task fifo_spi_test();
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );
 
-  #100
+  #100ns;
   // Generate a FIFO transaction, write SDO first
   repeat (NUM_OF_WORDS) begin
     axi_write (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
@@ -499,9 +501,9 @@ task fifo_spi_test();
 
   generate_transfer_cmd(1);
 
-  #100
+  #100ns;
   wait(sync_id == 1);
-  #100
+  #100ns;
 
   repeat (NUM_OF_WORDS) begin
     axi_read (`PULSAR_ADC_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), sdi_fifo_data);

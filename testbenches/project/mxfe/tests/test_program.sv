@@ -66,6 +66,7 @@ program test_program;
   xcvr tx_xcvr;
 
   int use_dds = 1;
+  int has_fsrc = `ENABLE_FSRC;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
@@ -142,61 +143,7 @@ program test_program;
     // =======================
     // JESD LINK TEST - DMA
     // =======================
-    jesd_link_test(0);
-
-    // -----------------------
-    // FSRC CONFIG
-    // -----------------------
-
-    `INFO(("Configuring FSRC TX"), ADI_VERBOSITY_NONE);
-    // Sanity
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h8, 32'hDEADBEEF);
-    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h8, 32'hBEEFDEAD);
-
-    // NS is 0 (NS_PARAM = 0)
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h18, 32'hFF); // CONV_MAS
-    for (int i = 0; i <= 15; i++) begin
-      val64 = (~TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED + 64'b1) + (i * TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED);
-      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h28, val64[31:0]);
-      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h2c, val64[63:32]);
-      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h24, i);
-      val64 += 64'h0FFF_E234_0000_0000;
-    end
-    val64 = TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED;
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h1c, val64[31:0]); // Add val
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h20, val64[63:32]); // Add val
-
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, {32'b100}); // CTRL_TRANSMIT SET
-
-    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h14, {16'd1002, 16'd1002}); // SEQ_CTRL_2
-    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'd0}); // SEQ_CTRL_3
-    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h1c, {16'd2102, 16'b0}); // SEQ_CTRL_4
-    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b10}); // SEQ_CTRL_3
-
-    //---
-    // -----------------------
-    // FSRC CONFIG
-    // -----------------------
-    // AXI_FSRC_TX_ENABLE
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h10, 32'b1);
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, 32'b1); // CTRL_TRANSMIT@start
-    // Uncomment to use trig_in instead of reg access ctrl_3.seq_start
-    //base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h1c, {16'd2102, 16'b01}); // SEQ_CTRL_4@ext_trig_en
-    // AXI_FSRC_RX_ENABLE
-    base_env.mng.sequencer.RegWrite32(`FSRC_RX_BA + 'h10, 32'd1);
-    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b11}); // SEQ_CTRL_3@seq_start
-    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b10}); // SEQ_CTRL_3@seq_start
-
-    tx_xcvr.up();
-    tx_ll.link_up();
-    #300us
-    `INFO(("Pausing FSRC TX"), ADI_VERBOSITY_NONE);
-    tx_ll.wait_link_up();
-    tx_xcvr.down();
-    // AXI_FSRC_TX_PAUSE
-    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, 32'b10); // CTRL_TRANSMIT@stop
-
-    jesd_link_test(0, 1, 1);
+    jesd_link_test(0,0,0,0,1);
 
     // =======================
     // JESD LINK TEST - DMA - RX/TX BYPASS
@@ -234,10 +181,66 @@ program test_program;
   // -----------------
   //
   // -----------------
+  task configure_tx_fsrc();
+    `INFO(("Configure TX FSRC"), ADI_VERBOSITY_NONE);
+    // Sanity
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h8, 32'hDEADBEEF);
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h8, 32'hBEEFDEAD);
+
+    // NS is 0 (NS_PARAM = 0)
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h18, 32'hFF); // CONV_MAS
+    for (int i = 0; i <= 15; i++) begin
+      val64 = (~TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED + 64'b1) + (i * TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED);
+      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h28, val64[31:0]);
+      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h2c, val64[63:32]);
+      base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h24, i);
+      val64 += 64'h0FFF_E234_0000_0000;
+    end
+    val64 = TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED;
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h1c, val64[31:0]); // Add val
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h20, val64[63:32]); // Add val
+
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, {32'b100}); // CTRL_TRANSMIT SET
+
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h14, {16'd1002, 16'd1002}); // SEQ_CTRL_2
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'd0}); // SEQ_CTRL_3
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h1c, {16'd2102, 16'b0}); // SEQ_CTRL_4
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b10}); // SEQ_CTRL_3
+  endtask : configure_tx_fsrc
+
+  // -----------------
+  //
+  // -----------------
+  task enable_and_start_tx_fsrc();
+    `INFO(("Enable TX FSRC"), ADI_VERBOSITY_NONE);
+    // AXI_FSRC_TX_ENABLE
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h10, 32'b1); // TX_EN
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, 32'b1); // CTRL_TRANSMIT@start
+    // Uncomment to use trig_in instead of reg access ctrl_3.seq_start
+    //base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h1c, {16'd2102, 16'b01}); // SEQ_CTRL_4@ext_trig_en
+    // AXI_FSRC_RX_ENABLE
+    base_env.mng.sequencer.RegWrite32(`FSRC_RX_BA + 'h10, 32'd1);
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b11}); // SEQ_CTRL_3@seq_start
+    base_env.mng.sequencer.RegWrite32(`FSRC_CTRL_BA + 'h18, {16'd1102, 16'b10}); // SEQ_CTRL_3@seq_start
+  endtask : enable_and_start_tx_fsrc
+
+  // -----------------
+  //
+  // -----------------
+  task stop_and_disable_tx_fsrc();
+    `INFO(("Stop TX FSRC"), ADI_VERBOSITY_NONE);
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h14, 32'b10); // CTRL_TRANSMIT@stop
+    base_env.mng.sequencer.RegWrite32(`FSRC_TX_BA + 'h10, 32'b0); // TX_EN
+  endtask : stop_and_disable_tx_fsrc
+
+  // -----------------
+  //
+  // -----------------
   task jesd_link_test(input use_dds = 1,
                       input rx_bypass = 0,
                       input tx_bypass = 0,
-                      input tdd_enabled = 0);
+                      input tdd_enabled = 0,
+		      input use_fsrc = 0);
 
     `INFO(("======================="), ADI_VERBOSITY_LOW);
     `INFO(("      JESD TEST        "+(use_dds ? "DDS" : "DMA")), ADI_VERBOSITY_LOW);
@@ -389,11 +392,17 @@ program test_program;
 
     base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_RSTN(1));
-
+    if (has_fsrc) begin
+	configure_tx_fsrc();
+    end
     rx_ll.link_up();
 
     rx_ll.wait_link_up();
     tx_ll.wait_link_up();
+
+    if (has_fsrc && use_fsrc) begin
+      enable_and_start_tx_fsrc();
+    end
 
     // Move data around for a while
     #5us;
@@ -419,6 +428,10 @@ program test_program;
                        `SET_ADC_COMMON_REG_RSTN_RSTN(0));
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_RSTN),
                        `SET_DAC_COMMON_REG_RSTN_RSTN(0));
+
+    if (has_fsrc && use_fsrc) begin
+      stop_and_disable_tx_fsrc();
+    end
 
     rx_xcvr.down();
     tx_xcvr.down();

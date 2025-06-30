@@ -54,6 +54,7 @@ module system_tb();
     .device_clk_out (device_clk),
     .sysref_clk_out (sysref),
 
+    .fsrc_sysref (sysref),
     .fsrc_trig_in (fsrc_trig_in),
     .fsrc_trig_out (fsrc_trig_out),
     .fsrc_ctrl (fsrc_ctrl),

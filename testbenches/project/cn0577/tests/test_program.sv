@@ -60,15 +60,17 @@ localparam RESOLUTION = (`RESOLUTION_16_18N == 1) ? 16 : 18;
 program test_program (
   input           ref_clk,
   input           clk_gate,
-  input           dco,
+  input           dco_in,
   output          da_n,
   output          da_p,
   output          db_n,
   output          db_p,
+  output reg      dco_p,
+  output reg      dco_n,
   output          cnv);
 
 timeunit 1ns;
-timeprecision 100ps;
+timeprecision 1ps;
 
 typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
 
@@ -78,7 +80,7 @@ test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(t
 localparam bit DEBUG = 1;
 
 // dco delay compared to the reference clk
-localparam DCO_DELAY = 0.7;
+localparam DCO_DELAY = 1;
 
 pwm_gen_api cn0577_pwm_gen_api;
 
@@ -181,52 +183,67 @@ localparam int N = (`TWOLANES == 0 && `RESOLUTION == 16) ? 16 :
                    (`TWOLANES == 1 && `RESOLUTION == 18) ? 10 :
                    -1; // Error case
 parameter int num_of_dco = N / 2;                   
-reg clk_gate_sh = 1'b0;
-reg [4:0] dco_edge_count = 3'h0;
-reg dco_cp = 1'b0;
+//reg clk_gate_sh = 1'b0;
+//reg [4:0] dco_edge_count = 3'h0;
+//reg dco_cp = 1'b0;
+
+//initial begin
+//  forever begin
+//    @(negedge clk_gate)
+//      #2
+//      dco_edge_count <= 0;  
+//    end
+// end
+
+//initial begin    
+//  forever begin
+//    @(posedge dco_in) begin
+//      dco_edge_count <= dco_edge_count + 1;
+//    end
+//    @(negedge dco_in) begin
+//      dco_edge_count <= dco_edge_count + 1;
+//    end
+//  end
+//end
+
+//initial begin
+//  forever begin
+//   @(ref_clk) begin
+//     if (clk_gate == 1'h1) begin
+//       if (dco_edge_count < N-1 && dco_edge_count >= 0)
+//         clk_gate_sh <= clk_gate;
+//       else 
+//         clk_gate_sh <= 1'h0;
+//       end  
+//     end
+//   end    
+//end
+
+//initial begin
+//  forever begin
+//   @(ref_clk) begin
+//     if (clk_gate == 1'h1)
+//       dco_cp <= dco_in;
+//     else
+//       dco_cp <= 1'h0;
+//     end
+//   end    
+//end
+
 
 initial begin
   forever begin
-    @(negedge clk_gate)
-      #2
-      dco_edge_count <= 0;  
-    end
- end
-
-initial begin    
-  forever begin
-    @(posedge dco) begin
-      dco_edge_count <= dco_edge_count + 1;
-    end
-    @(negedge dco) begin
-      dco_edge_count <= dco_edge_count + 1;
+    @(posedge dco_in, negedge dco_in) begin
+      #1
+      dco_p <= dco_in;
+      dco_n <= ~dco_in;    
     end
   end
-end
+ end
 
-initial begin
-  forever begin
-   @(ref_clk) begin
-     if (clk_gate == 1'h1) begin
-       if (dco_edge_count < N-1 && dco_edge_count >= 0)
-         clk_gate_sh <= clk_gate;
-       else 
-         clk_gate_sh <= 1'h0;
-       end  
-     end
-   end    
-end
+//assign dco_p = dco_in;
+//assign dco_n = ~dco_in;
 
-initial begin
-  forever begin
-   @(ref_clk) begin
-     if (clk_gate_sh == 1'h1)
-       dco_cp <= dco;
-     else
-       dco_cp <= 1'h0;
-     end
-   end    
-end
 
 //---------------------------------------------------------------------------
 // Data store
@@ -234,6 +251,7 @@ end
 
 reg   [RESOLUTION-1:0]  data_gen = 'h3a5a5;
 reg   [RESOLUTION-1:0]  data_shift = 'h0;
+
 reg                     r_da_p = 1'b0;
 reg                     r_da_n = 1'b0;
 reg                     r_db_p = 1'b0;
@@ -250,7 +268,7 @@ assign db_n = r_db_n;
 
 initial begin
   forever begin
-    @ (posedge dco_cp, negedge dco_cp) begin
+    @ (posedge dco_in, negedge dco_in) begin
       if (`TWOLANES == 1) begin
         r_da_p = data_shift[RESOLUTION - 1];
         r_da_n = ~data_shift[RESOLUTION - 1];
@@ -280,21 +298,63 @@ end
 
 initial begin
   forever begin
-    @(posedge dco_cp);
+    @(posedge dco_in);
     if (transfer_status) begin
       if (`RESOLUTION == 16) begin
-        if (transfer_cnt[0]) begin
-          dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen - 16'h0001;
+        if (`TWOLANES == 0) begin
+          if (transfer_cnt[0]) begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen - 16'h0001;
+          end else begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen - 16'h0001;
+          end
         end else begin
-          dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen - 16'h0001;
-        end
+          if (transfer_cnt[0]) begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen;
+          end else begin
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
+          end
+        end    
       end else if (`RESOLUTION == 18) begin
-        dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
+        if (`TWOLANES == 0) begin
+          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
+        end else begin
+          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
+        end
       end
     end  
-    @(negedge dco);
+    @(negedge dco_in);
   end
 end
+
+//initial begin
+//  forever begin
+//    @(posedge dco_in);
+//    if (transfer_status) begin
+//      if (`RESOLUTION == 16) begin
+//        if (`TWOLANES == 0) begin
+//          if (transfer_cnt[0]) begin
+//            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen - 16'h0001;
+//          end else begin
+//            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen - 16'h0001;
+//          end
+//        end else begin
+//          if (transfer_cnt[0]) begin
+//            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen;
+//          end else begin
+//            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
+//          end
+//        end    
+//      end else if (`RESOLUTION == 18) begin
+//        if (`TWOLANES == 0) begin
+//          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
+//        end else begin
+//          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
+//        end
+//      end
+//    end  
+//    @(negedge dco_in);
+//  end
+//end
 
 //---------------------------------------------------------------------------
 // Sanity test reg interface

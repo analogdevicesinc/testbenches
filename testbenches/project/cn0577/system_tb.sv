@@ -52,11 +52,11 @@ module system_tb();
   // reg signals
 
   reg                     ref_clk = 1'b0;
-  reg                     ref_clk_out = 1'b0;
+  reg                     dco_init = 1'b0;
   reg                     cnv_out = 1'b0;
   reg                     clk_gate = 1'b0;
-  reg                     dco_p = 1'b0;
-  reg                     dco_n = 1'b0;
+  wire                    dco_p;
+  wire                    dco_n;
   reg                     da_p = 1'b0;
   reg                     da_n = 1'b0;
   reg                     db_p = 1'b0;
@@ -108,9 +108,9 @@ module system_tb();
   // ---------------------------------------------------------------------------
   always @ (*) begin
     if (clk_gate == 1'b1) begin
-      ref_clk_out = ref_clk;
+      dco_init = ref_clk;
     end else begin
-      ref_clk_out = 1'b0;
+      dco_init = 1'b0;
     end
   end
 
@@ -120,32 +120,34 @@ module system_tb();
     s_axi_aresetn <= 1'b1;
   end
 
-  initial begin
-    dco_p = 0;
-    dco_n = 1;
-  end
+//  initial begin
+//    dco_p = 0;
+//    dco_n = 1;
+//  end
 
+ 
   // ---------------------------------------------------------------------------
   // Data clocks generation
   // ---------------------------------------------------------------------------
 
-  always @ (ref_clk_out) begin
-    dco_p <= ref_clk_out;
-    dco_n <= ~ref_clk_out;
-  end
-
-  always @ (ref_clk_out) begin
-    dco <= #DCO_DELAY  ref_clk_out;
-  end
+//  always @ (dco_init) begin
+//    dco <= dco_init;
+//  end
+  
+//  always @ (dco_init) begin
+//    dco <= #DCO_DELAY  dco_init;
+//  end
 
     `TEST_PROGRAM test(
        .ref_clk (ref_clk),
        .clk_gate (clk_gate),
-       .dco (dco),
+       .dco_in (dco_init),
        .da_p (da_p),
        .da_n (da_n),
        .db_p (db_p),
        .db_n (db_n),
+       .dco_p (dco_p),
+       .dco_n (dco_n),
        .cnv (cnv));
 
      test_harness `TH (

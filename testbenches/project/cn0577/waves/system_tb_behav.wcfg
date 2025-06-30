@@ -50,15 +50,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="23,495.666 ns"></ZoomStartTime>
-      <ZoomEndTime time="23,593.267 ns"></ZoomEndTime>
-      <Cursor1Time time="23,577.000 ns"></Cursor1Time>
+      <ZoomStartTime time="13,711.508 ns"></ZoomStartTime>
+      <ZoomEndTime time="13,813.022 ns"></ZoomEndTime>
+      <Cursor1Time time="13,756.560 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="177"></NameColumnWidth>
-      <ValueColumnWidth column_width="86"></ValueColumnWidth>
+      <NameColumnWidth column_width="173"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="22" />
+   <WVObjectSize size="24" />
    <wvobject type="logic" fp_name="/system_tb/test/ref_clk">
       <obj_property name="ElementShortName">ref_clk</obj_property>
       <obj_property name="ObjectShortName">ref_clk</obj_property>
@@ -67,25 +67,13 @@
       <obj_property name="ElementShortName">clk_gate</obj_property>
       <obj_property name="ObjectShortName">clk_gate</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/dco">
-      <obj_property name="ElementShortName">dco</obj_property>
-      <obj_property name="ObjectShortName">dco</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test/dco_in">
+      <obj_property name="ElementShortName">dco_in</obj_property>
+      <obj_property name="ObjectShortName">dco_in</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/dco_edge_count">
-      <obj_property name="ElementShortName">dco_edge_count[3:0]</obj_property>
-      <obj_property name="ObjectShortName">dco_edge_count[3:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/clk_gate_sh">
-      <obj_property name="ElementShortName">clk_gate_sh</obj_property>
-      <obj_property name="ObjectShortName">clk_gate_sh</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test/dco_cp">
-      <obj_property name="ElementShortName">dco_cp</obj_property>
-      <obj_property name="ObjectShortName">dco_cp</obj_property>
-      <obj_property name="CustomSignalColor">#F0E68C</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/dco_p">
+      <obj_property name="ElementShortName">dco_p</obj_property>
+      <obj_property name="ObjectShortName">dco_p</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test/da_p">
       <obj_property name="ElementShortName">da_p</obj_property>
@@ -99,14 +87,6 @@
       <obj_property name="ElementShortName">cnv</obj_property>
       <obj_property name="ObjectShortName">cnv</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/dco_p">
-      <obj_property name="ElementShortName">dco_p</obj_property>
-      <obj_property name="ObjectShortName">dco_p</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/da_p">
-      <obj_property name="ElementShortName">da_p</obj_property>
-      <obj_property name="ObjectShortName">da_p</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test/data_gen">
       <obj_property name="ElementShortName">data_gen[15:0]</obj_property>
       <obj_property name="ObjectShortName">data_gen[15:0]</obj_property>
@@ -115,19 +95,15 @@
       <obj_property name="ElementShortName">data_shift[15:0]</obj_property>
       <obj_property name="ObjectShortName">data_shift[15:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/dco">
-      <obj_property name="ElementShortName">dco</obj_property>
-      <obj_property name="ObjectShortName">dco</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/da_p">
-      <obj_property name="ElementShortName">da_p</obj_property>
-      <obj_property name="ObjectShortName">da_p</obj_property>
-      <obj_property name="CustomSignalColor">#0000FF</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test/transfer_status">
+      <obj_property name="ElementShortName">transfer_status</obj_property>
+      <obj_property name="ObjectShortName">transfer_status</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/da_p_int_s">
       <obj_property name="ElementShortName">da_p_int_s</obj_property>
       <obj_property name="ObjectShortName">da_p_int_s</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/da_n_int_s">
       <obj_property name="ElementShortName">da_n_int_s</obj_property>
@@ -141,6 +117,14 @@
       <obj_property name="ElementShortName">adc_data_da_n[9:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data_da_n[9:0]</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/adc_data_db_p">
+      <obj_property name="ElementShortName">adc_data_db_p[9:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_db_p[9:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/adc_data_db_n">
+      <obj_property name="ElementShortName">adc_data_db_n[9:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_db_n[9:0]</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/adc_data_int">
       <obj_property name="ElementShortName">adc_data_int[17:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data_int[17:0]</obj_property>
@@ -152,5 +136,25 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/adc_data">
       <obj_property name="ElementShortName">adc_data[17:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data[17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider66" type="divider">
+      <obj_property name="label">if</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/dco">
+      <obj_property name="ElementShortName">dco</obj_property>
+      <obj_property name="ObjectShortName">dco</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/dco_p">
+      <obj_property name="ElementShortName">dco_p</obj_property>
+      <obj_property name="ObjectShortName">dco_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/da_p">
+      <obj_property name="ElementShortName">da_p</obj_property>
+      <obj_property name="ObjectShortName">da_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/inst/i_if/da_p_int_s">
+      <obj_property name="ElementShortName">da_p_int_s</obj_property>
+      <obj_property name="ObjectShortName">da_p_int_s</obj_property>
    </wvobject>
 </wave_config>

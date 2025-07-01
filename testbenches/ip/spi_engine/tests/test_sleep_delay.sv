@@ -104,7 +104,7 @@ program test_sleep_delay (
   // --------------------------
   // Main procedure
   // --------------------------
-  int num_of_active_lanes = $countones(`SPI_LANE_MASK);
+  bit [7:0] spi_lane_mask;
   initial begin
 
     setLoggerVerbosity(ADI_VERBOSITY_HIGH);
@@ -163,7 +163,8 @@ program test_sleep_delay (
     #100ns;
 
     sleep_delay_test(7);
-
+    spi_lane_mask = (2 ** `NUM_OF_SDO)-1;
+    spi_api.fifo_command(`SET_SPI_LANE_MASK(spi_lane_mask));//guarantee all lanes must be active
     cs_delay_test(3,3);
 
     spi_env.stop();
@@ -366,8 +367,8 @@ program test_sleep_delay (
       input [1:0] cs_deactivate_delay);
 
     temp_data = new [`NUM_OF_SDO];
-    offload_captured_word_arr  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(num_of_active_lanes)];
-    offload_sdi_data_store_arr = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(num_of_active_lanes)];
+    offload_captured_word_arr  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
+    offload_sdi_data_store_arr = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
 
     //Configure DMA
     dma_api.enable_dma();
@@ -398,9 +399,9 @@ program test_sleep_delay (
 
     // Enqueue transfers to DUT
     for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
-      for (int j = 0; j < num_of_active_lanes; j++) begin
+      for (int j = 0; j < (`NUM_OF_SDO); j++) begin
         temp_data[j] = {$urandom};
-        offload_sdi_data_store_arr[i * num_of_active_lanes + j] = temp_data[j];
+        offload_sdi_data_store_arr[i * (`NUM_OF_SDO) + j] = temp_data[j];
       end
 
       spi_send(temp_data);
@@ -423,7 +424,7 @@ program test_sleep_delay (
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*num_of_active_lanes); i++) begin
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)); i++) begin
       offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
       if (offload_captured_word_arr[i] !== offload_sdi_data_store_arr[i]) begin //one word at a time comparison
         `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
@@ -461,9 +462,9 @@ program test_sleep_delay (
 
     // Enqueue transfers to DUT
     for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
-      for (int j = 0; j < num_of_active_lanes; j++) begin
+      for (int j = 0; j < (`NUM_OF_SDO); j++) begin
         temp_data[j] = {$urandom};
-        offload_sdi_data_store_arr[i * num_of_active_lanes + j] = temp_data[j];
+        offload_sdi_data_store_arr[i * (`NUM_OF_SDO) + j] = temp_data[j];
       end
 
       spi_send(temp_data);
@@ -486,7 +487,7 @@ program test_sleep_delay (
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*num_of_active_lanes); i++) begin
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)); i++) begin
       offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
       if (offload_captured_word_arr[i] !== offload_sdi_data_store_arr[i]) begin //one word at a time comparison
         `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",

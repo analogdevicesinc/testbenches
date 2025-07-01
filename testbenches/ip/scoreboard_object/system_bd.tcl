@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,10 +33,6 @@
 # ***************************************************************************
 # ***************************************************************************
 
-# Add test files to the project
-adi_sim_project_files [list \
-  "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
-  "$ad_tb_dir/library/drivers/common/scoreboard.sv" \
-  "$ad_tb_dir/library/drivers/common/scoreboard_pack.sv" \
-  "$ad_tb_dir/library/drivers/common/scoreboard_object.sv" \
-]
+global ad_project_params
+
+## DUT configuration

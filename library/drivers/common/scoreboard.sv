@@ -60,12 +60,16 @@ package scoreboard_pkg;
       endfunction: new
 
       virtual function void update(input data_type data [$]);
+        data_type foo;
         this.info($sformatf("Data received: %d", data.size()), ADI_VERBOSITY_MEDIUM);
         while (data.size()) begin
-          this.byte_stream.push_back(data.pop_front());
+          foo = data.pop_front();
+          this.info($sformatf("Data: %p", foo), ADI_VERBOSITY_MEDIUM);
+          this.byte_stream.push_back(foo);
         end
-
+        this.info($sformatf("scoreboard update"), ADI_VERBOSITY_MEDIUM);
         if (this.scoreboard_ref.get_enabled()) begin
+          this.info($sformatf("scoreboard comparing..."), ADI_VERBOSITY_MEDIUM);
           this.scoreboard_ref.compare_transaction();
         end
       endfunction: update
@@ -79,6 +83,7 @@ package scoreboard_pkg;
       endfunction: put_data
 
       function int get_size();
+        this.info($sformatf("Scoreboard Subscriber get_size() = %d", this.byte_stream.size()), ADI_VERBOSITY_MEDIUM);
         return this.byte_stream.size();
       endfunction: get_size
 
@@ -130,6 +135,7 @@ package scoreboard_pkg;
       this.enabled = 0;
       this.clear_streams();
       this.byte_streams_empty_sig = 1;
+      this.info($sformatf("Scoreboard stopped"), ADI_VERBOSITY_MEDIUM);
     endtask: stop
 
     function bit get_enabled();
@@ -168,11 +174,17 @@ package scoreboard_pkg;
       data_type source_byte;
       data_type sink_byte;
 
-      if (this.enabled == 0)
+      this.info($sformatf("scoreboard compare_transaction"), ADI_VERBOSITY_MEDIUM);
+
+
+      if (this.enabled == 0) begin
+        this.info($sformatf("skipping compare_transaction (not enabled)"), ADI_VERBOSITY_MEDIUM);
         return;
+      end
 
       while ((this.subscriber_source.get_size() > 0) &&
             (this.subscriber_sink.get_size() > 0)) begin
+        this.info($sformatf("subscriber_source size=%0d, subscriber_sink size=%0d",this.subscriber_source.get_size(),this.subscriber_sink.get_size()), ADI_VERBOSITY_MEDIUM);
         byte_streams_empty_sig = 0;
         source_byte = this.subscriber_source.get_data();
         if (this.sink_type == CYCLIC)
@@ -186,6 +198,7 @@ package scoreboard_pkg;
 
       if ((this.subscriber_source.get_size() == 0) &&
           (this.subscriber_sink.get_size() == 0)) begin
+        this.info($sformatf("byte_streams_empty_sig"), ADI_VERBOSITY_MEDIUM);
         this.byte_streams_empty_sig = 1;
         ->this.byte_streams_empty;
       end

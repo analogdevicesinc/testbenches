@@ -101,7 +101,7 @@ package adi_spi_vip_pkg;
             for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               if (!vif.get_cs_active()) begin
                 break;
-                mosi_bits.clear();
+                mosi_bits.clean();
               end
               vif.wait_for_sample_edge();
               mosi_logic = vif.get_mosi_delayed();
@@ -112,7 +112,7 @@ package adi_spi_vip_pkg;
             end
             mosi_mbx.put(mosi_bits);
             mosi_monitor_mbx.put(mosi_bits);
-            mosi_bits.clear();
+            mosi_bits.clean();
           end
         end
       end
@@ -163,13 +163,13 @@ package adi_spi_vip_pkg;
                 if (i != 0) begin
                   this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
                 end
-                miso_bits.clear();
+                miso_bits.clean();
                 break;
               end else if (pending_mbx) begin
                 // we were going to transmit default data, but new data arrived between the cs edge and vif.drive_edge
                 using_default = 1'b0;
                 pending_mbx = 1'b0;
-                miso_bits.clear();
+                miso_bits.clean();
                 break;
               end else begin
                 // vif.drive_edge has arrived
@@ -348,8 +348,8 @@ package adi_spi_vip_pkg;
 
   class adi_spi_monitor extends adi_monitor;
 
-    unsigned int mosi_publisher; // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
-    unsigned int miso_publisher; // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
+    adi_publisher #(unsigned int) mosi_publisher; // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
+    adi_publisher #(unsigned int) miso_publisher; // TODO: decide whether to use adi_fifo #(bit) for representing each transfer
     protected adi_spi_driver driver;
     protected bit enabled;
     protected bit stop_flag;
@@ -396,6 +396,10 @@ package adi_spi_vip_pkg;
       end
     endfunction: stop
 
+    protected function get_active();
+      return(this.active);
+    endfunction : get_active
+
     task get_transaction();
       adi_fifo #(bit) mosi_transaction;
       adi_fifo #(bit) miso_transaction;
@@ -414,7 +418,7 @@ package adi_spi_vip_pkg;
               mosi_word = ((mosi_word<<1) & mosi_transaction.pop());
             end
             this.mosi_publisher.notify(mosi_word);
-            mosi_transaction.clear();
+            mosi_transaction.clean();
           end
         end
         begin
@@ -427,7 +431,7 @@ package adi_spi_vip_pkg;
               miso_word = ((miso_word<<1) & miso_transaction.pop());
             end
             this.miso_publisher.notify(miso_transaction);
-            miso_transaction.clear();
+            miso_transaction.clean();
           end
         end
       join

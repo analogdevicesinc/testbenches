@@ -85,8 +85,9 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 #
 #
 set ASYMMETRIC_A_B_MODE 0
-set ENABLE_FSRC 1
+set FSRC_ENABLE 1
 set ACCUM_WIDTH 64
+adi_sim_add_define "ACCUM_WIDTH=[format "%d" ${ACCUM_WIDTH}]"
 source $ad_hdl_dir/projects/ad9084_ebz/common/ad9084_ebz_bd.tcl
 
 #if {$ad_project_params(JESD_MODE) == "8B10B"} {
@@ -146,13 +147,13 @@ if {$TDD_SUPPORT == 1} {
 }
 
 set FSRC_RX 0x44500000
-set_property offset $FSRC_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_rx}]
-adi_sim_add_define "FSRC_RX_BA=[format "%d" ${FSRC_RX}]"
-
 set FSRC_TX 0x44510000
-set_property offset $FSRC_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_tx}]
-adi_sim_add_define "FSRC_TX_BA=[format "%d" ${FSRC_TX}]"
-
 set FSRC_CTRL 0x44540000
-set_property offset $FSRC_CTRL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_ctrl}]
+adi_sim_add_define "FSRC_RX_BA=[format "%d" ${FSRC_RX}]"
+adi_sim_add_define "FSRC_TX_BA=[format "%d" ${FSRC_TX}]"
 adi_sim_add_define "FSRC_CTRL_BA=[format "%d" ${FSRC_CTRL}]"
+if {$FSRC_ENABLE} {
+  set_property offset $FSRC_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_rx}]
+  set_property offset $FSRC_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_tx}]
+  set_property offset $FSRC_CTRL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_fsrc_ctrl}]
+}

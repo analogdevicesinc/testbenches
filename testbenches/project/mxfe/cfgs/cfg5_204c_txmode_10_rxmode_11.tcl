@@ -25,4 +25,4 @@ set ad_project_params(TX_JESD_K) 128
 
 set ad_project_params(TDD_SUPPORT) 0
 set ad_project_params(HSCI_ENABLE) 0
-set ad_project_params(ENABLE_FSRC) 1
+set ad_project_params(FSRC_ENABLE) 1

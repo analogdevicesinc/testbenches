@@ -66,11 +66,11 @@ program test_program;
   xcvr tx_xcvr;
 
   int use_dds = 1;
-  int has_fsrc = `ENABLE_FSRC;
+  int has_fsrc = `FSRC_ENABLE;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
-  localparam TX_FSRC_ACCUM_WIDTH = 64;
+  localparam TX_FSRC_ACCUM_WIDTH = `ACCUM_WIDTH;
   localparam TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO = 0.6666667;
   localparam logic [TX_FSRC_ACCUM_WIDTH:0] ONE_FIXED = {1'b1, {TX_FSRC_ACCUM_WIDTH{1'b0}}};
   localparam logic [TX_FSRC_ACCUM_WIDTH-1:0] TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED = ONE_FIXED * TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO;

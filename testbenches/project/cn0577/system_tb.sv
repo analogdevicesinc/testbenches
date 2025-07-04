@@ -47,7 +47,7 @@ module system_tb();
   parameter RESOLUTION = 18;
 
   // dco delay compared to the reference clk
-  localparam DCO_DELAY = 1;
+  localparam DCO_DELAY = 12;
 
   // reg signals
 
@@ -55,8 +55,8 @@ module system_tb();
   reg                     dco_init = 1'b0;
   reg                     cnv_out = 1'b0;
   reg                     clk_gate = 1'b0;
-  wire                    dco_p;
-  wire                    dco_n;
+  reg                     dco_p;
+  reg                     dco_n;
   reg                     da_p = 1'b0;
   reg                     da_n = 1'b0;
   reg                     db_p = 1'b0;
@@ -101,7 +101,8 @@ module system_tb();
 
   // test bench variables
 
-  always #2.564 ref_clk = ~ref_clk;
+  always #25 ref_clk = ~ref_clk;
+  //always #2.564 ref_clk = ~ref_clk;
 
   // ---------------------------------------------------------------------------
   // Creating a "gate" through which the data clock can run (and only then)
@@ -125,18 +126,18 @@ module system_tb();
 //    dco_n = 1;
 //  end
 
- 
+
   // ---------------------------------------------------------------------------
   // Data clocks generation
   // ---------------------------------------------------------------------------
 
-//  always @ (dco_init) begin
-//    dco <= dco_init;
-//  end
-  
-//  always @ (dco_init) begin
-//    dco <= #DCO_DELAY  dco_init;
-//  end
+  always @ (dco_init) begin
+    dco <= dco_init;
+  end
+
+  always @ (dco_init) begin
+    dco <= #DCO_DELAY  dco_init;
+  end
 
     `TEST_PROGRAM test(
        .ref_clk (ref_clk),

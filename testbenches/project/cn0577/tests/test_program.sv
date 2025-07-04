@@ -80,7 +80,7 @@ test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(t
 localparam bit DEBUG = 1;
 
 // dco delay compared to the reference clk
-localparam DCO_DELAY = 1;
+localparam DCO_DELAY = 12;
 
 pwm_gen_api cn0577_pwm_gen_api;
 
@@ -182,7 +182,7 @@ localparam int N = (`TWOLANES == 0 && `RESOLUTION == 16) ? 16 :
                    (`TWOLANES == 1 && `RESOLUTION == 16) ? 8 :
                    (`TWOLANES == 1 && `RESOLUTION == 18) ? 10 :
                    -1; // Error case
-parameter int num_of_dco = N / 2;                   
+parameter int num_of_dco = N / 2;
 //reg clk_gate_sh = 1'b0;
 //reg [4:0] dco_edge_count = 3'h0;
 //reg dco_cp = 1'b0;
@@ -191,11 +191,11 @@ parameter int num_of_dco = N / 2;
 //  forever begin
 //    @(negedge clk_gate)
 //      #2
-//      dco_edge_count <= 0;  
+//      dco_edge_count <= 0;
 //    end
 // end
 
-//initial begin    
+//initial begin
 //  forever begin
 //    @(posedge dco_in) begin
 //      dco_edge_count <= dco_edge_count + 1;
@@ -212,11 +212,11 @@ parameter int num_of_dco = N / 2;
 //     if (clk_gate == 1'h1) begin
 //       if (dco_edge_count < N-1 && dco_edge_count >= 0)
 //         clk_gate_sh <= clk_gate;
-//       else 
+//       else
 //         clk_gate_sh <= 1'h0;
-//       end  
+//       end
 //     end
-//   end    
+//   end
 //end
 
 //initial begin
@@ -227,7 +227,7 @@ parameter int num_of_dco = N / 2;
 //     else
 //       dco_cp <= 1'h0;
 //     end
-//   end    
+//   end
 //end
 
 
@@ -236,7 +236,7 @@ initial begin
     @(posedge dco_in, negedge dco_in) begin
       #1
       dco_p <= dco_in;
-      dco_n <= ~dco_in;    
+      dco_n <= ~dco_in;
     end
   end
  end
@@ -313,7 +313,7 @@ initial begin
           end else begin
             dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
           end
-        end    
+        end
       end else if (`RESOLUTION == 18) begin
         if (`TWOLANES == 0) begin
           dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
@@ -321,7 +321,7 @@ initial begin
           dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
         end
       end
-    end  
+    end
     @(negedge dco_in);
   end
 end
@@ -343,7 +343,7 @@ end
 //          end else begin
 //            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
 //          end
-//        end    
+//        end
 //      end else if (`RESOLUTION == 18) begin
 //        if (`TWOLANES == 0) begin
 //          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
@@ -351,7 +351,7 @@ end
 //          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
 //        end
 //      end
-//    end  
+//    end
 //    @(negedge dco_in);
 //  end
 //end
@@ -401,10 +401,10 @@ task data_acquisition_test();
     cn0577_pwm_gen_api.pulse_width_config(
       .channel(8'h01),
       .width(num_of_dco));
-      
+
     cn0577_pwm_gen_api.pulse_offset_config(
       .channel(8'h01),
-      .offset(32'h03));  
+      .offset(32'h03));
 
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
     `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);

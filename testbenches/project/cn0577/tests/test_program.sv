@@ -303,9 +303,11 @@ initial begin
       if (`RESOLUTION == 16) begin
         if (`TWOLANES == 0) begin
           if (transfer_cnt[0]) begin
-            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen - 16'h0001;
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen;
+            //dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen - 16'h0001;
           end else begin
-            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen - 16'h0001;
+            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
+            //dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen - 16'h0001;
           end
         end else begin
           if (transfer_cnt[0]) begin
@@ -316,7 +318,8 @@ initial begin
         end
       end else if (`RESOLUTION == 18) begin
         if (`TWOLANES == 0) begin
-          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
+          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
+          //dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
         end else begin
           dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
         end

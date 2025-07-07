@@ -132,11 +132,8 @@ module system_tb();
   // ---------------------------------------------------------------------------
 
   always @ (dco_init) begin
-    dco <= dco_init;
-  end
-
-  always @ (dco_init) begin
-    dco <= #DCO_DELAY  dco_init;
+    dco_p <= #DCO_DELAY  dco_init;
+    dco_n <= #DCO_DELAY  ~dco_init;
   end
 
     `TEST_PROGRAM test(
@@ -147,8 +144,6 @@ module system_tb();
        .da_n (da_n),
        .db_p (db_p),
        .db_n (db_n),
-       .dco_p (dco_p),
-       .dco_n (dco_n),
        .cnv (cnv));
 
      test_harness `TH (

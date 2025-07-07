@@ -51,7 +51,6 @@ import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 localparam NUM_OF_TRANSFERS = 16;
-localparam RESOLUTION = (`RESOLUTION_16_18N == 1) ? 16 : 18;
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -85,9 +84,9 @@ localparam DCO_DELAY = 12;
 pwm_gen_api cn0577_pwm_gen_api;
 
 // dma interface
-wire                    adc_valid;
-wire  [RESOLUTION-1:0]  adc_data;
-reg                     adc_dovf = 1'b0;
+wire                     adc_valid;
+wire  [`RESOLUTION-1:0]  adc_data;
+reg                      adc_dovf = 1'b0;
 
 // --------------------------
 // Wrapper function for AXI read verif
@@ -249,8 +248,8 @@ initial begin
 // Data store
 //---------------------------------------------------------------------------
 
-reg   [RESOLUTION-1:0]  data_gen = 'h3a5a5;
-reg   [RESOLUTION-1:0]  data_shift = 'h0;
+reg   [`RESOLUTION-1:0]  data_gen = 'h3a5a5;
+reg   [`RESOLUTION-1:0]  data_shift = 'h0;
 
 reg                     r_da_p = 1'b0;
 reg                     r_da_n = 1'b0;
@@ -270,14 +269,14 @@ initial begin
   forever begin
     @ (posedge dco_in, negedge dco_in) begin
       if (`TWOLANES == 1) begin
-        r_da_p = data_shift[RESOLUTION - 1];
-        r_da_n = ~data_shift[RESOLUTION - 1];
-        r_db_p = data_shift[RESOLUTION - 2];
-        r_db_n = ~data_shift[RESOLUTION - 2];
+        r_da_p = data_shift[`RESOLUTION - 1];
+        r_da_n = ~data_shift[`RESOLUTION - 1];
+        r_db_p = data_shift[`RESOLUTION - 2];
+        r_db_n = ~data_shift[`RESOLUTION - 2];
         data_shift = data_shift << 2;
       end else begin
-        r_da_p = data_shift[RESOLUTION - 1];
-        r_da_n = ~data_shift[RESOLUTION - 1];
+        r_da_p = data_shift[`RESOLUTION - 1];
+        r_da_n = ~data_shift[`RESOLUTION - 1];
         data_shift = data_shift << 1;
       end
     end

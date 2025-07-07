@@ -43,8 +43,8 @@ module system_tb();
   parameter FPGA_TECHNOLOGY = 1;
   parameter IO_DELAY_GROUP = "adc_if_delay_group";
   parameter DELAY_REFCLK_FREQUENCY = 200;
-  parameter TWOLANES = 1;
-  parameter RESOLUTION = 18;
+  //parameter TWOLANES = 1;
+  //parameter RESOLUTION = 18;
 
   // dco delay compared to the reference clk
   localparam DCO_DELAY = 12;
@@ -64,9 +64,9 @@ module system_tb();
 
   // dma interface
 
-  wire                    adc_valid;
-  wire  [RESOLUTION-1:0]  adc_data;
-  reg                     adc_dovf = 1'b0;
+  wire                     adc_valid;
+  wire  [`RESOLUTION-1:0]  adc_data;
+  reg                      adc_dovf = 1'b0;
 
   // axi interface
 

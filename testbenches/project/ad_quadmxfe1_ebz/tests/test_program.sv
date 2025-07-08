@@ -71,7 +71,17 @@ program test_program;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     //creating base_environment
     base_env = new("Base base_environment",
@@ -81,8 +91,6 @@ program test_program;
                     `TH.`SYS_RST.inst.IF,
                     `TH.`MNG_AXI.inst.IF,
                     `TH.`DDR_AXI.inst.IF);
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     base_env.sys_reset();

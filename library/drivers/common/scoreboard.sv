@@ -61,11 +61,12 @@ package scoreboard_pkg;
 
       virtual function void update(input data_type data [$]);
         this.info($sformatf("Data received: %d", data.size()), ADI_VERBOSITY_MEDIUM);
-        while (data.size()) begin
-          this.byte_stream.push_back(data.pop_front());
-        end
 
         if (this.scoreboard_ref.get_enabled()) begin
+          while (data.size()) begin
+            this.byte_stream.push_back(data.pop_front());
+          end
+
           this.scoreboard_ref.compare_transaction();
         end
       endfunction: update
@@ -168,12 +169,13 @@ package scoreboard_pkg;
       data_type source_byte;
       data_type sink_byte;
 
+      this.byte_streams_empty_sig = 0;
+
       if (this.enabled == 0)
         return;
 
       while ((this.subscriber_source.get_size() > 0) &&
             (this.subscriber_sink.get_size() > 0)) begin
-        byte_streams_empty_sig = 0;
         source_byte = this.subscriber_source.get_data();
         if (this.sink_type == CYCLIC)
           this.subscriber_source.put_data(source_byte);

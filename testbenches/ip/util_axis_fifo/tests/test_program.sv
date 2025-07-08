@@ -89,7 +89,7 @@ program test_program ();
 
     uaf_env.run();
 
-    send_data_wd = new("Util AXIS FIFO Watchdog", 500000, "Send data");
+    send_data_wd = new("Util AXIS FIFO Watchdog", 100000, "Send data");
 
     send_data_wd.start();
 
@@ -101,7 +101,7 @@ program test_program ();
 
       if (!`TKEEP_EN) begin
         repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128), `TLAST_EN, 0);
+          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_sample_count($urandom_range(1,32), `TLAST_EN, 0);
         end
       end else begin
         repeat($urandom_range(1,5)) begin

@@ -99,7 +99,7 @@ program test_program ();
 
     uaf_env.run();
 
-    send_data_wd = new("Util AXIS FIFO Watchdog", 500000, "Send data");
+    send_data_wd = new("Util AXIS FIFO Watchdog", 100000, "Send data");
 
     send_data_wd.start();
 

@@ -40,7 +40,7 @@ set TKEEP_EN $ad_project_params(TKEEP_EN)
 set TLAST_EN $ad_project_params(TLAST_EN)
 set INPUT_WIDTH $ad_project_params(INPUT_WIDTH)
 set OUTPUT_WIDTH $ad_project_params(OUTPUT_WIDTH)
-set FIFO_LIMITED $ad_project_params(FIFO_LIMITED)
+set REDUCED_FIFO $ad_project_params(REDUCED_FIFO)
 set ADDRESS_WIDTH $ad_project_params(ADDRESS_WIDTH)
 set INPUT_CLK $ad_project_params(INPUT_CLK)
 set OUTPUT_CLK $ad_project_params(OUTPUT_CLK)
@@ -86,8 +86,7 @@ ad_ip_instance util_axis_fifo_asym util_axis_fifo_asym_DUT [list \
   ALMOST_FULL_THRESHOLD 0 \
   TLAST_EN $TLAST_EN \
   TKEEP_EN $TKEEP_EN \
-  FIFO_LIMITED $FIFO_LIMITED \
-  ADDRESS_WIDTH_PERSPECTIVE 0 \
+  REDUCED_FIFO $REDUCED_FIFO \
 ]
 
 ad_connect input_clk util_axis_fifo_asym_DUT/s_axis_aclk

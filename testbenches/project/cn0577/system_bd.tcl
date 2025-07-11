@@ -37,7 +37,7 @@ global ad_project_params
 
 # system level parameters
 set TWOLANES $ad_project_params(TWOLANES)
-set RESOLUTION_16_18N $ad_project_params(RESOLUTION_16_18N)
+set RESOLUTION $ad_project_params(RESOLUTION)
 
 adi_project_files [list \
     "$ad_hdl_dir/library/common/ad_iobuf.v" \

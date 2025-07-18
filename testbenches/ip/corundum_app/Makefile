@@ -12,6 +12,8 @@ include $(TB_LIBRARY_PATH)/includes/Makeinclude_axis.mk
 # Remaining test-bench dependencies except test programs
 LIB_DEPS := corundum/application_core
 
+SIM_LIB_DEPS += io_vip
+
 # default test program
 TP := test_program
 

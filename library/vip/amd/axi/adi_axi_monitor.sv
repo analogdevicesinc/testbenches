@@ -39,7 +39,8 @@ package adi_axi_monitor_pkg;
 
   import axi_vip_pkg::*;
   import logger_pkg::*;
-  import adi_vip_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_monitor_pkg::*;
   import pub_sub_pkg::*;
 
   class adi_axi_monitor #(int `AXI_VIP_PARAM_ORDER(axi)) extends adi_monitor;

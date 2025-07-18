@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,64 +35,19 @@
 
 `include "utils.svh"
 
-package watchdog_pkg;
+package adi_agent_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
+  import adi_environment_pkg::*;
 
-  class watchdog extends adi_component;
-
-    protected event stop_event;
-    protected bit [31:0] timer;
-    protected string message;
-
-
+  class adi_agent extends adi_component;
     function new(
       input string name,
-      input bit [31:0] timer,
-      input string message,
-      input adi_component parent = null);
+      input adi_environment parent = null);
 
       super.new(name, parent);
+    endfunction: new
+  endclass: adi_agent
 
-      this.timer = timer;
-      this.message = message;
-    endfunction
-
-    function void update_message(input string message);
-      this.message = message;
-    endfunction: update_message
-
-    function void update_timer(input bit [31:0] timer);
-      this.timer = timer;
-    endfunction: update_timer
-
-    task reset();
-      this.stop();
-      #1step;
-      this.start();
-    endtask: reset
-
-    task stop();
-      ->>this.stop_event;
-    endtask: stop
-
-    task start();
-      fork
-        begin
-          fork
-            begin
-              #(this.timer*1ns);
-              this.fatal($sformatf("Watchdog timer timed out! %s", this.message));
-            end
-            @this.stop_event;
-          join_any
-          disable fork;
-          this.info($sformatf("Watchdog timer reset."), ADI_VERBOSITY_MEDIUM);
-        end
-      join_none
-    endtask: start
-
-  endclass
-
-endpackage
+endpackage: adi_agent_pkg

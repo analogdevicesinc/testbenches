@@ -65,7 +65,7 @@ program test_program;
   dmac_api dmac_tx;
   dmac_api dmac_rx;
 
-  int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**int($clog2(`CHANNELS));
+  int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**$clog2(`CHANNELS);
 
   initial begin
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,63 +35,64 @@
 
 `include "utils.svh"
 
-package pub_sub_pkg;
+package watchdog_pkg;
 
   import logger_pkg::*;
   import adi_component_pkg::*;
 
-  class adi_subscriber #(type data_type = int) extends adi_component;
+  class watchdog extends adi_component;
 
-    protected static bit [15:0] last_id = 'd0;
-    bit [15:0] id;
+    protected event stop_event;
+    protected bit [31:0] timer;
+    protected string message;
+
 
     function new(
       input string name,
+      input bit [31:0] timer,
+      input string message,
       input adi_component parent = null);
 
       super.new(name, parent);
 
-      this.last_id++;
-      this.id = this.last_id;
-    endfunction: new
+      this.timer = timer;
+      this.message = message;
+    endfunction
 
-    virtual function void update(input data_type data [$]);
-      this.fatal($sformatf("This function is not implemented!"));
-    endfunction: update
+    function void update_message(input string message);
+      this.message = message;
+    endfunction: update_message
 
-  endclass: adi_subscriber
+    function void update_timer(input bit [31:0] timer);
+      this.timer = timer;
+    endfunction: update_timer
 
+    task reset();
+      this.stop();
+      #1step;
+      this.start();
+    endtask: reset
 
-  class adi_publisher #(type data_type = int) extends adi_component;
+    task stop();
+      ->>this.stop_event;
+    endtask: stop
 
-    protected adi_subscriber #(data_type) subscriber_list[bit[15:0]];
+    task start();
+      fork
+        begin
+          fork
+            begin
+              #(this.timer*1ns);
+              this.fatal($sformatf("Watchdog timer timed out! %s", this.message));
+            end
+            @this.stop_event;
+          join_any
+          disable fork;
+          this.info($sformatf("Watchdog timer reset."), ADI_VERBOSITY_MEDIUM);
+        end
+      join_none
+    endtask: start
 
-    function new(
-      input string name,
-      input adi_component parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-
-    function void subscribe(input adi_subscriber #(data_type) subscriber);
-      if (this.subscriber_list.exists(subscriber.id))
-        this.error($sformatf("Subscriber already on the list!"));
-      else
-        this.subscriber_list[subscriber.id] = subscriber;
-    endfunction: subscribe
-
-    function void unsubscribe(input adi_subscriber #(data_type) subscriber);
-      if (!this.subscriber_list.exists(subscriber.id))
-        this.error($sformatf("Subscriber does not exist on list!"));
-      else
-        this.subscriber_list.delete(subscriber.id);
-    endfunction: unsubscribe
-
-    function void notify(input data_type data [$]);
-      foreach (this.subscriber_list[i])
-        this.subscriber_list[i].update(data);
-    endfunction: notify
-
-  endclass: adi_publisher
+  endclass
 
 endpackage

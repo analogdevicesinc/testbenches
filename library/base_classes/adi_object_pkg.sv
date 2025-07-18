@@ -35,49 +35,57 @@
 
 `include "utils.svh"
 
-package adi_vip_pkg;
+package adi_object_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_environment_pkg::*;
 
-  class adi_agent extends adi_component;
-    function new(
-      input string name,
-      input adi_environment parent = null);
+  class adi_object;
+    protected string name;
 
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_agent
+    function new(input string name);
+      this.name = name;
+    endfunction
 
+    virtual function adi_object clone();
+      adi_object object;
+      object = new(.name(this.name));
+      this.copy(object);
+      return object;
+    endfunction: clone
 
-  class adi_driver extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
+    virtual function string convert2string();
+      string str;
+      str = {$sformatf("Name: %s", this.name)};
+      return(str);
+    endfunction: convert2string
 
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_driver
+    function void copy(input adi_object object);
+      this.do_copy(.object(object));
+    endfunction: copy
 
+    virtual function void do_copy(input adi_object object);
+      return;
+    endfunction: do_copy
 
-  class adi_sequencer extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
+    function void print();
+      `INFO(("%s", this.do_print()), ADI_VERBOSITY_NONE);
+    endfunction: print
 
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_sequencer
+    function string sprint();
+      return this.do_print();
+    endfunction: sprint
 
+    virtual function string do_print();
+      return this.convert2string();
+    endfunction: do_print
 
-  class adi_monitor extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
+    function bit compare(input adi_object object);
+      return this.do_compare(.object(object));
+    endfunction: compare
 
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_monitor
+    virtual function bit do_compare(input adi_object object);
+      return 1;
+    endfunction: do_compare
+  endclass: adi_object
 
-endpackage: adi_vip_pkg
+endpackage: adi_object_pkg

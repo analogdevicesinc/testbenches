@@ -35,19 +35,63 @@
 
 `include "utils.svh"
 
-package adi_environment_pkg;
+package adi_api_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_environment_pkg::*;
+  import adi_component_pkg::*;
+  import m_axi_sequencer_pkg::*;
 
-  class adi_environment extends adi_component;
+  class adi_api extends adi_component;
+
+    protected m_axi_sequencer_base bus;
+    protected bit [31:0] base_address;
+
+    // Semantic versioning
+    bit [7:0] ver_major;
+    bit [7:0] ver_minor;
+    bit [7:0] ver_patch;
+
     function new(
       input string name,
-      input adi_environment parent = null);
+      input m_axi_sequencer_base bus,
+      input bit [31:0] base_address,
+      input adi_component parent = null);
 
       super.new(name, parent);
-    endfunction: new
-  endclass: adi_environment
 
-endpackage: adi_environment_pkg
+      this.bus = bus;
+      this.base_address = base_address;
+    endfunction: new
+
+
+    virtual task probe();
+      bit [31:0] val;
+      this.bus.RegRead32(this.base_address + 'h0, val);
+      {ver_major, ver_minor, ver_patch} = val;
+      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
+    endtask
+
+    task axi_read(
+      input  [31:0] addr,
+      output [31:0] data);
+
+      this.bus.RegRead32(this.base_address + addr, data);
+    endtask: axi_read
+
+    task axi_write(
+      input [31:0] addr,
+      input [31:0] data);
+
+      this.bus.RegWrite32(this.base_address + addr, data);
+    endtask: axi_write
+
+    task axi_verify(
+      input [31:0] addr,
+      input [31:0] data);
+
+      this.bus.RegReadVerify32(this.base_address + addr, data);
+    endtask: axi_verify
+
+  endclass: adi_api
+
+endpackage: adi_api_pkg

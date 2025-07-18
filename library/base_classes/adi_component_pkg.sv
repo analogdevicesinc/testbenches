@@ -35,49 +35,10 @@
 
 `include "utils.svh"
 
-package adi_common_pkg;
+package adi_component_pkg;
 
   import logger_pkg::*;
-
-  class adi_reporter;
-    string name;
-    adi_reporter parent;
-
-    function new(
-      input string name,
-      input adi_reporter parent = null);
-
-      this.name = name;
-      this.parent = parent;
-    endfunction
-
-    function string get_path();
-      if (this.parent == null)
-        return this.name;
-      else
-        return $sformatf("%s.%s", this.parent.get_path(), this.name);
-    endfunction: get_path
-
-    function void info(
-      input string message,
-      input adi_verbosity_t verbosity);
-
-      `INFO(("[%s] %s", this.get_path(), message), verbosity);
-    endfunction: info
-
-    function void warning(input string message);
-      `WARNING(("[%s] %s", this.get_path(), message));
-    endfunction: warning
-
-    function void error(input string message);
-      `ERROR(("[%s] %s", this.get_path(), message));
-    endfunction: error
-
-    function void fatal(input string message);
-      `FATAL(("[%s] %s", this.get_path(), message));
-    endfunction: fatal
-  endclass: adi_reporter
-
+  import adi_reporter_pkg::*;
 
   class adi_component extends adi_reporter;
     function new(
@@ -88,4 +49,4 @@ package adi_common_pkg;
     endfunction: new
   endclass: adi_component
 
-endpackage: adi_common_pkg
+endpackage: adi_component_pkg

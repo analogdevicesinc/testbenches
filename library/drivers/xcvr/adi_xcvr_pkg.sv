@@ -38,7 +38,7 @@
 package adi_xcvr_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
   import adi_api_pkg::*;
   import m_axi_sequencer_pkg::*;
   import adi_regmap_pkg::*;

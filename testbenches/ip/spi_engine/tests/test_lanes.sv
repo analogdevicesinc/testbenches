@@ -178,13 +178,13 @@ program test_lanes (
 
     init();
 
-    #100ns
+    #100ns;
 
     fifo_spi_test();
     spi_lane_mask = (2 ** `NUM_OF_SDI)-1;
     spi_api.fifo_command(`SET_SPI_LANE_MASK(spi_lane_mask));//guarantee all lanes must be active
 
-    #100ns
+    #100ns;
 
     offload_spi_test();
 
@@ -292,7 +292,7 @@ program test_lanes (
     tx_data_cast         = new [`NUM_OF_SDO];
     tx_data              = new [`NUM_OF_SDO];
     sdo_write_data       = new [`NUM_OF_SDO];
-    rx_data              = new [(`NUM_OF_SDI)];
+    rx_data              = new [`NUM_OF_SDI];
     sdi_read_data        = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)];
     sdi_read_data_store  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)];
 
@@ -354,14 +354,14 @@ program test_lanes (
       `endif
     end
 
-    #100ns
+    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started."), ADI_VERBOSITY_LOW);
     spi_wait_send();
     spi_api.stop_offload();
     `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
-    #2000ns
+    #2000ns;
 
     if (irq_pending == 'h0) begin
       `FATAL(("IRQ Test FAILED"));
@@ -413,13 +413,13 @@ program test_lanes (
     //This test forces a wrong lane mask, then generates data
     //and much time later starts execution with the correct lane mask
     spi_api.fifo_command(`SET_SPI_LANE_MASK(8'hC)); //wrong lane mask on purpose
-    spi_lane_mask       = 8'h1; //new mask defining the active lanes (right lane mask)
+    spi_lane_mask       = 8'h8; //new mask defining the active lanes (right lane mask)
     num_of_active_lanes = $countones(spi_lane_mask);
 
-    rx_data_cast        = new [(`NUM_OF_SDI)];
+    rx_data_cast        = new [num_of_active_lanes];
     rx_data             = new [(`NUM_OF_SDI)];
-    sdi_fifo_data       = new [(`NUM_OF_SDI) * `NUM_OF_WORDS];
-    sdi_fifo_data_store = new [(`NUM_OF_SDI) * `NUM_OF_WORDS];
+    sdi_fifo_data       = new [num_of_active_lanes * `NUM_OF_WORDS];
+    sdi_fifo_data_store = new [num_of_active_lanes * `NUM_OF_WORDS];
     tx_data             = new [num_of_active_lanes];
     tx_data_cast        = new [num_of_active_lanes];
     receive_data        = new [`NUM_OF_SDO];
@@ -428,9 +428,12 @@ program test_lanes (
     
     // Generate a FIFO transaction, write SDO first
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
-      for (int j = 0; j < (`NUM_OF_SDI); j++) begin
+      for (int j = 0, k = 0; j < (`NUM_OF_SDI); j++) begin
         rx_data[j]      = spi_lane_mask[j] ? {$urandom} : `SDO_IDLE_STATE;
-        sdi_fifo_data_store[i * (`NUM_OF_SDI) + j] = rx_data[j];
+        if (spi_lane_mask[j]) begin
+          sdi_fifo_data_store[i * num_of_active_lanes + k] = rx_data[j];
+          k++;
+        end
       end
 
       for (int j = 0; j < num_of_active_lanes; j++) begin
@@ -452,7 +455,7 @@ program test_lanes (
     end
 
     //wait a long time before starting execution with the correct lane mask
-    #500ns
+    #500ns;
     generate_transfer_cmd(1, spi_lane_mask); //generate transfer with specific spi lane mask
 
     `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
@@ -462,8 +465,8 @@ program test_lanes (
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
       spi_api.sdi_fifo_read(rx_data_cast); //API always returns 32 bits
       spi_receive(receive_data);
-      for (int j = 0; j < (`NUM_OF_SDI); j++) begin
-        sdi_fifo_data[i * (`NUM_OF_SDI) + j] = rx_data_cast[j];
+      for (int j = 0; j < num_of_active_lanes; j++) begin
+        sdi_fifo_data[i * num_of_active_lanes + j] = rx_data_cast[j];
       end
       for (int j = 0; j < (`NUM_OF_SDO); j++) begin
         sdo_fifo_data[i * (`NUM_OF_SDO) + j] = receive_data[j];

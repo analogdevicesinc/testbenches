@@ -17,7 +17,7 @@ set project_name [file rootname $cfg_file]
 global ad_project_params
 
 set TWOLANES $ad_project_params(TWOLANES)
-set RESOLUTION $ad_project_params(RESOLUTION)
+set ADC_RES $ad_project_params(ADC_RES)
 
 # Set to use SmartConnect or AXI Interconnect
 set use_smartconnect 1

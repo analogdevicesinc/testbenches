@@ -85,7 +85,7 @@ pwm_gen_api cn0577_pwm_gen_api;
 
 // dma interface
 wire                     adc_valid;
-wire  [`RESOLUTION-1:0]  adc_data;
+wire  [`ADC_RES-1:0]  adc_data;
 reg                      adc_dovf = 1'b0;
 
 // --------------------------
@@ -176,59 +176,12 @@ end
 // Clk_gate shifted copy
 //---------------------------------------------------------------------------
 
-localparam int N = (`TWOLANES == 0 && `RESOLUTION == 16) ? 16 :
-                   (`TWOLANES == 0 && `RESOLUTION == 18) ? 18 :
-                   (`TWOLANES == 1 && `RESOLUTION == 16) ? 8 :
-                   (`TWOLANES == 1 && `RESOLUTION == 18) ? 10 :
+localparam int N = (`TWOLANES == 0 && `ADC_RES == 16) ? 16 :
+                   (`TWOLANES == 0 && `ADC_RES == 18) ? 18 :
+                   (`TWOLANES == 1 && `ADC_RES == 16) ? 8 :
+                   (`TWOLANES == 1 && `ADC_RES == 18) ? 10 :
                    -1; // Error case
 parameter int num_of_dco = N / 2;
-//reg clk_gate_sh = 1'b0;
-//reg [4:0] dco_edge_count = 3'h0;
-//reg dco_cp = 1'b0;
-
-//initial begin
-//  forever begin
-//    @(negedge clk_gate)
-//      #2
-//      dco_edge_count <= 0;
-//    end
-// end
-
-//initial begin
-//  forever begin
-//    @(posedge dco_in) begin
-//      dco_edge_count <= dco_edge_count + 1;
-//    end
-//    @(negedge dco_in) begin
-//      dco_edge_count <= dco_edge_count + 1;
-//    end
-//  end
-//end
-
-//initial begin
-//  forever begin
-//   @(ref_clk) begin
-//     if (clk_gate == 1'h1) begin
-//       if (dco_edge_count < N-1 && dco_edge_count >= 0)
-//         clk_gate_sh <= clk_gate;
-//       else
-//         clk_gate_sh <= 1'h0;
-//       end
-//     end
-//   end
-//end
-
-//initial begin
-//  forever begin
-//   @(ref_clk) begin
-//     if (clk_gate == 1'h1)
-//       dco_cp <= dco_in;
-//     else
-//       dco_cp <= 1'h0;
-//     end
-//   end
-//end
-
 
 initial begin
   forever begin
@@ -240,16 +193,12 @@ initial begin
   end
  end
 
-//assign dco_p = dco_in;
-//assign dco_n = ~dco_in;
-
-
 //---------------------------------------------------------------------------
 // Data store
 //---------------------------------------------------------------------------
 
-reg   [`RESOLUTION-1:0]  data_gen = 'h3a5a5;
-reg   [`RESOLUTION-1:0]  data_shift = 'h0;
+reg   [`ADC_RES-1:0]  data_gen = 'h3a5a5;
+reg   [`ADC_RES-1:0]  data_shift = 'h0;
 
 reg                     r_da_p = 1'b0;
 reg                     r_da_n = 1'b0;
@@ -269,14 +218,14 @@ initial begin
   forever begin
     @ (posedge dco_in, negedge dco_in) begin
       if (`TWOLANES == 1) begin
-        r_da_p = data_shift[`RESOLUTION - 1];
-        r_da_n = ~data_shift[`RESOLUTION - 1];
-        r_db_p = data_shift[`RESOLUTION - 2];
-        r_db_n = ~data_shift[`RESOLUTION - 2];
+        r_da_p = data_shift[`ADC_RES - 1];
+        r_da_n = ~data_shift[`ADC_RES - 1];
+        r_db_p = data_shift[`ADC_RES - 2];
+        r_db_n = ~data_shift[`ADC_RES - 2];
         data_shift = data_shift << 2;
       end else begin
-        r_da_p = data_shift[`RESOLUTION - 1];
-        r_da_n = ~data_shift[`RESOLUTION - 1];
+        r_da_p = data_shift[`ADC_RES - 1];
+        r_da_n = ~data_shift[`ADC_RES - 1];
         data_shift = data_shift << 1;
       end
     end
@@ -299,7 +248,7 @@ initial begin
   forever begin
     @(posedge dco_in);
     if (transfer_status) begin
-      if (`RESOLUTION == 16) begin
+      if (`ADC_RES == 16) begin
         if (`TWOLANES == 0) begin
           if (transfer_cnt[0]) begin
             dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen;
@@ -315,7 +264,7 @@ initial begin
             dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
           end
         end
-      end else if (`RESOLUTION == 18) begin
+      end else if (`ADC_RES == 18) begin
         if (`TWOLANES == 0) begin
           dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
           //dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
@@ -327,36 +276,6 @@ initial begin
     @(negedge dco_in);
   end
 end
-
-//initial begin
-//  forever begin
-//    @(posedge dco_in);
-//    if (transfer_status) begin
-//      if (`RESOLUTION == 16) begin
-//        if (`TWOLANES == 0) begin
-//          if (transfer_cnt[0]) begin
-//            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen - 16'h0001;
-//          end else begin
-//            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen - 16'h0001;
-//          end
-//        end else begin
-//          if (transfer_cnt[0]) begin
-//            dma_data_store_arr[(transfer_cnt - 1) >> 1][15:0] = data_gen;
-//          end else begin
-//            dma_data_store_arr[(transfer_cnt - 1) >> 1][31:16] = data_gen;
-//          end
-//        end
-//      end else if (`RESOLUTION == 18) begin
-//        if (`TWOLANES == 0) begin
-//          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen - 16'h0001;
-//        end else begin
-//          dma_data_store_arr[(transfer_cnt - 1) >> 1] = data_gen;
-//        end
-//      end
-//    end
-//    @(negedge dco_in);
-//  end
-//end
 
 //---------------------------------------------------------------------------
 // Sanity test reg interface
@@ -386,7 +305,6 @@ task data_acquisition_test();
 
     // Configure AXI PWM GEN
     axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    //axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h8)); // set PWM period
 
     cn0577_pwm_gen_api.pulse_period_config(
       .channel(8'h00),

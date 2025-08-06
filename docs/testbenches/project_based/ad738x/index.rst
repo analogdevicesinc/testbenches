@@ -36,7 +36,7 @@ The following parameters of this project that can be configured:
 -  ALERT_SPI_N: defines if a known pin will operate as a serial data output pin
    or alert indication pin:
    Options: 0 - Serial Data Output Pin, 1 - Alert Indication Ouput Pin
--  NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
+-  NUM_OF_SDIO: defines the number of MOSI lines of the SPI interface:
    Options: 1 - Interleaved mode, 2 - 1 lane per channel,
    4 - 2 lanes per channel
 
@@ -45,13 +45,13 @@ Configuration files
 
 The following configuration files are available:
 
-   +-----------------------+--------------------------+
-   | Configuration mode    | Parameters               |
-   |                       +----------+---------------+
-   |                       | ALERT_SPI_N | NUM_OF_SDI |
-   +=======================+=============+============+
-   | cfg1                  | 0           | 2          |
-   +-----------------------+-------------+------------+
+   +-----------------------+---------------------------+
+   | Configuration mode    | Parameters                |
+   |                       +----------+----------------+
+   |                       | ALERT_SPI_N | NUM_OF_SDIO |
+   +=======================+=============+=============+
+   | cfg1                  | 0           | 2           |
+   +-----------------------+-------------+-------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

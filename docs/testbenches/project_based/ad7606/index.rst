@@ -39,7 +39,7 @@ The following parameters of this project that can be configured:
    Options: 0 - without external clock, 1 - with external clock
 -  INTF: defines the interface type:
    Options: 0 - Parallel, 1 - Serial
--  NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
+-  NUM_OF_SDIO: defines the number of MOSI lines of the SPI interface:
    Options: 1 - Interleaved mode, 2 - 1 lane per channel,
    4 - 2 lanes per channel, 8 - 4 lanes per channel
 
@@ -50,15 +50,15 @@ The following configuration files are available:
 
    +-----------------------+------------------------------------------+
    | Configuration mode    | Parameters                               |
-   |                       +------------+---------+------+------------+
-   |                       | DEV_CONFIG | EXT_CLK | INTF | NUM_OF_SDI |
-   +=======================+============+=========+======+============+
-   | cfg1                  | 0          | 0       | 0    | 1          |
-   +-----------------------+------------+---------+------+------------+
-   | cfg2                  | 1          | 0       | 0    | 1          |
-   +-----------------------+------------+---------+------+------------+
-   | cfg3                  | 2          | 0       | 0    | 1          |
-   +-----------------------+------------+---------+------+------------+
+   |                       +------------+---------+------+-------------+
+   |                       | DEV_CONFIG | EXT_CLK | INTF | NUM_OF_SDIO |
+   +=======================+============+=========+======+=============+
+   | cfg1                  | 0          | 0       | 0    | 1           |
+   +-----------------------+------------+---------+------+-------------+
+   | cfg2                  | 1          | 0       | 0    | 1           |
+   +-----------------------+------------+---------+------+-------------+
+   | cfg3                  | 2          | 0       | 0    | 1           |
+   +-----------------------+------------+---------+------+-------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

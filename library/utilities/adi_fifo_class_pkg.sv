@@ -35,58 +35,61 @@
 
 `include "utils.svh"
 
-package adi_object_pkg;
+package adi_fifo_class_pkg;
 
   import logger_pkg::*;
+  import adi_object_pkg::*;
+  import adi_fifo_pkg::*;
 
-  class adi_object;
-    protected string name;
+  class adi_fifo_class #(type data_type = int) extends adi_fifo#(.data_type(data_type));
 
-    function new(input string name = "");
-      this.name = name;
-    endfunction
+    function new(
+      input string name = "",
+      input int depth = 0);
+
+      super.new(.name(name));
+
+      this.depth = depth;
+    endfunction: new
 
     virtual function adi_object clone();
-      adi_object object;
-      object = new(.name(this.name));
-      this.copy(object);
+      adi_fifo_class #(data_type) object;
+
+      object = new(
+        .name(this.name),
+        .depth(this.depth));
+
+      this.copy(.object(object));
+
       return object;
     endfunction: clone
 
-    virtual function string convert2string();
-      string str;
-      str = {"ADI Object\n",
-        $sformatf("name: %s\n", this.name)};
-      return(str);
-    endfunction: convert2string
-
-    function void copy(input adi_object object);
-      this.do_copy(.object(object));
-    endfunction: copy
-
-    virtual function void do_copy(input adi_object object);
-      return;
-    endfunction: do_copy
-
-    function void print();
-      `INFO(("%s", this.do_print()), ADI_VERBOSITY_NONE);
-    endfunction: print
-
-    function string sprint();
-      return this.do_print();
-    endfunction: sprint
-
-    virtual function string do_print();
-      return this.convert2string();
-    endfunction: do_print
-
-    function bit compare(input adi_object object);
-      return this.do_compare(.object(object));
-    endfunction: compare
-
     virtual function bit do_compare(input adi_object object);
+      adi_fifo_class #(data_type) cast_object;
+      data_type local_storage;
+      data_type object_storage;
+
+      if ($cast(
+        .dest_var(cast_object),
+        .source_exp(object)) == 0) begin
+
+        `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
+      end
+
+      for (int i=0; i<this.size(); i++) begin
+        local_storage = this.pop();
+        void'(this.push(.data(local_storage)));
+
+        object_storage = cast_object.pop();
+        void'(cast_object.push(.data(object_storage)));
+
+        if (local_storage.compare(.object(object_storage)) == 0) begin
+          return 0;
+        end
+      end
       return 1;
     endfunction: do_compare
-  endclass: adi_object
 
-endpackage: adi_object_pkg
+  endclass: adi_fifo_class
+
+endpackage: adi_fifo_class_pkg

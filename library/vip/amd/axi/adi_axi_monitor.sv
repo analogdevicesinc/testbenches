@@ -122,7 +122,7 @@ package adi_axi_monitor_pkg;
       xil_axi_strb_beat strb_beat;
       int num_bytes;
       logic [7:0] axi_byte;
-      logic [7:0] data_queue [$];
+      // logic [7:0] data_queue [$];
 
       forever begin
         this.monitor.item_collected_port.get(transaction);
@@ -133,20 +133,25 @@ package adi_axi_monitor_pkg;
           for (int j=0; j<num_bytes; j++) begin
             axi_byte = data_beat[j*8+:8];
             // put each beat into byte queues
-            if (bit'(transaction.get_cmd_type()) == 1'b0) begin // READ
-              data_queue.push_back(axi_byte);
-            end else if (strb_beat[j] || !this.monitor.vif_proxy.C_AXI_HAS_WSTRB) begin // WRITE
-              data_queue.push_back(axi_byte);
+            // if (bit'(transaction.get_cmd_type()) == 1'b0) begin // READ
+            //   data_queue.push_back(axi_byte);
+            // end else if (strb_beat[j] || !this.monitor.vif_proxy.C_AXI_HAS_WSTRB) begin // WRITE
+            //   data_queue.push_back(axi_byte);
+            // end
+            if (bit'(transaction.get_cmd_type()) == 1'b0) begin
+              this.publisher_rx.notify(axi_byte);
+            end else begin
+              this.publisher_tx.notify(axi_byte);
             end
           end
-          this.info($sformatf("Caught an AXI4 transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
+          // this.info($sformatf("Caught an AXI4 transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
         end
-        if (bit'(transaction.get_cmd_type()) == 1'b0) begin
-          this.publisher_rx.notify(data_queue);
-        end else begin
-          this.publisher_tx.notify(data_queue);
-        end
-        data_queue.delete();
+        // if (bit'(transaction.get_cmd_type()) == 1'b0) begin
+        //   this.publisher_rx.notify(data_queue);
+        // end else begin
+        //   this.publisher_tx.notify(data_queue);
+        // end
+        // data_queue.delete();
       end
     endtask: get_transaction
 

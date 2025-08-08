@@ -40,34 +40,27 @@ package adi_fifo_pkg;
   import logger_pkg::*;
   import adi_object_pkg::*;
 
-  class adi_fifo #(type data_type = int) extends adi_object;
+  virtual class adi_fifo #(type data_type = int) extends adi_object;
 
-    local data_type fifo [$];
-    local int depth;
-    local bit custom_compare = 0;
+    protected data_type fifo [$];
+    protected int depth;
 
     function new(
-      input string name,
+      input string name = "",
       input int depth = 0);
-
-      data_type dummy_data;
 
       super.new(.name(name));
 
       this.depth = depth;
-
-      if (dummy_data == null) begin
-        this.custom_compare = 1;
-      end
     endfunction: new
 
     function int size();
       return this.fifo.size();
     endfunction: size
 
-    function void clear();
+    function void delete();
       this.fifo.delete();
-    endfunction: clear
+    endfunction: delete
 
     function int room();
       if (this.depth == 0) begin
@@ -84,9 +77,12 @@ package adi_fifo_pkg;
       if (this.room()) begin
         return 0;
       end else begin
+        // this.fifo.insert(
+        //   .index(index),
+        //   .item(data));
         this.fifo.insert(
-          .index(index),
-          .item(data));
+          index,
+          data);
         return 1;
       end
     endfunction: insert
@@ -95,7 +91,8 @@ package adi_fifo_pkg;
       if (this.room()) begin
         return 0;
       end else begin
-        this.fifo.push_back(.item(data));
+        // this.fifo.push_back(.item(data));
+        this.fifo.push_back(data);
         return 1;
       end
     endfunction: push
@@ -104,17 +101,25 @@ package adi_fifo_pkg;
       return this.fifo.pop_front();
     endfunction: pop
 
-    virtual function adi_object clone();
-      adi_fifo #(data_type) object;
+    virtual function string convert2string();
+      string str;
+      str = {"ADI FIFO\n",
+        $sformatf("name: %s\n", this.name),
+        $sformatf("depth: %d\n", this.depth)};
+      return(str);
+    endfunction: convert2string
 
-      object = new(
-        .name(this.name),
-        .depth(this.depth));
+    // virtual function adi_object clone();
+    //   adi_fifo #(data_type) object;
 
-      this.copy(.object(object));
+    //   object = new(
+    //     .name(this.name),
+    //     .depth(this.depth));
 
-      return object;
-    endfunction: clone
+    //   this.copy(.object(object));
+
+    //   return object;
+    // endfunction: clone
 
     function void copy(input adi_object object);
       adi_fifo #(data_type) cast_object;
@@ -123,7 +128,7 @@ package adi_fifo_pkg;
         .dest_var(cast_object),
         .source_exp(object)) == 0) begin
 
-        `FATAL(("Input object %s type is not compatible with current object %s type!", object.convert2string(), this.convert2string()));
+        `FATAL(("Input object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
       if (this.size() == 0) begin
@@ -137,9 +142,12 @@ package adi_fifo_pkg;
       adi_fifo #(data_type) cast_object;
       data_type temporary_storage;
 
-      $cast(
+      if ($cast(
         .dest_var(cast_object),
-        .source_exp(object));
+        .source_exp(object)) == 0) begin
+
+        `FATAL(("Input object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
+      end
 
       for (int i=0; i<this.size(); i++) begin
         temporary_storage = this.pop();
@@ -156,7 +164,7 @@ package adi_fifo_pkg;
         .dest_var(cast_object),
         .source_exp(object)) == 0) begin
 
-        `FATAL(0, ("Cast object %s type is not compatible with current object %s type!", object.convert2string(), this.convert2string()));
+        `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
       if (this.room() != cast_object.room()) begin
@@ -169,35 +177,6 @@ package adi_fifo_pkg;
 
       return do_compare(.object(cast_object));
     endfunction: compare
-
-    virtual function bit do_compare(input data_type object);
-      adi_fifo #(data_type) cast_object;
-      data_type local_storage;
-      data_type object_storage;
-
-      $cast(
-        .dest_var(cast_object),
-        .source_exp(object));
-
-      for (int i=0; i<this.size(); i++) begin
-        local_storage = this.pop();
-        void'(this.push(.data(local_storage)));
-
-        object_storage = cast_object.pop();
-        void'(cast_object.push(.data(object_storage)));
-
-        if (custom_compare) begin
-          if (local_storage.compare(.object(object_storage)) == 0) begin
-            return 0;
-          end
-        end else begin
-          if (local_storage !== object_storage) begin
-            return 0;
-          end
-        end
-      end
-      return 1;
-    endfunction: do_compare
 
   endclass: adi_fifo
 

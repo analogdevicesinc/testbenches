@@ -46,7 +46,7 @@ package adi_lifo_pkg;
     local int depth;
 
     function new(
-      input string name,
+      input string name = "",
       input int depth);
 
       super.new(name);

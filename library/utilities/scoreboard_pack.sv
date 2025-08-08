@@ -38,7 +38,6 @@
 package scoreboard_pack_pkg;
 
   import logger_pkg::*;
-  import adi_component_pkg::*;
   import scoreboard_pkg::*;
 
   typedef enum {
@@ -73,7 +72,7 @@ package scoreboard_pack_pkg;
     endfunction: new
 
     // compare the collected data
-    virtual function void compare_transaction();
+    virtual task compare_transaction();
 
       logic [7:0] source_byte;
       logic [7:0] sink_byte;
@@ -113,7 +112,7 @@ package scoreboard_pack_pkg;
         this.byte_streams_empty_sig = 1;
         ->this.byte_streams_empty;
       end
-    endfunction: compare_transaction
+    endtask: compare_transaction
 
   endclass
 

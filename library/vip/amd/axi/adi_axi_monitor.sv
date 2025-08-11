@@ -42,7 +42,7 @@ package adi_axi_monitor_pkg;
   import adi_agent_pkg::*;
   import adi_monitor_pkg::*;
   import pub_sub_pkg::*;
-
+  import adi_fifo_primitive_pkg::*;
 
   class adi_axi_monitor_base extends adi_monitor;
 
@@ -122,7 +122,7 @@ package adi_axi_monitor_pkg;
       xil_axi_strb_beat strb_beat;
       int num_bytes;
       logic [7:0] axi_byte;
-      // logic [7:0] data_queue [$];
+      adi_fifo_primitive #(logic [7:0]) data_queue = new();
 
       forever begin
         this.monitor.item_collected_port.get(transaction);
@@ -133,25 +133,20 @@ package adi_axi_monitor_pkg;
           for (int j=0; j<num_bytes; j++) begin
             axi_byte = data_beat[j*8+:8];
             // put each beat into byte queues
-            // if (bit'(transaction.get_cmd_type()) == 1'b0) begin // READ
-            //   data_queue.push_back(axi_byte);
-            // end else if (strb_beat[j] || !this.monitor.vif_proxy.C_AXI_HAS_WSTRB) begin // WRITE
-            //   data_queue.push_back(axi_byte);
-            // end
-            if (bit'(transaction.get_cmd_type()) == 1'b0) begin
-              this.publisher_rx.notify(axi_byte);
-            end else begin
-              this.publisher_tx.notify(axi_byte);
+            if (bit'(transaction.get_cmd_type()) == 1'b0) begin // READ
+              void'(data_queue.push(axi_byte));
+            end else if (strb_beat[j] || !this.monitor.vif_proxy.C_AXI_HAS_WSTRB) begin // WRITE
+              void'(data_queue.push(axi_byte));
             end
           end
-          // this.info($sformatf("Caught an AXI4 transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
         end
-        // if (bit'(transaction.get_cmd_type()) == 1'b0) begin
-        //   this.publisher_rx.notify(data_queue);
-        // end else begin
-        //   this.publisher_tx.notify(data_queue);
-        // end
-        // data_queue.delete();
+        this.info($sformatf("Caught an AXI4 transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
+        if (bit'(transaction.get_cmd_type()) == 1'b0) begin
+          this.publisher_rx.notify(data_queue);
+        end else begin
+          this.publisher_tx.notify(data_queue);
+        end
+        data_queue.delete();
       end
     endtask: get_transaction
 

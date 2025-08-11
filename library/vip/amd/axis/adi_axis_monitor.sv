@@ -42,7 +42,7 @@ package adi_axis_monitor_pkg;
   import adi_agent_pkg::*;
   import adi_monitor_pkg::*;
   import pub_sub_pkg::*;
-
+  import adi_fifo_primitive_pkg::*;
 
   class adi_axis_monitor_base extends adi_monitor;
 
@@ -120,7 +120,7 @@ package adi_axis_monitor_pkg;
       xil_axi4stream_strb_beat keep_beat;
       int num_bytes;
       logic [7:0] axi_byte;
-      // logic [7:0] data_queue [$];
+      adi_fifo_primitive #(logic [7:0]) data_queue = new();
 
       forever begin
         this.monitor.item_collected_port.get(transaction);
@@ -131,13 +131,12 @@ package adi_axis_monitor_pkg;
         for (int j=0; j<num_bytes; j++) begin
           axi_byte = data_beat[j*8+:8];
           if (keep_beat[j+:1] || !this.monitor.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP]) begin
-            // data_queue.push_back(axi_byte);
-            this.publisher.notify(axi_byte);
+            void'(data_queue.push(axi_byte));
           end
         end
-        // this.info($sformatf("Caught an AXI4 stream transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
-        // this.publisher.notify(data_queue);
-        // data_queue.delete();
+        this.info($sformatf("Caught an AXI4 stream transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
+        this.publisher.notify(data_queue);
+        data_queue.delete();
       end
     endtask: get_transaction
 

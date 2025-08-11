@@ -69,10 +69,7 @@ package adi_fifo_class_pkg;
       data_type local_storage;
       data_type object_storage;
 
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
+      if ($cast(cast_object, object) == 0) begin
         `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 

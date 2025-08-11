@@ -40,7 +40,7 @@ package adi_fifo_pkg;
   import logger_pkg::*;
   import adi_object_pkg::*;
 
-  virtual class adi_fifo #(type data_type = int) extends adi_object;
+  class adi_fifo #(type data_type = int) extends adi_object;
 
     protected data_type fifo [$];
     protected int depth;
@@ -77,21 +77,15 @@ package adi_fifo_pkg;
       if (this.room()) begin
         return 0;
       end else begin
-        // this.fifo.insert(
-        //   .index(index),
-        //   .item(data));
-        this.fifo.insert(
-          index,
-          data);
+        this.fifo.insert(index, data);
         return 1;
       end
     endfunction: insert
 
     function bit push(input data_type data);
-      if (this.room()) begin
+      if (!this.room()) begin
         return 0;
       end else begin
-        // this.fifo.push_back(.item(data));
         this.fifo.push_back(data);
         return 1;
       end
@@ -103,31 +97,16 @@ package adi_fifo_pkg;
 
     virtual function string convert2string();
       string str;
-      str = {"ADI FIFO\n",
-        $sformatf("name: %s\n", this.name),
-        $sformatf("depth: %d\n", this.depth)};
+      str = {$sformatf("ADI FIFO\n"),
+        $sformatf("  name: %s\n", this.name),
+        $sformatf("  depth: %d\n", this.depth)};
       return(str);
     endfunction: convert2string
-
-    // virtual function adi_object clone();
-    //   adi_fifo #(data_type) object;
-
-    //   object = new(
-    //     .name(this.name),
-    //     .depth(this.depth));
-
-    //   this.copy(.object(object));
-
-    //   return object;
-    // endfunction: clone
 
     function void copy(input adi_object object);
       adi_fifo #(data_type) cast_object;
 
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
+      if ($cast(cast_object, object) == 0) begin
         `FATAL(("Input object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
@@ -135,17 +114,14 @@ package adi_fifo_pkg;
         return;
       end
 
-      this.do_copy(.object(object));
+      this.do_copy(.object(cast_object));
     endfunction: copy
 
     virtual function void do_copy(input adi_object object);
       adi_fifo #(data_type) cast_object;
       data_type temporary_storage;
 
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
+      if ($cast(cast_object, object) == 0) begin
         `FATAL(("Input object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
@@ -160,18 +136,17 @@ package adi_fifo_pkg;
     function bit compare(input adi_object object);
       adi_fifo #(data_type) cast_object;
 
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
+      if ($cast(cast_object, object) == 0) begin
         `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
       if (this.room() != cast_object.room()) begin
+        `ERROR(("Room size missmatch: %d - %d", this.room(), cast_object.room()));
         return 0;
       end
 
       if (this.size() != cast_object.size()) begin
+        `ERROR(("Size missmatch: %d - %d", this.size(), cast_object.size()));
         return 0;
       end
 

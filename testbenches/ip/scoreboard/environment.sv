@@ -50,7 +50,7 @@ package environment_pkg;
   import s_axis_sequencer_pkg::*;
   import adi_axi_agent_pkg::*;
   import adi_axis_agent_pkg::*;
-  import scoreboard_primitive_pkg::*;
+  import scoreboard_pkg::*;
   import vip_agent_typedef_pkg::*;
 
 
@@ -62,8 +62,8 @@ package environment_pkg;
     adi_axi_agent_base adc_dst_axi_pt_agent;
     adi_axi_agent_base dac_src_axi_pt_agent;
 
-    scoreboard_primitive #(logic [7:0]) scoreboard_tx;
-    scoreboard_primitive #(logic [7:0]) scoreboard_rx;
+    scoreboard #(logic [7:0]) scoreboard_tx;
+    scoreboard #(logic [7:0]) scoreboard_rx;
 
     //============================================================================
     // Constructor
@@ -115,13 +115,8 @@ package environment_pkg;
     // Run subroutine
     //============================================================================
     task run();
-      fork
-        this.adc_src_axis_agent.master_sequencer.start();
-        this.dac_dst_axis_agent.slave_sequencer.start();
-
-        this.scoreboard_tx.run();
-        this.scoreboard_rx.run();
-      join_none
+      this.scoreboard_tx.run();
+      this.scoreboard_rx.run();
     endtask
 
     //============================================================================

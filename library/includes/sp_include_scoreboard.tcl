@@ -40,7 +40,5 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/utilities/adi_fifo_primitive_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_fifo_class_pkg.sv" \
   "$ad_tb_dir/library/utilities/scoreboard.sv" \
-  "$ad_tb_dir/library/utilities/scoreboard_primitive.sv" \
-  "$ad_tb_dir/library/utilities/scoreboard_class.sv" \
   "$ad_tb_dir/library/utilities/scoreboard_pack.sv" \
 ]

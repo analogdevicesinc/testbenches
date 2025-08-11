@@ -60,7 +60,7 @@ package pub_sub_pkg;
       return this.id;
     endfunction: get_id
 
-    pure virtual task update(input data_type data);
+    pure virtual task update(input adi_fifo #(data_type) data);
 
   endclass: adi_subscriber
 
@@ -92,7 +92,7 @@ package pub_sub_pkg;
       end
     endfunction: unsubscribe
 
-    task notify(input data_type data);
+    task notify(input adi_fifo #(data_type) data);
       foreach (this.subscriber_list[i]) begin
         this.subscriber_list[i].update(data);
       end

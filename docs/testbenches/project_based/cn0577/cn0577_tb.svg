@@ -1807,8 +1807,8 @@
      showgrid="true"
      inkscape:current-layer="g11134"
      inkscape:document-units="px"
-     inkscape:cy="227.28432"
-     inkscape:cx="452.04327"
+     inkscape:cy="257.5889"
+     inkscape:cx="554.06867"
      inkscape:zoom="0.98994949"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -1943,7 +1943,7 @@
          inkscape:export-ydpi="96"
          inkscape:export-xdpi="96"
          y="12.800156"
-         x="-48.357376"
+         x="-21.210112"
          height="138.91609"
          width="25.810722"
          id="rect4487-0"
@@ -1953,12 +1953,12 @@
          inkscape:export-xdpi="96"
          transform="rotate(-90)"
          id="text4489-3"
-         y="-28.98402"
+         y="-1.8367714"
          x="-120.36315"
          style="font-style:normal;font-weight:normal;font-size:12px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
          xml:space="preserve"><tspan
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.5px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:1px"
-           y="-28.98402"
+           y="-1.8367714"
            x="-120.36315"
            id="tspan4491-1"
            sodipodi:role="line">DDR VIP</tspan></text>
@@ -2252,7 +2252,7 @@
       <g
          id="g5654"
          style="display:inline;fill:#a01414;fill-opacity:1;stroke:#a01414;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         transform="matrix(4.1009995,0,0,0.85718058,-556.42903,-385.53793)"
+         transform="matrix(3.235027,0,0,0.86988741,-416.90606,-392.4788)"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36">
@@ -2613,7 +2613,7 @@
            id="tspan2399-9-2-70-3"
            x="60.080853"
            y="86.763786"
-           style="stroke-width:0.905744">16/32</tspan></text>
+           style="stroke-width:0.905744">64</tspan></text>
       <text
          xml:space="preserve"
          style="font-style:normal;font-weight:normal;font-size:14.2731px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"

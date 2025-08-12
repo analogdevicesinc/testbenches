@@ -304,7 +304,7 @@ task data_acquisition_test();
     end
 
     // Configure AXI PWM GEN
-    axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    cn0577_pwm_gen_api.reset(); // PWM_GEN reset in regmap (ACTIVE HIGH)
 
     cn0577_pwm_gen_api.pulse_period_config(
       .channel(8'h00),
@@ -326,7 +326,8 @@ task data_acquisition_test();
       .channel(8'h01),
       .offset(32'h03));
 
-    axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+    cn0577_pwm_gen_api.load_config(); // load AXI_PWM_GEN configuration
+    cn0577_pwm_gen_api.start();
     `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
 
     // Configure DMA
@@ -358,7 +359,7 @@ task data_acquisition_test();
     transfer_status = 0;
 
     // Stop pwm gen
-    axi_write (`AXI_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
+    cn0577_pwm_gen_api.reset();
     `INFO(("AXI_PWM_GEN stopped"), ADI_VERBOSITY_LOW);
 
     // Configure axi_ltc2387

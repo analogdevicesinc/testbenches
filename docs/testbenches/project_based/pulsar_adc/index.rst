@@ -33,7 +33,7 @@ The following parameters of this project that can be configured:
 
 -  CLK_MODE: defines clocking mode of the device's digital interface:
    Options: 0 - SPI mode
--  NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
+-  NUM_OF_SDIO: defines the number of MOSI lines of the SPI interface:
    Options: 1 - Interleaved mode
 -  CAPTURE_ZONE: defines the capture zone of the next sample.
    There are two capture zones: 1 - from negative edge of the BUSY line
@@ -50,7 +50,7 @@ The following configuration file is available:
    +-----------------------+-----------------------------------------------+
    | Configuration mode    | Parameters                                    |
    |                       +----------+------------+--------------+--------+
-   |                       | CLK_MODE | NUM_OF_SDI | CAPTURE_ZONE | DDR_EN |
+   |                       | CLK_MODE |NUM_OF_SDIO | CAPTURE_ZONE | DDR_EN |
    +=======================+==========+============+==============+========+
    | cfg1                  | 0        | 2          | 1            | 0      |
    +-----------------------+----------+------------+--------------+--------+

@@ -1,17 +1,18 @@
 ####################################################################################
 ####################################################################################
-## Copyright (C) 2021 Analog Devices, Inc.
+## Copyright (C) 2021-2026 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_pwm_gen.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_clk_gen.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_spi_engine.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_clkgen_pkg.sv
-SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_pwm_gen_pkg.sv
+SV_DEPS += spi_environment.sv
 
 LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_dmac

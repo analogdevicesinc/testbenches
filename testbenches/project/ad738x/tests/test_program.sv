@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2023-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -36,16 +36,20 @@
 //
 
 `include "utils.svh"
+`include "axi_definitions.svh"
+`include "axis_definitions.svh"
 
-import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
-import adi_regmap_pkg::*;
-import adi_regmap_clkgen_pkg::*;
-import adi_regmap_dmac_pkg::*;
-import adi_regmap_pwm_gen_pkg::*;
-import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import spi_environment_pkg::*;
+import axi4stream_vip_pkg::*;
+import spi_engine_api_pkg::*;
+import dmac_api_pkg::*;
+import pwm_gen_api_pkg::*;
+import clk_gen_api_pkg::*;
+import spi_engine_instr_pkg::*;
+import adi_spi_vip_pkg::*;
+import axi_vip_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -53,468 +57,483 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
-localparam SAMPLE_PERIOD              = 500;
-localparam ASYNC_SPI_CLK              = 1;
-localparam DATA_WIDTH                 = 32;
-localparam DATA_DLENGTH               = 32;
-localparam ECHO_SCLK                  = 0;
-localparam SDI_PHY_DELAY              = 18;
-localparam SDI_DELAY                  = 0;
-localparam NUM_OF_CS                  = 1;
-localparam THREE_WIRE                 = 0;
-localparam CPOL                       = 0;
-localparam CPHA                       = 1;
-localparam CLOCK_DIVIDER              = 0;
-localparam NUM_OF_WORDS               = 1;
-localparam NUM_OF_TRANSFERS           = 10;
-
-//---------------------------------------------------------------------------
-// SPI Engine instructions
-//---------------------------------------------------------------------------
-
-// Chip select instructions
-localparam INST_CS_OFF                = 32'h0000_10FF;
-localparam INST_CS_ON                 = 32'h0000_10FE;
-
-// Transfer instructions
-localparam INST_WR                    = 32'h0000_0100 | (NUM_OF_WORDS-1);
-localparam INST_RD                    = 32'h0000_0200 | (NUM_OF_WORDS-1);
-localparam INST_WRD                   = 32'h0000_0300 | (NUM_OF_WORDS-1);
-
-// Configuration register instructions
-localparam INST_CFG                   = 32'h0000_2100 | (THREE_WIRE << 2) | (CPOL << 1) | CPHA;
-localparam INST_PRESCALE              = 32'h0000_2000 | CLOCK_DIVIDER;
-localparam INST_DLENGTH               = 32'h0000_2200 | DATA_DLENGTH;
-
-// Synchronization
-localparam INST_SYNC                  = 32'h0000_3000;
-
-// Sleep instruction
-localparam INST_SLEEP                 = 32'h0000_3100;
-`define sleep(a)                     = INST_SLEEP | (a & 8'hFF);
-
 program test_program (
-  input ad738x_spi_clk,
-  input ad738x_irq,
-  input ad738x_spi_sclk,
-  input [(`NUM_OF_SDI - 1):0] ad738x_spi_sdi,
-  input ad738x_spi_cs);
+  inout ad738x_irq,
+  inout ad738x_spi_sclk,
+  inout [(`NUM_OF_CS - 1):0] ad738x_spi_cs,
+  inout ad738x_spi_clk,
+  inout [(`NUM_OF_SDIO-1):0] ad738x_spi_sdi);
 
   timeunit 1ns;
-  timeprecision 1ps;
+  timeprecision 100ps;
 
-test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  // declare the class instances
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  spi_environment spi_env;
+  spi_engine_api spi_api;
+  dmac_api dma_api;
+  pwm_gen_api pwm_api;
+  clk_gen_api clkgen_api;
 
-// --------------------------
-// Wrapper function for AXI read verif
-// --------------------------
-task axi_read_v(
-    input   [31:0]  raddr,
-    input   [31:0]  vdata);
+  // --------------------------
+  // Wrapper function for SPI receive (from DUT)
+  // --------------------------
+  task automatic spi_receive(
+      ref int unsigned  data[]);
+      spi_env.spi_agent.sequencer.receive_data(data);
+  endtask
 
-  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
-endtask
+  // --------------------------
+  // Wrapper function for SPI send (to DUT)
+  // --------------------------
+  task spi_send(
+      input [`DATA_DLENGTH-1:0] data[]);
+    spi_env.spi_agent.sequencer.send_data(data);
+  endtask
 
-task axi_read(
-    input   [31:0]  raddr,
-    output  [31:0]  data);
+  // --------------------------
+  // Wrapper function for waiting for all SPI
+  // --------------------------
+  task spi_wait_send();
+    spi_env.spi_agent.sequencer.flush_send();
+  endtask
 
-  base_env.mng.sequencer.RegRead32(raddr,data);
-endtask
+  bit   [              7:0]  sdi_lane_mask;
+  bit   [              7:0]  sdo_lane_mask;
+  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data [];
+  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data [];
+  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data_store [];
+  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data_store [];
+  bit   [`DATA_DLENGTH-1:0]  rx_data [];
+  bit   [`DATA_DLENGTH-1:0]  tx_data [];
+  logic [  `DATA_WIDTH-1:0]  rx_data_cast [];
+  int unsigned               tx_data_cast [];
+  int unsigned               receive_data [];
+  int num_of_active_sdi_lanes = $countones(`SDI_LANE_MASK);
+  int num_of_active_sdo_lanes = $countones(`SDO_LANE_MASK);
 
-// --------------------------
-// Wrapper function for AXI write
-// --------------------------
-task axi_write(
-  input [31:0]  waddr,
-  input [31:0]  wdata);
+  // --------------------------
+  // Main procedure
+  // --------------------------
+  initial begin
 
-  base_env.mng.sequencer.RegWrite32(waddr,wdata);
-endtask
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-// --------------------------
-// Main procedure
-// --------------------------
-initial begin
+    //creating environment
+    base_env = new("Base Environment",
+                      `TH.`SYS_CLK.inst.IF,
+                      `TH.`DMA_CLK.inst.IF,
+                      `TH.`DDR_CLK.inst.IF,
+                      `TH.`SYS_RST.inst.IF,
+                      `TH.`MNG_AXI.inst.IF,
+                      `TH.`DDR_AXI.inst.IF);
 
-  //creating environment
-  base_env = new("Base Environment",
-                  `TH.`SYS_CLK.inst.IF,
-                  `TH.`DMA_CLK.inst.IF,
-                  `TH.`DDR_CLK.inst.IF,
-                  `TH.`SYS_RST.inst.IF,
-                  `TH.`MNG_AXI.inst.IF,
-                  `TH.`DDR_AXI.inst.IF);
+    spi_env = new("SPI Engine Environment",
+                  `ifdef DEF_SDO_STREAMING
+                    `TH.`SDO_SRC.inst.IF,
+                  `endif
+                  `TH.`SPI_S.inst.IF.vif);
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    spi_api = new("SPI Engine API",
+                  base_env.mng.sequencer,
+                  `SPI_AD738x_REGMAP_BA);
 
-  base_env.start();
-  base_env.sys_reset();
+    dma_api = new("RX DMA API",
+                  base_env.mng.sequencer,
+                  `AD738x_DMA_BA);
 
-  sanity_test();
+    clkgen_api = new("CLKGEN API",
+                    base_env.mng.sequencer,
+                    `AD738x_AXI_CLKGEN_BA);
 
-  #100ns;
+    pwm_api = new("PWM API",
+                  base_env.mng.sequencer,
+                  `AD738x_PWM_GEN_BA);
 
-  fifo_spi_test();
+    base_env.start();
+    spi_env.start();
 
-  #100ns;
+    base_env.sys_reset();
 
-  offload_spi_test();
+    spi_env.configure();
 
-  base_env.stop();
+    spi_env.run();
 
-  `INFO(("Test Done"), ADI_VERBOSITY_NONE);
-  $finish();
+    spi_env.spi_agent.sequencer.set_default_miso_data('h2AA55);
 
-end
+    // start sdo source (will wait for data enqueued)
+    `ifdef DEF_SDO_STREAMING
+      spi_env.sdo_src_agent.sequencer.start();
+    `endif
 
-//---------------------------------------------------------------------------
-// Sanity test reg interface
-//---------------------------------------------------------------------------
+    sanity_tests();
 
-task sanity_test();
-  bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
-                            | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
-                            | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
-  axi_read_v (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
-  axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  axi_read_v (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
-endtask
+    init();
 
-//---------------------------------------------------------------------------
-// SPI Engine generate transfer
-//---------------------------------------------------------------------------
+    #100ns;
 
-task generate_transfer_cmd(
-   input [7:0] sync_id);
+    fifo_spi_test();
+    sdi_lane_mask = 8'h1;
+    sdo_lane_mask = 8'h1;
+    // sdi_lane_mask = (2 ** `NUM_OF_SDIO)-1;
+    // sdo_lane_mask = (2 ** `NUM_OF_SDO)-1;
+    num_of_active_sdi_lanes = $countones(sdi_lane_mask);
+    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
+    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));//guarantee only one SDO lane is active
 
-    // assert CSN
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_ON);
-    // transfer data
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_WRD);
-    // de-assert CSN
-    axi_write (`SPI_AD738x_REGMAP_BA+ GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CS_OFF);
-    // SYNC command to generate interrupt
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (INST_SYNC | sync_id));
-    `INFO(("Transfer generation finished"), ADI_VERBOSITY_LOW);
-endtask
+    #100ns;
 
-//---------------------------------------------------------------------------
-// IRQ callback
-//---------------------------------------------------------------------------
+    offload_spi_test();
 
-reg [4:0] irq_pending = 0;
-reg [7:0] sync_id = 0;
+    spi_env.stop();
+    base_env.stop();
 
-initial begin
-  while (1) begin
-    @(posedge ad738x_irq);
-    // read pending IRQs
-    axi_read (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
-    // IRQ launched by Offload SYNC command
-    if (irq_pending & 5'b10000) begin
-      axi_read (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished", sync_id), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SYNC command
-    if (irq_pending & 5'b01000) begin
-      axi_read (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFO(("SYNC %d IRQ. FIFO transfer just finished", sync_id), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDI FIFO
-    if (irq_pending & 5'b00100) begin
-      `INFO(("SDI FIFO IRQ"), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDO FIFO
-    if (irq_pending & 5'b00010) begin
-      `INFO(("SDO FIFO IRQ"), ADI_VERBOSITY_LOW);
-    end
-    // IRQ launched by SDO FIFO
-    if (irq_pending & 5'b00001) begin
-      `INFO(("CMD FIFO IRQ"), ADI_VERBOSITY_LOW);
-    end
-    // Clear all pending IRQs
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    `INFO(("Test Done"), ADI_VERBOSITY_NONE);
+    $finish();
+
   end
-end
 
-//---------------------------------------------------------------------------
-// Echo SCLK generation - we need this only if ECHO_SCLK is enabled
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // SPI Engine generate transfer
+  //---------------------------------------------------------------------------
+  task generate_transfer_cmd(
+      input [7:0] sync_id,
+      input [7:0] sdi_lane_mask,
+      input [7:0] sdo_lane_mask);
+    
+    // define spi lane mask
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
+    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
+    // assert CSN
+    spi_api.fifo_command(`SET_CS(8'hFE));
+    // transfer data
+    spi_api.fifo_command(`INST_WRD);
+    // de-assert CSN
+    spi_api.fifo_command(`SET_CS(8'hFF));
+    // SYNC command to generate interrupt
+    spi_api.fifo_command(`INST_SYNC | sync_id);
+    `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
+  endtask
 
-  reg     [SDI_PHY_DELAY:0] echo_delay_sclk = {SDI_PHY_DELAY{1'b0}};
-  reg     delay_clk = 0;
-  wire    m_rx_sclk;
+  //---------------------------------------------------------------------------
+  // SPI Engine SDO data
+  //---------------------------------------------------------------------------
+  task sdo_stream_gen(
+      input [`DATA_DLENGTH-1:0] tx_data[]);
+    xil_axi4stream_data_byte data[((`DATA_WIDTH/8) * (`NUM_OF_SDO))-1:0];
+    `ifdef DEF_SDO_STREAMING
+      for (int i = 0; i < `NUM_OF_SDO; i++) begin
+        for (int j = 0; j < (`DATA_WIDTH/8); j++) begin
+          data[i * (`DATA_WIDTH/8) + j] = (tx_data[i] & (8'hFF << 8*j)) >> 8*j;
+          spi_env.sdo_src_agent.sequencer.push_byte_for_stream(data[i * (`DATA_WIDTH/8) + j]);
+        end
+      end
+      spi_env.sdo_src_agent.sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8) * (`NUM_OF_SDO),0,0);
+    `endif
+  endtask
 
-  assign  m_rx_sclk = ad738x_spi_sclk;
+  //---------------------------------------------------------------------------
+  // IRQ callback
+  //---------------------------------------------------------------------------
+  reg [4:0] irq_pending = 0;
+  reg [7:0] sync_id = 0;
 
-  // Add an arbitrary delay to the echo_sclk signal
   initial begin
     forever begin
-      @(posedge delay_clk) begin
-        echo_delay_sclk <= {echo_delay_sclk, m_rx_sclk};
-       end
-    end
-  end
-  assign ad738x_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
-
-initial begin
-  forever begin
-    #0.5ns   delay_clk = ~delay_clk;
-  end
-end
-
-//---------------------------------------------------------------------------
-// SDI data generator
-//---------------------------------------------------------------------------
-
-wire          end_of_word;
-wire          spi_sclk_bfm = ad738x_echo_sclk;
-wire          m_spi_csn_negedge_s;
-wire          m_spi_csn_int_s = &ad738x_spi_cs;
-bit           m_spi_csn_int_d = 0;
-bit   [31:0]  sdi_shiftreg;
-bit   [7:0]   spi_sclk_pos_counter = 0;
-bit   [7:0]   spi_sclk_neg_counter = 0;
-bit   [31:0]  sdi_preg[$];
-bit   [31:0]  sdi_nreg[$];
-
-initial begin
-  forever begin
-    @(posedge ad738x_spi_clk);
-      m_spi_csn_int_d <= m_spi_csn_int_s;
-  end
-end
-
-assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
-
-genvar i;
-for (i = 0; i < `NUM_OF_SDI; i++) begin
-  assign ad738x_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
-end
-
-assign end_of_word = (CPOL ^ CPHA) ?
-                     (spi_sclk_pos_counter == DATA_DLENGTH) :
-                     (spi_sclk_neg_counter == DATA_DLENGTH);
-
-initial begin
-  forever begin
-    @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if (m_spi_csn_negedge_s) begin
-      spi_sclk_pos_counter <= 8'b0;
-    end else begin
-      spi_sclk_pos_counter <= (spi_sclk_pos_counter == DATA_DLENGTH) ? 0 : spi_sclk_pos_counter+1;
-    end
-  end
-end
-
-initial begin
-  forever begin
-    @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if (m_spi_csn_negedge_s) begin
-      spi_sclk_neg_counter <= 8'b0;
-    end else begin
-      spi_sclk_neg_counter <= (spi_sclk_neg_counter == DATA_DLENGTH) ? 0 : spi_sclk_neg_counter+1;
-    end
-  end
-end
-
-// SDI shift register
-initial begin
-  forever begin
-    // synchronization
-    if (CPHA ^ CPOL)
-      @(posedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-    else
-      @(negedge spi_sclk_bfm or posedge m_spi_csn_negedge_s);
-    if ((m_spi_csn_negedge_s) || (end_of_word)) begin
-      // delete the last word at end_of_word
-      if (end_of_word) begin
-        sdi_preg.pop_back();
-        sdi_nreg.pop_back();
+      @(posedge ad738x_irq);
+      // read pending IRQs
+      spi_api.get_irq_pending(irq_pending);
+      // IRQ launched by Offload SYNC command
+      if (spi_api.check_irq_offload_sync_id_pending(irq_pending)) begin
+        spi_api.get_sync_id(sync_id);
+        `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.",  sync_id), ADI_VERBOSITY_LOW);
       end
-      if (m_spi_csn_negedge_s) begin
-        // NOTE: assuming queue is empty
-        repeat (NUM_OF_WORDS) begin
-          sdi_preg.push_front($urandom);
-          sdi_nreg.push_front($urandom);
-        end
-        #1step; // prevent race condition
-        sdi_shiftreg <= (CPOL ^ CPHA) ?
-                        sdi_preg[$] :
-                        sdi_nreg[$];
-      end else begin
-        sdi_shiftreg <= (CPOL ^ CPHA) ?
-                        sdi_preg[$] :
-                        sdi_nreg[$];
+      // IRQ launched by SYNC command
+      if (spi_api.check_irq_sync_event(irq_pending)) begin
+        spi_api.get_sync_id(sync_id);
+        `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
       end
-      if (m_spi_csn_negedge_s) @(posedge spi_sclk_bfm); // NOTE: when PHA=1 first shift should be at the second positive edge
-    end else begin /* if ((m_spi_csn_negedge_s) || (end_of_word)) */
-      sdi_shiftreg <= {sdi_shiftreg[30:0], 1'b0};
+      // IRQ launched by SDI FIFO
+      if (spi_api.check_irq_sdi_almost_full(irq_pending)) begin
+        `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by SDO FIFO
+      if (spi_api.check_irq_sdo_almost_empty(irq_pending)) begin
+        `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // IRQ launched by CMD FIFO
+      if (spi_api.check_irq_cmd_almost_empty(irq_pending)) begin
+        `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
+      end
+      // Clear all pending IRQs
+      spi_api.clear_irq_pending(irq_pending);
     end
   end
-end
 
-//---------------------------------------------------------------------------
-// Storing SDI Data for later comparison
-//---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
+  // Sanity Tests
+  //---------------------------------------------------------------------------
+  task sanity_tests();
+    spi_api.sanity_test();
+    dma_api.sanity_test();
+    pwm_api.sanity_test();
+  endtask
 
-bit         offload_status = 0;
-bit         shiftreg_sampled = 0;
-bit [15:0]  sdi_store_cnt = 'h0;
-bit [31:0]  offload_sdi_data_store_arr [(2* NUM_OF_TRANSFERS) - 1:0];
-bit [31:0]  sdi_fifo_data_store;
-bit [31:0]  sdi_data_store;
-bit [31:0]  sdi_shiftreg2;
-bit [31:0]  sdi_shiftreg_aux;
-bit [31:0]  sdi_shiftreg_aux_old;
-bit [31:0]  sdi_shiftreg_old;
+  //---------------------------------------------------------------------------
+  // Offload SPI Test
+  //---------------------------------------------------------------------------
+  bit [`DATA_DLENGTH-1:0] sdi_read_data [];
+  bit [`DATA_DLENGTH-1:0] sdi_read_data_store [];
+  bit [  `DATA_WIDTH-1:0] sdo_write_data [];
+  bit [`DATA_DLENGTH-1:0] sdo_write_data_store [];
 
-assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
+  task offload_spi_test();
 
-initial begin
-  forever begin
-    @(posedge ad738x_echo_sclk);
-    sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
-    if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
-      shiftreg_sampled <= 'h0;
-      if (offload_status) begin
-          sdi_store_cnt <= sdi_store_cnt + 2;
-      end
-    end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
-      if (offload_status) begin
-            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
-            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
-      end else begin
-        sdi_fifo_data_store = sdi_shiftreg;
-      end
-      shiftreg_sampled <= 'h1;
-    end
-  end
-end
+    tx_data_cast         = new [num_of_active_sdo_lanes];
+    tx_data              = new [num_of_active_sdo_lanes];
+    sdo_write_data       = new [`NUM_OF_SDO];
+    rx_data              = new [`NUM_OF_SDIO];
+    sdi_read_data        = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)* num_of_active_sdi_lanes];
+    sdi_read_data_store  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)* num_of_active_sdi_lanes];
 
-//---------------------------------------------------------------------------
-// Offload Transfer Counter
-//---------------------------------------------------------------------------
-
-bit [31:0] offload_transfer_cnt;
-
-initial begin
-  forever begin
-    @(posedge shiftreg_sampled && offload_status);
-      offload_transfer_cnt <= offload_transfer_cnt + 'h1;
-  end
-end
-
-//---------------------------------------------------------------------------
-// Offload SPI Test
-//---------------------------------------------------------------------------
-
-bit [31:0] offload_captured_word_arr [(2* NUM_OF_TRANSFERS) -1 :0];
-
-task offload_spi_test();
-    // Configure pwm
-    axi_write (`AD738x_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (`AD738x_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
-    axi_write (`AD738x_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
+    `ifdef DEF_SDO_STREAMING
+      sdo_write_data_store = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
+    `else
+      sdo_write_data_store = new [(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
+    `endif
 
     //Configure DMA
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_FLAGS),
-      `SET_DMAC_FLAGS_TLAST(1) |
-      `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
-      ); // Use TLAST
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*2)-1)); // X_LENGHTH = 1024-1
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    dma_api.enable_dma();
+    dma_api.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1)
+    );
+    dma_api.set_lengths(((`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_SDIO) * (`DATA_WIDTH/8))-1,0);
+    dma_api.set_dest_addr(`DDR_BA);
+    dma_api.transfer_start();
 
     // Configure the Offload module
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_PRESCALE);
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_DLENGTH);
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_ON);
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_RD);
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CS_OFF);
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_SYNC | 2);
+    spi_api.fifo_offload_command(`INST_CFG);
+    spi_api.fifo_offload_command(`INST_PRESCALE);
+    spi_api.fifo_offload_command(`INST_DLENGTH);
+    if (`CS_ACTIVE_HIGH) begin
+      spi_api.fifo_offload_command(`SET_CS_INV_MASK(8'hFF));
+    end
+    spi_api.fifo_offload_command(`SET_CS(8'hFE));
+    spi_api.fifo_offload_command(`INST_WRD);
+    spi_api.fifo_offload_command(`SET_CS(8'hFF));
+    spi_api.fifo_offload_command(`INST_SYNC | 2);
 
-    offload_status = 1;
+    // Enqueue transfers to DUT
+    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
+      for (int j = 0, k = 0; j < (`NUM_OF_SDIO); j++) begin
+        rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
+        if (sdi_lane_mask[j]) begin
+          sdi_read_data_store[i * num_of_active_sdi_lanes + k]  = rx_data[j];
+          k++;
+        end
+      end
 
-    // Start the offload
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-    `INFO(("Offload started"), ADI_VERBOSITY_LOW);
+      spi_send(rx_data);
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+      for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
+        tx_data[j] = $urandom;
+        tx_data_cast[j] = tx_data[j];
+      end
+      
+      `ifdef DEF_SDO_STREAMING
+        sdo_stream_gen(tx_data);
+        for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+          if (sdo_lane_mask[j]) begin
+            sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[k]; // all of valid random words will be used
+            k++;
+          end else begin
+            sdo_write_data_store[i * (`NUM_OF_SDO) + j] = `SDO_IDLE_STATE;
+          end
+        end
+      `else
+        if (i < (`NUM_OF_WORDS)) begin
+          for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+            if (sdo_lane_mask[j]) begin
+              sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[k]; //only the first NUM_OF_WORDS random words will be used for all transfers
+              k++;
+            end else begin
+              sdo_write_data_store[i * (`NUM_OF_SDO) + j] = `SDO_IDLE_STATE;
+            end
+          end
+          spi_api.sdo_offload_fifo_write(tx_data_cast);
+        end
+      `endif
+    end
 
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-    offload_status = 0;
-
-    `INFO(("Offload stopped"), ADI_VERBOSITY_LOW);
+    #100ns;
+    spi_api.start_offload();
+    `INFO(("Offload started."), ADI_VERBOSITY_LOW);
+    spi_wait_send();
+    spi_api.stop_offload();
+    `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
 
     #2000ns;
 
-    for (int i=0; i<=((2* NUM_OF_TRANSFERS) -1); i=i+1) begin
-      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-    end
-
-    if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
-      `ERROR(("Offload Test FAILED"));
+    if (irq_pending == 'h0) begin
+      `FATAL(("IRQ Test FAILED"));
     end else begin
-      `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
+      `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
-endtask
 
-//---------------------------------------------------------------------------
-// FIFO SPI Test
-//---------------------------------------------------------------------------
+    for (int i = 0, k = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDIO)); i++) begin
+      if (sdi_lane_mask[i%(`NUM_OF_SDIO)]) begin
+        sdi_read_data[k] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+        if (sdi_read_data[k] != sdi_read_data_store[k]) begin //one word at a time comparison
+          `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x",
+          k, sdi_read_data[k],
+          k, sdi_read_data_store[k]), ADI_VERBOSITY_LOW);
+          `FATAL(("Offload Read Test FAILED"));
+        end
+        k++;
+      end
+    end
+    `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);
 
-bit   [31:0]  sdi_fifo_data = 0;
+    for (int i = 0; i < (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i++) begin
+      spi_receive(sdo_write_data);
+      for (int j = 0; j < `NUM_OF_SDO; j++) begin
+        `ifdef DEF_SDO_STREAMING
+          if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_SDO + j)]) begin
+            `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x",
+                        j, sdo_write_data[j],
+                        (i * `NUM_OF_SDO + j),
+                        sdo_write_data_store[(i * `NUM_OF_SDO + j)]), ADI_VERBOSITY_LOW);
+            `FATAL(("Offload Write Test FAILED"));
+          end
+        `else
+          if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_SDO + j) % (`NUM_OF_WORDS * `NUM_OF_SDO)]) begin
+            `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x",
+                        j, sdo_write_data[j],
+                        ((i * `NUM_OF_SDO + j) % (`NUM_OF_WORDS * `NUM_OF_SDO)),
+                        sdo_write_data_store[(i * `NUM_OF_SDO + j) % (`NUM_OF_WORDS * `NUM_OF_SDO)]), ADI_VERBOSITY_LOW);
+            `FATAL(("Offload Write Test FAILED"));
+          end
+        `endif
+      end
+    end
+    `INFO(("Offload Write Test PASSED"), ADI_VERBOSITY_LOW);
+  endtask
 
-task fifo_spi_test();
-  // Start spi clk generator
-  axi_write (`AD738x_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
-    `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
-    `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
-    );
+  //---------------------------------------------------------------------------
+  // FIFO SPI Test
+  //---------------------------------------------------------------------------
+  task fifo_spi_test();
 
-  // Enable SPI Engine
-  axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+    sdi_lane_mask       = 8'h1;
+    sdo_lane_mask       = 8'h1;
+    num_of_active_sdi_lanes = $countones(sdi_lane_mask);
+    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
 
-  // Configure the execution module
-  axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_CFG);
-  axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_PRESCALE);
-  axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), INST_DLENGTH);
+    rx_data_cast        = new [num_of_active_sdi_lanes];
+    rx_data             = new [(`NUM_OF_SDIO)];
+    sdi_fifo_data       = new [num_of_active_sdi_lanes * `NUM_OF_WORDS];
+    sdi_fifo_data_store = new [num_of_active_sdi_lanes * `NUM_OF_WORDS];
+    tx_data             = new [num_of_active_sdo_lanes];
+    tx_data_cast        = new [num_of_active_sdo_lanes];
+    receive_data        = new [`NUM_OF_SDO];
+    sdo_fifo_data       = new [`NUM_OF_SDO * `NUM_OF_WORDS];
+    sdo_fifo_data_store = new [`NUM_OF_SDO * `NUM_OF_WORDS];
+    
+    // Generate a FIFO transaction, write SDO first
+    for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
+      for (int j = 0, k = 0; j < (`NUM_OF_SDIO); j++) begin
+        rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
+        if (sdi_lane_mask[j]) begin
+          sdi_fifo_data_store[i * num_of_active_sdi_lanes + k] = rx_data[j];
+          k++;
+        end
+      end
 
-  // Set up the interrupts
-  axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
-    `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
-    `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
-    );
+      for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
+        tx_data[j]      = $urandom;
+        tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
+      end
 
-  #100ns;
-  // Generate a FIFO transaction, write SDO first
-  repeat (NUM_OF_WORDS) begin
-    axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDO_FIFO), (16'hDEAD << (DATA_WIDTH - DATA_DLENGTH)));
-  end
+      for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+        if (sdo_lane_mask[j]) begin
+          sdo_fifo_data_store[i * `NUM_OF_SDO + j] = tx_data[k];
+          k++;
+        end else begin
+          sdo_fifo_data_store[i * `NUM_OF_SDO + j] = `SDO_IDLE_STATE;
+        end
+      end
+      
+      spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits, only active lanes are written
+      spi_send(rx_data);
+    end
 
-  generate_transfer_cmd(1);
+    //wait a long time before starting execution with the correct lane mask
+    #500ns;
+    generate_transfer_cmd(1, sdi_lane_mask, sdo_lane_mask); //generate transfer with specific spi lane mask
 
-  #100ns;
-  wait(sync_id == 1);
-  #100ns;
+    `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
+    spi_wait_send();
+    `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
 
-  repeat (NUM_OF_WORDS) begin
-    axi_read (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK) , sdi_fifo_data);
-  end
+    for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
+      spi_api.sdi_fifo_read(rx_data_cast); //API always returns 32 bits
+      spi_receive(receive_data);
+      for (int j = 0; j < num_of_active_sdi_lanes; j++) begin
+        sdi_fifo_data[i * num_of_active_sdi_lanes + j] = rx_data_cast[j];
+      end
+      for (int j = 0; j < (`NUM_OF_SDO); j++) begin
+        sdo_fifo_data[i * (`NUM_OF_SDO) + j] = receive_data[j];
+      end
+    end
 
-  `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
-
-  if (sdi_fifo_data != sdi_fifo_data_store) begin
-    `ERROR(("Fifo Read Test FAILED"));
-  end else begin
+    foreach (sdi_fifo_data[i]) begin
+      if (sdi_fifo_data[i] !== sdi_fifo_data_store[i]) begin
+        `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data[i], sdi_fifo_data_store[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("Fifo Read Test FAILED"));
+      end
+    end
     `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
-  end
-endtask
+
+    foreach (sdo_fifo_data[i]) begin
+      if (sdo_fifo_data[i] !== sdo_fifo_data_store[i]) begin
+        `INFO(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data[i], sdo_fifo_data_store[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("Fifo Write Test FAILED"));
+      end
+    end
+    `INFO(("Fifo Write Test PASSED"), ADI_VERBOSITY_LOW);
+  endtask
+
+  //---------------------------------------------------------------------------
+  // Test initialization
+  //---------------------------------------------------------------------------
+  task init();
+    // Start spi clk generator
+    clkgen_api.enable_clkgen();
+
+    // Config pwm
+    pwm_api.reset();
+    pwm_api.pulse_period_config(0,'h64); // config channel 0 period
+    pwm_api.load_config();
+    pwm_api.start();
+    `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
+
+    // Enable SPI Engine
+    spi_api.enable_spi_engine();
+
+    // Configure the execution module
+    spi_api.fifo_command(`INST_CFG);
+    spi_api.fifo_command(`INST_PRESCALE);
+    spi_api.fifo_command(`INST_DLENGTH);
+    if (`CS_ACTIVE_HIGH) begin
+      spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
+    end
+
+    // Set up the interrupts
+    spi_api.set_interrup_mask(.sync_event(1'b1),.offload_sync_id_pending(1'b1));
+
+  endtask
 
 endprogram

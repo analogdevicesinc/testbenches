@@ -181,8 +181,8 @@ program test_lanes (
     #100ns;
 
     fifo_spi_test();
-    sdi_lane_mask = (2 ** `NUM_OF_SDI)-1;
-    sdo_lane_mask = (2 ** `NUM_OF_SDO)-1;
+    sdi_lane_mask = 8'h1;
+    sdo_lane_mask = 8'h1;
     spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));//guarantee all SDO lanes must be active
 
@@ -284,7 +284,7 @@ program test_lanes (
     pwm_api.sanity_test();
   endtask
 
-  //---------------------------------------------------------------------------
+    //---------------------------------------------------------------------------
   // Offload SPI Test
   //---------------------------------------------------------------------------
   bit [`DATA_DLENGTH-1:0] sdi_read_data [];
@@ -294,12 +294,12 @@ program test_lanes (
 
   task offload_spi_test();
 
-    tx_data_cast         = new [`NUM_OF_SDO];
-    tx_data              = new [`NUM_OF_SDO];
+    tx_data_cast         = new [num_of_active_sdo_lanes];
+    tx_data              = new [num_of_active_sdo_lanes];
     sdo_write_data       = new [`NUM_OF_SDO];
     rx_data              = new [`NUM_OF_SDI];
-    sdi_read_data        = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)];
-    sdi_read_data_store  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)];
+    sdi_read_data        = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)* num_of_active_sdi_lanes];
+    sdi_read_data_store  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)* num_of_active_sdi_lanes];
 
     `ifdef DEF_SDO_STREAMING
       sdo_write_data_store = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
@@ -332,27 +332,40 @@ program test_lanes (
 
     // Enqueue transfers to DUT
     for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
-      for (int j = 0; j < (`NUM_OF_SDI); j++) begin
-        rx_data[j] = $urandom;
-        sdi_read_data_store[i * (`NUM_OF_SDI) + j]  = rx_data[j];
+      for (int j = 0, k = 0; j < (`NUM_OF_SDI); j++) begin
+        rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
+        if (sdi_lane_mask[j]) begin
+          sdi_read_data_store[i * num_of_active_sdi_lanes + k]  = rx_data[j];
+          k++;
+        end
       end
 
       spi_send(rx_data);
 
-      for (int j = 0; j < (`NUM_OF_SDO); j++) begin
+      for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
         tx_data[j] = $urandom;
         tx_data_cast[j] = tx_data[j];
       end
       
       `ifdef DEF_SDO_STREAMING
         sdo_stream_gen(tx_data);
-        for (int j = 0; j < `NUM_OF_SDO; j++) begin
-          sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[j]; // all of the random words will be used
+        for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+          if (sdo_lane_mask[j]) begin
+            sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[k]; // all of valid random words will be used
+            k++;
+          end else begin
+            sdo_write_data_store[i * (`NUM_OF_SDO) + j] = `SDO_IDLE_STATE;
+          end
         end
       `else
         if (i < (`NUM_OF_WORDS)) begin
-          for (int j = 0; j < `NUM_OF_SDO; j++) begin
-            sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[j]; //only the first NUM_OF_WORDS random words will be used for all transfers
+          for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+            if (sdo_lane_mask[j]) begin
+              sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[k]; //only the first NUM_OF_WORDS random words will be used for all transfers
+              k++;
+            end else begin
+              sdo_write_data_store[i * (`NUM_OF_SDO) + j] = `SDO_IDLE_STATE;
+            end
           end
           spi_api.sdo_offload_fifo_write(tx_data_cast);
         end
@@ -374,13 +387,15 @@ program test_lanes (
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)); i++) begin
-      sdi_read_data[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-      if (sdi_read_data[i] != sdi_read_data_store[i]) begin //one word at a time comparison
-        `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x",
-        i, sdi_read_data[i],
-        i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
-        `FATAL(("Offload Read Test FAILED"));
+    for (int i = 0, k = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)); i++) begin
+      if (sdi_lane_mask[i%(`NUM_OF_SDI)]) begin
+        if (sdi_read_data[k] != sdi_read_data_store[k]) begin //one word at a time comparison
+          `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x",
+          k, sdi_read_data[k],
+          k, sdi_read_data_store[k]), ADI_VERBOSITY_LOW);
+          `FATAL(("Offload Read Test FAILED"));
+        end
+        k++;
       end
     end
     `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);

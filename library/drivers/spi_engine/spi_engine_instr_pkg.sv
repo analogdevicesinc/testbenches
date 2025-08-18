@@ -12,10 +12,14 @@ package spi_engine_instr_pkg;
 `define INST_WRD        (32'h0000_0300 | (`NUM_OF_WORDS-1))
 
 // Configuration register instructions
-`define INST_CFG        (32'h0000_2100 | (`SDO_IDLE_STATE << 3) | (`THREE_WIRE << 2) | (`CPOL << 1) | `CPHA)
-`define INST_PRESCALE   (32'h0000_2000 | `CLOCK_DIVIDER)
-`define INST_DLENGTH    (32'h0000_2200 | `DATA_DLENGTH)
-`define SET_DLENGTH(d)  ((`INST_DLENGTH) & ~32'hFF | (d & 8'hFF))
+`define INST_CFG               (32'h0000_2100 | (`SDO_IDLE_STATE << 3) | (`THREE_WIRE << 2) | (`CPOL << 1) | `CPHA)
+`define INST_PRESCALE          (32'h0000_2000 | `CLOCK_DIVIDER)
+`define INST_DLENGTH           (32'h0000_2200 | `DATA_DLENGTH)
+`define SET_DLENGTH(d)         ((`INST_DLENGTH) & ~32'hFF | (d & 8'hFF))
+`define INST_SDI_LANE_MASK     (32'h0000_2300 | `SDI_LANE_MASK)
+`define SET_SDI_LANE_MASK(m)   ((`INST_SDI_LANE_MASK) & ~32'hFF | (m & 8'hFF))
+`define INST_SDO_LANE_MASK     (32'h0000_2400 | `SDO_LANE_MASK)
+`define SET_SDO_LANE_MASK(m)   ((`INST_SDO_LANE_MASK) & ~32'hFF | (m & 8'hFF))
 
 // Synchronization
 `define INST_SYNC       (32'h0000_3000)

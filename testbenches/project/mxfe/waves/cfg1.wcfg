@@ -40,7 +40,7 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000000 us"></ZoomStartTime>
-      <ZoomEndTime time="170.600000001 us"></ZoomEndTime>
+      <ZoomEndTime time="362.380000001 us"></ZoomEndTime>
       <Cursor1Time time="103.614000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
@@ -432,6 +432,8 @@
       <obj_property name="CustomSignalColor">#FFFF00</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
       <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="AnalogYRangeMin">0</obj_property>
+      <obj_property name="AnalogYRRangeMax">1.04027e+06</obj_property>
       <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[15]">
          <obj_property name="ElementShortName">[15]</obj_property>
          <obj_property name="ObjectShortName">[15]</obj_property>
@@ -514,11 +516,13 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_data_0">
       <obj_property name="ElementShortName">adc_data_0[15:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data_0[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
       <obj_property name="AnalogYRangeMin">-5226</obj_property>
       <obj_property name="AnalogYRRangeMax">2614</obj_property>
       <obj_property name="CustomSignalColor">#FFFF00</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_valid_0">
       <obj_property name="ElementShortName">adc_valid_0[0:0]</obj_property>

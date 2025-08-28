@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_common_pkg" />
+            <top_module name="adi_environment_pkg" />
+            <top_module name="adi_regmap_adc_pkg" />
+            <top_module name="adi_regmap_common_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_vip_pkg" />
+            <top_module name="attributes" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="math_real" />
+            <top_module name="numeric_std" />
+            <top_module name="pub_sub_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="standard" />
+            <top_module name="std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_misc" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+            <top_module name="vital_primitives" />
+            <top_module name="vital_timing" />
+            <top_module name="vpkg" />
+            <top_module name="watchdog_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="3.223000 us"></ZoomStartTime>
+      <ZoomEndTime time="18.323001 us"></ZoomEndTime>
+      <Cursor1Time time="8.206000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="220"></NameColumnWidth>
+      <ValueColumnWidth column_width="105"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="16" />
+   <wvobject type="array" fp_name="/system_tb/final_sample">
+      <obj_property name="ElementShortName">final_sample[19:0]</obj_property>
+      <obj_property name="ObjectShortName">final_sample[19:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
+      <obj_property name="AnalogYRangeMin">155615</obj_property>
+      <obj_property name="AnalogYRRangeMax">155621</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/adc_clk">
+      <obj_property name="ElementShortName">adc_clk</obj_property>
+      <obj_property name="ObjectShortName">adc_clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/adc_data">
+      <obj_property name="ElementShortName">adc_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[31:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="AnalogYRangeMin">1.84467e+19</obj_property>
+      <obj_property name="AnalogYRRangeMax">1.69044e+09</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/adc_valid">
+      <obj_property name="ElementShortName">adc_valid</obj_property>
+      <obj_property name="ObjectShortName">adc_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/BITS_PER_CYCLE">
+      <obj_property name="ElementShortName">BITS_PER_CYCLE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BITS_PER_CYCLE[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/system_tb/DCO_HALF_PERIOD">
+      <obj_property name="ElementShortName">DCO_HALF_PERIOD</obj_property>
+      <obj_property name="ObjectShortName">DCO_HALF_PERIOD</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/system_tb/CNV_HALF_PERIOD">
+      <obj_property name="ElementShortName">CNV_HALF_PERIOD</obj_property>
+      <obj_property name="ObjectShortName">CNV_HALF_PERIOD</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/LATENCY">
+      <obj_property name="ElementShortName">LATENCY[31:0]</obj_property>
+      <obj_property name="ObjectShortName">LATENCY[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/cnv_clk">
+      <obj_property name="ElementShortName">cnv_clk</obj_property>
+      <obj_property name="ObjectShortName">cnv_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/sync_n">
+      <obj_property name="ElementShortName">sync_n</obj_property>
+      <obj_property name="ObjectShortName">sync_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/self_sync">
+      <obj_property name="ElementShortName">self_sync</obj_property>
+      <obj_property name="ObjectShortName">self_sync</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/bitslip_enable">
+      <obj_property name="ElementShortName">bitslip_enable</obj_property>
+      <obj_property name="ObjectShortName">bitslip_enable</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/sync_status">
+      <obj_property name="ElementShortName">sync_status</obj_property>
+      <obj_property name="ObjectShortName">sync_status</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/shift_cnt_en_s">
+      <obj_property name="ElementShortName">shift_cnt_en_s</obj_property>
+      <obj_property name="ObjectShortName">shift_cnt_en_s</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/shift_cnt">
+      <obj_property name="ElementShortName">shift_cnt[4:0]</obj_property>
+      <obj_property name="ObjectShortName">shift_cnt[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad4080_adc/inst/ad408x_interface/shift_cnt_value">
+      <obj_property name="ElementShortName">shift_cnt_value[4:0]</obj_property>
+      <obj_property name="ObjectShortName">shift_cnt_value[4:0]</obj_property>
+   </wvobject>
+</wave_config>

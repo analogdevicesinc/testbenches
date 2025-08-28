@@ -5,44 +5,54 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
+            <top_module name="\$unit_xpm_cdc_sv_220102727 " />
+            <top_module name="adi_api_pkg" />
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_common_pkg" />
+            <top_module name="adi_environment_pkg" />
             <top_module name="adi_jesd204_pkg" />
-
             <top_module name="adi_regmap_adc_pkg" />
             <top_module name="adi_regmap_dac_pkg" />
             <top_module name="adi_regmap_dmac_pkg" />
             <top_module name="adi_regmap_jesd_rx_pkg" />
             <top_module name="adi_regmap_jesd_tx_pkg" />
             <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_regmap_tdd_gen_pkg" />
             <top_module name="adi_regmap_xcvr_pkg" />
+            <top_module name="adi_vip_pkg" />
             <top_module name="adi_xcvr_pkg" />
-            <top_module name="axi4stream_vip_pkg" />
             <top_module name="axi_vip_pkg" />
             <top_module name="glbl" />
             <top_module name="ipif_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
-
+            <top_module name="pub_sub_pkg" />
             <top_module name="s_axi_sequencer_pkg" />
             <top_module name="std" />
             <top_module name="system_tb" />
-            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
             <top_module name="test_harness_env_pkg" />
-            <top_module name="test_harness_mng_axi_vip_0_pkg" />
             <top_module name="vpkg" />
+            <top_module name="watchdog_pkg" />
             <top_module name="xil_common_vip_pkg" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="189.217954545 us"></ZoomStartTime>
-      <ZoomEndTime time="331.618409091 us"></ZoomEndTime>
-      <Cursor1Time time="307.885000000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000000 us"></ZoomStartTime>
+      <ZoomEndTime time="170.600000001 us"></ZoomEndTime>
+      <Cursor1Time time="103.614000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="177"></NameColumnWidth>
-      <ValueColumnWidth column_width="233"></ValueColumnWidth>
+      <ValueColumnWidth column_width="229"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="105" />
+   <WVObjectSize size="124" />
+   <wave_markers>
+      <marker label="" time="72954000000" />
+      <marker label="" time="72200000000" />
+      <marker label="" time="55282000000" />
+   </wave_markers>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/phy_data">
       <obj_property name="ElementShortName">phy_data[127:0]</obj_property>
       <obj_property name="ObjectShortName">phy_data[127:0]</obj_property>
@@ -78,17 +88,6 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/sync">
       <obj_property name="ElementShortName">sync[0:0]</obj_property>
       <obj_property name="ObjectShortName">sync[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_data_0">
-      <obj_property name="ElementShortName">adc_data_0[15:0]</obj_property>
-      <obj_property name="ObjectShortName">adc_data_0[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
-      <obj_property name="CellHeight">100</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_valid_0">
-      <obj_property name="ElementShortName">adc_valid_0[0:0]</obj_property>
-      <obj_property name="ObjectShortName">adc_valid_0[0:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_tx_jesd/tx/inst/\mode_8b10b.gen_lane[0].i_lane /i_align_replace/data_out">
       <obj_property name="ElementShortName">data_out[31:0]</obj_property>
@@ -253,20 +252,20 @@
    <wvobject fp_name="divider351" type="divider">
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_regmap/i_up_dac_common/i_xfer_cntrl/up_data_cntrl">
-      <obj_property name="ElementShortName">up_data_cntrl[34:0]</obj_property>
-      <obj_property name="ObjectShortName">up_data_cntrl[34:0]</obj_property>
+      <obj_property name="ElementShortName">up_data_cntrl[98:0]</obj_property>
+      <obj_property name="ObjectShortName">up_data_cntrl[98:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_regmap/i_up_dac_common/i_xfer_cntrl/up_xfer_done">
       <obj_property name="ElementShortName">up_xfer_done</obj_property>
       <obj_property name="ObjectShortName">up_xfer_done</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_regmap/i_up_dac_common/i_xfer_cntrl/up_xfer_data">
-      <obj_property name="ElementShortName">up_xfer_data[34:0]</obj_property>
-      <obj_property name="ObjectShortName">up_xfer_data[34:0]</obj_property>
+      <obj_property name="ElementShortName">up_xfer_data[98:0]</obj_property>
+      <obj_property name="ObjectShortName">up_xfer_data[98:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_regmap/i_up_dac_common/i_xfer_cntrl/d_data_cntrl">
-      <obj_property name="ElementShortName">d_data_cntrl[34:0]</obj_property>
-      <obj_property name="ObjectShortName">d_data_cntrl[34:0]</obj_property>
+      <obj_property name="ElementShortName">d_data_cntrl[98:0]</obj_property>
+      <obj_property name="ObjectShortName">d_data_cntrl[98:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/inst/i_regmap/i_up_dac_common/dac_ext_sync_arm">
       <obj_property name="ElementShortName">dac_ext_sync_arm</obj_property>
@@ -292,9 +291,240 @@
       <obj_property name="ElementShortName">link_tvalid</obj_property>
       <obj_property name="ObjectShortName">link_tvalid</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/dac_ddata">
+      <obj_property name="ElementShortName">dac_ddata[127:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_ddata[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_0">
+      <obj_property name="ElementShortName">dac_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_data_0[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="vbus" fp_name="vbus708">
+      <obj_property name="label">New Virtual Bus 4</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_7">
+         <obj_property name="ElementShortName">fifo_rd_data_7[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_7[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_6">
+         <obj_property name="ElementShortName">fifo_rd_data_6[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_6[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_5">
+         <obj_property name="ElementShortName">fifo_rd_data_5[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_5[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_4">
+         <obj_property name="ElementShortName">fifo_rd_data_4[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_4[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_3">
+         <obj_property name="ElementShortName">fifo_rd_data_3[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_3[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_2">
+         <obj_property name="ElementShortName">fifo_rd_data_2[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_2[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_1">
+         <obj_property name="ElementShortName">fifo_rd_data_1[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_1[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_upack/fifo_rd_data_0">
+         <obj_property name="ElementShortName">fifo_rd_data_0[15:0]</obj_property>
+         <obj_property name="ObjectShortName">fifo_rd_data_0[15:0]</obj_property>
+      </wvobject>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/link_tdata">
       <obj_property name="ElementShortName">link_tdata[127:0]</obj_property>
       <obj_property name="ObjectShortName">link_tdata[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_tx_jesd/tx_data_tdata">
+      <obj_property name="ElementShortName">tx_data_tdata[127:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_data_tdata[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_tx_jesd/tx/phy_data">
+      <obj_property name="ElementShortName">phy_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">phy_data[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/tx_data_0">
+      <obj_property name="ElementShortName">tx_data_0[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_data_0[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/tx_data_1">
+      <obj_property name="ElementShortName">tx_data_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_data_1[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/tx_data_2">
+      <obj_property name="ElementShortName">tx_data_2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_data_2[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/tx_data_3">
+      <obj_property name="ElementShortName">tx_data_3[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tx_data_3[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/rx_data_0">
+      <obj_property name="ElementShortName">rx_data_0[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_data_0[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/rx_data_1">
+      <obj_property name="ElementShortName">rx_data_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_data_1[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/rx_data_2">
+      <obj_property name="ElementShortName">rx_data_2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_data_2[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_mxfe_xcvr/rx_data_3">
+      <obj_property name="ElementShortName">rx_data_3[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_data_3[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx/phy_data">
+      <obj_property name="ElementShortName">phy_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">phy_data[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_mxfe_rx_jesd/rx_data_tdata">
+      <obj_property name="ElementShortName">rx_data_tdata[127:0]</obj_property>
+      <obj_property name="ObjectShortName">rx_data_tdata[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="vbus" fp_name="vbus676">
+      <obj_property name="label">rx_tpl/rx_data_tdata_0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[15]">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[14]">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[13]">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[12]">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[11]">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[10]">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[9]">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[8]">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[7]">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[6]">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[5]">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[4]">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[3]">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[2]">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[1]">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data[0]">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_clk">
+      <obj_property name="ElementShortName">link_clk</obj_property>
+      <obj_property name="ObjectShortName">link_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_tpl_core/link_clk">
+      <obj_property name="ElementShortName">link_clk</obj_property>
+      <obj_property name="ObjectShortName">link_clk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_tpl_core/link_data">
+      <obj_property name="ElementShortName">link_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">link_data[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_data_0">
+      <obj_property name="ElementShortName">adc_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_0[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="AnalogYRangeMin">-5226</obj_property>
+      <obj_property name="AnalogYRRangeMax">2614</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/rx_mxfe_tpl_core/adc_valid_0">
+      <obj_property name="ElementShortName">adc_valid_0[0:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_valid_0[0:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/tx_mxfe_tpl_core/dac_data_0_1">
       <obj_property name="ElementShortName">dac_data_0_1[15:0]</obj_property>
@@ -359,7 +589,6 @@
       <obj_property name="Overlay_Object_1">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.linkStall</obj_property>
       <obj_property name="Overlay_Color_1">#E64C00</obj_property>
       <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.streamTooltipData</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis">
       <obj_property name="children_use_element_short_name">true</obj_property>
@@ -376,7 +605,6 @@
       <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.streamTooltipData</obj_property>
       <obj_property name="ElementShortName">m_axis</obj_property>
       <obj_property name="ObjectShortName">m_axis</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/init_req">
       <obj_property name="ElementShortName">init_req</obj_property>
@@ -401,7 +629,6 @@
       <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/s_axis.streamTooltipData</obj_property>
       <obj_property name="ElementShortName">s_axis</obj_property>
       <obj_property name="ObjectShortName">s_axis</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/m_axis">
       <obj_property name="children_use_element_short_name">true</obj_property>
@@ -418,7 +645,6 @@
       <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/m_axis.streamTooltipData</obj_property>
       <obj_property name="ElementShortName">m_axis</obj_property>
       <obj_property name="ObjectShortName">m_axis</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/mxfe_tx_data_offload/i_data_offload/inst/i_bypass_fifo/\genblk1[0].i_fifo /s_axis_ready">
       <obj_property name="ElementShortName">s_axis_ready</obj_property>
@@ -615,7 +841,6 @@
       <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/s_axis.streamTooltipData</obj_property>
       <obj_property name="ElementShortName">s_axis</obj_property>
       <obj_property name="ObjectShortName">s_axis</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis">
       <obj_property name="children_use_element_short_name">true</obj_property>
@@ -632,7 +857,6 @@
       <obj_property name="Detail_Data">/system_tb/test_harness/mxfe_rx_data_offload/i_data_offload/m_axis.streamTooltipData</obj_property>
       <obj_property name="ElementShortName">m_axis</obj_property>
       <obj_property name="ObjectShortName">m_axis</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="divider1190" type="divider">
       <obj_property name="label">RX DMA</obj_property>

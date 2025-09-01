@@ -19,7 +19,7 @@ set ad_project_params(SDO_STREAMING)        0
 # Test parameters
 set ad_project_params(DATA_DLENGTH)         16
 set ad_project_params(THREE_WIRE)           0
-set ad_project_params(CPOL)                 0
+set ad_project_params(CPOL)                 1
 set ad_project_params(CPHA)                 0
 set ad_project_params(SDO_IDLE_STATE)       0
 set ad_project_params(SLAVE_TIN)            0
@@ -28,10 +28,10 @@ set ad_project_params(MASTER_TIN)           0
 set ad_project_params(MASTER_TOUT)          0
 set ad_project_params(CS_TO_MISO)           0
 set ad_project_params(CLOCK_DIVIDER)        0
-set ad_project_params(NUM_OF_WORDS)         2
-set ad_project_params(NUM_OF_TRANSFERS)     3
+set ad_project_params(NUM_OF_WORDS)         1
+set ad_project_params(NUM_OF_TRANSFERS)     1
 set ad_project_params(SDI_LANE_MASK)        'hf
-set ad_project_params(SDO_LANE_MASK)        'hf
+set ad_project_params(SDO_LANE_MASK)        'h1
 set ad_project_params(CS_ACTIVE_HIGH)       0
 set ad_project_params(ECHO_SCLK_DELAY)      0.1
 

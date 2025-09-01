@@ -29,6 +29,7 @@ adi_sim_project_files [list \
  "tests/test_sleep_delay.sv" \
  "tests/test_slowdata.sv" \
  "tests/test_lanes.sv" \
+ "tests/test_david.sv" \
  ]
 
 #set a default test program

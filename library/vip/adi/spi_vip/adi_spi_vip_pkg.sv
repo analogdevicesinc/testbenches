@@ -151,8 +151,6 @@ package adi_spi_vip_pkg;
             foreach (miso_mbx[i]) begin
               if (using_default) begin
                 miso_data[i] = default_miso_data;
-              end else begin
-                miso_mbx[i].try_peek(miso_data[i]);
               end
               miso_bits[i] = int_to_bitqueue(miso_data[i],vif.get_param_DATA_DLENGTH());
               pending_mbx = 1'b0;

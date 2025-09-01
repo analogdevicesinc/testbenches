@@ -105,6 +105,11 @@ package spi_engine_api_pkg;
       end
     endtask
 
+    task get_sdi_fifo_level(output logic [31:0] level);
+      this.axi_read(GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_LEVEL), val);
+      level = `GET_AXI_SPI_ENGINE_SDI_FIFO_LEVEL_SDI_FIFO_LEVEL(val);
+    endtask
+
     task offload_mem_assert_reset();
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), `SET_AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET_OFFLOAD0_MEM_RESET(1));
     endtask

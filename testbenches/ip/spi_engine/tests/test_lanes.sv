@@ -181,8 +181,10 @@ program test_lanes (
     #100ns;
 
     fifo_spi_test();
-    sdi_lane_mask = 8'h1;
-    sdo_lane_mask = 8'h1;
+    sdi_lane_mask = {`NUM_OF_SDI{1'b1}};
+    sdo_lane_mask = {`NUM_OF_SDO{1'b1}};
+    num_of_active_sdi_lanes = $countones(sdi_lane_mask);
+    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
     spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));//guarantee all SDO lanes must be active
 
@@ -389,6 +391,7 @@ program test_lanes (
 
     for (int i = 0, k = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)); i++) begin
       if (sdi_lane_mask[i%(`NUM_OF_SDI)]) begin
+        sdi_read_data[k] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
         if (sdi_read_data[k] != sdi_read_data_store[k]) begin //one word at a time comparison
           `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x",
           k, sdi_read_data[k],

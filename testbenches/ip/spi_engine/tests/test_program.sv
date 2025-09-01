@@ -431,12 +431,12 @@ program test_program (
     // Generate a FIFO transaction, write SDO first
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
       for (int j = 0; j < (`NUM_OF_SDI); j++) begin
-        rx_data[j]      = sdo_lane_mask[j] ? {$urandom} : `SDO_IDLE_STATE;
+        rx_data[j]      = sdo_lane_mask[j] ? $urandom : `SDO_IDLE_STATE;
         sdi_fifo_data_store[i * (`NUM_OF_SDI) + j] = rx_data[j];
       end
 
       for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
-        tx_data[j]      = {$urandom};
+        tx_data[j]      = $urandom;
         tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
       end
 

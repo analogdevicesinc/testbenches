@@ -248,12 +248,14 @@ program test_slowdata (
 
   task generate_single_rtransfer_cmd(
       input [7:0] sync_id,
+      input [7:0] sdi_lane_mask,
       input [7:0] sdo_lane_mask);
     // configure cs
     if (`CS_ACTIVE_HIGH) begin
       spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
     end
     // define spi lane mask
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
     // write cfg
     spi_api.fifo_command(`INST_CFG);
@@ -275,12 +277,14 @@ program test_slowdata (
 
   task generate_double_rtransfer_cmd(
      input [7:0] sync_id,
+     input [7:0] sdi_lane_mask,
      input [7:0] sdo_lane_mask);
     // configure cs
     if (`CS_ACTIVE_HIGH) begin
       spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
     end
     // define spi lane mask
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
     // write cfg
     spi_api.fifo_command(`INST_CFG);
@@ -651,7 +655,7 @@ program test_slowdata (
     end
     spi_send(rx_data);
 
-    generate_single_rtransfer_cmd(1, sdo_lane_mask);
+    generate_single_rtransfer_cmd(1, sdi_lane_mask, sdo_lane_mask);
 
     `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
     spi_wait_send();
@@ -693,7 +697,7 @@ program test_slowdata (
       spi_send(rx_data);
     end
 
-    generate_double_rtransfer_cmd(1, sdo_lane_mask);
+    generate_double_rtransfer_cmd(1, sdi_lane_mask, sdo_lane_mask);
 
     `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
     spi_wait_send();

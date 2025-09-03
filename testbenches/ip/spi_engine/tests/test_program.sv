@@ -205,9 +205,11 @@ program test_program (
   //---------------------------------------------------------------------------
   task generate_transfer_cmd(
       input [7:0] sync_id,
+      input [7:0] sdi_lane_mask,
       input [7:0] sdo_lane_mask);
     
     // define spi lane mask
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
     // assert CSN
     spi_api.fifo_command(`SET_CS(8'hFE));
@@ -415,6 +417,7 @@ program test_program (
   //---------------------------------------------------------------------------
   task fifo_spi_test();
 
+    sdi_lane_mask       = (2**`NUM_OF_SDI)-1; //new mask defining the active lanes
     sdo_lane_mask       = (2**`NUM_OF_SDO)-1; //new mask defining the active lanes
     num_of_active_sdo_lanes = $countones(sdo_lane_mask);
 
@@ -453,7 +456,7 @@ program test_program (
       spi_send(rx_data);
     end
 
-    generate_transfer_cmd(1, sdo_lane_mask); //generate transfer with specific spi lane mask
+    generate_transfer_cmd(1, sdi_lane_mask, sdo_lane_mask); //generate transfer with specific spi lane mask
 
     `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
     spi_wait_send();

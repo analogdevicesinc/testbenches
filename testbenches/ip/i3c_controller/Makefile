@@ -10,8 +10,8 @@ include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_i3c_controller.mk
 
 # Remaining test-bench dependencies except test programs
-ENV_DEPS += $(HDL_LIBRARY_PATH)/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh
-ENV_DEPS += $(HDL_LIBRARY_PATH)/i3c_controller/i3c_controller_core/i3c_controller_word.vh
+SV_DEPS += $(ADI_HDL_DIR)/library/i3c_controller/i3c_controller_host_interface/i3c_controller_regmap.vh
+SV_DEPS += $(ADI_HDL_DIR)/library/i3c_controller/i3c_controller_core/i3c_controller_word.vh
 
 LIB_DEPS += i3c_controller/i3c_controller_host_interface
 LIB_DEPS += i3c_controller/i3c_controller_core

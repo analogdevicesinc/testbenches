@@ -654,14 +654,13 @@ task priv_i2c_test();
   // Assert is in I²C mode
   if (`DUT_I3C_BIT_MOD.i2c_mode !== 1)
    `ERROR(("Not in I2C mode!"));
-  // Dummy LOW peripheral write + ACK continue
+  // Dummy HIGH peripheral write
   wait (`DUT_I3C_WORD.st == `CMDW_I2C_RX);
   set_auto_ack(0);
-  i3c_dev_sda <= 1'b0;
+  i3c_dev_sda <= 1'bZ;
   // Count n ACK-bit asserted low by the controller (sampling before
   // tri-state)
   repeat (I2C_CMD_2[15:8]) @(negedge `DUT_I3C_BIT_MOD.sdo);
-  i3c_dev_sda <= 1'bZ;
 
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   wait (`DUT_I3C_BIT_MOD.nop == 1);

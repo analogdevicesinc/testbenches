@@ -62,6 +62,36 @@ Process:
    ``configuration``, otherwise add it to the list manually.
 -  Test the program with the existing configurations.
 
+.. _create_edit_tb makefile:
+
+Adding source files to a Makefile
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the simulation ``Makefile``, there are specific variable lists for each
+source files type:
+
+* ``LIB_DEPS``: Add IP to inherit its dependency list.
+* ``SIM_LIB_DEPS`` : Add Simulation IP to inherit its dependency list.
+* ``ENV_DEPS``: Used for building the block design.
+* ``SV_DEPS``: Used for making sure the simulation has all the required files.
+
+For example for ``SV_DEPS``, with:
+
+.. code:: Makefile
+
+   SV_DEPS += $(ADI_HDL_DIR)/library/my_library/my_file.vh
+
+The file can be included without the path in ``test_program.sv`` as:
+
+.. code:: systemverilog
+
+   `include "my_file.vh"
+
+   // ...
+
+   localparam SOME_PARAM = `MY_FILE_DEFINE
+
+
 Creating a modified block design in the same project folder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

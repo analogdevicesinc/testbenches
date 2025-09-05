@@ -52,7 +52,7 @@ The following parameters of this project that can be configured:
 
 -  CLK_MODE: defines clocking mode of the device's digital interface:
    Options: 0 - SPI mode, 1 - Echo-clock or Master clock mode
--  NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
+-  NUM_OF_SDIO: defines the number of MOSI lines of the SPI interface:
    Options: 1 - Interleaved mode, 2 - 1 lane per channel,
    4 - 2 lanes per channel, 8 - 4 lanes per channel
 -  CAPTURE_ZONE: defines the capture zone of the next sample.
@@ -75,7 +75,7 @@ The following are available configurations for the testbench:
    +-----------------------+-----------------------------------------------+
    | Configuration mode    | Parameters                                    |
    |                       +----------+------------+--------------+--------+
-   |                       | CLK_MODE | NUM_OF_SDI | CAPTURE_ZONE | DDR_EN |
+   |                       | CLK_MODE |NUM_OF_SDIO | CAPTURE_ZONE | DDR_EN |
    +=======================+==========+============+==============+========+
    | cfg_cm0_sdi2_cz1_ddr0 | 0        | 2          | 1            | 0      |
    +-----------------------+----------+------------+--------------+--------+
@@ -112,7 +112,7 @@ The following are available configurations for the testbench:
      -
    * -
      - CLK_MODE
-     - NUM_OF_SDI
+     - NUM_OF_SDIO
      - CAPTURE_ZONE
      - DDR_EN
    * - cfg_cm0_sdi2_cz1_ddr0

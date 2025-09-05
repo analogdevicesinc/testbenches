@@ -95,6 +95,7 @@
 <li><a class="reference internal" href="#creating-a-new-testbench">Creating a new testbench</a><ul>
 <li><a class="reference internal" href="#adding-a-new-configuration-to-a-test-bench">Adding a new configuration to a test bench</a></li>
 <li><a class="reference internal" href="#adding-a-new-test-program-to-a-test-bench">Adding a new test program to a test bench</a></li>
+<li><a class="reference internal" href="#adding-source-files-to-a-makefile">Adding source files to a Makefile</a></li>
 <li><a class="reference internal" href="#creating-a-modified-block-design-in-the-same-project-folder">Creating a modified block design in the same project folder</a></li>
 </ul>
 </li>
@@ -299,6 +300,29 @@ files are updated with the new parameter name and a new value as well</p></li>
 <code class="docutils literal notranslate"><span class="pre">configuration</span></code>, otherwise add it to the list manually.</p></li>
 <li><p>Test the program with the existing configurations.</p></li>
 </ul>
+</section>
+<section id="adding-source-files-to-a-makefile">
+<span id="create-edit-tb-makefile"></span><h3>Adding source files to a Makefile<a class="headerlink" href="#adding-source-files-to-a-makefile" title="Link to this heading"></a></h3>
+<p>In the simulation <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>, there are specific variable lists for each
+source files type:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">LIB_DEPS</span></code>: Add IP to inherit its dependency list.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SIM_LIB_DEPS</span></code> : Add Simulation IP to inherit its dependency list.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ENV_DEPS</span></code>: Used for building the block design.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SV_DEPS</span></code>: Used for making sure the simulation has all the required files.</p></li>
+</ul>
+<p>For example for <code class="docutils literal notranslate"><span class="pre">SV_DEPS</span></code>, with:</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">SV_DEPS</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="k">$(</span>ADI_HDL_DIR<span class="k">)</span>/library/my_library/my_file.vh
+</pre></div>
+</div>
+<p>The file can be included without the path in <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code> as:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;my_file.vh&quot;</span>
+
+<span class="c1">// ...</span>
+
+<span class="k">localparam</span><span class="w"> </span><span class="n">SOME_PARAM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">`MY_FILE_DEFINE</span>
+</pre></div>
+</div>
 </section>
 <section id="creating-a-modified-block-design-in-the-same-project-folder">
 <h3>Creating a modified block design in the same project folder<a class="headerlink" href="#creating-a-modified-block-design-in-the-same-project-folder" title="Link to this heading"></a></h3>

@@ -4,18 +4,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Message logging is similar to the UVM style logging, but it is more primitive and does support many features from it. The logger supports multiple levels of debug message printing, like UVM, however, it does not follow the debug level recommendations. These levels are described in ADI Testbenches coding guidelines section F5. Similarly to how UVM works, activating a higher debug level will activate all debug messages, that are below it as well." name="description" />
 
     <title>Debugging a testbench &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=25ed7d6a" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=37266688" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
-    <script defer="" src="../_static/app.umd.js?v=80d097f0"></script>
+    <script async="async" src="../_static/app.umd.js?v=8f62bab2"></script>
     <link rel="icon" href="../_static/icon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Documentation guidelines" href="docs_guidelines.html" />
     <link rel="prev" title="ADI Testbenches coding guidelines" href="coding_guidelines.html" />
    
+  
   
   <meta name="repository" content="testbenches">
   <meta name="version" content="">
@@ -60,9 +62,11 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com"></a>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
+        
         <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
         <a id="logo" href="../index.html">
           <div>HDL Testbenches</div>
         </a>
@@ -82,8 +86,7 @@
   </div>
     <div class="localtoc">
       <div class="tocwrapper">
-        <div>
-          <div class="localtoc-header"></div>
+        <div class="header localtoc-header">
           <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
         </div>
         <nav>
@@ -223,13 +226,8 @@ Content on this topic
       <div class="documentwrapper">
         <div class="bodywrapper" id="top-anchor">
           <div class="body-header">
-    <nav class="breadcrumb">
-        <ol>
-          <li><a href="index.html">User Guide</a></li>
-          </ol>
-    </nav>
-  </div>
-
+  <nav class="breadcrumb"><ol><li><a href="index.html">User Guide</a></li></ol></nav>
+</div>
           <div class="body" role="main">
             
   <section id="debugging-a-testbench">

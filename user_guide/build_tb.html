@@ -4,18 +4,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Please note that ADI only provides the source files necessary to create and build the designs. This means that you are responsible for modifying and building these projects." name="description" />
 
     <title>Build a testbench &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=25ed7d6a" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=37266688" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
-    <script defer="" src="../_static/app.umd.js?v=80d097f0"></script>
+    <script async="async" src="../_static/app.umd.js?v=8f62bab2"></script>
     <link rel="icon" href="../_static/icon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Repository hierarchy" href="hierarchy.html" />
     <link rel="prev" title="Releases" href="releases.html" />
    
+  
   
   <meta name="repository" content="testbenches">
   <meta name="version" content="">
@@ -60,9 +62,11 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com"></a>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
+        
         <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
         <a id="logo" href="../index.html">
           <div>HDL Testbenches</div>
         </a>
@@ -82,8 +86,7 @@
   </div>
     <div class="localtoc">
       <div class="tocwrapper">
-        <div>
-          <div class="localtoc-header"></div>
+        <div class="header localtoc-header">
           <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
         </div>
         <nav>
@@ -226,13 +229,8 @@ Content on this topic
       <div class="documentwrapper">
         <div class="bodywrapper" id="top-anchor">
           <div class="body-header">
-    <nav class="breadcrumb">
-        <ol>
-          <li><a href="index.html">User Guide</a></li>
-          </ol>
-    </nav>
-  </div>
-
+  <nav class="breadcrumb"><ol><li><a href="index.html">User Guide</a></li></ol></nav>
+</div>
           <div class="body" role="main">
             
   <section id="build-a-testbench">
@@ -253,17 +251,17 @@ use <strong>Cygwin</strong>.</p>
 <p class="admonition-title">Important</p>
 <p>Before building any testbench, you <strong>must</strong>:</p>
 <ol class="arabic simple">
-<li><p>Clone the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">HDL repository</a></p></li>
+<li><p>Clone the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">HDL repository</a></p></li>
 <li><p>Check the Vivado version needed by entering the
-<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/scripts/adi_env.tcl">hdl/scripts/adi_env.tcl</a> file. If you do
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/scripts/adi_env.tcl" target="_blank">hdl/scripts/adi_env.tcl</a> file. If you do
 not want to use that (although <strong>we strongly advise you to use it</strong>)
 then you have the alternative of setting <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_IGNORE_VERSION_CHECK=1</span></code>
 before building the project. Otherwise your project will fail.</p></li>
-<li><p><a class="reference external" href="https://analogdevicesinc.github.io/hdl/user_guide/build_hdl.html#build-hdl" title="(in HDL)"><span class="xref std std-ref">Set up the HDL repository</span></a></p></li>
+<li><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/user_guide/build_hdl.html#build-hdl" target="_blank" title="(in HDL)"><span class="xref std std-ref">Set up the HDL repository</span></a></p></li>
 </ol>
 </div>
-<p>The <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/">Testbenches repository</a> can be cloned anywhere
-relative to the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/">HDL repository</a>. Our recommendation is to clone
+<p>The <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">Testbenches repository</a> can be cloned anywhere
+relative to the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">HDL repository</a>. Our recommendation is to clone
 the testbenches repository next to the HDL repository:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
@@ -321,7 +319,7 @@ these things, it is best to leave it to the tools to set up the environment.</p>
 <section id="windows-environment-setup">
 <h3>Windows environment setup<a class="headerlink" href="#windows-environment-setup" title="Link to this heading"></a></h3>
 <p>The best option on Windows is to use
-<a class="reference external" href="https://www.cygwin.com">Cygwin</a>. When installing it, select the
+<a class="icon link reference external" href="https://www.cygwin.com" target="_blank">Cygwin</a>. When installing it, select the
 <code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> packages. You should do changes to your <strong>.bashrc</strong> in a
 similar manner to the Linux environment.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
@@ -331,7 +329,7 @@ similar manner to the Linux environment.</p>
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>A very good alternative to Cygwin is
-<a class="reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install/">WSL</a>. The
+<a class="icon link reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install/" target="_blank">WSL</a>. The
 manual changes to your <strong>.bashrc</strong> should look like:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>

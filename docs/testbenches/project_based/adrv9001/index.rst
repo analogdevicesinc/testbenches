@@ -46,7 +46,7 @@ The following parameters of this project can be configured:
 -  SYMB_8_16B: Select number of bits for symbol format mode:
    Options: 0 - 16 bits, 1 - 8 bits
 -  DDS_DISABLE: By setting this parameter you can remove the dual tone DDS logic
-   from the Tx channels. This will reduce resource utilization significantly,
+   from the TX channels. This will reduce resource utilization significantly,
    but will lose the ability to generate a test tone:
    Options: 0 - Enable DDS, 1 - Disable DDS                   
    
@@ -113,7 +113,6 @@ axi_adrv9001_rx1_dma       0x44A3_0000
 axi_adrv9001_rx2_dma       0x44A4_0000
 axi_adrv9001_tx1_dma       0x44A5_0000
 axi_adrv9001_tx2_dma       0x44A6_0000
-axi_ad9361_dac_dma         0x7C42_0000
 ddr_axi_vip                0x8000_0000
 =========================  ===========
 
@@ -161,9 +160,12 @@ PN test
 
 The PN test verifies the PN data.
 
-The steps of this test are:
+.. note::
 
-* PN Test Skipped in 8 bits symbol mode, otherwise test for:
+PN Test Skipped in 8 bits symbol mode.
+
+
+The steps of this test are for:
     * NIBBLE_RAMP
     * FULL_RAMP
     * PN7
@@ -196,7 +198,7 @@ The steps of this test are:
 * Configure TX DMA
 * Select DMA as source
 * Enable normal data path for RX1
-* Enable Rx channel, enable sign extension
+* Enable RX channel, enable sign extension
 * Sync DAC channels
 * Link setup
 * Configure RX DMA
@@ -211,7 +213,7 @@ This test is used for the R1T1 configuration and comprises the following steps:
 
 * Enable normal data path for RX2
 
-DMA test procedure for Rx2/Tx2 independent pairs
+DMA test procedure for RX2/TX2 independent pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The steps of this test are:
@@ -220,7 +222,7 @@ The steps of this test are:
 * Clear destination region
 * Configure TX DMA
 * Select DMA as source
-* Enable Rx channel, enable sign extension
+* Enable RX channel, enable sign extension
 * Sync DAC channels
 * Link setup
 * Configure RX DMA
@@ -232,7 +234,7 @@ Test internal loopback DAC2->ADC2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Enable internal loopback
-* DMA test procedure for Rx2/Tx2 independent pairs
+* DMA test procedure for RX2/TX2 independent pairs
 
 Stop the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -317,12 +319,6 @@ HDL related dependencies forming the DUT
    * - AXI_DMAC
      - :git-hdl:`library/axi_dmac`
      - :external+hdl:ref:`axi_dmac`
-   * - AXI_SYSID
-     - :git-hdl:`library/axi_sysid`
-     - :external+hdl:ref:`axi_sysid`
-   * - SYSID_ROM
-     - :git-hdl:`library/sysid_rom`
-     - :external+hdl:ref:`axi_sysid`
    * - UTIL_CPACK2
      - :git-hdl:`library/util_pack/util_cpack2`
      - :external+hdl:ref:`util_cpack2`

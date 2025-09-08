@@ -124,10 +124,10 @@ Below are the Programmable Logic interrupts used in this project:
 ====================  ===
 Instance name         HDL
 ====================  ===
-axi_adrv9001_rx1_dma  13
-axi_adrv9001_rx2_dma  12
-axi_adrv9001_tx2_dma  10
-axi_adrv9001_tx1_dma  9
+axi_adrv9001_rx1_dma  12
+axi_adrv9001_rx2_dma  11
+axi_adrv9001_tx1_dma  6
+axi_adrv9001_tx2_dma  5
 ====================  ===
 
 Test stimulus

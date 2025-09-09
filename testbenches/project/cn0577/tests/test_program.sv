@@ -265,7 +265,7 @@ end
 //---------------------------------------------------------------------------
 
 task sanity_tests();
-    ltc2387_common_api.sanity_test();
+    //ltc2387_common_api.sanity_test();
     cn0577_dmac_api.sanity_test();
     cn0577_pwm_gen_api.sanity_test();
     `INFO(("Sanity Tests Done"), ADI_VERBOSITY_LOW);

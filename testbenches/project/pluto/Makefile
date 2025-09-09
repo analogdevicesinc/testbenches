@@ -4,7 +4,6 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_tdd.mk
 
@@ -19,20 +18,15 @@ LIB_DEPS += axi_tdd
 LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += util_pack/util_upack2
 
-# default test program
-TP := test_program
+# list of test programs
+TP := $(notdir $(basename $(wildcard tests/*.sv)))
 
 # config files should have the following format
-#  cfg_<param1>_<param2>.tcl
+# cfg_<param1>_<param2>.tcl
 CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
-#$(warning $(CFG_FILES))
 
 # List of tests and configuration combinations that has to be run
-# Format is:  <configuration>:<test name>
+# Format is: <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
-#TESTS += cfg1_mm2mm_default:directed_test
-#TESTS += cfg1:test_program
-#TESTS += cfg2_fsync:test_program
-#TESTS += cfg2_fsync:test_frame_delay
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk

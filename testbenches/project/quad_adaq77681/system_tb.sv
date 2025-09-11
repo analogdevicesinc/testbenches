@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright 2023 (c) Analog Devices, Inc. All rights reserved.
+// Copyright 2024 (c) Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -35,28 +35,39 @@
 
 `timescale 1ns/1ps
 
-`ifndef _SPI_ENGINE_SVH_
-`define _SPI_ENGINE_SVH_
+`include "utils.svh"
 
-`define SPI_ENG_ADDR_VERSION        32'h0000_0000
-`define SPI_ENG_ADDR_ID             32'h0000_0004
-`define SPI_ENG_ADDR_SCRATCH        32'h0000_0008
-`define SPI_ENG_ADDR_ENABLE         32'h0000_0040
-`define SPI_ENG_ADDR_IRQMASK        32'h0000_0080
-`define SPI_ENG_ADDR_IRQPEND        32'h0000_0084
-`define SPI_ENG_ADDR_IRQSRC         32'h0000_0088
-`define SPI_ENG_ADDR_SYNCID         32'h0000_00C0
-`define SPI_ENG_ADDR_CMDFIFO_ROOM   32'h0000_00D0
-`define SPI_ENG_ADDR_SDOFIFO_ROOM   32'h0000_00D4
-`define SPI_ENG_ADDR_SDIFIFO_LEVEL  32'h0000_00D8
-`define SPI_ENG_ADDR_CMDFIFO        32'h0000_00E0
-`define SPI_ENG_ADDR_SDOFIFO        32'h0000_00E4
-`define SPI_ENG_ADDR_SDIFIFO        32'h0000_00E8
-`define SPI_ENG_ADDR_SDIFIFO_PEEK   32'h0000_00F0
-`define SPI_ENG_ADDR_OFFLOAD_EN     32'h0000_0100
-`define SPI_ENG_ADDR_OFFLOAD_RESET  32'h0000_0108
-`define SPI_ENG_ADDR_OFFLOAD_CMD    32'h0000_0110
-`define SPI_ENG_ADDR_OFFLOAD_SDO    32'h0000_0114
+module system_tb();
 
+  `ifdef DEF_ECHO_SCLK
+  wire                     quad_adaq77681_echo_sclk;
+  `endif
+  wire                     quad_adaq77681_spi_clk;
+  wire                     quad_adaq77681_spi_sclk;
+  wire [(`NUM_OF_CS-1) :0] quad_adaq77681_spi_cs;
+  wire [(`NUM_OF_SDI-1):0] quad_adaq77681_spi_sdi;
+  wire [(`NUM_OF_SDO-1):0] quad_adaq77681_spi_sdo;
+  wire                     quad_adaq77681_irq;
+  
+  `TEST_PROGRAM test(
+    `ifdef DEF_ECHO_SCLK
+    .quad_adaq77681_echo_sclk(quad_adaq77681_echo_sclk),
+    `endif
+    .quad_adaq77681_spi_clk(quad_adaq77681_spi_clk),
+    .quad_adaq77681_spi_sclk(quad_adaq77681_spi_sclk),
+    .quad_adaq77681_spi_cs(quad_adaq77681_spi_cs),
+    .quad_adaq77681_spi_sdi(quad_adaq77681_spi_sdi),
+    .quad_adaq77681_irq(quad_adaq77681_irq));
 
-`endif
+  test_harness `TH (
+    `ifdef DEF_ECHO_SCLK
+    .quad_adaq77681_echo_sclk(quad_adaq77681_echo_sclk),
+    `endif
+    .quad_adaq77681_spi_vip_clk(quad_adaq77681_spi_clk),
+    .quad_adaq77681_spi_vip_sclk(quad_adaq77681_spi_sclk),
+    .quad_adaq77681_spi_vip_cs(quad_adaq77681_spi_cs),
+    .quad_adaq77681_spi_vip_sdi(quad_adaq77681_spi_sdi),
+    .quad_adaq77681_spi_vip_sdo(quad_adaq77681_spi_sdo),
+    .quad_adaq77681_irq(quad_adaq77681_irq));
+
+endmodule

@@ -26,42 +26,82 @@
 #
 #   2. An ADI specific BSD license, which can be found in the top level directory
 #      of this repository (LICENSE_ADIBSD), and also on-line at:
-#      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+#      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 #      This will allow to generate bit files and not release the source code,
 #      as long as it attaches to an ADI device.
 #
 # ***************************************************************************
 # ***************************************************************************
 
-source ../../scripts/adi_env.tcl
-
 global ad_project_params
 
 adi_project_files [list \
-	        "../../library/common/ad_iobuf.v" \
+	  "$ad_hdl_dir/library/common/ad_iobuf.v" \
 ]
 
 #
 #  Block design under test
 #
 
-source ../../projects/quad_adaq77681/common/quad_adaq77681_bd.tcl
+source $ad_hdl_dir/projects/quad_adaq77681/common/quad_adaq77681_bd.tcl
 
-create_bd_cell -type ip -vlnv xilinx.com:ip:clk_vip:1.0 mclk_clkgen_vip
-set_property -dict [list CONFIG.FREQ_HZ.VALUE_SRC USER] [get_bd_cells mclk_clkgen_vip]
+ad_ip_instance axi_pwm_gen quad_adaq77681_trigger_gen
+ad_ip_parameter quad_adaq77681_trigger_gen CONFIG.PULSE_0_PERIOD 16
+ad_ip_parameter quad_adaq77681_trigger_gen CONFIG.PULSE_0_WIDTH 1
 
-set_property -dict [list \
-  CONFIG.FREQ_HZ {32768000} \
-  CONFIG.INTERFACE_MODE {MASTER} \
-] [get_bd_cells mclk_clkgen_vip]
+ad_connect mclk_clkgen/clk_0 quad_adaq77681_trigger_gen/ext_clk
+ad_connect $sys_cpu_clk quad_adaq77681_trigger_gen/s_axi_aclk
+ad_connect sys_cpu_resetn quad_adaq77681_trigger_gen/s_axi_aresetn
+
+ad_ip_instance xlconcat concat_spi_trigger
+ad_ip_parameter concat_spi_trigger CONFIG.NUM_PORTS 4
+ad_cpu_interconnect 0x44c00000 quad_adaq77681_trigger_gen
+
+ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
+adi_sim_add_define "SPI_S=spi_s_vip"
+
+# Create a new interface with Monitor mode
+create_bd_intf_port -mode Monitor -vlnv analog.com:interface:spi_engine_rtl:1.0 quad_adaq77681_spi_vip
+
+# it is necessary to remove the connection with the input ports quad_ada77681_drdy
+ad_disconnect quad_adaq77681_drdy drdy_buf/Op1
+ad_connect  concat_spi_trigger/In3   quad_adaq77681_trigger_gen/pwm_0
+ad_connect  concat_spi_trigger/In2   quad_adaq77681_trigger_gen/pwm_0
+ad_connect  concat_spi_trigger/In1   quad_adaq77681_trigger_gen/pwm_0
+ad_connect  concat_spi_trigger/In0   quad_adaq77681_trigger_gen/pwm_0
+ad_connect  concat_spi_trigger/dout  drdy_buf/Op1
+
+
+# it is necessary to remove the connection with the master interface of the quad_ada77681_bd
+ad_disconnect quad_adaq77681_spi quad_adaq77681/m_spi
+ad_connect spi_s_vip/s_spi quad_adaq77681/m_spi
+ad_connect quad_adaq77681_spi_vip quad_adaq77681/m_spi
+
+create_bd_port -dir O quad_adaq77681_spi_vip_clk
+create_bd_port -dir O quad_adaq77681_irq
+if {$ad_project_params(ECHO_SCLK)} {
+    create_bd_port -dir I quad_adaq77681_echo_sclk
+    ad_connect quad_adaq77681_echo_sclk $hier_spi_engine/echo_sclk
+}
+
+if ($ad_project_params(SDO_STREAMING)) {
+    ad_ip_instance axi4stream_vip sdo_src $ad_project_params(axis_sdo_src_vip_cfg)
+    adi_sim_add_define "SDO_SRC=sdo_src"
+    ad_connect spi_clk sdo_src/aclk
+    ad_connect sys_cpu_resetn sdo_src/aresetn
+    ad_connect sdo_src/m_axis $hier_spi_engine/s_axis_sample
+}
+
+ad_ip_instance clk_vip mclk_clkgen_vip [ list \
+  INTERFACE_MODE {MASTER} \
+  FREQ_HZ 32768000 \
+]
+adi_sim_add_define "MCLK_CLK=mclk_clkgen_vip"
 
 delete_bd_objs [get_bd_nets quad_adaq77681_mclk_refclk_1]
 connect_bd_net [get_bd_pins mclk_clkgen_vip/clk_out] [get_bd_pins mclk_clkgen/clk]
- 
-create_bd_port -dir O quad_adaq77681_spi_clk
-create_bd_port -dir O quad_adaq77681_irq
 
-ad_connect quad_adaq77681_spi_clk spi_clkgen/clk_0
+ad_connect quad_adaq77681_spi_vip_clk spi_clkgen/clk_0
 ad_connect quad_adaq77681_irq quad_adaq77681/irq
 
 set BA_SPI_REGMAP 0x44A00000
@@ -79,3 +119,7 @@ adi_sim_add_define "QUAD_ADAQ77681_AXI_SPI_CLKGEN_BA=[format "%d" ${BA_SPI_CLKGE
 set BA_MCLK_CLKGEN 0x44B00000
 set_property offset $BA_MCLK_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mclk_clkgen}]
 adi_sim_add_define "QUAD_ADAQ77681_AXI_MCLK_CLKGEN_BA=[format "%d" ${BA_MCLK_CLKGEN}]"
+
+set BA_PWM 0x44C00000
+set_property offset $BA_PWM [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_quad_adaq77681_trigger_gen}]
+adi_sim_add_define "QUAD_ADAQ77681_PWM_GEN_BA=[format "%d" ${BA_PWM}]"

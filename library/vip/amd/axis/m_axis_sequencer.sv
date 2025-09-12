@@ -43,9 +43,11 @@ package m_axis_sequencer_pkg;
   import logger_pkg::*;
 
   typedef enum {
-      DATA_GEN_MODE_TEST_DATA,  // get data from test
-      DATA_GEN_MODE_AUTO_INCR,  // autogenerate incrementing data until aborted
-      DATA_GEN_MODE_AUTO_RAND   // autogenerate randomized data until aborted
+      DATA_GEN_MODE_TEST_DATA,        // get data from test
+      DATA_GEN_MODE_TEST_DATA_TKEEP,  // get data from test, with user-defined tkeep
+      DATA_GEN_MODE_AUTO_INCR,        // autogenerate incrementing data until aborted
+      DATA_GEN_MODE_AUTO_INCR_TKEEP,  // autogenerate incrementing data until aborted, with user-defined tkeep
+      DATA_GEN_MODE_AUTO_RAND         // autogenerate randomized data until aborted
   } data_gen_mode_t;
 
   typedef enum bit [1:0] {
@@ -81,10 +83,12 @@ package m_axis_sequencer_pkg;
     protected event packet_done;
     protected event queue_empty;
     protected event byte_stream_ev;
+    protected event tkeep_stream_ev;
     protected event queue_ev;
 
     protected axi4stream_transaction trans;
     protected xil_axi4stream_data_byte byte_stream [$];
+    protected xil_axi4stream_strb tkeep_stream [$];
 
     typedef struct{
       int num_bytes;
@@ -268,8 +272,9 @@ package m_axis_sequencer_pkg;
                 if (enabled || (!enabled && stop_policy == STOP_POLICY_DESCRIPTOR_QUEUE)) begin
                   packetize();
                   descriptor_delay_subroutine();
-                end else
+                end else begin
                   @enable_ev;
+                end
               end else begin
                 this.queue_empty_sig = 1;
                 ->> queue_empty;
@@ -287,6 +292,12 @@ package m_axis_sequencer_pkg;
       this.byte_stream.push_back(byte_stream);
       ->>byte_stream_ev;
     endfunction: push_byte_for_stream
+
+    function void push_tkeep_for_stream(xil_axi4stream_strb tkeep_stream);
+      this.tkeep_stream.push_back(tkeep_stream);
+      ->>tkeep_stream_ev;
+    endfunction: push_tkeep_for_stream
+
 
     // descriptor delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
@@ -403,40 +414,101 @@ package m_axis_sequencer_pkg;
 
       for (int tc=0; tc<packet_length; tc++) begin : packet_loop
         data = new[byte_per_beat];
-        for (int i=0; i<byte_per_beat; i++)
-          data[i] = 'd0;
         keep = new[byte_per_beat];
+        for (int i=0; i<byte_per_beat; i++) begin
+          data[i] = 'd0;
+          keep[i] = 1'b0;
+        end
 
         for (int i=0; i<byte_per_beat && (keep_all || tc*byte_per_beat+i<descriptor.num_bytes); i++) begin
           case (data_gen_mode)
             DATA_GEN_MODE_TEST_DATA:
               // block transfer until we get data from byte stream queue
-              forever begin
-                if (byte_stream.size() > 0) begin
-                  data[i] = byte_stream.pop_front();
-                  keep[i] = 1'b1;
-                  break;
-                end else
-                  fork begin
-                    fork
-                      @byte_stream_ev;
-                      begin
-                        @disable_ev;
-                        if (tc==0 && i==0) begin
-                          case (stop_policy)
-                            STOP_POLICY_PACKET: ->> packet_done;
-                            STOP_POLICY_DATA_BEAT: ->> beat_done;
-                            default: ;
-                          endcase
-                        end
+              if (byte_stream.size() > 0) begin
+                data[i] = byte_stream.pop_front();
+                keep[i] = 1'b1;
+              end else begin
+                fork begin
+                  fork
+                    @byte_stream_ev;
+                    begin
+                      @disable_ev;
+                      if (tc==0 && i==0) begin
+                        case (stop_policy)
+                          STOP_POLICY_PACKET: ->> packet_done;
+                          STOP_POLICY_DATA_BEAT: ->> beat_done;
+                          default: ;
+                        endcase
                       end
-                    join_any
-                    disable fork;
-                  end join
+                    end
+                  join_any
+                  disable fork;
+                end join
+              end
+            DATA_GEN_MODE_TEST_DATA_TKEEP:
+              // block transfer until we get data from byte stream queue
+              if (byte_stream.size() > 0 && tkeep_stream.size() > 0) begin
+                data[i] = byte_stream.pop_front();
+                keep[i] = tkeep_stream.pop_front();
+              end else begin
+                fork begin
+                  fork
+                    begin
+                      fork
+                        begin
+                          if (byte_stream.size() == 0) begin
+                            @byte_stream_ev;
+                          end
+                        end
+                        begin
+                          if (tkeep_stream.size() == 0) begin
+                            @tkeep_stream_ev;
+                          end
+                        end
+                      join
+                    end
+                    begin
+                      @disable_ev;
+                      if (tc==0 && i==0) begin
+                        case (stop_policy)
+                          STOP_POLICY_PACKET: ->> packet_done;
+                          STOP_POLICY_DATA_BEAT: ->> beat_done;
+                          default: ;
+                        endcase
+                      end
+                    end
+                  join_any
+                  disable fork;
+                end join
               end
             DATA_GEN_MODE_AUTO_INCR: begin
               data[i] = byte_count++;
               keep[i] = 1'b1;
+            end
+            DATA_GEN_MODE_AUTO_INCR_TKEEP: begin
+              // block transfer until we get data from tkeep stream queue
+              if (tkeep_stream.size() > 0) begin
+                data[i] = byte_count++;;
+                keep[i] = tkeep_stream.pop_front();
+                break;
+              end else begin
+                fork begin
+                  fork
+                    @tkeep_stream_ev;
+                    begin
+                      @disable_ev;
+                      if (tc==0 && i==0) begin
+                        case (stop_policy)
+                          STOP_POLICY_PACKET: ->> packet_done;
+                          STOP_POLICY_DATA_BEAT: ->> beat_done;
+                          default: ;
+                        endcase
+                      end
+                    end
+                  join_any
+                  disable fork;
+                end join
+              end
             end
             DATA_GEN_MODE_AUTO_RAND: begin
               data[i] = $random;

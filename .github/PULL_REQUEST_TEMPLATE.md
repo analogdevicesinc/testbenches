@@ -14,6 +14,7 @@ try to push all related PRs at the same time.
 - [ ] Bug fix (change that fixes an issue)
 - [ ] New feature (change that adds new functionality)
 - [ ] New test (change that adds new test program and/or testbench)
+- [ ] Update (change that modifies existing functionality)
 - [ ] Breaking change (has dependencies in other repositories/testbenches)
 - [ ] Documentation (change that adds or modifies documentation)
 

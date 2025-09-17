@@ -36,10 +36,10 @@
 global ad_project_params
 
 ## Data Offload
-set adc_offload_type $ad_project_params(ADC_OFFLOAD_TYPE)
-set adc_offload_size $ad_project_params(ADC_OFFLOAD_SIZE)
-set dac_offload_type $ad_project_params(DAC_OFFLOAD_TYPE)
-set dac_offload_size $ad_project_params(DAC_OFFLOAD_SIZE)
+## ADC FIFO depth in samples per converter
+set adc_fifo_samples_per_converter [expr $ad_project_params(RX_KS_PER_CHANNEL)*1024]
+## DAC FIFO depth in samples per converter
+set dac_fifo_samples_per_converter [expr $ad_project_params(TX_KS_PER_CHANNEL)*1024]
 set rd_data_registered $ad_project_params(RD_DATA_REGISTERED)
 set rd_fifo_address_width $ad_project_params(RD_FIFO_ADDRESS_WIDTH)
 

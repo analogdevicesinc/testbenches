@@ -6,7 +6,6 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_spi_engine.mk
 
@@ -28,21 +27,20 @@ LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
 
-# default test programs
-# Format is: <test name>
+# list of test programs
 TP := $(notdir $(basename $(wildcard tests/*.sv)))
 
 # config files should have the following format
-#  cfg_<param1>_<param2>.tcl
+# cfg_<param1>_<param2>.tcl
 CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 
 # List of tests and configuration combinations that has to be run
-# Format is:  <configuration>:<test name>
+# Format is: <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(addprefix $(cfg):, $(TP)))
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 
-# usage :
+# usage:
 #
 # run specific test on a specific configuration in gui mode
 # 	make CFG=cfg1 TST=test_program MODE=gui

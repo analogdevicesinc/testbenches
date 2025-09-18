@@ -3,6 +3,7 @@
 ####################################################################################
 
 # All test-bench dependencies except test programs
+SV_DEPS += $(TB_LIBRARY_PATH)/vip/vip_agent_typedef_pkg.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axi/adi_axi_agent.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axi/m_axi_sequencer.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axi/s_axi_sequencer.sv

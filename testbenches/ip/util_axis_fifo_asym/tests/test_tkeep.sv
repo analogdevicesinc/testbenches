@@ -92,7 +92,7 @@ program test_tkeep ();
 
     uaf_env.run();
 
-    send_data_wd = new("Util AXIS FIFO Watchdog", 50000, "Send data");
+    send_data_wd = new("Util AXIS FIFO Watchdog", 500000, "Send data");
 
     send_data_wd.start();
 
@@ -103,10 +103,9 @@ program test_tkeep ();
       send_data_wd.reset();
 
       if ((!`TKEEP_EN || !`TLAST_EN) && `INPUT_WIDTH < `OUTPUT_WIDTH) begin
-        `FATAL(("bad parameter case"));
         repeat($urandom_range(1,5)) begin
           sample_count = $urandom_range(1,128);
-          repeat(sample_count) begin
+          repeat(sample_count*`OUTPUT_WIDTH/8) begin
             uaf_env.input_axis_agent.sequencer.push_byte_for_stream($urandom_range(0,255));
             uaf_env.input_axis_agent.sequencer.push_tkeep_for_stream($urandom_range(0,1));
           end
@@ -123,8 +122,7 @@ program test_tkeep ();
         end
       end
 
-
-      #($urandom_range(1,10)*1us);
+      #($urandom_range(1,50)*1us);
 
       uaf_env.input_axis_agent.sequencer.clear_descriptor_queue();
       uaf_env.input_axis_agent.sequencer.wait_empty_descriptor_queue();

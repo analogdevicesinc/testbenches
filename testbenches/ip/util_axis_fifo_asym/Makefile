@@ -18,7 +18,7 @@ LIB_DEPS += util_axis_fifo
 LIB_DEPS += util_axis_fifo_asym
 
 # default test program
-TP := test_program
+TP := $(notdir $(basename $(wildcard tests/*.sv)))
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl
@@ -27,7 +27,7 @@ CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
-TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
+TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(addprefix $(cfg):, $(TP)))
 
 include ../../../scripts/project-sim.mk
 

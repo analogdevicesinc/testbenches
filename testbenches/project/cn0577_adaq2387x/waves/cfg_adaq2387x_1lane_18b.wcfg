@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv_1777850807 " />
+            <top_module name="adc_api_pkg" />
+            <top_module name="adi_api_pkg" />
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_common_pkg" />
+            <top_module name="adi_environment_pkg" />
+            <top_module name="adi_regmap_adc_pkg" />
+            <top_module name="adi_regmap_common_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_regmap_pwm_gen_pkg" />
+            <top_module name="adi_vip_pkg" />
+            <top_module name="attributes" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="common_api_pkg" />
+            <top_module name="dma_trans_pkg" />
+            <top_module name="dmac_api_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="math_real" />
+            <top_module name="numeric_std" />
+            <top_module name="pub_sub_pkg" />
+            <top_module name="pwm_gen_api_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="standard" />
+            <top_module name="std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_misc" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+            <top_module name="vital_primitives" />
+            <top_module name="vital_timing" />
+            <top_module name="vpkg" />
+            <top_module name="watchdog_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="31,259,995 ps"></ZoomStartTime>
+      <ZoomEndTime time="31,260,002 ps"></ZoomEndTime>
+      <Cursor1Time time="31,260,000 ps"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="242"></NameColumnWidth>
+      <ValueColumnWidth column_width="99"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="11" />
+   <wvobject type="logic" fp_name="/system_tb/test/ref_clk_out">
+      <obj_property name="ElementShortName">ref_clk_out</obj_property>
+      <obj_property name="ObjectShortName">ref_clk_out</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/clk_gate">
+      <obj_property name="ElementShortName">clk_gate</obj_property>
+      <obj_property name="ObjectShortName">clk_gate</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/da_p">
+      <obj_property name="ElementShortName">da_p</obj_property>
+      <obj_property name="ObjectShortName">da_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/da_n">
+      <obj_property name="ElementShortName">da_n</obj_property>
+      <obj_property name="ObjectShortName">da_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/dco_p">
+      <obj_property name="ElementShortName">dco_p</obj_property>
+      <obj_property name="ObjectShortName">dco_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/dco_n">
+      <obj_property name="ElementShortName">dco_n</obj_property>
+      <obj_property name="ObjectShortName">dco_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/cnv">
+      <obj_property name="ElementShortName">cnv</obj_property>
+      <obj_property name="ObjectShortName">cnv</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/adc_valid">
+      <obj_property name="ElementShortName">adc_valid</obj_property>
+      <obj_property name="ObjectShortName">adc_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ltc2387/adc_data">
+      <obj_property name="ElementShortName">adc_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/dma_data_store_arr">
+      <obj_property name="ElementShortName">dma_data_store_arr[15:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">dma_data_store_arr[15:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/captured_word_arr">
+      <obj_property name="ElementShortName">captured_word_arr[15:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">captured_word_arr[15:0][31:0]</obj_property>
+   </wvobject>
+</wave_config>

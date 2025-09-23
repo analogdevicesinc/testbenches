@@ -40,7 +40,7 @@ global ad_project_params
 
 ## DUT configuration
 
-# Instanțiere IP
+# Instantiere IP
 ad_ip_instance axi_gpio_adi gpio_ip
 
 # Setare adresă de bază
@@ -49,7 +49,7 @@ set BA 0x50000000
 # Conectare AXI la CPU
 ad_cpu_interconnect [expr ${BA} + 0x40000] gpio_ip
 
-# === GPIO bidirecțional (tri-state style) ===
+# === GPIO bidirectional (tri-state style) ===
 
 # Creăm 3 porturi separate (stil Xilinx)
 create_bd_port -dir O  -from 31 -to 0 gpio_m_io_o

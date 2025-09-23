@@ -19,10 +19,10 @@ adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 # Aici adaugi directoarele pentru include-uri
 set gpio_inc_dir "$ad_hdl_dir/library/gpio_adi"
 
-# Obține fileset-ul
+# Obtine fileset-ul
 set fileset [get_filesets sim_1]
 
-# Setează include dir pentru compilator
+# Seteaza include dir pentru compilator
 set_property verilog_include_dirs $gpio_inc_dir $fileset
 
 source $ad_tb_dir/library/includes/sp_include_axis.tcl
@@ -37,7 +37,7 @@ adi_sim_project_files [list \
   "tests/test_program.sv" \
 ]
 
-# 2. Adăugăm definițiile .svh ca surse (nu se includ automat la compile)
+# 2. Adaugam definitiile .svh ca surse (nu se includ automat la compile)
 add_files -fileset sim_1 \
   "$ad_hdl_dir/library/gpio_adi/gpio_definitions.svh"
 

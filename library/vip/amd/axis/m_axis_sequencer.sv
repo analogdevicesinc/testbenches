@@ -422,12 +422,9 @@ package m_axis_sequencer_pkg;
 
         for (int i=0; i<byte_per_beat && (keep_all || tc*byte_per_beat+i<descriptor.num_bytes); i++) begin
           case (data_gen_mode)
-            DATA_GEN_MODE_TEST_DATA:
+            DATA_GEN_MODE_TEST_DATA: begin
               // block transfer until we get data from byte stream queue
-              if (byte_stream.size() > 0) begin
-                data[i] = byte_stream.pop_front();
-                keep[i] = 1'b1;
-              end else begin
+              if (byte_stream.size() == 0) begin
                 fork begin
                   fork
                     @byte_stream_ev;
@@ -445,27 +442,21 @@ package m_axis_sequencer_pkg;
                   disable fork;
                 end join
               end
-            DATA_GEN_MODE_TEST_DATA_TKEEP:
+              data[i] = byte_stream.pop_front();
+              keep[i] = 1'b1;
+            end
+            DATA_GEN_MODE_TEST_DATA_TKEEP: begin
               // block transfer until we get data from byte stream queue
-              if (byte_stream.size() > 0 && tkeep_stream.size() > 0) begin
-                data[i] = byte_stream.pop_front();
-                keep[i] = tkeep_stream.pop_front();
-              end else begin
+              if (byte_stream.size() == 0 || tkeep_stream.size() == 0) begin
                 fork begin
                   fork
                     begin
-                      fork
-                        begin
-                          if (byte_stream.size() == 0) begin
-                            @byte_stream_ev;
-                          end
-                        end
-                        begin
-                          if (tkeep_stream.size() == 0) begin
-                            @tkeep_stream_ev;
-                          end
-                        end
-                      join
+                      if (byte_stream.size() == 0) begin
+                        @byte_stream_ev;
+                      end
+                      if (tkeep_stream.size() == 0) begin
+                        @tkeep_stream_ev;
+                      end
                     end
                     begin
                       @disable_ev;
@@ -481,17 +472,16 @@ package m_axis_sequencer_pkg;
                   disable fork;
                 end join
               end
+              data[i] = byte_stream.pop_front();
+              keep[i] = tkeep_stream.pop_front();
+            end
             DATA_GEN_MODE_AUTO_INCR: begin
               data[i] = byte_count++;
               keep[i] = 1'b1;
             end
             DATA_GEN_MODE_AUTO_INCR_TKEEP: begin
               // block transfer until we get data from tkeep stream queue
-              if (tkeep_stream.size() > 0) begin
-                data[i] = byte_count++;;
-                keep[i] = tkeep_stream.pop_front();
-                break;
-              end else begin
+              if (tkeep_stream.size() == 0) begin
                 fork begin
                   fork
                     @tkeep_stream_ev;
@@ -509,6 +499,8 @@ package m_axis_sequencer_pkg;
                   disable fork;
                 end join
               end
+              data[i] = byte_count++;;
+              keep[i] = tkeep_stream.pop_front();
             end
             DATA_GEN_MODE_AUTO_RAND: begin
               data[i] = $random;

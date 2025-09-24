@@ -98,7 +98,6 @@ package m_axis_sequencer_pkg;
 
     protected descriptor_t descriptor_q [$];
 
-
     // new
     function new(
       input string name,
@@ -118,7 +117,6 @@ package m_axis_sequencer_pkg;
       this.queue_empty_sig = 1;
       this.keep_all = 1;
     endfunction: new
-
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
@@ -162,7 +160,6 @@ package m_axis_sequencer_pkg;
     virtual task packet_sent();
       this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
     endtask: packet_sent
-
 
     // set disable policy
     function void set_stop_policy(input stop_policy_t stop_policy);
@@ -298,7 +295,6 @@ package m_axis_sequencer_pkg;
       ->>tkeep_stream_ev;
     endfunction: push_tkeep_for_stream
 
-
     // descriptor delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
     protected task data_beat_delay_subroutine();
@@ -333,7 +329,6 @@ package m_axis_sequencer_pkg;
 
     protected axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver;
 
-
     function new(
       input string name,
       input axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
@@ -345,7 +340,6 @@ package m_axis_sequencer_pkg;
 
       this.driver.vif_proxy.set_no_insert_x_when_keep_low(1);
     endfunction: new
-
 
     // wait until data beat is sent
     virtual task beat_sent();

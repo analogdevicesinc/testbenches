@@ -11,8 +11,6 @@ proc create_aurora_controller { \
 
   ad_ip_instance aurora_64b66b aurora_64b66b
   ad_ip_parameter aurora_64b66b CONFIG.SupportLevel 1
-  # ad_ip_parameter aurora_64b66b CONFIG.C_INIT_CLK.VALUE_SRC USER
-  # ad_ip_parameter aurora_64b66b CONFIG.C_INIT_CLK 100
   ad_ip_parameter aurora_64b66b CONFIG.C_LINE_RATE 12.5
   ad_ip_parameter aurora_64b66b CONFIG.C_REFCLK_FREQUENCY 300
   ad_ip_parameter aurora_64b66b CONFIG.SINGLEEND_GTREFCLK {true}
@@ -36,11 +34,6 @@ proc create_aurora_controller { \
   ad_connect aurora_64b66b/channel_up axi_chip2chip/axi_c2c_aurora_channel_up
   ad_connect aurora_64b66b/user_clk_out axi_chip2chip/axi_c2c_phy_clk
 
-  # ad_ip_instance smartconnect axi_smartconnect
-  # ad_ip_parameter axi_smartconnect CONFIG.NUM_SI 1
-  # ad_ip_parameter axi_smartconnect CONFIG.NUM_MI 1
-  # ad_ip_parameter axi_smartconnect CONFIG.NUM_CLKS 1
-
   create_bd_port -dir I controller_init_clk
   create_bd_port -dir I controller_resetn
 
@@ -52,21 +45,9 @@ proc create_aurora_controller { \
   ad_connect controller_clk_rstgen/peripheral_aresetn axi_chip2chip/s_aresetn
   ad_connect controller_init_clk aurora_64b66b/init_clk
 
-  # ad_connect controller_init_clk axi_smartconnect/aclk
-  # ad_connect controller_clk_rstgen/peripheral_aresetn axi_smartconnect/aresetn
-
-  # ad_connect axi_smartconnect/M00_AXI 
   make_bd_intf_pins_external [get_bd_intf_pins axi_chip2chip/s_axi]
 
-  # assign_bd_address
-
-  # set_property offset 0x80000000 [get_bd_addr_segs {S00_AXI_0/SEG_axi_chip2chip_Mem0}]
-  # set_property range 256K [get_bd_addr_segs {S00_AXI_0/SEG_axi_chip2chip_Mem0}]
-
-  # make_bd_intf_pins_external [get_bd_intf_pins axi_smartconnect/S00_AXI]
-
   validate_bd_design
-
   save_bd_design
   close_bd_design [current_bd_design]
 

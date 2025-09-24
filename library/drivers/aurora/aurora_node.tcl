@@ -14,8 +14,6 @@ proc create_aurora_node { \
 
   ad_ip_instance aurora_64b66b aurora_64b66b
   ad_ip_parameter aurora_64b66b CONFIG.SupportLevel 1
-  # ad_ip_parameter aurora_64b66b CONFIG.C_INIT_CLK.VALUE_SRC USER
-  # ad_ip_parameter aurora_64b66b CONFIG.C_INIT_CLK 100
   ad_ip_parameter aurora_64b66b CONFIG.C_LINE_RATE 12.5
   ad_ip_parameter aurora_64b66b CONFIG.C_REFCLK_FREQUENCY 300
   ad_ip_parameter aurora_64b66b CONFIG.SINGLEEND_GTREFCLK {true}
@@ -39,11 +37,6 @@ proc create_aurora_node { \
   ad_connect aurora_64b66b/mmcm_not_locked_out axi_chip2chip/aurora_mmcm_not_locked
   ad_connect aurora_64b66b/init_clk axi_chip2chip/aurora_init_clk
 
-  # ad_ip_instance smartconnect axi_smartconnect
-  # ad_ip_parameter axi_smartconnect CONFIG.NUM_SI 1
-  # ad_ip_parameter axi_smartconnect CONFIG.NUM_MI 1
-  # ad_ip_parameter axi_smartconnect CONFIG.NUM_CLKS 1
-
   create_bd_port -dir I node_init_clk
   create_bd_port -dir I node_resetn
 
@@ -55,24 +48,9 @@ proc create_aurora_node { \
   ad_connect node_clk_rstgen/peripheral_aresetn axi_chip2chip/m_aresetn
   ad_connect node_init_clk aurora_64b66b/init_clk
 
-  # ad_connect node_init_clk axi_smartconnect/aclk
-  # ad_connect node_clk_rstgen/peripheral_aresetn axi_smartconnect/aresetn
-
-  # ad_connect axi_chip2chip/m_axi axi_smartconnect/S00_AXI
-
-  # ad_ip_instance axi_gpio axi_gpio
-  # ad_ip_parameter axi_gpio CONFIG.GPIO_BOARD_INTERFACE {dip_switches_4bits}
-
-  # make_bd_intf_pins_external [get_bd_intf_pins axi_gpio/GPIO]
-  # ad_connect axi_smartconnect/aclk axi_gpio/s_axi_aclk
-  # ad_connect axi_smartconnect/M00_AXI axi_gpio/S_AXI
-
   make_bd_intf_pins_external [get_bd_intf_pins axi_chip2chip/m_axi]
 
-  # set_property offset 0x81000000 [get_bd_addr_segs {axi_chip2chip/MAXI/SEG_axi_gpio_Reg}]
-
   validate_bd_design
-
   save_bd_design
   close_bd_design [current_bd_design]
 

@@ -7,13 +7,13 @@ proc create_aurora_bridge { \
   create_bd_design $NAME
 
   ad_ip_instance aurora_64b66b aurora_64b66b_slave
+  ad_ip_parameter aurora_64b66b_slave CONFIG.SupportLevel 1
   ad_ip_parameter aurora_64b66b_slave CONFIG.C_LINE_RATE 12.5
   ad_ip_parameter aurora_64b66b_slave CONFIG.C_REFCLK_FREQUENCY 300
   ad_ip_parameter aurora_64b66b_slave CONFIG.SINGLEEND_GTREFCLK {true}
   ad_ip_parameter aurora_64b66b_slave CONFIG.interface_mode {Streaming}
 
   ad_ip_instance aurora_64b66b aurora_64b66b_master
-  ad_ip_parameter aurora_64b66b_master CONFIG.SupportLevel 1
   ad_ip_parameter aurora_64b66b_master CONFIG.C_LINE_RATE 12.5
   ad_ip_parameter aurora_64b66b_master CONFIG.C_REFCLK_FREQUENCY 300
   ad_ip_parameter aurora_64b66b_master CONFIG.SINGLEEND_GTREFCLK {true}
@@ -59,17 +59,17 @@ proc create_aurora_bridge { \
 
   ad_connect axi_chip2chip_master/aurora_reset_pb aurora_64b66b_master/reset_pb
   ad_connect aurora_64b66b_master/pma_init axi_chip2chip_master/aurora_pma_init_out
-  ad_connect aurora_64b66b_master/gt_qpllrefclk_quad1_out aurora_64b66b_slave/gt_qpllrefclk_quad1_in
-  ad_connect aurora_64b66b_master/gt_qpllclk_quad1_out aurora_64b66b_slave/gt_qpllclk_quad1_in
-  ad_connect aurora_64b66b_master/sync_clk_out aurora_64b66b_slave/sync_clk
-  ad_connect aurora_64b66b_master/user_clk_out aurora_64b66b_slave/user_clk
-  ad_connect axi_chip2chip_slave/axi_c2c_phy_clk aurora_64b66b_master/user_clk_out
-  ad_connect axi_chip2chip_master/axi_c2c_phy_clk aurora_64b66b_master/user_clk_out
+  ad_connect aurora_64b66b_slave/gt_qpllrefclk_quad1_out aurora_64b66b_master/gt_qpllrefclk_quad1_in
+  ad_connect aurora_64b66b_slave/gt_qpllclk_quad1_out aurora_64b66b_master/gt_qpllclk_quad1_in
+  ad_connect aurora_64b66b_slave/sync_clk_out aurora_64b66b_master/sync_clk
+  ad_connect aurora_64b66b_slave/user_clk_out aurora_64b66b_master/user_clk
+  ad_connect axi_chip2chip_slave/axi_c2c_phy_clk aurora_64b66b_slave/user_clk_out
+  ad_connect axi_chip2chip_master/axi_c2c_phy_clk aurora_64b66b_slave/user_clk_out
   ad_connect aurora_64b66b_master/channel_up axi_chip2chip_master/axi_c2c_aurora_channel_up
 
-  ad_connect aurora_64b66b_master/mmcm_not_locked_out axi_chip2chip_master/aurora_mmcm_not_locked
-  ad_connect aurora_64b66b_master/gt_qplllock_quad1_out aurora_64b66b_slave/gt_qplllock_quad1_in
-  ad_connect aurora_64b66b_master/gt_qpllrefclklost_quad1_out aurora_64b66b_slave/gt_qpllrefclklost_quad1
+  ad_connect aurora_64b66b_slave/mmcm_not_locked_out axi_chip2chip_slave/aurora_mmcm_not_locked
+  ad_connect aurora_64b66b_slave/gt_qplllock_quad1_out aurora_64b66b_master/gt_qplllock_quad1_in
+  ad_connect aurora_64b66b_slave/gt_qpllrefclklost_quad1_out aurora_64b66b_master/gt_qpllrefclklost_quad1
 
   ad_connect aurora_64b66b_slave/reset_pb axi_chip2chip_slave/aurora_reset_pb
   ad_connect aurora_64b66b_slave/pma_init axi_chip2chip_slave/aurora_pma_init_out
@@ -98,7 +98,6 @@ proc create_aurora_bridge { \
   set_property range 256M [get_bd_addr_segs {axi_chip2chip_slave/MAXI/SEG_axi_chip2chip_master_Mem0}]
 
   validate_bd_design
-
   save_bd_design
   close_bd_design [current_bd_design]
 

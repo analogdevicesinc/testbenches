@@ -79,12 +79,15 @@ program test_program;
     `TH.`BRIDGE_CLK.inst.IF.start_clock();
 
     #20us
-    `INFO(("Write transaction on AXI_GPIO"), ADI_VERBOSITY_NONE);
+    `INFO(("Write transaction on AXI_GPIO_0"), ADI_VERBOSITY_NONE);
     // base_env.mng.sequencer.RegWrite32(`AXI_GPIO_BA + 'h04, 'h0);
     // #5us;
-    base_env.mng.sequencer.RegWrite32(`AXI_GPIO_BA, 'h0f0f0f0f);
+    base_env.mng.sequencer.RegWrite32(`AXI_GPIO_BA_0, 'h0f0f0f0f);
+    #5us;
+    `INFO(("Write transaction on AXI_GPIO_1"), ADI_VERBOSITY_NONE);
+    base_env.mng.sequencer.RegWrite32(`AXI_GPIO_BA_1, 'h1f1f3f3f);
 
-    `INFO(("End AXI_GPIO transaction"), ADI_VERBOSITY_NONE);
+    `INFO(("End AXI_GPIO transactions"), ADI_VERBOSITY_NONE);
 
     base_env.stop();
 

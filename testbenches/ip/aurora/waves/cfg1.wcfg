@@ -29,11 +29,87 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0 fs"></ZoomStartTime>
-      <ZoomEndTime time="-11 fs"></ZoomEndTime>
-      <Cursor1Time time="0 fs"></Cursor1Time>
+      <ZoomStartTime time="682,253.555 ns"></ZoomStartTime>
+      <ZoomEndTime time="682,860.056 ns"></ZoomEndTime>
+      <Cursor1Time time="682,758.972 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
+      <NameColumnWidth column_width="231"></NameColumnWidth>
+      <ValueColumnWidth column_width="94"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="0" />
+   <WVObjectSize size="7" />
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_aurora_controller/s_axi_0">
+      <obj_property name="ElementShortName">s_axi_0</obj_property>
+      <obj_property name="ObjectShortName">s_axi_0</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_0/AXIS_RX">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_0/AXIS_RX.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_0/AXIS_RX.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_0/AXIS_RX.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_0/AXIS_RX.streamTooltipData</obj_property>
+      <obj_property name="ElementShortName">AXIS_RX</obj_property>
+      <obj_property name="ObjectShortName">AXIS_RX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_1/AXIS_RX">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">#00E600</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_1/AXIS_RX.streamWaveData</obj_property>
+      <obj_property name="Number_Overlay">2</obj_property>
+      <obj_property name="Overlay_Object_0">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_1/AXIS_RX.linkStarve</obj_property>
+      <obj_property name="Overlay_Color_0">#99E600</obj_property>
+      <obj_property name="Overlay_Object_1">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_1/AXIS_RX.linkStall</obj_property>
+      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
+      <obj_property name="Detail_Data">/system_tb/test_harness/i_aurora_bridge/axi_chip2chip_master_1/AXIS_RX.streamTooltipData</obj_property>
+      <obj_property name="ElementShortName">AXIS_RX</obj_property>
+      <obj_property name="ObjectShortName">AXIS_RX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_aurora_node_0/m_axi_0">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/i_aurora_node_0/m_axi_0.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
+      <obj_property name="ElementShortName">m_axi_0</obj_property>
+      <obj_property name="ObjectShortName">m_axi_0</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_aurora_node_1/m_axi_0">
+      <obj_property name="children_use_element_short_name">true</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
+      <obj_property name="EnumTransactionColorTable">0=blank 1=#D399FF 2=pink</obj_property>
+      <obj_property name="EnumTransactionValueTable">0=blank;1=Read;2=Write;3=Read/Write</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <obj_property name="CustomSignalColor">turquoise</obj_property>
+      <obj_property name="Render_Data">/system_tb/test_harness/i_aurora_node_1/m_axi_0.readWriteSummary</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CellHeight">36</obj_property>
+      <obj_property name="ElementShortName">m_axi_0</obj_property>
+      <obj_property name="ObjectShortName">m_axi_0</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_gpio_0/gpio_io_o">
+      <obj_property name="ElementShortName">gpio_io_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">gpio_io_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_gpio_1/gpio_io_o">
+      <obj_property name="ElementShortName">gpio_io_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">gpio_io_o[31:0]</obj_property>
+   </wvobject>
 </wave_config>

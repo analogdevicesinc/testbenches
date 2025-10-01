@@ -41,6 +41,11 @@ import test_harness_env_pkg::*;
 import environment_pkg::*;
 import watchdog_pkg::*;
 
+import adi_axis_byte_pkg::*;
+import adi_axis_transaction_pkg::*;
+import adi_axis_packet_pkg::*;
+import adi_axis_frame_pkg::*;
+
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
@@ -58,7 +63,141 @@ program test_program ();
 
   watchdog send_data_wd;
 
+  adi_axis_byte #(
+    .EN_TKEEP(1),
+    .EN_TSTRB(1),
+    .EN_TUSER(1),
+    .TUSER_WIDTH(1)
+  ) axis_byte, axis_byte2;
+
+  adi_axis_transaction #(
+    .BYTES_PER_TRANSACTION(8),
+    .EN_TKEEP(1),
+    .EN_TSTRB(1),
+    .EN_TUSER(1),
+    .EN_TLAST(1),
+    .EN_TID(1),
+    .EN_TDEST(1),
+    .TUSER_BYTE_BASED(1),
+    .TID_WIDTH(1),
+    .TDEST_WIDTH(1),
+    .TUSER_WIDTH(1)
+  ) axis_transaction, axis_transaction2;
+
+  adi_axis_packet #(
+    .BYTES_PER_TRANSACTION(8),
+    .EN_TKEEP(1),
+    .EN_TSTRB(1),
+    .EN_TUSER(1),
+    .EN_TLAST(1),
+    .EN_TID(1),
+    .EN_TDEST(1),
+    .TUSER_BYTE_BASED(1),
+    .TID_WIDTH(1),
+    .TDEST_WIDTH(1),
+    .TUSER_WIDTH(1)
+  ) axis_packet, axis_packet2;
+
+  adi_axis_frame #(
+    .BYTES_PER_TRANSACTION(8),
+    .EN_TKEEP(1),
+    .EN_TSTRB(1),
+    .EN_TUSER(1),
+    .EN_TLAST(1),
+    .EN_TID(1),
+    .EN_TDEST(1),
+    .TUSER_BYTE_BASED(1),
+    .TID_WIDTH(1),
+    .TDEST_WIDTH(1),
+    .TUSER_WIDTH(1)
+  ) axis_frame, axis_frame2;
+
   initial begin
+
+    axis_byte = new();
+    axis_transaction = new();
+    axis_packet = new(.packet_size_limit(8));
+    axis_frame = new(
+      .frame_size_limit(8),
+      .packet_size_limit(8));
+
+    axis_byte.randomize_all();
+    axis_transaction.randomize_all();
+    axis_packet.randomize_all();
+    axis_frame.randomize_all();
+
+    axis_byte2 = new();
+    axis_transaction2 = new();
+    axis_packet2 = new();
+    axis_frame2 = new();
+
+    axis_byte.copy(axis_byte2);
+    axis_transaction.copy(axis_transaction2);
+    axis_packet.copy(axis_packet2);
+    axis_frame.copy(axis_frame2);
+
+    `INFO(("Comparing axis_byte. %0b", axis_byte.compare(axis_byte2)), ADI_VERBOSITY_NONE);
+    `INFO(("Comparing axis_transaction. %0b", axis_transaction.compare(axis_transaction2)), ADI_VERBOSITY_NONE);
+    `INFO(("Comparing axis_packet. %0b", axis_packet.compare(axis_packet2)), ADI_VERBOSITY_NONE);
+    `INFO(("Comparing axis_frame. %0b", axis_frame.compare(axis_frame2)), ADI_VERBOSITY_NONE);
+
+    axis_byte.randomize_all();
+    axis_transaction.randomize_all();
+    axis_packet.randomize_packet();
+    axis_frame.randomize_frame();
+
+    `INFO(("Comparing axis_byte. %0b", axis_byte.compare(axis_byte2)), ADI_VERBOSITY_NONE);
+    `INFO(("Comparing axis_transaction. %0b", axis_transaction.compare(axis_transaction2)), ADI_VERBOSITY_NONE);
+    `INFO(("Comparing axis_packet. %0b", axis_packet.compare(axis_packet2)), ADI_VERBOSITY_NONE);
+    `INFO(("Comparing axis_frame. %0b", axis_frame.compare(axis_frame2)), ADI_VERBOSITY_NONE);
+
+    // byte class updates
+    axis_byte.update_tdata(8'ha5);
+    axis_byte.update_tkeep(1'b0);
+    axis_byte.update_tstrb(1'b1);
+    axis_byte.update_tuser(1'b0);
+
+    axis_byte.update_byte_info(8'h5a, 1'b1, 1'b0, 1'b1);
+    axis_byte.update_byte_info_class(axis_byte2);
+
+    // transaction class updates
+    axis_transaction.update_tlast(1'b0);
+    axis_transaction.update_tid(1'b1);
+    axis_transaction.update_tdest(1'b0);
+    axis_transaction.update_tuser(1'b1);
+
+    axis_transaction.add_transaction_info(1'b1, 1'b0, 1'b1, 1'b0);
+    axis_transaction.add_transaction_info_class(axis_transaction2);
+
+    axis_transaction.update_data_byte(0, 8'ha5, 1'b0, 1'b1, 1'b0);
+    axis_transaction.update_data_byte_class(0, axis_byte2);
+
+    axis_transaction.bytes[1].update_tdata(8'ha5);
+    axis_transaction.bytes[1].update_byte_info(8'h5a, 1'b1, 1'b0, 1'b1);
+    axis_transaction.bytes[1].update_byte_info_class(axis_byte2);
+
+    // packet class updates
+    axis_packet.create_packet(5);
+
+    axis_packet.transactions[1].update_tlast(1'b0);
+    axis_packet.transactions[1].update_tid(axis_packet.transactions[1].tid);
+    axis_packet.transactions[1].update_tdest(axis_packet.transactions[1].tdest);
+    axis_packet.transactions[1].update_tuser(1'b1);
+
+    axis_packet.transactions[1].add_transaction_info(1'b0, axis_packet.transactions[1].tid, axis_packet.transactions[1].tdest, 1'b0);
+    axis_packet.transactions[1].add_transaction_info_class(axis_transaction2);
+
+    axis_packet.transactions[1].update_data_byte(0, 8'ha5, 1'b0, 1'b1, 1'b0);
+    axis_packet.transactions[1].update_data_byte_class(0, axis_byte2);
+
+    axis_packet.transactions[1].bytes[1].update_tdata(8'ha5);
+    axis_packet.transactions[1].bytes[1].update_byte_info(8'h5a, 1'b1, 1'b0, 1'b1);
+    axis_packet.transactions[1].bytes[1].update_byte_info_class(axis_byte2);
+
+    axis_packet.update_transaction_class(4, axis_transaction2);
+    axis_packet.add_transaction_class(axis_transaction2);
+
+    // frame class updates
 
     // create environment
     base_env = new("Base Environment",

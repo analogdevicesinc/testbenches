@@ -39,187 +39,178 @@ package adi_axis_transaction_pkg;
 
   import logger_pkg::*;
   import adi_object_pkg::*;
-  import axi4stream_vip_pkg::*;
-
-
-  class adi_axis_byte #(int TUSER = 0) extends adi_object;
-    logic [7:0] tdata;
-    logic tkeep;
-    logic tstrb;
-    logic [TUSER:0] tuser;
-
-    function new(input string name = "");
-      super.new(name);
-    endfunction: new
-
-    function void add_byte_info(
-      input logic [7:0] tdata,
-      input logic tkeep,
-      input logic tstrb,
-      input logic [TUSER:0] tuser = 0);
-
-      this.tdata = tdata;
-      this.tkeep = tkeep;
-      this.tstrb = tstrb;
-      this.tuser = tuser;
-    endfunction: add_byte_info
-
-    virtual function string convert2string();
-      string str;
-      str = {"ADI AXIS Byte\n",
-        $sformatf("name: %s\n", this.name),
-        $sformatf("tdata: %d\n", this.tdata),
-        $sformatf("tkeep: %d\n", this.tkeep),
-        $sformatf("tstrb: %d\n", this.tstrb),
-        $sformatf("tuser: %d\n", this.tuser)};
-      return(str);
-    endfunction: convert2string
-
-    virtual function void do_copy(input adi_object object);
-      adi_axis_byte #(TUSER) cast_object;
-
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
-        `FATAL(("Input object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
-      end
-
-      cast_object.add_transfer(
-        .tdata(this.tdata),
-        .tkeep(this.tkeep),
-        .tstrb(this.tstrb),
-        .tuser(this.tuser));
-    endfunction: do_copy
-
-    virtual function bit do_compare(input data_type object);
-      adi_axis_byte #(TUSER) cast_object;
-
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
-        `FATAL(0, ("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
-      end
-
-      if (this.tdata != cast_object.tdata ||
-        this.tkeep != cast_object.tkeep ||
-        this.tstrb != cast_object.tstrb ||
-        this.tuser != cast_object.tuser) begin
-
-        return 0;
-      end
-      return 1;
-    endfunction: do_compare
-  endclass: adi_axis_byte
+  import adi_axis_byte_pkg::*;
 
 
   class adi_axis_transaction #(
-    int TID = 0,
-    int TDEST = 0,
-    int TUSER = 0) extends adi_object;
+    int BYTES_PER_TRANSACTION,
+    bit EN_TKEEP = 0,
+    bit EN_TSTRB = 0,
+    bit EN_TLAST = 0,
+    bit EN_TUSER = 0,
+    bit EN_TID = 0,
+    bit EN_TDEST = 0,
+    bit TUSER_BYTE_BASED = 0,
+    int TID_WIDTH = 1,
+    int TDEST_WIDTH = 1,
+    int TUSER_WIDTH = 1) extends adi_object;
 
-    adi_axis_byte #(TUSER) bytes [];
-    logic tlast;
-    logic [TID:0] tid;
-    logic [TDEST:0] tdest;
-    logic [TUSER:0] tuser;
+    adi_axis_byte #(EN_TKEEP, EN_TSTRB, (EN_TUSER && TUSER_BYTE_BASED), TUSER_WIDTH) bytes [BYTES_PER_TRANSACTION-1:0];
+    rand logic tlast = 1'b1;
+    rand logic [TID_WIDTH-1:0] tid = {TID_WIDTH{1'b0}};
+    rand logic [TDEST_WIDTH-1:0] tdest = {TDEST_WIDTH{1'b0}};
+    rand logic [TUSER_WIDTH-1:0] tuser = {TUSER_WIDTH{1'b0}};
+
+    constraint c_tlast { (EN_TLAST == 0) -> (tlast == 1'b0); }
+    constraint c_tid { (EN_TID == 0) -> (tid == {TID_WIDTH{1'b0}}); }
+    constraint c_tdest { (EN_TDEST == 0) -> (tdest == {TDEST_WIDTH{1'b0}}); }
+    constraint c_tuser { (EN_TUSER == 0 || TUSER_BYTE_BASED == 1) -> (tuser == {TUSER_WIDTH{1'b0}}); }
 
     function new(input string name = "");
       super.new(name);
 
-      this.bytes = new();
+      for (int i=0; i<BYTES_PER_TRANSACTION; i++) begin
+        this.bytes[i] = new();
+      end
+
+      if (TUSER_WIDTH == 0) begin
+        `FATAL(("TUSER width value cannot be 0!"));
+      end
+      if (TID_WIDTH == 0) begin
+        `FATAL(("TID width value cannot be 0!"));
+      end
+      if (TDEST_WIDTH == 0) begin
+        `FATAL(("TDEST width value cannot be 0!"));
+      end
     endfunction: new
 
-    function void add_transfer(
-      input logic tlast,
-      input logic [TID:0] tid,
-      input logic [TDEST:0] tdest,
-      input logic [TUSER:0] tuser);
+    function void randomize_transaction();
+      if (!this.randomize()) begin
+        `FATAL(("Randomization failed!"));
+      end
+    endfunction: randomize_transaction
 
-      this.tlast = tlast;
-      this.tid = tid;
-      this.tdest = tdest;
-      this.tuser = tuser;
-    endfunction: add_transfer
+    function void randomize_all();
+      this.randomize_transaction();
+      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
+        this.bytes[i].randomize_all();
+      end
+    endfunction: randomize_all
 
-    function void add_data_byte(
+    function void update_tlast(input logic tlast);
+      if (EN_TLAST) begin
+        this.tlast = tlast;
+      end else begin
+        if (tlast != 1'b1) begin
+          `WARNING(("Writing on a disabled TLAST parameter is not accepted!"));
+        end
+      end
+    endfunction: update_tlast
+
+    function void update_tid(input logic [TID_WIDTH:0] tid);
+      if (EN_TID) begin
+        this.tid = tid;
+      end else begin
+        if (tid != {TID_WIDTH{1'b0}}) begin
+          `WARNING(("Writing on a disabled TID parameter is not accepted!"));
+        end
+      end
+    endfunction: update_tid
+
+    function void update_tdest(input logic [TDEST_WIDTH:0] tdest);
+      if (EN_TDEST) begin
+        this.tdest = tdest;
+      end else begin
+        if (tdest != {TDEST_WIDTH{1'b0}}) begin
+          `WARNING(("Writing on a disabled TDEST parameter is not accepted!"));
+        end
+      end
+    endfunction: update_tdest
+
+    function void update_tuser(input logic [TUSER_WIDTH:0] tuser);
+      if (EN_TUSER) begin
+        this.tuser = tuser;
+      end else begin
+        if (tuser != {TUSER_WIDTH{1'b0}}) begin
+          `WARNING(("Writing on a disabled TUSER parameter is not accepted!"));
+        end
+      end
+    endfunction: update_tuser
+
+    function void add_transaction_info(
+      input logic tlast = 1'b1,
+      input logic [TID_WIDTH:0] tid = {TID_WIDTH{1'b0}},
+      input logic [TDEST_WIDTH:0] tdest = {TDEST_WIDTH{1'b0}},
+      input logic [TUSER_WIDTH:0] tuser = {TUSER_WIDTH{1'b0}});
+
+      this.update_tlast(tlast);
+      this.update_tid(tid);
+      this.update_tdest(tdest);
+      this.update_tuser(tuser);
+    endfunction: add_transaction_info
+
+    function void add_transaction_info_class(input adi_axis_transaction #(BYTES_PER_TRANSACTION, EN_TKEEP, EN_TSTRB, EN_TUSER, EN_TID, EN_TDEST, TUSER_BYTE_BASED, TID_WIDTH, TDEST_WIDTH, TUSER_WIDTH) transaction_info);
+      this.update_tlast(transaction_info.tlast);
+      this.update_tid(transaction_info.tid);
+      this.update_tdest(transaction_info.tdest);
+      this.update_tuser(transaction_info.tuser);
+    endfunction: add_transaction_info_class
+
+    function void update_data_byte(
+      input int location,
       input logic [7:0] tdata,
-      input logic tkeep,
-      input logic tstrb,
-      input logic [TUSER:0] tuser = 0);
+      input logic tkeep = 1,
+      input logic tstrb = 0,
+      input logic [TUSER_WIDTH:0] tuser = {TUSER_WIDTH{1'b0}});
 
-      adi_axis_byte #(TUSER) byte_info = new();
+      adi_axis_byte #(EN_TKEEP, EN_TSTRB, (EN_TUSER && TUSER_BYTE_BASED), TUSER_WIDTH) byte_info = new();
 
-      byte_info.add_byte_info(
+      byte_info.update_byte_info(
         .tdata(tdata),
         .tkeep(tkeep),
         .tstrb(tstrb),
         .tuser(tuser));
 
-      this.bytes = new [this.bytes.size()+1] (this.bytes);
-      this.bytes[this.bytes.size()-1] = byte_info;
-    endfunction: add_data_byte
+      this.bytes[location] = byte_info;
+    endfunction: update_data_byte
+
+    function void update_data_byte_class(
+      input int location,
+      input adi_axis_byte #(EN_TKEEP, EN_TSTRB, (EN_TUSER && TUSER_BYTE_BASED), TUSER_WIDTH) byte_info);
+
+      byte_info.copy(this.bytes[location]);
+    endfunction: update_data_byte_class
 
     virtual function string convert2string();
       string str;
       str = {"ADI AXIS Transaction\n",
-        $sformatf("name: %s\n", this.name),
-        $sformatf("tlast: %d\n", this.tlast),
-        $sformatf("tid: %d\n", this.tid),
-        $sformatf("tdest: %d\n", this.tdest),
-        $sformatf("tuser: %d\n", this.tuser)};
+        $sformatf("name: %s\n", this.name)};
       return(str);
     endfunction: convert2string
 
     virtual function void do_copy(input adi_object object);
-      adi_axis_transaction #(TID, TDEST, TUSER) cast_object;
+      adi_axis_transaction #(BYTES_PER_TRANSACTION, EN_TKEEP, EN_TSTRB, EN_TUSER, EN_TID, EN_TDEST, TUSER_BYTE_BASED, TID_WIDTH, TDEST_WIDTH, TUSER_WIDTH) cast_object;
 
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
+      if ($cast(cast_object, object) == 0) begin
         `FATAL(("Input object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
-      cast_object.add_transfer(
+      cast_object.add_transaction_info(
         .tlast(this.tlast),
         .tid(this.tid),
         .tdest(this.tdest),
         .tuser(this.tuser));
 
-      cast_object.bytes = new [this.bytes.size()];
-
-      for (int i=0; i<this.bytes.size(); i++) begin
+      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
         this.bytes[i].copy(cast_object.bytes[i]);
       end
     endfunction: do_copy
 
-    function bit compare(input adi_object object);
-      adi_axis_transaction #(TID, TDEST, TUSER) cast_object;
+    virtual function bit do_compare(input adi_object object);
+      adi_axis_transaction #(BYTES_PER_TRANSACTION, EN_TKEEP, EN_TSTRB, EN_TUSER, EN_TID, EN_TDEST, TUSER_BYTE_BASED, TID_WIDTH, TDEST_WIDTH, TUSER_WIDTH) cast_object;
 
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
-        `FATAL(0, ("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
-      end
-
-      if (this.bytes.size() != cast_object.bytes.size()) begin
-        return 0;
-      end
-
-      return do_compare(.object(cast_object));
-    endfunction: compare
-
-    virtual function bit do_compare(input data_type object);
-      adi_axis_transaction #(TID, TDEST, TUSER) cast_object;
-
-      if ($cast(
-        .dest_var(cast_object),
-        .source_exp(object)) == 0) begin
-
-        `FATAL(0, ("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
+      if ($cast(cast_object, object) == 0) begin
+        `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
       if (this.tlast != cast_object.tlast ||
@@ -230,13 +221,14 @@ package adi_axis_transaction_pkg;
         return 0;
       end
 
-      for (int i=0; i<this.bytes.size(); i++) begin
+      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
         if (this.bytes[i].compare(cast_object.bytes[i]) == 0) begin
           return 0;
         end
       end
       return 1;
     endfunction: do_compare
+
   endclass: adi_axis_transaction
 
 endpackage: adi_axis_transaction_pkg

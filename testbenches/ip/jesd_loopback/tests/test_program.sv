@@ -228,9 +228,9 @@ program test_program;
     #5us;
 
     // Arm external sync
-    base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),2);
-    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,2);
-    #1us;
+    base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),`SET_DAC_COMMON_REG_CNTRL_1_EXT_SYNC_ARM(1));
+    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_CNTRL_2),`SET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_ARM(1));
+    #((64*1e9/rx_ll.device_clk)*1.1ns); // transport layer needs up to 64 link clock cycles to update xfer status, 10% extra for CDC
     // Check if armed
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(1));
@@ -243,7 +243,7 @@ program test_program;
     @(posedge system_tb.device_clk);
     system_tb.ext_sync <= 1'b0;
 
-    #1us;
+    #((128*1e9/rx_ll.device_clk)*1.1ns); // transport layer needs up to 128 link clock cycles to clear xfer status, 10% extra for CDC
     // Check if trigger captured
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
                             `SET_DAC_COMMON_REG_SYNC_STATUS_DAC_SYNC_STATUS(0));
@@ -312,10 +312,16 @@ program test_program;
   //
   // -----------------
   task arm_disarm_test();
+
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    `INFO(("    ARM-DISARM TEST    "), ADI_VERBOSITY_LOW);
+    `INFO(("======================="), ADI_VERBOSITY_LOW);
+    // -----------------------
+
     // Arm external sync
-    base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),2);
-    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,2);
-    #1us;
+    base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),`SET_DAC_COMMON_REG_CNTRL_1_EXT_SYNC_ARM(1));
+    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_CNTRL_2),`SET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_ARM(1));
+    #((64*1e9/rx_ll.device_clk)*1.1ns); // transport layer needs up to 64 link clock cycles to update xfer status, 10% extra for CDC
 
     // Check if armed
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),
@@ -324,9 +330,9 @@ program test_program;
                             `SET_ADC_COMMON_REG_SYNC_STATUS_ADC_SYNC(1));
 
     // DisArm external sync
-    base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),4);
-    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + 'h48,4);
-    #1us;
+    base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_CNTRL_1),`SET_DAC_COMMON_REG_CNTRL_1_EXT_SYNC_DISARM(1));
+    base_env.mng.sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_CNTRL_2),`SET_ADC_COMMON_REG_CNTRL_2_EXT_SYNC_DISARM(1));
+    #((128*1e9/rx_ll.device_clk)*1.1ns); // transport layer needs up to 128 link clock cycles to clear xfer status, 10% extra for CDC
 
     // Check if disarmed
     base_env.mng.sequencer.RegReadVerify32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_SYNC_STATUS),

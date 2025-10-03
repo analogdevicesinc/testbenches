@@ -50,7 +50,8 @@ package adi_jesd204_pkg;
   typedef enum bit [1:0] {sc0 = 0, sc1 = 1, sc2 = 2} subclass_t;
   typedef enum bit [1:0] {v204A = 0, v204B = 1, v204C = 2} version_t;
   typedef enum bit [0:0] {enc8b10b = 0, enc64b66b = 1} encoding_t;
-  typedef enum bit [1:0] {ls_8b10b_init = 0, ls_8b10b_check = 1, ls_8b10b_data = 2} lanestate_8b10b_t;
+  typedef enum bit [1:0] {ls_8b10b_cgs_init = 0, ls_8b10b_cgs_check = 1, ls_8b10b_cgs_data = 2} cgs_lanestate_8b10b_t;
+  typedef enum bit       {ls_8b10b_ilas_not_ready = 0, ls_8b10b_ilas_ready = 1} ilas_lanestate_8b10b_t;
   typedef enum bit [2:0] {ls_64b66b_emb_init = 1, ls_64b66b_emb_hunt = 2, ls_64b66b_emb_lock = 4} lanestate_64b66b_t;
   const string encoding_s [2] = {"8B10B", "64B66B"};
   const string rx_link_states_8b10b [4] = {"RESET", "WAIT_FOR_PHY", "CGS", "DATA"};
@@ -58,15 +59,16 @@ package adi_jesd204_pkg;
   const string tx_link_states_8b10b [4] = {"WAIT", "CGS", "ILAS", "DATA"};
   const string tx_link_states_64b66b [4] = {"RESET", "N/A", "N/A", "DATA"};
 
-  const string rx_lane_states_8b10b [3] = {"INIT", "CHECK", "DATA"};
-  const string rx_lane_states_64b66b [8] = { "UNUSED",
-                                             "EMB_INIT",
-                                             "EMB_HUNT",
-                                             "UNUSED",
-                                             "EMB_LOCK",
-                                             "UNUSED",
-                                             "UNUSED",
-                                             "UNUSED"};
+  const string rx_cgs_lane_states_8b10b [3]   = {"INIT", "CHECK", "DATA"};
+  const string rx_ilas_lane_states_8b10b [2]  = {"ILAS_NOT_READY", "ILAS_READY"};
+  const string rx_emb_lane_states_64b66b [8]  = { "UNUSED",
+                                                  "EMB_INIT",
+                                                  "EMB_HUNT",
+                                                  "UNUSED",
+                                                  "EMB_LOCK",
+                                                  "UNUSED",
+                                                  "UNUSED",
+                                                  "UNUSED"};
 
   //============================================================================
   // JESD 204C link class
@@ -315,7 +317,10 @@ package adi_jesd204_pkg;
       bit [31:0] val;
       int timeout = 30;
       bit [1:0] link_state;
-      bit [2:0] lane_state;
+      bit [2:0] emb_state;
+      bit [2:0] cgs_state;
+      bit       ilas_state;
+
       bit all_lanes_in_data = 1'b0;
       // wait until link and all lanes are in DATA
       while ((link_state != 3 || all_lanes_in_data == 1'b0) && timeout > 0) begin
@@ -327,12 +332,16 @@ package adi_jesd204_pkg;
         for (int i = 0; i < link.L; i++) begin
           this.bus.RegRead32(this.base_address + i * 'h20 + GetAddrs(JESD_RX_LANEn_STATUS), val);
           if (link.encoding == enc8b10b) begin
-            lane_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
-            if (lane_state != ls_8b10b_data)
+            cgs_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
+            if (cgs_state != ls_8b10b_cgs_data)
               all_lanes_in_data = 0;
+            ilas_state = `GET_JESD_RX_LANEn_STATUS_ILAS_READY(val);
+            if (ilas_state != ls_8b10b_ilas_ready) begin
+              all_lanes_in_data = 0;
+            end
           end else begin
-            lane_state = `GET_JESD_RX_LANEn_STATUS_EMB_STATE(val);
-            if (lane_state != ls_64b66b_emb_lock)
+            emb_state = `GET_JESD_RX_LANEn_STATUS_EMB_STATE(val);
+            if (emb_state != ls_64b66b_emb_lock)
               all_lanes_in_data = 0;
           end
         end
@@ -356,7 +365,9 @@ package adi_jesd204_pkg;
     // -----------------
     task link_verify();
       bit [31:0] val;
-      bit [2:0] lane_state;
+      bit [2:0] emb_state;
+      bit [2:0] cgs_state;
+      bit       ilas_state;
 
       link_status_print();
 
@@ -371,17 +382,23 @@ package adi_jesd204_pkg;
       for (int i = 0; i < link.L; i++) begin
         this.bus.RegRead32(this.base_address + i * 'h20 + GetAddrs(JESD_RX_LANEn_STATUS), val);
         if (link.encoding == enc8b10b) begin
-          lane_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
-          if (lane_state != ls_8b10b_data)
-            this.error($sformatf("Lane %d state %s",i,rx_lane_states_8b10b[i]));
+          cgs_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
+          if (cgs_state != ls_8b10b_cgs_data) begin
+            this.error($sformatf("Lane %d state %s",i,rx_cgs_lane_states_8b10b[cgs_state]));
+          end
+          ilas_state = `GET_JESD_RX_LANEn_STATUS_ILAS_READY(val);
+          if (ilas_state != ls_8b10b_ilas_ready) begin
+            this.error($sformatf("Lane %d state %s",i,rx_ilas_lane_states_8b10b[ilas_state]));
+          end
         end else begin
-          lane_state = `GET_JESD_RX_LANEn_STATUS_EMB_STATE(val);
-          if (lane_state != ls_64b66b_emb_lock)
-            this.error($sformatf("Lane %d state %s",i,rx_lane_states_64b66b[i]));
+          emb_state = `GET_JESD_RX_LANEn_STATUS_EMB_STATE(val);
+          if (emb_state != ls_64b66b_emb_lock) begin
+            this.error($sformatf("Lane %d state %s",i,rx_emb_lane_states_64b66b[emb_state]));
+          end
         end
       end
 
-      // Check received ILAS
+      // Check received ILAS config data
       if (link.encoding == enc8b10b) begin
         for (int i = 0; i < link.L; i++) begin
           this.bus.RegReadVerify32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS1),

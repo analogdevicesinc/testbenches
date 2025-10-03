@@ -94,7 +94,7 @@ package jesd_tx_api_pkg;
     endtask
 
     task set_link_conf0(
-      input bit [2:0] octets_per_frame,
+      input bit [7:0] octets_per_frame,
       input bit [9:0] octets_per_multiframe);
 
       this.axi_write(GetAddrs(JESD_TX_LINK_CONF0),

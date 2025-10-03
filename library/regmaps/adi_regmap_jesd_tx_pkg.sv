@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -32,8 +32,6 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-/* Auto generated Register Map */
-/* Thu Mar 28 13:22:23 2024 */
 
 package adi_regmap_jesd_tx_pkg;
   import adi_regmap_pkg::*;
@@ -213,7 +211,7 @@ package adi_regmap_jesd_tx_pkg;
   `define UPDATE_JESD_TX_LANES_DISABLE_LANE_DISABLEn(x,y) UpdateField(JESD_TX_LANES_DISABLE,"LANE_DISABLEn",x,y)
 
   const reg_t JESD_TX_LINK_CONF0 = '{ 'h0210, "LINK_CONF0" , '{
-    "OCTETS_PER_FRAME": '{ 18, 16, RW, 'h00 },
+    "OCTETS_PER_FRAME": '{ 23, 16, RW, 'h00 },
     "OCTETS_PER_MULTIFRAME": '{ 9, 0, RW, 'h03 }}};
   `define SET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(x) SetField(JESD_TX_LINK_CONF0,"OCTETS_PER_FRAME",x)
   `define GET_JESD_TX_LINK_CONF0_OCTETS_PER_FRAME(x) GetField(JESD_TX_LINK_CONF0,"OCTETS_PER_FRAME",x)

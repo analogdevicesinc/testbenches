@@ -1,29 +1,30 @@
-.. _cn0577:
+.. _cn0577_adaq2387x:
 
-CN0577
+CN0577/ ADAQ2387X
 ================================================================================
 
 Overview
 -------------------------------------------------------------------------------
 
 The purpose of this testbench is to validate the of the
-:git-hdl:`projects/cn0577` reference design.
+:git-hdl:`projects/cn0577` and :git-hdl:`projects/adaq2387x` reference designs.
 
 The entire HDL documentation can be found here
-:external+hdl:ref:`CN0577 HDL project <cn0577>`.
+:external+hdl:ref:`CN0577 HDL project <cn0577>` and here
+:external+hdl:ref:`ADAQ2387X HDL project <adaq2387x>`.
 
 Block design
 -------------------------------------------------------------------------------
 
-The testbench block design includes part of the CN0577 HDL reference design,
-along with VIPs used for clocking, reset, PS and DDR simulations.
+The testbench block design includes part of the CN0577/ ADAQ2387X HDL reference
+designs, along with VIPs used for clocking, reset, PS and DDR simulations.
 
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The data path and clock domains are depicted in the below diagram:
 
-CN0577 parallel interface
+CN0577/ ADAQ2387X Testbench block diagram 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ./cn0577_tb.svg
@@ -40,36 +41,44 @@ The following parameter of this project that can be configured:
    Options: 0 - One lane, 1 - Two lanes
 -  ADC_RES: defines the device's resolution in bits:
    Options: 16 - 16 bits, 18 - 18 bits
-
+-  USE_MMCM: defines the ref clk value in MHz:
+   Options: 0 - 100MHz, 1 - 120MHz
+-  CN0577_ADAQ2387X_N: selects the HDL project
+   Options: 0 - ADAQ2387X, 1 - CN0577
+ 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following configuration files are available:
 
-   +-----------------------+--------------------+
-   | Configuration mode    | Parameters         |
-   |                       +--------------------+
-   |                       | TWOLANES | ADC_RES |
-   +=======================+==========+=========+
-   | cfg_1lane_16b         | 0        | 16      |
-   +-----------------------+----------+---------+
-   | cfg_1lane_18b         | 0        | 18      |
-   +-----------------------+----------+---------+
-   | cfg_2lanes_16b        | 1        | 16      |
-   +-----------------------+----------+---------+
-   | cfg_2lanes_18b        | 1        | 18      |
-   +-----------------------+----------+---------+
+   +--------------------------+----------------------------------------------------+
+   | Configuration mode       | Parameters                                         |
+   |                          +-------------------------------+--------------------+
+   |                          | TWOLANES | ADC_RES | USE_MMCM | CN0577_ADAQ2387X_N |
+   +==========================+==========+=========+==========+====================+
+   | cfg_adaq2387x_1lane_16b  | 0        | 16      | 0        | 0                  |
+   +--------------------------+----------+---------+----------+--------------------+
+   | cfg_adaq2387x_1lane_18b  | 0        | 18      | 0        | 0                  |
+   +--------------------------+----------+---------+----------+--------------------+
+   | cfg_adaq2387x_2lanes_16b | 1        | 16      | 0        | 0                  |
+   +--------------------------+----------+---------+----------+--------------------+
+   | cfg_adaq2387x_2lanes_18b | 1        | 18      | 0        | 0                  |
+   +--------------------------+----------+---------+----------+--------------------+
+   | cfg_cn0577_1lane         | 0        | 18      | 0        | 1                  |
+   +--------------------------+----------+---------+----------+--------------------+
+   | cfg_cn0577_2lanes        | 1        | 18      | 0        | 1                  |
+   +--------------------------+----------+---------+----------+--------------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following test program files are available:
 
-============  =====================================
+============  ================================================
 Test program  Usage
-============  =====================================
-test_program  Tests the cn0577 design capabilities.
-============  =====================================
+============  ================================================
+test_program  Tests the cn0577/ adaq2387x design capabilities.
+============  ================================================
 
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -175,7 +184,7 @@ command line.
 .. shell::
    :showuser:
 
-   $cd testbenches/project/cn0577
+   $cd testbenches/project/cn0577_adaq2387x
    $make
 
 *Example 2*
@@ -187,7 +196,7 @@ the waveforms.
 .. shell::
    :showuser:
 
-   $cd testbenches/project/cn0577
+   $cd testbenches/project/cn0577_adaq2387x
    $make MODE=gui
 
 *Example 3*
@@ -199,19 +208,19 @@ waveforms.
 .. shell::
    :showuser:
 
-   $cd testbenches/project/cn0577
-   $make MODE=gui CFG=cfg_2lanes_18b TST=test_program
+   $cd testbenches/project/cn0577_adaq2387x
+   $make MODE=gui CFG=cfg_adaq2387x_2lanes_18b TST=test_program
 
 The built projects can be found in the ``runs`` folder, where each configuration
 specific build has it's own folder named after the configuration file's name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):
 
-``make CFG=cfg_2lanes_18b``
+``make CFG=cfg_adaq2387x_2lanes_18b``
 
 Then the subfolder under ``runs`` name will be:
 
-``cfg_2lanes_18b``
+``cfg_adaq2387x_2lanes_18b``
 
 Resources
 -------------------------------------------------------------------------------

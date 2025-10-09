@@ -115,10 +115,12 @@ package adi_spi_vip_pkg;
     protected task tx_miso();
         bit using_default;
         bit pending_mbx;
+        bit cs_assertion_edge;
         int miso_data;
         bitqueue_t miso_bits;
       forever begin
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
+          cs_assertion_edge = 1'b1;
           vif.wait_cs_active();
           while (vif.get_cs_active()) begin
             // try to get an item from the mailbox, without popping it
@@ -132,7 +134,14 @@ package adi_spi_vip_pkg;
             pending_mbx = 1'b0;
             // early drive and shift if CPHA=0
             if (vif.get_param_CPHA() == 0) begin
-              vif.set_miso_drive_instantaneous(bitqueue_pop_msb(miso_bits));
+              if (cs_assertion_edge) begin
+                cs_assertion_edge = 1'b0;
+                // for the first driven bit after cs assertion, the only delay should be CS_TO_MISO
+                vif.set_miso_drive_instantaneous(bitqueue_pop_msb(miso_bits));
+              end else begin
+                // for subsequent bits, SLAVE_TOUT applies
+                vif.set_miso_drive(bitqueue_pop_msb(miso_bits));
+              end
             end
             for (int i = 0; i<vif.get_param_DATA_DLENGTH(); i++) begin
               fork

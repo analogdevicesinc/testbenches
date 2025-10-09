@@ -55,7 +55,7 @@ adi_sim_add_define "DRP_CLK=drp_clk_vip"
 # Ref clk
 ad_ip_instance clk_vip ref_clk_vip [ list \
   INTERFACE_MODE {MASTER} \
-  FREQ_HZ 250000000 \
+  FREQ_HZ 200000000 \
 ]
 adi_sim_add_define "REF_CLK=ref_clk_vip"
 create_bd_port -dir O ref_clk_out
@@ -64,7 +64,7 @@ ad_connect ref_clk_out ref_clk_vip/clk_out
 # Device clk
 ad_ip_instance clk_vip device_clk_vip [ list \
   INTERFACE_MODE {MASTER} \
-  FREQ_HZ 250000000 \
+  FREQ_HZ 200000000 \
 ]
 adi_sim_add_define "DEVICE_CLK=device_clk_vip"
 create_bd_port -dir O device_clk_out
@@ -84,6 +84,13 @@ ad_connect sysref_clk_out sysref_clk_vip/clk_out
 #  Block design under test
 #
 #
+
+add_files -norecurse $ad_hdl_dir/library/util_cdc/sync_bits.v
+update_compile_order -fileset sources_1
+
+set ADI_PHY_SEL 0
+set TRANSCEIVER_TYPE GTM
+set EXTERNAL_LINK_CLK 0
 source $ad_hdl_dir/projects/ad9081_fmca_ebz/common/ad9081_fmca_ebz_bd.tcl
 
 #if {$ad_project_params(JESD_MODE) == "8B10B"} {
@@ -99,17 +106,17 @@ set RX_DMA 0x7C420000
 set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_dma}]
 adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
 
-set RX_XCVR 0x44A60000
-set_property offset $RX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_xcvr}]
-adi_sim_add_define "RX_XCVR_BA=[format "%d" ${RX_XCVR}]"
+# set RX_XCVR 0x44A60000
+# set_property offset $RX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_xcvr}]
+# adi_sim_add_define "RX_XCVR_BA=[format "%d" ${RX_XCVR}]"
 
 set TX_DMA 0x7C430000
 set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_dma}]
 adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
 
-set TX_XCVR 0x44B60000
-set_property offset $TX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_xcvr}]
-adi_sim_add_define "TX_XCVR_BA=[format "%d" ${TX_XCVR}]"
+# set TX_XCVR 0x44B60000
+# set_property offset $TX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_tx_xcvr}]
+# adi_sim_add_define "TX_XCVR_BA=[format "%d" ${TX_XCVR}]"
 
 set AXI_JESD_RX 0x44A90000
 set_property offset $AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_mxfe_rx_jesd}]

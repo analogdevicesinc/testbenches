@@ -35,6 +35,8 @@ LIB_DEPS += util_pack/util_upack2
 LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += xilinx/axi_adxcvr
 LIB_DEPS += xilinx/util_adxcvr
+LIB_DEPS += jesd204/jesd204_versal_gt_adapter_rx
+LIB_DEPS += jesd204/jesd204_versal_gt_adapter_tx
 
 # default test program
 TP := test_program
@@ -51,6 +53,7 @@ TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 #TESTS += cfg1:test_program
 #TESTS += cfg2_fsync:test_program
 #TESTS += cfg2_fsync:test_frame_delay
+# TESTS += cfg1:test_program
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 

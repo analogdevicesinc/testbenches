@@ -64,8 +64,8 @@ program test_program;
   jesd_link link;
   rx_link_layer rx_ll;
   tx_link_layer tx_ll;
-  xcvr rx_xcvr;
-  xcvr tx_xcvr;
+  // xcvr rx_xcvr;
+  // xcvr tx_xcvr;
 
   int use_dds = 1;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
@@ -82,7 +82,7 @@ program test_program;
                     `TH.`MNG_AXI.inst.IF,
                     `TH.`DDR_AXI.inst.IF);
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_MEDIUM);
 
     base_env.start();
     base_env.sys_reset();
@@ -104,11 +104,11 @@ program test_program;
     tx_ll = new("TX_LINK_LAYER", base_env.mng.sequencer, `AXI_JESD_TX_BA, link);
     tx_ll.probe();
 
-    rx_xcvr = new("RX_XCVR", base_env.mng.sequencer, `RX_XCVR_BA);
-    rx_xcvr.probe();
+    // rx_xcvr = new("RX_XCVR", base_env.mng.sequencer, `RX_XCVR_BA);
+    // rx_xcvr.probe();
 
-    tx_xcvr = new("TX_XCVR", base_env.mng.sequencer, `TX_XCVR_BA);
-    tx_xcvr.probe();
+    // tx_xcvr = new("TX_XCVR", base_env.mng.sequencer, `TX_XCVR_BA);
+    // tx_xcvr.probe();
 
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
@@ -119,40 +119,45 @@ program test_program;
     `TH.`DEVICE_CLK.inst.IF.start_clock();
     `TH.`SYSREF_CLK.inst.IF.start_clock();
 
-    rx_xcvr.setup_clocks(lane_rate,
-                         `REF_CLK_RATE*1000000);
+    // wait until gt_powergood toggles ... otherwise it doesn't work
+    wait(system_tb.gt_powergood);
+    wait(system_tb.tx_resetdone);
+    wait(system_tb.rx_resetdone);
 
-    tx_xcvr.setup_clocks(lane_rate,
-                         `REF_CLK_RATE*1000000);
+    // rx_xcvr.setup_clocks(lane_rate,
+    //                      `REF_CLK_RATE*1000000);
+
+    // tx_xcvr.setup_clocks(lane_rate,
+    //                      `REF_CLK_RATE*1000000);
 
     // =======================
     // JESD LINK TEST - DDS
     // =======================
     jesd_link_test(1);
 
-    // =======================
-    // JESD LINK TEST - DMA
-    // =======================
+    // // =======================
+    // // JESD LINK TEST - DMA
+    // // =======================
     jesd_link_test(0);
 
-    // =======================
-    // JESD LINK TEST - DMA - RX/TX BYPASS
-    // =======================
+    // // =======================
+    // // JESD LINK TEST - DMA - RX/TX BYPASS
+    // // =======================
     jesd_link_test(0,1,1);
 
-    // =======================
-    // JESD LINK TEST - DMA - DO -TDD
-    // =======================
+    // // =======================
+    // // JESD LINK TEST - DMA - DO -TDD
+    // // =======================
     jesd_link_test(0,0,0,1);
 
-    // =======================
-    // JESD LINK TEST - DDS - EXT_SYNC
-    // =======================
+    // // =======================
+    // // JESD LINK TEST - DDS - EXT_SYNC
+    // // =======================
     jesd_link_test_ext_sync(1);
 
-    // =======================
-    // JESD LINK TEST - DMA - EXT_SYNC
-    // =======================
+    // // =======================
+    // // JESD LINK TEST - DMA - EXT_SYNC
+    // // =======================
     jesd_link_test_ext_sync(0);
 
     base_env.stop();
@@ -181,7 +186,7 @@ program test_program;
     // -----------------------
     // TX PHY INIT
     // -----------------------
-    tx_xcvr.up();
+    // tx_xcvr.up();
 
     // -----------------------
     // Configure TPL
@@ -299,7 +304,7 @@ program test_program;
     // -----------------------
     // RX PHY INIT
     // -----------------------
-    rx_xcvr.up();
+    // rx_xcvr.up();
 
     // -----------------------
     // Configure ADC TPL
@@ -342,8 +347,8 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_RSTN),
                        `SET_DAC_COMMON_REG_RSTN_RSTN(0));
 
-    rx_xcvr.down();
-    tx_xcvr.down();
+    // rx_xcvr.down();
+    // tx_xcvr.down();
 
     `INFO(("======================="), ADI_VERBOSITY_LOW);
     `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_LOW);
@@ -362,7 +367,7 @@ program test_program;
     // -----------------------
     // TX PHY INIT
     // -----------------------
-    tx_xcvr.up();
+    // tx_xcvr.up();
 
     // -----------------------
     // Configure TPL
@@ -406,7 +411,7 @@ program test_program;
     // -----------------------
     // RX PHY INIT
     // -----------------------
-    rx_xcvr.up();
+    // rx_xcvr.up();
 
     // -----------------------
     // Configure ADC TPL
@@ -498,8 +503,8 @@ program test_program;
     base_env.mng.sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_RSTN),
                        `SET_DAC_COMMON_REG_RSTN_RSTN(0));
 
-    rx_xcvr.down();
-    tx_xcvr.down();
+    // rx_xcvr.down();
+    // tx_xcvr.down();
 
     `INFO(("======================="), ADI_VERBOSITY_LOW);
     `INFO(("  JESD LINK TEST DONE  "), ADI_VERBOSITY_LOW);

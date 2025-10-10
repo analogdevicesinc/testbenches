@@ -44,7 +44,7 @@ package adi_regmap_i3c_controller_pkg;
   const reg_t i3c_controller_host_interface_VERSION = '{ 'h0000, "VERSION" , '{
     "VERSION_MAJOR": '{ 31, 16, RO, 'h01 },
     "VERSION_MINOR": '{ 15, 8, RO, 'h00 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h00 }}};
+    "VERSION_PATCH": '{ 7, 0, RO, 'h01 }}};
   `define SET_i3c_controller_host_interface_VERSION_VERSION_MAJOR(x) SetField(i3c_controller_host_interface_VERSION,"VERSION_MAJOR",x)
   `define GET_i3c_controller_host_interface_VERSION_VERSION_MAJOR(x) GetField(i3c_controller_host_interface_VERSION,"VERSION_MAJOR",x)
   `define DEFAULT_i3c_controller_host_interface_VERSION_VERSION_MAJOR GetResetValue(i3c_controller_host_interface_VERSION,"VERSION_MAJOR")

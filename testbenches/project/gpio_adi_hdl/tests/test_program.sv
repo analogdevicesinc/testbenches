@@ -7,7 +7,7 @@ import test_harness_env_pkg::*;
 import environment_pkg::*;
 import gpio_api_pkg::*;
 import m_axi_sequencer_pkg::*;
-import axi_vip_pkg::*;  
+import axi_vip_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -15,9 +15,9 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 `define AXI_GPIO_BA 32'h50040000
 
 program test_program (
-  output logic [31:0] gpio_m_io_i,  // TB → IP
-  input  logic [31:0] gpio_m_io_o,  // IP → TB
-  input  logic [31:0] gpio_m_io_t,  // direcție de la IP
+  output logic [31:0] gpio_m_io_i,  // TB - IP
+  input  logic [31:0] gpio_m_io_o,  // IP - TB
+  input  logic [31:0] gpio_m_io_t,  // directie de la IP
   input  logic        irq_0
 );
 

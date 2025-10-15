@@ -27,9 +27,9 @@ source $ad_tb_dir/library/includes/sp_include_scoreboard.tcl
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_data_offload.tcl
 
-# ------------------------------------------------------------
+
 # Include fisiere HDL (proiectul gpio_adi)
-# ------------------------------------------------------------
+
 adi_sim_project_files [list \
   "$ad_hdl_dir/library/common/ad_iobuf.v" \
   "$ad_hdl_dir/projects/common/coraz7s/coraz7s_system_constr.xdc" \
@@ -37,9 +37,8 @@ adi_sim_project_files [list \
   "$ad_hdl_dir/projects/gpio_adi/coraz7s/system_top.v" \
 ]
 
-# ------------------------------------------------------------
 # Include fisiere testbench + API
-# ------------------------------------------------------------
+
 adi_sim_project_files [list \
   "$ad_hdl_dir/library/gpio_adi/gpio_api_pkg.sv" \
   "environment.sv" \

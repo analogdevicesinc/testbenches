@@ -98,7 +98,7 @@ program test_program (
     axi_write(AXI_GPIO_BA + 4 * 32'h24, 32'h00000000);        // GPIO ca iesire din IP (input pt TB)
 
 
-    // 1. IP scrie pe GPIO → TB citeste
+    // 1. IP scrie pe GPIO - TB citeste
 
     `INFO(("IP write → TB read"), ADI_VERBOSITY_LOW);
     for (int i = 0; i < 16; i++) begin
@@ -116,7 +116,7 @@ program test_program (
     end
 
 
-    // 2. TB scrie pe GPIO → IP citeste
+    // 2. TB scrie pe GPIO - IP citeste
 
     `INFO(("TB write → IP read"), ADI_VERBOSITY_LOW);
     axi_write(AXI_GPIO_BA + 4 * 32'h24, 32'hFFFFFFFF); // GPIO ca intrare in IP (scriere din TB)

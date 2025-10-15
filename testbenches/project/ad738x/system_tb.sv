@@ -37,27 +37,27 @@
 
 module system_tb();
 
-      wire ad738x_spi_sclk;
-      wire ad738x_spi_sdo;
-      wire [`NUM_OF_SDI-1:0] ad738x_spi_sdi;
-      wire ad738x_spi_cs;
-      wire ad738x_spi_clk;
-      wire ad738x_irq;
+    wire ad738x_irq;
+    wire ad738x_spi_sclk;
+    wire [(`NUM_OF_CS - 1):0] ad738x_spi_cs;
+    wire ad738x_spi_clk;
+    wire ad738x_spi_sdo;
+    wire [`NUM_OF_SDIO-1:0] ad738x_spi_sdi;
 
     `TEST_PROGRAM test(
-      .ad738x_spi_clk (ad738x_spi_clk),
       .ad738x_irq (ad738x_irq),
-      .ad738x_spi_sdi(ad738x_spi_sdi),
+      .ad738x_spi_sclk (ad738x_spi_sclk),
       .ad738x_spi_cs (ad738x_spi_cs),
-      .ad738x_spi_sclk (ad738x_spi_sclk));
+      .ad738x_spi_clk (ad738x_spi_clk),
+      .ad738x_spi_sdi(ad738x_spi_sdi));
 
     test_harness `TH (
-      .ad738x_spi_clk (ad738x_spi_clk),
       .irq (),
       .ad738x_irq(ad738x_irq),
-      .ad738x_spi_sdo (ad738x_spi_sdo),
-      .ad738x_spi_sdi (ad738x_spi_sdi),
-      .ad738x_spi_cs (ad738x_spi_cs),
-      .ad738x_spi_sclk (ad738x_spi_sclk));
+      .ad738x_spi_vip_sclk (ad738x_spi_sclk),
+      .ad738x_spi_vip_cs (ad738x_spi_cs),
+      .ad738x_spi_vip_clk (ad738x_spi_clk),
+      .ad738x_spi_vip_sdo (ad738x_spi_sdo),
+      .ad738x_spi_vip_sdi (ad738x_spi_sdi));
 
 endmodule

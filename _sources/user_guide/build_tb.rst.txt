@@ -77,6 +77,14 @@ You may also do this manually (for better or worse); the following snippet is
 from a **.bashrc** file. Please note that unless you are an expert at manipulating
 these things, it is best to leave it to the tools to set up the environment.
 
+For Vivado versions of 2025 and later, use the following command:
+
+.. shell::
+
+   $export PATH=$PATH:/opt/Xilinx/202x.x/Vivado/bin:/opt/Xilinx/202x.x/Vitis/bin
+
+For Vivado versions prior to 2025, use the following command:
+
 .. shell::
 
    $export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
@@ -89,6 +97,14 @@ The best option on Windows is to use
 ``make`` and ``git`` packages. You should do changes to your **.bashrc** in a
 similar manner to the Linux environment.
 
+For Vivado versions of 2025 and later, use the following command:
+
+.. shell::
+
+   $export PATH=$PATH:/cygdrive/d/Xilinx/202x.x/Vivado/bin:/cygdrive/d/Xilinx/202x.x/Vitis/bin
+
+For Vivado versions prior to 2025, use the following command:
+
 .. shell::
 
    $export PATH=$PATH:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
@@ -96,6 +112,14 @@ similar manner to the Linux environment.
 A very good alternative to Cygwin is
 `WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__. The
 manual changes to your **.bashrc** should look like:
+
+For Vivado versions of 2025 and later, use the following command:
+
+.. shell::
+
+   $export PATH=$PATH:/opt/path_to/202x.x/Vivado/bin:/opt/202x.x/Vitis/bin
+
+For Vivado versions prior to 2025, use the following command:
 
 .. shell::
 
@@ -108,7 +132,8 @@ variations** installed by the tools itself.
 
 Some of these may not be fully functional with our scripts and/or projects.
 If you are an AMD user, use the **gnuwin** installed as part of the SDK,
-usually at ``C:\Xilinx\Vitis\202x.x\gnuwin\bin``.
+usually at ``C:\Xilinx\202x.x\Vitis\gnuwin\bin`` for Vitis versions of 2025 and
+later, or ``C:\Xilinx\Vitis\202x.x\gnuwin\bin`` for prior versions.
 
 Repository path setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

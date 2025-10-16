@@ -314,6 +314,14 @@ you may source in your <strong>.bashrc</strong> file to set up the environment.
 You may also do this manually (for better or worse); the following snippet is
 from a <strong>.bashrc</strong> file. Please note that unless you are an expert at manipulating
 these things, it is best to leave it to the tools to set up the environment.</p>
+<p>For Vivado versions of 2025 and later, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/202x.x/Vivado/bin:/opt/Xilinx/202x.x/Vitis/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>For Vivado versions prior to 2025, use the following command:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
@@ -327,6 +335,14 @@ these things, it is best to leave it to the tools to set up the environment.</p>
 <a class="icon link reference external" href="https://www.cygwin.com" target="_blank">Cygwin</a>. When installing it, select the
 <code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> packages. You should do changes to your <strong>.bashrc</strong> in a
 similar manner to the Linux environment.</p>
+<p>For Vivado versions of 2025 and later, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/202x.x/Vivado/bin:/cygdrive/d/Xilinx/202x.x/Vitis/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>For Vivado versions prior to 2025, use the following command:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
@@ -336,6 +352,14 @@ similar manner to the Linux environment.</p>
 <div class="clear-left"></div></div></div><p>A very good alternative to Cygwin is
 <a class="icon link reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install/" target="_blank">WSL</a>. The
 manual changes to your <strong>.bashrc</strong> should look like:</p>
+<p>For Vivado versions of 2025 and later, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/202x.x/Vivado/bin:/opt/202x.x/Vitis/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>For Vivado versions prior to 2025, use the following command:</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
 </pre></div>
 </div>
@@ -348,7 +372,8 @@ Prompt</strong>, minimalist GNU for Windows (<strong>MinGW</strong>), or the <st
 variations</strong> installed by the tools itself.</p>
 <p>Some of these may not be fully functional with our scripts and/or projects.
 If you are an AMD user, use the <strong>gnuwin</strong> installed as part of the SDK,
-usually at <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\Vitis\202x.x\gnuwin\bin</span></code>.</p>
+usually at <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\202x.x\Vitis\gnuwin\bin</span></code> for Vitis versions of 2025 and
+later, or <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\Vitis\202x.x\gnuwin\bin</span></code> for prior versions.</p>
 </section>
 <section id="repository-path-setup">
 <h3>Repository path setup<a class="headerlink" href="#repository-path-setup" title="Link to this heading"></a></h3>

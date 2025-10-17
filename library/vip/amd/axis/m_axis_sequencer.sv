@@ -42,6 +42,11 @@ package m_axis_sequencer_pkg;
   import adi_agent_pkg::*;
   import adi_sequencer_pkg::*;
   import logger_pkg::*;
+  import adi_object_pkg::*;
+  import adi_axis_transaction_pkg::*;
+  import adi_axis_packet_pkg::*;
+  import adi_axis_frame_pkg::*;
+  import adi_fifo_class_pkg::*;
 
   typedef enum {
       DATA_GEN_MODE_TEST_DATA,  // get data from test
@@ -52,11 +57,11 @@ package m_axis_sequencer_pkg;
   typedef enum bit [1:0] {
     STOP_POLICY_DATA_BEAT = 2'h1,        // disable after the data beat has been transferred
     STOP_POLICY_PACKET = 2'h2,           // disable after the packet has been transferred
-    STOP_POLICY_DESCRIPTOR_QUEUE = 2'h3  // disable after the packet queue has been transferred
+    STOP_POLICY_transaction_QUEUE = 2'h3  // disable after the packet queue has been transferred
   } stop_policy_t;
 
 
-  class m_axis_sequencer_base extends adi_sequencer;
+  virtual class m_axis_sequencer_base extends adi_sequencer;
 
     protected bit enabled;
     protected bit generator_running;
@@ -66,15 +71,15 @@ package m_axis_sequencer_pkg;
 
     protected data_gen_mode_t data_gen_mode;
 
-    protected bit descriptor_gen_mode;  // 0 - get descriptor from test;
-                                        // 1 - autogenerate descriptor based on the first descriptor from test until aborted
+    protected bit transaction_gen_mode;  // 0 - get transaction from test;
+                                        // 1 - autogenerate transaction based on the first transaction from test until aborted
     protected bit keep_all; // 0 - bytes can be set to be invalid
                             // 1 - all bytes are always valid, data is generated only for the set part
 
     protected int byte_count;
 
     protected int data_beat_delay; // delay in clock cycles
-    protected int descriptor_delay; // delay in clock cycles
+    protected int transaction_delay; // delay in clock cycles
 
     protected stop_policy_t stop_policy;
 
@@ -92,9 +97,11 @@ package m_axis_sequencer_pkg;
       int num_bytes;
       bit gen_last;
       bit gen_sync;
-    } descriptor_t;
+    } transaction_t;
 
-    protected descriptor_t descriptor_q [$];
+    protected transaction_t transaction_q [$];
+
+    adi_fifo_class #(adi_object) sequences;
 
 
     // new
@@ -108,10 +115,10 @@ package m_axis_sequencer_pkg;
 
       this.enabled = 1'b0;
       this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
-      this.descriptor_gen_mode = 1'b0;
+      this.transaction_gen_mode = 1'b0;
       this.byte_count = 0;
       this.data_beat_delay = 0;
-      this.descriptor_delay = 0;
+      this.transaction_delay = 0;
       this.stop_policy = STOP_POLICY_DATA_BEAT;
       this.queue_empty_sig = 1;
       this.keep_all = 1;
@@ -119,47 +126,30 @@ package m_axis_sequencer_pkg;
 
 
     // set vif proxy to drive outputs with 0 when inactive
-    virtual task set_inactive_drive_output_0();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: set_inactive_drive_output_0
+    pure virtual task set_inactive_drive_output_0();
 
     // check if ready is asserted
-    virtual function bit check_ready_asserted();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endfunction: check_ready_asserted
+    pure virtual function bit check_ready_asserted();
 
     // wait for set amount of clock cycles
-    virtual task wait_clk_count(input int wait_clocks);
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: wait_clk_count
+    pure virtual task wait_clk_count(input int wait_clocks);
 
     // pack the byte stream into transfers(beats) then in packets by setting the tlast
-    virtual protected task packetize();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: packetize
+    pure virtual protected task packetize();
 
-    virtual protected task sender();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: sender
+    pure virtual protected task sender();
 
     // create transfer based on data beats per packet
-    virtual function void add_xfer_descriptor_sample_count(
+    pure virtual function void add_xfer_transaction_sample_count(
       input int data_beats_per_packet,
       input int gen_tlast = 1,
       input int gen_sync = 1);
 
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endfunction: add_xfer_descriptor_sample_count
-
     // wait until data beat is sent
-    virtual task beat_sent();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: beat_sent
+    pure virtual task beat_sent();
 
     // wait until packet is sent
-    virtual task packet_sent();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: packet_sent
+    pure virtual task packet_sent();
 
 
     // set disable policy
@@ -181,12 +171,12 @@ package m_axis_sequencer_pkg;
     endfunction: set_data_gen_mode
 
     // set data generation mode
-    function void set_descriptor_gen_mode(input bit descriptor_gen_mode);
+    function void set_transaction_gen_mode(input bit transaction_gen_mode);
       if (enabled)
-        this.error($sformatf("Sequencer must be disabled before configuring descriptor generation mode"));
-      this.descriptor_gen_mode = descriptor_gen_mode;
-      this.info($sformatf("Descriptor generation mode configured"), ADI_VERBOSITY_HIGH);
-    endfunction: set_descriptor_gen_mode
+        this.error($sformatf("Sequencer must be disabled before configuring transaction generation mode"));
+      this.transaction_gen_mode = transaction_gen_mode;
+      this.info($sformatf("transaction generation mode configured"), ADI_VERBOSITY_HIGH);
+    endfunction: set_transaction_gen_mode
 
     // set data beat delay
     function void set_data_beat_delay(input int data_beat_delay);
@@ -194,11 +184,11 @@ package m_axis_sequencer_pkg;
       this.info($sformatf("Data beat delay configured"), ADI_VERBOSITY_HIGH);
     endfunction: set_data_beat_delay
 
-    // set descriptor delay
-    function void set_descriptor_delay(input int descriptor_delay);
-      this.descriptor_delay = descriptor_delay;
-      this.info($sformatf("Descriptor delay configured"), ADI_VERBOSITY_HIGH);
-    endfunction: set_descriptor_delay
+    // set transaction delay
+    function void set_transaction_delay(input int transaction_delay);
+      this.transaction_delay = transaction_delay;
+      this.info($sformatf("transaction delay configured"), ADI_VERBOSITY_HIGH);
+    endfunction: set_transaction_delay
 
     // set all bytes valid in a sample, sets keep to 1
     function void set_keep_all();
@@ -216,44 +206,49 @@ package m_axis_sequencer_pkg;
       this.keep_all = 0;
     endfunction: set_keep_some
 
-    // create transfer descriptor
-    function void add_xfer_descriptor_byte_count(
+    // create transfer transaction
+    function void add_xfer_transaction_byte_count(
       input int bytes_to_generate,
       input int gen_last = 1,
       input int gen_sync = 1);
 
-      descriptor_t descriptor;
-      descriptor.num_bytes = bytes_to_generate;
-      descriptor.gen_last = gen_last;
-      descriptor.gen_sync = gen_sync;
+      transaction_t transaction;
+      transaction.num_bytes = bytes_to_generate;
+      transaction.gen_last = gen_last;
+      transaction.gen_sync = gen_sync;
       // this.info($sformatf("Updating generator with %0d bytes with last %0d, sync %0d",
       //          bytes_to_generate, gen_last, gen_sync), ADI_VERBOSITY_HIGH);
 
-      descriptor_q.push_back(descriptor);
+      transaction_q.push_back(transaction);
       this.queue_empty_sig = 0;
       ->>queue_ev;
-    endfunction: add_xfer_descriptor_byte_count
+    endfunction: add_xfer_transaction_byte_count
 
-    // descriptor delay subroutine
+    // add sequence to the queue
+    function void add_sequence(adi_object new_sequence);
+      this.sequences.push(new_sequence);
+    endfunction: add_sequence
+
+    // transaction delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
-    protected task descriptor_delay_subroutine();
-      wait_clk_count(descriptor_delay);
-    endtask: descriptor_delay_subroutine
+    protected task transaction_delay_subroutine();
+      wait_clk_count(transaction_delay);
+    endtask: transaction_delay_subroutine
 
     // wait until queue is empty
-    task wait_empty_descriptor_queue();
+    task wait_empty_transaction_queue();
       if (this.queue_empty_sig) begin
         return;
       end
       @queue_empty;
-    endtask: wait_empty_descriptor_queue
+    endtask: wait_empty_transaction_queue
 
     // clear queue
-    task clear_descriptor_queue();
-      descriptor_q.delete();
-    endtask: clear_descriptor_queue
+    task clear_transaction_queue();
+      transaction_q.delete();
+    endtask: clear_transaction_queue
 
-    // generate transfer with transfer descriptors
+    // generate transfer with transfer transactions
     protected task generator();
       this.info($sformatf("Generator started"), ADI_VERBOSITY_HIGH);
       this.generator_running = 1;
@@ -262,16 +257,16 @@ package m_axis_sequencer_pkg;
           begin
             @disable_ev;
             case (stop_policy)
-              STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
+              STOP_POLICY_transaction_QUEUE: wait_empty_transaction_queue();
               STOP_POLICY_PACKET: packet_sent();
               STOP_POLICY_DATA_BEAT: beat_sent();
             endcase
           end
           forever begin
-            if (descriptor_q.size() > 0) begin
-              if (enabled || (!enabled && stop_policy == STOP_POLICY_DESCRIPTOR_QUEUE)) begin
+            if (transaction_q.size() > 0) begin
+              if (enabled || (!enabled && stop_policy == STOP_POLICY_transaction_QUEUE)) begin
                 packetize();
-                descriptor_delay_subroutine();
+                transaction_delay_subroutine();
               end else begin
                 packet_sent();
               end
@@ -293,7 +288,7 @@ package m_axis_sequencer_pkg;
       ->>byte_stream_ev;
     endfunction: push_byte_for_stream
 
-    // descriptor delay subroutine
+    // transaction delay subroutine
     // - can be overridden in inherited classes for more specific delay generation
     protected task data_beat_delay_subroutine();
       trans.set_delay(data_beat_delay);
@@ -305,7 +300,7 @@ package m_axis_sequencer_pkg;
         if (this.enabled) begin
           this.warning($sformatf("Sequencer is already running!"));
         end else begin
-          this.warning($sformatf("Sequencer is still running!"));
+          this.warning($sformatf("Sequencer is still running, ending the task!"));
         end
         return;
       end
@@ -362,13 +357,13 @@ package m_axis_sequencer_pkg;
     endtask: packet_sent
 
     // create transfer based on data beats per packet
-    virtual function void add_xfer_descriptor_sample_count(
+    virtual function void add_xfer_transaction_sample_count(
       input int data_beats_per_packet,
       input int gen_tlast = 1,
       input int gen_sync = 1);
 
-      add_xfer_descriptor_byte_count(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
-    endfunction: add_xfer_descriptor_sample_count
+      add_xfer_transaction_byte_count(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
+    endfunction: add_xfer_transaction_sample_count
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
@@ -393,24 +388,24 @@ package m_axis_sequencer_pkg;
       xil_axi4stream_strb keep[];
       int packet_length;
       int byte_per_beat;
-      descriptor_t descriptor;
+      transaction_t transaction;
 
       this.info($sformatf("packetize start"), ADI_VERBOSITY_HIGH);
       byte_per_beat = AXIS_VIP_DATA_WIDTH/8;
-      descriptor = this.descriptor_q.pop_front();
+      transaction = this.transaction_q.pop_front();
 
-      // put a copy of the descriptor back into the queue and continue processing
-      if (this.descriptor_gen_mode == 1 && enabled) begin
-        this.descriptor_q.push_back(descriptor);
+      // put a copy of the transaction back into the queue and continue processing
+      if (this.transaction_gen_mode == 1 && enabled) begin
+        this.transaction_q.push_back(transaction);
       end
 
-      packet_length = descriptor.num_bytes / byte_per_beat;
-      if (packet_length*byte_per_beat < descriptor.num_bytes) begin
+      packet_length = transaction.num_bytes / byte_per_beat;
+      if (packet_length*byte_per_beat < transaction.num_bytes) begin
         packet_length++;
       end
 
       if (this.keep_all) begin
-        descriptor.num_bytes = packet_length*byte_per_beat;
+        transaction.num_bytes = packet_length*byte_per_beat;
       end
 
       for (int tc=0; tc<packet_length; tc++) begin : packet_loop
@@ -420,7 +415,7 @@ package m_axis_sequencer_pkg;
         end
         keep = new[byte_per_beat];
 
-        for (int i=0; i<byte_per_beat && (this.keep_all || tc*byte_per_beat+i<descriptor.num_bytes); i++) begin
+        for (int i=0; i<byte_per_beat && (this.keep_all || tc*byte_per_beat+i<transaction.num_bytes); i++) begin
           case (this.data_gen_mode)
             DATA_GEN_MODE_TEST_DATA: begin
               // block transfer until we get data from byte stream queue
@@ -472,11 +467,11 @@ package m_axis_sequencer_pkg;
         end
 
         if (AXIS_VIP_HAS_TLAST) begin
-          this.trans.set_last((tc == packet_length-1) & descriptor.gen_last);
+          this.trans.set_last((tc == packet_length-1) & transaction.gen_last);
         end
 
         if (AXIS_VIP_USER_WIDTH > 0) begin
-          this.trans.set_user_beat((tc == 0) & descriptor.gen_sync);
+          this.trans.set_user_beat((tc == 0) & transaction.gen_sync);
         end
 
         ->> data_av_ev;
@@ -494,7 +489,7 @@ package m_axis_sequencer_pkg;
           begin
             @this.disable_ev;
             case (this.stop_policy)
-              STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
+              STOP_POLICY_transaction_QUEUE: wait_empty_transaction_queue();
               STOP_POLICY_PACKET: packet_sent();
               STOP_POLICY_DATA_BEAT: beat_sent();
             endcase

@@ -87,9 +87,9 @@ package environment_pkg;
       // configuration for input
       this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
       this.input_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.input_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
+      this.input_axis_agent.master_sequencer.set_transaction_gen_mode(1);
       this.input_axis_agent.master_sequencer.set_data_beat_delay(0);
-      this.input_axis_agent.master_sequencer.set_descriptor_delay(0);
+      this.input_axis_agent.master_sequencer.set_transaction_delay(0);
       this.input_axis_agent.master_sequencer.set_inactive_drive_output_0();
 
       // configuration for output

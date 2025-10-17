@@ -215,6 +215,13 @@ for restarting it.
   are changed after the build was created or when the block design is changed
   manually. When the simulation seed is hard coded, this option must be used.
 
+.. note::
+
+   When rerunning a simulation in GUI mode, there is a slight chance that
+   Vivado crashes. The reason for this is unknown, and it usually happens when
+   the restarting process is going and the user tries putting the process in the
+   background via the pop-up window.
+
 Opening a testbench
 -------------------------------------------------------------------------------
 

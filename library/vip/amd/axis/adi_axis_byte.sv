@@ -53,7 +53,8 @@ package adi_axis_byte_pkg;
     rand logic [TUSER_WIDTH-1:0] tuser = {TUSER_WIDTH{1'b0}};
 
     constraint c_tkeep { (EN_TKEEP == 0) -> (tkeep == 1'b1); }
-    constraint c_tstrb { (EN_TSTRB == 0) -> (tstrb == 1'b0); }
+    constraint c_tstrb { (EN_TSTRB == 0) -> (tstrb == tkeep); }
+    constraint c_tstrb_order { solve tkeep before tstrb; }
     constraint c_tuser { (EN_TUSER == 0) -> (tuser == {TUSER_WIDTH{1'b0}}); }
 
     function new(input string name = "");

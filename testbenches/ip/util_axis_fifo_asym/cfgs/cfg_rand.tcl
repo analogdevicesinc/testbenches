@@ -3,12 +3,6 @@ global ad_project_params
 set async_clk [expr int(rand()*2)]
 set ad_project_params(ASYNC_CLK) $async_clk
 
-set tkeep_en [expr int(rand()*2)]
-set ad_project_params(TKEEP_EN) $tkeep_en
-
-set tlast_en [expr int(rand()*2)]
-set ad_project_params(TLAST_EN) $tlast_en
-
 set random_width [expr int(8*pow(2, int(7.0*rand()+1)))]
 set INPUT_WIDTH $random_width
 set ad_project_params(INPUT_WIDTH) $INPUT_WIDTH
@@ -17,10 +11,10 @@ set random_width [expr int(8*pow(2, int(7.0*rand()+1)))]
 set OUTPUT_WIDTH $random_width
 set ad_project_params(OUTPUT_WIDTH) $OUTPUT_WIDTH
 
-set fifo_limited [expr int(rand()*2)]
-set ad_project_params(FIFO_LIMITED) $fifo_limited
+set reduced_fifo [expr int(rand()*2)]
+set ad_project_params(REDUCED_FIFO) $reduced_fifo
 
-if {$fifo_limited} {
+if {$reduced_fifo} {
     if {$INPUT_WIDTH > $OUTPUT_WIDTH} {
         set RATIO $INPUT_WIDTH/$OUTPUT_WIDTH
     } else {
@@ -32,6 +26,39 @@ if {$fifo_limited} {
 
 set random_width [expr int(int(log($RATIO)/log(2))+4.0*rand()+1)]
 set ad_project_params(ADDRESS_WIDTH) $random_width
+
+set tkeep_en [expr int(rand()*2)]
+set ad_project_params(TKEEP_EN) $tkeep_en
+
+set tstrb_en [expr int(rand()*2)]
+set ad_project_params(TSTRB_EN) $tkeep_en
+
+set tlast_en [expr int(rand()*2)]
+set ad_project_params(TLAST_EN) $tlast_en
+
+set tuser_en [expr int(rand()*2)]
+set ad_project_params(TUSER_EN) $tuser_en
+
+set tid_en [expr int(rand()*2)]
+set ad_project_params(TID_EN) $tid_en
+
+set tdest_en [expr int(rand()*2)]
+set ad_project_params(TDEST_EN) $tdest_en
+
+set tuser_bits_per_byte [expr int(rand()*2)]
+set ad_project_params(TUSER_BITS_PER_BYTE) $tuser_bits_per_byte
+
+set random_width [expr int(rand()*8)+1]
+set TUSER_WIDTH $random_width
+set ad_project_params(TUSER_WIDTH) $TUSER_WIDTH
+
+set random_width [expr int(rand()*8)+1]
+set TID_WIDTH $random_width
+set ad_project_params(TID_WIDTH) $TID_WIDTH
+
+set random_width [expr int(rand()*8)+1]
+set TDEST_WIDTH $random_width
+set ad_project_params(TDEST_WIDTH) $TDEST_WIDTH
 
 set input_clk [expr int(rand()*9)+1]
 set ad_project_params(INPUT_CLK) $input_clk

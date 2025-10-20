@@ -7,7 +7,7 @@ import test_harness_env_pkg::*;
 import environment_pkg::*;
 import gpio_api_pkg::*;
 import m_axi_sequencer_pkg::*;
-import axi_vip_pkg::*;  
+import axi_vip_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -15,9 +15,9 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 `define AXI_GPIO_BA 32'h50040000
 
 program test_program (
-  output logic [31:0] gpio_m_io_i,  // TB → IP
-  input  logic [31:0] gpio_m_io_o,  // IP → TB
-  input  logic [31:0] gpio_m_io_t,  // direcție de la IP
+  output logic [31:0] gpio_m_io_i,
+  input  logic [31:0] gpio_m_io_o,
+  input  logic [31:0] gpio_m_io_t,
   input  logic        irq_0
 );
 
@@ -99,7 +99,7 @@ program test_program (
   task test_irq();
     `INFO(("Start IRQ test sequence"), ADI_VERBOSITY_LOW);
 
-    gpio.unmask_irq(32'hFFFFFFFB); // unmask bit 2
+    gpio.unmask_irq(32'h0000000B); // unmask bit 2
     #50;
 
     gpio_m_io_i = 32'b0;

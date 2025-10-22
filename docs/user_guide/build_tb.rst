@@ -163,41 +163,106 @@ In this example, it is building the **AD7616** testbench.
    $cd ad7616
    $make
 
-The ``make`` builds all the libraries first and then builds the testbench.
-This assumes that you have the tools and licenses set up correctly. If
-you don't get to the last line, the make failed to build one or more
-targets: it could be a library component or the project itself. There is
-nothing you can gather from the ``make`` output (other than which one
-failed). The actual information about the failure is in a log file inside
-the project directory. By default, ``make`` builds all of the available
+The ``make`` builds all the libraries first and then builds the testbench. The
+testbench build folder is in the testbench project's location under ``runs/``
+with the configuration's name as Vivado project name. This assumes that you have
+the tools and licenses set up correctly and the build finishes with no errors.
+If the make fails to build one or more targets, there is no useful information
+you can gather from the ``make`` output (other than which target failed to
+build). The actual information about the failure is in a log file inside
+the target's directory. By default, ``make`` builds all of the available
 configurations and runs all of the ``test programs`` that are predefined
 in the ``Makefile``.
 
-Also, there's an option to use ``make`` using GUI, so that at the end of the
-build it will launch Vivado and start the simulation with the waveform viewer
-started as well.
+There are multiple ``make`` parameters that can be used to build and run a
+simulation.
+
+**Examples**
+
+The ``all`` keyword is the same as running ``make`` by itself with no additional
+configuration/test program parameter. Often used in combination with ``clean``
+parameter.
+
+.. shell::
+
+   $make all
+
+Another build option is to use the configuration file's name as a make parameter
+without any other input. This will build the configuration and run all test
+programs on it.
+
+.. shell::
+
+   $make cfg_si
+
+Some projects support adding additional ``make`` parameters to configure
+the project. This option gives you the ability to build only the configuration
+that you're interested in, without building the rest of the available
+configurations, as well as running the chosen test program. ``CFG`` specifies
+the configuration file's name, while ``TST`` specifies the test program's name.
+
+.. shell::
+
+   $make CFG=cfg_si TST=test_program_si
+
+.. caution::
+
+   Trying to run incompatible configuration and test program combinations will
+   result in simulation error! Please refer to the projects guide to check
+   compatibility.
+
+.. note::
+
+   When running the ``make`` command with one of the above mentioned 3 options,
+   please choose only 1 of them! Using multiple options may lead to building
+   multiple designs and running multiple test programs.
+
+The ``clean`` keyword removes the ``runs`` and ``results`` folders, as well as
+the log files created by Vivado.
+
+.. shell::
+
+   $make clean
+
+There's an option to use Vivado's XSim GUI, so that at the end of the build it
+will launch Vivado and start the simulation with the waveform viewer started as
+well. By default, ``make`` launches Vivado in batch mode, meaning that it won't
+provide a GUI, only a result in the terminal at the end of the simulation.
 
 .. shell::
 
    $make MODE=gui
 
-Some projects support adding additional ``make`` parameters to configure
-the project. This option gives you the ability to build only the configuration
-that you're interested in, without building the rest of the available
-configurations, as well as running the chosen test program, if it is the case.
-
-If parameters were used, the result of the build will be in a folder under
-``runs/``, named by the configuration used.
-
-**Example**
-
-Running the command below will create a folder named
-**cfg_si** for the following file combination: **cfg_si** configuration file and
-the **test_program_si** test program.
+The ``STOP_ON_ERROR`` parameter is mainly used for continuous integration
+purposes, which allows the user to build and run all testbenches even if one
+fails. The only exception to this is when a library fails to build, as this will
+prevent any of the testbench designs to be run. The default value is ``y``,
+which halts the simulation once it runs into an error. The other option to run
+all testbenches is ``n``. This is useful for checking which configuration and
+test program configurations are failing.
 
 .. shell::
 
-   $make MODE=gui CFG=cfg_si TST=test_program_si
+   $make STOP_ON_ERROR=y
+
+Rerunning a simulation
+-------------------------------------------------------------------------------
+
+If you want to rerun a simulation, you can do it in a couple of different ways,
+depending on what you're trying to do.
+
+The most straightforward and easiest way is to rerun the ``make`` command with
+the parameters it was ran initially if it is the case. This will rebuild any
+libraries and/or the testbench block design if any of them changed and then run
+the simulation. If there are changes that affect the architecture of the
+testbench, then design is going to be rebuilt. If only the simulation files are
+updated, which don't affect the testbench block design, then only the simulation
+will be run. This is the recommended way to run the testbench to avoid any
+issues if the source files are modified.
+
+.. attention::
+
+   Vivado must be closed before rerunning the ``make`` command!
 
 In GUI mode, if the simulation was already run, there are a couple of options
 for restarting it.
@@ -213,7 +278,9 @@ for restarting it.
   simulation`` option from the Flow Navigator. This will recompile the project
   and start the simulation. This is needed when project simulation parameters
   are changed after the build was created or when the block design is changed
-  manually. When the simulation seed is hard coded, this option must be used.
+  manually. When the simulation seed is changed or randomized, and you want to
+  rerun the simulation with an updated seed value, this is the option that must
+  be used.
 
 .. note::
 

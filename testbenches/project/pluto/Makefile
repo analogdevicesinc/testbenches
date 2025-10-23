@@ -30,3 +30,14 @@ CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
+
+# usage:
+#
+# run specific test on a specific configuration in gui mode
+# 	make CFG=<configuration_name> TST=<test_name> MODE=gui
+#
+# run all test from a configuration
+# 	make <configuration_name>
+
+####################################################################################
+####################################################################################

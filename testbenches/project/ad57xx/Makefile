@@ -42,10 +42,10 @@ include $(ADI_TB_DIR)/scripts/project-sim.mk
 # usage:
 #
 # run specific test on a specific configuration in gui mode
-# 	make CFG=cfg1 TST=test_program MODE=gui
+# 	make CFG=<configuration_name> TST=<test_name> MODE=gui
 #
 # run all test from a configuration
-# 	make cfg1
+# 	make <configuration_name>
 
 ####################################################################################
 ####################################################################################

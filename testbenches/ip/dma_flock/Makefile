@@ -27,10 +27,10 @@ include $(ADI_TB_DIR)/scripts/project-sim.mk
 # usage:
 #
 # run specific test on a specific configuration in gui mode
-# 	make CFG=cfg2_fsync TST=test_program_frame_delay MODE=gui
+# 	make CFG=<configuration_name> TST=<test_name> MODE=gui
 #
 # run all test from a configuration
-# 	make cfg2_fsync
+# 	make <configuration_name>
 
 ####################################################################################
 ####################################################################################

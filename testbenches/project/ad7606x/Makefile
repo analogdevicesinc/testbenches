@@ -6,7 +6,6 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_spi_engine.mk
 
@@ -35,20 +34,8 @@ LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
 
-# default test program
-TP := test_program_si
-#TP := test_program_4ch
-#TP := test_program_6ch
-#TP := test_program_8ch
-
-# config files should have the following format
-#  cfg_<param1>_<param2>.tcl
-#CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
-#$(warning $(CFG_FILES))
-
 # List of tests and configuration combinations that has to be run
-# Format is:  <configuration>:<test name>
-#TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(cfg):$(TP))
+# Format is: <configuration>:<test name>
 
 # Parallel interface configurations
 TESTS += cfg_p_16b:test_program_4ch
@@ -64,11 +51,13 @@ TESTS += cfg_s_sdi8:test_program_si
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 
-# usage :
+# usage:
 #
 # run specific test on a specific configuration in gui mode
-# 	make CFG=cfg_p_18b TST=test_program_8ch MODE=gui
+# 	make CFG=<configuration_name> TST=<test_name> MODE=gui
 #
+# run all test from a configuration
+# 	make <configuration_name>
 
 ####################################################################################
 ####################################################################################

@@ -262,7 +262,7 @@ program test_program_frame_delay;
               begin
                 for (int l = 0; l < m_seg.ylength; l++) begin
                   // update the AXIS generator command
-                  dma_flock_env.src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(.bytes_to_generate(m_seg.length),
+                  dma_flock_env.src_axis_agent.master_sequencer.add_xfer_transaction_byte_count(.bytes_to_generate(m_seg.length),
                                                        .gen_last(1),
                                                        .gen_sync(l==0));
                 end

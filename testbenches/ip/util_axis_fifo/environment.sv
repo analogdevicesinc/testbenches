@@ -45,6 +45,7 @@ package environment_pkg;
   import s_axis_sequencer_pkg::*;
   import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
+  import adi_axis_transaction_pkg::*;
 
   class util_axis_fifo_environment #(`AXIS_VIP_PARAM_DECL(input_axis), `AXIS_VIP_PARAM_DECL(output_axis), int INPUT_CLK, int OUTPUT_CLK) extends adi_environment;
 
@@ -54,7 +55,7 @@ package environment_pkg;
     adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(input_axis)) input_axis_agent;
     adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(output_axis)) output_axis_agent;
 
-    scoreboard #(logic [7:0]) scoreboard_inst;
+    scoreboard #(adi_axis_transaction) scoreboard_inst;
 
     //============================================================================
     // Constructor
@@ -85,11 +86,7 @@ package environment_pkg;
     //============================================================================
     task configure();
       // configuration for input
-      this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-      this.input_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.input_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
-      this.input_axis_agent.master_sequencer.set_data_beat_delay(0);
-      this.input_axis_agent.master_sequencer.set_descriptor_delay(0);
+      this.input_axis_agent.master_sequencer.set_repeat_transaction_mode(1);
       this.input_axis_agent.master_sequencer.set_inactive_drive_output_0();
 
       // configuration for output
@@ -125,11 +122,13 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.input_clk_vip_if.stop_clock();
-      this.output_clk_vip_if.stop_clock();
+      this.input_axis_agent.master_sequencer.wait_driver_idle();
 
       this.input_axis_agent.stop_master();
       this.output_axis_agent.stop_slave();
+
+      this.input_clk_vip_if.stop_clock();
+      this.output_clk_vip_if.stop_clock();
     endtask
 
   endclass

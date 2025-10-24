@@ -204,7 +204,7 @@ program test_program (
         data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
         spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i]);
       end
-      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
+      spi_env.sdo_src_agent.master_sequencer.add_xfer_transaction_byte_count((`DATA_WIDTH/8),0,0);
     `endif
   endtask
 

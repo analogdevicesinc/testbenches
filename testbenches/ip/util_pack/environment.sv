@@ -87,13 +87,13 @@ package environment_pkg;
     task configure(int bytes_to_generate);
       // TX stubs
       this.tx_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.tx_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
+      this.tx_src_axis_agent.master_sequencer.add_xfer_transaction_byte_count(bytes_to_generate, 0, 0);
 
       this.tx_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
 
       // RX stub
       this.rx_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.rx_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
+      this.rx_src_axis_agent.master_sequencer.add_xfer_transaction_byte_count(bytes_to_generate, 0, 0);
 
       this.rx_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask

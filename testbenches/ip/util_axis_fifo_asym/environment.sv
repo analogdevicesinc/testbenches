@@ -45,6 +45,8 @@ package environment_pkg;
   import s_axis_sequencer_pkg::*;
   import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
+  import adi_axis_transaction_pkg::*;
+  import axis_transaction_adapter_pkg::*;
 
   class util_axis_fifo_environment #(`AXIS_VIP_PARAM_DECL(input_axis), `AXIS_VIP_PARAM_DECL(output_axis), int INPUT_CLK, int OUTPUT_CLK) extends adi_environment;
 
@@ -54,7 +56,9 @@ package environment_pkg;
     adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(input_axis)) input_axis_agent;
     adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(output_axis)) output_axis_agent;
 
-    scoreboard #(logic [7:0]) scoreboard_inst;
+    scoreboard #(adi_axis_transaction) scoreboard_inst;
+
+    axis_transaction_adapter axis_adapter;
 
     //============================================================================
     // Constructor
@@ -78,6 +82,12 @@ package environment_pkg;
       this.output_axis_agent = new("Output AXI Stream Agent", output_axis_vip_if, this);
 
       this.scoreboard_inst = new("Util AXIS FIFO Scoreboard", this);
+
+      this.axis_adapter = new(
+        .name("Axis Adapter"),
+        .source_bytes_per_transaction(input_axis_VIP_DATA_WIDTH/8),
+        .sink_bytes_per_transaction(output_axis_VIP_DATA_WIDTH/8),
+        .parent(this));
     endfunction
 
     //============================================================================
@@ -85,11 +95,7 @@ package environment_pkg;
     //============================================================================
     task configure();
       // configuration for input
-      this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-      this.input_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.input_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
-      this.input_axis_agent.master_sequencer.set_data_beat_delay(0);
-      this.input_axis_agent.master_sequencer.set_descriptor_delay(0);
+      this.input_axis_agent.master_sequencer.set_repeat_transaction_mode(1);
       this.input_axis_agent.master_sequencer.set_inactive_drive_output_0();
 
       // configuration for output
@@ -108,8 +114,11 @@ package environment_pkg;
       this.input_axis_agent.start_master();
       this.output_axis_agent.start_slave();
 
-      this.input_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_source);
-      this.output_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_sink);
+      this.input_axis_agent.monitor.publisher.subscribe(this.axis_adapter.subscriber_source);
+      this.output_axis_agent.monitor.publisher.subscribe(this.axis_adapter.subscriber_sink);
+
+      this.axis_adapter.publisher_source.subscribe(this.scoreboard_inst.subscriber_source);
+      this.axis_adapter.publisher_sink.subscribe(this.scoreboard_inst.subscriber_sink);
     endtask
 
     //============================================================================
@@ -125,11 +134,13 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.input_clk_vip_if.stop_clock();
-      this.output_clk_vip_if.stop_clock();
+      this.input_axis_agent.master_sequencer.wait_driver_idle();
 
       this.input_axis_agent.stop_master();
       this.output_axis_agent.stop_slave();
+
+      this.input_clk_vip_if.stop_clock();
+      this.output_clk_vip_if.stop_clock();
     endtask
 
   endclass

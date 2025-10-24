@@ -36,9 +36,16 @@
 global ad_project_params
 
 set ASYNC_CLK $ad_project_params(ASYNC_CLK)
-set TKEEP_EN $ad_project_params(TKEEP_EN)
-set TLAST_EN $ad_project_params(TLAST_EN)
 set DATA_WIDTH $ad_project_params(DATA_WIDTH)
+set TKEEP_EN $ad_project_params(TKEEP_EN)
+set TSTRB_EN $ad_project_params(TSTRB_EN)
+set TLAST_EN $ad_project_params(TLAST_EN)
+set TUSER_EN $ad_project_params(TUSER_EN)
+set TID_EN $ad_project_params(TID_EN)
+set TDEST_EN $ad_project_params(TDEST_EN)
+set TUSER_WIDTH $ad_project_params(TUSER_WIDTH)
+set TID_WIDTH $ad_project_params(TID_WIDTH)
+set TDEST_WIDTH $ad_project_params(TDEST_WIDTH)
 set ADDRESS_WIDTH $ad_project_params(ADDRESS_WIDTH)
 set INPUT_CLK $ad_project_params(INPUT_CLK)
 set OUTPUT_CLK $ad_project_params(OUTPUT_CLK)
@@ -81,9 +88,15 @@ ad_ip_instance util_axis_fifo util_axis_fifo_DUT [list \
   M_AXIS_REGISTERED 1 \
   ALMOST_EMPTY_THRESHOLD 0 \
   ALMOST_FULL_THRESHOLD 0 \
-  TLAST_EN $TLAST_EN \
   TKEEP_EN $TKEEP_EN \
-  REMOVE_NULL_BEAT_EN 0 \
+  TSTRB_EN $TSTRB_EN \
+  TLAST_EN $TLAST_EN \
+  TUSER_EN $TUSER_EN \
+  TID_EN $TID_EN \
+  TDEST_EN $TDEST_EN \
+  TUSER_WIDTH $TUSER_WIDTH \
+  TID_WIDTH $TID_WIDTH \
+  TDEST_WIDTH $TDEST_WIDTH \
 ]
 
 ad_connect input_clk util_axis_fifo_DUT/s_axis_aclk
@@ -94,12 +107,14 @@ ad_connect output_resetn util_axis_fifo_DUT/m_axis_aresetn
 
 ad_ip_instance axi4stream_vip input_axis [list \
   INTERFACE_MODE {MASTER} \
-  HAS_TREADY {1} \
-  TDEST_WIDTH {0} \
-  TID_WIDTH {0} \
-  HAS_TLAST $TLAST_EN \
-  HAS_TKEEP $TKEEP_EN \
   TDATA_NUM_BYTES [expr {$DATA_WIDTH/8}] \
+  HAS_TREADY {1} \
+  HAS_TKEEP $TKEEP_EN \
+  HAS_TSTRB $TSTRB_EN \
+  HAS_TLAST $TLAST_EN \
+  TUSER_WIDTH [expr $TUSER_WIDTH * $TUSER_EN] \
+  TID_WIDTH [expr $TID_WIDTH * $TID_EN] \
+  TDEST_WIDTH [expr $TDEST_WIDTH * $TDEST_EN] \
 ]
 adi_sim_add_define "INPUT_AXIS=input_axis"
 
@@ -110,9 +125,13 @@ ad_connect util_axis_fifo_DUT/s_axis input_axis/m_axis
 
 ad_ip_instance axi4stream_vip output_axis [list \
   INTERFACE_MODE {SLAVE} \
-  HAS_TLAST $TLAST_EN \
-  HAS_TKEEP $TKEEP_EN \
   TDATA_NUM_BYTES [expr {$DATA_WIDTH/8}] \
+  HAS_TKEEP $TKEEP_EN \
+  HAS_TSTRB $TSTRB_EN \
+  HAS_TLAST $TLAST_EN \
+  TUSER_WIDTH [expr $TUSER_WIDTH * $TUSER_EN] \
+  TID_WIDTH [expr $TID_WIDTH * $TID_EN] \
+  TDEST_WIDTH [expr $TDEST_WIDTH * $TDEST_EN] \
 ]
 adi_sim_add_define "OUTPUT_AXIS=output_axis"
 

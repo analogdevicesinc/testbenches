@@ -95,7 +95,7 @@ package dma_trans_pkg;
     // -----------------
     //
     // -----------------
-    function copy(dma_segment ds);
+    function void copy(dma_segment ds);
       ds.p = p;
       ds.src_addr = src_addr;
       ds.dst_addr = dst_addr;
@@ -169,7 +169,7 @@ package dma_trans_pkg;
     // -----------------
     //
     // -----------------
-    function copy(dma_partial_segment ds);
+    function void copy(dma_partial_segment ds);
       super.copy(ds);
       ds.reduced_length = reduced_length;
     endfunction
@@ -228,7 +228,7 @@ package dma_trans_pkg;
     // -----------------
     //
     // -----------------
-    function copy(dma_2d_segment ds);
+    function void copy(dma_2d_segment ds);
       super.copy(ds);
       ds.src_stride = src_stride;
       ds.dst_stride = dst_stride;
@@ -319,7 +319,7 @@ package dma_trans_pkg;
     // -----------------
     //
     // -----------------
-    function copy(dma_partial_2d_segment ds);
+    function void copy(dma_partial_2d_segment ds);
       super.copy(ds);
       ds.partial_segment_no = partial_segment_no;
       ds.reduced_length = reduced_length;
@@ -421,7 +421,7 @@ package dma_trans_pkg;
     // -----------------
     //
     // -----------------
-    function copy(dma_flocked_2d_segment ds);
+    function void copy(dma_flocked_2d_segment ds);
       super.copy(ds);
       ds.flock_framenum = flock_framenum;
       ds.flock_distance = flock_distance;

@@ -35,57 +35,58 @@
 
 `include "utils.svh"
 
-package adi_common_pkg;
+package adi_object_pkg;
 
   import logger_pkg::*;
 
-  class adi_reporter;
-    string name;
-    adi_reporter parent;
+  class adi_object;
+    protected string name;
 
-    function new(
-      input string name,
-      input adi_reporter parent = null);
-
+    function new(input string name = "");
       this.name = name;
-      this.parent = parent;
     endfunction
 
-    function string get_path();
-      if (this.parent == null)
-        return this.name;
-      else
-        return $sformatf("%s.%s", this.parent.get_path(), this.name);
-    endfunction: get_path
+    virtual function adi_object clone();
+      adi_object object;
+      object = new(.name(this.name));
+      this.copy(object);
+      return object;
+    endfunction: clone
 
-    function void info(
-      input string message,
-      input adi_verbosity_t verbosity);
+    virtual function string convert2string();
+      string str;
+      str = {"ADI Object\n",
+        $sformatf("name: %s\n", this.name)};
+      return(str);
+    endfunction: convert2string
 
-      `INFO(("[%s] %s", this.get_path(), message), verbosity);
-    endfunction: info
+    function void copy(input adi_object object);
+      this.do_copy(.object(object));
+    endfunction: copy
 
-    function void warning(input string message);
-      `WARNING(("[%s] %s", this.get_path(), message));
-    endfunction: warning
+    virtual function void do_copy(input adi_object object);
+      return;
+    endfunction: do_copy
 
-    function void error(input string message);
-      `ERROR(("[%s] %s", this.get_path(), message));
-    endfunction: error
+    function void print();
+      `INFO(("%s", this.do_print()), ADI_VERBOSITY_NONE);
+    endfunction: print
 
-    function void fatal(input string message);
-      `FATAL(("[%s] %s", this.get_path(), message));
-    endfunction: fatal
-  endclass: adi_reporter
+    function string sprint();
+      return this.do_print();
+    endfunction: sprint
 
+    virtual function string do_print();
+      return this.convert2string();
+    endfunction: do_print
 
-  class adi_component extends adi_reporter;
-    function new(
-      input string name,
-      input adi_component parent = null);
+    function bit compare(input adi_object object);
+      return this.do_compare(.object(object));
+    endfunction: compare
 
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_component
+    virtual function bit do_compare(input adi_object object);
+      return 1;
+    endfunction: do_compare
+  endclass: adi_object
 
-endpackage: adi_common_pkg
+endpackage: adi_object_pkg

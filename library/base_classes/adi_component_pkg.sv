@@ -35,49 +35,18 @@
 
 `include "utils.svh"
 
-package adi_vip_pkg;
+package adi_component_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_environment_pkg::*;
+  import adi_reporter_pkg::*;
 
-  class adi_agent extends adi_component;
+  class adi_component extends adi_reporter;
     function new(
       input string name,
-      input adi_environment parent = null);
+      input adi_component parent = null);
 
       super.new(name, parent);
     endfunction: new
-  endclass: adi_agent
+  endclass: adi_component
 
-
-  class adi_driver extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_driver
-
-
-  class adi_sequencer extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_sequencer
-
-
-  class adi_monitor extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_monitor
-
-endpackage: adi_vip_pkg
+endpackage: adi_component_pkg

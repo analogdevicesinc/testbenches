@@ -38,12 +38,13 @@
 package pub_sub_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
+  import adi_fifo_pkg::*;
 
-  class adi_subscriber #(type data_type = int) extends adi_component;
+  virtual class adi_subscriber #(type data_type = int) extends adi_component;
 
     protected static bit [15:0] last_id = 'd0;
-    bit [15:0] id;
+    protected bit [15:0] id;
 
     function new(
       input string name,
@@ -55,9 +56,11 @@ package pub_sub_pkg;
       this.id = this.last_id;
     endfunction: new
 
-    virtual function void update(input data_type data [$]);
-      this.fatal($sformatf("This function is not implemented!"));
-    endfunction: update
+    function bit[15:0] get_id();
+      return this.id;
+    endfunction: get_id
+
+    pure virtual task update(input adi_fifo #(data_type) data);
 
   endclass: adi_subscriber
 
@@ -74,23 +77,26 @@ package pub_sub_pkg;
     endfunction: new
 
     function void subscribe(input adi_subscriber #(data_type) subscriber);
-      if (this.subscriber_list.exists(subscriber.id))
+      if (this.subscriber_list.exists(subscriber.get_id())) begin
         this.error($sformatf("Subscriber already on the list!"));
-      else
-        this.subscriber_list[subscriber.id] = subscriber;
+      end else begin
+        this.subscriber_list[subscriber.get_id()] = subscriber;
+      end
     endfunction: subscribe
 
     function void unsubscribe(input adi_subscriber #(data_type) subscriber);
-      if (!this.subscriber_list.exists(subscriber.id))
+      if (!this.subscriber_list.exists(subscriber.get_id())) begin
         this.error($sformatf("Subscriber does not exist on list!"));
-      else
-        this.subscriber_list.delete(subscriber.id);
+      end else begin
+        this.subscriber_list.delete(subscriber.get_id());
+      end
     endfunction: unsubscribe
 
-    function void notify(input data_type data [$]);
-      foreach (this.subscriber_list[i])
+    task notify(input adi_fifo #(data_type) data);
+      foreach (this.subscriber_list[i]) begin
         this.subscriber_list[i].update(data);
-    endfunction: notify
+      end
+    endtask: notify
 
   endclass: adi_publisher
 

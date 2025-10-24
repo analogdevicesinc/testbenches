@@ -95,12 +95,12 @@ package test_harness_env_pkg;
     task start();
       this.simulation_watchdog.start();
 
-      this.mng.start_master();
-      this.ddr.start_slave();
-
       this.sys_clk_vip_if.start_clock();
       this.dma_clk_vip_if.start_clock();
       this.ddr_clk_vip_if.start_clock();
+
+      this.mng.start_master();
+      this.ddr.start_slave();
     endtask
 
     //============================================================================
@@ -121,7 +121,7 @@ package test_harness_env_pkg;
     // System reset routine
     //============================================================================
     task sys_reset();
-      //asserts all the resets for 100 ns
+      //asserts all the resets for 1 us
       this.sys_rst_vip_if.assert_reset();
       #200ns;
       this.sys_rst_vip_if.deassert_reset();

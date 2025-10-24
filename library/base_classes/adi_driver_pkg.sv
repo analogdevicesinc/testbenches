@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,47 +33,21 @@
 // ***************************************************************************
 // ***************************************************************************
 
+`include "utils.svh"
 
-`timescale 1ns/1ps
+package adi_driver_pkg;
 
-`ifndef _UTILS_SVH_
-`define _UTILS_SVH_
+  import logger_pkg::*;
+  import adi_component_pkg::*;
+  import adi_agent_pkg::*;
 
-// Help build agent package name like "<test_harness>_<mng_axi_vip>_0_pkg"
-`define PKGIFY(th,vip) th``_``vip``_0_pkg
+  class adi_driver extends adi_component;
+    function new(
+      input string name,
+      input adi_agent parent = null);
 
-// Help build agent type like "<test_harness>_<mng_axi_vip>_0_<mst_t>"
-`define AGENT(th,vip,agent_type) th``_``vip``_0_``agent_type
+      super.new(name, parent);
+    endfunction: new
+  endclass: adi_driver
 
-// Help build VIP parameter name  e.g. test_harness_dst_axis_vip_0_VIP_DATA_WIDTH
-`define GETPARAM(th,vip,param) th``_``vip``_0_``param
-
-// Help link AMD AXI and AXIS VIPs to ADI Environment VIPs
-`define LINK(top,env,inst) \
-  top``.pre_link_agent(``env``.``inst``); \
-  env``.``inst`` = ``top``; \
-  top``.post_link_agent(``env``.``inst``);
-
-// Macros used in Simulation files during simulation
-`define INFO(m,v)  \
-  PrintInfo($sformatf("%s", \
-    $sformatf m ),v)
-
-`define WARNING(m)  \
-  PrintWarning($sformatf("%s", \
-    $sformatf m ))
-
-`define ERROR(m)  \
-  PrintError($sformatf("%s", \
-    $sformatf m ))
-
-`define FATAL(m)  \
-  PrintFatal($sformatf("%s\n  found in %s:%0d", \
-    $sformatf m , `__FILE__, `__LINE__))
-
-`define MAX(a,b) ((a > b) ? a : b)
-`define MIN(a,b) ((a > b) ? b : a)
-
-`define INT_MAX 32'sd2147483647
-
-`endif
+endpackage: adi_driver_pkg

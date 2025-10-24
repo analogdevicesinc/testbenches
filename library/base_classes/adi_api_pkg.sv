@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,47 +33,65 @@
 // ***************************************************************************
 // ***************************************************************************
 
+`include "utils.svh"
 
-`timescale 1ns/1ps
+package adi_api_pkg;
 
-`ifndef _UTILS_SVH_
-`define _UTILS_SVH_
+  import logger_pkg::*;
+  import adi_component_pkg::*;
+  import m_axi_sequencer_pkg::*;
 
-// Help build agent package name like "<test_harness>_<mng_axi_vip>_0_pkg"
-`define PKGIFY(th,vip) th``_``vip``_0_pkg
+  class adi_api extends adi_component;
 
-// Help build agent type like "<test_harness>_<mng_axi_vip>_0_<mst_t>"
-`define AGENT(th,vip,agent_type) th``_``vip``_0_``agent_type
+    protected m_axi_sequencer_base bus;
+    protected bit [31:0] base_address;
 
-// Help build VIP parameter name  e.g. test_harness_dst_axis_vip_0_VIP_DATA_WIDTH
-`define GETPARAM(th,vip,param) th``_``vip``_0_``param
+    // Semantic versioning
+    bit [7:0] ver_major;
+    bit [7:0] ver_minor;
+    bit [7:0] ver_patch;
 
-// Help link AMD AXI and AXIS VIPs to ADI Environment VIPs
-`define LINK(top,env,inst) \
-  top``.pre_link_agent(``env``.``inst``); \
-  env``.``inst`` = ``top``; \
-  top``.post_link_agent(``env``.``inst``);
+    function new(
+      input string name,
+      input m_axi_sequencer_base bus,
+      input bit [31:0] base_address,
+      input adi_component parent = null);
 
-// Macros used in Simulation files during simulation
-`define INFO(m,v)  \
-  PrintInfo($sformatf("%s", \
-    $sformatf m ),v)
+      super.new(name, parent);
 
-`define WARNING(m)  \
-  PrintWarning($sformatf("%s", \
-    $sformatf m ))
+      this.bus = bus;
+      this.base_address = base_address;
+    endfunction: new
 
-`define ERROR(m)  \
-  PrintError($sformatf("%s", \
-    $sformatf m ))
 
-`define FATAL(m)  \
-  PrintFatal($sformatf("%s\n  found in %s:%0d", \
-    $sformatf m , `__FILE__, `__LINE__))
+    virtual task probe();
+      bit [31:0] val;
+      this.bus.RegRead32(this.base_address + 'h0, val);
+      {ver_major, ver_minor, ver_patch} = val;
+      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
+    endtask
 
-`define MAX(a,b) ((a > b) ? a : b)
-`define MIN(a,b) ((a > b) ? b : a)
+    task axi_read(
+      input  [31:0] addr,
+      output [31:0] data);
 
-`define INT_MAX 32'sd2147483647
+      this.bus.RegRead32(this.base_address + addr, data);
+    endtask: axi_read
 
-`endif
+    task axi_write(
+      input [31:0] addr,
+      input [31:0] data);
+
+      this.bus.RegWrite32(this.base_address + addr, data);
+    endtask: axi_write
+
+    task axi_verify(
+      input [31:0] addr,
+      input [31:0] data);
+
+      this.bus.RegReadVerify32(this.base_address + addr, data);
+    endtask: axi_verify
+
+  endclass: adi_api
+
+endpackage: adi_api_pkg

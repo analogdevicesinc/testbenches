@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,47 +33,66 @@
 // ***************************************************************************
 // ***************************************************************************
 
+`include "utils.svh"
 
-`timescale 1ns/1ps
+package watchdog_pkg;
 
-`ifndef _UTILS_SVH_
-`define _UTILS_SVH_
+  import logger_pkg::*;
+  import adi_component_pkg::*;
 
-// Help build agent package name like "<test_harness>_<mng_axi_vip>_0_pkg"
-`define PKGIFY(th,vip) th``_``vip``_0_pkg
+  class watchdog extends adi_component;
 
-// Help build agent type like "<test_harness>_<mng_axi_vip>_0_<mst_t>"
-`define AGENT(th,vip,agent_type) th``_``vip``_0_``agent_type
+    protected event stop_event;
+    protected bit [31:0] timer;
+    protected string message;
 
-// Help build VIP parameter name  e.g. test_harness_dst_axis_vip_0_VIP_DATA_WIDTH
-`define GETPARAM(th,vip,param) th``_``vip``_0_``param
 
-// Help link AMD AXI and AXIS VIPs to ADI Environment VIPs
-`define LINK(top,env,inst) \
-  top``.pre_link_agent(``env``.``inst``); \
-  env``.``inst`` = ``top``; \
-  top``.post_link_agent(``env``.``inst``);
+    function new(
+      input string name,
+      input bit [31:0] timer,
+      input string message,
+      input adi_component parent = null);
 
-// Macros used in Simulation files during simulation
-`define INFO(m,v)  \
-  PrintInfo($sformatf("%s", \
-    $sformatf m ),v)
+      super.new(name, parent);
 
-`define WARNING(m)  \
-  PrintWarning($sformatf("%s", \
-    $sformatf m ))
+      this.timer = timer;
+      this.message = message;
+    endfunction
 
-`define ERROR(m)  \
-  PrintError($sformatf("%s", \
-    $sformatf m ))
+    function void update_message(input string message);
+      this.message = message;
+    endfunction: update_message
 
-`define FATAL(m)  \
-  PrintFatal($sformatf("%s\n  found in %s:%0d", \
-    $sformatf m , `__FILE__, `__LINE__))
+    function void update_timer(input bit [31:0] timer);
+      this.timer = timer;
+    endfunction: update_timer
 
-`define MAX(a,b) ((a > b) ? a : b)
-`define MIN(a,b) ((a > b) ? b : a)
+    task reset();
+      this.stop();
+      #1step;
+      this.start();
+    endtask: reset
 
-`define INT_MAX 32'sd2147483647
+    task stop();
+      ->>this.stop_event;
+    endtask: stop
 
-`endif
+    task start();
+      fork
+        begin
+          fork
+            begin
+              #(this.timer*1ns);
+              this.fatal($sformatf("Watchdog timer timed out! %s", this.message));
+            end
+            @this.stop_event;
+          join_any
+          disable fork;
+          this.info($sformatf("Watchdog timer reset."), ADI_VERBOSITY_MEDIUM);
+        end
+      join_none
+    endtask: start
+
+  endclass
+
+endpackage

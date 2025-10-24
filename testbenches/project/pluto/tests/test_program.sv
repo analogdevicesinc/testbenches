@@ -77,7 +77,7 @@ program test_program;
     input   [31:0]  raddr,
     output  [31:0]  rdata);
 
-    base_env.mng.sequencer.RegRead32(raddr,rdata);
+    base_env.mng.master_sequencer.RegRead32(raddr,rdata);
   endtask
 
   // --------------------------
@@ -87,7 +87,7 @@ program test_program;
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+    base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   // --------------------------
@@ -97,7 +97,7 @@ program test_program;
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    base_env.mng.sequencer.RegWrite32(waddr,wdata);
+    base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
   endtask
 
   // --------------------------
@@ -379,7 +379,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
+      base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
     end
 
     // Configure TX DMA
@@ -488,7 +488,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
+      base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361
     end
 
     link_setup();
@@ -644,7 +644,7 @@ program test_program;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_address);
+      captured_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_address);
       if (i==0) begin
         first = captured_word[15:0];
       end else begin

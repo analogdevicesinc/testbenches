@@ -42,7 +42,7 @@ package s_axis_sequencer_pkg;
   import adi_vip_pkg::*;
   import logger_pkg::*;
 
-  class s_axis_sequencer_base extends adi_sequencer;
+  virtual class s_axis_sequencer_base extends adi_sequencer;
 
     protected xil_axi4stream_data_byte byte_stream [$];
     protected xil_axi4stream_ready_gen_policy_t mode;
@@ -129,33 +129,10 @@ package s_axis_sequencer_pkg;
       this.low_time_max = low_time_max;
     endfunction: set_low_time_range
 
-    // function for verifying bytes
-    task verify_byte(input bit [7:0] refdata);
-      bit [7:0] data;
-      if (byte_stream.size() == 0) begin
-        this.error($sformatf("Byte steam empty !!!"));
-      end else begin
-        data = byte_stream.pop_front();
-        if (data !== refdata) begin
-          this.error($sformatf("Unexpected data received. Expected: %0h Found: %0h Left : %0d", refdata, data, byte_stream.size()));
-        end
-      end
-    endtask: verify_byte
-
-    // call ready generation function
-    task run();
-      user_gen_tready();
-    endtask: run
-
-
     // virtual tasks to be implemented
-    virtual task user_gen_tready();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: user_gen_tready
+    pure virtual task start();
 
-    virtual task get_transfer();
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: get_transfer
+    pure virtual task stop();
 
   endclass: s_axis_sequencer_base
 
@@ -176,7 +153,7 @@ package s_axis_sequencer_pkg;
     endfunction: new
 
 
-    virtual task user_gen_tready();
+    virtual task start();
       axi4stream_ready_gen tready_gen;
 
       tready_gen = this.driver.create_ready("TREADY");
@@ -196,7 +173,11 @@ package s_axis_sequencer_pkg;
         tready_gen.set_high_time_range(this.high_time_min, this.high_time_max);
       end
       this.driver.send_tready(tready_gen);
-    endtask: user_gen_tready
+    endtask: start
+
+    virtual task stop();
+      this.driver.vif_proxy.reset();
+    endtask: stop
 
   endclass: s_axis_sequencer
 

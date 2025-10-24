@@ -99,32 +99,32 @@ program test_program;
 
     tx_dmac_api = new(
       "TX DMAC API",
-      base_env.mng.sequencer,
+      base_env.mng.master_sequencer,
       `TX_DMA_BA);
 
     rx_dmac_api = new(
       "RX DMAC API",
-      base_env.mng.sequencer,
+      base_env.mng.master_sequencer,
       `RX_DMA_BA);
 
     tx_dac_api = new(
       "TX DAC Common API",
-      base_env.mng.sequencer,
+      base_env.mng.master_sequencer,
       TX1_COMMON);
 
     rx_adc_api = new(
       "RX ADC Common API",
-      base_env.mng.sequencer,
+      base_env.mng.master_sequencer,
       RX1_COMMON);
 
     tx_common_api = new(
       "TX Common API",
-      base_env.mng.sequencer,
+      base_env.mng.master_sequencer,
       TX1_COMMON);
 
     rx_common_api = new(
       "RX Common API",
-      base_env.mng.sequencer,
+      base_env.mng.master_sequencer,
       RX1_COMMON);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
@@ -474,7 +474,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361_BA
+      base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)<<4) << 16) | i<<4 ,15); // (<< 4) - 4 LSBs are dropped in the AXI_AD9361_BA
     end
 
     // Configure TX DMA
@@ -630,7 +630,7 @@ program test_program;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_address);
+      captured_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_address);
       if (i==0) begin
         first = captured_word[15:0];
       end else begin

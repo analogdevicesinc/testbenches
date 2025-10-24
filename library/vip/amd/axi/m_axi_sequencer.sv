@@ -43,7 +43,7 @@ package m_axi_sequencer_pkg;
   import adi_vip_pkg::*;
 
 
-  class m_axi_sequencer_base extends adi_sequencer;
+  virtual class m_axi_sequencer_base extends adi_sequencer;
 
     function new(
       input string name,
@@ -52,26 +52,17 @@ package m_axi_sequencer_pkg;
       super.new(name, parent);
     endfunction: new
 
-    virtual task automatic RegWrite32(
+    pure virtual task automatic RegWrite32(
       input xil_axi_ulong addr =0,
       input bit [31:0]    data);
 
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: RegWrite32
-
-    virtual task automatic RegRead32(
+    pure virtual task automatic RegRead32(
       input xil_axi_ulong  addr =0,
       output bit [31:0]    data);
 
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: RegRead32
-
-    virtual task automatic RegReadVerify32(
+    pure virtual task automatic RegReadVerify32(
       input xil_axi_ulong  addr =0,
       input bit [31:0]     data);
-
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: RegReadVerify32
 
   endclass: m_axi_sequencer_base
 

@@ -112,14 +112,14 @@ task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+  base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-  base_env.mng.sequencer.RegRead32(raddr,data);
+  base_env.mng.master_sequencer.RegRead32(raddr,data);
 endtask
 
 // --------------------------
@@ -129,7 +129,7 @@ task axi_write(
   input [31:0]  waddr,
   input [31:0]  wdata);
 
-  base_env.mng.sequencer.RegWrite32(waddr,wdata);
+  base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
@@ -421,14 +421,14 @@ task offload_spi_test();
     `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
 
     //Configure DMA
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_FLAGS),
+    base_env.mng.master_sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    base_env.mng.master_sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*2)-1)); // X_LENGHTH = 1024-1
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
-    base_env.mng.sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    base_env.mng.master_sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4*2)-1)); // X_LENGHTH = 1024-1
+    base_env.mng.master_sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
+    base_env.mng.master_sequencer.RegWrite32(`AD738x_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Configure the Offload module
     axi_write (`SPI_AD738x_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
@@ -455,7 +455,7 @@ task offload_spi_test();
     #2000ns;
 
     for (int i=0; i<=((2* NUM_OF_TRANSFERS) -1); i=i+1) begin
-      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin

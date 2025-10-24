@@ -124,19 +124,19 @@ program test_sleep_delay (
               `TH.`SPI_S.inst.IF.vif);
 
     spi_api = new("SPI Engine API",
-                  base_env.mng.sequencer,
+                  base_env.mng.master_sequencer,
                   `SPI_ENGINE_SPI_REGMAP_BA);
 
     dma_api = new("RX DMA API",
-                  base_env.mng.sequencer,
+                  base_env.mng.master_sequencer,
                   `SPI_ENGINE_DMA_BA);
 
     clkgen_api = new("CLKGEN API",
-                    base_env.mng.sequencer,
+                    base_env.mng.master_sequencer,
                     `SPI_ENGINE_AXI_CLKGEN_BA);
 
     pwm_api = new("PWM API",
-                  base_env.mng.sequencer,
+                  base_env.mng.master_sequencer,
                   `SPI_ENGINE_PWM_GEN_BA);
 
     base_env.start();
@@ -146,13 +146,11 @@ program test_sleep_delay (
 
     spi_env.configure();
 
-    spi_env.run();
-
     spi_env.spi_agent.sequencer.set_default_miso_data('h2AA55);
 
     // start sdo source (will wait for data enqueued)
     `ifdef DEF_SDO_STREAMING
-      spi_env.sdo_src_agent.sequencer.start();
+      spi_env.sdo_src_agent.master_sequencer.start();
     `endif
 
     sanity_tests();
@@ -410,7 +408,7 @@ program test_sleep_delay (
     #2000ns;
 
     for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (irq_pending == 'h0) begin
@@ -468,7 +466,7 @@ program test_sleep_delay (
     #2000ns;
 
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (irq_pending == 'h0) begin

@@ -86,9 +86,9 @@ program test_tkeep ();
     base_env.sys_reset();
 
     uaf_env.configure();
-    uaf_env.input_axis_agent.sequencer.set_keep_some();
-    uaf_env.input_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA_TKEEP);
-    uaf_env.input_axis_agent.sequencer.set_descriptor_gen_mode(0);
+    uaf_env.input_axis_agent.master_sequencer.set_keep_some();
+    uaf_env.input_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA_TKEEP);
+    uaf_env.input_axis_agent.master_sequencer.set_descriptor_gen_mode(0);
 
     uaf_env.run();
 
@@ -96,7 +96,7 @@ program test_tkeep ();
 
     send_data_wd.start();
 
-    uaf_env.input_axis_agent.sequencer.start();
+    uaf_env.input_axis_agent.master_sequencer.start();
 
     // stimulus
     repeat($urandom_range(5,10)) begin
@@ -106,26 +106,26 @@ program test_tkeep ();
         repeat($urandom_range(1,5)) begin
           sample_count = $urandom_range(1,128);
           repeat(sample_count*`OUTPUT_WIDTH/8) begin
-            uaf_env.input_axis_agent.sequencer.push_byte_for_stream($urandom_range(0,255));
-            uaf_env.input_axis_agent.sequencer.push_tkeep_for_stream($urandom_range(0,1));
+            uaf_env.input_axis_agent.master_sequencer.push_byte_for_stream($urandom_range(0,255));
+            uaf_env.input_axis_agent.master_sequencer.push_tkeep_for_stream($urandom_range(0,1));
           end
-          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_sample_count(sample_count*`OUTPUT_WIDTH/`INPUT_WIDTH, `TLAST_EN, 0);
+          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_sample_count(sample_count*`OUTPUT_WIDTH/`INPUT_WIDTH, `TLAST_EN, 0);
         end
       end else begin
         repeat($urandom_range(1,5)) begin
           byte_count = $urandom_range(1,1024);
           repeat(byte_count) begin
-            uaf_env.input_axis_agent.sequencer.push_byte_for_stream($urandom_range(0,255));
-            uaf_env.input_axis_agent.sequencer.push_tkeep_for_stream($urandom_range(0,1));
+            uaf_env.input_axis_agent.master_sequencer.push_byte_for_stream($urandom_range(0,255));
+            uaf_env.input_axis_agent.master_sequencer.push_tkeep_for_stream($urandom_range(0,1));
           end
-          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_byte_count(byte_count, `TLAST_EN, 0);
+          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(byte_count, `TLAST_EN, 0);
         end
       end
 
       #($urandom_range(1,50)*1us);
 
-      uaf_env.input_axis_agent.sequencer.clear_descriptor_queue();
-      uaf_env.input_axis_agent.sequencer.wait_empty_descriptor_queue();
+      uaf_env.input_axis_agent.master_sequencer.clear_descriptor_queue();
+      uaf_env.input_axis_agent.master_sequencer.wait_empty_descriptor_queue();
 
       uaf_env.scoreboard_inst.wait_until_complete();
 

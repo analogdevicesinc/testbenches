@@ -75,10 +75,10 @@ program test_program;
     start_clocks();
     base_env.sys_reset();
 
-    m_dmac_api = new("TX_DMA", base_env.mng.sequencer, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA", base_env.mng.sequencer, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA", base_env.mng.master_sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
 
     //  -------------------------------------------------------
@@ -87,7 +87,7 @@ program test_program;
 
     // Init test data
     for (int i=0;i<2048*2 ;i=i+2) begin
-      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,'hF);
+      base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,'hF);
     end
 
     do_transfer(
@@ -159,8 +159,8 @@ program test_program;
     for (int i=0;i<length/4;i=i+4) begin
       current_src_address = src_addr+i;
       current_dest_address = dest_addr+i;
-      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_dest_address);
-      reference_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_src_address);
+      captured_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_dest_address);
+      reference_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_src_address);
 
       if (captured_word !== reference_word) begin
         `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_dest_address,reference_word,captured_word));

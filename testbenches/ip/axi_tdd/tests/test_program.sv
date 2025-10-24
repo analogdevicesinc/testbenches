@@ -110,7 +110,7 @@ program test_program;
 
     // Init test data
     // Read the interface description
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_INTERFACE_DESCRIPTION), val);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_INTERFACE_DESCRIPTION), val);
     channel_count     = `GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_CHANNEL_COUNT_EXTRA(val);
     reg_count_width   = `GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_REGISTER_WIDTH(val);
     burst_count_width = `GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_BURST_COUNT_WIDTH(val);
@@ -120,41 +120,41 @@ program test_program;
     sync_ext_cdc      = `GET_TDDN_CNTRL_INTERFACE_DESCRIPTION_SYNC_EXTERNAL_CDC(val);
 
     // Register configuration
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
                        `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(32'hFFFFFFFF));
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
                        `SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(32'h00000000));
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT),
                        `SET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(channel_count+1));
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY),
                        `SET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(32'h0000007F));
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_FRAME_LENGTH),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_FRAME_LENGTH),
                        `SET_TDDN_CNTRL_FRAME_LENGTH_FRAME_LENGTH(32'h0000007F));
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_LOW),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_LOW),
                        `SET_TDDN_CNTRL_SYNC_COUNTER_LOW_SYNC_COUNTER_LOW(32'h000001FF));
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_HIGH),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_HIGH),
                        `SET_TDDN_CNTRL_SYNC_COUNTER_HIGH_SYNC_COUNTER_HIGH(32'h00000000));
 
     // Reading back the actual register values (the values may change depending on the synthesis configuration)
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE), ch_en);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE), ch_en);
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT), burst_count);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT), burst_count);
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY), startup_delay);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY), startup_delay);
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_FRAME_LENGTH), frame_length);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_FRAME_LENGTH), frame_length);
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_LOW), sync_count_low);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_LOW), sync_count_low);
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_HIGH), sync_count_high);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_SYNC_COUNTER_HIGH), sync_count_high);
 
 
     //  -------------------------------------------------------
@@ -170,17 +170,17 @@ program test_program;
     end
 
     for (int i=0; i<32; i++) begin
-      base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
+      base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
                          `SET_TDDN_CNTRL_CH0_ON_CH0_ON(ch_on[i]));
 
-      base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
+      base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
                          `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(ch_off[i]));
     end
 
 
     // Read back the values; unimplemented channels should not store these values
     for (int i=0; i<32; i++) begin
-      base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, val);
+      base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, val);
 
       if (i <= channel_count) begin
         expected_val = ch_on[i];
@@ -194,7 +194,7 @@ program test_program;
         success_count++;
       end
 
-      base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, val);
+      base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, val);
 
       if (i <= channel_count) begin
         expected_val = ch_off[i];
@@ -210,7 +210,7 @@ program test_program;
     end
 
     // Read the status register to validate the current state
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b00) begin
       `FATAL(("Idle state: Expected 2'b00 found 2'b%b", current_state));
@@ -220,7 +220,7 @@ program test_program;
 
 
     // Enable the module; use internal sync for transfer triggering
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(0)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(0)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_INT(1)|
@@ -236,7 +236,7 @@ program test_program;
 
     // Read the status register to validate the current state
     repeat (8) @(posedge `TH.dut_tdd.inst.up_clk);
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b10) begin
       `FATAL(("Waiting state: Expected 2'b10 found 2'b%b", current_state));
@@ -262,7 +262,7 @@ program test_program;
 
     // Read the status register to validate the current state issuing a parallel thread
     repeat (8) @(posedge `TH.dut_tdd.inst.up_clk);
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b11) begin
       `FATAL(("Running state: Expected 2'b11 found 2'b%b", current_state));
@@ -279,7 +279,7 @@ program test_program;
     //*******//
     // Read the status register to validate the current state
     repeat (8) @(posedge `TH.dut_tdd.inst.up_clk);
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STATUS), current_state);
 
     if (current_state !== 2'b01) begin
       `FATAL(("Armed state: Expected 2'b01 found 2'b%b", current_state));
@@ -288,17 +288,17 @@ program test_program;
     end
 
     // Disable the module to change the polarity
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
 
     // Switch to inverted polarity
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
                        `SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(32'hFFFFFFFF));
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
 
     // Re-enable the module
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(0)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(0)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_INT(1)|
@@ -319,14 +319,14 @@ program test_program;
     // ARMED //
     //*******//
     // Disable the module
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
 
     // Switch to direct polarity
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
                        `SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(32'h00000000));
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
 
 
     //  -------------------------------------------------------
@@ -342,16 +342,16 @@ program test_program;
     end
 
     for (int i=0; i<32; i++) begin
-      base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
+      base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8,
                          `SET_TDDN_CNTRL_CH0_ON_CH0_ON(ch_on[i]));
 
-      base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
+      base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8,
                          `SET_TDDN_CNTRL_CH0_OFF_CH0_OFF(ch_off[i]));
     end
 
     // Read back the values; unimplemented channels should not store these values
     for (int i=0; i<32; i++) begin
-      base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, val);
+      base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_ON)+i*8, val);
 
       if (i <= channel_count) begin
         expected_val = ch_on[i];
@@ -365,7 +365,7 @@ program test_program;
         success_count++;
       end
 
-      base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, val);
+      base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CH0_OFF)+i*8, val);
 
       if (i <= channel_count) begin
         expected_val = ch_off[i];
@@ -382,7 +382,7 @@ program test_program;
 
 
     // Enable the module; use external sync for transfer triggering
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(0)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(1)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_INT(0)|
@@ -406,17 +406,17 @@ program test_program;
     // ARMED //
     //*******//
     // Disable the module
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
 
     // Switch to inverted polarity
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
                        `SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(32'hFFFFFFFF));
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
 
     // Keep the module enabled; issue a software sync
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(1)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(0)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_INT(0)|
@@ -437,14 +437,14 @@ program test_program;
     // ARMED //
     //*******//
     // Disable the module
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
 
     // Switch to direct polarity
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY),
                        `SET_TDDN_CNTRL_CHANNEL_POLARITY_CHANNEL_POLARITY(32'h00000000));
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_POLARITY), ch_pol);
 
 
     //  -------------------------------------------------------
@@ -452,11 +452,11 @@ program test_program;
     //  -------------------------------------------------------
 
     // Increase the burst count value by 1
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT),
                        `SET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(channel_count+2));
 
     // Keep the module enabled; issue a software sync; enable external sync and reset on sync
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(1)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(1)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_INT(0)|
@@ -485,7 +485,7 @@ program test_program;
     end
 
     // Disable the module before the end of the burst
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
 
     @(posedge `TH.dut_tdd.inst.tdd_endof_frame);
@@ -493,24 +493,24 @@ program test_program;
     // Check the pulse length using a loop on all available channels
     check_pulse_length();
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
                        `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(0));
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE), ch_en);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE), ch_en);
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT),
                        `SET_TDDN_CNTRL_BURST_COUNT_BURST_COUNT(0));
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT), burst_count);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_BURST_COUNT), burst_count);
 
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY),
                        `SET_TDDN_CNTRL_STARTUP_DELAY_STARTUP_DELAY(0));
 
-    base_env.mng.sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY), startup_delay);
+    base_env.mng.master_sequencer.RegRead32(`TDD_BA+GetAddrs(TDDN_CNTRL_STARTUP_DELAY), startup_delay);
 
 
     // Enable the module with external synchronization actived
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_SYNC_SOFT(0)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_EXT(1)|
                        `SET_TDDN_CNTRL_CONTROL_SYNC_INT(0)|
@@ -533,7 +533,7 @@ program test_program;
         success_count++;
       end
 
-      base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
+      base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
                          `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(ch_en));
 
       ch_en = (ch_en << 1) | 32'b1;
@@ -551,7 +551,7 @@ program test_program;
         success_count++;
       end
 
-      base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
+      base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE),
                          `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(ch_en));
 
       ch_en = (ch_en >> 1);
@@ -559,7 +559,7 @@ program test_program;
     end
 
     // Disable the module
-    base_env.mng.sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
+    base_env.mng.master_sequencer.RegWrite32(`TDD_BA+GetAddrs(TDDN_CNTRL_CONTROL),
                        `SET_TDDN_CNTRL_CONTROL_ENABLE(0));
 
     base_env.stop();

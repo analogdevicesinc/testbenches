@@ -82,7 +82,7 @@ program test_program;
 //
 //    // Init test data
 //    for (int i=0;i<2048*2 ;i=i+2) begin
-//      base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(`DDR_BASE+src_addr+i*2,(((i+1)) << 16) | i ,'hF);
+//      base_env.ddr.slave_sequencer.BackdoorWrite32(`DDR_BASE+src_addr+i*2,(((i+1)) << 16) | i ,'hF);
 //    end
 //
 //    do_transfer(
@@ -112,27 +112,27 @@ program test_program;
 //                   bit [31:0] length);
 //
 //    // Configure TX DMA
-//    base_env.mng.sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_CONTROL),
+//    base_env.mng.master_sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_CONTROL),
 //                       `SET_dmac_CONTROL_ENABLE(1));
-//    base_env.mng.sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_FLAGS),
+//    base_env.mng.master_sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_FLAGS),
 //                       `SET_dmac_FLAGS_TLAST(32'h00000006));
-//    base_env.mng.sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_X_LENGTH),
+//    base_env.mng.master_sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_X_LENGTH),
 //                       `SET_dmac_X_LENGTH_X_LENGTH(length-1));
-//    base_env.mng.sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_SRC_ADDRESS),
+//    base_env.mng.master_sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_SRC_ADDRESS),
 //                       `SET_dmac_SRC_ADDRESS_SRC_ADDRESS(src_addr));
-//    base_env.mng.sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
+//    base_env.mng.master_sequencer.RegWrite32(`TX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
 //                       `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 //
 //    // Configure RX DMA
-//    base_env.mng.sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_CONTROL),
+//    base_env.mng.master_sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_CONTROL),
 //                       `SET_dmac_CONTROL_ENABLE(1));
-//    base_env.mng.sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_FLAGS),
+//    base_env.mng.master_sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_FLAGS),
 //                       `SET_dmac_FLAGS_TLAST(32'h00000006));
-//    base_env.mng.sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_X_LENGTH),
+//    base_env.mng.master_sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_X_LENGTH),
 //                       `SET_dmac_X_LENGTH_X_LENGTH(length-1));
-//    base_env.mng.sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_DEST_ADDRESS),
+//    base_env.mng.master_sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_DEST_ADDRESS),
 //                       `SET_dmac_DEST_ADDRESS_DEST_ADDRESS(dest_addr));
-//    base_env.mng.sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
+//    base_env.mng.master_sequencer.RegWrite32(`RX_DMA+GetAddrs(dmac_TRANSFER_SUBMIT),
 //                       `SET_dmac_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 //  endtask
 //
@@ -150,8 +150,8 @@ program test_program;
 //    for (int i=0;i<length/4;i=i+4) begin
 //      current_src_address = src_addr+i;
 //      current_dest_address = dest_addr+i;
-//      captured_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_dest_address);
-//      reference_word = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(current_src_address);
+//      captured_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_dest_address);
+//      reference_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_src_address);
 //
 //      if (captured_word !== reference_word) begin
 //        `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_dest_address,reference_word,captured_word));

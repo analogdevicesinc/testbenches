@@ -1,9 +1,7 @@
 global ad_project_params
 
-set ad_project_params(ADC_OFFLOAD_TYPE) 0
-set ad_project_params(ADC_OFFLOAD_SIZE) [expr 2*1024*1024]
-set ad_project_params(DAC_OFFLOAD_TYPE) 0
-set ad_project_params(DAC_OFFLOAD_SIZE) [expr 2*1024*1024]
+set ad_project_params(RX_KS_PER_CHANNEL) 32
+set ad_project_params(TX_KS_PER_CHANNEL) 32
 set ad_project_params(RD_DATA_REGISTERED) 1
 set ad_project_params(RD_FIFO_ADDRESS_WIDTH) 3
 

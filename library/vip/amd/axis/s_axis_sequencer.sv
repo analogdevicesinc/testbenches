@@ -39,12 +39,12 @@
 package s_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
-  import adi_vip_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_sequencer_pkg::*;
   import logger_pkg::*;
 
   class s_axis_sequencer_base extends adi_sequencer;
 
-    protected xil_axi4stream_data_byte byte_stream [$];
     protected xil_axi4stream_ready_gen_policy_t mode;
 
     protected bit variable_ranges;

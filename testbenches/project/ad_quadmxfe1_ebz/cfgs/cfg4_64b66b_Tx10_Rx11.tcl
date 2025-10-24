@@ -1,7 +1,7 @@
 global ad_project_params
 
 set ad_project_params(RX_KS_PER_CHANNEL) 32
-set ad_project_params(TX_KS_PER_CHANNEL) 16
+set ad_project_params(TX_KS_PER_CHANNEL) 32
 set ad_project_params(RD_DATA_REGISTERED) 1
 set ad_project_params(RD_FIFO_ADDRESS_WIDTH) 3
 

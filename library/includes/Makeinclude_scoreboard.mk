@@ -4,5 +4,8 @@
 
 # All test-bench dependencies except test programs
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/pub_sub_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/drivers/common/scoreboard.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/drivers/common/scoreboard_pack.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_fifo_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_fifo_primitive_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_fifo_class_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/scoreboard.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/scoreboard_pack.sv

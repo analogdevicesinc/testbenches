@@ -16,11 +16,6 @@ set project_name [file rootname $cfg_file]
 # Set project params
 global ad_project_params
 
-set TWOLANES $ad_project_params(TWOLANES)
-set ADC_RES $ad_project_params(ADC_RES)
-set CN0577_ADAQ2387X_N $ad_project_params(CN0577_ADAQ2387X_N)
-set USE_MMCM $ad_project_params(USE_MMCM)
-
 # Set to use SmartConnect or AXI Interconnect
 set use_smartconnect 1
 

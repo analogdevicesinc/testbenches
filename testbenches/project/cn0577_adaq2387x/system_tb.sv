@@ -39,9 +39,6 @@
 
 module system_tb();
 
-  // dco delay compared to the reference clk
-  localparam DCO_DELAY = 12;
-
   // reg signals
 
   reg                     ref_clk = 1'b0;
@@ -55,44 +52,18 @@ module system_tb();
   reg                     db_p = 1'b0;
   reg                     db_n = 1'b0;
 
-  // dma interface
-
-  wire                    adc_valid;
-  wire  [`ADC_RES-1:0]    adc_data;
-  reg                     adc_dovf = 1'b0;
-
   wire  cnv;
-  reg   dco = 1'b0;
-
-  integer cnv_count = 0;
 
   // test bench variables
 
   always #25 ref_clk = ~ref_clk;
 
-  // ---------------------------------------------------------------------------
-  // Creating a "gate" through which the data clock can run (and only then)
-  // ---------------------------------------------------------------------------
-  always @ (*) begin
-    if (clk_gate == 1'b1) begin
-      dco_init = ref_clk;
-    end else begin
-      dco_init = 1'b0;
-    end
-  end
-
-  // Data clocks generation
-  // ---------------------------------------------------------------------------
-
-  always @ (dco_init) begin
-    dco_p <= #DCO_DELAY  dco_init;
-    dco_n <= #DCO_DELAY  ~dco_init;
-  end
-
     `TEST_PROGRAM test(
        .ref_clk (ref_clk),
        .clk_gate (clk_gate),
        .dco_in (dco_init),
+       .dco_p (dco_p),
+       .dco_n (dco_n),
        .da_p (da_p),
        .da_n (da_n),
        .db_p (db_p),

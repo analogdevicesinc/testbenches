@@ -41,10 +41,6 @@ set ADC_RES $ad_project_params(ADC_RES)
 set CN0577_ADAQ2387X_N $ad_project_params(CN0577_ADAQ2387X_N)
 set USE_MMCM $ad_project_params(USE_MMCM)
 
-adi_project_files [list \
-    "$ad_hdl_dir/library/common/ad_iobuf.v" \
-]
-
 #
 #  Block design under test
 #
@@ -54,6 +50,9 @@ if {$CN0577_ADAQ2387X_N == 1} {
 } else {
   source $ad_hdl_dir/projects/adaq2387x/common/adaq2387x_bd.tcl
 }
+
+ad_disconnect  sys_200m_clk  axi_ltc2387/delay_clk
+ad_connect     sys_dma_clk   axi_ltc2387/delay_clk
 
 set BA_AXI_LTC2387 0x44A00000
 set_property offset $BA_AXI_LTC2387 [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ltc2387}]

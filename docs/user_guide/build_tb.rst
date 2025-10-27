@@ -41,6 +41,7 @@ relative to the :git-hdl:`HDL repository </>`. Our recommendation is to clone
 the testbenches repository next to the HDL repository:
 
 .. shell::
+   :showuser:
 
    $git clone git@github.com:analogdevicesinc/testbenches.git
 
@@ -50,6 +51,7 @@ branch, but it also has features **that are not fully tested**. If you
 want to switch to any other branch you need to checkout that branch:
 
 .. shell::
+   :showuser:
 
    $cd testbenches/
    $git branch
@@ -80,12 +82,14 @@ these things, it is best to leave it to the tools to set up the environment.
 For Vivado versions of 2025 and later, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/opt/Xilinx/202x.x/Vivado/bin:/opt/Xilinx/202x.x/Vitis/bin
 
 For Vivado versions prior to 2025, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
 
@@ -100,12 +104,14 @@ similar manner to the Linux environment.
 For Vivado versions of 2025 and later, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/cygdrive/d/Xilinx/202x.x/Vivado/bin:/cygdrive/d/Xilinx/202x.x/Vitis/bin
 
 For Vivado versions prior to 2025, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
 
@@ -116,12 +122,14 @@ manual changes to your **.bashrc** should look like:
 For Vivado versions of 2025 and later, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/opt/path_to/202x.x/Vivado/bin:/opt/202x.x/Vitis/bin
 
 For Vivado versions prior to 2025, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
 
@@ -142,6 +150,7 @@ The make script must know where the cloned HDL and Testbenches repositories are
 located. Two variables must be exported, which specify the target directories:
 
 .. shell::
+   :showuser:
 
    $export ADI_HDL_DIR=<path to cloned HDL directory>
    $export ADI_TB_DIR=<path to cloned Testbenches directory>
@@ -156,11 +165,12 @@ Building a testbench
    from above!
 
 The way of building a testbench in Cygwin and WSL is almost the same.
-In this example, it is building the **AD7616** testbench.
+In this example, it is building the **Base** testbench.
 
 .. shell::
+   :showuser:
 
-   $cd ad7616
+   $cd testbenches/ip/base
    $make
 
 The ``make`` builds all the libraries first and then builds the testbench. The
@@ -184,6 +194,7 @@ configuration/test program parameter. Often used in combination with ``clean``
 parameter.
 
 .. shell::
+   :showuser:
 
    $make all
 
@@ -192,8 +203,9 @@ without any other input. This will build the configuration and run all test
 programs on it.
 
 .. shell::
+   :showuser:
 
-   $make cfg_si
+   $make cfg
 
 Some projects support adding additional ``make`` parameters to configure
 the project. This option gives you the ability to build only the configuration
@@ -202,8 +214,9 @@ configurations, as well as running the chosen test program. ``CFG`` specifies
 the configuration file's name, while ``TST`` specifies the test program's name.
 
 .. shell::
+   :showuser:
 
-   $make CFG=cfg_si TST=test_program_si
+   $make CFG=cfg1 TST=test_program
 
 .. caution::
 
@@ -221,6 +234,7 @@ The ``clean`` keyword removes the ``runs`` and ``results`` folders, as well as
 the log files created by Vivado.
 
 .. shell::
+   :showuser:
 
    $make clean
 
@@ -230,7 +244,9 @@ well. By default, ``make`` launches Vivado in batch mode, meaning that it won't
 provide a GUI, only a result in the terminal at the end of the simulation.
 
 .. shell::
+   :showuser:
 
+   $cd testbenches/ip/base
    $make MODE=gui
 
 The ``STOP_ON_ERROR`` parameter is mainly used for continuous integration
@@ -242,6 +258,7 @@ all testbenches is ``n``. This is useful for checking which configuration and
 test program configurations are failing.
 
 .. shell::
+   :showuser:
 
    $make STOP_ON_ERROR=y
 
@@ -299,8 +316,9 @@ waveform, there are two options:
   mode right after it builds the block design.
 
 .. shell::
+   :showuser:
 
-   $cd ad7616
+   $cd testbenches/ip/base
    $make MODE=gui
 
 - Build the testbench using ``make`` and open Vivado manually after the block
@@ -311,10 +329,11 @@ waveform, there are two options:
   that can be opened.
 
 .. shell::
+   :showuser:
 
-   $cd ad7616
+   $cd testbenches/ip/base
    $make
-   $cd runs/cfg_si
-   $vivado ./cfg_si.xpr
+   $cd runs/cfg1
+   $vivado ./cfg1.xpr
 
 .. _AMD Xilinx Vivado: https://www.xilinx.com/support/download.html

@@ -59,7 +59,18 @@ module test_program_sync (
 
   data_offload                      dut;
 
+  // Process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
+
     //creating environment
     env = new(`TH.`MNG_AXI.inst.IF,
               `TH.`SRC_AXIS.inst.IF,
@@ -80,8 +91,6 @@ module test_program_sync (
     env.dst_axis_seq.set_low_time(`DST_READY_LOW);
 
     //=========================================================================
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     env.scoreboard.set_oneshot(1);
 

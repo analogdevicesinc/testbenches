@@ -100,6 +100,9 @@ program test_sleep_delay (
     spi_env.spi_agent.sequencer.flush_send();
   endtask
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
 
   // --------------------------
   // Main procedure
@@ -107,6 +110,10 @@ program test_sleep_delay (
   initial begin
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     //creating environment
     base_env = new("Base Environment",

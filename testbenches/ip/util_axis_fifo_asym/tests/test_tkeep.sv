@@ -61,7 +61,17 @@ program test_tkeep ();
 
   int byte_count, sample_count;
 
+  // Process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     // create environment
     base_env = new("Base Environment",
@@ -77,8 +87,6 @@ program test_tkeep ();
                   `TH.`OUTPUT_CLK_VIP.inst.IF,
                   `TH.`INPUT_AXIS.inst.IF,
                   `TH.`OUTPUT_AXIS.inst.IF);
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     uaf_env.start();

@@ -63,7 +63,17 @@ program test_program_64b66b;
   bit [31:0] val;
   int tmp;
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     // create environment
     base_env = new("Base Environment",
@@ -78,8 +88,6 @@ program test_program_64b66b;
     `TH.`REF_CLK.inst.IF.start_clock();
     `TH.`DRP_CLK.inst.IF.start_clock();
     `TH.`SYSREF_CLK.inst.IF.start_clock();
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     base_env.sys_reset();

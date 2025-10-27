@@ -127,10 +127,20 @@ program test_program;
     endcase
   end
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   // --------------------------
   // Main procedure
   // --------------------------
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     //creating environment
     base_env = new("Base Environment",
@@ -200,8 +210,6 @@ program test_program;
       "RX2 Common API",
       base_env.mng.master_sequencer,
       RX2_COMMON);
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
 

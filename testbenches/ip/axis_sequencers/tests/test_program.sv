@@ -60,7 +60,17 @@ program test_program;
 
   watchdog send_data_wd;
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     // create environment
     base_env = new("Base Environment",
@@ -74,8 +84,6 @@ program test_program;
     axis_seq_env = new("Axis Sequencers Environment",
                         `TH.`SRC_AXIS.inst.IF,
                         `TH.`DST_AXIS.inst.IF);
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     axis_seq_env.start();

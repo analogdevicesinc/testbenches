@@ -126,19 +126,19 @@ program test_program (
                   `TH.`SPI_S.inst.IF.vif);
 
     spi_api = new("SPI Engine API",
-                  base_env.mng.sequencer,
+                  base_env.mng.master_sequencer,
                   `SPI_ENGINE_SPI_REGMAP_BA);
 
     dma_api = new("RX DMA API",
-                  base_env.mng.sequencer,
+                  base_env.mng.master_sequencer,
                   `SPI_ENGINE_DMA_BA);
 
     clkgen_api = new("CLKGEN API",
-                    base_env.mng.sequencer,
+                    base_env.mng.master_sequencer,
                     `SPI_ENGINE_AXI_CLKGEN_BA);
 
     pwm_api = new("PWM API",
-                  base_env.mng.sequencer,
+                  base_env.mng.master_sequencer,
                   `SPI_ENGINE_PWM_GEN_BA);
 
     base_env.start();
@@ -148,13 +148,11 @@ program test_program (
 
     spi_env.configure();
 
-    spi_env.run();
-
     spi_env.spi_agent.sequencer.set_default_miso_data('h2AA55);
 
     // start sdo source (will wait for data enqueued)
     `ifdef DEF_SDO_STREAMING
-      spi_env.sdo_src_agent.sequencer.start();
+      spi_env.sdo_src_agent.master_sequencer.start();
     `endif
 
     sanity_tests();
@@ -204,9 +202,9 @@ program test_program (
     `ifdef DEF_SDO_STREAMING
       for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
         data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
-        spi_env.sdo_src_agent.sequencer.push_byte_for_stream(data[i]);
+        spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i]);
       end
-      spi_env.sdo_src_agent.sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
+      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
     `endif
   endtask
 
@@ -334,7 +332,7 @@ program test_program (
     end
 
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      sdi_read_data[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      sdi_read_data[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
       if (sdi_read_data[i] != sdi_read_data_store[i]) begin
         `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
         `ERROR(("Offload Read Test FAILED"));

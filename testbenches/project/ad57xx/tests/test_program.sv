@@ -73,13 +73,13 @@ ad57xx_environment spi_env;
 task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+  base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-  base_env.mng.sequencer.RegRead32(raddr,data);
+  base_env.mng.master_sequencer.RegRead32(raddr,data);
 endtask
 
 // --------------------------
@@ -88,7 +88,7 @@ endtask
 task axi_write(
     input [31:0]  waddr,
     input [31:0]  wdata);
-  base_env.mng.sequencer.RegWrite32(waddr,wdata);
+  base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
@@ -278,21 +278,21 @@ task offload_spi_test(
     temp_data = {4'b0001,dac_word,2'b00};
     sdo_write_data_store [i] = temp_data;
 
-    base_env.ddr.agent.mem_model.backdoor_memory_write_4byte(.addr(`DDR_BA + 4*i),
-                                                  .payload(temp_data),
+    base_env.ddr.slave_sequencer.BackdoorWrite32(.addr(`DDR_BA + 4*i),
+                                                  .data(temp_data),
                                                   .strb('1));
     spi_send('0);
   end
 
   //Configure TX DMA
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
+  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
     `SET_DMAC_FLAGS_TLAST(1) |
     `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
     ); // Use TLAST
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-  base_env.mng.sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1));
+  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
+  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   // Configure the Offload module
   axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);

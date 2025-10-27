@@ -85,9 +85,9 @@ program test_program ();
     uaf_env.configure();
 
     if (!`TKEEP_EN) begin
-      uaf_env.input_axis_agent.sequencer.set_keep_some();
+      uaf_env.input_axis_agent.master_sequencer.set_keep_some();
     end else begin
-      uaf_env.input_axis_agent.sequencer.set_keep_all();
+      uaf_env.input_axis_agent.master_sequencer.set_keep_all();
     end
 
     uaf_env.run();
@@ -96,7 +96,7 @@ program test_program ();
 
     send_data_wd.start();
 
-    uaf_env.input_axis_agent.sequencer.start();
+    uaf_env.input_axis_agent.master_sequencer.start();
 
     // stimulus
     repeat($urandom_range(5,10)) begin
@@ -104,18 +104,18 @@ program test_program ();
 
       if (!`TKEEP_EN) begin
         repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128), `TLAST_EN, 0);
+          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128), `TLAST_EN, 0);
         end
       end else begin
         repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.sequencer.add_xfer_descriptor_byte_count($urandom_range(1,1024), `TLAST_EN, 0);
+          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_byte_count($urandom_range(1,1024), `TLAST_EN, 0);
         end
       end
 
       #($urandom_range(1,10)*1us);
 
-      uaf_env.input_axis_agent.sequencer.clear_descriptor_queue();
-      uaf_env.input_axis_agent.sequencer.wait_empty_descriptor_queue();
+      uaf_env.input_axis_agent.master_sequencer.clear_descriptor_queue();
+      uaf_env.input_axis_agent.master_sequencer.wait_empty_descriptor_queue();
 
       uaf_env.scoreboard_inst.wait_until_complete();
 

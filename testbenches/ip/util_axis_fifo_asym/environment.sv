@@ -85,15 +85,15 @@ package environment_pkg;
     //============================================================================
     task configure();
       // configuration for input
-      this.input_axis_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
-      this.input_axis_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.input_axis_agent.sequencer.set_descriptor_gen_mode(1);
-      this.input_axis_agent.sequencer.set_data_beat_delay(0);
-      this.input_axis_agent.sequencer.set_descriptor_delay(0);
-      this.input_axis_agent.sequencer.set_inactive_drive_output_0();
+      this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
+      this.input_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      this.input_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
+      this.input_axis_agent.master_sequencer.set_data_beat_delay(0);
+      this.input_axis_agent.master_sequencer.set_descriptor_delay(0);
+      this.input_axis_agent.master_sequencer.set_inactive_drive_output_0();
 
       // configuration for output
-      this.output_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      this.output_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask
 
     //============================================================================
@@ -105,8 +105,8 @@ package environment_pkg;
       this.input_clk_vip_if.start_clock();
       this.output_clk_vip_if.start_clock();
 
-      this.input_axis_agent.start();
-      this.output_axis_agent.start();
+      this.input_axis_agent.start_master();
+      this.output_axis_agent.start_slave();
 
       this.input_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_source);
       this.output_axis_agent.monitor.publisher.subscribe(this.scoreboard_inst.subscriber_sink);
@@ -117,9 +117,6 @@ package environment_pkg;
     //============================================================================
     task run();
       fork
-        this.input_axis_agent.run();
-        this.output_axis_agent.run();
-
         this.scoreboard_inst.run();
       join_none
     endtask
@@ -131,8 +128,8 @@ package environment_pkg;
       this.input_clk_vip_if.stop_clock();
       this.output_clk_vip_if.stop_clock();
 
-      this.input_axis_agent.stop();
-      this.output_axis_agent.stop();
+      this.input_axis_agent.stop_master();
+      this.output_axis_agent.stop_slave();
     endtask
 
   endclass

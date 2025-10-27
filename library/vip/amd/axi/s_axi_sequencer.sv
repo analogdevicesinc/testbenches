@@ -43,7 +43,7 @@ package s_axi_sequencer_pkg;
   import logger_pkg::*;
 
 
-  class s_axi_sequencer_base extends adi_sequencer;
+  virtual class s_axi_sequencer_base extends adi_sequencer;
 
     function new(
       input string name,
@@ -52,26 +52,12 @@ package s_axi_sequencer_pkg;
       super.new(name, parent);
     endfunction: new
 
-    virtual task get_byte_from_mem(
+    pure virtual function logic [31:0] BackdoorRead32(input xil_axi_ulong addr);
+
+    pure virtual function void BackdoorWrite32(
       input xil_axi_ulong addr,
-      output bit [7:0] data);
-
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: get_byte_from_mem
-
-    virtual task set_byte_in_mem(
-      input xil_axi_ulong addr,
-      input bit [7:0] data);
-
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: set_byte_in_mem
-
-    virtual task verify_byte(
-      input xil_axi_ulong addr,
-      input bit [7:0] refdata);
-
-      this.fatal($sformatf("Base class was instantiated instead of the parameterized class!"));
-    endtask: verify_byte
+      input logic [31:0] data,
+      input bit [3:0] strb);
 
   endclass: s_axi_sequencer_base
 
@@ -90,47 +76,20 @@ package s_axi_sequencer_pkg;
       this.mem_model = mem_model;
     endfunction: new
 
-    task get_byte_from_mem(
+    virtual function logic [31:0] BackdoorRead32(input xil_axi_ulong addr);
+      return this.mem_model.backdoor_memory_read_4byte(addr);
+    endfunction: BackdoorRead32
+
+    virtual function void BackdoorWrite32(
       input xil_axi_ulong addr,
-      output bit [7:0] data);
+      input logic [31:0] data,
+      input bit [3:0] strb);
 
-      bit [31:0] four_bytes;
-      four_bytes = this.mem_model.backdoor_memory_read_4byte(addr);
-      case (addr[1:0])
-        2'b00: data = four_bytes[0+:8];
-        2'b01: data = four_bytes[8+:8];
-        2'b10: data = four_bytes[16+:8];
-        2'b11: data = four_bytes[24+:8];
-      endcase
-    endtask: get_byte_from_mem
-
-    task set_byte_in_mem(
-      input xil_axi_ulong addr,
-      input bit [7:0] data);
-
-      bit [3:0] strb;
-      case (addr[1:0])
-        2'b00: strb = 'b0001;
-        2'b01: strb = 'b0010;
-        2'b10: strb = 'b0100;
-        2'b11: strb = 'b1000;
-      endcase
-      this.mem_model.backdoor_memory_write_4byte(.addr(addr),
-                                                  .payload({4{data}}),
-                                                  .strb(strb));
-    endtask: set_byte_in_mem
-
-    task verify_byte(
-      input xil_axi_ulong addr,
-      input bit [7:0] refdata);
-
-      bit [7:0] data;
-
-      get_byte_from_mem (addr, data);
-      if (data !== refdata) begin
-        this.error($sformatf("Unexpected value at address %0h . Expected: %0h Found: %0h", addr, refdata, data));
-      end
-    endtask: verify_byte
+      this.mem_model.backdoor_memory_write_4byte(
+        .addr(addr),
+        .payload(data),
+        .strb(strb));
+    endfunction: BackdoorWrite32
 
   endclass: s_axi_sequencer
 

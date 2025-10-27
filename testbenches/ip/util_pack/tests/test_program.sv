@@ -65,7 +65,7 @@ program test_program;
   dmac_api dmac_tx;
   dmac_api dmac_rx;
 
-  int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**int($clog2(`CHANNELS));
+  int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**int'($clog2(`CHANNELS));
 
   initial begin
 
@@ -86,8 +86,10 @@ program test_program;
                     `TH.`RX_SRC_AXIS.inst.IF,
                     `TH.`RX_DST_AXIS.inst.IF);
 
-    dmac_tx = new("DMAC TX 0", base_env.mng.sequencer, `TX_DMA_BA);
-    dmac_rx = new("DMAC RX 0", base_env.mng.sequencer, `RX_DMA_BA);
+    dmac_tx = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA);
+    dmac_rx = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA);
+
+    pack_env.configure(data_length);
 
     base_env.start();
     pack_env.start();
@@ -95,7 +97,6 @@ program test_program;
     base_env.sys_reset();
 
     // configure environment sequencers
-    pack_env.configure(data_length);
 
     `INFO(("Bring up IPs from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
@@ -110,8 +111,10 @@ program test_program;
     tx_dma_transfer(data_length);
 
     // start generating data
-    pack_env.tx_src_axis_agent.sequencer.start();
-    pack_env.rx_src_axis_agent.sequencer.start();
+    pack_env.tx_src_axis_agent.master_sequencer.start();
+    pack_env.rx_src_axis_agent.master_sequencer.start();
+    pack_env.tx_dst_axis_agent.slave_sequencer.start();
+    pack_env.rx_dst_axis_agent.slave_sequencer.start();
 
     // prepare watchdog with 20 us of wait time
     packer_scoreboard_wd = new("Packer watchdog", 20000, "Packers Scoreboard");

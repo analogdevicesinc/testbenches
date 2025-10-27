@@ -86,14 +86,14 @@ program test_program_6ch (
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-    base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+    base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
   endtask
 
   task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-    base_env.mng.sequencer.RegRead32(raddr,data);
+    base_env.mng.master_sequencer.RegRead32(raddr,data);
   endtask
 
   // --------------------------
@@ -103,7 +103,7 @@ program test_program_6ch (
     input [31:0]  waddr,
     input [31:0]  wdata);
 
-    base_env.mng.sequencer.RegWrite32(waddr,wdata);
+    base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
   endtask
 
   // --------------------------

@@ -48,7 +48,7 @@ program test_program;
   timeprecision 1ps;
 
   // Declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) env;
+  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
   // Process variables
   process current_process;
@@ -64,20 +64,21 @@ program test_program;
     `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     // Create environment
-    env = new("Base Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
+    base_env = new(
+      "Base Environment",
+      `TH.`SYS_CLK.inst.IF,
+      `TH.`DMA_CLK.inst.IF,
+      `TH.`DDR_CLK.inst.IF,
+      `TH.`SYS_RST.inst.IF,
+      `TH.`MNG_AXI.inst.IF,
+      `TH.`DDR_AXI.inst.IF);
 
-    env.start();
-    env.sys_reset();
+    base_env.start();
+    base_env.sys_reset();
 
     /* Add stimulus tasks */
 
-    env.stop();
+    base_env.stop();
 
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();

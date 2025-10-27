@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,45 +33,8 @@
 // ***************************************************************************
 // ***************************************************************************
 
+package vip_agent_typedef_pkg;
 
-`timescale 1ns/1ps
+  typedef enum {MASTER, SLAVE, PASSTHROUGH} agent_typedef;
 
-`ifndef _UTILS_SVH_
-`define _UTILS_SVH_
-
-// Help build agent package name like "<test_harness>_<mng_axi_vip>_0_pkg"
-`define PKGIFY(th,vip) th``_``vip``_0_pkg
-
-// Help build agent type like "<test_harness>_<mng_axi_vip>_0_<mst_t>"
-`define AGENT(th,vip,agent_type) th``_``vip``_0_``agent_type
-
-// Help build VIP parameter name  e.g. test_harness_dst_axis_vip_0_VIP_DATA_WIDTH
-`define GETPARAM(th,vip,param) th``_``vip``_0_``param
-
-// Help link AMD AXI and AXIS VIPs to ADI Environment VIPs
-`define LINK(top,env,inst) \
-  top``.pre_link_agent(``env``.``inst``); \
-  env``.``inst`` = ``top``; \
-  top``.post_link_agent(``env``.``inst``);
-
-// Macros used in Simulation files during simulation
-`define INFO(m,v)  \
-  PrintInfo($sformatf("%s", \
-    $sformatf m ),v)
-
-`define WARNING(m)  \
-  PrintWarning($sformatf("%s", \
-    $sformatf m ))
-
-`define ERROR(m)  \
-  PrintError($sformatf("%s", \
-    $sformatf m ))
-
-`define FATAL(m)  \
-  PrintFatal($sformatf("%s\n  found in %s:%0d", \
-    $sformatf m , `__FILE__, `__LINE__))
-
-`define MAX(a,b) ((a > b) ? a : b)
-`define MIN(a,b) ((a > b) ? b : a)
-
-`endif
+endpackage: vip_agent_typedef_pkg

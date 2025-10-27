@@ -102,10 +102,10 @@ program test_program_frame_delay;
 
     dma_flock_env.run();
 
-    m_dmac_api = new("TX_DMA_BA", base_env.mng.sequencer, `TX_DMA_BA);
+    m_dmac_api = new("TX_DMA_BA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
 
-    s_dmac_api = new("RX_DMA_BA", base_env.mng.sequencer, `RX_DMA_BA);
+    s_dmac_api = new("RX_DMA_BA", base_env.mng.master_sequencer, `RX_DMA_BA);
     s_dmac_api.probe();
 
 
@@ -187,8 +187,8 @@ program test_program_frame_delay;
     axi_ready_gen  wready_gen;
 
     // Set no backpressure from AXIS destination
-    dma_flock_env.dst_axis_agent.sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-    dma_flock_env.dst_axis_agent.sequencer.user_gen_tready();
+    dma_flock_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    dma_flock_env.dst_axis_agent.slave_sequencer.start();
 
     // Set no backpressure from DDR
     wready_gen = base_env.ddr.agent.wr_driver.create_ready("wready");
@@ -220,9 +220,9 @@ program test_program_frame_delay;
 
     s_seg = m_seg.toSlaveSeg();
 
-    dma_flock_env.src_axis_agent.sequencer.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_DESCRIPTOR_QUEUE);
-    dma_flock_env.src_axis_agent.sequencer.set_data_gen_mode(m_axis_sequencer_pkg::DATA_GEN_MODE_TEST_DATA);
-    dma_flock_env.src_axis_agent.sequencer.start();
+    dma_flock_env.src_axis_agent.master_sequencer.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_DESCRIPTOR_QUEUE);
+    dma_flock_env.src_axis_agent.master_sequencer.set_data_gen_mode(m_axis_sequencer_pkg::DATA_GEN_MODE_TEST_DATA);
+    dma_flock_env.src_axis_agent.master_sequencer.start();
 
     if (has_autorun == 0) begin
       m_dmac_api.set_control('b1001);
@@ -262,7 +262,7 @@ program test_program_frame_delay;
               begin
                 for (int l = 0; l < m_seg.ylength; l++) begin
                   // update the AXIS generator command
-                  dma_flock_env.src_axis_agent.sequencer.add_xfer_descriptor_byte_count(.bytes_to_generate(m_seg.length),
+                  dma_flock_env.src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(.bytes_to_generate(m_seg.length),
                                                        .gen_last(1),
                                                        .gen_sync(l==0));
                 end
@@ -270,7 +270,7 @@ program test_program_frame_delay;
                 // update the AXIS generator data
                 for (int j = 0; j < m_seg.get_bytes_in_transfer; j++) begin
                   // ADI DMA frames start from offset 0x00
-                  dma_flock_env.src_axis_agent.sequencer.push_byte_for_stream(frame_count);
+                  dma_flock_env.src_axis_agent.master_sequencer.push_byte_for_stream(frame_count);
                 end
               end
             join
@@ -293,7 +293,7 @@ program test_program_frame_delay;
     sync_gen_en = 0;
 
     // Stop triggers wait stop policy
-    dma_flock_env.src_axis_agent.sequencer.stop();
+    dma_flock_env.src_axis_agent.master_sequencer.stop();
 
     // Shutdown DMACs
     if (!has_m_autorun) begin
@@ -312,16 +312,16 @@ program test_program_frame_delay;
     bit [63:0]    mtestWData; // Write Data
     bit [31:0]    rdData;
 
-    base_env.mng.sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
+    base_env.mng.master_sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
 
     mtestWData = 0;
     repeat (10) begin
-      base_env.mng.sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
-      base_env.mng.sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
+      base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
+      base_env.mng.master_sequencer.RegReadVerify32(`TX_DMA_BA + GetAddrs(DMAC_SCRATCH), mtestWData);
       mtestWData += 4;
     end
 
-    base_env.mng.sequencer.RegReadVerify32(`RX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
+    base_env.mng.master_sequencer.RegReadVerify32(`RX_DMA_BA + GetAddrs(DMAC_IDENTIFICATION), 'h44_4D_41_43);
 
   endtask
 

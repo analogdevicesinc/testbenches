@@ -91,8 +91,8 @@ package spi_environment_pkg;
     //============================================================================
     task configure();
       `ifdef DEF_SDO_STREAMING
-        this.sdo_src_agent.sequencer.set_stop_policy(STOP_POLICY_PACKET);
-        this.sdo_src_agent.sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
+        this.sdo_src_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
+        this.sdo_src_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
       `endif
     endtask
 
@@ -104,19 +104,8 @@ package spi_environment_pkg;
     task start();
       this.spi_agent.start();
       `ifdef DEF_SDO_STREAMING
-        this.sdo_src_agent.start();
+        this.sdo_src_agent.start_master();
       `endif
-    endtask
-
-    //============================================================================
-    // Run subroutine
-    //============================================================================
-    task run();
-      fork
-        `ifdef DEF_SDO_STREAMING
-          this.sdo_src_agent.run();
-        `endif
-      join_none
     endtask
 
     //============================================================================
@@ -125,7 +114,7 @@ package spi_environment_pkg;
     task stop();
       this.spi_agent.stop();
       `ifdef DEF_SDO_STREAMING
-        this.sdo_src_agent.stop();
+        this.sdo_src_agent.stop_master();
       `endif
     endtask
 

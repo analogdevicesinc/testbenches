@@ -82,6 +82,7 @@ these things, it is best to leave it to the tools to set up the environment.
 For Vivado versions of 2025 and later, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/opt/Xilinx/202x.x/Vivado/bin:/opt/Xilinx/202x.x/Vitis/bin
 
@@ -103,6 +104,7 @@ similar manner to the Linux environment.
 For Vivado versions of 2025 and later, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/cygdrive/d/Xilinx/202x.x/Vivado/bin:/cygdrive/d/Xilinx/202x.x/Vitis/bin
 
@@ -120,6 +122,7 @@ manual changes to your **.bashrc** should look like:
 For Vivado versions of 2025 and later, use the following command:
 
 .. shell::
+   :showuser:
 
    $export PATH=$PATH:/opt/path_to/202x.x/Vivado/bin:/opt/202x.x/Vitis/bin
 
@@ -191,6 +194,7 @@ configuration/test program parameter. Often used in combination with ``clean``
 parameter.
 
 .. shell::
+   :showuser:
 
    $make all
 
@@ -199,8 +203,9 @@ without any other input. This will build the configuration and run all test
 programs on it.
 
 .. shell::
+   :showuser:
 
-   $make cfg_si
+   $make cfg
 
 Some projects support adding additional ``make`` parameters to configure
 the project. This option gives you the ability to build only the configuration
@@ -209,8 +214,9 @@ configurations, as well as running the chosen test program. ``CFG`` specifies
 the configuration file's name, while ``TST`` specifies the test program's name.
 
 .. shell::
+   :showuser:
 
-   $make CFG=cfg_si TST=test_program_si
+   $make CFG=cfg1 TST=test_program
 
 .. caution::
 
@@ -228,6 +234,7 @@ The ``clean`` keyword removes the ``runs`` and ``results`` folders, as well as
 the log files created by Vivado.
 
 .. shell::
+   :showuser:
 
    $make clean
 

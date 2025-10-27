@@ -316,7 +316,7 @@ You may also do this manually (for better or worse); the following snippet is
 from a <strong>.bashrc</strong> file. Please note that unless you are an expert at manipulating
 these things, it is best to leave it to the tools to set up the environment.</p>
 <p>For Vivado versions of 2025 and later, use the following command:</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/202x.x/Vivado/bin:/opt/Xilinx/202x.x/Vitis/bin
@@ -337,7 +337,7 @@ these things, it is best to leave it to the tools to set up the environment.</p>
 <code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> packages. You should do changes to your <strong>.bashrc</strong> in a
 similar manner to the Linux environment.</p>
 <p>For Vivado versions of 2025 and later, use the following command:</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/202x.x/Vivado/bin:/cygdrive/d/Xilinx/202x.x/Vitis/bin
@@ -354,7 +354,7 @@ similar manner to the Linux environment.</p>
 <a class="icon link reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install/" target="_blank">WSL</a>. The
 manual changes to your <strong>.bashrc</strong> should look like:</p>
 <p>For Vivado versions of 2025 and later, use the following command:</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/202x.x/Vivado/bin:/opt/202x.x/Vitis/bin
@@ -432,7 +432,7 @@ simulation.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">all</span></code> keyword is the same as running <code class="docutils literal notranslate"><span class="pre">make</span></code> by itself with no additional
 configuration/test program parameter. Often used in combination with <code class="docutils literal notranslate"><span class="pre">clean</span></code>
 parameter.</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>all
@@ -441,10 +441,10 @@ parameter.</p>
 <div class="clear-left"></div></div></div><p>Another build option is to use the configuration file’s name as a make parameter
 without any other input. This will build the configuration and run all test
 programs on it.</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cfg_si
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cfg
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>Some projects support adding additional <code class="docutils literal notranslate"><span class="pre">make</span></code> parameters to configure
@@ -452,10 +452,10 @@ the project. This option gives you the ability to build only the configuration
 that you’re interested in, without building the rest of the available
 configurations, as well as running the chosen test program. <code class="docutils literal notranslate"><span class="pre">CFG</span></code> specifies
 the configuration file’s name, while <code class="docutils literal notranslate"><span class="pre">TST</span></code> specifies the test program’s name.</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_si<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_si
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><div class="admonition caution">
@@ -472,7 +472,7 @@ multiple designs and running multiple test programs.</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">clean</span></code> keyword removes the <code class="docutils literal notranslate"><span class="pre">runs</span></code> and <code class="docutils literal notranslate"><span class="pre">results</span></code> folders, as well as
 the log files created by Vivado.</p>
-<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>~$
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean

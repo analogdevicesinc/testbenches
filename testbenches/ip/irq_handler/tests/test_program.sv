@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -34,37 +34,41 @@
 // ***************************************************************************
 
 `include "utils.svh"
-`include "axis_definitions.svh"
+`include "axi_definitions.svh"
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
-import environment_pkg::*;
-import watchdog_pkg::*;
+import adi_axi_agent_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-import `PKGIFY(test_harness, input_axis)::*;
-import `PKGIFY(test_harness, output_axis)::*;
+program test_program;
 
-program test_program ();
-
-  timeunit 1ns;
-  timeprecision 1ps;
-
-  // declare the class instances
+  // Declare the class instances
   test_harness_env base_env;
 
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
-  util_axis_fifo_environment #(`AXIS_VIP_PARAMS(test_harness, input_axis), `AXIS_VIP_PARAMS(test_harness, output_axis), `INPUT_CLK, `OUTPUT_CLK) uaf_env;
+  // Process variables
+  process current_process;
+  string current_process_random_state;
 
-  watchdog send_data_wd;
+  event dummy_api_event;
+
+  reg [31:0] data;
+
 
   initial begin
 
-    // create environment
+    setLoggerVerbosity(ADI_VERBOSITY_LOW);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
+
+    // Create environment
     base_env = new(
       .name("Base Environment"),
       .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
@@ -80,64 +84,55 @@ program test_program ();
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 
-    uaf_env = new("Util AXIS FIFO Environment",
-                  `TH.`INPUT_CLK_VIP.inst.IF,
-                  `TH.`OUTPUT_CLK_VIP.inst.IF,
-                  `TH.`INPUT_AXIS.inst.IF,
-                  `TH.`OUTPUT_AXIS.inst.IF);
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
-
     base_env.start();
-    uaf_env.start();
-
     base_env.sys_reset();
 
-    uaf_env.configure();
+    // register IRQ devices
+    dummy_api_event = base_env.irq_handler.register_device(0);
 
-    if (!`TKEEP_EN) begin
-      uaf_env.input_axis_agent.master_sequencer.set_keep_some();
-    end else begin
-      uaf_env.input_axis_agent.master_sequencer.set_keep_all();
-    end
+    // start IRQ handler
+    base_env.irq_handler.start();
 
-    uaf_env.run();
+    // wait for the IRQ to trigger before it is triggered
+    fork
+      begin
+        @dummy_api_event;
+        `INFO(("IRQ triggered"), ADI_VERBOSITY_LOW);
+      end
+    join_none
 
-    send_data_wd = new("Util AXIS FIFO Watchdog", 500000, "Send data");
+    `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b0);
 
-    send_data_wd.start();
+    #1us;
 
-    uaf_env.input_axis_agent.master_sequencer.start();
+    // trigger the IRQ
+    `TH.`IRQ_TEST.inst.inst.IF.vif.wait_posedge_clk();
+    `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b1);
+    `TH.`IRQ_TEST.inst.inst.IF.vif.wait_posedge_clk();
+    `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b0);
 
-    // stimulus
-    repeat($urandom_range(5,10)) begin
-      send_data_wd.reset();
+    #1us;
 
-      if (!`TKEEP_EN) begin
-        repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128), `TLAST_EN, 0);
+    // priority packet test
+    fork
+      begin
+        repeat(5) begin
+          fork
+            base_env.mng.master_sequencer.RegWrite32(`IRQ_C_BA + 'h10, 'd0);
+            base_env.mng.master_sequencer.RegRead32(`IRQ_C_BA + 'h10, data);
+          join_none
         end
-      end else begin
-        repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_byte_count($urandom_range(1,1024), `TLAST_EN, 0);
+        repeat(5) begin
+          fork
+            base_env.mng.master_sequencer.RegWrite32(`IRQ_C_BA + 'h10, 'd0, 1);
+            base_env.mng.master_sequencer.RegRead32(`IRQ_C_BA + 'h10, data, 1);
+          join_none
         end
       end
+    join
 
-      #($urandom_range(1,10)*1us);
+    #10us;
 
-      uaf_env.input_axis_agent.master_sequencer.clear_descriptor_queue();
-      uaf_env.input_axis_agent.master_sequencer.wait_empty_descriptor_queue();
-
-      uaf_env.scoreboard_inst.wait_until_complete();
-
-      `INFO(("Packet finished."), ADI_VERBOSITY_LOW);
-    end
-
-    send_data_wd.stop();
-
-    #100ns;
-
-    uaf_env.stop();
     base_env.stop();
 
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);

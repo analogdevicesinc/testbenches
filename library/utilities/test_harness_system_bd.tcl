@@ -49,6 +49,13 @@ ad_ip_instance axi_intc axi_intc [list \
   C_HAS_FAST 0 \
 ]
 
+# create IRQ VIP
+ad_ip_instance io_vip irq_vip [ list \
+  ASYNC {true} \
+  MODE {0} \
+]
+adi_sim_add_define "IRQ=irq_vip"
+
 ad_ip_instance xlconcat sys_concat_intc
 ad_ip_parameter sys_concat_intc CONFIG.NUM_PORTS 16
 
@@ -62,7 +69,6 @@ ad_ip_instance clk_vip sys_clk_vip [ list \
   FREQ_HZ 100000000 \
 ]
 adi_sim_add_define "SYS_CLK=sys_clk_vip"
-
 
 # DMA clock
 ad_ip_instance clk_vip dma_clk_vip [ list \
@@ -160,7 +166,9 @@ ad_connect sys_concat_intc/In15   GND
 
 # interconnect - processor
 
-ad_cpu_interconnect 0x41200000 axi_intc
+set IRQ_C_BASE 0x41200000
+ad_cpu_interconnect $IRQ_C_BASE axi_intc
+adi_sim_add_define "IRQ_C_BA=[format "%d" ${IRQ_C_BASE}]"
 
 # interconnect - memory
 
@@ -189,10 +197,8 @@ incr sys_cpu_interconnect_index
 global sys_mem_interconnect_index
 incr sys_mem_interconnect_index
 
-# create external port for IRQ
-create_bd_port -dir O -type intr irq
-
-ad_connect irq axi_intc/irq
+# connect the IRQ controller to the IRQ VIP
+ad_connect axi_intc/irq irq_vip/i
 
 # Set DDR VIP to a range of 2G
 set DDR_BASE 0x80000000

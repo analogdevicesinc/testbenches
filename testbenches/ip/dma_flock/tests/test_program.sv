@@ -69,7 +69,18 @@ program test_program;
   int has_dfsync;
   int sync_gen_en;
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
+    
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
+
     //creating environment
     base_env = new("Base Environment",
                     `TH.`SYS_CLK.inst.IF,
@@ -85,8 +96,6 @@ program test_program;
 
     has_sfsync = `M_DMA_CFG_USE_EXT_SYNC;
     has_dfsync = `S_DMA_CFG_USE_EXT_SYNC;
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     dma_flock_env.start();

@@ -67,9 +67,17 @@ program test_program;
 
   int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**int'($clog2(`CHANNELS));
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     // create environment
     base_env = new("Base Environment",

@@ -185,6 +185,7 @@ After this change, ``xvlog`` will start linting the ``*_pkg.sv`` files.
 If you prefer not to use the Vivado GUI, you can call ``xvlog`` directly:
 
 .. shell::
+   :showuser:
 
    /path/testbenches/library/vip/adi/my_vip
    $xvlog -prj ./*.sim/sim_1/behav/xsim/*_vlog.prj \
@@ -193,6 +194,7 @@ If you prefer not to use the Vivado GUI, you can call ``xvlog`` directly:
 And for a specific file:
 
 .. shell::
+   :showuser:
 
    /path/testbenches/library/vip/adi/my_vip
    $xvlog -work xil_defaultlib --sv -i ../../../utilities \

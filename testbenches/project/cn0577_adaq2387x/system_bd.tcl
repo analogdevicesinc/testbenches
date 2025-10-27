@@ -41,10 +41,6 @@ set ADC_RES $ad_project_params(ADC_RES)
 set CN0577_ADAQ2387X_N $ad_project_params(CN0577_ADAQ2387X_N)
 set USE_MMCM $ad_project_params(USE_MMCM)
 
-adi_project_files [list \
-    "$ad_hdl_dir/library/common/ad_iobuf.v" \
-]
-
 #
 #  Block design under test
 #

@@ -68,18 +68,10 @@ program test_program (
 timeunit 1ns;
 timeprecision 1ps;
 
-typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
-
 test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
 
-// set to active debug messages
-localparam bit DEBUG = 1;
-
-// dco delay compared to the reference clk
-localparam DCO_DELAY = 12;
-
-dmac_api cn0577_dmac_api;
-pwm_gen_api cn0577_pwm_gen_api;
+dmac_api dmac_api_inst;
+pwm_gen_api pwm_gen_api_inst;
 adc_api ltc2387_adc_api;
 common_api ltc2387_common_api;
 
@@ -102,12 +94,13 @@ initial begin
                   `TH.`SYS_RST.inst.IF,
                   `TH.`MNG_AXI.inst.IF,
                   `TH.`DDR_AXI.inst.IF);
-  cn0577_dmac_api = new(
+
+  dmac_api_inst = new(
       "CN0577 DMAC API",
       base_env.mng.sequencer,
       `AXI_LTC2387_DMA_BA);
 
-  cn0577_pwm_gen_api = new(
+  pwm_gen_api_inst = new(
       "CN0577 AXI PWM GEN API",
       base_env.mng.sequencer,
       `AXI_PWM_GEN_BA);
@@ -122,12 +115,12 @@ initial begin
       base_env.mng.sequencer,
       `AXI_LTC2387_BA);
 
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
   base_env.start();
   base_env.sys_reset();
 
   sanity_tests();
-
-  #100ns;
 
   data_acquisition_test();
 
@@ -265,8 +258,8 @@ end
 
 task sanity_tests();
     //ltc2387_common_api.sanity_test();
-    cn0577_dmac_api.sanity_test();
-    cn0577_pwm_gen_api.sanity_test();
+    dmac_api_inst.sanity_test();
+    pwm_gen_api_inst.sanity_test();
     `INFO(("Sanity Tests Done"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -288,45 +281,45 @@ task data_acquisition_test();
     end
 
     // Configure AXI PWM GEN
-    cn0577_pwm_gen_api.reset(); // PWM_GEN reset in regmap (ACTIVE HIGH)
+    pwm_gen_api_inst.reset(); // PWM_GEN reset in regmap (ACTIVE HIGH)
 
-    cn0577_pwm_gen_api.pulse_period_config(
-      .channel(8'h00),
-      .period(32'h1A));
+    pwm_gen_api_inst.pulse_period_config(
+      .channel(8'd0),
+      .period(32'd26));
 
-    cn0577_pwm_gen_api.pulse_width_config(
-      .channel(8'h00),
-      .width(32'h01));
+    pwm_gen_api_inst.pulse_width_config(
+      .channel(8'd0),
+      .width(32'd1));
 
-    cn0577_pwm_gen_api.pulse_period_config(
-      .channel(8'h01),
-      .period(32'h1A));
+    pwm_gen_api_inst.pulse_period_config(
+      .channel(8'd1),
+      .period(32'd26));
 
-    cn0577_pwm_gen_api.pulse_width_config(
-      .channel(8'h01),
+    pwm_gen_api_inst.pulse_width_config(
+      .channel(8'd1),
       .width(num_of_dco));
 
-    cn0577_pwm_gen_api.pulse_offset_config(
-      .channel(8'h01),
-      .offset(32'h03));
+    pwm_gen_api_inst.pulse_offset_config(
+      .channel(8'd1),
+      .offset(32'd3));
 
-    cn0577_pwm_gen_api.load_config(); // load AXI_PWM_GEN configuration
-    cn0577_pwm_gen_api.start();
+    pwm_gen_api_inst.load_config(); // load AXI_PWM_GEN configuration
+    pwm_gen_api_inst.start();
     `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
 
     // Configure DMA
-    cn0577_dmac_api.set_irq_mask(
+    dmac_api_inst.set_irq_mask(
       .transfer_completed(1'b0),
       .transfer_queued(1'b1));
-    cn0577_dmac_api.enable_dma();
-    cn0577_dmac_api.set_flags(
+    dmac_api_inst.enable_dma();
+    dmac_api_inst.set_flags(
       .cyclic(1'b0),
       .tlast(1'b1),
       .partial_reporting_en(1'b1));
-    cn0577_dmac_api.set_lengths(
+    dmac_api_inst.set_lengths(
       .xfer_length_x((NUM_OF_TRANSFERS*4)-1),
       .xfer_length_y(32'h0));
-    cn0577_dmac_api.set_dest_addr(`DDR_BA);
+    dmac_api_inst.set_dest_addr(`DDR_BA);
 
     // Configure AXI_LTC2387
     ltc2387_adc_api.reset(
@@ -346,7 +339,7 @@ task data_acquisition_test();
 
     transfer_status = 1;
 
-    cn0577_dmac_api.transfer_start();
+    dmac_api_inst.transfer_start();
 
     wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
@@ -358,12 +351,12 @@ task data_acquisition_test();
     //@(posedge system_tb.test_harness.axi_ltc2387_dma.irq);
 
     // Clear interrupt
-    cn0577_dmac_api.clear_irq_pending(
+    dmac_api_inst.clear_irq_pending(
       .transfer_completed(1'b1),
       .transfer_queued(1'b0));
 
     // Stop pwm gen
-    cn0577_pwm_gen_api.reset();
+    pwm_gen_api_inst.reset();
     `INFO(("AXI_PWM_GEN stopped"), ADI_VERBOSITY_LOW);
 
     // Configure axi_ltc2387
@@ -409,7 +402,6 @@ task data_acquisition_test();
 
     #2000ns;
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
-    #1ns;
       captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
     end
 

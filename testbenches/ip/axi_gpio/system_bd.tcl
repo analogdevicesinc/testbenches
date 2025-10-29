@@ -40,30 +40,28 @@ global ad_project_params
 
 ## DUT configuration
 
-# Instantiere IP
+
 ad_ip_instance axi_gpio_adi gpio_ip
 
-# Setare adresă de bază
+
 set BA 0x50000000
 
-# Conectare AXI la CPU
+
 ad_cpu_interconnect [expr ${BA} + 0x40000] gpio_ip
 
-# === GPIO bidirectional (tri-state style) ===
 
-# Creăm 3 porturi separate (stil Xilinx)
 create_bd_port -dir O  -from 31 -to 0 gpio_m_io_o
 create_bd_port -dir I  -from 31 -to 0 gpio_m_io_i
 create_bd_port -dir O  -from 31 -to 0 gpio_m_io_t
 create_bd_port -dir O irq_0
 
-# Conectăm porturile externe la semnalele interne ale IP-ului
+
 ad_connect gpio_m_io_i gpio_ip/gpio_io_i
 ad_connect gpio_m_io_o gpio_ip/gpio_io_o
 ad_connect gpio_m_io_t gpio_ip/gpio_io_t
 ad_connect irq_0       gpio_ip/irq
 
-# Interrupt la procesor
+
 ad_cpu_interrupt "ps-0" "mb-0" gpio_ip/irq
 
 

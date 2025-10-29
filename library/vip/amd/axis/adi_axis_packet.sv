@@ -57,11 +57,13 @@ package adi_axis_packet_pkg;
     int TUSER_WIDTH;
 
     adi_axis_transaction transactions[];
-    int packet_size_limit;
+    int transactions_per_packet;
+    int bytes_per_packet;
 
     function new(
       input string name = "",
-      input int packet_size_limit = 0,
+      input int transactions_per_packet = 0,
+      input int bytes_per_packet = 0,
       input int BYTES_PER_TRANSACTION,
       input bit EN_TKEEP = 0,
       input bit EN_TSTRB = 0,
@@ -88,9 +90,11 @@ package adi_axis_packet_pkg;
       this.TDEST_WIDTH = TDEST_WIDTH;
       this.TUSER_WIDTH = TUSER_WIDTH;
 
-      this.packet_size_limit = packet_size_limit;
-      if (this.packet_size_limit != 0) begin
-        this.create_packet(this.packet_size_limit);
+      this.bytes_per_packet = bytes_per_packet;
+      this.transactions_per_packet = `MAX($ceil(this.bytes_per_packet/this.BYTES_PER_TRANSACTION), transactions_per_packet);
+
+      if (this.transactions_per_packet > 0 || this.bytes_per_packet > 0) begin
+        this.create_packet();
       end
     endfunction: new
 
@@ -99,33 +103,36 @@ package adi_axis_packet_pkg;
         `FATAL(("The packet is empty, nothing to randomize!"));
       end
 
-      this.transactions[0].randomize_all();
-      if (this.EN_TLAST) begin
-        this.transactions[0].update_tlast(1'b0);
-      end
-      for (int i=1; i<this.transactions.size(); i++) begin
-        this.transactions[i].randomize_all();
+      for (int i=0; i<this.transactions.size(); i++) begin
+        this.transactions[i].randomize_transaction();
         if (this.EN_TLAST) begin
           this.transactions[i].update_tlast(1'b0);
         end
-        this.transactions[i].update_tid(this.transactions[0].tid);
-        this.transactions[i].update_tdest(this.transactions[0].tdest);
+        if (this.EN_TID) begin
+          this.transactions[i].update_tid(this.transactions[0].tid);
+        end
+        if (this.EN_TDEST) begin
+          this.transactions[i].update_tdest(this.transactions[0].tdest);
+        end
       end
-      this.transactions[this.transactions.size()-1].update_tlast(1'b1);
+      if (this.EN_TLAST) begin
+        this.transactions[this.transactions.size()-1].update_tlast(1'b1);
+      end
     endfunction: randomize_packet
 
-    function void randomize_all();
-      if (packet_size_limit == 0) begin
-        this.create_packet($urandom());
+    function void create_packet(
+      input int transactions_per_packet = 0,
+      input int bytes_per_packet = 0);
+
+      if (transactions_per_packet > 0 || bytes_per_packet > 0) begin
+        this.transactions = new[`MAX(transactions_per_packet, $ceil(bytes_per_packet/this.BYTES_PER_TRANSACTION))];
       end else begin
-        this.create_packet($urandom_range(1, this.packet_size_limit));
+        if (this.transactions_per_packet == 0 && this.bytes_per_packet == 0) begin
+          `FATAL(("Creating a packet without transaction or byte size set is not allowed!"));
+        end else begin
+          this.transactions = new[`MAX(this.transactions_per_packet, $ceil(this.bytes_per_packet/this.BYTES_PER_TRANSACTION))];
+        end
       end
-
-      this.randomize_packet();
-    endfunction: randomize_all
-
-    function void create_packet(input int packet_size);
-      this.transactions = new[packet_size];
 
       for (int i=0; i<this.transactions.size(); i++) begin
         this.transactions[i] = new(
@@ -140,11 +147,7 @@ package adi_axis_packet_pkg;
           .TID_WIDTH(this.TID_WIDTH),
           .TDEST_WIDTH(this.TDEST_WIDTH),
           .TUSER_WIDTH(this.TUSER_WIDTH));
-        if (this.EN_TLAST) begin
-          this.transactions[i].update_tlast(1'b0);
-        end
       end
-      this.transactions[this.transactions.size()-1].update_tlast(1'b1);
     endfunction: create_packet
 
     function void update_transaction_class(

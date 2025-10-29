@@ -15,6 +15,7 @@ package environment_pkg;
   import adi_axi_agent_pkg::*;
   import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
+  import axis_transaction_to_byte_adapter_pkg::*;
 
 
   class scoreboard_environment #(
@@ -30,6 +31,9 @@ package environment_pkg;
 
     scoreboard #(logic [7:0]) scoreboard_tx;
     scoreboard #(logic [7:0]) scoreboard_rx;
+
+    axis_transaction_to_byte_adapter axis_adapter_tx;
+    axis_transaction_to_byte_adapter axis_adapter_rx;
 
     //============================================================================
     // Constructor
@@ -54,6 +58,14 @@ package environment_pkg;
 
       this.scoreboard_tx = new("Data Offload TX Scoreboard", this);
       this.scoreboard_rx = new("Data Offload RX Scoreboard", this);
+
+      this.axis_adapter_tx = new(
+        .name("Axis Adapter TX"),
+        .parent(this));
+
+      this.axis_adapter_rx = new(
+        .name("Axis Adapter RX"),
+        .parent(this));
     endfunction
 
     //============================================================================
@@ -62,8 +74,8 @@ package environment_pkg;
     //============================================================================
     task configure(int bytes_to_generate);
       // ADC stub
-      this.adc_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.adc_src_axis_agent.master_sequencer.add_xfer_transaction_byte_count(bytes_to_generate, 0, 0);
+      // this.adc_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
+      // this.adc_src_axis_agent.master_sequencer.add_xfer_transaction_byte_count(bytes_to_generate, 0, 0);
 
       // DAC stub
       this.dac_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
@@ -82,9 +94,11 @@ package environment_pkg;
       this.dac_dst_axis_agent.start_slave();
 
       this.dac_src_axi_agent.monitor.publisher_rx.subscribe(this.scoreboard_tx.subscriber_source);
-      this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
+      this.dac_dst_axis_agent.monitor.publisher.subscribe(this.axis_adapter_tx.subscriber);
+      this.axis_adapter_tx.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
-      this.adc_src_axis_agent.monitor.publisher.subscribe(this.scoreboard_rx.subscriber_source);
+      this.adc_src_axis_agent.monitor.publisher.subscribe(this.axis_adapter_rx.subscriber);
+      this.axis_adapter_rx.publisher.subscribe(this.scoreboard_rx.subscriber_source);
       this.adc_dst_axi_agent.monitor.publisher_tx.subscribe(this.scoreboard_rx.subscriber_sink);
     endtask
 

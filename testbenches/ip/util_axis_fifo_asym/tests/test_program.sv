@@ -112,11 +112,11 @@ program test_program ();
 
     if (test_harness_input_axis_0_VIP_HAS_TLAST && test_harness_input_axis_0_VIP_HAS_TKEEP) begin
       axis_packet = new(
-        .packet_size_limit($urandom_range(1, 20)),
+        .transactions_per_packet($urandom_range(1, 20)),
         `AXIS_TRANSACTION_PARAM(test_harness, input_axis));
     end else begin
       axis_packet = new(
-        .packet_size_limit(`MAX(test_harness_input_axis_0_VIP_DATA_WIDTH, test_harness_output_axis_0_VIP_DATA_WIDTH) / `MIN(test_harness_input_axis_0_VIP_DATA_WIDTH, test_harness_output_axis_0_VIP_DATA_WIDTH) * $urandom_range(1, 5)),
+        .transactions_per_packet(`MAX(test_harness_input_axis_0_VIP_DATA_WIDTH, test_harness_output_axis_0_VIP_DATA_WIDTH) / `MIN(test_harness_input_axis_0_VIP_DATA_WIDTH, test_harness_output_axis_0_VIP_DATA_WIDTH) * $urandom_range(1, 5)),
         `AXIS_TRANSACTION_PARAM(test_harness, input_axis));
     end
 

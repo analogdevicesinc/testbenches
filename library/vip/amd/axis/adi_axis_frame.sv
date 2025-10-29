@@ -57,13 +57,15 @@ package adi_axis_frame_pkg;
     int TUSER_WIDTH;
 
     adi_axis_packet packets[];
-    int frame_size_limit;
-    int packet_size_limit;
+    int packets_per_frame;
+    int transactions_per_packet;
+    int bytes_per_packet;
 
     function new(
       input string name = "",
-      input int frame_size_limit = 0,
-      input int packet_size_limit = 0,
+      input int packets_per_frame = 0,
+      input int transactions_per_packet = 0,
+      input int bytes_per_packet = 0,
       input int BYTES_PER_TRANSACTION,
       input bit EN_TKEEP = 0,
       input bit EN_TSTRB = 0,
@@ -90,11 +92,12 @@ package adi_axis_frame_pkg;
       this.TDEST_WIDTH = TDEST_WIDTH;
       this.TUSER_WIDTH = TUSER_WIDTH;
 
-      this.frame_size_limit = frame_size_limit;
-      this.packet_size_limit = packet_size_limit;
+      this.packets_per_frame = packets_per_frame;
+      this.transactions_per_packet = transactions_per_packet;
+      this.bytes_per_packet = bytes_per_packet;
 
-      if (this.frame_size_limit != 0) begin
-        this.create_frame(this.frame_size_limit);
+      if (this.packets_per_frame != 0) begin
+        this.create_frame();
       end
     endfunction: new
 
@@ -108,37 +111,32 @@ package adi_axis_frame_pkg;
       end
     endfunction: randomize_frame
 
-    function void randomize_all();
-      if (frame_size_limit == 0) begin
-        this.create_frame($urandom());
+    function void create_frame(input int packets_per_frame = 0);
+      if (packets_per_frame > 0) begin
+        this.packets = new[packets_per_frame];
       end else begin
-        this.create_frame($urandom_range(1, this.frame_size_limit));
+        if (this.packets_per_frame == 0) begin
+          `FATAL(("Creating a frame without packet count set is not allowed!"));
+        end else begin
+          this.packets = new[this.packets_per_frame];
+        end
       end
 
       for (int i=0; i<this.packets.size(); i++) begin
-        this.packets[i].randomize_all();
-      end
-    endfunction: randomize_all
-
-    function void create_frame(input int frame_size);
-      this.packets = new[frame_size];
-
-      if (this.packet_size_limit != 0) begin
-        for (int i=0; i<this.packets.size(); i++) begin
-          this.packets[i] = new(
-            .packet_size_limit(this.packet_size_limit),
-            .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
-            .EN_TKEEP(this.EN_TKEEP),
-            .EN_TSTRB(this.EN_TSTRB),
-            .EN_TLAST(this.EN_TLAST),
-            .EN_TUSER(this.EN_TUSER),
-            .EN_TID(this.EN_TID),
-            .EN_TDEST(this.EN_TDEST),
-            .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
-            .TID_WIDTH(this.TID_WIDTH),
-            .TDEST_WIDTH(this.TDEST_WIDTH),
-            .TUSER_WIDTH(this.TUSER_WIDTH));
-        end
+        this.packets[i] = new(
+          .transactions_per_packet(this.transactions_per_packet),
+          .bytes_per_packet(this.bytes_per_packet),
+          .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
+          .EN_TKEEP(this.EN_TKEEP),
+          .EN_TSTRB(this.EN_TSTRB),
+          .EN_TLAST(this.EN_TLAST),
+          .EN_TUSER(this.EN_TUSER),
+          .EN_TID(this.EN_TID),
+          .EN_TDEST(this.EN_TDEST),
+          .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
+          .TID_WIDTH(this.TID_WIDTH),
+          .TDEST_WIDTH(this.TDEST_WIDTH),
+          .TUSER_WIDTH(this.TUSER_WIDTH));
       end
     endfunction: create_frame
 
@@ -152,7 +150,7 @@ package adi_axis_frame_pkg;
     function void add_packet_class(input adi_axis_packet packet_info);
       this.packets = new [this.packets.size() + 1] (this.packets);
       this.packets[this.packets.size()-1] = new(
-        .packet_size_limit(packet_info.packet_size_limit),
+        .transactions_per_packet(packet_info.transactions_per_packet),
         .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
         .EN_TKEEP(this.EN_TKEEP),
         .EN_TSTRB(this.EN_TSTRB),

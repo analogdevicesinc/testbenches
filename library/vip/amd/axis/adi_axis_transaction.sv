@@ -72,6 +72,7 @@ package adi_axis_transaction_pkg;
 
     function new(
       input string name = "",
+      input int bytes_per_transaction = 0,
       input int BYTES_PER_TRANSACTION,
       input bit EN_TKEEP = 0,
       input bit EN_TSTRB = 0,
@@ -98,7 +99,22 @@ package adi_axis_transaction_pkg;
       this.TDEST_WIDTH = TDEST_WIDTH;
       this.TUSER_WIDTH = TUSER_WIDTH;
 
+      this.create_transaction();
+    endfunction: new
+
+    function void randomize_transaction();
+      if (!this.randomize()) begin
+        `FATAL(("Randomization failed!"));
+      end
+
+      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
+        this.bytes[i].randomize_byte();
+      end
+    endfunction: randomize_transaction
+
+    function void create_transaction();
       this.bytes = new [BYTES_PER_TRANSACTION];
+
       for (int i=0; i<BYTES_PER_TRANSACTION; i++) begin
         this.bytes[i] = new(
           .EN_TKEEP(EN_TKEEP),
@@ -106,20 +122,7 @@ package adi_axis_transaction_pkg;
           .EN_TUSER((EN_TUSER && TUSER_BYTE_BASED)),
           .TUSER_WIDTH(TUSER_WIDTH/BYTES_PER_TRANSACTION));
       end
-    endfunction: new
-
-    function void randomize_transaction();
-      if (!this.randomize()) begin
-        `FATAL(("Randomization failed!"));
-      end
-    endfunction: randomize_transaction
-
-    function void randomize_all();
-      this.randomize_transaction();
-      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
-        this.bytes[i].randomize_all();
-      end
-    endfunction: randomize_all
+    endfunction: create_transaction
 
     function void update_tlast(input logic tlast);
       if (this.EN_TLAST) begin

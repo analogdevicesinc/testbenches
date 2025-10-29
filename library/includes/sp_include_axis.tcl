@@ -48,5 +48,5 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/amd/axis/axis_definitions.svh" \
   "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_fifo_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_fifo_primitive_pkg.sv" \
+  "$ad_tb_dir/library/utilities/adi_fifo_class_pkg.sv" \
 ]

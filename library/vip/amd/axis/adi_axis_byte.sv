@@ -74,11 +74,11 @@ package adi_axis_byte_pkg;
       this.TUSER_WIDTH = TUSER_WIDTH;
     endfunction: new
 
-    function void randomize_all();
+    function void randomize_byte();
       if (!this.randomize()) begin
         `FATAL(("Randomization failed!"));
       end
-    endfunction: randomize_all
+    endfunction: randomize_byte
 
     function void update_tdata(input logic [7:0] tdata);
       this.tdata = tdata;

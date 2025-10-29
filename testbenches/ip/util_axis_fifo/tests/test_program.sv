@@ -70,8 +70,6 @@ program test_program ();
 
   adi_fifo_class #(adi_object) axis_fifo;
 
-  int policy_randomizer;
-
   initial begin
 
     // create environment
@@ -107,24 +105,15 @@ program test_program ();
 
     send_data_wd.start();
 
-    policy_randomizer = $urandom_range(1, 5);
-    case (policy_randomizer)
-      'd1: uaf_env.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_TRANSACTION);
-      'd2: uaf_env.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-      'd3: uaf_env.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_FRAME);
-      'd4: uaf_env.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_SEQUENCE);
-      'd5: uaf_env.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_QUEUE);
-    endcase
-
     uaf_env.input_axis_agent.master_sequencer.start();
 
     axis_transaction = new(`AXIS_TRANSACTION_PARAM(test_harness, input_axis));
     axis_packet = new(
-      .packet_size_limit(5),
+      .transactions_per_packet(5),
       `AXIS_TRANSACTION_PARAM(test_harness, input_axis));
     axis_frame = new(
-      .frame_size_limit(5),
-      .packet_size_limit(5),
+      .packets_per_frame(5),
+      .transactions_per_packet(5),
       `AXIS_TRANSACTION_PARAM(test_harness, input_axis));
     axis_fifo = new();
 
@@ -133,7 +122,7 @@ program test_program ();
       send_data_wd.reset();
 
       repeat($urandom_range(1, 2)) begin
-        axis_transaction.randomize_all();
+        axis_transaction.randomize_transaction();
         axis_packet.randomize_packet();
         axis_frame.randomize_frame();
         void'(axis_fifo.push(axis_transaction));

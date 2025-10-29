@@ -85,6 +85,17 @@ package environment_pkg;
     // Configure environment
     //============================================================================
     task configure();
+      int policy_randomizer;
+
+      policy_randomizer = $urandom_range(1, 5);
+      case (policy_randomizer)
+        'd1: this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_TRANSACTION);
+        'd2: this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
+        'd3: this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_FRAME);
+        'd4: this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_SEQUENCE);
+        'd5: this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_QUEUE);
+      endcase
+
       // configuration for input
       this.input_axis_agent.master_sequencer.set_repeat_transaction_mode(1);
       this.input_axis_agent.master_sequencer.set_inactive_drive_output_0();

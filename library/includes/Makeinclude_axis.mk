@@ -15,5 +15,4 @@ SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axis/adi_axis_frame.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axis/axis_transaction_adapter.sv
 SV_DEPS += $(TB_LIBRARY_PATH)/vip/amd/axis/axis_definitions.svh
 SV_DEPS += $(TB_LIBRARY_PATH)/utilities/pub_sub_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_fifo_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_fifo_primitive_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/utilities/adi_fifo_class_pkg.sv

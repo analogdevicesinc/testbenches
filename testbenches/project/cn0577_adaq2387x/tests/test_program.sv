@@ -152,12 +152,34 @@ localparam int N = (`TWOLANES == 0 && `ADC_RES == 16) ? 16 :
                    -1; // Error case
 parameter int num_of_dco = N / 2;
 
+// dco delay compared to the reference clk
+localparam DCO_DELAY = 12;
+
+reg  dco_init = 1'b0;
+
+  // ---------------------------------------------------------------------------
+  // Creating a "gate" through which the data clock can run (and only then)
+  // ---------------------------------------------------------------------------
+
+ initial begin
+  forever begin
+    if (clk_gate == 1'b1) begin
+      dco_init = ref_clk;
+    end else begin
+      dco_init = 1'b0;
+    end
+  end
+end
+
+  // ---------------------------------------------------------------------------
+  // Data clocks generation
+  // ---------------------------------------------------------------------------
+
 initial begin
   forever begin
     @(posedge dco_in, negedge dco_in) begin
-      #1
-      dco_p <= dco_in;
-      dco_n <= ~dco_in;
+    dco_p <= #DCO_DELAY  dco_init;
+    dco_n <= #DCO_DELAY  ~dco_init;
     end
   end
  end

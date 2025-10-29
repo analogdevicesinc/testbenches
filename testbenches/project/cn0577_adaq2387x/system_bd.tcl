@@ -51,6 +51,9 @@ if {$CN0577_ADAQ2387X_N == 1} {
   source $ad_hdl_dir/projects/adaq2387x/common/adaq2387x_bd.tcl
 }
 
+ad_disconnect  sys_200m_clk  axi_ltc2387/delay_clk
+ad_connect     sys_dma_clk   axi_ltc2387/delay_clk
+
 set BA_AXI_LTC2387 0x44A00000
 set_property offset $BA_AXI_LTC2387 [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ltc2387}]
 adi_sim_add_define "AXI_LTC2387_BA=[format "%d" ${BA_AXI_LTC2387}]"

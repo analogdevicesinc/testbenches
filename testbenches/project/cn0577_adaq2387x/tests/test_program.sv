@@ -49,10 +49,6 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 localparam NUM_OF_TRANSFERS = 16;
 
-//---------------------------------------------------------------------------
-// SPI Engine configuration parameters
-//---------------------------------------------------------------------------
-
 program test_program (
   input           ref_clk,
   input           clk_gate,
@@ -74,11 +70,6 @@ dmac_api dmac_api_inst;
 pwm_gen_api pwm_gen_api_inst;
 adc_api ltc2387_adc_api;
 common_api ltc2387_common_api;
-
-// dma interface
-wire                     adc_valid;
-wire  [`ADC_RES-1:0]     adc_data;
-reg                      adc_dovf = 1'b0;
 
 // --------------------------
 // Main procedure
@@ -361,9 +352,9 @@ task data_acquisition_test();
 
     // Configure axi_ltc2387
     ltc2387_adc_api.reset(
-      .ce_n(0),
-      .mmcm_rstn(1),
-      .rstn(1)); // bring out of reset
+      .ce_n(1'b0),
+      .mmcm_rstn(1'b1),
+      .rstn(1'b1)); // bring out of reset
 
     ltc2387_adc_api.set_adc_config_wr(
       .cfg(32'h00002181)); // set static data setup in device's reg 0x21

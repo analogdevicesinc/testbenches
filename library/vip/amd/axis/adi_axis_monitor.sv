@@ -45,6 +45,7 @@ package adi_axis_monitor_pkg;
   import adi_object_pkg::*;
   import adi_axis_transaction_pkg::*;
   import adi_fifo_class_pkg::*;
+  import adi_axis_config_pkg::*;
 
   class adi_axis_monitor_base extends adi_monitor;
 
@@ -125,7 +126,8 @@ package adi_axis_monitor_pkg;
       xil_axi4stream_uint tid;
       xil_axi4stream_uint tdest;
       xil_axi4stream_user_beat tuser;
-      adi_axis_transaction adi_transaction = new(`AXIS_TRANSACTION_SEQ_PARAM(AXIS));
+      adi_axis_config axis_cfg = new(`AXIS_TRANSACTION_SEQ_PARAM(AXIS));
+      adi_axis_transaction adi_transaction = new(.cfg(axis_cfg));
       adi_fifo_class #(adi_axis_transaction) data_queue = new();
 
       forever begin

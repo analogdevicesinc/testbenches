@@ -45,6 +45,9 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/vip/amd/axis/adi_axis_packet.sv" \
   "$ad_tb_dir/library/vip/amd/axis/adi_axis_frame.sv" \
   "$ad_tb_dir/library/vip/amd/axis/axis_transaction_adapter.sv" \
+  "$ad_tb_dir/library/vip/amd/axis/axis_transaction_to_byte_adapter.sv" \
+  "$ad_tb_dir/library/vip/amd/axis/adi_axis_config.sv" \
+  "$ad_tb_dir/library/vip/amd/axis/adi_axis_rand_config.sv" \
   "$ad_tb_dir/library/vip/amd/axis/axis_definitions.svh" \
   "$ad_tb_dir/library/utilities/pub_sub_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_fifo_pkg.sv" \

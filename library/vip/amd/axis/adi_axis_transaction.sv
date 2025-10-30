@@ -40,21 +40,14 @@ package adi_axis_transaction_pkg;
   import logger_pkg::*;
   import adi_object_pkg::*;
   import adi_axis_byte_pkg::*;
+  import adi_axis_config_pkg::*;
+  import adi_axis_rand_config_pkg::*;
 
 
   class adi_axis_transaction extends adi_object;
 
-    int BYTES_PER_TRANSACTION;
-    bit EN_TKEEP;
-    bit EN_TSTRB;
-    bit EN_TLAST;
-    bit EN_TUSER;
-    bit EN_TID;
-    bit EN_TDEST;
-    bit TUSER_BYTE_BASED;
-    int TID_WIDTH;
-    int TDEST_WIDTH;
-    int TUSER_WIDTH;
+    adi_axis_config cfg;
+    adi_axis_rand_config rand_cfg;
 
     adi_axis_byte bytes [];
     rand logic tlast = 1'b1;
@@ -62,108 +55,129 @@ package adi_axis_transaction_pkg;
     rand logic [32-1:0] tdest = {32{1'b0}};
     rand logic [32-1:0] tuser = {32{1'b0}};
 
-    constraint c_tlast { (this.EN_TLAST == 0) -> (tlast == 1'b1); }
-    constraint c_tid { (this.EN_TID == 0) -> (tid == {32{1'b0}});
-                       tid < 2**this.TID_WIDTH; }
-    constraint c_tdest { (this.EN_TDEST == 0) -> (tdest == {32{1'b0}});
-                         tdest < 2**this.TDEST_WIDTH; }
-    constraint c_tuser { (this.EN_TUSER == 0 || this.TUSER_BYTE_BASED == 1) -> (tuser == {32{1'b0}});
-                         (this.EN_TUSER == 1 && this.TUSER_BYTE_BASED == 0) -> (tuser < 2**this.TUSER_WIDTH); }
+    constraint c_tlast {
+      if (this.cfg.EN_TLAST == 0) {
+        this.tlast == 1'b1;
+      }
+    }
+    constraint c_tid {
+      if (this.cfg.EN_TID == 0) {
+        this.tid == {32{1'b0}};
+      }
+      if (this.rand_cfg.TID_MODE != 0) {
+        this.tid == this.rand_cfg.tid;
+      } else {
+        this.tid < 2**this.cfg.TID_WIDTH;
+      }
+    }
+    constraint c_tdest {
+      if (this.cfg.EN_TDEST == 0) {
+        this.tdest == {32{1'b0}};
+      }
+      if (this.rand_cfg.TDEST_MODE != 0) {
+        this.tdest == this.rand_cfg.tdest;
+      } else {
+        this.tdest < 2**this.cfg.TDEST_WIDTH;
+      }
+    }
+    constraint c_tuser {
+      if (this.cfg.EN_TUSER == 0 || this.cfg.TUSER_BYTE_BASED == 1) {
+        this.tuser == {32{1'b0}};
+      }
+      if (this.cfg.EN_TUSER == 1 && this.cfg.TUSER_BYTE_BASED == 0) {
+        if (this.rand_cfg.TUSER_TX_MODE == 1 || this.rand_cfg.TUSER_TX_MODE == 2) {
+          this.tuser == this.rand_cfg.tuser_tx;
+        } else {
+          this.tuser < 2**this.cfg.TUSER_WIDTH;
+        }
+      }
+    }
 
     function new(
       input string name = "",
-      input int bytes_per_transaction = 0,
-      input int BYTES_PER_TRANSACTION,
-      input bit EN_TKEEP = 0,
-      input bit EN_TSTRB = 0,
-      input bit EN_TLAST = 0,
-      input bit EN_TUSER = 0,
-      input bit EN_TID = 0,
-      input bit EN_TDEST = 0,
-      input bit TUSER_BYTE_BASED = 0,
-      input int TID_WIDTH = 0,
-      input int TDEST_WIDTH = 0,
-      input int TUSER_WIDTH = 0);
+      input adi_axis_config cfg,
+      input adi_axis_rand_config rand_cfg = null);
 
       super.new(name);
 
-      this.BYTES_PER_TRANSACTION = BYTES_PER_TRANSACTION;
-      this.EN_TKEEP = EN_TKEEP;
-      this.EN_TSTRB = EN_TSTRB;
-      this.EN_TLAST = EN_TLAST;
-      this.EN_TUSER = EN_TUSER;
-      this.EN_TID = EN_TID;
-      this.EN_TDEST = EN_TDEST;
-      this.TUSER_BYTE_BASED = TUSER_BYTE_BASED;
-      this.TID_WIDTH = TID_WIDTH;
-      this.TDEST_WIDTH = TDEST_WIDTH;
-      this.TUSER_WIDTH = TUSER_WIDTH;
+      this.cfg = cfg;
+      if (rand_cfg == null) begin
+        this.rand_cfg = new();
+      end else begin
+        this.rand_cfg = rand_cfg;
+      end
 
       this.create_transaction();
     endfunction: new
 
-    function void randomize_transaction();
+    function void randomize_transaction(input int bytes_per_transaction = 0);
       if (!this.randomize()) begin
         `FATAL(("Randomization failed!"));
       end
 
-      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
+      for (int i=0; i<this.cfg.BYTES_PER_TRANSACTION; i++) begin
         this.bytes[i].randomize_byte();
       end
     endfunction: randomize_transaction
 
-    function void create_transaction();
-      this.bytes = new [BYTES_PER_TRANSACTION];
+    function void post_randomize();
+      if (this.rand_cfg.TID_MODE == 1) begin
+        this.rand_cfg.tid = this.rand_cfg.tid + 1;
+      end
+      if (this.rand_cfg.TDEST_MODE == 1) begin
+        this.rand_cfg.tdest = this.rand_cfg.tdest + 1;
+      end
+      if (this.rand_cfg.TUSER_BYTE_MODE == 1) begin
+        this.rand_cfg.tuser_tx = this.rand_cfg.tuser_tx + 1;
+      end
+    endfunction: post_randomize
 
-      for (int i=0; i<BYTES_PER_TRANSACTION; i++) begin
+    function void create_transaction();
+      this.bytes = new [this.cfg.BYTES_PER_TRANSACTION];
+
+      for (int i=0; i<this.cfg.BYTES_PER_TRANSACTION; i++) begin
         this.bytes[i] = new(
-          .EN_TKEEP(EN_TKEEP),
-          .EN_TSTRB(EN_TSTRB),
-          .EN_TUSER((EN_TUSER && TUSER_BYTE_BASED)),
-          .TUSER_WIDTH(TUSER_WIDTH/BYTES_PER_TRANSACTION));
+          .cfg(this.cfg),
+          .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
       end
     endfunction: create_transaction
 
     function void update_tlast(input logic tlast);
-      if (this.EN_TLAST) begin
+      if (this.cfg.EN_TLAST) begin
         this.tlast = tlast;
       end else begin
         if (tlast != 1'b1) begin
           `WARNING(("Writing on a disabled TLAST parameter is ignored!"));
-          `ERROR(("Writing on a disabled TLAST parameter is ignored!"));
         end
       end
     endfunction: update_tlast
 
     function void update_tid(input logic [32-1:0] tid);
-      if (this.EN_TID) begin
+      if (this.cfg.EN_TID) begin
         this.tid = tid;
       end else begin
         if (tid != {32{1'b0}}) begin
           `WARNING(("Writing on a disabled TID parameter is ignored!"));
-          `ERROR(("Writing on a disabled TID parameter is ignored!"));
         end
       end
     endfunction: update_tid
 
     function void update_tdest(input logic [32-1:0] tdest);
-      if (this.EN_TDEST) begin
+      if (this.cfg.EN_TDEST) begin
         this.tdest = tdest;
       end else begin
         if (tdest != {32{1'b0}}) begin
           `WARNING(("Writing on a disabled TDEST parameter is ignored!"));
-          `ERROR(("Writing on a disabled TDEST parameter is ignored!"));
         end
       end
     endfunction: update_tdest
 
     function void update_tuser(input logic [32-1:0] tuser);
-      if (this.EN_TUSER) begin
+      if (this.cfg.EN_TUSER) begin
         this.tuser = tuser;
       end else begin
         if (tuser != {32{1'b0}}) begin
           `WARNING(("Writing on a disabled TUSER parameter is ignored!"));
-          `ERROR(("Writing on a disabled TUSER parameter is ignored!"));
         end
       end
     endfunction: update_tuser
@@ -195,10 +209,8 @@ package adi_axis_transaction_pkg;
       input logic [32-1:0] tuser = {32{1'b0}});
 
       adi_axis_byte byte_info = new(
-        .EN_TKEEP(this.EN_TKEEP),
-        .EN_TSTRB(this.EN_TSTRB),
-        .EN_TUSER(this.EN_TUSER && this.TUSER_BYTE_BASED),
-        .TUSER_WIDTH(this.TUSER_WIDTH));
+        .cfg(this.cfg),
+        .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
 
       byte_info.update_byte_info(
         .tdata(tdata),
@@ -236,7 +248,7 @@ package adi_axis_transaction_pkg;
         .tdest(this.tdest),
         .tuser(this.tuser));
 
-      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
+      for (int i=0; i<this.cfg.BYTES_PER_TRANSACTION; i++) begin
         this.bytes[i].copy(cast_object.bytes[i]);
       end
     endfunction: do_copy
@@ -248,15 +260,15 @@ package adi_axis_transaction_pkg;
         `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
       end
 
-      if ((this.EN_TLAST && (this.tlast != cast_object.tlast)) ||
-        (this.EN_TID && (this.tid != cast_object.tid)) ||
-        (this.EN_TDEST && (this.tdest != cast_object.tdest)) ||
-        (this.EN_TUSER && this.TUSER_BYTE_BASED && (this.tuser != cast_object.tuser))) begin
+      if ((this.cfg.EN_TLAST && (this.tlast != cast_object.tlast)) ||
+        (this.cfg.EN_TID && (this.tid != cast_object.tid)) ||
+        (this.cfg.EN_TDEST && (this.tdest != cast_object.tdest)) ||
+        (this.cfg.EN_TUSER && this.cfg.TUSER_BYTE_BASED && (this.tuser != cast_object.tuser))) begin
 
         return 0;
       end
 
-      for (int i=0; i<this.BYTES_PER_TRANSACTION; i++) begin
+      for (int i=0; i<this.cfg.BYTES_PER_TRANSACTION; i++) begin
         if (this.bytes[i].compare(cast_object.bytes[i]) == 0) begin
           return 0;
         end

@@ -46,6 +46,8 @@ import adi_axis_frame_pkg::*;
 import adi_object_pkg::*;
 import adi_fifo_class_pkg::*;
 import m_axis_sequencer_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -63,6 +65,9 @@ program test_program ();
   util_axis_fifo_environment #(`AXIS_VIP_PARAMS(test_harness, input_axis), `AXIS_VIP_PARAMS(test_harness, output_axis), `INPUT_CLK, `OUTPUT_CLK) uaf_env;
 
   watchdog send_data_wd;
+
+  adi_axis_config axis_cfg;
+  adi_axis_rand_config axis_rand_cfg;
 
   adi_axis_transaction axis_transaction;
   adi_axis_packet axis_packet;
@@ -107,14 +112,27 @@ program test_program ();
 
     uaf_env.input_axis_agent.master_sequencer.start();
 
-    axis_transaction = new(`AXIS_TRANSACTION_PARAM(test_harness, input_axis));
+    axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, input_axis));
+    axis_rand_cfg = new();
+
+    axis_rand_cfg.randomize_configuration();
+    axis_transaction = new(
+      .cfg(axis_cfg),
+      .rand_cfg(axis_rand_cfg));
+
+    axis_rand_cfg.randomize_configuration();
     axis_packet = new(
       .transactions_per_packet(5),
-      `AXIS_TRANSACTION_PARAM(test_harness, input_axis));
+      .cfg(axis_cfg),
+      .rand_cfg(axis_rand_cfg));
+
+    axis_rand_cfg.randomize_configuration();
     axis_frame = new(
       .packets_per_frame(5),
       .transactions_per_packet(5),
-      `AXIS_TRANSACTION_PARAM(test_harness, input_axis));
+      .cfg(axis_cfg),
+      .rand_cfg(axis_rand_cfg));
+
     axis_fifo = new();
 
     // stimulus

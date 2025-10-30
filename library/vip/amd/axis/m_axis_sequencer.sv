@@ -47,6 +47,7 @@ package m_axis_sequencer_pkg;
   import adi_axis_packet_pkg::*;
   import adi_axis_frame_pkg::*;
   import adi_fifo_class_pkg::*;
+  import adi_axis_config_pkg::*;
 
   typedef enum bit [2:0] {
     STOP_POLICY_TRANSACTION = 3'h0, // disable after transaction has been transferred
@@ -414,13 +415,15 @@ package m_axis_sequencer_pkg;
       input axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
       input adi_agent parent = null);
 
+      adi_axis_config axis_cfg = new(`AXIS_TRANSACTION_SEQ_PARAM(AXIS));
+
       super.new(name, parent);
 
       this.driver = driver;
 
       this.driver.vif_proxy.set_no_insert_x_when_keep_low(1);
 
-      this.transaction_object = new(`AXIS_TRANSACTION_SEQ_PARAM(AXIS));
+      this.transaction_object = new(.cfg(axis_cfg));
     endfunction: new
 
 
@@ -473,7 +476,7 @@ package m_axis_sequencer_pkg;
             this.xilinx_trans_object = this.driver.create_transaction();
 
             // extract information from object
-            for (int i=0; i<this.transaction_object.BYTES_PER_TRANSACTION; i++) begin
+            for (int i=0; i<this.transaction_object.cfg.BYTES_PER_TRANSACTION; i++) begin
               tdata[i] = this.transaction_object.bytes[i].tdata;
               tkeep[i] = this.transaction_object.bytes[i].tkeep;
               tstrb[i] = this.transaction_object.bytes[i].tstrb;
@@ -482,7 +485,7 @@ package m_axis_sequencer_pkg;
             tid = this.transaction_object.tid;
             tdest = this.transaction_object.tdest;
             if (AXIS_VIP_USER_BITS_PER_BYTE) begin
-              for (int i=0; i<this.transaction_object.BYTES_PER_TRANSACTION; i++) begin
+              for (int i=0; i<this.transaction_object.cfg.BYTES_PER_TRANSACTION; i++) begin
                 tuser[AXIS_VIP_USER_WIDTH/(AXIS_VIP_DATA_WIDTH/8)*i+:AXIS_VIP_USER_WIDTH/(AXIS_VIP_DATA_WIDTH/8)] = this.transaction_object.bytes[i].tuser;
               end
             end else begin
@@ -501,13 +504,13 @@ package m_axis_sequencer_pkg;
               this.xilinx_trans_object.set_last(tlast);
             end
             if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_ID) begin
-              this.xilinx_trans_object.set_id(tid);
+              this.xilinx_trans_object.set_id(tid[this.driver.C_XIL_AXI4STREAM_ID_WIDTH-1:0]);
             end
             if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_DEST) begin
-              this.xilinx_trans_object.set_dest(tdest);
+              this.xilinx_trans_object.set_dest(tdest[this.driver.C_XIL_AXI4STREAM_DEST_WIDTH-1:0]);
             end
             if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_USER) begin
-              this.xilinx_trans_object.set_user_beat(tuser);
+              this.xilinx_trans_object.set_user_beat(tuser[this.driver.C_XIL_AXI4STREAM_USER_WIDTH-1:0]);
             end
 
             this.driver.send(this.xilinx_trans_object);

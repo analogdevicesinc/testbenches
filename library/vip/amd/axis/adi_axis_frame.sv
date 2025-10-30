@@ -40,21 +40,14 @@ package adi_axis_frame_pkg;
   import logger_pkg::*;
   import adi_object_pkg::*;
   import adi_axis_packet_pkg::*;
+  import adi_axis_config_pkg::*;
+  import adi_axis_rand_config_pkg::*;
 
 
   class adi_axis_frame extends adi_object;
 
-    int BYTES_PER_TRANSACTION;
-    bit EN_TKEEP;
-    bit EN_TSTRB;
-    bit EN_TLAST;
-    bit EN_TUSER;
-    bit EN_TID;
-    bit EN_TDEST;
-    bit TUSER_BYTE_BASED;
-    int TID_WIDTH;
-    int TDEST_WIDTH;
-    int TUSER_WIDTH;
+    adi_axis_config cfg;
+    adi_axis_rand_config rand_cfg;
 
     adi_axis_packet packets[];
     int packets_per_frame;
@@ -66,35 +59,25 @@ package adi_axis_frame_pkg;
       input int packets_per_frame = 0,
       input int transactions_per_packet = 0,
       input int bytes_per_packet = 0,
-      input int BYTES_PER_TRANSACTION,
-      input bit EN_TKEEP = 0,
-      input bit EN_TSTRB = 0,
-      input bit EN_TLAST = 0,
-      input bit EN_TUSER = 0,
-      input bit EN_TID = 0,
-      input bit EN_TDEST = 0,
-      input bit TUSER_BYTE_BASED = 0,
-      input int TID_WIDTH = 0,
-      input int TDEST_WIDTH = 0,
-      input int TUSER_WIDTH = 0);
+      input adi_axis_config cfg,
+      input adi_axis_rand_config rand_cfg = null);
 
       super.new(name);
 
-      this.BYTES_PER_TRANSACTION = BYTES_PER_TRANSACTION;
-      this.EN_TKEEP = EN_TKEEP;
-      this.EN_TSTRB = EN_TSTRB;
-      this.EN_TLAST = EN_TLAST;
-      this.EN_TUSER = EN_TUSER;
-      this.EN_TID = EN_TID;
-      this.EN_TDEST = EN_TDEST;
-      this.TUSER_BYTE_BASED = TUSER_BYTE_BASED;
-      this.TID_WIDTH = TID_WIDTH;
-      this.TDEST_WIDTH = TDEST_WIDTH;
-      this.TUSER_WIDTH = TUSER_WIDTH;
+      this.cfg = cfg;
+      if (rand_cfg == null) begin
+        this.rand_cfg = new();
+      end else begin
+        this.rand_cfg = rand_cfg;
+      end
 
       this.packets_per_frame = packets_per_frame;
       this.transactions_per_packet = transactions_per_packet;
       this.bytes_per_packet = bytes_per_packet;
+
+      if (this.bytes_per_packet) begin
+        this.rand_cfg.TKEEP_MODE = 1;
+      end
 
       if (this.packets_per_frame != 0) begin
         this.create_frame();
@@ -109,34 +92,49 @@ package adi_axis_frame_pkg;
       for (int i=0; i<this.packets.size(); i++) begin
         this.packets[i].randomize_packet();
       end
+
+      if (!this.randomize()) begin
+        `FATAL(("Randomization failed!"));
+      end
     endfunction: randomize_frame
 
-    function void create_frame(input int packets_per_frame = 0);
+    function void post_randomize();
+      if (this.rand_cfg.TID_MODE == 3) begin
+        this.rand_cfg.tid = this.rand_cfg.tid + 1;
+      end
+      if (this.rand_cfg.TDEST_MODE == 3) begin
+        this.rand_cfg.tdest = this.rand_cfg.tdest + 1;
+      end
+    endfunction: post_randomize
+
+    function void create_frame(
+      input int packets_per_frame = 0,
+      input int transactions_per_packet = 0,
+      input int bytes_per_packet = 0);
+
       if (packets_per_frame > 0) begin
-        this.packets = new[packets_per_frame];
-      end else begin
-        if (this.packets_per_frame == 0) begin
-          `FATAL(("Creating a frame without packet count set is not allowed!"));
-        end else begin
-          this.packets = new[this.packets_per_frame];
-        end
+        this.packets_per_frame = packets_per_frame;
       end
 
-      for (int i=0; i<this.packets.size(); i++) begin
-        this.packets[i] = new(
-          .transactions_per_packet(this.transactions_per_packet),
-          .bytes_per_packet(this.bytes_per_packet),
-          .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
-          .EN_TKEEP(this.EN_TKEEP),
-          .EN_TSTRB(this.EN_TSTRB),
-          .EN_TLAST(this.EN_TLAST),
-          .EN_TUSER(this.EN_TUSER),
-          .EN_TID(this.EN_TID),
-          .EN_TDEST(this.EN_TDEST),
-          .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
-          .TID_WIDTH(this.TID_WIDTH),
-          .TDEST_WIDTH(this.TDEST_WIDTH),
-          .TUSER_WIDTH(this.TUSER_WIDTH));
+      if (this.packets_per_frame == 0) begin
+        `FATAL(("Creating a frame without packet count set is not allowed!"));
+      end else begin
+        this.packets = new[this.packets_per_frame];
+      end
+
+      if (transactions_per_packet > 0 || bytes_per_packet > 0) begin
+        this.bytes_per_packet = bytes_per_packet;
+        this.transactions_per_packet = transactions_per_packet;
+      end
+
+      if (this.transactions_per_packet > 0 || this.bytes_per_packet > 0) begin
+        for (int i=0; i<this.packets.size(); i++) begin
+          this.packets[i] = new(
+            .transactions_per_packet(this.transactions_per_packet),
+            .bytes_per_packet(this.bytes_per_packet),
+            .cfg(this.cfg),
+            .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
+        end
       end
     endfunction: create_frame
 
@@ -151,17 +149,9 @@ package adi_axis_frame_pkg;
       this.packets = new [this.packets.size() + 1] (this.packets);
       this.packets[this.packets.size()-1] = new(
         .transactions_per_packet(packet_info.transactions_per_packet),
-        .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
-        .EN_TKEEP(this.EN_TKEEP),
-        .EN_TSTRB(this.EN_TSTRB),
-        .EN_TLAST(this.EN_TLAST),
-        .EN_TUSER(this.EN_TUSER),
-        .EN_TID(this.EN_TID),
-        .EN_TDEST(this.EN_TDEST),
-        .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
-        .TID_WIDTH(this.TID_WIDTH),
-        .TDEST_WIDTH(this.TDEST_WIDTH),
-        .TUSER_WIDTH(this.TUSER_WIDTH));
+        .bytes_per_packet(this.bytes_per_packet),
+        .cfg(this.cfg),
+        .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
 
       this.update_packet_class(
         .location(this.packets.size()-1),
@@ -186,17 +176,10 @@ package adi_axis_frame_pkg;
 
       for (int i=0; i<this.packets.size(); i++) begin
         cast_object.packets[i] = new(
-          .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
-          .EN_TKEEP(this.EN_TKEEP),
-          .EN_TSTRB(this.EN_TSTRB),
-          .EN_TLAST(this.EN_TLAST),
-          .EN_TUSER(this.EN_TUSER),
-          .EN_TID(this.EN_TID),
-          .EN_TDEST(this.EN_TDEST),
-          .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
-          .TID_WIDTH(this.TID_WIDTH),
-          .TDEST_WIDTH(this.TDEST_WIDTH),
-          .TUSER_WIDTH(this.TUSER_WIDTH));
+          .transactions_per_packet(this.transactions_per_packet),
+          .bytes_per_packet(this.bytes_per_packet),
+          .cfg(this.cfg),
+          .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
         this.packets[i].copy(cast_object.packets[i]);
       end
     endfunction: do_copy

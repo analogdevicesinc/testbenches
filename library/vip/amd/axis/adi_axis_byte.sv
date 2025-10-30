@@ -39,39 +39,72 @@ package adi_axis_byte_pkg;
 
   import logger_pkg::*;
   import adi_object_pkg::*;
+  import adi_axis_config_pkg::*;
+  import adi_axis_rand_config_pkg::*;
 
 
   class adi_axis_byte extends adi_object;
 
-    bit EN_TKEEP;
-    bit EN_TSTRB;
-    bit EN_TUSER;
-    int TUSER_WIDTH;
+    adi_axis_config cfg;
+    adi_axis_rand_config rand_cfg;
 
     rand logic [7:0] tdata = 8'd0;
     rand logic tkeep = 1'b1;
-    rand logic tstrb = 1'b0;
+    rand logic tstrb = 1'b1;
     rand logic [32-1:0] tuser = {32{1'b0}};
 
-    constraint c_tkeep { (this.EN_TKEEP == 0) -> (tkeep == 1'b1); }
-    constraint c_tstrb { (this.EN_TSTRB == 0 || tkeep == 1'b0) -> (tstrb == tkeep); }
+    // construct constraints
+    constraint c_tdata {
+      if (this.rand_cfg.TDATA_MODE == 1 || this.rand_cfg.TDATA_MODE == 2) {
+        this.tdata == this.rand_cfg.tdata;
+      }
+    }
+    constraint c_tkeep {
+      if (this.cfg.EN_TKEEP == 0) {
+        this.tkeep == 1'b1;
+      } else {
+        if (this.rand_cfg.TKEEP_MODE == 1) {
+          this.tkeep == this.rand_cfg.tkeep;
+        }
+      }
+    }
+    constraint c_tstrb {
+      if (this.cfg.EN_TSTRB == 0 || this.tkeep == 1'b0) {
+        this.tstrb == this.tkeep;
+      } else {
+        if (this.rand_cfg.TSTRB_MODE == 1 || this.rand_cfg.TSTRB_MODE == 2) {
+          this.tstrb == this.rand_cfg.tstrb;
+        }
+      }
+    }
+    constraint c_tuser {
+      if (this.cfg.EN_TUSER == 0 || this.cfg.TUSER_BYTE_BASED == 0) {
+        this.tuser == {32{1'b0}};
+      }
+      if (this.cfg.EN_TUSER == 1 && this.cfg.TUSER_BYTE_BASED == 1) {
+        if (this.rand_cfg.TUSER_BYTE_MODE == 1 || this.rand_cfg.TUSER_BYTE_MODE == 2) {
+          this.tuser == this.rand_cfg.tuser_byte;
+        } else {
+          this.tuser < 2**this.cfg.TUSER_WIDTH;
+        }
+      }
+    }
+
     constraint c_tstrb_order { solve tkeep before tstrb; }
-    constraint c_tuser { (this.EN_TUSER == 0) -> (tuser == {32{1'b0}});
-                         tuser < 2**this.TUSER_WIDTH; }
 
     function new(
       input string name = "",
-      bit EN_TKEEP = 0,
-      bit EN_TSTRB = 0,
-      bit EN_TUSER = 0,
-      int TUSER_WIDTH = 1);
+      input adi_axis_config cfg,
+      input adi_axis_rand_config rand_cfg = null);
 
       super.new(name);
 
-      this.EN_TKEEP = EN_TKEEP;
-      this.EN_TSTRB = EN_TSTRB;
-      this.EN_TUSER = EN_TUSER;
-      this.TUSER_WIDTH = TUSER_WIDTH;
+      this.cfg = cfg;
+      if (rand_cfg == null) begin
+        this.rand_cfg = new();
+      end else begin
+        this.rand_cfg = rand_cfg;
+      end
     endfunction: new
 
     function void randomize_byte();
@@ -80,39 +113,48 @@ package adi_axis_byte_pkg;
       end
     endfunction: randomize_byte
 
+    function void post_randomize();
+      if (this.rand_cfg.TDATA_MODE == 1) begin
+        this.rand_cfg.tdata = this.rand_cfg.tdata + 1;
+      end
+      if (this.rand_cfg.TSTRB_MODE == 2) begin
+        this.rand_cfg.tstrb = ~this.rand_cfg.tstrb;
+      end
+      if (this.rand_cfg.TUSER_BYTE_MODE == 1) begin
+        this.rand_cfg.tuser_byte = this.rand_cfg.tuser_byte + 1;
+      end
+    endfunction: post_randomize
+
     function void update_tdata(input logic [7:0] tdata);
       this.tdata = tdata;
     endfunction: update_tdata
 
     function void update_tkeep(input logic tkeep);
-      if (this.EN_TKEEP) begin
+      if (this.cfg.EN_TKEEP) begin
         this.tkeep = tkeep;
       end else begin
         if (tkeep != 1'b1) begin
           `WARNING(("Writing on a disabled TKEEP parameter is ignored!"));
-          `ERROR(("Writing on a disabled TKEEP parameter is ignored!"));
         end
       end
     endfunction: update_tkeep
 
     function void update_tstrb(input logic tstrb);
-      if (this.EN_TSTRB) begin
+      if (this.cfg.EN_TSTRB) begin
         this.tstrb = tstrb;
       end else begin
         if (tstrb != tkeep) begin
           `WARNING(("Writing on a disabled TSTRB parameter is ignored!"));
-          `ERROR(("Writing on a disabled TSTRB parameter is ignored!"));
         end
       end
     endfunction: update_tstrb
 
     function void update_tuser(input logic [32-1:0] tuser);
-      if (this.EN_TUSER) begin
+      if (this.cfg.EN_TUSER) begin
         this.tuser = tuser;
       end else begin
         if (tuser != {32{1'b0}}) begin
           `WARNING(("Writing on a disabled TUSER parameter is ignored!"));
-          `ERROR(("Writing on a disabled TUSER parameter is ignored!"));
         end
       end
     endfunction: update_tuser
@@ -165,9 +207,9 @@ package adi_axis_byte_pkg;
       end
 
       if (this.tdata != cast_object.tdata ||
-        (this.EN_TKEEP && (this.tkeep != cast_object.tkeep)) ||
-        (this.EN_TSTRB && (this.tstrb != cast_object.tstrb)) ||
-        (this.EN_TUSER && (this.tuser != cast_object.tuser))) begin
+        (this.cfg.EN_TKEEP && (this.tkeep != cast_object.tkeep)) ||
+        (this.cfg.EN_TSTRB && (this.tstrb != cast_object.tstrb)) ||
+        (this.cfg.EN_TUSER && (this.tuser != cast_object.tuser))) begin
 
         return 0;
       end

@@ -40,21 +40,14 @@ package adi_axis_packet_pkg;
   import logger_pkg::*;
   import adi_object_pkg::*;
   import adi_axis_transaction_pkg::*;
+  import adi_axis_config_pkg::*;
+  import adi_axis_rand_config_pkg::*;
 
 
   class adi_axis_packet extends adi_object;
 
-    int BYTES_PER_TRANSACTION;
-    bit EN_TKEEP;
-    bit EN_TSTRB;
-    bit EN_TLAST;
-    bit EN_TUSER;
-    bit EN_TID;
-    bit EN_TDEST;
-    bit TUSER_BYTE_BASED;
-    int TID_WIDTH;
-    int TDEST_WIDTH;
-    int TUSER_WIDTH;
+    adi_axis_config cfg;
+    adi_axis_rand_config rand_cfg;
 
     adi_axis_transaction transactions[];
     int transactions_per_packet;
@@ -64,34 +57,24 @@ package adi_axis_packet_pkg;
       input string name = "",
       input int transactions_per_packet = 0,
       input int bytes_per_packet = 0,
-      input int BYTES_PER_TRANSACTION,
-      input bit EN_TKEEP = 0,
-      input bit EN_TSTRB = 0,
-      input bit EN_TLAST = 0,
-      input bit EN_TUSER = 0,
-      input bit EN_TID = 0,
-      input bit EN_TDEST = 0,
-      input bit TUSER_BYTE_BASED = 0,
-      input int TID_WIDTH = 0,
-      input int TDEST_WIDTH = 0,
-      input int TUSER_WIDTH = 0);
+      input adi_axis_config cfg,
+      input adi_axis_rand_config rand_cfg = null);
 
       super.new(name);
 
-      this.BYTES_PER_TRANSACTION = BYTES_PER_TRANSACTION;
-      this.EN_TKEEP = EN_TKEEP;
-      this.EN_TSTRB = EN_TSTRB;
-      this.EN_TLAST = EN_TLAST;
-      this.EN_TUSER = EN_TUSER;
-      this.EN_TID = EN_TID;
-      this.EN_TDEST = EN_TDEST;
-      this.TUSER_BYTE_BASED = TUSER_BYTE_BASED;
-      this.TID_WIDTH = TID_WIDTH;
-      this.TDEST_WIDTH = TDEST_WIDTH;
-      this.TUSER_WIDTH = TUSER_WIDTH;
+      this.cfg = cfg;
+      if (rand_cfg == null) begin
+        this.rand_cfg = new();
+      end else begin
+        this.rand_cfg = rand_cfg;
+      end
 
       this.bytes_per_packet = bytes_per_packet;
-      this.transactions_per_packet = `MAX($ceil(this.bytes_per_packet/this.BYTES_PER_TRANSACTION), transactions_per_packet);
+      this.transactions_per_packet = `MAX($ceil(this.bytes_per_packet/this.cfg.BYTES_PER_TRANSACTION), transactions_per_packet);
+
+      if (this.bytes_per_packet) begin
+        this.rand_cfg.TKEEP_MODE = 1;
+      end
 
       if (this.transactions_per_packet > 0 || this.bytes_per_packet > 0) begin
         this.create_packet();
@@ -105,48 +88,53 @@ package adi_axis_packet_pkg;
 
       for (int i=0; i<this.transactions.size(); i++) begin
         this.transactions[i].randomize_transaction();
-        if (this.EN_TLAST) begin
+        if (this.cfg.EN_TLAST) begin
           this.transactions[i].update_tlast(1'b0);
         end
-        if (this.EN_TID) begin
+        if (this.cfg.EN_TID) begin
           this.transactions[i].update_tid(this.transactions[0].tid);
         end
-        if (this.EN_TDEST) begin
+        if (this.cfg.EN_TDEST) begin
           this.transactions[i].update_tdest(this.transactions[0].tdest);
         end
       end
-      if (this.EN_TLAST) begin
+      if (this.cfg.EN_TLAST) begin
         this.transactions[this.transactions.size()-1].update_tlast(1'b1);
       end
+
+      if (!this.randomize()) begin
+        `FATAL(("Randomization failed!"));
+      end
     endfunction: randomize_packet
+
+    function void post_randomize();
+      if (this.rand_cfg.TID_MODE == 2) begin
+        this.rand_cfg.tid = this.rand_cfg.tid + 1;
+      end
+      if (this.rand_cfg.TDEST_MODE == 2) begin
+        this.rand_cfg.tdest = this.rand_cfg.tdest + 1;
+      end
+    endfunction: post_randomize
 
     function void create_packet(
       input int transactions_per_packet = 0,
       input int bytes_per_packet = 0);
 
       if (transactions_per_packet > 0 || bytes_per_packet > 0) begin
-        this.transactions = new[`MAX(transactions_per_packet, $ceil(bytes_per_packet/this.BYTES_PER_TRANSACTION))];
+        this.bytes_per_packet = bytes_per_packet;
+        this.transactions_per_packet = `MAX($ceil(this.bytes_per_packet/this.cfg.BYTES_PER_TRANSACTION), transactions_per_packet);
+      end
+
+      if (this.transactions_per_packet == 0 && this.bytes_per_packet == 0) begin
+        `FATAL(("Creating a packet without transaction count or byte size set is not allowed!"));
       end else begin
-        if (this.transactions_per_packet == 0 && this.bytes_per_packet == 0) begin
-          `FATAL(("Creating a packet without transaction or byte size set is not allowed!"));
-        end else begin
-          this.transactions = new[`MAX(this.transactions_per_packet, $ceil(this.bytes_per_packet/this.BYTES_PER_TRANSACTION))];
-        end
+        this.transactions = new[`MAX(this.transactions_per_packet, $ceil(this.bytes_per_packet/this.cfg.BYTES_PER_TRANSACTION))];
       end
 
       for (int i=0; i<this.transactions.size(); i++) begin
         this.transactions[i] = new(
-          .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
-          .EN_TKEEP(this.EN_TKEEP),
-          .EN_TSTRB(this.EN_TSTRB),
-          .EN_TLAST(this.EN_TLAST),
-          .EN_TUSER(this.EN_TUSER),
-          .EN_TID(this.EN_TID),
-          .EN_TDEST(this.EN_TDEST),
-          .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
-          .TID_WIDTH(this.TID_WIDTH),
-          .TDEST_WIDTH(this.TDEST_WIDTH),
-          .TUSER_WIDTH(this.TUSER_WIDTH));
+          .cfg(this.cfg),
+          .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
       end
     endfunction: create_packet
 
@@ -173,22 +161,13 @@ package adi_axis_packet_pkg;
     endfunction: update_transaction_class
 
     function void add_transaction_class(input adi_axis_transaction transaction_info);
-      if (this.EN_TLAST) begin
+      if (this.cfg.EN_TLAST) begin
         this.transactions[this.transactions.size()-1].update_tlast(1'b0);
       end
       this.transactions = new [this.transactions.size() + 1] (this.transactions);
       this.transactions[this.transactions.size()-1] = new(
-        .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
-        .EN_TKEEP(this.EN_TKEEP),
-        .EN_TSTRB(this.EN_TSTRB),
-        .EN_TLAST(this.EN_TLAST),
-        .EN_TUSER(this.EN_TUSER),
-        .EN_TID(this.EN_TID),
-        .EN_TDEST(this.EN_TDEST),
-        .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
-        .TID_WIDTH(this.TID_WIDTH),
-        .TDEST_WIDTH(this.TDEST_WIDTH),
-        .TUSER_WIDTH(this.TUSER_WIDTH));
+        .cfg(this.cfg),
+        .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
 
       this.update_transaction_class(
         .location(this.transactions.size()-1),
@@ -213,17 +192,8 @@ package adi_axis_packet_pkg;
 
       for (int i=0; i<this.transactions.size(); i++) begin
         cast_object.transactions[i] = new(
-          .BYTES_PER_TRANSACTION(this.BYTES_PER_TRANSACTION),
-          .EN_TKEEP(this.EN_TKEEP),
-          .EN_TSTRB(this.EN_TSTRB),
-          .EN_TLAST(this.EN_TLAST),
-          .EN_TUSER(this.EN_TUSER),
-          .EN_TID(this.EN_TID),
-          .EN_TDEST(this.EN_TDEST),
-          .TUSER_BYTE_BASED(this.TUSER_BYTE_BASED),
-          .TID_WIDTH(this.TID_WIDTH),
-          .TDEST_WIDTH(this.TDEST_WIDTH),
-          .TUSER_WIDTH(this.TUSER_WIDTH));
+          .cfg(this.cfg),
+          .rand_cfg(adi_axis_rand_config'(this.rand_cfg.clone())));
         this.transactions[i].copy(cast_object.transactions[i]);
       end
     endfunction: do_copy

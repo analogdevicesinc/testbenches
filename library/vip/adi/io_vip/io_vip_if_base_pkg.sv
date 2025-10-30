@@ -1,6 +1,5 @@
 // ***************************************************************************
-// ***************************************************************************
-// Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +7,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,30 +32,22 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`include "utils.svh"
+package io_vip_if_base_pkg;
 
-module system_tb();
+  virtual class io_vip_if_base;
 
-      wire ad738x_spi_sclk;
-      wire ad738x_spi_sdo;
-      wire [`NUM_OF_SDI-1:0] ad738x_spi_sdi;
-      wire ad738x_spi_cs;
-      wire ad738x_spi_clk;
-      wire ad738x_irq;
+    function new();
+    endfunction
 
-    `TEST_PROGRAM test(
-      .ad738x_spi_clk (ad738x_spi_clk),
-      .ad738x_irq (ad738x_irq),
-      .ad738x_spi_sdi(ad738x_spi_sdi),
-      .ad738x_spi_cs (ad738x_spi_cs),
-      .ad738x_spi_sclk (ad738x_spi_sclk));
+    pure virtual function void set_io(input logic [1023:0] o);
+    pure virtual function logic [1023:0] get_io();
+    pure virtual task wait_io_change();
+    pure virtual task wait_posedge_clk();
+    pure virtual task wait_negedge_clk();
+    pure virtual function int get_width();
+    pure virtual function void set_positive_edge();
+    pure virtual function void set_negative_edge();
 
-    test_harness `TH (
-      .ad738x_spi_clk (ad738x_spi_clk),
-      .ad738x_irq(ad738x_irq),
-      .ad738x_spi_sdo (ad738x_spi_sdo),
-      .ad738x_spi_sdi (ad738x_spi_sdi),
-      .ad738x_spi_cs (ad738x_spi_cs),
-      .ad738x_spi_sclk (ad738x_spi_sclk));
+  endclass: io_vip_if_base
 
-endmodule
+endpackage: io_vip_if_base_pkg

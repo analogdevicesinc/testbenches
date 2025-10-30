@@ -117,7 +117,7 @@ if {[dict exists $m_dma_cfg USE_EXT_SYNC]} {
 }
 if {[dict exists $s_dma_cfg USE_EXT_SYNC]} {
   if {[dict get $s_dma_cfg USE_EXT_SYNC] == 1} {
-    ad_connect dst_sync_io_vip/out dut_rx_dma/dest_ext_sync
+    ad_connect dst_sync_io_vip/o dut_rx_dma/dest_ext_sync
   }
 }
 

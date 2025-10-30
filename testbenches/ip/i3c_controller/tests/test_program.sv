@@ -43,6 +43,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import i3c_controller_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
@@ -151,7 +152,10 @@ program test_program (
   timeunit 1ns;
   timeprecision 1ps;
 
-test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 i3c_controller_api i3c_controller;
 
 //---------------------------------------------------------------------------
@@ -253,13 +257,20 @@ end
 initial begin
 
   // Creating environment
-  base_env = new("Base Environment",
-                  `TH.`SYS_CLK.inst.IF,
-                  `TH.`DMA_CLK.inst.IF,
-                  `TH.`DDR_CLK.inst.IF,
-                  `TH.`SYS_RST.inst.IF,
-                  `TH.`MNG_AXI.inst.IF,
-                  `TH.`DDR_AXI.inst.IF);
+  base_env = new(
+    .name("Base Environment"),
+    .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+    .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+    .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+    .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+    .irq_base_address(`IRQ_C_BA),
+    .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+
+  mng = new("", `TH.`MNG_AXI.inst.IF);
+  ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+  `LINK(mng, base_env, mng)
+  `LINK(ddr, base_env, ddr)
 
   i3c_controller = new(
     "I3C Controller API",

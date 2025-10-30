@@ -38,6 +38,7 @@
 import logger_pkg::*;
 import environment_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import adi_regmap_pkg::*;
@@ -57,7 +58,11 @@ program test_program;
   timeprecision 1ps;
 
   // declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+
   dma_flock_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis_vip), `AXIS_VIP_PARAMS(test_harness, dst_axis_vip)) dma_flock_env;
 
   // Register accessors
@@ -71,13 +76,20 @@ program test_program;
 
   initial begin
     //creating environment
-    base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+    base_env = new(
+      .name("Base Environment"),
+      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+      .irq_base_address(`IRQ_C_BA),
+      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     dma_flock_env = new("DMA Flock Environment",
                         `TH.`SRC_AXIS.inst.IF,
@@ -159,9 +171,9 @@ program test_program;
     dma_flock_env.dst_axis_agent.slave_sequencer.start();
 
     // Set no backpressure from DDR
-    wready_gen = base_env.ddr.agent.wr_driver.create_ready("wready");
+    wready_gen = base_env.ddr.wr_driver.create_ready("wready");
     wready_gen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
-    base_env.ddr.agent.wr_driver.send_wready(wready_gen);
+    base_env.ddr.wr_driver.send_wready(wready_gen);
 
     m_seg = new(m_dmac_api.p);
     rand_succ = m_seg.randomize() with { dst_addr == 0;

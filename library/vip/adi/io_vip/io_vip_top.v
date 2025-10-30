@@ -33,74 +33,23 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`include "utils.svh"
-`include "axi_definitions.svh"
+module io_vip_top #(
+  parameter MODE = 1, // 1 - master, 0 - slave, 2 - passthrough
+  parameter WIDTH = 1, // bitwidth
+  parameter ASYNC = 0 // clock synchronous
+)(
+  input  clk,
+  input  [WIDTH-1:0] i,
+  output [WIDTH-1:0] o
+);
 
-import logger_pkg::*;
-import test_harness_env_pkg::*;
-import adi_axi_agent_pkg::*;
+  io_vip #(
+    .MODE(MODE),
+    .WIDTH(WIDTH),
+    .ASYNC(ASYNC)
+  ) inst (
+    .clk(clk),
+    .i(i),
+    .o(o));
 
-import `PKGIFY(test_harness, mng_axi_vip)::*;
-import `PKGIFY(test_harness, ddr_axi_vip)::*;
-
-program test_program;
-
-  timeunit 1ns;
-  timeprecision 1ps;
-
-  // Declare the class instances
-  test_harness_env base_env;
-
-  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
-  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
-
-  // Process variables
-  process current_process;
-  string current_process_random_state;
-
-
-  initial begin
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
-
-    current_process = process::self();
-    current_process_random_state = current_process.get_randstate();
-    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
-
-    // Create environment
-    base_env = new(
-      .name("Base Environment"),
-      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
-      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
-      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
-      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
-      .irq_base_address(`IRQ_C_BA),
-      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
-
-    mng = new("", `TH.`MNG_AXI.inst.IF);
-    ddr = new("", `TH.`DDR_AXI.inst.IF);
-
-    `LINK(mng, base_env, mng)
-    `LINK(ddr, base_env, ddr)
-
-    base_env.irq_handler = new(
-      .name("IRQ handler"),
-      .bus(base_env.mng.master_sequencer),
-      .base_address(`IRQ_C_BA),
-      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif),
-      .parent(base_env));
-
-    base_env.start();
-    base_env.sys_reset();
-    base_env.irq_handler.start();
-
-    /* Add stimulus tasks */
-
-    base_env.stop();
-
-    `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
-    $finish();
-
-  end
-
-endprogram
+endmodule

@@ -53,7 +53,6 @@ module system_tb();
 
     test_harness `TH (
       .ad738x_spi_clk (ad738x_spi_clk),
-      .irq (),
       .ad738x_irq(ad738x_irq),
       .ad738x_spi_sdo (ad738x_spi_sdo),
       .ad738x_spi_sdi (ad738x_spi_sdi),

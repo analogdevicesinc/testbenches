@@ -171,9 +171,9 @@ program test_program;
     dma_flock_env.dst_axis_agent.slave_sequencer.start();
 
     // Set no backpressure from DDR
-    wready_gen = base_env.ddr.agent.wr_driver.create_ready("wready");
+    wready_gen = base_env.ddr.wr_driver.create_ready("wready");
     wready_gen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
-    base_env.ddr.agent.wr_driver.send_wready(wready_gen);
+    base_env.ddr.wr_driver.send_wready(wready_gen);
 
     m_seg = new(m_dmac_api.p);
     rand_succ = m_seg.randomize() with { dst_addr == 0;

@@ -39,6 +39,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import dmac_api_pkg::*;
 import adc_api_pkg::*;
 import dac_api_pkg::*;

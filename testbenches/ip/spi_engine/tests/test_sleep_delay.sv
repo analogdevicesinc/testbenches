@@ -39,6 +39,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import spi_environment_pkg::*;
 import axi4stream_vip_pkg::*;
 import spi_engine_api_pkg::*;

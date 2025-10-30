@@ -43,6 +43,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import i3c_controller_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;

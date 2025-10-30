@@ -38,6 +38,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import environment_pkg::*;
 import dmac_api_pkg::*;
 import data_offload_api_pkg::*;

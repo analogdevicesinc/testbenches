@@ -37,6 +37,7 @@
 `include "axi_definitions.svh"
 
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import logger_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;

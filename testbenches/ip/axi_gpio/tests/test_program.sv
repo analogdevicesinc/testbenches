@@ -38,7 +38,7 @@ program test_program (
   // Test sequence: 0 -> 1 -> 0 -> 2 -> 0 -> 4 -> 0 -> 8 -> 0
   // This creates rising and falling edges on individual GPIO pins (bits 0,1,2,3)
   // Values 1,2,4,8 correspond to GPIO bits 0,1,2,3 respectively
-  int irq_seq[0:8] = '{32'h0, 32'h1, 32'h0, 32'h2, 32'h0, 32'h4, 32'h0, 32'h8, 32'h0};
+  int irq_seq[0:8] = '{32'h0, 32'h1, 32'h0, 32'h2, 32'h0, 32'h3, 32'h0, 32'h4, 32'h0};
 
   initial begin
     gpio_m_io_i = 32'h0;
@@ -105,7 +105,7 @@ program test_program (
 
 
 task test_irq_multiple();
-  `INFO(("Start GPIO IRQ test (fan control style sequence)"), ADI_VERBOSITY_LOW);
+  `INFO(("Start GPIO IRQ test"), ADI_VERBOSITY_LOW);
 
   // Debug: Print register addresses
   $display("[%0t] GPIO Register addresses:", $time);
@@ -120,9 +120,17 @@ task test_irq_multiple();
   // So we need to write ~(0x0F) = 0xFFFFFFF0 to enable IRQs for bits 0-3
   gpio.unmask_irq(32'hFFFFFFF0);
 
+  gpio.axi_read(`GPIO_REG_TRI, regval);
+  $display("[%0t] DEBUG: GPIO_REG_TRI = 0x%0h (expect 0x00000000 for inputs)", $time, regval);
+
   // Verify mask was set correctly
   gpio.axi_read(`GPIO_REG_IRQ_MASK, regval);
-  $display("[%0t] IRQ mask set to: 0x%0h", $time, regval);
+  $display("[%0t] DEBUG: IRQ_MASK = 0x%0h (expect 0xFFFFFFF0 to enable bits 0..3)", $time, regval);
+
+  gpio.axi_read(`GPIO_REG_INPUT, regval);
+  $display("[%0t] DEBUG: GPIO_INPUT = 0x%0h", $time, regval);
+
+
 
   // Wait for configuration to settle
   #500;

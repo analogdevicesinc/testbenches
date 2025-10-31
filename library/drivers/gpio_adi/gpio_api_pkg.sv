@@ -25,8 +25,8 @@ package gpio_api_pkg;
     endtask
 
     task release_reset();        axi_write(`GPIO_REG_RST,       1); endtask
-    task set_direction_output(); axi_write(`GPIO_REG_TRI,       0); endtask
-    task set_direction_input();  axi_write(`GPIO_REG_TRI,       -1); endtask
+    task set_direction_output(); axi_write(`GPIO_REG_TRI,       32'hFFFFFFFF); endtask
+    task set_direction_input();  axi_write(`GPIO_REG_TRI,       32'h00000000); endtask
     task write_output(input logic [31:0] d);      axi_write(`GPIO_REG_DATA,     d); endtask
     task read_input(output logic [31:0] d);       axi_read (`GPIO_REG_INPUT,    d); endtask
     task unmask_irq(input logic [31:0] m);        axi_write(`GPIO_REG_IRQ_MASK, m); endtask

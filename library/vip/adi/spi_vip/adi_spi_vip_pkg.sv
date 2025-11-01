@@ -283,7 +283,7 @@ package adi_spi_vip_pkg;
         begin: isolation_process
           foreach (miso_mbx[i]) begin
             fork
-              automatic int k = i; 
+              automatic int k = i;
               begin
                 wait (miso_mbx[k].num() == 0);
               end

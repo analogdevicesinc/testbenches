@@ -7,12 +7,14 @@
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_axis.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_pwm_gen.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_clk_gen.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_spi_engine.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_clkgen_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_pwm_gen_pkg.sv
+SV_DEPS += spi_environment.sv
 
 ENV_DEPS += $(HDL_LIBRARY_PATH)/util_cdc/sync_bits.v
 ENV_DEPS += $(HDL_LIBRARY_PATH)/common/ad_edge_detect.v

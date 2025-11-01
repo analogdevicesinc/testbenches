@@ -1,11 +1,11 @@
 global ad_project_params
 
 # SPI Engine DUT parameters
-set ad_project_params(CLK_MODE)             1
-set ad_project_params(NUM_OF_SDIO)          2
+set ad_project_params(CLK_MODE)             0
+set ad_project_params(NUM_OF_SDIO)          1
 set ad_project_params(NUM_OF_SDO)           1
-set ad_project_params(CAPTURE_ZONE)         2
-set ad_project_params(DDR_EN)               1
+set ad_project_params(CAPTURE_ZONE)         1
+set ad_project_params(DDR_EN)               0
 set ad_project_params(NO_REORDER)           0
 set ad_project_params(DATA_WIDTH)           32
 set ad_project_params(ASYNC_SPI_CLK)        1
@@ -52,16 +52,20 @@ set ad_project_params(CPOL)                 0
 set ad_project_params(CPHA)                 1
 set ad_project_params(SDO_IDLE_STATE)       0
 set ad_project_params(SLAVE_TIN)            0
+# set ad_project_params(SLAVE_TOUT)           18
+# set ad_project_params(SLAVE_TOUT)           [expr {$ad_project_params(CLK_MODE) ? ($ad_project_params(DDR_EN) ? $ECHO_CLK_DDR_SLAVE_TOUT : $ECHO_CLK_SDR_SLAVE_TOUT) : $SPI_MODE_SLAVE_TOUT}]
 set ad_project_params(SLAVE_TOUT)           [expr {$ad_project_params(CLK_MODE) ? ($ad_project_params(DDR_EN) ? $ECHO_CLK_DDR_SCK - $SKEW : $ECHO_CLK_SDR_SCK - $SKEW) : $SPI_MODE_SLAVE_TOUT}]
 set ad_project_params(MASTER_TIN)           0
 set ad_project_params(MASTER_TOUT)          0
+# set ad_project_params(CS_TO_MISO)           0
 set ad_project_params(CS_TO_MISO)           [expr {$ad_project_params(CLK_MODE) ? ($ad_project_params(DDR_EN) ? $ECHO_CLK_DDR_CS_TO_MISO_DELAY : $ECHO_CLK_SDR_CS_TO_MISO_DELAY) : $SPI_MODE_CS_TO_MISO_DELAY}]
 set ad_project_params(CLOCK_DIVIDER)        0
 set ad_project_params(NUM_OF_WORDS)         1
 set ad_project_params(NUM_OF_TRANSFERS)     10
-set ad_project_params(SDI_LANE_MASK)        'h3
+set ad_project_params(SDI_LANE_MASK)        'h1
 set ad_project_params(SDO_LANE_MASK)        'h1
 set ad_project_params(CS_ACTIVE_HIGH)       0
+# set ad_project_params(ECHO_SCLK_DELAY)      18
 set ad_project_params(ECHO_SCLK_DELAY)      [expr {$ad_project_params(CLK_MODE) ? ($ad_project_params(DDR_EN) ? $ECHO_CLK_DDR_SCK : $ECHO_CLK_SDR_SCK) : $SPI_MODE_ECHO_SCK}]
 
 set spi_s_vip_cfg [ list \

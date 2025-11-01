@@ -207,7 +207,7 @@ program test_lanes (
       input [7:0] sync_id,
       input [7:0] sdi_lane_mask,
       input [7:0] sdo_lane_mask);
-    
+
     // define spi lane mask
     spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));

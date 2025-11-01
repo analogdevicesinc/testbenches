@@ -207,7 +207,7 @@ program test_program (
       input [7:0] sync_id,
       input [7:0] sdi_lane_mask,
       input [7:0] sdo_lane_mask);
-    
+
     // define spi lane mask
     spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
     spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
@@ -345,7 +345,7 @@ program test_program (
         tx_data[j] = {$urandom};
         tx_data_cast[j] = tx_data[j];
       end
-      
+
       `ifdef DEF_SDO_STREAMING
         sdo_stream_gen(tx_data);
         for (int j = 0; j < `NUM_OF_SDO; j++) begin
@@ -430,7 +430,7 @@ program test_program (
     receive_data        = new [`NUM_OF_SDO];
     sdo_fifo_data       = new [`NUM_OF_SDO * `NUM_OF_WORDS];
     sdo_fifo_data_store = new [`NUM_OF_SDO * `NUM_OF_WORDS];
-    
+
     // Generate a FIFO transaction, write SDO first
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
       for (int j = 0; j < (`NUM_OF_SDI); j++) begin
@@ -451,7 +451,7 @@ program test_program (
           sdo_fifo_data_store[i * `NUM_OF_SDO + j] = `SDO_IDLE_STATE;
         end
       end
-      
+
       spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits, only active lanes are written
       spi_send(rx_data);
     end

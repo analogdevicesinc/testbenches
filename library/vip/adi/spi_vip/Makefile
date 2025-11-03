@@ -17,4 +17,4 @@ XILINX_DEPS += adi_spi_vip_ip.tcl
 
 #TODO: INTEL_DEPS += adi_spi_vip_hw.tcl
 
-include $(HDL_LIBRARY_PATH)/scripts/library.mk
+include $(ADI_HDL_DIR)/library//scripts/library.mk

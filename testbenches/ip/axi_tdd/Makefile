@@ -6,7 +6,7 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_tdd.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_tdd.mk
 
 # Remaining test-bench dependencies except test programs
 LIB_DEPS += axi_tdd

@@ -7,7 +7,3 @@ $(error Environment variable ADI_HDL_DIR not set, please set it with the absolut
 endif
 
 ADI_TB_DIR := $(shell git rev-parse --show-toplevel)
-
-# Assumes this file is in <HDL>/testbenches/scripts/make_tb_path.mk
-HDL_LIBRARY_PATH := $(ADI_HDL_DIR)/library/
-TB_LIBRARY_PATH := $(ADI_TB_DIR)/library/

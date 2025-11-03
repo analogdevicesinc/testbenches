@@ -6,8 +6,8 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_axis.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_axis.mk
 
 # All test-bench dependencies except test programs
 SV_DEPS += environment.sv

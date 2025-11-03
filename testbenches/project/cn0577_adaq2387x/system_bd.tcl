@@ -54,6 +54,29 @@ if {$CN0577_ADAQ2387X_N == 1} {
 ad_disconnect  sys_200m_clk  axi_ltc2387/delay_clk
 ad_connect     sys_dma_clk   axi_ltc2387/delay_clk
 
+delete_bd_objs [get_bd_nets ref_clk_1]
+
+if {$CN0577_ADAQ2387X_N == 1} {
+  # 120MHz ref_clk for cn0577
+ set ref_freq 120000000
+} else {
+  # 100Mhz ref_clk for adaq2387x
+ set ref_freq 100000000
+}
+
+ad_ip_instance clk_vip ref_clk_vip [ list \
+  INTERFACE_MODE {MASTER} \
+  FREQ_HZ $ref_freq \
+]
+
+adi_sim_add_define "REF_CLK=ref_clk_vip"
+
+create_bd_port -dir O ref_clk_out
+ad_connect ref_clk_out ref_clk_vip/clk_out
+ad_connect axi_ltc2387/ref_clk ref_clk_vip/clk_out
+ad_connect axi_ltc2387_dma/fifo_wr_clk ref_clk_vip/clk_out
+ad_connect axi_pwm_gen/ext_clk ref_clk_vip/clk_out
+
 set BA_AXI_LTC2387 0x44A00000
 set_property offset $BA_AXI_LTC2387 [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ltc2387}]
 adi_sim_add_define "AXI_LTC2387_BA=[format "%d" ${BA_AXI_LTC2387}]"

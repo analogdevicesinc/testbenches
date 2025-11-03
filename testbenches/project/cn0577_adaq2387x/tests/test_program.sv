@@ -50,7 +50,7 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 localparam NUM_OF_TRANSFERS = 16;
 
 program test_program (
-  input           ref_clk,
+  input           ref_clk_out,
   input           clk_gate,
   input           dco_in,
   output          da_n,
@@ -109,6 +109,9 @@ initial begin
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
   base_env.start();
+
+  `TH.`REF_CLK.inst.IF.start_clock();
+
   base_env.sys_reset();
 
   sanity_tests();
@@ -116,6 +119,8 @@ initial begin
   data_acquisition_test();
 
   base_env.stop();
+
+  `TH.`REF_CLK.inst.IF.stop_clock();
 
   `INFO(("Test Done"), ADI_VERBOSITY_NONE);
   $finish();
@@ -163,11 +168,12 @@ reg  dco_init = 1'b0;
 
  initial begin
   forever begin
-    if (clk_gate == 1'b1) begin
-      dco_init = ref_clk;
-    end else begin
-      dco_init = 1'b0;
-    end
+    @(posedge clk_gate, negedge clk_gate)
+      if (clk_gate == 1'b1) begin
+        dco_init = ref_clk_out;
+      end else begin
+        dco_init = 1'b0;
+      end
   end
 end
 
@@ -358,7 +364,7 @@ task data_acquisition_test();
 
     #100ns;
     @(negedge cnv);
-    @(posedge ref_clk);
+    @(posedge ref_clk_out);
     transfer_status = 0;
 
     //@(posedge system_tb.test_harness.axi_ltc2387_dma.irq);

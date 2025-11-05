@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="This repository contains testbenches and verification components for system level projects or components connected at block level from the HDL repository." name="description" />
+
+    <title>Testbenches Git repository &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <script async="async" src="../_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Releases" href="releases.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Testbenches Git repository</a><ul>
+<li><a class="reference internal" href="#folder-structure">Folder structure</a></li>
+<li><a class="reference internal" href="#repository-releases-and-branches">Repository releases and branches</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../library/index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../library/drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../library/drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../library/drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../library/drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../library/regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../library/utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../library/utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../library/vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../library/vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../testbenches/index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../testbenches/ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../testbenches/project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="index.html">User Guide</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="testbenches-git-repository">
+<span id="git-repository"></span><h1>Testbenches Git repository<a class="headerlink" href="#testbenches-git-repository" title="Link to this heading"></a></h1>
+<p>This repository contains testbenches and verification components for system level
+projects or components connected at block level from the HDL repository.</p>
+<p>This repository is not a stand alone one. It must be cloned or linked as a
+submodule inside the HDL repository you want to test.</p>
+<p>All the <strong>HDL</strong> sources can be found in the following git repository:
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">ADI HDL repository</a></p>
+<p>All the <strong>Testbenches</strong> sources can be found in the following git repository:
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">ADI Testbenches repository</a></p>
+<p>We assume that the user is familiar with <a class="icon link reference external" href="https://git-scm.com/" target="_blank">git</a>.
+Knows how to
+<a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank">clone</a>
+the repository, how to check its
+<a class="icon link reference external" href="https://git-scm.com/docs/git-status" target="_blank">status</a> or how to
+<a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging" target="_blank">switch</a>
+between branches.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>A basic git knowledge is required in order to work with these source files,
+if you do not have any, don’t worry!</p>
+<p>There are a lot of great resources and tutorials about git all over the
+<a class="icon link reference external" href="http://lmgtfy.com/?q=git+tutorial" target="_blank">web</a>.</p>
+</div>
+<p>If you want to pull down the sources as soon as possible, just do the
+following few steps:</p>
+<ol class="arabic simple">
+<li><p>Install Git from <a class="icon link reference external" href="https://git-scm.com/" target="_blank">here</a></p></li>
+<li><p>Open up Git bash, change your current directory to a place where you
+want to keep the hdl source</p></li>
+<li><p>Clone the repository using
+<a class="icon link reference external" href="https://help.github.com/articles/cloning-a-repository/" target="_blank">these</a>
+instructions</p></li>
+</ol>
+<section id="folder-structure">
+<h2>Folder structure<a class="headerlink" href="#folder-structure" title="Link to this heading"></a></h2>
+<p>The root of the Testbenches repository has the following structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span>
+<span class="o">+--</span> <span class="o">.</span><span class="n">github</span>
+<span class="o">+--</span> <span class="n">docs</span>
+<span class="o">+--</span> <span class="n">library</span>
+<span class="o">+--</span> <span class="n">scripts</span>
+<span class="o">+--</span> <span class="n">testbenches</span>
+<span class="o">+--</span> <span class="n">Makefile</span>
+<span class="o">+--</span> <span class="n">README</span><span class="o">.</span><span class="n">md</span>
+<span class="o">+--</span> <span class="n">LICENSE</span>
+</pre></div>
+</div>
+<p>The repository is divided into 5 separate sections:</p>
+<ul class="simple">
+<li><p><strong>.github</strong> with all our automations regarding coding checks, GitHub actions</p></li>
+<li><p><strong>docs</strong> with our GitHubIO documentation and regmap source files</p></li>
+<li><p><strong>library</strong> with all the Analog Devices Inc. proprietary IP cores and
+hdl modules, which are required to build the projects</p></li>
+<li><p><strong>scripts</strong> with scripts and makefiles to build and run the testbench</p></li>
+<li><p><strong>testbenches</strong> with all the currently supported testbenches</p></li>
+</ul>
+<p>The file <strong>.gitattributes</strong> is used to properly <a class="icon link reference external" href="https://help.github.com/articles/dealing-with-line-endings/" target="_blank">handle
+different</a>
+line endings. And the <strong>.gitignore</strong> specifies intentionally untracked
+files that Git should ignore. The root <strong>Makefile</strong> can be used to build
+all the project of the repository. To learn more about hdl <strong>Makefiles</strong>
+visit the <a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/user_guide/build_hdl.html#build-hdl" target="_blank" title="(in HDL)"><span class="xref std std-ref">Building &amp; Generating programming files</span></a> section.</p>
+</section>
+<section id="repository-releases-and-branches">
+<h2>Repository releases and branches<a class="headerlink" href="#repository-releases-and-branches" title="Link to this heading"></a></h2>
+<p>The repository may contain multiple branches and tags. The
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">main</a> branch is the development branch (latest sources,
+but not stable). If you check out this branch, some builds may fail. If you are
+not into any kind of experimentation, you should only check out one of the
+release branch.</p>
+<p>All our release branches have the following naming convention:
+[year_of_release]<strong>_r</strong>[1 or 2]. (e.g.
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/2022_r2/" target="_blank">2022_r2</a>)</p>
+<p>ADI does two releases each year when all the projects get an update to
+support the latest tools and get additional new features. ** The
+main branch is always synchronized with the latest release. ** If you
+are in doubt, ask us on <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can find the release notes on of the repositories at:</p>
+<p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/releases" target="_blank">ADI Testbenches repository (releases)</a></p>
+<p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/releases" target="_blank">ADI HDL repository (releases)</a></p>
+<p>The latest version of tools used on main can be found at:
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/scripts/adi_env.tcl" target="_blank">scripts/adi_env.tcl</a> (<em>required_vivado_version</em> variable).</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="introduction.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Introduction</a>
+    <a href="releases.html" title="Next document (Alt+Shift+RightArrow)" class="next">Releases</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

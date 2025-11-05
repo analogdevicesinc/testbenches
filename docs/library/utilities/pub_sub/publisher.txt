@@ -1,0 +1,28 @@
+# Classes
+
+# Base
+adi_reporter: {shape: class}
+adi_component: {shape: class}
+
+# Components
+adi_publisher: {
+  shape: class
+  \#subscriber_list
+  +subscribe()
+  +unsubscribe()
+  +notify()
+}
+adi_subscriber: {shape: class}
+
+# Inheritances
+
+# Base
+adi_reporter <- adi_component: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Components
+adi_component <- adi_publisher: {shape: triangle; source-arrowhead.style.filled: false}
+
+# Aggregations
+
+# Components
+adi_publisher <- adi_subscriber: {source-arrowhead: * {shape: diamond; style.filled: true}}

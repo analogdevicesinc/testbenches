@@ -8,7 +8,7 @@ Overview
 
 This class is designed to be used in conjunction with a publisher class. The
 class is parameterized with a data_type. It is mainly used in scoreboard and
-checker classes which need data inputs from various other modules. 
+checker classes which need data inputs from various other modules.
 
 .. important::
 
@@ -57,8 +57,6 @@ Basic usage of the subscriber:
 
 .. important::
 
-  The publisher, subscriber, filter and processing modules must operate on the
-  same data type. A filter and a processor is not needed for the publisher to
-  work.
+  The publisher and subscriber modules must operate on the same data type.
 
 .. include:: ../../../common/support.rst

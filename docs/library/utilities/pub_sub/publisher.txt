@@ -8,19 +8,11 @@ adi_component: {shape: class}
 adi_publisher: {
   shape: class
   \#subscriber_list
-  \#filter
-  \#packet_processor
-  +setup_filter()
-  +remove_filter()
-  +setup_processor()
-  +remove_processor()
   +subscribe()
   +unsubscribe()
   +notify()
 }
 adi_subscriber: {shape: class}
-adi_filter: {shape: class}
-adi_processor: {shape: class}
 
 # Inheritances
 
@@ -34,5 +26,3 @@ adi_component <- adi_publisher: {shape: triangle; source-arrowhead.style.filled:
 
 # Components
 adi_publisher <- adi_subscriber: {source-arrowhead: * {shape: diamond; style.filled: true}}
-adi_publisher <- adi_filter: {source-arrowhead: 0..1 {shape: diamond; style.filled: true}}
-adi_publisher <- adi_processor: {source-arrowhead: 0..1 {shape: diamond; style.filled: true}}

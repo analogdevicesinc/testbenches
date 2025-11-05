@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Please note that ADI only provides the source files necessary to create and build the designs. This means that you are responsible for modifying and building these projects." name="description" />
+
+    <title>Build a testbench &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <script async="async" src="../_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Repository hierarchy" href="hierarchy.html" />
+    <link rel="prev" title="Releases" href="releases.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Build a testbench</a><ul>
+<li><a class="reference internal" href="#set-up-the-testbenches-repository">Set up the Testbenches repository</a></li>
+<li><a class="reference internal" href="#environment">Environment</a><ul>
+<li><a class="reference internal" href="#linux-environment-setup">Linux environment setup</a></li>
+<li><a class="reference internal" href="#windows-environment-setup">Windows environment setup</a></li>
+<li><a class="reference internal" href="#repository-path-setup">Repository path setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-a-testbench">Building a testbench</a></li>
+<li><a class="reference internal" href="#rerunning-a-simulation">Rerunning a simulation</a></li>
+<li><a class="reference internal" href="#opening-a-testbench">Opening a testbench</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../library/index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../library/drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../library/drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../library/drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../library/drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../library/regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../library/utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../library/utilities/irq_handler/index.html">IRQ Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../library/vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../library/vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../testbenches/index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../testbenches/ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../testbenches/project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="index.html">User Guide</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="build-a-testbench">
+<span id="build-tb"></span><h1>Build a testbench<a class="headerlink" href="#build-a-testbench" title="Link to this heading"></a></h1>
+<p><strong>Please note that ADI only provides the source files necessary to create and
+build the designs. This means that you are responsible for modifying and
+building these projects.</strong></p>
+<p>Here, we are giving you a quick rundown on how we build things. That said,
+the steps below are <strong>not a recommendation</strong>, but a suggestion.
+How you want to build these projects is entirely up to you.
+The only catch is that if you run into problems, you have to resolve them independently.</p>
+<p>The build process depends on certain software and tools, which you could use in
+many ways. We use <strong>command line</strong> and mostly <strong>Linux systems</strong>. On Windows, we
+use <strong>Cygwin</strong>.</p>
+<section id="set-up-the-testbenches-repository">
+<span id="build-tb-set-up-tb-repo"></span><h2>Set up the Testbenches repository<a class="headerlink" href="#set-up-the-testbenches-repository" title="Link to this heading"></a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Before building any testbench, you <strong>must</strong>:</p>
+<ol class="arabic simple">
+<li><p>Clone the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">HDL repository</a></p></li>
+<li><p>Check the Vivado version needed by entering the
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/scripts/adi_env.tcl" target="_blank">hdl/scripts/adi_env.tcl</a> file. If you do
+not want to use that (although <strong>we strongly advise you to use it</strong>)
+then you have the alternative of setting <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">ADI_IGNORE_VERSION_CHECK=1</span></code>
+before building the project. Otherwise your project will fail.</p></li>
+<li><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/user_guide/build_hdl.html#build-hdl" target="_blank" title="(in HDL)"><span class="xref std std-ref">Set up the HDL repository</span></a></p></li>
+</ol>
+</div>
+<p>The <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">Testbenches repository</a> can be cloned anywhere
+relative to the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">HDL repository</a>. Our recommendation is to clone
+the testbenches repository next to the HDL repository:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:analogdevicesinc/testbenches.git
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>The above command clones the <strong>default</strong> branch, which is the <strong>main</strong> for
+Testbenches. The <strong>main</strong> branch always points to the latest stable release
+branch, but it also has features <strong>that are not fully tested</strong>. If you
+want to switch to any other branch you need to checkout that branch:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>branch
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>2022_r2
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+<section id="environment">
+<h2>Environment<a class="headerlink" href="#environment" title="Link to this heading"></a></h2>
+<p>Our recommended build flow is to use <code class="docutils literal notranslate"><span class="pre">make</span></code> and the command line version of
+the tools. This method facilitates our overall build and release process as it
+automatically builds the required libraries and dependencies. Before running
+any testbench, the environment in which your working must be prepared.</p>
+<section id="linux-environment-setup">
+<h3>Linux environment setup<a class="headerlink" href="#linux-environment-setup" title="Link to this heading"></a></h3>
+<p>All major distributions should have <code class="docutils literal notranslate"><span class="pre">make</span></code> installed by default. If not,
+if you try the command, it should tell you how to install it with the
+package name.</p>
+<p>You may have to install <code class="docutils literal notranslate"><span class="pre">git</span></code> (<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">git</span></code>)
+and the AMD tools. These tools come with certain <strong>settings*.sh</strong> scripts that
+you may source in your <strong>.bashrc</strong> file to set up the environment.
+You may also do this manually (for better or worse); the following snippet is
+from a <strong>.bashrc</strong> file. Please note that unless you are an expert at manipulating
+these things, it is best to leave it to the tools to set up the environment.</p>
+<p>For Vivado versions of 2025 and later, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/202x.x/Vivado/bin:/opt/Xilinx/202x.x/Vitis/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>For Vivado versions prior to 2025, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+<section id="windows-environment-setup">
+<h3>Windows environment setup<a class="headerlink" href="#windows-environment-setup" title="Link to this heading"></a></h3>
+<p>The best option on Windows is to use
+<a class="icon link reference external" href="https://www.cygwin.com" target="_blank">Cygwin</a>. When installing it, select the
+<code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span></code> packages. You should do changes to your <strong>.bashrc</strong> in a
+similar manner to the Linux environment.</p>
+<p>For Vivado versions of 2025 and later, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/202x.x/Vivado/bin:/cygdrive/d/Xilinx/202x.x/Vitis/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>For Vivado versions prior to 2025, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/cygdrive/d/Xilinx/Vivado/202x.x/bin:/cygdrive/d/Xilinx/Vitis/202x.x/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>A very good alternative to Cygwin is
+<a class="icon link reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install/" target="_blank">WSL</a>. The
+manual changes to your <strong>.bashrc</strong> should look like:</p>
+<p>For Vivado versions of 2025 and later, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/202x.x/Vivado/bin:/opt/202x.x/Vitis/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>For Vivado versions prior to 2025, use the following command:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/opt/path_to/Vivado/202x.x/bin:/opt/Vitis/202x.x/bin
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>If you do not want to install Cygwin, there might still be some
+alternative. There are <code class="docutils literal notranslate"><span class="pre">make</span></code> alternatives for <strong>Windows Command
+Prompt</strong>, minimalist GNU for Windows (<strong>MinGW</strong>), or the <strong>Cygwin
+variations</strong> installed by the tools itself.</p>
+<p>Some of these may not be fully functional with our scripts and/or projects.
+If you are an AMD user, use the <strong>gnuwin</strong> installed as part of the SDK,
+usually at <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\202x.x\Vitis\gnuwin\bin</span></code> for Vitis versions of 2025 and
+later, or <code class="docutils literal notranslate"><span class="pre">C:\Xilinx\Vitis\202x.x\gnuwin\bin</span></code> for prior versions.</p>
+</section>
+<section id="repository-path-setup">
+<h3>Repository path setup<a class="headerlink" href="#repository-path-setup" title="Link to this heading"></a></h3>
+<p>The make script must know where the cloned HDL and Testbenches repositories are
+located. Two variables must be exported, which specify the target directories:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ADI_HDL_DIR</span><span class="o">=</span>&lt;path<span class="w"> </span>to<span class="w"> </span>cloned<span class="w"> </span>HDL<span class="w"> </span>directory&gt;
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">ADI_TB_DIR</span><span class="o">=</span>&lt;path<span class="w"> </span>to<span class="w"> </span>cloned<span class="w"> </span>Testbenches<span class="w"> </span>directory&gt;
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+</section>
+<section id="building-a-testbench">
+<h2>Building a testbench<a class="headerlink" href="#building-a-testbench" title="Link to this heading"></a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Before building any testbench, you must have the environment prepared each
+time a new terminal session is started, following the environment setup guide
+from above!</p>
+</div>
+<p>The way of building a testbench in Cygwin and WSL is almost the same.
+In this example, it is building the <strong>Base</strong> testbench.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/base
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>The <code class="docutils literal notranslate"><span class="pre">make</span></code> builds all the libraries first and then builds the testbench. The
+testbench build folder is in the testbench project’s location under <code class="docutils literal notranslate"><span class="pre">runs/</span></code>
+with the configuration’s name as Vivado project name. This assumes that you have
+the tools and licenses set up correctly and the build finishes with no errors.
+If the make fails to build one or more targets, there is no useful information
+you can gather from the <code class="docutils literal notranslate"><span class="pre">make</span></code> output (other than which target failed to
+build). The actual information about the failure is in a log file inside
+the target’s directory. By default, <code class="docutils literal notranslate"><span class="pre">make</span></code> builds all of the available
+configurations and runs all of the <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">programs</span></code> that are predefined
+in the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.</p>
+<p>There are multiple <code class="docutils literal notranslate"><span class="pre">make</span></code> parameters that can be used to build and run a
+simulation.</p>
+<p><strong>Examples</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">all</span></code> keyword is the same as running <code class="docutils literal notranslate"><span class="pre">make</span></code> by itself with no additional
+configuration/test program parameter. Often used in combination with <code class="docutils literal notranslate"><span class="pre">clean</span></code>
+parameter.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>all
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>Another build option is to use the configuration file’s name as a make parameter
+without any other input. This will build the configuration and run all test
+programs on it.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cfg
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>Some projects support adding additional <code class="docutils literal notranslate"><span class="pre">make</span></code> parameters to configure
+the project. This option gives you the ability to build only the configuration
+that you’re interested in, without building the rest of the available
+configurations, as well as running the chosen test program. <code class="docutils literal notranslate"><span class="pre">CFG</span></code> specifies
+the configuration file’s name, while <code class="docutils literal notranslate"><span class="pre">TST</span></code> specifies the test program’s name.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Trying to run incompatible configuration and test program combinations will
+result in simulation error! Please refer to the projects guide to check
+compatibility.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When running the <code class="docutils literal notranslate"><span class="pre">make</span></code> command with one of the above mentioned 3 options,
+please choose only 1 of them! Using multiple options may lead to building
+multiple designs and running multiple test programs.</p>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">clean</span></code> keyword removes the <code class="docutils literal notranslate"><span class="pre">runs</span></code> and <code class="docutils literal notranslate"><span class="pre">results</span></code> folders, as well as
+the log files created by Vivado.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>There’s an option to use Vivado’s XSim GUI, so that at the end of the build it
+will launch Vivado and start the simulation with the waveform viewer started as
+well. By default, <code class="docutils literal notranslate"><span class="pre">make</span></code> launches Vivado in batch mode, meaning that it won’t
+provide a GUI, only a result in the terminal at the end of the simulation.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/base
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>The <code class="docutils literal notranslate"><span class="pre">STOP_ON_ERROR</span></code> parameter is mainly used for continuous integration
+purposes, which allows the user to build and run all testbenches even if one
+fails. The only exception to this is when a library fails to build, as this will
+prevent any of the testbench designs to be run. The default value is <code class="docutils literal notranslate"><span class="pre">y</span></code>,
+which halts the simulation once it runs into an error. The other option to run
+all testbenches is <code class="docutils literal notranslate"><span class="pre">n</span></code>. This is useful for checking which configuration and
+test program configurations are failing.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">STOP_ON_ERROR</span><span class="o">=</span>y
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+<section id="rerunning-a-simulation">
+<h2>Rerunning a simulation<a class="headerlink" href="#rerunning-a-simulation" title="Link to this heading"></a></h2>
+<p>If you want to rerun a simulation, you can do it in a couple of different ways,
+depending on what you’re trying to do.</p>
+<p>The most straightforward and easiest way is to rerun the <code class="docutils literal notranslate"><span class="pre">make</span></code> command with
+the parameters it was ran initially if it is the case. This will rebuild any
+libraries and/or the testbench block design if any of them changed and then run
+the simulation. If there are changes that affect the architecture of the
+testbench, then design is going to be rebuilt. If only the simulation files are
+updated, which don’t affect the testbench block design, then only the simulation
+will be run. This is the recommended way to run the testbench to avoid any
+issues if the source files are modified.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Vivado must be closed before rerunning the <code class="docutils literal notranslate"><span class="pre">make</span></code> command!</p>
+</div>
+<p>In GUI mode, if the simulation was already run, there are a couple of options
+for restarting it.</p>
+<ul class="simple">
+<li><p>The first option is to run the simulation again, with the <code class="docutils literal notranslate"><span class="pre">Restart</span></code> button
+or by running the <code class="docutils literal notranslate"><span class="pre">restart</span></code> TCL command. This will reset the simulation and
+start it again without recompiling the files.</p></li>
+<li><p>The second option is to recompile the project and then run the simulation.
+This is done by clicking the <code class="docutils literal notranslate"><span class="pre">Relaunch</span> <span class="pre">Simulation</span></code> button. This will not
+close the simulation window, but it will recompile the project and start the
+simulation.</p></li>
+<li><p>The third option is to close the simulation window and use the <code class="docutils literal notranslate"><span class="pre">Run</span>
+<span class="pre">simulation</span></code> option from the Flow Navigator. This will recompile the project
+and start the simulation. This is needed when project simulation parameters
+are changed after the build was created or when the block design is changed
+manually. When the simulation seed is changed or randomized, and you want to
+rerun the simulation with an updated seed value, this is the option that must
+be used.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When rerunning a simulation in GUI mode, there is a slight chance that
+Vivado crashes. The reason for this is unknown, and it usually happens when
+the restarting process is going and the user tries putting the process in the
+background via the pop-up window.</p>
+</div>
+</section>
+<section id="opening-a-testbench">
+<h2>Opening a testbench<a class="headerlink" href="#opening-a-testbench" title="Link to this heading"></a></h2>
+<p>If you want to open the testbench and check the block design and/or the
+waveform, there are two options:</p>
+<ul class="simple">
+<li><p>Build the testbench using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">MODE=gui</span></code> and it will open Vivado in GUI
+mode right after it builds the block design.</p></li>
+</ul>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/base
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><ul class="simple">
+<li><p>Build the testbench using <code class="docutils literal notranslate"><span class="pre">make</span></code> and open Vivado manually after the block
+design is built and the simulation is finished. In the project folder, after
+running <code class="docutils literal notranslate"><span class="pre">make</span></code>, a <code class="docutils literal notranslate"><span class="pre">runs/</span></code> folder will be created. Under <code class="docutils literal notranslate"><span class="pre">runs/</span></code> you’ll
+find one or more configuration folder, depending on how you ran the <code class="docutils literal notranslate"><span class="pre">make</span></code>
+command. Under the folder named after the configuration is the Vivado project
+that can be opened.</p></li>
+</ul>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/base
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>runs/cfg1
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/base/runs/cfg1$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>./cfg1.xpr
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="releases.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Releases</a>
+    <a href="hierarchy.html" title="Next document (Alt+Shift+RightArrow)" class="next">Repository hierarchy</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

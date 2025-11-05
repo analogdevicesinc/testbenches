@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="This class is a specialized version of a generic scoreboard class, parameterized by the data type and packer mode. The scoreboard pack class is designed to handle and compare data streams in a verification environment." name="description" />
+
+    <title>Scoreboard Pack &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
+    <script async="async" src="../../../../_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="../../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Watchdog" href="../watchdog/index.html" />
+    <link rel="prev" title="Scoreboard" href="../scoreboard/index.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../../../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Scoreboard Pack</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#function-new">function new(…);</a></li>
+<li><a class="reference internal" href="#virtual-function-void-compare-transaction">virtual function void compare_transaction();</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage-and-recommendations">Usage and recommendations</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../../../index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Scoreboard Pack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../../vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../../vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../../vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../../vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../../testbenches/index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../../../testbenches/ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../../../testbenches/project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../../index.html">Library</a></li><li><a href="../../index.html">Drivers</a></li><li><a href="../index.html">Common</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="scoreboard-pack">
+<span id="id1"></span><h1>Scoreboard Pack<a class="headerlink" href="#scoreboard-pack" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>This class is a specialized version of a generic scoreboard class, parameterized
+by the data type and packer mode. The scoreboard pack class is designed to
+handle and compare data streams in a verification environment.</p>
+<div class="svg align-center"><?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.6.9-HEAD" preserveAspectRatio="xMidYMid meet" viewBox="0 0 600 1172"><svg class="d2-2453456735 d2-svg" width="600" height="1172" viewBox="-89 -89 600 1172"><rect x="-89.000000" y="-89.000000" width="600.000000" height="1172.000000" rx="0.000000" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-2453456735 .text-italic {
+	font-family: "d2-2453456735-font-italic";
+}
+@font-face {
+	font-family: d2-2453456735-font-italic;
+	src: url("data:application/font-woff;base64,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");
+}
+.d2-2453456735 .text-mono {
+	font-family: "d2-2453456735-font-mono";
+}
+@font-face {
+	font-family: d2-2453456735-font-mono;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-2453456735 .fill-N1{fill:#0A0F25;}
+		.d2-2453456735 .fill-N2{fill:#676C7E;}
+		.d2-2453456735 .fill-N3{fill:#9499AB;}
+		.d2-2453456735 .fill-N4{fill:#CFD2DD;}
+		.d2-2453456735 .fill-N5{fill:#DEE1EB;}
+		.d2-2453456735 .fill-N6{fill:#EEF1F8;}
+		.d2-2453456735 .fill-N7{fill:#FFFFFF;}
+		.d2-2453456735 .fill-B1{fill:#0D32B2;}
+		.d2-2453456735 .fill-B2{fill:#0D32B2;}
+		.d2-2453456735 .fill-B3{fill:#E3E9FD;}
+		.d2-2453456735 .fill-B4{fill:#E3E9FD;}
+		.d2-2453456735 .fill-B5{fill:#EDF0FD;}
+		.d2-2453456735 .fill-B6{fill:#F7F8FE;}
+		.d2-2453456735 .fill-AA2{fill:#4A6FF3;}
+		.d2-2453456735 .fill-AA4{fill:#EDF0FD;}
+		.d2-2453456735 .fill-AA5{fill:#F7F8FE;}
+		.d2-2453456735 .fill-AB4{fill:#EDF0FD;}
+		.d2-2453456735 .fill-AB5{fill:#F7F8FE;}
+		.d2-2453456735 .stroke-N1{stroke:#0A0F25;}
+		.d2-2453456735 .stroke-N2{stroke:#676C7E;}
+		.d2-2453456735 .stroke-N3{stroke:#9499AB;}
+		.d2-2453456735 .stroke-N4{stroke:#CFD2DD;}
+		.d2-2453456735 .stroke-N5{stroke:#DEE1EB;}
+		.d2-2453456735 .stroke-N6{stroke:#EEF1F8;}
+		.d2-2453456735 .stroke-N7{stroke:#FFFFFF;}
+		.d2-2453456735 .stroke-B1{stroke:#0D32B2;}
+		.d2-2453456735 .stroke-B2{stroke:#0D32B2;}
+		.d2-2453456735 .stroke-B3{stroke:#E3E9FD;}
+		.d2-2453456735 .stroke-B4{stroke:#E3E9FD;}
+		.d2-2453456735 .stroke-B5{stroke:#EDF0FD;}
+		.d2-2453456735 .stroke-B6{stroke:#F7F8FE;}
+		.d2-2453456735 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-2453456735 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-2453456735 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-2453456735 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-2453456735 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-2453456735 .background-color-N1{background-color:#0A0F25;}
+		.d2-2453456735 .background-color-N2{background-color:#676C7E;}
+		.d2-2453456735 .background-color-N3{background-color:#9499AB;}
+		.d2-2453456735 .background-color-N4{background-color:#CFD2DD;}
+		.d2-2453456735 .background-color-N5{background-color:#DEE1EB;}
+		.d2-2453456735 .background-color-N6{background-color:#EEF1F8;}
+		.d2-2453456735 .background-color-N7{background-color:#FFFFFF;}
+		.d2-2453456735 .background-color-B1{background-color:#0D32B2;}
+		.d2-2453456735 .background-color-B2{background-color:#0D32B2;}
+		.d2-2453456735 .background-color-B3{background-color:#E3E9FD;}
+		.d2-2453456735 .background-color-B4{background-color:#E3E9FD;}
+		.d2-2453456735 .background-color-B5{background-color:#EDF0FD;}
+		.d2-2453456735 .background-color-B6{background-color:#F7F8FE;}
+		.d2-2453456735 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-2453456735 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-2453456735 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-2453456735 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-2453456735 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-2453456735 .color-N1{color:#0A0F25;}
+		.d2-2453456735 .color-N2{color:#676C7E;}
+		.d2-2453456735 .color-N3{color:#9499AB;}
+		.d2-2453456735 .color-N4{color:#CFD2DD;}
+		.d2-2453456735 .color-N5{color:#DEE1EB;}
+		.d2-2453456735 .color-N6{color:#EEF1F8;}
+		.d2-2453456735 .color-N7{color:#FFFFFF;}
+		.d2-2453456735 .color-B1{color:#0D32B2;}
+		.d2-2453456735 .color-B2{color:#0D32B2;}
+		.d2-2453456735 .color-B3{color:#E3E9FD;}
+		.d2-2453456735 .color-B4{color:#E3E9FD;}
+		.d2-2453456735 .color-B5{color:#EDF0FD;}
+		.d2-2453456735 .color-B6{color:#F7F8FE;}
+		.d2-2453456735 .color-AA2{color:#4A6FF3;}
+		.d2-2453456735 .color-AA4{color:#EDF0FD;}
+		.d2-2453456735 .color-AA5{color:#F7F8FE;}
+		.d2-2453456735 .color-AB4{color:#EDF0FD;}
+		.d2-2453456735 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-2453456735);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-2453456735);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-2453456735);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-2453456735);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-2453456735);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-2453456735);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-2453456735);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-2453456735);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><g class="YWRpX3JlcG9ydGVy"><g class="shape" ><rect x="73.000000" y="12.000000" width="276.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="73.000000" y="12.000000" width="276.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="211.000000" y="62.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_reporter</text><line x1="73.000000" x2="349.000000" y1="104.000000" y2="104.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="YWRpX2NvbXBvbmVudA=="><g class="shape" ><rect x="65.000000" y="174.000000" width="291.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="65.000000" y="174.000000" width="291.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="210.500000" y="224.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_component</text><line x1="65.000000" x2="356.000000" y1="266.000000" y2="266.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="YWRpX3N1YnNjcmliZXI="><g class="shape" ><rect x="58.000000" y="890.000000" width="305.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="58.000000" y="890.000000" width="305.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="210.500000" y="940.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_subscriber</text><line x1="58.000000" x2="363.000000" y1="982.000000" y2="982.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="c2NvcmVib2FyZA=="><g class="shape" ><rect x="87.000000" y="336.000000" width="247.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="87.000000" y="336.000000" width="247.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="210.500000" y="386.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">scoreboard</text><line x1="87.000000" x2="334.000000" y1="428.000000" y2="428.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="c2NvcmVib2FyZF9wYWNr"><g class="shape" ><rect x="12.000000" y="498.000000" width="398.000000" height="322.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="12.000000" y="498.000000" width="398.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="211.000000" y="548.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">scoreboard_pack</text><text x="22.000000" y="618.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="618.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">channels</text><text x="390.000000" y="618.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="664.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="664.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">samples</text><text x="390.000000" y="664.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="710.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="710.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">width</text><text x="390.000000" y="710.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="756.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="756.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">mode</text><text x="390.000000" y="756.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="12.000000" x2="410.000000" y1="774.000000" y2="774.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /><text x="22.000000" y="802.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="802.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">compare_transaction()</text><text x="390.000000" y="802.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text></g></g><g class="KGFkaV9yZXBvcnRlciAmbHQ7LSBhZGlfY29tcG9uZW50KVswXQ=="><marker id="mk-d2-2453456735-2954633863" markerWidth="13.000000" markerHeight="15.000000" refX="3.000000" refY="7.500000" viewBox="0.000000 0.000000 13.000000 15.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="12.000000,1.000000 1.000000,7.500000 12.000000,14.000000" stroke="#0D32B2" fill="#FFFFFF" class="connection stroke-B1 fill-N7" stroke-width="2" /> </marker><path d="M 211.000000 108.000000 L 211.000000 172.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-2453456735-2954633863)" mask="url(#d2-2453456735)" /></g><g class="KGFkaV9jb21wb25lbnQgJmx0Oy0gc2NvcmVib2FyZClbMF0="><path d="M 211.000000 270.000000 L 211.000000 334.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-2453456735-2954633863)" mask="url(#d2-2453456735)" /></g><g class="KHNjb3JlYm9hcmQgJmx0Oy0gc2NvcmVib2FyZF9wYWNrKVswXQ=="><path d="M 211.000000 432.000000 L 211.000000 496.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-2453456735-2954633863)" mask="url(#d2-2453456735)" /></g><g class="KHNjb3JlYm9hcmRfcGFjayAmbHQ7LSBhZGlfc3Vic2NyaWJlcilbMF0="><marker id="mk-d2-2453456735-765394478" markerWidth="22.000000" markerHeight="14.000000" refX="3.000000" refY="7.000000" viewBox="0.000000 0.000000 22.000000 14.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,7.000000 11.000000,0.000000 22.000000,7.000000 11.000000,14.000000" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 211.000000 824.000000 L 211.000000 888.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-2453456735-765394478)" mask="url(#d2-2453456735)" /><text x="224.500000" y="841.000000" fill="#0A0F25" class="text-italic fill-N1" style="text-anchor:middle;font-size:16px">2</text></g><mask id="d2-2453456735" maskUnits="userSpaceOnUse" x="-89" y="-89" width="600" height="1172">
+<rect x="-89" y="-89" width="600" height="1172" fill="white"></rect>
+
+</mask></svg></svg></div></section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
+<p>No additional variables are available for direct external access.</p>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<section id="function-new">
+<h3>function new(…);<a class="headerlink" href="#function-new" title="Link to this heading"></a></h3>
+<p>Creates the scoreboard object. The name gives the scoreboard a name that is
+relevant in the current environment it is instantiated in, the channels set the
+number of channels that are present on the packer module, the sample value sets
+the number of samples that are set in the converter, the width specifies the
+width of one sample for one channel, the mode is set based on the current pack
+module, which can be a packer or unpacker and the parent sets the parent object
+in which it resides.</p>
+</section>
+<section id="virtual-function-void-compare-transaction">
+<h3>virtual function void compare_transaction();<a class="headerlink" href="#virtual-function-void-compare-transaction" title="Link to this heading"></a></h3>
+<p>The compare module’s base functionality is the same as the base class, but it
+specifically verifies the input and output of the packer and unpacker modules.</p>
+</section>
+</section>
+<section id="usage-and-recommendations">
+<h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading"></a></h2>
+<p>Same as the base class.</p>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../scoreboard/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Scoreboard</a>
+    <a href="../watchdog/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Watchdog</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

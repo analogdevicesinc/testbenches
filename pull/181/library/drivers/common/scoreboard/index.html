@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The scoreboard class is designed for transaction comparison in a verification environment. This class extends adi_component and is parameterized by a datatype data_type, which allows the verification of different datatypes without the need of inheriting this class. The scoreboard class contains an inner class subscriber_class which extends adi_subscriber and is responsible for receiving and storing data streams. The scoreboard can operate in oneshot or in cyclic mode, which allows the verification of repeating sequence verification." name="description" />
+
+    <title>Scoreboard &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
+    <script async="async" src="../../../../_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="../../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Scoreboard Pack" href="../scoreboard_pack/index.html" />
+    <link rel="prev" title="Common" href="../index.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../../../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Scoreboard</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#function-new-input-string-name-input-adi-component-parent-null">function new(input string name, input adi_component parent = null);</a></li>
+<li><a class="reference internal" href="#task-run">task run();</a></li>
+<li><a class="reference internal" href="#task-stop">task stop();</a></li>
+<li><a class="reference internal" href="#function-void-set-sink-type-input-bit-sink-type">function void set_sink_type(input bit sink_type);</a></li>
+<li><a class="reference internal" href="#function-bit-get-sink-type">function bit get_sink_type();</a></li>
+<li><a class="reference internal" href="#protected-function-void-clear-streams">protected function void clear_streams();</a></li>
+<li><a class="reference internal" href="#task-wait-until-complete">task wait_until_complete();</a></li>
+<li><a class="reference internal" href="#virtual-function-void-compare-transaction">virtual function void compare_transaction();</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage-and-recommendations">Usage and recommendations</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../user_guide/docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../../../index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../scoreboard_pack/index.html">Scoreboard Pack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../../vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../../vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../../vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../../vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../../testbenches/index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../../../testbenches/ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../../../testbenches/project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../../index.html">Library</a></li><li><a href="../../index.html">Drivers</a></li><li><a href="../index.html">Common</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="scoreboard">
+<span id="id1"></span><h1>Scoreboard<a class="headerlink" href="#scoreboard" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The scoreboard class is designed for transaction comparison in a verification
+environment. This class extends adi_component and is parameterized by a
+datatype data_type, which allows the verification of different datatypes without
+the need of inheriting this class. The scoreboard class contains an inner class
+subscriber_class which extends adi_subscriber and is responsible for receiving
+and storing data streams. The scoreboard can operate in oneshot or in
+cyclic mode, which allows the verification of repeating sequence verification.</p>
+<div class="svg align-center"><?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.6.9-HEAD" preserveAspectRatio="xMidYMid meet" viewBox="0 0 601 1424"><svg class="d2-3403827828 d2-svg" width="601" height="1424" viewBox="-89 -89 601 1424"><rect x="-89.000000" y="-89.000000" width="601.000000" height="1424.000000" rx="0.000000" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-3403827828 .text-italic {
+	font-family: "d2-3403827828-font-italic";
+}
+@font-face {
+	font-family: d2-3403827828-font-italic;
+	src: url("data:application/font-woff;base64,d09GRgABAAAAAA1EAAoAAAAAFLgAARhRAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgW1SVeGNtYXAAAAFUAAAAjAAAALIC2QPDZ2x5ZgAAAeAAAAbuAAAJeJTLngxoZWFkAAAI0AAAADYAAAA2G7Ur2mhoZWEAAAkIAAAAJAAAACQLeAjBaG10eAAACSwAAAB0AAAAdDKnAwhsb2NhAAAJoAAAADwAAAA8JhIocm1heHAAAAncAAAAIAAAACAANQD2bmFtZQAACfwAAAMmAAAIMgntVzNwb3N0AAANJAAAACAAAAAg/8YAMgADAeEBkAAFAAACigJY//EASwKKAlgARAFeADIBIwAAAgsFAwMEAwkCBCAAAHcAAAADAAAAAAAAAABBREJPAAEAIP//Au7/BgAAA9gBESAAAZMAAAAAAeYClAAAACAAA3icbMw9TsIAGIDhp7Zq1ar1v7p20bhxIcJACGEhLISz8DtxBQ7EAbqxfoSGkXd9kheJVIJCZotKKZWr/fnX0dU3MDQ2NYtA7fcsvVZGJieJQzTRxD52sYl1rGIZi5i378t9+1L58eFT4koqc+3Grdydew8Kj548K7149eadIwAAAP//AQAA///ySCCKeJx8VX1oG+cd/r3vne9iW5EtnXSyFEtn3Xu6s+XTh3WSLoqtL3/KtlR/JE6cJnacsqZpmg2zLGNbkqULI4wwsg1KYIN9sDLYCKwhhUE26KAtxM0wbBBGR7uNdasykpV2woS1LHfjJNVWMugfd7wcvL/nfZ73eZ6DNpAA8BfwS0BBO3SBE9wAGhekKE3XiYfSFIWwrK5wHCtdQhuXfkCPPf1+/08+VgV66hu/mP3X2nX80qPT6MWVixeNI9969tlDDx4YYfTHBwAAGBRzC/0H1cAFBMAjyqlkDmsJ3qPpGkV0wjBKIq3rskxEO3a7+FcLZXVmVVOyDprLHc/vosmyU56TVHeiVxpLCUO2I0uTXz2q9Qezhq8UihWisT/JYnh6JZHPNvAEcwt9hDfAbbHyiLJCWMJpLKul01qCd7vsWEnkcCopE5FhWZ6/r2QdlCt/taLwWDoQqcOnpLFUID4gLpCoS7P1B7N447U1/+DTBy3oQnh6Rctlw6F7sggIQuYWuolq0PsYO9YixDBuF68l0rqHYd6e+5xaOZ5SR/gIJ/vjB9OZfX1pXvRVbCdWxs8sxURv3OMeXx8bnfQ5Eq7QtnZYaeGyo91ni7fPSXXLle821Xsq9KR6St+x1x7tfVI+XOfyW1QDH4Ra8Xi3i2GDDP8pF0pLp1PJOsN/HHw+Mns0rhcDtjbjzfa+sbA/4wn4F75vYso5QFKrtlPHJ9YX1eh8olez5+dDXofmFlCos2d375CwBBiQKaEaqoEA0cZ96Q0cnWHI425hGOoxtteHDhKpd6I/N2P3ygdi2fnB6aNDcs5BcfkT3JkMWRAH+aFeUtQCsXdlf8ojlgsnZfXg0tiXDics/1DHTqDgYPj3sjgwuRwfHgYA0wQBAD7BN7EMewCAgd6SdRfI+o4+wBtgs7KhURqnsRxRWFa4WlnDHy+/fvaplXUf3jD8CP3OeP+DL54DBKq5BZ/gDXBazFJJnbNIuF1NGT9fZM5VLiDkoBgWdfC2vMOLX3j0PbadciI8TNPbuPg+qkG4jtu0sadpZoalCGddhmXm1qVwPM/S8n5531BbbDmUTdN0rpKl6Sl3SZ0oj9D0JF8anEDVaWlI71e14l5HwGXcQaqrZ/dsOGr8fGe1zf1tVIOe1jO4Xf+POLAYzaV25SyEUm8p2kAo7hWk1uE7vfAOqkEX+Fu91gho3V/NAN2dW1VnVhNzx9TZ1XBkQUsnrJft5JGJM0vRxrswuj4+OjW2Pj46ac02H5oa+gjVGrlhW05sx6TeCCz3WAd0XMkzVGgpWo9PQh7hsFP4WWsHbOJXC0KkGR7h5I8RapaA/M9QcMcf51ENuls08rDyp9p00v5yxOve0+2TykIWVVfUbPv4rvywsQnI/K+5hS6gGiitCUglZUWWU8nGhTcKxe3iPfU4Mi8PrXjjnoIczg7sjWbUaTU60xvltKA8lO7LJeOLtmS/LPRHiU8RfLmBwWJICvS7fBEhIDvFETUyHrLOPGJuoWV8eru70jpH8lhjNZZQLd11q5CkUWaqsywV95yzXchQvaLd1+nojtnykS7fbuTMtF2+nDPuO52BQEebznZZs/eaW+hDVAXvzuwd93PN+rq+7cySf0qdKFuF33/ANqo7BA6ljbuc17IMWjZ8M0Rr6DwMgP6GqrAbwEohz3u0tDUQXZoqSzRD0w6J+07FeISqxj0yS6RpCXkNX2PvJAC+jaoQfGLvzooilCwrhGFY6nlS7kYI0V17ul+cdWCMaLuv+2Lpz8fs9a/+ri+jqvGeOC6K4yIKtKx8qIOUJKlEjIeAzNfNGPo7qoIPgK3fbb3cHju5HTMdfXav0xkqep37y3LbLop2hJzfLhvveYdLf2DZTHs2QdA948NghZCyiByP/h2rqHVO5kMA9Ca+Ys0neo5qmlrZNjwbZDt2rV1djWmpvqKoqIfii8vhxfP7kcsWXTj3zOGoOhIU4vLA4fHU6tp6adSa+a75TXTD/BVQAKweZKVO9FbH+USirmHRnEeH8DvQBeBp2FP3MFYd856v9QT1kzORU6fbXfYbhZcXz771mxXvZeOvP4qeWJOtuXfNebjf3KukndY/xDK75WcUOfVCu7MrYY244buMgj+MnTgmc4WfLp6982urL3oA0AN8BfZYSdN0ojceja0/LKk/RCcsp+lELs7tXozO2w8Ma/suDGv75uyL0QX7UiFZ/Hph4WL04qZ+Tb9169Yt/Zq+ubmJ6GsNf8ThOXQHh6ETQE+RlJbS3JqbuP/yy1dGXrnx3O3MG29kbjezDpuoaulj/QuE45VnULVuMgRTeBZu4pvWDK7u+0ZRf4ULEI/LT/Csh/cGe3hv3/8AAAD//wEAAP//AFH8nAAAAAEAAAABGFGsCFq7Xw889QABA+gAAAAA2F2gzAAAAADdZi83/r3+3QgdA8kAAgADAAIAAAAAAAAAAQAAA9j+7wAACED+vf28CB0D6ADC/9EAAAAAAAAAAAAAAB0CdAAkAhkAJwIYAB8BswAlAhcAJwHhACUCEwABAO0AHwHcAB8A+AAsAx8AHwINAB8CAwAnAhf/9gFWAB8Bkv/8AUUAPAIQADgBwAA7AsMARgHA/8IB4P/2AeP/3AEjAEEBJf/UAd8AGAHgADAA7QAfAAAARwAAAC4AZgCeAMwBBAE+AYYBkgGsAc4CEAI6AmgCogLAAvwDKgNWA3QDrgPeBAgEFgQ0BFIEhASYBKYEvAABAAAAHQCMAAwAZgAHAAEAAAAAAAAAAAAAAAAABAADeJyclNtOG1cUhj8H2216uqhQRG7QvkylZEyjECXhypSgjIpw6nF6kKpKgz0+iPHMyDOYkifodd+ib5GrPkafoup1tX8vgx1FQSAE/Hv2OvxrrX9tYJP/2KBWvwv83ZwbrrHd/NnwHb5oHhneYL/5meE6Dxv/GG4waLw13ORBo2v4E97V/zT8KU/qvxm+y1b90PDnPK5vGv5yw/Gv4a94wrsFrsEz/jBcY4vC8B02+dXwBvewmLU699gx3OBrtg032QZ6TKhImZAxwjFkwogzZiSURCTMmDAkYYAjpE1Kpa8ZsZBj9MGvMREVM2JFHFPhSIlIiSkZW8S38sp5rYxDnWZ216ZiTMyJPE6JyXDkjMjJSDhVnIqKghe0aFHSF9+CipKAkgkpATkzRrTocMgRPcZMKHEcKpJnFpEzpOKcWPmdWfjO9EnIKI3VGRkD8XTil8g75AhHh0K2q5GP1iI8xPGjvD23XLbfEujXrTBbz7tkEzNXP1N1JdXNuSY41q3P2+YH4YoXuFv1Z53J9T0a6H+lyCecaf4DTSoTkwzntmgTSUGRu49jX+eQSB35iZAer+jwhp7Obbp0aXNMj5CX8u3QxfEdHY45kEcovLg7lGKO+QXH94Sy8bET689iYgm/U5i6S3GcqY4phXrumQeqNVGFN5+w36F8TR2lfPraI2/pNL9MexYzMlUUYjhVL5faKK1/A1PEVLX42V7d+22Y2+4tt/iCXDvs1brg5Ce3YHTdVIP3NHOun4CYATknsuiTM6VFxYV4vybmjBTHgbr3SltS0b708XkupJKEqRiEZIozo9Df2HQTGff+mu6dvSUD+Xump5dV3SaLU6+uZvRG3VveRdblZGUCLZtqvqKmvrhmpv1EO7XKP5Jvqdct5xGh4i52+0OvwA7P2WWPsbL0dTO/vPOvhLfYUwdOSWQ1lKZ9DY8J2CXgKbvs8pyn7/VyycYZH7fGZzV/mwP26bB3bTUL2w77vFyL9vHMf4ntjupxPLo8Pbv1NB/cQLXfaN+u3s2uJuenMbdoV9txTMzUc3FbqzW5+wT/AwAA//8BAAD//3KhUUAAAAADAAD/9QAA/84AMgAAAAAAAAAAAAAAAAAAAAAAAAAA");
+}
+.d2-3403827828 .text-mono {
+	font-family: "d2-3403827828-font-mono";
+}
+@font-face {
+	font-family: d2-3403827828-font-mono;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-3403827828 .fill-N1{fill:#0A0F25;}
+		.d2-3403827828 .fill-N2{fill:#676C7E;}
+		.d2-3403827828 .fill-N3{fill:#9499AB;}
+		.d2-3403827828 .fill-N4{fill:#CFD2DD;}
+		.d2-3403827828 .fill-N5{fill:#DEE1EB;}
+		.d2-3403827828 .fill-N6{fill:#EEF1F8;}
+		.d2-3403827828 .fill-N7{fill:#FFFFFF;}
+		.d2-3403827828 .fill-B1{fill:#0D32B2;}
+		.d2-3403827828 .fill-B2{fill:#0D32B2;}
+		.d2-3403827828 .fill-B3{fill:#E3E9FD;}
+		.d2-3403827828 .fill-B4{fill:#E3E9FD;}
+		.d2-3403827828 .fill-B5{fill:#EDF0FD;}
+		.d2-3403827828 .fill-B6{fill:#F7F8FE;}
+		.d2-3403827828 .fill-AA2{fill:#4A6FF3;}
+		.d2-3403827828 .fill-AA4{fill:#EDF0FD;}
+		.d2-3403827828 .fill-AA5{fill:#F7F8FE;}
+		.d2-3403827828 .fill-AB4{fill:#EDF0FD;}
+		.d2-3403827828 .fill-AB5{fill:#F7F8FE;}
+		.d2-3403827828 .stroke-N1{stroke:#0A0F25;}
+		.d2-3403827828 .stroke-N2{stroke:#676C7E;}
+		.d2-3403827828 .stroke-N3{stroke:#9499AB;}
+		.d2-3403827828 .stroke-N4{stroke:#CFD2DD;}
+		.d2-3403827828 .stroke-N5{stroke:#DEE1EB;}
+		.d2-3403827828 .stroke-N6{stroke:#EEF1F8;}
+		.d2-3403827828 .stroke-N7{stroke:#FFFFFF;}
+		.d2-3403827828 .stroke-B1{stroke:#0D32B2;}
+		.d2-3403827828 .stroke-B2{stroke:#0D32B2;}
+		.d2-3403827828 .stroke-B3{stroke:#E3E9FD;}
+		.d2-3403827828 .stroke-B4{stroke:#E3E9FD;}
+		.d2-3403827828 .stroke-B5{stroke:#EDF0FD;}
+		.d2-3403827828 .stroke-B6{stroke:#F7F8FE;}
+		.d2-3403827828 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-3403827828 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-3403827828 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-3403827828 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-3403827828 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-3403827828 .background-color-N1{background-color:#0A0F25;}
+		.d2-3403827828 .background-color-N2{background-color:#676C7E;}
+		.d2-3403827828 .background-color-N3{background-color:#9499AB;}
+		.d2-3403827828 .background-color-N4{background-color:#CFD2DD;}
+		.d2-3403827828 .background-color-N5{background-color:#DEE1EB;}
+		.d2-3403827828 .background-color-N6{background-color:#EEF1F8;}
+		.d2-3403827828 .background-color-N7{background-color:#FFFFFF;}
+		.d2-3403827828 .background-color-B1{background-color:#0D32B2;}
+		.d2-3403827828 .background-color-B2{background-color:#0D32B2;}
+		.d2-3403827828 .background-color-B3{background-color:#E3E9FD;}
+		.d2-3403827828 .background-color-B4{background-color:#E3E9FD;}
+		.d2-3403827828 .background-color-B5{background-color:#EDF0FD;}
+		.d2-3403827828 .background-color-B6{background-color:#F7F8FE;}
+		.d2-3403827828 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-3403827828 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-3403827828 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-3403827828 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-3403827828 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-3403827828 .color-N1{color:#0A0F25;}
+		.d2-3403827828 .color-N2{color:#676C7E;}
+		.d2-3403827828 .color-N3{color:#9499AB;}
+		.d2-3403827828 .color-N4{color:#CFD2DD;}
+		.d2-3403827828 .color-N5{color:#DEE1EB;}
+		.d2-3403827828 .color-N6{color:#EEF1F8;}
+		.d2-3403827828 .color-N7{color:#FFFFFF;}
+		.d2-3403827828 .color-B1{color:#0D32B2;}
+		.d2-3403827828 .color-B2{color:#0D32B2;}
+		.d2-3403827828 .color-B3{color:#E3E9FD;}
+		.d2-3403827828 .color-B4{color:#E3E9FD;}
+		.d2-3403827828 .color-B5{color:#EDF0FD;}
+		.d2-3403827828 .color-B6{color:#F7F8FE;}
+		.d2-3403827828 .color-AA2{color:#4A6FF3;}
+		.d2-3403827828 .color-AA4{color:#EDF0FD;}
+		.d2-3403827828 .color-AA5{color:#F7F8FE;}
+		.d2-3403827828 .color-AB4{color:#EDF0FD;}
+		.d2-3403827828 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-3403827828);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-3403827828);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-3403827828);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-3403827828);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-3403827828);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-3403827828);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-3403827828);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-3403827828);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><g class="YWRpX3JlcG9ydGVy"><g class="shape" ><rect x="73.000000" y="12.000000" width="276.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="73.000000" y="12.000000" width="276.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="211.000000" y="62.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_reporter</text><line x1="73.000000" x2="349.000000" y1="104.000000" y2="104.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="YWRpX2NvbXBvbmVudA=="><g class="shape" ><rect x="66.000000" y="174.000000" width="291.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="66.000000" y="174.000000" width="291.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="211.500000" y="224.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_component</text><line x1="66.000000" x2="357.000000" y1="266.000000" y2="266.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="YWRpX3N1YnNjcmliZXI="><g class="shape" ><rect x="59.000000" y="1142.000000" width="305.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="59.000000" y="1142.000000" width="305.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="211.500000" y="1192.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_subscriber</text><line x1="59.000000" x2="364.000000" y1="1234.000000" y2="1234.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="c2NvcmVib2FyZA=="><g class="shape" ><rect x="12.000000" y="336.000000" width="399.000000" height="736.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="12.000000" y="336.000000" width="399.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="211.500000" y="386.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">scoreboard</text><text x="22.000000" y="456.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="456.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">subscriber_source</text><text x="391.000000" y="456.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="502.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="502.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">subscriber_sink</text><text x="391.000000" y="502.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="548.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="548.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">sink_type</text><text x="391.000000" y="548.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="594.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="594.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">enabled</text><text x="391.000000" y="594.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="640.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="640.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">bytestream_empty_sig</text><text x="391.000000" y="640.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="686.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="686.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">byte_streams_empty</text><text x="391.000000" y="686.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="22.000000" y="732.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="732.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">stop_scoreboard</text><text x="391.000000" y="732.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="12.000000" x2="411.000000" y1="750.000000" y2="750.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /><text x="22.000000" y="778.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="778.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">run()</text><text x="391.000000" y="778.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="22.000000" y="824.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="824.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">stop()</text><text x="391.000000" y="824.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="22.000000" y="870.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="870.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">set_sink_type()</text><text x="391.000000" y="870.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="22.000000" y="916.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="916.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">get_sink_type()</text><text x="391.000000" y="916.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="22.000000" y="962.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="962.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">clear_streams()</text><text x="391.000000" y="962.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="22.000000" y="1008.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="1008.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">wait_until_complete()</text><text x="391.000000" y="1008.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="22.000000" y="1054.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="1054.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">compare_transaction()</text><text x="391.000000" y="1054.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text></g></g><g class="KGFkaV9yZXBvcnRlciAmbHQ7LSBhZGlfY29tcG9uZW50KVswXQ=="><marker id="mk-d2-3403827828-2954633863" markerWidth="13.000000" markerHeight="15.000000" refX="3.000000" refY="7.500000" viewBox="0.000000 0.000000 13.000000 15.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="12.000000,1.000000 1.000000,7.500000 12.000000,14.000000" stroke="#0D32B2" fill="#FFFFFF" class="connection stroke-B1 fill-N7" stroke-width="2" /> </marker><path d="M 211.500000 108.000000 L 211.500000 172.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-3403827828-2954633863)" mask="url(#d2-3403827828)" /></g><g class="KGFkaV9jb21wb25lbnQgJmx0Oy0gc2NvcmVib2FyZClbMF0="><path d="M 211.500000 270.000000 L 211.500000 334.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-3403827828-2954633863)" mask="url(#d2-3403827828)" /></g><g class="KHNjb3JlYm9hcmQgJmx0Oy0gYWRpX3N1YnNjcmliZXIpWzBd"><marker id="mk-d2-3403827828-765394478" markerWidth="22.000000" markerHeight="14.000000" refX="3.000000" refY="7.000000" viewBox="0.000000 0.000000 22.000000 14.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,7.000000 11.000000,0.000000 22.000000,7.000000 11.000000,14.000000" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 211.500000 1076.000000 L 211.500000 1140.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-3403827828-765394478)" mask="url(#d2-3403827828)" /><text x="225.500000" y="1093.000000" fill="#0A0F25" class="text-italic fill-N1" style="text-anchor:middle;font-size:16px">2</text></g><mask id="d2-3403827828" maskUnits="userSpaceOnUse" x="-89" y="-89" width="601" height="1424">
+<rect x="-89" y="-89" width="601" height="1424" fill="white"></rect>
+
+</mask></svg></svg></div></section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
+<p>The scoreboard class itself has two instances of subscriber_class, named
+subscriber_source and subscriber_sink, which represent the source and sink of
+the data streams. These are subscribed to a publisher, which calls the
+respective functions when new data is available.</p>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<section id="function-new-input-string-name-input-adi-component-parent-null">
+<h3>function new(input string name, input adi_component parent = null);<a class="headerlink" href="#function-new-input-string-name-input-adi-component-parent-null" title="Link to this heading"></a></h3>
+<p>Creates the scoreboard object. The name gives the scoreboard a name that is
+relevant in the current environment it is instantiated in and the parent sets
+the parent object in which it resides.</p>
+</section>
+<section id="task-run">
+<h3>task run();<a class="headerlink" href="#task-run" title="Link to this heading"></a></h3>
+<p>Enables the scoreboard and clears the data streams.</p>
+</section>
+<section id="task-stop">
+<h3>task stop();<a class="headerlink" href="#task-stop" title="Link to this heading"></a></h3>
+<p>Disables the scoreboard and clears the data streams.</p>
+</section>
+<section id="function-void-set-sink-type-input-bit-sink-type">
+<h3>function void set_sink_type(input bit sink_type);<a class="headerlink" href="#function-void-set-sink-type-input-bit-sink-type" title="Link to this heading"></a></h3>
+<p>Allows the setting of the sink type, which defines if the output data may or may
+not repeat. If set to oneshot, then the source data is verified only once. If
+set to cyclic, then the source data is verified against the sink data as long as
+new data is coming in on the sink side. This value can only be set when the
+scoreboard is disabled.</p>
+</section>
+<section id="function-bit-get-sink-type">
+<h3>function bit get_sink_type();<a class="headerlink" href="#function-bit-get-sink-type" title="Link to this heading"></a></h3>
+<p>Get the sink type.</p>
+</section>
+<section id="protected-function-void-clear-streams">
+<h3>protected function void clear_streams();<a class="headerlink" href="#protected-function-void-clear-streams" title="Link to this heading"></a></h3>
+<p>Clear the source and sink data streams.</p>
+</section>
+<section id="task-wait-until-complete">
+<h3>task wait_until_complete();<a class="headerlink" href="#task-wait-until-complete" title="Link to this heading"></a></h3>
+<p>Wait until the source and the sink datastreams are clear of data, which means
+that all source data was verified against all sink data.</p>
+</section>
+<section id="virtual-function-void-compare-transaction">
+<h3>virtual function void compare_transaction();<a class="headerlink" href="#virtual-function-void-compare-transaction" title="Link to this heading"></a></h3>
+<p>Compares the source and the sink datastreams against each other. This method is
+called by the subscriber when new data arrives. If the scoreboard is disabled,
+the comparison is ommited.</p>
+</section>
+</section>
+<section id="usage-and-recommendations">
+<h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading"></a></h2>
+<p>Basic usage of the scoreboard:</p>
+<ul class="simple">
+<li><p>Declare the scoreboard</p></li>
+<li><p>Link the source and sink subscribers to the publishers where you want to
+verify data</p></li>
+<li><p>Optional: set the sink type; default is oneshot</p></li>
+<li><p>Call the run function to start the verification</p></li>
+<li><p>Wait until the scoreboard completes verification</p></li>
+<li><p>Stop the scoreboard</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<ul class="simple">
+<li><p>The scoreboard must be started before the data transmission begins,
+otherwise, data will be lost and the verification will fail!</p></li>
+</ul>
+</div>
+<p>Other use-cases:</p>
+<ul class="simple">
+<li><p>The scoreboard can be dynamically reconfigured to use other inputs. Stop the
+scoreboard, unsubscribe the subscribers from the publishers and subscribe them
+to the other publisher where you want to verify data.</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<ul class="simple">
+<li><p>The datatype cannot be changed during runtime, only the publisher, to which
+they are subscribed to.</p></li>
+</ul>
+</div>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Common</a>
+    <a href="../scoreboard_pack/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Scoreboard Pack</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

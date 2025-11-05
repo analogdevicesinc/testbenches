@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="This class is designed to be used in conjunction with a publisher class. The class is parameterized with a data_type. It is mainly used in scoreboard and checker classes which need data inputs from various other modules." name="description" />
+
+    <title>Subscriber &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script async="async" src="../../../_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Test Harness" href="../test_harness/index.html" />
+    <link rel="prev" title="Publisher" href="publisher.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Subscriber</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#function-new-input-string-name-input-adi-component-parent-null">function new(input string name, input adi_component parent = null);</a></li>
+<li><a class="reference internal" href="#virtual-function-void-update-input-adi-fifo-data-type-data">virtual function void update(input adi_fifo #(data_type) data);</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage-and-recommendations">Usage and recommendations</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../../drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2-1" id="toctree-collapse-2-2-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">Publisher-Subscriber package</a><label for="toctree-collapse-2-2-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="publisher.html">Publisher</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Subscriber</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../testbenches/index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../../testbenches/ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../../testbenches/project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Library</a></li><li><a href="../index.html">Utilities</a></li><li><a href="index.html">Publisher-Subscriber package</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="subscriber">
+<span id="id1"></span><h1>Subscriber<a class="headerlink" href="#subscriber" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>This class is designed to be used in conjunction with a publisher class. The
+class is parameterized with a data_type. It is mainly used in scoreboard and
+checker classes which need data inputs from various other modules.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The subscriber base class must be inherited and a new implementation must be
+written in a subclass.</p>
+</div>
+<div class="svg align-center"><?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.7.0-HEAD" preserveAspectRatio="xMidYMid meet" viewBox="0 0 507 710"><svg class="d2-2013641140 d2-svg" width="507" height="710" viewBox="-89 -89 507 710"><rect x="-89.000000" y="-89.000000" width="507.000000" height="710.000000" rx="0.000000" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-2013641140 .text-mono {
+	font-family: "d2-2013641140-font-mono";
+}
+@font-face {
+	font-family: d2-2013641140-font-mono;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-2013641140 .fill-N1{fill:#0A0F25;}
+		.d2-2013641140 .fill-N2{fill:#676C7E;}
+		.d2-2013641140 .fill-N3{fill:#9499AB;}
+		.d2-2013641140 .fill-N4{fill:#CFD2DD;}
+		.d2-2013641140 .fill-N5{fill:#DEE1EB;}
+		.d2-2013641140 .fill-N6{fill:#EEF1F8;}
+		.d2-2013641140 .fill-N7{fill:#FFFFFF;}
+		.d2-2013641140 .fill-B1{fill:#0D32B2;}
+		.d2-2013641140 .fill-B2{fill:#0D32B2;}
+		.d2-2013641140 .fill-B3{fill:#E3E9FD;}
+		.d2-2013641140 .fill-B4{fill:#E3E9FD;}
+		.d2-2013641140 .fill-B5{fill:#EDF0FD;}
+		.d2-2013641140 .fill-B6{fill:#F7F8FE;}
+		.d2-2013641140 .fill-AA2{fill:#4A6FF3;}
+		.d2-2013641140 .fill-AA4{fill:#EDF0FD;}
+		.d2-2013641140 .fill-AA5{fill:#F7F8FE;}
+		.d2-2013641140 .fill-AB4{fill:#EDF0FD;}
+		.d2-2013641140 .fill-AB5{fill:#F7F8FE;}
+		.d2-2013641140 .stroke-N1{stroke:#0A0F25;}
+		.d2-2013641140 .stroke-N2{stroke:#676C7E;}
+		.d2-2013641140 .stroke-N3{stroke:#9499AB;}
+		.d2-2013641140 .stroke-N4{stroke:#CFD2DD;}
+		.d2-2013641140 .stroke-N5{stroke:#DEE1EB;}
+		.d2-2013641140 .stroke-N6{stroke:#EEF1F8;}
+		.d2-2013641140 .stroke-N7{stroke:#FFFFFF;}
+		.d2-2013641140 .stroke-B1{stroke:#0D32B2;}
+		.d2-2013641140 .stroke-B2{stroke:#0D32B2;}
+		.d2-2013641140 .stroke-B3{stroke:#E3E9FD;}
+		.d2-2013641140 .stroke-B4{stroke:#E3E9FD;}
+		.d2-2013641140 .stroke-B5{stroke:#EDF0FD;}
+		.d2-2013641140 .stroke-B6{stroke:#F7F8FE;}
+		.d2-2013641140 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-2013641140 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-2013641140 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-2013641140 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-2013641140 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-2013641140 .background-color-N1{background-color:#0A0F25;}
+		.d2-2013641140 .background-color-N2{background-color:#676C7E;}
+		.d2-2013641140 .background-color-N3{background-color:#9499AB;}
+		.d2-2013641140 .background-color-N4{background-color:#CFD2DD;}
+		.d2-2013641140 .background-color-N5{background-color:#DEE1EB;}
+		.d2-2013641140 .background-color-N6{background-color:#EEF1F8;}
+		.d2-2013641140 .background-color-N7{background-color:#FFFFFF;}
+		.d2-2013641140 .background-color-B1{background-color:#0D32B2;}
+		.d2-2013641140 .background-color-B2{background-color:#0D32B2;}
+		.d2-2013641140 .background-color-B3{background-color:#E3E9FD;}
+		.d2-2013641140 .background-color-B4{background-color:#E3E9FD;}
+		.d2-2013641140 .background-color-B5{background-color:#EDF0FD;}
+		.d2-2013641140 .background-color-B6{background-color:#F7F8FE;}
+		.d2-2013641140 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-2013641140 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-2013641140 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-2013641140 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-2013641140 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-2013641140 .color-N1{color:#0A0F25;}
+		.d2-2013641140 .color-N2{color:#676C7E;}
+		.d2-2013641140 .color-N3{color:#9499AB;}
+		.d2-2013641140 .color-N4{color:#CFD2DD;}
+		.d2-2013641140 .color-N5{color:#DEE1EB;}
+		.d2-2013641140 .color-N6{color:#EEF1F8;}
+		.d2-2013641140 .color-N7{color:#FFFFFF;}
+		.d2-2013641140 .color-B1{color:#0D32B2;}
+		.d2-2013641140 .color-B2{color:#0D32B2;}
+		.d2-2013641140 .color-B3{color:#E3E9FD;}
+		.d2-2013641140 .color-B4{color:#E3E9FD;}
+		.d2-2013641140 .color-B5{color:#EDF0FD;}
+		.d2-2013641140 .color-B6{color:#F7F8FE;}
+		.d2-2013641140 .color-AA2{color:#4A6FF3;}
+		.d2-2013641140 .color-AA4{color:#EDF0FD;}
+		.d2-2013641140 .color-AA5{color:#F7F8FE;}
+		.d2-2013641140 .color-AB4{color:#EDF0FD;}
+		.d2-2013641140 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-2013641140);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-2013641140);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-2013641140);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-2013641140);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-2013641140);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-2013641140);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-2013641140);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-2013641140);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><g class="YWRpX3JlcG9ydGVy"><g class="shape" ><rect x="26.000000" y="12.000000" width="276.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="26.000000" y="12.000000" width="276.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="164.000000" y="62.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_reporter</text><line x1="26.000000" x2="302.000000" y1="104.000000" y2="104.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="YWRpX2NvbXBvbmVudA=="><g class="shape" ><rect x="19.000000" y="174.000000" width="291.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="19.000000" y="174.000000" width="291.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="164.500000" y="224.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_component</text><line x1="19.000000" x2="310.000000" y1="266.000000" y2="266.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="YWRpX3N1YnNjcmliZXI="><g class="shape" ><rect x="12.000000" y="336.000000" width="305.000000" height="184.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="12.000000" y="336.000000" width="305.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="164.500000" y="386.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_subscriber</text><text x="22.000000" y="456.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="42.000000" y="456.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">id</text><text x="297.000000" y="456.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="12.000000" x2="317.000000" y1="474.000000" y2="474.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /><text x="22.000000" y="502.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="42.000000" y="502.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">update()</text><text x="297.000000" y="502.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text></g></g><g class="KGFkaV9yZXBvcnRlciAmbHQ7LSBhZGlfY29tcG9uZW50KVswXQ=="><marker id="mk-d2-2013641140-2954633863" markerWidth="13.000000" markerHeight="15.000000" refX="3.000000" refY="7.500000" viewBox="0.000000 0.000000 13.000000 15.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="12.000000,1.000000 1.000000,7.500000 12.000000,14.000000" stroke="#0D32B2" fill="#FFFFFF" class="connection stroke-B1 fill-N7" stroke-width="2" /> </marker><path d="M 164.500000 108.000000 L 164.500000 172.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-2013641140-2954633863)" mask="url(#d2-2013641140)" /></g><g class="KGFkaV9jb21wb25lbnQgJmx0Oy0gYWRpX3N1YnNjcmliZXIpWzBd"><path d="M 164.500000 270.000000 L 164.500000 334.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-2013641140-2954633863)" mask="url(#d2-2013641140)" /></g><mask id="d2-2013641140" maskUnits="userSpaceOnUse" x="-89" y="-89" width="507" height="710">
+<rect x="-89" y="-89" width="507" height="710" fill="white"></rect>
+
+</mask></svg></svg></div></section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
+<p>It has a variable ID that is public, which is used to identify the current
+instance. It is also used by the publisher when adding/removing the subscribing
+class to/from the list.</p>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<section id="function-new-input-string-name-input-adi-component-parent-null">
+<h3>function new(input string name, input adi_component parent = null);<a class="headerlink" href="#function-new-input-string-name-input-adi-component-parent-null" title="Link to this heading"></a></h3>
+<p>The class constructor function initializes the object with the provided name and
+parent component. A static variable is counting the number of subscribers that
+have been created up until this point, this ensures that all subscribers receive
+a unique identification number.</p>
+</section>
+<section id="virtual-function-void-update-input-adi-fifo-data-type-data">
+<h3>virtual function void update(input adi_fifo #(data_type) data);<a class="headerlink" href="#virtual-function-void-update-input-adi-fifo-data-type-data" title="Link to this heading"></a></h3>
+<p>This function is intended to be overridden by subclasses. When a publisher has
+new data, it calls each subscriber’s update function, which ensures that each
+implementation will use the published data in the way it was intended to be used
+in the class where the subscriber is instantiated.</p>
+</section>
+</section>
+<section id="usage-and-recommendations">
+<h2>Usage and recommendations<a class="headerlink" href="#usage-and-recommendations" title="Link to this heading"></a></h2>
+<p>Basic usage of the subscriber:</p>
+<ul class="simple">
+<li><p>Create a subscriber subclass</p></li>
+<li><p>Implement the update function</p></li>
+<li><p>Add extra functionality if needed</p></li>
+<li><p>Subscribe to the publisher</p></li>
+<li><p>Unsubscribe from the publisher</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The publisher and subscriber modules must operate on the same data type.</p>
+</div>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="publisher.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Publisher</a>
+    <a href="../test_harness/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Test Harness</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

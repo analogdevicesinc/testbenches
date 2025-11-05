@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Create the Makefile and list all of the currently known dependencies" name="description" />
+
+    <title>Creation and Editing of HDL Testbenches &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <script async="async" src="../_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ADI Testbenches coding guidelines" href="coding_guidelines.html" />
+    <link rel="prev" title="Repository hierarchy" href="hierarchy.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Creation and Editing of HDL Testbenches</a><ul>
+<li><a class="reference internal" href="#creating-a-new-testbench">Creating a new testbench</a><ul>
+<li><a class="reference internal" href="#adding-a-new-configuration-to-a-test-bench">Adding a new configuration to a test bench</a></li>
+<li><a class="reference internal" href="#adding-a-new-test-program-to-a-test-bench">Adding a new test program to a test bench</a></li>
+<li><a class="reference internal" href="#adding-source-files-to-a-makefile">Adding source files to a Makefile</a></li>
+<li><a class="reference internal" href="#creating-a-modified-block-design-in-the-same-project-folder">Creating a modified block design in the same project folder</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#edit-a-testbench-efficiently">Edit a testbench efficiently</a><ul>
+<li><a class="reference internal" href="#update-testbench-block-design">Update testbench block design</a></li>
+<li><a class="reference internal" href="#update-testbench-stimulus">Update testbench stimulus</a></li>
+<li><a class="reference internal" href="#update-library-files">Update library files</a></li>
+<li><a class="reference internal" href="#file-management">File management</a></li>
+<li><a class="reference internal" href="#compile-vip-files-within-the-vip-project">Compile VIP files within the VIP project</a></li>
+<li><a class="reference internal" href="#update-vip-files-of-an-open-simulation">Update VIP files of an open simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1" checked=""/><div class="collapse"><a class="reference internal" href="index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../library/index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../library/drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../library/drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../library/drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../library/drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../library/drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../library/regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../library/utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2-1" id="toctree-collapse-2-2-1"/><div class="collapse"><a class="reference internal" href="../library/utilities/pub_sub/index.html">Publisher-Subscriber package</a><label for="toctree-collapse-2-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../library/utilities/pub_sub/publisher.html">Publisher</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../library/utilities/pub_sub/subscriber.html">Subscriber</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../library/utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../library/vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../library/vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../library/vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../library/vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../library/vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../testbenches/index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../testbenches/ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../testbenches/project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="index.html">User Guide</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="creation-and-editing-of-hdl-testbenches">
+<span id="create-edit-tb"></span><h1>Creation and Editing of HDL Testbenches<a class="headerlink" href="#creation-and-editing-of-hdl-testbenches" title="Link to this heading"></a></h1>
+<section id="creating-a-new-testbench">
+<h2>Creating a new testbench<a class="headerlink" href="#creating-a-new-testbench" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> and list all of the currently known dependencies</p></li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> script and add the currently known
+simulation dependencies there as well</p></li>
+<li><p>Create at least one <code class="docutils literal notranslate"><span class="pre">configuration</span> <span class="pre">file</span></code> (it can be left empty)</p></li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">system_bd.tcl</span></code> script, which creates the block design (consider
+using Verification IPs as these are created to make testing easier and facilitates
+faster testbench bring-up as well as less bugs in general)</p></li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">system_tb.sv</span></code> file that connects the testbench with the block design</p></li>
+<li><p>Consider creating <code class="docutils literal notranslate"><span class="pre">classes</span></code> that encapsulate the variables and functions, so it
+can be used in other testbenches</p></li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code> to run the simulation</p></li>
+<li><p>Update the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> and <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> with the new dependencies
+if needed.</p></li>
+</ul>
+<section id="adding-a-new-configuration-to-a-test-bench">
+<h3>Adding a new configuration to a test bench<a class="headerlink" href="#adding-a-new-configuration-to-a-test-bench" title="Link to this heading"></a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Simple, all of the configurations are compatible with all of the test programs.</p>
+</div>
+<p>Requirements:</p>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">configuration</span></code> doesn’t change the connections between the block design and
+the <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Test</span> <span class="pre">program</span></code> can be used with the new <code class="docutils literal notranslate"><span class="pre">configuration</span></code> without modifications.</p></li>
+</ul>
+<p>Process:</p>
+<ul class="simple">
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">configuration</span></code> in <code class="docutils literal notranslate"><span class="pre">cfg</span></code> folder.</p></li>
+<li><p>Check if the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> automatically includes the newly created <code class="docutils literal notranslate"><span class="pre">configuration</span></code>,
+otherwise add it to the list manually.</p></li>
+<li><p>If a <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">parameter</span></code> needs to be added, make sure all of the other <code class="docutils literal notranslate"><span class="pre">configuration</span></code>
+files are updated with the new parameter name and a new value as well</p></li>
+<li><p>Test the configuration with the existing test program.</p></li>
+</ul>
+</section>
+<section id="adding-a-new-test-program-to-a-test-bench">
+<h3>Adding a new test program to a test bench<a class="headerlink" href="#adding-a-new-test-program-to-a-test-bench" title="Link to this heading"></a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Simple, all of the configurations are compatible with all of the test programs.</p>
+</div>
+<p>Requirements:</p>
+<ul class="simple">
+<li><p>Connections between the block design and the test program don’t change.</p></li>
+<li><p>All of the existing <code class="docutils literal notranslate"><span class="pre">configurations</span></code> must be compatible with the new
+<code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
+</ul>
+<p>Process:</p>
+<ul class="simple">
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">test</span> <span class="pre">program</span></code> in tests folder.</p></li>
+<li><p>Check if the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> automatically includes the newly created
+<code class="docutils literal notranslate"><span class="pre">configuration</span></code>, otherwise add it to the list manually.</p></li>
+<li><p>Test the program with the existing configurations.</p></li>
+</ul>
+</section>
+<section id="adding-source-files-to-a-makefile">
+<span id="create-edit-tb-makefile"></span><h3>Adding source files to a Makefile<a class="headerlink" href="#adding-source-files-to-a-makefile" title="Link to this heading"></a></h3>
+<p>In the simulation <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>, there are specific variable lists for each
+source files type:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">LIB_DEPS</span></code>: Add IP to inherit its dependency list.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SIM_LIB_DEPS</span></code> : Add Simulation IP to inherit its dependency list.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ENV_DEPS</span></code>: Used for building the block design.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SV_DEPS</span></code>: Used for making sure the simulation has all the required files.</p></li>
+</ul>
+<p>For example for <code class="docutils literal notranslate"><span class="pre">SV_DEPS</span></code>, with:</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">SV_DEPS</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="k">$(</span>ADI_HDL_DIR<span class="k">)</span>/library/my_library/my_file.vh
+</pre></div>
+</div>
+<p>The file can be included without the path in <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code> as:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;my_file.vh&quot;</span>
+
+<span class="c1">// ...</span>
+
+<span class="k">localparam</span><span class="w"> </span><span class="n">SOME_PARAM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">`MY_FILE_DEFINE</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-a-modified-block-design-in-the-same-project-folder">
+<h3>Creating a modified block design in the same project folder<a class="headerlink" href="#creating-a-modified-block-design-in-the-same-project-folder" title="Link to this heading"></a></h3>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Advanced, not all configurations are compatible with the test programs.</p>
+</div>
+<p>Requirements:</p>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">configuration</span> <span class="pre">file(s)</span></code> must be created for the new block design.</p></li>
+</ul>
+<p>Process:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Create a new parameter that tells the <code class="docutils literal notranslate"><span class="pre">system_bd.tcl</span></code> what to build.</dt><dd><ul>
+<li><p>this parameter must be included in all of the existing and new
+configuration files;</p></li>
+<li><p>if the design already has multiple variations of the block design,
+update the existing parameter with the new value which corresponds
+to the new block design</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Modify the <code class="docutils literal notranslate"><span class="pre">system_bd.tcl</span></code> script to use the created parameter to create the
+old or new block design.</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">system_tb.sv</span></code> use the parameter to connect the new block design with a
+new <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
+<li><p>Create the <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>, modify the TESTS list to not be automatically generated
+and add the test program:config options to the list that you want to run.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> add a switch that chooses between the test programs
+based on the parameter.</p></li>
+<li><p>Write and test the new <code class="docutils literal notranslate"><span class="pre">test</span> <span class="pre">program</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="edit-a-testbench-efficiently">
+<h2>Edit a testbench efficiently<a class="headerlink" href="#edit-a-testbench-efficiently" title="Link to this heading"></a></h2>
+<p>Depending on what needs to be, there are several ways to edit a testbench.</p>
+<section id="update-testbench-block-design">
+<h3>Update testbench block design<a class="headerlink" href="#update-testbench-block-design" title="Link to this heading"></a></h3>
+<p>If the block design needs to be updated, the <code class="docutils literal notranslate"><span class="pre">system_bd.tcl</span></code> script and the
+configuration files must be modified. After this, the block design must be
+rebuilt by running the <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</p>
+</section>
+<section id="update-testbench-stimulus">
+<h3>Update testbench stimulus<a class="headerlink" href="#update-testbench-stimulus" title="Link to this heading"></a></h3>
+<p>Changing the test stimulus can be done by modifying the <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code>
+file. If new files need to be imported into the simulation, then the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>
+and the <code class="docutils literal notranslate"><span class="pre">system_project.tcl</span></code> script must be updated. After this, the
+project must be rebuilt by running the <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</p>
+</section>
+<section id="update-library-files">
+<h3>Update library files<a class="headerlink" href="#update-library-files" title="Link to this heading"></a></h3>
+<p>If the library files need to be updated for bugfixes or adding new functionality,
+the appropriate source files must be modified. After this, the simulation must
+be recompiled. In some cases, running the <code class="docutils literal notranslate"><span class="pre">simulate</span></code> command is enough, but
+in other cases, the project must be rebuilt by running the <code class="docutils literal notranslate"><span class="pre">make</span></code> command.</p>
+</section>
+<section id="file-management">
+<h3>File management<a class="headerlink" href="#file-management" title="Link to this heading"></a></h3>
+<p>When designing a testbench, it’s crucial to comprehend the steps involved
+to ensure the testbench runs swiftly and exhibits predictable behavior.</p>
+<p>By default, we link the original source file in the project, with exceptions
+for VIPs and IPs source files, which are copied over to the <code class="docutils literal notranslate"><span class="pre">cfg*.ip_user_files</span></code>
+and <code class="docutils literal notranslate"><span class="pre">cfg*.gen/sources</span></code> paths under the testbench project directory.</p>
+<p>A grey area exists regarding the VIP <code class="docutils literal notranslate"><span class="pre">*_pkg.sv</span></code> files because they are not
+referenced by any VIP module but serve as auxiliary files to interact with them.
+As such, they are not compiled in the IP Packager project by default, resulting
+in linting not being performed because they are not listed in <code class="docutils literal notranslate"><span class="pre">*_vlog.prj</span></code>.</p>
+</section>
+<section id="compile-vip-files-within-the-vip-project">
+<h3>Compile VIP files within the VIP project<a class="headerlink" href="#compile-vip-files-within-the-vip-project" title="Link to this heading"></a></h3>
+<p>It is possible to force Vivado to compile <code class="docutils literal notranslate"><span class="pre">*_pkg.sv</span></code> files by setting the
+compilation order to manual (and specifying the top module since it will no
+longer be discovered):</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">set_property</span><span class="w"> </span>source_mgmt_mode<span class="w"> </span>DisplayOnly<span class="w"> </span><span class="k">[</span><span class="nv">current_project</span><span class="k">]</span>
+<span class="nv">set_property</span><span class="w"> </span>top<span class="w"> </span>my_vip<span class="w"> </span><span class="k">[</span><span class="nv">get_filesets</span><span class="w"> </span>sim_1<span class="k">]</span>
+<span class="nv">launch_simulation</span><span class="w"> </span><span class="o">-</span>scripts_only
+</pre></div>
+</div>
+<p>Change from <code class="docutils literal notranslate"><span class="pre">DisplayOnly</span></code> to <code class="docutils literal notranslate"><span class="pre">None</span></code> to revert.</p>
+<p>After this change, <code class="docutils literal notranslate"><span class="pre">xvlog</span></code> will start linting the <code class="docutils literal notranslate"><span class="pre">*_pkg.sv</span></code> files.</p>
+<p>If you prefer not to use the Vivado GUI, you can call <code class="docutils literal notranslate"><span class="pre">xvlog</span></code> directly:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:/path/testbenches/library/vip/adi/my_vip$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>xvlog<span class="w"> </span>-prj<span class="w"> </span>./*.sim/sim_1/behav/xsim/*_vlog.prj<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-i<span class="w"> </span>../../../utilities/
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>And for a specific file:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:/path/testbenches/library/vip/adi/my_vip$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>xvlog<span class="w"> </span>-work<span class="w"> </span>xil_defaultlib<span class="w"> </span>--sv<span class="w"> </span>-i<span class="w"> </span>../../../utilities<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-i<span class="w"> </span>../../../utilities/<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>my_vip_pkg.sv
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Ensure to call xvlog in the correct compilation order,
+to add them to <code class="docutils literal notranslate"><span class="pre">xil_defaultlib</span></code>, otherwise call <code class="docutils literal notranslate"><span class="pre">*_vlog.prj</span></code> first.</p>
+</div>
+</section>
+<section id="update-vip-files-of-an-open-simulation">
+<h3>Update VIP files of an open simulation<a class="headerlink" href="#update-vip-files-of-an-open-simulation" title="Link to this heading"></a></h3>
+<p>When launching a simulation, Vivado always recompiles all files.
+However, VIP source files are not automatically updated, but trigger the
+“Upgrade IP” mechanism, which is slow (or if using <code class="docutils literal notranslate"><span class="pre">make</span></code>, will rebuild the
+entire testbench project).</p>
+<p>A technique to significantly speed up testing is to exploit that Vivado always
+recompiles all files by patching the <code class="docutils literal notranslate"><span class="pre">cfg*.ip_user_files</span></code> and
+<code class="docutils literal notranslate"><span class="pre">cfg*.gen/sources</span></code> paths with the edited sources.</p>
+<p>The following bash script demonstrates how this can be achieved, for a VIP
+called <cite>my_vip</cite> and testbench called <cite>my_ip_testbench</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Patch VIP source files of an open simulation</span>
+<span class="c1">#./patch_tb.sh ; make</span>
+
+<span class="nv">my_vip_path</span><span class="o">=</span><span class="nv">$ADI_TB_DIR</span>/library/vip/adi/my_vip
+<span class="nv">tb_path</span><span class="o">=</span><span class="nv">$ADI_TB_DIR</span>/testbenches/ip/my_ip_testbench
+
+<span class="nv">my_vip_files</span><span class="o">=</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="nv">$my_vip_path</span><span class="w"> </span><span class="p">;</span><span class="w"> </span>find<span class="w"> </span>.<span class="w"> </span>-maxdepth<span class="w"> </span><span class="m">1</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.v&quot;</span><span class="w"> </span>-or<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.vh&quot;</span><span class="w"> </span>-or<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.sv&quot;</span><span class="k">)</span>
+
+<span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nv">$my_vip_files</span>
+<span class="k">do</span>
+<span class="w">     </span><span class="nv">f</span><span class="o">=</span><span class="k">$(</span>basename<span class="w"> </span><span class="nv">$f</span><span class="k">)</span>
+<span class="w">     </span>tee<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span><span class="nv">$tb_path</span><span class="w"> </span>-wholename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tb_path</span><span class="s2">/runs/cfg*/cfg*.ip_user_files/bd/test_harness/ipshared/*/</span><span class="nv">$f</span><span class="s2">&quot;</span><span class="k">)</span><span class="w"> </span>&lt;<span class="w"> </span><span class="nv">$my_vip_path</span>/<span class="nv">$f</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="w">     </span>tee<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span><span class="nv">$tb_path</span><span class="w"> </span>-wholename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tb_path</span><span class="s2">/runs/cfg*/cfg*.gen/sources_1/bd/test_harness/ipshared/*/</span><span class="nv">$f</span><span class="s2">&quot;</span><span class="k">)</span><span class="w"> </span>&lt;<span class="w"> </span><span class="nv">$my_vip_path</span>/<span class="nv">$f</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="k">done</span>
+</pre></div>
+</div>
+<p>Then, simply relaunch the simulation.
+The snippet above also works with IP projects, just modify the paths.</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="hierarchy.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Repository hierarchy</a>
+    <a href="coding_guidelines.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADI Testbenches coding guidelines</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

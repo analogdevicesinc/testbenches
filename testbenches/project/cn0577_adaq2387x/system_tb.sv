@@ -39,24 +39,21 @@
 
 module system_tb();
 
-  // reg signals
-
-  reg                     dco_init = 1'b0;
-  reg                     ref_clk_out = 1'b0;
-  reg                     clk_gate = 1'b0;
-  reg                     da_p = 1'b0;
-  reg                     da_n = 1'b0;
-  reg                     db_p = 1'b0;
-  reg                     db_n = 1'b0;
-
-  wire  cnv;
+  wire    ref_clk_out;
+  wire    clk_gate;
+  wire    da_p;
+  wire    da_n;
+  wire    db_p;
+  wire    db_n;
+  wire    dco_p;
+  wire    dco_n;
+  wire    cnv;
 
   // test bench variables
 
     `TEST_PROGRAM test(
        .ref_clk_out (ref_clk_out),
        .clk_gate (clk_gate),
-       .dco_in (dco_init),
        .dco_p (dco_p),
        .dco_n (dco_n),
        .da_p (da_p),
@@ -72,6 +69,8 @@ module system_tb();
        .da_p (da_p),
        .db_n (db_n),
        .db_p (db_p),
+       .dco_p (dco_p),
+       .dco_n(dco_n),
        .clk_gate (clk_gate));
 
 endmodule

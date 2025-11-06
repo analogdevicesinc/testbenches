@@ -43,22 +43,26 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2,310.252936 us"></ZoomStartTime>
-      <ZoomEndTime time="3,074.252937 us"></ZoomEndTime>
-      <Cursor1Time time="2,610.252936 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="6.608306 us"></ZoomEndTime>
+      <Cursor1Time time="0.000232 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="169"></NameColumnWidth>
+      <NameColumnWidth column_width="161"></NameColumnWidth>
       <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="22" />
-   <wvobject type="logic" fp_name="/system_tb/test/ref_clk">
-      <obj_property name="ElementShortName">ref_clk</obj_property>
-      <obj_property name="ObjectShortName">ref_clk</obj_property>
-   </wvobject>
+   <WVObjectSize size="23" />
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ltc2387/clk_gate">
       <obj_property name="ElementShortName">clk_gate</obj_property>
       <obj_property name="ObjectShortName">clk_gate</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ref_clk_out">
+      <obj_property name="ElementShortName">ref_clk_out</obj_property>
+      <obj_property name="ObjectShortName">ref_clk_out</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/dco_init">
+      <obj_property name="ElementShortName">dco_init</obj_property>
+      <obj_property name="ObjectShortName">dco_init</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test/dco_in">
       <obj_property name="ElementShortName">dco_in</obj_property>

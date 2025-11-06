@@ -52,7 +52,6 @@ localparam NUM_OF_TRANSFERS = 16;
 program test_program (
   input           ref_clk_out,
   input           clk_gate,
-  input           dco_in,
   output          da_n,
   output          da_p,
   output          db_n,
@@ -158,37 +157,42 @@ localparam int N = (`TWOLANES == 0 && `ADC_RES == 16) ? 16 :
 parameter int num_of_dco = N / 2;
 
 // dco delay compared to the reference clk
-localparam DCO_DELAY = 12;
+//localparam DCO_DELAY = 12;
+localparam DCO_DELAY = 4;
 
-reg  dco_init = 1'b0;
+// ---------------------------------------------------------------------------
+// Creating a "gate" through which the data clock can run (and only then)
+// ---------------------------------------------------------------------------
 
-  // ---------------------------------------------------------------------------
-  // Creating a "gate" through which the data clock can run (and only then)
-  // ---------------------------------------------------------------------------
+reg dco_init;
 
- initial begin
+initial begin
+  dco_init = 1'b0;
   forever begin
-    @(posedge clk_gate, negedge clk_gate)
-      if (clk_gate == 1'b1) begin
-        dco_init = ref_clk_out;
-      end else begin
-        dco_init = 1'b0;
-      end
+    @(posedge ref_clk_out, negedge ref_clk_out) begin
+      dco_init = clk_gate ? ref_clk_out : 1'b0;
+    end
   end
 end
 
-  // ---------------------------------------------------------------------------
-  // Data clocks generation
-  // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Data clocks generation
+// ---------------------------------------------------------------------------
 
 initial begin
+  dco_p = 1'b0;
+  dco_n = 1'b1;
   forever begin
-    @(posedge dco_in, negedge dco_in) begin
+    @(posedge dco_init) begin
+    dco_p <= #DCO_DELAY  dco_init;
+    dco_n <= #DCO_DELAY  ~dco_init;
+    end
+    @(negedge dco_init) begin
     dco_p <= #DCO_DELAY  dco_init;
     dco_n <= #DCO_DELAY  ~dco_init;
     end
   end
- end
+end
 
 //---------------------------------------------------------------------------
 // Data store
@@ -196,11 +200,10 @@ initial begin
 
 reg   [`ADC_RES-1:0]  data_gen = 'h3a5a5;
 reg   [`ADC_RES-1:0]  data_shift = 'h0;
-
-reg                     r_da_p = 1'b0;
-reg                     r_da_n = 1'b0;
-reg                     r_db_p = 1'b0;
-reg                     r_db_n = 1'b0;
+reg                   r_da_p;
+reg                   r_da_n;
+reg                   r_db_p;
+reg                   r_db_n;
 
 assign da_p = r_da_p;
 assign da_n = r_da_n;
@@ -213,18 +216,29 @@ assign db_n = r_db_n;
 
 initial begin
   forever begin
-    @ (posedge dco_in, negedge dco_in) begin
-      if (`TWOLANES == 1) begin
-        r_da_p = data_shift[`ADC_RES - 1];
-        r_da_n = ~data_shift[`ADC_RES - 1];
-        r_db_p = data_shift[`ADC_RES - 2];
-        r_db_n = ~data_shift[`ADC_RES - 2];
-        data_shift = data_shift << 2;
-      end else begin
-        r_da_p = data_shift[`ADC_RES - 1];
-        r_da_n = ~data_shift[`ADC_RES - 1];
-        data_shift = data_shift << 1;
+    @(posedge dco_init, negedge dco_init) begin
+        if (`TWOLANES == 1) begin
+          r_da_p = data_shift[`ADC_RES - 1];
+          r_da_n = ~data_shift[`ADC_RES - 1];
+          r_db_p = data_shift[`ADC_RES - 2];
+          r_db_n = ~data_shift[`ADC_RES - 2];
+          data_shift = data_shift << 2;
+        end else begin
+          r_da_p = data_shift[`ADC_RES - 1];
+          r_da_n = ~data_shift[`ADC_RES - 1];
+          data_shift = data_shift << 1;
+        end
       end
+  end
+end
+
+initial begin
+  forever begin
+    @(negedge clk_gate) begin
+      r_da_p = 1'b0;
+      r_da_n = 1'b0;
+      r_db_p = 1'b0;
+      r_db_n = 1'b0;
     end
   end
 end
@@ -243,7 +257,7 @@ end
 
 initial begin
   forever begin
-    @(posedge dco_in);
+    @(posedge dco_init);
     if (transfer_status) begin
       if (`ADC_RES == 16) begin
         if (`TWOLANES == 0) begin
@@ -267,7 +281,7 @@ initial begin
         end
       end
     end
-    @(negedge dco_in);
+    @(negedge dco_init);
   end
 end
 

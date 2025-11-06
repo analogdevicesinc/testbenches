@@ -277,7 +277,8 @@ of the <a class="icon git reference external" href="https://github.com/analogdev
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
 <p>The testbench block design includes part of the ADRV9009 HDL reference design,
-along with VIPs used for clocking, reset, PS and DDR simulations.</p>
+along with JESD exercisers and VIPs used for clocking, reset, PS and DDR
+simulations.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
 <p>The data path and clock domains are depicted in the below diagram:</p>
@@ -288,8 +289,9 @@ along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
 <p>The following parameters of this testbench that can be configured:</p>
 <ul class="simple">
-<li><p>LINK_MODE: the JESD204B link mode</p></li>
-<li><p>REF_CLK_RATE: the rate of the reference clock</p></li>
+<li><p>LINK_MODE: the JESD204B link mode (1: JESD_8B10B encoding; 2: JESD_64B66B
+encoding)</p></li>
+<li><p>REF_CLK_RATE: the rate of the reference clock in MHz</p></li>
 <li><p>LANE_RATE: the JESD204B lane rate in Gbps</p></li>
 <li><p>DAC_OFFLOAD_TYPE: the type of DAC offload</p></li>
 <li><p>DAC_OFFLOAD_SIZE: the size of DAC offload</p></li>

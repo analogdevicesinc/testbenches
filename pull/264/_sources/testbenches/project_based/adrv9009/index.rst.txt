@@ -16,7 +16,8 @@ Block design
 -------------------------------------------------------------------------------
 
 The testbench block design includes part of the ADRV9009 HDL reference design,
-along with VIPs used for clocking, reset, PS and DDR simulations.
+along with JESD exercisers and VIPs used for clocking, reset, PS and DDR
+simulations.
 
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,8 +34,9 @@ Configuration parameters and modes
 
 The following parameters of this testbench that can be configured:
 
-- LINK_MODE: the JESD204B link mode
-- REF_CLK_RATE: the rate of the reference clock
+- LINK_MODE: the JESD204B link mode (1: JESD_8B10B encoding; 2: JESD_64B66B
+  encoding)
+- REF_CLK_RATE: the rate of the reference clock in MHz
 - LANE_RATE: the JESD204B lane rate in Gbps
 - DAC_OFFLOAD_TYPE: the type of DAC offload
 - DAC_OFFLOAD_SIZE: the size of DAC offload

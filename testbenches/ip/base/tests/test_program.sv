@@ -54,7 +54,6 @@ program test_program;
   process current_process;
   string current_process_random_state;
 
-
   initial begin
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);

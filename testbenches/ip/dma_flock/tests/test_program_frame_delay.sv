@@ -71,7 +71,17 @@ program test_program_frame_delay;
   int has_m_autorun;
   int sync_gen_en;
 
+  // process variables
+  process current_process;
+  string current_process_random_state;
+
   initial begin
+
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     //creating environment
     base_env = new("Base Environment",
@@ -90,8 +100,6 @@ program test_program_frame_delay;
     has_dfsync = `S_DMA_CFG_USE_EXT_SYNC;
     has_m_autorun = `M_DMA_CFG_AUTORUN;
     has_s_autorun = `S_DMA_CFG_AUTORUN;
-
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
     dma_flock_env.start();

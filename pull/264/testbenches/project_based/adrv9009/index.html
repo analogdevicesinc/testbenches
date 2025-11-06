@@ -700,7 +700,7 @@ tones and DMA-based stimulus depending on the <cite>use_dds</cite> parameter (<c
 is used).</p>
 <section id="tx-tpl-test">
 <h4>TX TPL test<a class="headerlink" href="#tx-tpl-test" title="Link to this heading"></a></h4>
-<ol class="arabic simple">
+<ul>
 <li><p><strong>Initialize DMA-based stimulus (if use_dds == 0)</strong></p>
 <ul class="simple">
 <li><p>Write a deterministic pattern to DDR memory using the <code class="docutils literal notranslate"><span class="pre">BackdoorWrite32</span></code>
@@ -749,35 +749,44 @@ interface of the DDR slave sequencer.</p></li>
 </ul>
 </li>
 <li><p><strong>Synchronize DDS cores (if use_dds == 1)</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Write to the DAC common control register to trigger synchronization.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Bring up the DUT TX path and external RX path</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Start the TX clock generator (<cite>AXI_CLKGEN_TX_BA</cite>) and bring up the DUT TX
 transceiver.</p></li>
 <li><p>Bring up the external RX transceiver and link.</p></li>
 <li><p>Wait for both DUT and external link layers to report link-up status.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Simulation delay</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Wait for 10 µs to allow data flow and link stabilization.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Bring down the links</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Shut down the transceivers to conclude the test.</p></li>
 </ul>
+</div></blockquote>
 </li>
-</ol>
+</ul>
 </section>
 <section id="rx-tpl-test">
 <h4>RX TPL test<a class="headerlink" href="#rx-tpl-test" title="Link to this heading"></a></h4>
-<ol class="arabic simple">
+<ul>
 <li><p><strong>Configure external DAC TPL channels</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Iterate over all RX lanes (<cite>i = 0..RX_JESD_M-1</cite>):</p>
 <ul>
 <li><p>If <cite>use_dds</cite> is enabled:</p>
@@ -795,34 +804,44 @@ transceiver.</p></li>
 </ul>
 </li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Enable ADC TPL Channels</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Iterate over all RX lanes and enable the corresponding ADC channels via
 <cite>CHAN_CNTRL</cite> register.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Release DAC and ADC Resets</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Deassert reset (<cite>RSTN = 1</cite>) for both the external DAC TPL and ADC TPL
 common blocks.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Bring up DUT RX and External TX Paths</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Start the RX clock generator (<cite>AXI_CLKGEN_RX_BA</cite>) for the DUT.</p></li>
 <li><p>Bring up the external TX transceiver and link.</p></li>
 <li><p>Bring up the DUT RX transceiver and link.</p></li>
 <li><p>Wait for both DUT and external link layers to report link-up.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Simulation delay</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Wait for 10 µs to allow data flow and link stabilization.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Configure RX DMA (if `use_dds == 0`)</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Enable the RX DMA engine and configure:</p>
 <ul>
 <li><p>Control register (enable DMA).</p></li>
@@ -834,9 +853,11 @@ common blocks.</p></li>
 </li>
 <li><p>Wait for 5 µs to allow DMA to start.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Check Captured Data</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Call the <cite>check_captured_data</cite> function to verify that the data received
 from the TX path is correctly captured in DDR:</p>
 <ul>
@@ -844,19 +865,23 @@ from the TX path is correctly captured in DDR:</p>
 </ul>
 </li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Shutdown RX Path</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Bring down the DUT RX and external TX transceivers to conclude the test.</p></li>
 </ul>
+</div></blockquote>
 </li>
-</ol>
+</ul>
 </section>
 <section id="rx-os-tpl-test">
 <h4>RX OS TPL test<a class="headerlink" href="#rx-os-tpl-test" title="Link to this heading"></a></h4>
-<ol class="arabic simple">
+<ul>
 <li><p><strong>Configure External DAC OS TPL Channels</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Iterate over all RX_OS lanes (<cite>i = 0..RX_OS_JESD_M-1</cite>):</p>
 <ul>
 <li><p>If <cite>use_dds</cite> is enabled:</p>
@@ -874,34 +899,44 @@ from the TX path is correctly captured in DDR:</p>
 </ul>
 </li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Enable ADC OS TPL Channels</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Iterate over all RX_OS lanes and enable the corresponding ADC OS channels
 via <cite>CHAN_CNTRL</cite> register.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Release DAC and ADC OS Resets</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Deassert reset (<cite>RSTN = 1</cite>) for both the external DAC OS TPL and ADC OS TPL
 common blocks.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Bring up DUT RX Observation and External TX Observation Paths</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Start the RX OS clock generator (<cite>AXI_CLKGEN_RX_OS_BA</cite>) for the DUT.</p></li>
 <li><p>Bring up the external TX OS transceiver and link.</p></li>
 <li><p>Bring up the DUT RX OS transceiver and link.</p></li>
 <li><p>Wait for both DUT and external RX OS links to report link-up.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Simulation Delay</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Wait 10 µs for data flow and link stabilization.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Configure RX OS DMA (if `use_dds == 0`)</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Enable the RX OS DMA engine and configure:
 - Control register (enable DMA).
 - Flags (TLAST).
@@ -910,20 +945,25 @@ common blocks.</p></li>
 - Submit DMA transfer.</p></li>
 <li><p>Wait 5 µs to allow DMA to start.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Check Captured Data</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Call the <cite>check_captured_data</cite> task to verify that the RX OS data captured
 in DDR matches the expected template:
 - Parameters: address, length, step, max_sample.</p></li>
 </ul>
+</div></blockquote>
 </li>
 <li><p><strong>Shutdown RX OS Path</strong></p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li><p>Bring down the DUT RX OS and external TX OS transceivers.</p></li>
 </ul>
+</div></blockquote>
 </li>
-</ol>
+</ul>
 </section>
 </section>
 <section id="stop-the-environment">

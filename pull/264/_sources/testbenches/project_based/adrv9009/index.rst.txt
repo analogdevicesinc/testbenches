@@ -320,65 +320,65 @@ is used).
 TX TPL test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. **Initialize DMA-based stimulus (if use_dds == 0)**
+* **Initialize DMA-based stimulus (if use_dds == 0)**
 
-   - Write a deterministic pattern to DDR memory using the ``BackdoorWrite32`` 
-     interface of the DDR slave sequencer.
-   - Configure the TX DMA engine by writing to its registers:
+  - Write a deterministic pattern to DDR memory using the ``BackdoorWrite32`` 
+    interface of the DDR slave sequencer.
+  - Configure the TX DMA engine by writing to its registers:
 
-     - Enable DMA.
-     - Set TLAST flag.
-     - Set transfer length.
-     - Set source address to DDR base.
-     - Submit DMA transfer.
-     - Wait for 5 µs to ensure the DMA is configured.
+    - Enable DMA.
+    - Set TLAST flag. 
+    - Set transfer length.
+    - Set source address to DDR base.
+    - Submit DMA transfer.
+    - Wait for 5 µs to ensure the DMA is configured.
 
-2. **Configure DAC TPL channels** 
+* **Configure DAC TPL channels**
 
-   - Iterate over each TX lane:
+  - Iterate over each TX lane:
 
-     - If ``use_dds`` is enabled:
+    - If ``use_dds`` is enabled:
 
-       - Select DDS as the data source.
-       - Configure tone amplitude (``DDS_SCALE_1``) and frequency
-         (``DDS_INCR_1``).
-     
-     - Otherwise:
+      - Select DDS as the data source.
+      - Configure tone amplitude (``DDS_SCALE_1``) and frequency
+        (``DDS_INCR_1``).
+    
+    - Otherwise:
 
-       - Select DMA as the source for the DAC template pattern.
+      - Select DMA as the source for the DAC template pattern.
 
-3. **Enable external ADC TPL channels**
+* **Enable external ADC TPL channels**
 
-   - Iterate over all TX lanes and enable the corresponding ADC TPL channels via
-     ``CHAN_CNTRL`` register.
+  - Iterate over all TX lanes and enable the corresponding ADC TPL channels via
+    ``CHAN_CNTRL`` register.
 
-4. **Release DAC and ADC resets**
+* **Release DAC and ADC resets**
 
-   - Write ``RSTN = 1`` to ``DAC_COMMON_REG_RSTN`` and ``ADC_COMMON_REG_RSTN``.
+  - Write ``RSTN = 1`` to ``DAC_COMMON_REG_RSTN`` and ``ADC_COMMON_REG_RSTN``.
 
-5. **Synchronize DDS cores (if use_dds == 1)**
+* **Synchronize DDS cores (if use_dds == 1)**
 
    - Write to the DAC common control register to trigger synchronization.
 
-6. **Bring up the DUT TX path and external RX path**
+* **Bring up the DUT TX path and external RX path**
 
    - Start the TX clock generator (`AXI_CLKGEN_TX_BA`) and bring up the DUT TX
      transceiver.
    - Bring up the external RX transceiver and link.
    - Wait for both DUT and external link layers to report link-up status.
 
-7. **Simulation delay**
+* **Simulation delay**
 
    - Wait for 10 µs to allow data flow and link stabilization.
 
-8. **Bring down the links**
+* **Bring down the links**
 
    - Shut down the transceivers to conclude the test.
 
 RX TPL test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. **Configure external DAC TPL channels**
+* **Configure external DAC TPL channels**
 
    - Iterate over all RX lanes (`i = 0..RX_JESD_M-1`):
 
@@ -392,28 +392,28 @@ RX TPL test
 
        - Select DMA as the data source for the DAC TPL channel.
 
-2. **Enable ADC TPL Channels**
+* **Enable ADC TPL Channels**
 
    - Iterate over all RX lanes and enable the corresponding ADC channels via
      `CHAN_CNTRL` register.
 
-3. **Release DAC and ADC Resets**
+* **Release DAC and ADC Resets**
 
    - Deassert reset (`RSTN = 1`) for both the external DAC TPL and ADC TPL
      common blocks.
 
-4. **Bring up DUT RX and External TX Paths**
+* **Bring up DUT RX and External TX Paths**
 
    - Start the RX clock generator (`AXI_CLKGEN_RX_BA`) for the DUT.
    - Bring up the external TX transceiver and link.
    - Bring up the DUT RX transceiver and link.
    - Wait for both DUT and external link layers to report link-up.
 
-5. **Simulation delay**
+* **Simulation delay**
 
    - Wait for 10 µs to allow data flow and link stabilization.
 
-6. **Configure RX DMA (if `use_dds == 0`)**
+* **Configure RX DMA (if `use_dds == 0`)**
 
    - Enable the RX DMA engine and configure:
 
@@ -425,21 +425,21 @@ RX TPL test
 
    - Wait for 5 µs to allow DMA to start.
 
-7. **Check Captured Data**
+* **Check Captured Data**
 
    - Call the `check_captured_data` function to verify that the data received
      from the TX path is correctly captured in DDR:
 
      - Parameters: address, length, step, max_sample.
 
-8. **Shutdown RX Path**
+* **Shutdown RX Path**
 
    - Bring down the DUT RX and external TX transceivers to conclude the test.
 
 RX OS TPL test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. **Configure External DAC OS TPL Channels**
+* **Configure External DAC OS TPL Channels**
 
    - Iterate over all RX_OS lanes (`i = 0..RX_OS_JESD_M-1`):
 
@@ -453,28 +453,28 @@ RX OS TPL test
 
        - Select DMA as the source for DAC OS TPL channels.
 
-2. **Enable ADC OS TPL Channels**
+* **Enable ADC OS TPL Channels**
 
    - Iterate over all RX_OS lanes and enable the corresponding ADC OS channels
      via `CHAN_CNTRL` register.
 
-3. **Release DAC and ADC OS Resets**
+* **Release DAC and ADC OS Resets**
 
    - Deassert reset (`RSTN = 1`) for both the external DAC OS TPL and ADC OS TPL
      common blocks.
 
-4. **Bring up DUT RX Observation and External TX Observation Paths**
+* **Bring up DUT RX Observation and External TX Observation Paths**
 
    - Start the RX OS clock generator (`AXI_CLKGEN_RX_OS_BA`) for the DUT.
    - Bring up the external TX OS transceiver and link.
    - Bring up the DUT RX OS transceiver and link.
    - Wait for both DUT and external RX OS links to report link-up.
 
-5. **Simulation Delay**
+* **Simulation Delay**
 
    - Wait 10 µs for data flow and link stabilization.
 
-6. **Configure RX OS DMA (if `use_dds == 0`)**
+* **Configure RX OS DMA (if `use_dds == 0`)**
 
    - Enable the RX OS DMA engine and configure:
      - Control register (enable DMA).
@@ -484,13 +484,13 @@ RX OS TPL test
      - Submit DMA transfer.
    - Wait 5 µs to allow DMA to start.
 
-7. **Check Captured Data**
+* **Check Captured Data**
 
    - Call the `check_captured_data` task to verify that the RX OS data captured
      in DDR matches the expected template:
      - Parameters: address, length, step, max_sample.
 
-8. **Shutdown RX OS Path**
+* **Shutdown RX OS Path**
 
    - Bring down the DUT RX OS and external TX OS transceivers.
 

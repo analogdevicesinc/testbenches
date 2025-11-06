@@ -48,8 +48,8 @@ The following parameters of this project can be configured:
 -  DDS_DISABLE: By setting this parameter you can remove the dual tone DDS logic
    from the TX channels. This will reduce resource utilization significantly,
    but will lose the ability to generate a test tone:
-   Options: 0 - Enable DDS, 1 - Disable DDS                   
-   
+   Options: 0 - Enable DDS, 1 - Disable DDS
+
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -162,7 +162,7 @@ The PN test verifies the PN data.
 
 .. note::
 
-PN Test Skipped in 8 bits symbol mode.
+   PN Test Skipped in 8 bits symbol mode.
 
 The steps of this test are for:
     * NIBBLE_RAMP

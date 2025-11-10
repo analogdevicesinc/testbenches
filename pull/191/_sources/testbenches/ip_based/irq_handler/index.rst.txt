@@ -62,18 +62,15 @@ The test program is compatible with the configuration.
 CPU/Memory interconnects addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Below are the CPU/Memory interconnect addresses used in this project:
-
-======== ===========
-Instance Address
-======== ===========
-axi_intc 0x4120_0000
-======== ===========
+=========== ===========
+Instance    Address
+=========== ===========
+axi_intc    0x4120_0000
+ddr_axi_vip 0x8000_0000
+=========== ===========
 
 Interrupts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Below are the Programmable Logic interrupts used in this project:
 
 ============= ===
 Instance name HDL

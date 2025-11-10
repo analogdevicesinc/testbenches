@@ -6,12 +6,12 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_spi_engine.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_spi_engine.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_clkgen_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_pwm_gen_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_clkgen_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_pwm_gen_pkg.sv
 
 LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_dmac

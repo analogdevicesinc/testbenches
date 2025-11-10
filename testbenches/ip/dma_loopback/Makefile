@@ -6,7 +6,7 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
 
 # Remaining test-bench dependencies except test programs
 LIB_DEPS += axi_dmac

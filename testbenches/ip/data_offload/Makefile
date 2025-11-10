@@ -6,10 +6,10 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_axis.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_scoreboard.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_data_offload.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_axis.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_scoreboard.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_data_offload.mk
 
 # Remaining test-bench dependencies except test programs
 SV_DEPS += environment.sv

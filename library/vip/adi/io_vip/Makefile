@@ -14,4 +14,4 @@ GENERIC_DEPS += io_vip_if.sv
 XILINX_DEPS += io_vip_ip.tcl
 XILINX_DEPS += io_vip_pkg.ttcl
 
-include $(HDL_LIBRARY_PATH)/scripts/library.mk
+include $(ADI_HDL_DIR)/library//scripts/library.mk

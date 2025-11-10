@@ -4,13 +4,13 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_tdd.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_tdd.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_dac_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_adc_pkg.sv
-SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_common_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_dac_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_adc_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_common_pkg.sv
 
 LIB_DEPS += axi_ad9361
 LIB_DEPS += axi_dmac

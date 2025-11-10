@@ -8,7 +8,7 @@ include $(ADI_TB_DIR)/library/includes/Makeinclude_common.mk
 
 include $(ADI_HDL_DIR)/quiet.mk
 
-ENV_DEPS += $(foreach dep,$(LIB_DEPS),$(HDL_LIBRARY_PATH)$(dep)/component.xml)
+ENV_DEPS += $(foreach dep,$(LIB_DEPS),$(ADI_HDL_DIR)/library/$(dep)/component.xml)
 ENV_DEPS += $(foreach dep,$(SIM_LIB_DEPS),$(ADI_TB_DIR)/library/vip/adi/$(dep)/component.xml)
 
 SHELL:=/bin/bash
@@ -151,9 +151,9 @@ clean:
 	-rm -rf vivado*
 
 # Create here the targets which build the libraries
-$(HDL_LIBRARY_PATH)%/component.xml: TARGET:=xilinx
+$(ADI_HDL_DIR)/library/%/component.xml: TARGET:=xilinx
 FORCE:
-$(HDL_LIBRARY_PATH)%/component.xml: FORCE
+$(ADI_HDL_DIR)/library/%/component.xml: FORCE
 	flock $(dir $@).lock sh -c " \
 	$(MAKE) -C $(dir $@) $(TARGET); \
 	"; exit $$?

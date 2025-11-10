@@ -6,9 +6,9 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_jesd.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_xcvr.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_jesd.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_xcvr.mk
 
 # Remaining test-bench dependencies except test programs
 # Missing things

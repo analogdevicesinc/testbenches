@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright (C) 2018 Analog Devices, Inc.
+## Copyright (C) 2018-2026 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -8,20 +8,15 @@
 include ../../../scripts/make_tb_path.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_spi_engine.mk
-
-# Remaining test-bench dependencies except test programs
-SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_clkgen_pkg.sv
-SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_pwm_gen_pkg.sv
+include $(ADI_TB_DIR)/library/includes/Makeinclude_pwm_gen.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_clk_gen.mk
 
 ENV_DEPS += $(ADI_HDL_DIR)/library//util_cdc/sync_bits.v
 ENV_DEPS += $(ADI_HDL_DIR)/library//common/ad_edge_detect.v
 
 LIB_DEPS += ad463x_data_capture
 LIB_DEPS += axi_dmac
-LIB_DEPS += util_pack/util_upack2
-LIB_DEPS += util_pack/util_cpack2
 LIB_DEPS += axi_clkgen
-LIB_DEPS += axi_i2s_adi
 LIB_DEPS += axi_pwm_gen
 LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_axis_reorder

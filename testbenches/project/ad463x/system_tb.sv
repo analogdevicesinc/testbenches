@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2018 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -40,7 +40,7 @@ module system_tb();
   wire ad463x_busy;
   wire ad463x_cnv;
   wire ad463x_echo_sclk;
-  reg ad463x_ext_clk = 0;
+  wire ad463x_ext_clk;
   wire ad463x_spi_cs;
   wire ad463x_spi_sclk;
   wire ad463x_spi_clk;
@@ -50,43 +50,28 @@ module system_tb();
 
   `TEST_PROGRAM test(
     .ad463x_irq(ad463x_irq),
+    .ad463x_cnv(ad463x_cnv),
+    .ad463x_busy(ad463x_busy),
     .ad463x_echo_sclk(ad463x_echo_sclk),
+    .ad463x_ext_clk(ad463x_ext_clk),
     .ad463x_spi_sclk(ad463x_spi_sclk),
     .ad463x_spi_cs(ad463x_spi_cs),
     .ad463x_spi_clk(ad463x_spi_clk),
-    .ad463x_spi_sdi(ad463x_spi_sdi));
+    .ad463x_spi_sdi(ad463x_spi_sdi)
+  );
 
   test_harness `TH (
     .ad463x_busy(ad463x_busy),
     .ad463x_irq(ad463x_irq),
     .ad463x_cnv(ad463x_cnv),
+    .ad463x_trigger(1'b0),
     .ad463x_echo_sclk(ad463x_echo_sclk),
     .ad463x_ext_clk(ad463x_ext_clk),
     .ad463x_spi_cs(ad463x_spi_cs),
     .ad463x_spi_sclk(ad463x_spi_sclk),
     .ad463x_spi_clk(ad463x_spi_clk),
     .ad463x_spi_sdi(ad463x_spi_sdi),
-    .ad463x_spi_sdo(ad463x_spi_sdo));
-
-  //---------------------------------------------------------------------------
-  // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
-  //---------------------------------------------------------------------------
-  localparam SDI_PHY_DELAY = 18;
-
-  reg     [SDI_PHY_DELAY:0] echo_delay_sclk = {SDI_PHY_DELAY{1'b0}};
-  reg     delay_clk = 0;
-  wire    m_spi_sclk;
-
-  assign ad463x_busy = (`CAPTURE_ZONE == 2) ? ad463x_echo_sclk : ad463x_cnv;
-  assign  m_spi_sclk = ad463x_spi_sclk;
-
-  // Add an arbitrary delay to the echo_sclk signal
-  always @(posedge delay_clk) begin
-    echo_delay_sclk <= {echo_delay_sclk, m_spi_sclk};
-  end
-  assign ad463x_echo_sclk = echo_delay_sclk[SDI_PHY_DELAY-1];
-
-  always #0.5ns       delay_clk = ~delay_clk;
-  always #5ns         ad463x_ext_clk = ~ad463x_ext_clk;
+    .ad463x_spi_sdo(ad463x_spi_sdo)
+  );
 
 endmodule

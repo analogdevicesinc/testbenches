@@ -108,11 +108,6 @@ function int get_width();
 
 Returns the bitwidth set for the VIP.
 
-Known Issues
---------------------------------------------------------------------------------
-
-.. include:: ../../../../common/support.rst
-
 References
 --------------------------------------------------------------------------------
 

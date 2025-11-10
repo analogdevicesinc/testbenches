@@ -147,13 +147,12 @@ Repository path setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The make script must know where the cloned HDL and Testbenches repositories are
-located. Two variables must be exported, which specify the target directories:
+located. One variable must be exported, which specifies the target directory:
 
 .. shell::
    :showuser:
 
    $export ADI_HDL_DIR=<path to cloned HDL directory>
-   $export ADI_TB_DIR=<path to cloned Testbenches directory>
 
 Building a testbench
 -------------------------------------------------------------------------------

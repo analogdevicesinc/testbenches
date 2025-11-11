@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -45,9 +45,6 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 program test_program;
 
-  timeunit 1ns;
-  timeprecision 1ps;
-
   // Declare the class instances
   test_harness_env base_env;
 
@@ -58,10 +55,14 @@ program test_program;
   process current_process;
   string current_process_random_state;
 
+  event dummy_api_event;
+
+  reg [31:0] data;
+
 
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
     current_process = process::self();
     current_process_random_state = current_process.get_randstate();
@@ -83,18 +84,54 @@ program test_program;
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 
-    base_env.irq_handler = new(
-      .name("IRQ handler"),
-      .bus(base_env.mng.master_sequencer),
-      .base_address(`IRQ_C_BA),
-      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif),
-      .parent(base_env));
-
     base_env.start();
     base_env.sys_reset();
+
+    // register IRQ devices
+    dummy_api_event = base_env.irq_handler.register_device(0);
+
+    // start IRQ handler
     base_env.irq_handler.start();
 
-    /* Add stimulus tasks */
+    // wait for the IRQ to trigger before it is triggered
+    fork
+      begin
+        @dummy_api_event;
+        `INFO(("IRQ triggered"), ADI_VERBOSITY_LOW);
+      end
+    join_none
+
+    `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b0);
+
+    #1us;
+
+    // trigger the IRQ
+    `TH.`IRQ_TEST.inst.inst.IF.vif.wait_posedge_clk();
+    `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b1);
+    `TH.`IRQ_TEST.inst.inst.IF.vif.wait_posedge_clk();
+    `TH.`IRQ_TEST.inst.inst.IF.vif.set_io(1'b0);
+
+    #1us;
+
+    // priority packet test
+    fork
+      begin
+        repeat(5) begin
+          fork
+            base_env.mng.master_sequencer.RegWrite32(`IRQ_C_BA + 'h10, 'd0);
+            base_env.mng.master_sequencer.RegRead32(`IRQ_C_BA + 'h10, data);
+          join_none
+        end
+        repeat(5) begin
+          fork
+            base_env.mng.master_sequencer.RegWrite32(`IRQ_C_BA + 'h10, 'd0, 1);
+            base_env.mng.master_sequencer.RegRead32(`IRQ_C_BA + 'h10, data, 1);
+          join_none
+        end
+      end
+    join
+
+    #10us;
 
     base_env.stop();
 

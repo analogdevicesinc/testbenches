@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,30 +33,23 @@
 // ***************************************************************************
 // ***************************************************************************
 
-`include "utils.svh"
+module io_vip_top #(
+  parameter MODE = 1, // 1 - master, 0 - slave, 2 - passthrough
+  parameter WIDTH = 1, // bitwidth
+  parameter ASYNC = 0 // clock synchronous
+)(
+  input  clk,
+  input  [WIDTH-1:0] i,
+  output [WIDTH-1:0] o
+);
 
-module system_tb();
-
-      wire ad738x_spi_sclk;
-      wire ad738x_spi_sdo;
-      wire [`NUM_OF_SDI-1:0] ad738x_spi_sdi;
-      wire ad738x_spi_cs;
-      wire ad738x_spi_clk;
-      wire ad738x_irq;
-
-    `TEST_PROGRAM test(
-      .ad738x_spi_clk (ad738x_spi_clk),
-      .ad738x_irq (ad738x_irq),
-      .ad738x_spi_sdi(ad738x_spi_sdi),
-      .ad738x_spi_cs (ad738x_spi_cs),
-      .ad738x_spi_sclk (ad738x_spi_sclk));
-
-    test_harness `TH (
-      .ad738x_spi_clk (ad738x_spi_clk),
-      .ad738x_irq(ad738x_irq),
-      .ad738x_spi_sdo (ad738x_spi_sdo),
-      .ad738x_spi_sdi (ad738x_spi_sdi),
-      .ad738x_spi_cs (ad738x_spi_cs),
-      .ad738x_spi_sclk (ad738x_spi_sclk));
+  io_vip #(
+    .MODE(MODE),
+    .WIDTH(WIDTH),
+    .ASYNC(ASYNC)
+  ) inst (
+    .clk(clk),
+    .i(i),
+    .o(o));
 
 endmodule

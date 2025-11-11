@@ -38,6 +38,7 @@
 import logger_pkg::*;
 import environment_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import dmac_api_pkg::*;
@@ -57,7 +58,11 @@ program test_program_frame_delay;
   timeprecision 1ps;
 
   // declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+
   dma_flock_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis_vip), `AXIS_VIP_PARAMS(test_harness, dst_axis_vip)) dma_flock_env;
 
   // Register accessors
@@ -74,13 +79,20 @@ program test_program_frame_delay;
   initial begin
 
     //creating environment
-    base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+    base_env = new(
+      .name("Base Environment"),
+      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+      .irq_base_address(`IRQ_C_BA),
+      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     dma_flock_env = new("DMA Flock Environment",
                         `TH.`SRC_AXIS.inst.IF,
@@ -101,6 +113,17 @@ program test_program_frame_delay;
     base_env.sys_reset();
 
     dma_flock_env.run();
+
+    // Set no backpressure from AXIS destination
+    dma_flock_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+    dma_flock_env.dst_axis_agent.slave_sequencer.start();
+
+    // Set no backpressure from DDR
+    base_env.ddr.slave_sequencer.set_backpressure(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
+
+    dma_flock_env.src_axis_agent.master_sequencer.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_DESCRIPTOR_QUEUE);
+    dma_flock_env.src_axis_agent.master_sequencer.set_data_gen_mode(m_axis_sequencer_pkg::DATA_GEN_MODE_TEST_DATA);
+    dma_flock_env.src_axis_agent.master_sequencer.start();
 
     m_dmac_api = new("TX_DMA_BA", base_env.mng.master_sequencer, `TX_DMA_BA);
     m_dmac_api.probe();
@@ -162,6 +185,9 @@ program test_program_frame_delay;
       `ERROR(("Both DMACs must be set in autorun mode."));
     end
 
+    // Stop triggers wait stop policy
+    dma_flock_env.src_axis_agent.master_sequencer.stop();
+
     base_env.stop();
     stop_clocks();
 
@@ -182,18 +208,6 @@ program test_program_frame_delay;
     int m_tid, s_tid;
     automatic int rand_succ = 0;
     int x_length, y_length, baseaddress;
-
-    axi4stream_ready_gen tready_gen;
-    axi_ready_gen  wready_gen;
-
-    // Set no backpressure from AXIS destination
-    dma_flock_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-    dma_flock_env.dst_axis_agent.slave_sequencer.start();
-
-    // Set no backpressure from DDR
-    wready_gen = base_env.ddr.agent.wr_driver.create_ready("wready");
-    wready_gen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
-    base_env.ddr.agent.wr_driver.send_wready(wready_gen);
 
     m_seg = new(m_dmac_api.p);
 
@@ -219,10 +233,6 @@ program test_program_frame_delay;
     m_seg.flock_wait_writer = 1;
 
     s_seg = m_seg.toSlaveSeg();
-
-    dma_flock_env.src_axis_agent.master_sequencer.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_DESCRIPTOR_QUEUE);
-    dma_flock_env.src_axis_agent.master_sequencer.set_data_gen_mode(m_axis_sequencer_pkg::DATA_GEN_MODE_TEST_DATA);
-    dma_flock_env.src_axis_agent.master_sequencer.start();
 
     if (has_autorun == 0) begin
       m_dmac_api.set_control('b1001);
@@ -292,9 +302,6 @@ program test_program_frame_delay;
     join
     sync_gen_en = 0;
 
-    // Stop triggers wait stop policy
-    dma_flock_env.src_axis_agent.master_sequencer.stop();
-
     // Shutdown DMACs
     if (!has_m_autorun) begin
       m_dmac_api.disable_dma();
@@ -360,16 +367,16 @@ program test_program_frame_delay;
   // Assert external sync for one clock cycle
   task assert_writer_ext_sync();
   `ifdef SRC_SYNC_IO
-    `TH.`SRC_SYNC_IO.inst.IF.setw_io(1);
-    `TH.`SRC_SYNC_IO.inst.IF.setw_io(0);
+    `TH.`SRC_SYNC_IO.inst.inst.IF.vif.set_io(1);
+    `TH.`SRC_SYNC_IO.inst.inst.IF.vif.set_io(0);
   `endif
   endtask
 
   // Assert external sync for one clock cycle
   task assert_reader_ext_sync();
   `ifdef DST_SYNC_IO
-    `TH.`DST_SYNC_IO.inst.IF.setw_io(1);
-    `TH.`DST_SYNC_IO.inst.IF.setw_io(0);
+    `TH.`DST_SYNC_IO.inst.inst.IF.vif.set_io(1);
+    `TH.`DST_SYNC_IO.inst.inst.IF.vif.set_io(0);
   `endif
   endtask
 

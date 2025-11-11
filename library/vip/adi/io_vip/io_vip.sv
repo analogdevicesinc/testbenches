@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -34,25 +34,75 @@
 // ***************************************************************************
 
 module io_vip #(
-  parameter MODE = 1, // 1 - master, 0 - slave
-  parameter WIDTH = 1
+  parameter MODE = 1, // 1 - master, 0 - slave, 2 - passthrough
+  parameter WIDTH = 1, // bitwidth
+  parameter ASYNC = 0 // clock synchronous
 )(
   input  clk,
-  input  [WIDTH-1:0] in,
-  output [WIDTH-1:0] out
+  input  [WIDTH-1:0] i,
+  output [WIDTH-1:0] o
 );
+
+  wire intf_clk;
+
+  logic master_mode = 0;
+  logic slave_mode = 0;
 
   io_vip_if #(
     .MODE (MODE),
-    .WIDTH (WIDTH)
+    .WIDTH (WIDTH),
+    .ASYNC (ASYNC)
   ) IF (
-    .clk(clk)
-  );
+    .clk(intf_clk));
 
-  assign out = IF.io;
-  generate if (~MODE) begin
-    assign IF.io = in;
-  end
+  assign o = (master_mode) ? IF.IO : {WIDTH{1'b0}};
+
+  assign IF.IO = (slave_mode) ? i : {WIDTH{1'bz}};
+
+  assign intf_clk = (ASYNC == 0) ? clk : 1'b0;
+
+  generate
+    initial begin
+      if (MODE == 1) begin
+        master_mode = 1;
+        IF.set_intf_master();
+      end else if (MODE == 0) begin
+        slave_mode = 1;
+        IF.set_intf_slave();
+      end else if (MODE == 2) begin
+        IF.set_intf_monitor();
+      end else begin
+        $fatal(0, "This VIP mode does not exist");
+      end
+    end
   endgenerate
 
-endmodule
+  function void set_master_mode();
+    if (MODE == 2) begin
+      master_mode = 1;
+      IF.set_intf_master();
+    end else begin
+      $fatal(0, "VIP mode cannot be set, unless it is configured to passthrough mode");
+    end
+  endfunction: set_master_mode
+
+  function void set_slave_mode();
+    if (MODE == 2) begin
+      slave_mode = 1;
+      IF.set_intf_slave();
+    end else begin
+      $fatal(0, "VIP mode cannot be set, unless it is configured to passthrough mode");
+    end
+  endfunction: set_slave_mode
+
+  function void set_passthrough_mode();
+    if (MODE == 2) begin
+      master_mode = 0;
+      slave_mode = 0;
+      IF.set_intf_monitor();
+    end else begin
+      $fatal(0, "VIP mode cannot be set, unless it is configured to passthrough mode");
+    end
+  endfunction: set_passthrough_mode
+
+endmodule: io_vip

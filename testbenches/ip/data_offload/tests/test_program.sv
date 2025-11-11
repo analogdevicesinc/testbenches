@@ -38,6 +38,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import environment_pkg::*;
 import dmac_api_pkg::*;
 import data_offload_api_pkg::*;
@@ -58,7 +59,10 @@ program test_program;
   timeprecision 1ps;
 
   // declare the class instances
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
   scoreboard_environment #(
     `AXIS_VIP_PARAMS(test_harness, adc_src_axis), `AXI_VIP_PARAMS(test_harness, adc_dst_axi),
     `AXI_VIP_PARAMS(test_harness, dac_src_axi), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis)) scb_env;
@@ -71,14 +75,21 @@ program test_program;
 
   initial begin
 
-    // create environment
-    base_env = new("Base Environment",
-                    `TH.`SYS_CLK.inst.IF,
-                    `TH.`DMA_CLK.inst.IF,
-                    `TH.`DDR_CLK.inst.IF,
-                    `TH.`SYS_RST.inst.IF,
-                    `TH.`MNG_AXI.inst.IF,
-                    `TH.`DDR_AXI.inst.IF);
+    // Create environment
+    base_env = new(
+      .name("Base Environment"),
+      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+      .irq_base_address(`IRQ_C_BA),
+      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+
+    mng = new("", `TH.`MNG_AXI.inst.IF);
+    ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     scb_env = new("Scoreboard Environment 0",
                   `TH.`ADC_SRC_AXIS.inst.IF,

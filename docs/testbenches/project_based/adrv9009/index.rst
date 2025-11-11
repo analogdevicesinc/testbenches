@@ -616,7 +616,6 @@ HDL related dependencies forming the DUT
      - :git-hdl:`library/util_do_ram`
      - :external+hdl:ref:`data_offload`
 
-
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -658,6 +657,9 @@ Testbench specific dependencies:
    * - ADI_REGMAP_XCVR_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_xcvr_pkg.sv`
      - ---
+   * - ADI_JESD204
+     - :git-testbenches:`library/drivers/jesd/adi_jesd204_pkg.sv`
+     - ---
    * - DMA_TRANS
      - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
      - ---
@@ -666,6 +668,15 @@ Testbench specific dependencies:
      - ---
    * - JESD_EXERCISER
      - :git-testbenches:`library/drivers/jesd/jesd_exerciser.tcl`
+     - ---
+   * - JESD_RX_API
+     - :git-testbenches:`library/drivers/jesd/jesd_rx_api_pkg.sv`
+     - ---
+   * - JESD_TX_API
+     - :git-testbenches:`library/drivers/jesd/jesd_tx_api_pkg.sv`
+     - ---
+   * - XCVR_API
+     - :git-testbenches:`library/drivers/xcvr/xcvr_api_pkg.sv`
      - ---
 
 .. include:: ../../../common/more_information.rst

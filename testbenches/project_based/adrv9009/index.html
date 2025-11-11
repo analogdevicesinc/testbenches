@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="The purpose of this testbench is to validate the serial interface functionality of the projects/fmcomms2 reference design." name="description" />
+<meta content="The purpose of this testbench is to validate the serial interface functionality of the projects/adrv9009 reference design." name="description" />
 
-    <title>FMCOMMS2 &#8212; Testbenches  documentation</title>
+    <title>ADRV9009 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=31a9e0ba" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -14,8 +14,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="PLUTO" href="../pluto/index.html" />
-    <link rel="prev" title="ADRV9009" href="../adrv9009/index.html" />
+    <link rel="next" title="FMCOMMS2" href="../fmcomms2/index.html" />
+    <link rel="prev" title="ADRV9001" href="../adrv9001/index.html" />
    
   
   
@@ -95,7 +95,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">FMCOMMS2</a><ul>
+<li><a class="reference internal" href="#">ADRV9009</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -111,10 +111,15 @@
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
 <li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
-<li><a class="reference internal" href="#sanity-test">Sanity test</a></li>
-<li><a class="reference internal" href="#pn-test">PN test</a></li>
-<li><a class="reference internal" href="#dds-test">DDS test</a></li>
-<li><a class="reference internal" href="#dma-test">DMA test</a></li>
+<li><a class="reference internal" href="#jesd-objects-initialization-link-layer-and-transceiver-interface-setup">JESD objects initialization, link-layer and transceiver interface setup</a></li>
+<li><a class="reference internal" href="#clock-frequency-configuration-and-jesd-device-clock-setup">Clock frequency configuration and JESD device clock setup</a></li>
+<li><a class="reference internal" href="#clock-startup-transceiver-configuration-and-test-execution">Clock startup, transceiver configuration, and test execution</a></li>
+<li><a class="reference internal" href="#test-execution">Test execution</a><ul>
+<li><a class="reference internal" href="#tx-tpl-test">TX TPL test</a></li>
+<li><a class="reference internal" href="#rx-tpl-test">RX TPL test</a></li>
+<li><a class="reference internal" href="#rx-os-tpl-test">RX OS TPL test</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
 </ul>
 </li>
@@ -236,8 +241,8 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../ad7616/index.html">AD7616</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ad9083/index.html">AD9083</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">FMCOMMS2</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
 </ul>
@@ -260,50 +265,205 @@ Content on this topic
 </div>
           <div class="body" role="main">
             
-  <section id="fmcomms2">
-<span id="id1"></span><h1>FMCOMMS2<a class="headerlink" href="#fmcomms2" title="Link to this heading"></a></h1>
+  <section id="adrv9009">
+<span id="id1"></span><h1>ADRV9009<a class="headerlink" href="#adrv9009" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>The purpose of this testbench is to validate the serial interface functionality
-of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/fmcomms2" target="_blank">projects/fmcomms2</a> reference design.</p>
+of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/adrv9009" target="_blank">projects/adrv9009</a> reference design.</p>
 <p>The entire HDL documentation can be found here
-<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/fmcomms2/index.html#fmcomms2" target="_blank" title="(in HDL)"><span class="xref std std-ref">FMCOMMS2 HDL project</span></a>.</p>
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/adrv9009/index.html#adrv9009" target="_blank" title="(in HDL)"><span class="xref std std-ref">ADRV9009 HDL project</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The testbench block design includes part of the FMCOMMS2 HDL reference design,
-along with VIPs used for clocking, reset, PS and DDR simulations.</p>
+<p>The testbench block design includes part of the ADRV9009 HDL reference design,
+along with JESD exercisers and VIPs used for clocking, reset, PS and DDR
+simulations.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
 <p>The data path and clock domains are depicted in the below diagram:</p>
-<a class="reference internal image-reference" href="../../../_images/fmcomms2_tb.svg"><img alt="fmcomms2/Testbench block diagram" class="align-center" src="../../../_images/fmcomms2_tb.svg" style="width: 800px;" />
+<a class="reference internal image-reference" href="../../../_images/adrv9009_tb.svg"><img alt="adrv9009/Testbench block diagram" class="align-center" src="../../../_images/adrv9009_tb.svg" style="width: 800px;" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
-<p>There are no project parameters that can be configured in the testbench
-configuration files.</p>
+<p>The following parameters of this testbench that can be configured:</p>
+<ul class="simple">
+<li><p>LINK_MODE: the JESD204B link mode (1: JESD_8B10B encoding; 2: JESD_64B66B
+encoding)</p></li>
+<li><p>REF_CLK_RATE: the rate of the reference clock in MHz</p></li>
+<li><p>LANE_RATE: the JESD204B lane rate in Gbps</p></li>
+<li><p>DAC_OFFLOAD_TYPE: the type of DAC offload</p></li>
+<li><p>DAC_OFFLOAD_SIZE: the size of DAC offload</p></li>
+<li><p>PLDDR_OFFLOAD_DATA_WIDTH: the data width of the PL DDR offload interface</p></li>
+<li><p>[RX/TX/RX_OS]_JESD_M: number of converters per link</p></li>
+<li><p>[RX/TX/RX_OS]_JESD_L: number of lanes per link</p></li>
+<li><p>[RX/TX/RX_OS]_JESD_S: number of samples per frame</p></li>
+<li><p>[RX/TX/RX_OS]_JESD_NP: number of bits per sample</p></li>
+<li><p>[RX/TX/RX_OS]_JESD_F: number of octets per frame per lane</p></li>
+<li><p>[RX/TX/RX_OS]_JESD_K: number of framer per multiframe</p></li>
+</ul>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
-<p>The following configuration file is available:</p>
-<blockquote>
-<div><div class="table-wrapper docutils container">
+<p>The following configuration files are available:</p>
+<div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
-<th class="head"><p>Parameters</p></th>
-</tr>
-<tr class="row-even"><th class="head"><p>—</p></th>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>cfg1</p></th>
+<th class="head"><p>cfg2</p></th>
+<th class="head"><p>cfg3</p></th>
+<th class="head"><p>cfg4</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-odd"><td><p>cfg1</p></td>
-<td><p>—</p></td>
+<tr class="row-even"><td><p>LINK_MODE</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>REF_CLK_RATE</p></td>
+<td><p>500</p></td>
+<td><p>500</p></td>
+<td><p>500</p></td>
+<td><p>500</p></td>
+</tr>
+<tr class="row-even"><td><p>LANE_RATE</p></td>
+<td><p>10</p></td>
+<td><p>10</p></td>
+<td><p>10</p></td>
+<td><p>10</p></td>
+</tr>
+<tr class="row-odd"><td><p>DAC_OFFLOAD_TYPE</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>DAC_OFFLOAD_SIZE</p></td>
+<td><p>[expr 2*1024*1024]</p></td>
+<td><p>[expr 2*1024*1024]</p></td>
+<td><p>[expr 2*1024*1024]</p></td>
+<td><p>[expr 2*1024*1024]</p></td>
+</tr>
+<tr class="row-odd"><td><p>PLDDR_OFFLOAD_DATA_WIDTH</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>TX_JESD_M</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>TX_JESD_L</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>TX_JESD_S</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>TX_JESD_NP</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-even"><td><p>TX_JESD_F</p></td>
+<td><p>4</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>TX_JESD_K</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+</tr>
+<tr class="row-even"><td><p>RX_JESD_M</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX_JESD_L</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>RX_JESD_S</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX_JESD_NP</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-even"><td><p>RX_JESD_F</p></td>
+<td><p>8</p></td>
+<td><p>8</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX_JESD_K</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+</tr>
+<tr class="row-even"><td><p>RX_OS_JESD_M</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX_OS_JESD_L</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>RX_OS_JESD_S</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX_OS_JESD_NP</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-even"><td><p>RX_OS_JESD_F</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+<td><p>4</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX_OS_JESD_K</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
+<td><p>32</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-</div></blockquote>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
@@ -317,7 +477,7 @@ configuration files.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Tests the fmcomms2 project capabilities.</p></td>
+<td><p>Tests the adrv9009 project capabilities.</p></td>
 </tr>
 </tbody>
 </table>
@@ -325,7 +485,7 @@ configuration files.</p>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
-<p>The test program is compatible with the above mentioned configuration.</p>
+<p>The test program is compatible with the above mentioned configurations.</p>
 </section>
 </section>
 <section id="cpu-memory-interconnect-addresses">
@@ -342,14 +502,83 @@ configuration files.</p>
 <tr class="row-even"><td><p>axi_intc</p></td>
 <td><p>0x4120_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>axi_ad9361</p></td>
-<td><p>0x7902_0000</p></td>
+<tr class="row-odd"><td><p>axi_adrv9009_tx_clkgen</p></td>
+<td><p>0x43C0_0000</p></td>
 </tr>
-<tr class="row-even"><td><p>axi_ad9361_adc_dma</p></td>
+<tr class="row-even"><td><p>axi_adrv9909_rx_clkgen</p></td>
+<td><p>0x43C1_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_adrv9009_rs_os_clkgen</p></td>
+<td><p>0x43C2_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>rx_adrv9009_tpl_core</p></td>
+<td><p>0x44A0_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>tx_adrv9009_tpl_core</p></td>
+<td><p>0x44A0_4000</p></td>
+</tr>
+<tr class="row-even"><td><p>rx_os_adrv9009_tpl_core</p></td>
+<td><p>0x44A0_8000</p></td>
+</tr>
+<tr class="row-odd"><td><p>rx_jesd_exerciser/axi_jesd</p></td>
+<td><p>0x44A1_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>rx_jesd_exerciser/axi_xcvr</p></td>
+<td><p>0x44A2_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>rx_jesd_exerciser/rx_tpl_core</p></td>
+<td><p>0x44A3_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>tx_jesd_exerciser/axi_jesd</p></td>
+<td><p>0x44A4_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_adrv9009_rx_os_xcvr</p></td>
+<td><p>0x44A5_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_adrv9009_rx_xcvr</p></td>
+<td><p>0x44A6_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>tx_jesd_exerciser/axi_xcvr</p></td>
+<td><p>0x44A7_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_adrv9009_tx_xcvr</p></td>
+<td><p>0x44A8_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_adrv9009_tx_jesd</p></td>
+<td><p>0x44A9_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_adrv9009_rx_jesd</p></td>
+<td><p>0x44AA_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_adrv9009_rx_os_jesd</p></td>
+<td><p>0x44AB_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>tx_jesd_exerciser/tx_tpl_core</p></td>
+<td><p>0x44AC_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>tx_os_exerciser/axi_jesd</p></td>
+<td><p>0x44AD_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>tx_os_exerciser/axi_xcvr</p></td>
+<td><p>0x44AE_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>tx_os_exerciser/tx_tpl_core</p></td>
+<td><p>0x44AF_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_adrv9009_rx_dma</p></td>
 <td><p>0x7C40_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>axi_ad9361_dac_dma</p></td>
+<tr class="row-odd"><td><p>axi_adrv9009_tx_dma</p></td>
 <td><p>0x7C42_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>adrv9009_data_offload</p></td>
+<td><p>0x7C43_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_adrv9009_rx_os_dma</p></td>
+<td><p>0x7C44_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
 </tr>
 </tbody>
 </table>
@@ -366,11 +595,23 @@ configuration files.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>axi_ad9361_adc_dma</p></td>
+<tr class="row-even"><td><p>axi_adrv9009_rx_jesd</p></td>
+<td><p>15</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_adrv9009_rx_os_dma</p></td>
+<td><p>14</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_adrv9009_tx_dma</p></td>
 <td><p>13</p></td>
 </tr>
-<tr class="row-odd"><td><p>axi_ad9361_dac_dma</p></td>
+<tr class="row-odd"><td><p>axi_adrv9009_rx_dma</p></td>
 <td><p>12</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_adrv9009_rx_os_jesd</p></td>
+<td><p>8</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_adrv9009_tx_jesd</p></td>
+<td><p>7</p></td>
 </tr>
 </tbody>
 </table>
@@ -386,78 +627,369 @@ configuration files.</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
 <li><p>Start the environment</p></li>
-<li><p>Start the clocks</p></li>
 <li><p>Assert the resets</p></li>
 </ul>
 </section>
-<section id="sanity-test">
-<h3>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h3>
-<p>This test is used to check the ADC version and DAC version.</p>
+<section id="jesd-objects-initialization-link-layer-and-transceiver-interface-setup">
+<h3>JESD objects initialization, link-layer and transceiver interface setup<a class="headerlink" href="#jesd-objects-initialization-link-layer-and-transceiver-interface-setup" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Create and configure the JESD204 link objects used in the testbench: TX, RX,
+and RX_OS. Each link is instantiated and its key parameters are set based on
+the project configuration macros.</p></li>
+<li><p>Instantiate and initialize AXI-accessible verification components that model
+both the DUT and the external (EX) JESD204 interfaces. Each component is
+connected to the common AXI master sequencer within the base environment and
+linked to its corresponding JESD link configuration object.</p></li>
+<li><p>The <cite>probe()</cite> method is called for each instance to read and verify initial
+register states, confirming correct connectivity to the mapped AXI address
+regions.</p></li>
+</ul>
 </section>
-<section id="pn-test">
-<h3>PN test<a class="headerlink" href="#pn-test" title="Link to this heading"></a></h3>
-<p>The PN test verifies the PN data.</p>
-<p>The steps of this test are:</p>
+<section id="clock-frequency-configuration-and-jesd-device-clock-setup">
+<h3>Clock frequency configuration and JESD device clock setup<a class="headerlink" href="#clock-frequency-configuration-and-jesd-device-clock-setup" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>The reference clock (<cite>REF_CLK</cite>) is initialized based on the project’s
+configured reference rate (<cite>REF_CLK_RATE</cite>), converted to Hz.</p></li>
+<li><p>Each JESD link-layer model (RX, TX, TX_OS) computes its respective device
+clock frequency using its internal parameters via <cite>calc_device_clk()</cite>.</p></li>
+<li><p>The calculated device clocks are then applied to the corresponding clock
+interface handles in the test harness (<cite>TH</cite>), ensuring that all simulated
+clock domains (RX, TX, TX_LINK, TX_OS) run at frequencies consistent with
+the configured JESD link settings.</p></li>
+<li><p>Similarly, each link-layer model computes its SYSREF clock via
+<cite>calc_sysref_clk()</cite>, providing the synchronized SYSREF timing used for
+deterministic latency alignment in JESD204 systems.</p></li>
+</ul>
+</section>
+<section id="clock-startup-transceiver-configuration-and-test-execution">
+<h3>Clock startup, transceiver configuration, and test execution<a class="headerlink" href="#clock-startup-transceiver-configuration-and-test-execution" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><dl class="simple">
-<dt>Link setup</dt><dd><ul>
-<li><p>Configure RX and TX interfaces</p></li>
-<li><p>Pull RX and TX out of reset</p></li>
+<dt>SYSREF clock assignment</dt><dd><ul>
+<li><p>The common SYSREF frequency is applied to the SYSREF clock interface.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><p>Enable test data for TX1 and RX1</p></li>
-<li><p>Sync DAC channels</p></li>
-<li><p>Sync ADC channels</p></li>
-<li><p>Allow initial OOS to propagate</p></li>
-<li><p>Clear PN OOS and PN ERR</p></li>
-<li><p>Check PN OOS and PN ERR flags</p></li>
-</ul>
-</section>
-<section id="dds-test">
-<h3>DDS test<a class="headerlink" href="#dds-test" title="Link to this heading"></a></h3>
-<p>The DDS test verifies the DDS path.</p>
-<p>The steps of this test are:</p>
-<ul class="simple">
-<li><p>Link setup</p></li>
-<li><p>Select DDS as source</p></li>
-<li><p>Enable normal data path for RX1</p></li>
-<li><p>Configure tone amplitude and frequency</p></li>
-<li><p>Enable RX channels, enable sign extension</p></li>
-<li><p>Sync DAC channels</p></li>
-<li><p>Sync ADC channels</p></li>
 <li><dl class="simple">
-<dt>Link down</dt><dd><ul>
-<li><p>Put RX and TX in reset</p></li>
+<dt>Start all clocks</dt><dd><ul>
+<li><p>All relevant clock domains (REF_CLK, RX/TX/TX_LINK/TX_OS device clocks,
+and SYSREF) are started to begin simulation timing.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Transceiver clock setup</dt><dd><ul>
+<li><p>External (ex_*) and DUT (dut_*) transceivers are configured via
+<cite>setup_clocks()</cite> using the lane rate and reference clock.</p></li>
+<li><p>DUT transceivers also specify the PLL type (CPLL/QPLL) where required.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
 </section>
-<section id="dma-test">
-<h3>DMA test<a class="headerlink" href="#dma-test" title="Link to this heading"></a></h3>
-<p>The DMA test verifies the DMA path.</p>
-<p>The steps of this test are:</p>
+<section id="test-execution">
+<h3>Test execution<a class="headerlink" href="#test-execution" title="Link to this heading"></a></h3>
+<p>Template pattern tests for TX, RX, and RX_OS paths are executed. These tasks
+configure and execute JESD204 template pattern tests for the TX, RX, and RX
+observation (RX_OS) paths in the testbench. They support both DDS-generated
+tones and DMA-based stimulus depending on the <cite>use_dds</cite> parameter (<cite>int use_dds</cite>
+– if non-zero, the external DAC uses DDS-generated tones; otherwise, DMA data
+is used).</p>
+<section id="tx-tpl-test">
+<h4>TX TPL test<a class="headerlink" href="#tx-tpl-test" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>Initialize DMA-based stimulus (if use_dds == 0)</strong></p>
 <ul class="simple">
-<li><p>Write data to DDR</p></li>
-<li><p>Configure the TX DMA</p></li>
-<li><p>Select DMA as source</p></li>
-<li><p>Enable normal data path for RX1</p></li>
-<li><p>Enable RX channel, enable sign extension</p></li>
-<li><p>Sync DAC channels</p></li>
-<li><p>Sync ADC channels</p></li>
-<li><p>Link setup</p></li>
-<li><p>Configure RX DMA</p></li>
-<li><p>Check captured data from DDR</p></li>
-<li><p>Check captured data against incremental pattern based on first sample</p></li>
+<li><p>Write a deterministic pattern to DDR memory using the <code class="docutils literal notranslate"><span class="pre">BackdoorWrite32</span></code>
+interface of the DDR slave sequencer.</p></li>
+<li><p>Configure the TX DMA engine by writing to its registers:</p>
+<ul>
+<li><p>Enable DMA.</p></li>
+<li><p>Set TLAST flag.</p></li>
+<li><p>Set transfer length.</p></li>
+<li><p>Set source address to DDR base.</p></li>
+<li><p>Submit DMA transfer.</p></li>
+<li><p>Wait for 5 µs to ensure the DMA is configured.</p></li>
 </ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Configure DAC TPL channels</strong></p>
+<ul class="simple">
+<li><p>Iterate over each TX lane:</p>
+<ul>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">use_dds</span></code> is enabled:</p>
+<ul>
+<li><p>Select DDS as the data source.</p></li>
+<li><p>Configure tone amplitude (<code class="docutils literal notranslate"><span class="pre">DDS_SCALE_1</span></code>) and frequency
+(<code class="docutils literal notranslate"><span class="pre">DDS_INCR_1</span></code>).</p></li>
+</ul>
+</li>
+<li><p>Otherwise:</p>
+<ul>
+<li><p>Select DMA as the source for the DAC template pattern.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Enable external ADC TPL channels</strong></p>
+<ul class="simple">
+<li><p>Iterate over all TX lanes and enable the corresponding ADC TPL channels via
+<code class="docutils literal notranslate"><span class="pre">CHAN_CNTRL</span></code> register.</p></li>
+</ul>
+</li>
+<li><p><strong>Release DAC and ADC resets</strong></p>
+<ul class="simple">
+<li><p>Write <code class="docutils literal notranslate"><span class="pre">RSTN</span> <span class="pre">=</span> <span class="pre">1</span></code> to <code class="docutils literal notranslate"><span class="pre">DAC_COMMON_REG_RSTN</span></code> and <code class="docutils literal notranslate"><span class="pre">ADC_COMMON_REG_RSTN</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Synchronize DDS cores (if use_dds == 1)</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Write to the DAC common control register to trigger synchronization.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Bring up the DUT TX path and external RX path</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Start the TX clock generator (<cite>AXI_CLKGEN_TX_BA</cite>) and bring up the DUT TX
+transceiver.</p></li>
+<li><p>Bring up the external RX transceiver and link.</p></li>
+<li><p>Wait for both DUT and external link layers to report link-up status.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Simulation delay</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Wait for 10 µs to allow data flow and link stabilization.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Bring down the links</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Shut down the transceivers to conclude the test.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="rx-tpl-test">
+<h4>RX TPL test<a class="headerlink" href="#rx-tpl-test" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>Configure external DAC TPL channels</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Iterate over all RX lanes (<cite>i = 0..RX_JESD_M-1</cite>):</p>
+<ul>
+<li><p>If <cite>use_dds</cite> is enabled:</p>
+<ul>
+<li><p>Select DDS as the data source for the DAC TPL channel.</p></li>
+<li><p>Set the tone amplitude (<cite>DDS_SCALE_1</cite>) and frequency increment
+(<cite>DDS_INCR_1</cite>).</p></li>
+</ul>
+</li>
+<li><p>Otherwise:</p>
+<ul>
+<li><p>Select DMA as the data source for the DAC TPL channel.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Enable ADC TPL Channels</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Iterate over all RX lanes and enable the corresponding ADC channels via
+<cite>CHAN_CNTRL</cite> register.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Release DAC and ADC Resets</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Deassert reset (<cite>RSTN = 1</cite>) for both the external DAC TPL and ADC TPL
+common blocks.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Bring up DUT RX and External TX Paths</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Start the RX clock generator (<cite>AXI_CLKGEN_RX_BA</cite>) for the DUT.</p></li>
+<li><p>Bring up the external TX transceiver and link.</p></li>
+<li><p>Bring up the DUT RX transceiver and link.</p></li>
+<li><p>Wait for both DUT and external link layers to report link-up.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Simulation delay</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Wait for 10 µs to allow data flow and link stabilization.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Configure RX DMA (if `use_dds == 0`)</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Enable the RX DMA engine and configure:</p>
+<ul>
+<li><p>Control register (enable DMA).</p></li>
+<li><p>Flags (TLAST).</p></li>
+<li><p>Transfer length.</p></li>
+<li><p>Destination address in DDR.</p></li>
+<li><p>Submit DMA transfer.</p></li>
+</ul>
+</li>
+<li><p>Wait for 5 µs to allow DMA to start.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Check Captured Data</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Call the <cite>check_captured_data</cite> function to verify that the data received
+from the TX path is correctly captured in DDR:</p>
+<ul>
+<li><p>Parameters: address, length, step, max_sample.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Shutdown RX Path</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Bring down the DUT RX and external TX transceivers to conclude the test.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="rx-os-tpl-test">
+<h4>RX OS TPL test<a class="headerlink" href="#rx-os-tpl-test" title="Link to this heading"></a></h4>
+<ul>
+<li><p><strong>Configure External DAC OS TPL Channels</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Iterate over all RX_OS lanes (<cite>i = 0..RX_OS_JESD_M-1</cite>):</p>
+<ul>
+<li><p>If <cite>use_dds</cite> is enabled:</p>
+<ul>
+<li><p>Select DDS as the data source for each DAC OS TPL channel.</p></li>
+<li><p>Set the tone amplitude (<cite>DDS_SCALE_1</cite>) and frequency increment
+(<cite>DDS_INCR_1</cite>).</p></li>
+</ul>
+</li>
+<li><p>Otherwise:</p>
+<ul>
+<li><p>Select DMA as the source for DAC OS TPL channels.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Enable ADC OS TPL Channels</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Iterate over all RX_OS lanes and enable the corresponding ADC OS channels
+via <cite>CHAN_CNTRL</cite> register.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Release DAC and ADC OS Resets</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Deassert reset (<cite>RSTN = 1</cite>) for both the external DAC OS TPL and ADC OS TPL
+common blocks.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Bring up DUT RX Observation and External TX Observation Paths</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Start the RX OS clock generator (<cite>AXI_CLKGEN_RX_OS_BA</cite>) for the DUT.</p></li>
+<li><p>Bring up the external TX OS transceiver and link.</p></li>
+<li><p>Bring up the DUT RX OS transceiver and link.</p></li>
+<li><p>Wait for both DUT and external RX OS links to report link-up.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Simulation Delay</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Wait 10 µs for data flow and link stabilization.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Configure RX OS DMA (if `use_dds == 0`)</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Enable the RX OS DMA engine and configure:
+- Control register (enable DMA).
+- Flags (TLAST).
+- Transfer length.
+- Destination address in DDR.
+- Submit DMA transfer.</p></li>
+<li><p>Wait 5 µs to allow DMA to start.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Check Captured Data</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Call the <cite>check_captured_data</cite> task to verify that the RX OS data captured
+in DDR matches the expected template:
+- Parameters: address, length, step, max_sample.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Shutdown RX OS Path</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Bring down the DUT RX OS and external TX OS transceivers.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
 </section>
 <section id="stop-the-environment">
 <h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Stop the clocks</p></li>
+<li><dl class="simple">
+<dt>Environment Stop</dt><dd><ul>
+<li><p>The base testbench environment is stopped to end the test.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Stop All Clocks</dt><dd><ul>
+<li><p>All clocks started previously are stopped to ensure clean shutdown.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Reporting</dt><dd><ul>
+<li><p>A final informational message indicates that the test has completed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
 </ul>
 </section>
 </section>
@@ -477,10 +1009,10 @@ command line.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/fmcomms2
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/adrv9009
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/fmcomms2$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/adrv9009$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
@@ -493,10 +1025,10 @@ the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/fmcomms2
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/adrv9009
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/fmcomms2$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/adrv9009$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -509,10 +1041,10 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/fmcomms2
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/adrv9009
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/fmcomms2$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/adrv9009$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
@@ -544,45 +1076,57 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AXI_AD9361</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ad9361" target="_blank">library/axi_ad9361</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_ad9361/index.html#axi-ad9361" target="_blank" title="(in HDL)"><span>AXI AD9361</span></a></p></td>
+<tr class="row-even"><td><p>AXI_ADXCVR</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/xilinx/axi_adxcvr" target="_blank">library/xilinx/axi_adxcvr</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_adxcvr/index.html#axi-adxcvr-amd" target="_blank" title="(in HDL)"><span>AMD Xilinx Devices</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>AXI_DMAC</p></td>
+<tr class="row-odd"><td><p>AXI_CLKGEN</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_clkgen" target="_blank">library/axi_clkgen</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_clkgen/index.html#axi-clkgen" target="_blank" title="(in HDL)"><span>AXI CLK Generator</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_DMAC</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
 <td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>AXI_SYSID</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_sysid" target="_blank">library/axi_sysid</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" target="_blank" title="(in HDL)"><span>AXI System ID</span></a></p></td>
+<tr class="row-odd"><td><p>AXI_JESD204_RX</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/axi_jesd204_rx" target="_blank">library/jesd204/axi_jesd204_rx</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/axi_jesd204_rx/index.html#axi-jesd204-rx" target="_blank" title="(in HDL)"><span>JESD204B/C Link Receive Peripheral</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>SYSID_ROM</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/sysid_rom" target="_blank">library/sysid_rom</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" target="_blank" title="(in HDL)"><span>AXI System ID</span></a></p></td>
+<tr class="row-even"><td><p>AXI_JESD204_TX</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/axi_jesd204_tx" target="_blank">library/jesd204/axi_jesd204_tx</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/axi_jesd204_tx/index.html#axi-jesd204-tx" target="_blank" title="(in HDL)"><span>JESD204B/C Link Transmit Peripheral</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>UTIL_CPACK2</p></td>
+<tr class="row-odd"><td><p>DATA_OFFLOAD</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/data_offload" target="_blank">library/data_offload</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/index.html#data-offload" target="_blank" title="(in HDL)"><span>Data Offload</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>JESD204_TPL_ADC</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/ad_ip_jesd204_tpl_adc" target="_blank">library/jesd204/ad_ip_jesd204_tpl_adc</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/ad_ip_jesd204_tpl_adc/index.html#ad-ip-jesd204-tpl-adc" target="_blank" title="(in HDL)"><span>ADC JESD204B/C Transport Peripheral</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>JESD204_TPL_DAC</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/ad_ip_jesd204_tpl_dac" target="_blank">library/jesd204/ad_ip_jesd204_tpl_dac</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/ad_ip_jesd204_tpl_dac/index.html#ad-ip-jesd204-tpl-dac" target="_blank" title="(in HDL)"><span>DAC JESD204B/C Transport Peripheral</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>UTIL_ADXCVR</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/xilinx/util_adxcvr" target="_blank">library/xilinx/util_adxcvr</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/xilinx/util_adxcvr/index.html#util-adxcvr" target="_blank" title="(in HDL)"><span>UTIL_ADXCVR core for AMD Xilinx devices</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>UTIL_CPACK2</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_pack/util_cpack2" target="_blank">library/util_pack/util_cpack2</a></p></td>
 <td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/util_pack/util_cpack2.html#util-cpack2" target="_blank" title="(in HDL)"><span>Channel CPACK Utility</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>UTIL_HBM</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_hbm" target="_blank">library/util_hbm</a></p></td>
+<td><p>—</p></td>
 </tr>
 <tr class="row-odd"><td><p>UTIL_UPACK2</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_pack/util_upack2" target="_blank">library/util_pack/util_upack2</a></p></td>
 <td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/util_pack/util_upack2.html#util-upack2" target="_blank" title="(in HDL)"><span>Channel UPACK Utility</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>UTIL_RFIFO</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_rfifo" target="_blank">library/util_rfifo</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/util_rfifo/index.html#util-rfifo" target="_blank" title="(in HDL)"><span>Util RFIFO</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>UTIL_WFIFO</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_wfifo" target="_blank">library/util_wfifo</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/util_wfifo/index.html#util-wfifo" target="_blank" title="(in HDL)"><span>Util WFIFO</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>UTIL_TDD_SYNC</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_tdd_sync" target="_blank">library/util_tdd_sync</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>UTIL_CLKDIV</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/xilinx/util_clkdiv" target="_blank">library/xilinx/util_clkdiv</a></p></td>
-<td><p>—</p></td>
+<tr class="row-even"><td><p>UTIL_DO_RAM</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_do_ram" target="_blank">library/util_do_ram</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/index.html#data-offload" target="_blank" title="(in HDL)"><span>Data Offload</span></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -671,12 +1215,48 @@ clean folder (no runs folder available):</p>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dac_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>DMA_TRANS</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_JESD_RX_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_rx_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_rx_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_JESD_TX_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_tx_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_tx_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_JESD_TPL_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_tpl_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_tpl_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_XCVR_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_xcvr_pkg.sv" target="_blank">library/regmaps/adi_regmap_xcvr_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_JESD204</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/jesd/adi_jesd204_pkg.sv" target="_blank">library/drivers/jesd/adi_jesd204_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>DMA_TRANS</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv" target="_blank">library/drivers/dmac/dma_trans.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>DMAC_API</p></td>
+<tr class="row-odd"><td><p>DMAC_API</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>JESD_EXERCISER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/jesd/jesd_exerciser.tcl" target="_blank">library/drivers/jesd/jesd_exerciser.tcl</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>JESD_RX_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/jesd/jesd_rx_api_pkg.sv" target="_blank">library/drivers/jesd/jesd_rx_api_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>JESD_TX_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/jesd/jesd_tx_api_pkg.sv" target="_blank">library/drivers/jesd/jesd_tx_api_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>XCVR_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/xcvr/xcvr_api_pkg.sv" target="_blank">library/drivers/xcvr/xcvr_api_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
 </tbody>
@@ -704,8 +1284,8 @@ are, the lower the chances to receive support from <a class="icon link reference
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../adrv9009/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADRV9009</a>
-    <a href="../pluto/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">PLUTO</a>
+    <a href="../adrv9001/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADRV9001</a>
+    <a href="../fmcomms2/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">FMCOMMS2</a>
               </div>
           
         </div>

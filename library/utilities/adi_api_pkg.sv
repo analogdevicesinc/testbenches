@@ -72,24 +72,27 @@ package adi_api_pkg;
     endtask
 
     task axi_read(
-      input  [31:0] addr,
-      output [31:0] data);
+      input  bit [31:0] addr,
+      output bit [31:0] data,
+      input bit priority_packet = 0);
 
-      this.bus.RegRead32(this.base_address + addr, data);
+      this.bus.RegRead32(this.base_address + addr, data, priority_packet);
     endtask: axi_read
 
     task axi_write(
-      input [31:0] addr,
-      input [31:0] data);
+      input bit [31:0] addr,
+      input bit [31:0] data,
+      input bit priority_packet = 0);
 
-      this.bus.RegWrite32(this.base_address + addr, data);
+      this.bus.RegWrite32(this.base_address + addr, data, priority_packet);
     endtask: axi_write
 
     task axi_verify(
-      input [31:0] addr,
-      input [31:0] data);
+      input bit [31:0] addr,
+      input bit [31:0] data,
+      input bit priority_packet = 0);
 
-      this.bus.RegReadVerify32(this.base_address + addr, data);
+      this.bus.RegReadVerify32(this.base_address + addr, data, priority_packet);
     endtask: axi_verify
 
   endclass: adi_api

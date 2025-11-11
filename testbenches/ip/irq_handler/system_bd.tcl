@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,19 +33,13 @@
 # ***************************************************************************
 # ***************************************************************************
 
-source $ad_tb_dir/library/includes/sp_include_axi.tcl
+global ad_project_params
 
-# Add test files to the project
-adi_sim_project_files [list \
-  "$ad_tb_dir/library/utilities/utils.svh" \
-  "$ad_tb_dir/library/utilities/logger_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_common_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_vip_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_api_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_environment_pkg.sv" \
-  "$ad_tb_dir/library/utilities/test_harness_env.sv" \
-  "$ad_tb_dir/library/utilities/irq_handler_pkg.sv" \
-  "$ad_tb_dir/library/drivers/common/watchdog.sv" \
-  "$ad_tb_dir/library/vip/adi/io_vip/io_vip_if_base_pkg.sv" \
-  "system_tb.sv" \
+# create IRQ VIP
+ad_ip_instance io_vip irq_test_vip [ list \
+  MODE {1} \
 ]
+adi_sim_add_define "IRQ_TEST=irq_test_vip"
+
+ad_connect irq_test_vip/clk sys_cpu_clk
+ad_cpu_interrupt ps-0 mb-0 irq_test_vip/o

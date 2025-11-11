@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -34,42 +34,125 @@
 // ***************************************************************************
 
 interface io_vip_if #(
-  int MODE = 0, // 1 - master, 0 - slave
-      WIDTH = 1
+  int MODE = 1, // 1 - master, 0 - slave, 2 - passthrough
+      WIDTH = 1, // bitwidth
+      ASYNC = 0 // clock synchronous
 ) (
   input bit clk
 );
 
-  logic [WIDTH-1:0] io = 0;
+  import io_vip_if_base_pkg::*;
 
-  // Master functions
-  function void set_io(int o);
-    if (MODE === 0) begin
-      $display("[ERROR] %0t Unsupported in slave mode", $time);
-      $finish;
-    end else begin
-      io <= o[WIDTH-1:0];
-    end
-  endfunction
+  wire [WIDTH-1:0] IO;
 
-  // Wait and set
-  task setw_io(int o, int w=1);
-    repeat(w) wait_posedge_clk();
-    set_io(o);
-  endtask
+  logic intf_is_master = 0;
+  logic intf_is_slave = 0;
+  logic edge_case = 1'b1;
 
-  // Slave functions
-  function int get_io();
-    return io;
-  endfunction
+  function void set_intf_master();
+    intf_is_master = 1;
+    intf_is_slave = 0;
+  endfunction: set_intf_master
 
-  task wait_posedge_clk();
-    @(cb);
-  endtask
+  function void set_intf_slave();
+    intf_is_master = 0;
+    intf_is_slave = 1;
+  endfunction: set_intf_slave
 
-  default clocking cb @(posedge clk);
+  function void set_intf_monitor();
+    intf_is_master = 0;
+    intf_is_slave = 0;
+  endfunction: set_intf_monitor
+
+  class io_vip_if_class #(int WIDTH = 1) extends io_vip_if_base;
+
+    function new();
+    endfunction
+
+    virtual function void set_io(logic [1023:0] o);
+      if (intf_is_master) begin
+        if (edge_case) begin
+          cb_p.IO <= o[WIDTH-1:0];
+        end else begin
+          cb_n.IO <= o[WIDTH-1:0];
+        end
+      end else begin
+        $fatal(0, "Supported only in runtime master mode");
+      end
+    endfunction: set_io
+
+    virtual function logic [1023:0] get_io();
+      if (intf_is_slave) begin
+        if (ASYNC == 1) begin
+          get_io = {{1024-WIDTH{1'b0}}, IO};
+        end else begin
+          if (edge_case) begin
+            get_io = {{1024-WIDTH{1'b0}}, cb_p.IO};
+          end else begin
+            get_io = {{1024-WIDTH{1'b0}}, cb_n.IO};
+          end
+        end
+      end else begin
+        $fatal(0, "Supported only in runtime slave mode");
+      end
+    endfunction: get_io
+
+    virtual task wait_io_change();
+      if (ASYNC == 1) begin
+        @(IO);
+      end else begin
+        if (edge_case) begin
+          @(cb_p.IO);
+        end else begin
+          @(cb_n.IO);
+        end
+      end
+    endtask: wait_io_change
+
+    virtual task wait_posedge_clk();
+      if (ASYNC == 1) begin
+        $fatal(0, "Unsupported in async mode");
+      end
+      @(cb_p);
+    endtask: wait_posedge_clk
+
+    virtual task wait_negedge_clk();
+      if (ASYNC == 1) begin
+        $fatal(0, "Unsupported in async mode");
+      end
+      @(cb_n);
+    endtask: wait_negedge_clk
+
+    virtual function int get_width();
+      get_width = WIDTH;
+    endfunction: get_width
+
+    virtual function void set_positive_edge();
+      if (ASYNC == 1) begin
+        $fatal(0, "Unsupported in async mode");
+      end
+      edge_case = 1'b1;
+    endfunction: set_positive_edge
+
+    virtual function void set_negative_edge();
+      if (ASYNC == 1) begin
+        $fatal(0, "Unsupported in async mode");
+      end
+      edge_case = 1'b0;
+    endfunction: set_negative_edge
+
+  endclass: io_vip_if_class
+
+  io_vip_if_class #(WIDTH) vif = new();
+
+  clocking cb_p @(posedge clk);
     default input #1step output #1ps;
-    inout io;
-  endclocking : cb
+    inout IO;
+  endclocking : cb_p
 
-endinterface
+  clocking cb_n @(negedge clk);
+    default input #1step output #1ps;
+    inout IO;
+  endclocking : cb_n
+
+endinterface: io_vip_if

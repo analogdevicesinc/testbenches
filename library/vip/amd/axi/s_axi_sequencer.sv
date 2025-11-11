@@ -59,20 +59,29 @@ package s_axi_sequencer_pkg;
       input logic [31:0] data,
       input bit [3:0] strb);
 
+    pure virtual task set_backpressure(input xil_axi_ready_gen_policy_t backpressure_policy);
+
   endclass: s_axi_sequencer_base
 
 
   class s_axi_sequencer #(`AXI_VIP_PARAM_DECL(AXI)) extends s_axi_sequencer_base;
 
+    axi_slv_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver;
+    axi_slv_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver;
+
     xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(AXI)) mem_model;
 
     function new(
       input string name,
+      input axi_slv_wr_driver #(`AXI_VIP_PARAM_ORDER(AXI)) wr_driver,
+      input axi_slv_rd_driver #(`AXI_VIP_PARAM_ORDER(AXI)) rd_driver,
       input xil_axi_slv_mem_model #(`AXI_VIP_PARAM_ORDER(AXI)) mem_model,
       input adi_agent parent = null);
 
       super.new(name, parent);
 
+      this.wr_driver = wr_driver;
+      this.rd_driver = rd_driver;
       this.mem_model = mem_model;
     endfunction: new
 
@@ -90,6 +99,14 @@ package s_axi_sequencer_pkg;
         .payload(data),
         .strb(strb));
     endfunction: BackdoorWrite32
+
+    virtual task set_backpressure(input xil_axi_ready_gen_policy_t backpressure_policy);
+      axi_ready_gen  wready_gen;
+
+      wready_gen = this.wr_driver.create_ready("wready");
+      wready_gen.set_ready_policy(backpressure_policy);
+      this.wr_driver.send_wready(wready_gen);
+    endtask: set_backpressure
 
   endclass: s_axi_sequencer
 

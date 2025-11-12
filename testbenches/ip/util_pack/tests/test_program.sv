@@ -42,6 +42,11 @@ import test_harness_env_pkg::*;
 import environment_pkg::*;
 import dmac_api_pkg::*;
 import watchdog_pkg::*;
+import adi_axis_agent_pkg::*;
+import adi_axis_packet_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
+import adi_axis_rand_obj_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -58,14 +63,30 @@ program test_program;
 
   // declare the class instances
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
-  util_pack_environment #(`AXIS_VIP_PARAMS(test_harness, tx_src_axis), `AXIS_VIP_PARAMS(test_harness, tx_dst_axis), `AXIS_VIP_PARAMS(test_harness, rx_src_axis), `AXIS_VIP_PARAMS(test_harness, rx_dst_axis)) pack_env;
+
+  util_pack_environment pack_env;
+
+  adi_axis_master_agent #(`AXIS_VIP_PARAMS(test_harness, tx_src_axis)) tx_src_axis_agent;
+  adi_axis_slave_agent #(`AXIS_VIP_PARAMS(test_harness, tx_dst_axis)) tx_dst_axis_agent;
+  adi_axis_master_agent #(`AXIS_VIP_PARAMS(test_harness, rx_src_axis)) rx_src_axis_agent;
+  adi_axis_slave_agent #(`AXIS_VIP_PARAMS(test_harness, rx_dst_axis)) rx_dst_axis_agent;
 
   watchdog packer_scoreboard_wd;
 
   dmac_api dmac_tx;
   dmac_api dmac_rx;
 
-  int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**int'($clog2(`CHANNELS));
+  adi_axis_config axis_cfg_tx;
+  adi_axis_rand_config axis_rand_cfg_tx;
+  adi_axis_rand_obj axis_rand_obj_tx;
+  adi_axis_packet axis_packet_tx;
+
+  adi_axis_config axis_cfg_rx;
+  adi_axis_rand_config axis_rand_cfg_rx;
+  adi_axis_rand_obj axis_rand_obj_rx;
+  adi_axis_packet axis_packet_rx;
+
+  int data_length = $urandom_range(5, 10) * `WIDTH * `CHANNELS * `SAMPLES / 8 * 2**$clog2(`CHANNELS);
 
   initial begin
 
@@ -80,16 +101,64 @@ program test_program;
                     `TH.`MNG_AXI.inst.IF,
                     `TH.`DDR_AXI.inst.IF);
 
-    pack_env = new("Util Pack Environment",
-                    `TH.`TX_SRC_AXIS.inst.IF,
-                    `TH.`TX_DST_AXIS.inst.IF,
-                    `TH.`RX_SRC_AXIS.inst.IF,
-                    `TH.`RX_DST_AXIS.inst.IF);
+    pack_env = new("Util Pack Environment");
+
+    tx_src_axis_agent = new("", `TH.`TX_SRC_AXIS.inst.IF);
+    tx_dst_axis_agent = new("", `TH.`TX_DST_AXIS.inst.IF);
+    rx_src_axis_agent = new("", `TH.`RX_SRC_AXIS.inst.IF);
+    rx_dst_axis_agent = new("", `TH.`RX_DST_AXIS.inst.IF);
+
+    `LINK(tx_src_axis_agent, pack_env, tx_src_axis_agent)
+    `LINK(tx_dst_axis_agent, pack_env, tx_dst_axis_agent)
+    `LINK(rx_src_axis_agent, pack_env, rx_src_axis_agent)
+    `LINK(rx_dst_axis_agent, pack_env, rx_dst_axis_agent)
 
     dmac_tx = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA);
     dmac_rx = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA);
 
-    pack_env.configure(data_length);
+    // TX packet
+    axis_cfg_tx = new(`AXIS_TRANSACTION_PARAM(test_harness, tx_src_axis));
+    axis_rand_cfg_tx = new();
+    axis_rand_obj_tx = new();
+
+    // tdata - ramp
+    axis_rand_cfg_tx.TDATA_MODE = 1;
+
+    // tkeep - constant 1
+    axis_rand_cfg_tx.TKEEP_MODE = 1;
+    axis_rand_obj_tx.tkeep = 1'b1;
+
+    axis_packet_tx = new(
+      .bytes_per_packet(data_length),
+      .cfg(axis_cfg_tx),
+      .rand_cfg(axis_rand_cfg_tx),
+      .rand_obj(axis_rand_obj_tx));
+
+    axis_packet_tx.randomize_packet();
+
+    // RX packet
+    axis_cfg_rx = new(`AXIS_TRANSACTION_PARAM(test_harness, rx_src_axis));
+    axis_rand_cfg_rx = new();
+    axis_rand_obj_rx = new();
+
+    // tdata - ramp
+    axis_rand_cfg_rx.TDATA_MODE = 1;
+
+    // tkeep - constant 1
+    axis_rand_cfg_rx.TKEEP_MODE = 1;
+    axis_rand_obj_rx.tkeep = 1'b1;
+
+    axis_packet_rx = new(
+      .bytes_per_packet(data_length),
+      .cfg(axis_cfg_rx),
+      .rand_cfg(axis_rand_cfg_rx),
+      .rand_obj(axis_rand_obj_rx));
+
+    axis_packet_rx.randomize_packet();
+
+    pack_env.configure(
+      .tx_packet(axis_packet_tx),
+      .rx_packet(axis_packet_rx));
 
     base_env.start();
     pack_env.start();
@@ -124,8 +193,8 @@ program test_program;
 
     // wait for scoreboards to finish
     fork
-      pack_env.scoreboard_rx.wait_until_complete();
       pack_env.scoreboard_tx.wait_until_complete();
+      pack_env.scoreboard_rx.wait_until_complete();
     join
 
     packer_scoreboard_wd.stop();

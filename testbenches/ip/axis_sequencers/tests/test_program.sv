@@ -42,6 +42,10 @@ import watchdog_pkg::*;
 import axi4stream_vip_pkg::*;
 import m_axis_sequencer_pkg::*;
 import s_axis_sequencer_pkg::*;
+import adi_axis_packet_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
+import adi_axis_rand_obj_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -59,6 +63,11 @@ program test_program;
   axis_sequencer_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis), `AXIS_VIP_PARAMS(test_harness, dst_axis)) axis_seq_env;
 
   watchdog send_data_wd;
+
+  adi_axis_config axis_cfg;
+  adi_axis_rand_config axis_rand_cfg;
+  adi_axis_rand_obj axis_rand_obj;
+  adi_axis_packet axis_packet;
 
   initial begin
 
@@ -84,11 +93,11 @@ program test_program;
 
     axis_seq_env.configure();
 
-    axis_seq_env.src_axis_agent.master_sequencer.set_data_beat_delay(`SRC_BEAT_DELAY);
-    axis_seq_env.src_axis_agent.master_sequencer.set_descriptor_delay(`SRC_DESCRIPTOR_DELAY);
+    axis_seq_env.src_axis_agent.master_sequencer.set_transaction_delay(`SRC_TRANSACTION_DELAY);
+    axis_seq_env.src_axis_agent.master_sequencer.set_packet_delay(`SRC_PACKET_DELAY);
 
-    axis_seq_env.dst_axis_agent.slave_sequencer.set_high_time(`DEST_BEAT_DELAY_HIGH);
-    axis_seq_env.dst_axis_agent.slave_sequencer.set_low_time(`DEST_BEAT_DELAY_LOW);
+    axis_seq_env.dst_axis_agent.slave_sequencer.set_high_time(`DEST_TRANSACTION_HIGH);
+    axis_seq_env.dst_axis_agent.slave_sequencer.set_low_time(`DEST_TRANSACTION_LOW);
 
     case (`DEST_BACKPRESSURE)
       1: axis_seq_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
@@ -96,26 +105,48 @@ program test_program;
       default: `FATAL(("Destination backpressure mode parameter incorrect!"));
     endcase
 
+    axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, src_axis));
+    axis_rand_cfg = new();
+    axis_rand_obj = new();
+
+    // tdata - ramp
+    axis_rand_cfg.TDATA_MODE = 1;
+
+    // tkeep - constant 1
+    axis_rand_cfg.TKEEP_MODE = 1;
+    axis_rand_obj.tkeep = 1'b1;
+
+    axis_packet = new(
+      .transactions_per_packet(5),
+      .cfg(axis_cfg),
+      .rand_cfg(axis_rand_cfg),
+      .rand_obj(axis_rand_obj));
+
+    axis_packet.randomize_packet();
+
     case (`SRC_DESCRIPTORS)
       1: begin
-        axis_seq_env.src_axis_agent.master_sequencer.set_descriptor_gen_mode(0);
-        axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_DATA_BEAT);
-        // axis_seq_env.src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(32'h600, 1, 0);
-        axis_seq_env.src_axis_agent.master_sequencer.add_xfer_descriptor_sample_count(32'd10, 1, 0);
+        axis_seq_env.src_axis_agent.master_sequencer.set_repeat_transaction_mode(0);
+        axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_TRANSACTION);
+        axis_seq_env.src_axis_agent.master_sequencer.add_packet(axis_packet);
 
         send_data_wd = new("Axis Sequencer Watchdog", 1000, "Send data");
       end
       2: begin
-        axis_seq_env.src_axis_agent.master_sequencer.set_descriptor_gen_mode(0);
-        axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_DESCRIPTOR_QUEUE);
-        repeat (10) axis_seq_env.src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(32'h600, 1, 0);
+        axis_seq_env.src_axis_agent.master_sequencer.set_repeat_transaction_mode(0);
+        axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_QUEUE);
+        repeat (10) begin
+          axis_packet.randomize_packet();
+          axis_seq_env.src_axis_agent.master_sequencer.add_packet(axis_packet);
+        end
 
         send_data_wd = new("Axis Sequencer Watchdog", 30000, "Send data");
       end
       3: begin
-        axis_seq_env.src_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
+        axis_seq_env.src_axis_agent.master_sequencer.set_repeat_transaction_mode(1);
         axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-        axis_seq_env.src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(32'h600, 1, 0);
+        axis_packet.randomize_packet();
+        axis_seq_env.src_axis_agent.master_sequencer.add_packet(axis_packet);
 
         send_data_wd = new("Axis Sequencer Watchdog", 20000, "Send data");
       end
@@ -126,12 +157,12 @@ program test_program;
 
     axis_seq_env.src_axis_agent.master_sequencer.start();
 
-    #1step;
+    #100ns;
 
     case (`SRC_DESCRIPTORS)
       1: //axis_seq_env.src_axis_agent.master_sequencer.beat_sent();
         axis_seq_env.src_axis_agent.master_sequencer.packet_sent();
-      2: axis_seq_env.src_axis_agent.master_sequencer.wait_empty_descriptor_queue();
+      2: axis_seq_env.src_axis_agent.master_sequencer.wait_empty_sequences();
       3: begin
         #10us;
 
@@ -141,6 +172,8 @@ program test_program;
       end
       default: ;
     endcase
+
+    axis_seq_env.src_axis_agent.master_sequencer.sequence_sent();
 
     send_data_wd.stop();
 

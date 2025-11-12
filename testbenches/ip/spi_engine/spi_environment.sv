@@ -92,7 +92,6 @@ package spi_environment_pkg;
     task configure();
       `ifdef DEF_SDO_STREAMING
         this.sdo_src_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-        this.sdo_src_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
       `endif
     endtask
 

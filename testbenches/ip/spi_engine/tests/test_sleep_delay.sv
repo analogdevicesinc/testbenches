@@ -369,7 +369,7 @@ program test_sleep_delay (
       .tlast(1'b1),
       .partial_reporting_en(1'b1));
     dma_api.set_lengths(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1,0);
-    dma_api.set_dest_addr(`DDR_BA);
+    dma_api.set_dest_addr(xil_axi_uint'(`DDR_BA));
     dma_api.transfer_start();
 
     // Configure the Offload module

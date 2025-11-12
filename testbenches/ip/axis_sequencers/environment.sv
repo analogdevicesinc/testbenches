@@ -40,7 +40,6 @@ package environment_pkg;
 
   import logger_pkg::*;
   import adi_environment_pkg::*;
-
   import axi4stream_vip_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
@@ -73,14 +72,11 @@ package environment_pkg;
     //   - Configure the sequencer VIPs with an initial configuration before starting them
     //============================================================================
     task configure();
-      xil_axi4stream_ready_gen_policy_t dac_mode;
-
       // source stub
       this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
 
       // destination stub
-      dac_mode = XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE;
-      this.dst_axis_agent.slave_sequencer.set_mode(dac_mode);
+      this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
     endtask
 
     //============================================================================

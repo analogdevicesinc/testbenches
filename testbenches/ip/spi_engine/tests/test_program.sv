@@ -50,9 +50,17 @@ import clk_gen_api_pkg::*;
 import spi_engine_instr_pkg::*;
 import adi_spi_vip_pkg::*;
 import axi_vip_pkg::*;
+import adi_axis_packet_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
+import adi_axis_rand_obj_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+`ifdef DEF_SDO_STREAMING
+  import `PKGIFY(test_harness, sdo_src)::*;
+`endif
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -196,15 +204,30 @@ program test_program (
   // SPI Engine SDO data
   //---------------------------------------------------------------------------
 
-  task sdo_stream_gen(
-      input [`DATA_DLENGTH:0]  tx_data);
-    xil_axi4stream_data_byte data[(`DATA_WIDTH/8)-1:0];
+  task sdo_stream_gen(input [`DATA_DLENGTH-1:0]  tx_data);
     `ifdef DEF_SDO_STREAMING
-      for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
-        data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
-        spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i]);
+      adi_axis_config axis_cfg;
+      adi_axis_rand_config axis_rand_cfg;
+      adi_axis_rand_obj axis_rand_obj;
+      adi_axis_packet axis_packet;
+
+      axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, sdo_src));
+      axis_rand_cfg = new();
+      axis_rand_obj = new();
+
+      axis_packet = new(
+        .bytes_per_packet(`DATA_WIDTH/8),
+        .cfg(axis_cfg),
+        .rand_cfg(axis_rand_cfg),
+        .rand_obj(axis_rand_obj));
+
+      axis_packet.randomize_packet();
+
+      for (int i=0; i<`DATA_WIDTH/8; i++) begin
+        axis_packet.transactions[i / axis_packet.cfg.BYTES_PER_TRANSACTION].bytes[i % axis_packet.cfg.BYTES_PER_TRANSACTION].update_tdata((tx_data & (8'hFF << 8*i)) >> 8*i);
       end
-      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
+
+      spi_env.sdo_src_agent.master_sequencer.add_packet(axis_packet);
     `endif
   endtask
 
@@ -282,7 +305,7 @@ program test_program (
       .tlast(1'b1),
       .partial_reporting_en(1'b1));
     dma_api.set_lengths(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1,0);
-    dma_api.set_dest_addr(`DDR_BA);
+    dma_api.set_dest_addr(xil_axi_uint'(`DDR_BA));
     dma_api.transfer_start();
 
     // Configure the Offload module
@@ -338,7 +361,7 @@ program test_program (
         `ERROR(("Offload Read Test FAILED"));
       end
     end
-    `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);
+    `INFO(("Offload Read Test finished"), ADI_VERBOSITY_LOW);
 
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
       spi_receive(sdo_write_data[i]);
@@ -347,7 +370,7 @@ program test_program (
         `ERROR(("Offload Write Test FAILED"));
       end
     end
-    `INFO(("Offload Write Test PASSED"), ADI_VERBOSITY_LOW);
+    `INFO(("Offload Write Test finished"), ADI_VERBOSITY_LOW);
   endtask
 
   //---------------------------------------------------------------------------

@@ -40,6 +40,15 @@ import logger_pkg::*;
 import test_harness_env_pkg::*;
 import environment_pkg::*;
 import watchdog_pkg::*;
+import adi_axis_transaction_pkg::*;
+import adi_axis_packet_pkg::*;
+import adi_axis_frame_pkg::*;
+import adi_object_pkg::*;
+import adi_fifo_class_pkg::*;
+import m_axis_sequencer_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
+import adi_axis_rand_obj_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -57,6 +66,16 @@ program test_program ();
   util_axis_fifo_environment #(`AXIS_VIP_PARAMS(test_harness, input_axis), `AXIS_VIP_PARAMS(test_harness, output_axis), `INPUT_CLK, `OUTPUT_CLK) uaf_env;
 
   watchdog send_data_wd;
+
+  adi_axis_config axis_cfg;
+  adi_axis_rand_config axis_rand_cfg;
+  adi_axis_rand_obj axis_rand_obj;
+
+  adi_axis_transaction axis_transaction;
+  adi_axis_packet axis_packet;
+  adi_axis_frame axis_frame;
+
+  adi_fifo_class #(adi_object) axis_fifo;
 
   initial begin
 
@@ -84,38 +103,63 @@ program test_program ();
 
     uaf_env.configure();
 
-    if (!`TKEEP_EN) begin
-      uaf_env.input_axis_agent.master_sequencer.set_keep_some();
-    end else begin
-      uaf_env.input_axis_agent.master_sequencer.set_keep_all();
-    end
-
     uaf_env.run();
 
     send_data_wd = new("Util AXIS FIFO Watchdog", 500000, "Send data");
 
+    // stop the integrated watchdog, as this testbench has another watchdog that is better suited for this test
+    base_env.simulation_watchdog.stop();
     send_data_wd.start();
 
-    uaf_env.input_axis_agent.master_sequencer.start();
+    axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, input_axis));
+    axis_rand_cfg = new();
+    axis_rand_obj = new();
+
+    axis_rand_cfg.randomize_configuration();
+    axis_transaction = new(
+      .cfg(axis_cfg),
+      .rand_cfg(adi_axis_rand_config'(axis_rand_cfg.clone())),
+      .rand_obj(adi_axis_rand_obj'(axis_rand_obj.clone())));
+
+    axis_rand_cfg.randomize_configuration();
+    axis_packet = new(
+      .transactions_per_packet(5),
+      .cfg(axis_cfg),
+      .rand_cfg(adi_axis_rand_config'(axis_rand_cfg.clone())),
+      .rand_obj(adi_axis_rand_obj'(axis_rand_obj.clone())));
+
+    axis_rand_cfg.randomize_configuration();
+    axis_frame = new(
+      .packets_per_frame(5),
+      .transactions_per_packet(5),
+      .cfg(axis_cfg),
+      .rand_cfg(adi_axis_rand_config'(axis_rand_cfg.clone())),
+      .rand_obj(adi_axis_rand_obj'(axis_rand_obj.clone())));
+
+    axis_fifo = new();
 
     // stimulus
-    repeat($urandom_range(5,10)) begin
+    repeat($urandom_range(5, 10)) begin
       send_data_wd.reset();
 
-      if (!`TKEEP_EN) begin
-        repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128), `TLAST_EN, 0);
-        end
-      end else begin
-        repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_byte_count($urandom_range(1,1024), `TLAST_EN, 0);
-        end
+      repeat($urandom_range(1, 2)) begin
+        axis_transaction.randomize_transaction();
+        axis_packet.randomize_packet();
+        axis_frame.randomize_frame();
+        void'(axis_fifo.push(axis_transaction));
+        void'(axis_fifo.push(axis_packet));
+
+        uaf_env.input_axis_agent.master_sequencer.add_transaction(axis_transaction);
+        uaf_env.input_axis_agent.master_sequencer.add_packet(axis_packet);
+        uaf_env.input_axis_agent.master_sequencer.add_frame(axis_frame);
+        uaf_env.input_axis_agent.master_sequencer.add_sequence(axis_fifo);
       end
 
       #($urandom_range(1,10)*1us);
 
-      uaf_env.input_axis_agent.master_sequencer.clear_descriptor_queue();
-      uaf_env.input_axis_agent.master_sequencer.wait_empty_descriptor_queue();
+      uaf_env.input_axis_agent.master_sequencer.clear_sequences();
+      uaf_env.input_axis_agent.master_sequencer.wait_empty_sequences();
+      uaf_env.input_axis_agent.master_sequencer.sequence_sent();
 
       uaf_env.scoreboard_inst.wait_until_complete();
 
@@ -123,8 +167,6 @@ program test_program ();
     end
 
     send_data_wd.stop();
-
-    #100ns;
 
     uaf_env.stop();
     base_env.stop();

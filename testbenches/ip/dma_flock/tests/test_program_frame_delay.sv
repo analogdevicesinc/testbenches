@@ -44,6 +44,10 @@ import dmac_api_pkg::*;
 import dma_trans_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
+import adi_axis_packet_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
+import adi_axis_rand_obj_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -71,6 +75,11 @@ program test_program_frame_delay;
   int has_m_autorun;
   int sync_gen_en;
 
+  adi_axis_config axis_cfg;
+  adi_axis_rand_config axis_rand_cfg;
+  adi_axis_rand_obj axis_rand_obj;
+  adi_axis_packet axis_packet;
+
   initial begin
 
     //creating environment
@@ -90,6 +99,10 @@ program test_program_frame_delay;
     has_dfsync = `S_DMA_CFG_USE_EXT_SYNC;
     has_m_autorun = `M_DMA_CFG_AUTORUN;
     has_s_autorun = `S_DMA_CFG_AUTORUN;
+
+    axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, src_axis_vip));
+    axis_rand_cfg = new();
+    axis_rand_obj = new();
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
@@ -220,8 +233,7 @@ program test_program_frame_delay;
 
     s_seg = m_seg.toSlaveSeg();
 
-    dma_flock_env.src_axis_agent.master_sequencer.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_DESCRIPTOR_QUEUE);
-    dma_flock_env.src_axis_agent.master_sequencer.set_data_gen_mode(m_axis_sequencer_pkg::DATA_GEN_MODE_TEST_DATA);
+    dma_flock_env.src_axis_agent.master_sequencer.set_stop_policy(m_axis_sequencer_pkg::STOP_POLICY_QUEUE);
     dma_flock_env.src_axis_agent.master_sequencer.start();
 
     if (has_autorun == 0) begin
@@ -260,17 +272,27 @@ program test_program_frame_delay;
                             .bytes_to_transfer(m_seg.get_bytes_in_transfer));
               // Generate data
               begin
-                for (int l = 0; l < m_seg.ylength; l++) begin
-                  // update the AXIS generator command
-                  dma_flock_env.src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(.bytes_to_generate(m_seg.length),
-                                                       .gen_last(1),
-                                                       .gen_sync(l==0));
-                end
+                for (int j = 0; j < m_seg.ylength; j++) begin
+                  axis_packet = new(
+                    .bytes_per_packet(m_seg.length),
+                    .cfg(axis_cfg),
+                    .rand_cfg(axis_rand_cfg),
+                    .rand_obj(axis_rand_obj));
 
-                // update the AXIS generator data
-                for (int j = 0; j < m_seg.get_bytes_in_transfer; j++) begin
-                  // ADI DMA frames start from offset 0x00
-                  dma_flock_env.src_axis_agent.master_sequencer.push_byte_for_stream(frame_count);
+                  axis_packet.randomize_packet();
+
+                  // update the AXIS generator command
+                  if (axis_packet.cfg.EN_TUSER) begin
+                    axis_packet.transactions[0].update_tuser((j==0) ? 1'b1 : 1'b0);
+                  end
+
+                  // update the AXIS generator data
+                  for (int k = 0; k < m_seg.length; k++) begin
+                    // ADI DMA frames start from offset 0x00
+                    axis_packet.transactions[k / axis_packet.cfg.BYTES_PER_TRANSACTION].bytes[k % axis_packet.cfg.BYTES_PER_TRANSACTION].update_tdata(frame_count);
+                  end
+
+                  dma_flock_env.src_axis_agent.master_sequencer.add_packet(axis_packet);
                 end
               end
             join

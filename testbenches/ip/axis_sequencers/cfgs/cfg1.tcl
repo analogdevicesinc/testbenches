@@ -8,10 +8,10 @@ global ad_project_params
 set ad_project_params(SRC_DESCRIPTORS) 3
 
 # #) - Inter-beat valid delays
-set ad_project_params(SRC_BEAT_DELAY) 0
+set ad_project_params(SRC_TRANSACTION_DELAY) 0
 
 # #) - Inter-descriptor valid delays
-set ad_project_params(SRC_DESCRIPTOR_DELAY) 0
+set ad_project_params(SRC_PACKET_DELAY) 0
 
 
 # Destination data generation mode
@@ -21,5 +21,5 @@ set ad_project_params(SRC_DESCRIPTOR_DELAY) 0
 set ad_project_params(DEST_BACKPRESSURE) 2
 
 # #) - Inter-beat ready delays high and low time
-set ad_project_params(DEST_BEAT_DELAY_HIGH) 1
-set ad_project_params(DEST_BEAT_DELAY_LOW) 5
+set ad_project_params(DEST_TRANSACTION_HIGH) 1
+set ad_project_params(DEST_TRANSACTION_LOW) 5

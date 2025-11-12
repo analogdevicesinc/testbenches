@@ -38,8 +38,11 @@
 package adi_spi_vip_pkg;
 
   import logger_pkg::*;
-  import adi_vip_pkg::*;
   import adi_environment_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_driver_pkg::*;
+  import adi_monitor_pkg::*;
+  import adi_sequencer_pkg::*;
   import adi_spi_vip_if_base_pkg::*;
 
   // forward declaration to avoid errors

@@ -39,24 +39,27 @@
 package s_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
-  import adi_vip_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_sequencer_pkg::*;
   import logger_pkg::*;
 
   virtual class s_axis_sequencer_base extends adi_sequencer;
 
-    protected xil_axi4stream_data_byte byte_stream [$];
     protected xil_axi4stream_ready_gen_policy_t mode;
 
     protected bit variable_ranges;
 
     protected xil_axi4stream_uint high_time;
-    protected xil_axi4stream_uint low_time;
-
     protected xil_axi4stream_uint high_time_min;
     protected xil_axi4stream_uint high_time_max;
 
+    protected xil_axi4stream_uint low_time;
     protected xil_axi4stream_uint low_time_min;
     protected xil_axi4stream_uint low_time_max;
+
+    protected xil_axi4stream_uint event_count;
+    protected xil_axi4stream_uint event_count_min;
+    protected xil_axi4stream_uint event_count_max;
 
 
     // new
@@ -66,14 +69,26 @@ package s_axis_sequencer_pkg;
 
       super.new(name, parent);
 
+      // ready gen policy
       this.mode = XIL_AXI4STREAM_READY_GEN_RANDOM;
-      this.low_time = 0;
+
+      // high times
       this.high_time = 1;
       this.high_time_min = 1;
       this.high_time_max = 1;
+
+      // low times
+      this.low_time = 0;
       this.low_time_min = 0;
       this.low_time_max = 0;
+
+      // variablel high/low times
       this.variable_ranges = 0;
+
+      // event counts
+      this.event_count = 0;
+      this.event_count_min = 0;
+      this.event_count_max = 0;
     endfunction: new
 
 
@@ -91,18 +106,10 @@ package s_axis_sequencer_pkg;
       this.mode = mode;
     endfunction: set_mode
 
-    function xil_axi4stream_ready_gen_policy_t get_mode();
-      return this.mode;
-    endfunction: get_mode
-
     // high time functions
     function void set_high_time(input xil_axi4stream_uint high_time);
       this.high_time = high_time;
     endfunction: set_high_time
-
-    function xil_axi4stream_uint get_high_time();
-      return this.high_time;
-    endfunction: get_high_time
 
     function void set_high_time_range(
       input xil_axi4stream_uint high_time_min,
@@ -117,10 +124,6 @@ package s_axis_sequencer_pkg;
       this.low_time = low_time;
     endfunction: set_low_time
 
-    function xil_axi4stream_uint get_low_time();
-      return this.low_time;
-    endfunction
-
     function void set_low_time_range(
       input xil_axi4stream_uint low_time_min,
       input xil_axi4stream_uint low_time_max);
@@ -128,6 +131,19 @@ package s_axis_sequencer_pkg;
       this.low_time_min = low_time_min;
       this.low_time_max = low_time_max;
     endfunction: set_low_time_range
+
+    // event count functions
+    function void set_event_count(input xil_axi4stream_uint event_count);
+      this.event_count = event_count;
+    endfunction: set_event_count
+
+    function void set_event_count_range(
+      input xil_axi4stream_uint event_count_min,
+      input xil_axi4stream_uint event_count_max);
+
+      this.event_count_min = event_count_min;
+      this.event_count_max = event_count_max;
+    endfunction: set_event_count_range
 
     // virtual tasks to be implemented
     pure virtual task start();
@@ -160,17 +176,21 @@ package s_axis_sequencer_pkg;
 
       tready_gen.set_ready_policy(this.mode);
 
-      if (this.variable_ranges)
-        tready_gen.set_use_variable_ranges();
-      else
-        tready_gen.clr_use_variable_ranges();
-
       if (this.mode != XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE) begin
-        tready_gen.set_low_time(this.low_time);
-        tready_gen.set_high_time(this.high_time);
+        if (this.variable_ranges) begin
+          tready_gen.set_use_variable_ranges();
+        end else begin
+          tready_gen.clr_use_variable_ranges();
+        end
 
+        tready_gen.set_low_time(this.low_time);
         tready_gen.set_low_time_range(this.low_time_min, this.low_time_max);
+
+        tready_gen.set_high_time(this.high_time);
         tready_gen.set_high_time_range(this.high_time_min, this.high_time_max);
+
+        tready_gen.set_event_count(this.event_count);
+        tready_gen.set_event_count_range(this.event_count_min, this.event_count_max);
       end
       this.driver.send_tready(tready_gen);
     endtask: start

@@ -39,8 +39,9 @@
 package s_axi_sequencer_pkg;
 
   import axi_vip_pkg::*;
-  import adi_vip_pkg::*;
   import logger_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_sequencer_pkg::*;
 
 
   virtual class s_axi_sequencer_base extends adi_sequencer;

@@ -35,57 +35,59 @@
 
 `include "utils.svh"
 
-package adi_common_pkg;
+package adi_fifo_primitive_pkg;
 
   import logger_pkg::*;
+  import adi_object_pkg::*;
+  import adi_fifo_pkg::*;
 
-  class adi_reporter;
-    string name;
-    adi_reporter parent;
+  class adi_fifo_primitive #(type data_type = int) extends adi_fifo#(.data_type(data_type));
 
     function new(
-      input string name,
-      input adi_reporter parent = null);
+      input string name = "",
+      input int depth = 0);
 
-      this.name = name;
-      this.parent = parent;
-    endfunction
+      super.new(.name(name));
 
-    function string get_path();
-      if (this.parent == null)
-        return this.name;
-      else
-        return $sformatf("%s.%s", this.parent.get_path(), this.name);
-    endfunction: get_path
-
-    function void info(
-      input string message,
-      input adi_verbosity_t verbosity);
-
-      `INFO(("[%s] %s", this.get_path(), message), verbosity);
-    endfunction: info
-
-    function void warning(input string message);
-      `WARNING(("[%s] %s", this.get_path(), message));
-    endfunction: warning
-
-    function void error(input string message);
-      `ERROR(("[%s] %s", this.get_path(), message));
-    endfunction: error
-
-    function void fatal(input string message);
-      `FATAL(("[%s] %s", this.get_path(), message));
-    endfunction: fatal
-  endclass: adi_reporter
-
-
-  class adi_component extends adi_reporter;
-    function new(
-      input string name,
-      input adi_component parent = null);
-
-      super.new(name, parent);
+      this.depth = depth;
     endfunction: new
-  endclass: adi_component
 
-endpackage: adi_common_pkg
+    virtual function adi_object clone();
+      adi_fifo_primitive #(data_type) object;
+
+      object = new(
+        .name(this.name),
+        .depth(this.depth));
+
+      this.copy(.object(object));
+
+      return object;
+    endfunction: clone
+
+    virtual function bit do_compare(input adi_object object);
+      adi_fifo_primitive #(data_type) cast_object;
+      data_type local_storage;
+      data_type object_storage;
+
+      if ($cast(cast_object, object) == 0) begin
+        `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
+      end
+
+      for (int i=0; i<this.size(); i++) begin
+        local_storage = this.pop();
+        void'(this.push(.data(local_storage)));
+
+        object_storage = cast_object.pop();
+        void'(cast_object.push(.data(object_storage)));
+
+        if (local_storage !== object_storage) begin
+          `ERROR(("Data missmatch: %d - %d", local_storage, object_storage));
+          return 0;
+        end
+      end
+      return 1;
+    endfunction: do_compare
+
+  endclass: adi_fifo_primitive
+
+endpackage: adi_fifo_primitive_pkg

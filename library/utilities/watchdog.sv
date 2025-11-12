@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,49 +35,64 @@
 
 `include "utils.svh"
 
-package adi_vip_pkg;
+package watchdog_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_environment_pkg::*;
+  import adi_component_pkg::*;
 
-  class adi_agent extends adi_component;
+  class watchdog extends adi_component;
+
+    protected event stop_event;
+    protected bit [31:0] timer;
+    protected string message;
+
+
     function new(
       input string name,
-      input adi_environment parent = null);
+      input bit [31:0] timer,
+      input string message,
+      input adi_component parent = null);
 
       super.new(name, parent);
-    endfunction: new
-  endclass: adi_agent
 
+      this.timer = timer;
+      this.message = message;
+    endfunction
 
-  class adi_driver extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
+    function void update_message(input string message);
+      this.message = message;
+    endfunction: update_message
 
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_driver
+    function void update_timer(input bit [31:0] timer);
+      this.timer = timer;
+    endfunction: update_timer
 
+    task reset();
+      this.stop();
+      #1step;
+      this.start();
+    endtask: reset
 
-  class adi_sequencer extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
+    task stop();
+      ->>this.stop_event;
+    endtask: stop
 
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_sequencer
+    task start();
+      fork
+        begin
+          fork
+            begin
+              #(this.timer*1ns);
+              this.fatal($sformatf("Watchdog timer timed out! %s", this.message));
+            end
+            @this.stop_event;
+          join_any
+          disable fork;
+          this.info($sformatf("Watchdog timer reset."), ADI_VERBOSITY_MEDIUM);
+        end
+      join_none
+    endtask: start
 
+  endclass
 
-  class adi_monitor extends adi_component;
-    function new(
-      input string name,
-      input adi_agent parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_monitor
-
-endpackage: adi_vip_pkg
+endpackage

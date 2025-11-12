@@ -35,73 +35,58 @@
 
 `include "utils.svh"
 
-package adi_api_pkg;
+package adi_fifo_class_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import m_axi_sequencer_pkg::*;
+  import adi_object_pkg::*;
+  import adi_fifo_pkg::*;
 
-  class adi_api extends adi_component;
-
-    protected m_axi_sequencer_base bus;
-    protected bit [31:0] base_address;
-
-    // Semantic versioning
-    bit [7:0] ver_major;
-    bit [7:0] ver_minor;
-    bit [7:0] ver_patch;
+  class adi_fifo_class #(type data_type = int) extends adi_fifo#(.data_type(data_type));
 
     function new(
-      input string name,
-      input m_axi_sequencer_base bus,
-      input bit [31:0] base_address,
-      input adi_component parent = null);
+      input string name = "",
+      input int depth = 0);
 
-      super.new(name, parent);
+      super.new(.name(name));
 
-      this.bus = bus;
-      this.base_address = base_address;
+      this.depth = depth;
     endfunction: new
 
+    virtual function adi_object clone();
+      adi_fifo_class #(data_type) object;
 
-    virtual task probe();
-      bit [31:0] val;
-      this.bus.RegRead32(this.base_address + 'h0, val);
-      {ver_major, ver_minor, ver_patch} = val;
-      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
-    endtask
+      object = new(
+        .name(this.name),
+        .depth(this.depth));
 
-    task axi_read(
-      input  [31:0] addr,
-      output [31:0] data);
+      this.copy(.object(object));
 
-      this.bus.RegRead32(this.base_address + addr, data);
-    endtask: axi_read
+      return object;
+    endfunction: clone
 
-    task axi_write(
-      input [31:0] addr,
-      input [31:0] data);
+    virtual function bit do_compare(input adi_object object);
+      adi_fifo_class #(data_type) cast_object;
+      data_type local_storage;
+      data_type object_storage;
 
-      this.bus.RegWrite32(this.base_address + addr, data);
-    endtask: axi_write
+      if ($cast(cast_object, object) == 0) begin
+        `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
+      end
 
-    task axi_verify(
-      input [31:0] addr,
-      input [31:0] data);
+      for (int i=0; i<this.size(); i++) begin
+        local_storage = this.pop();
+        void'(this.push(.data(local_storage)));
 
-      this.bus.RegReadVerify32(this.base_address + addr, data);
-    endtask: axi_verify
+        object_storage = cast_object.pop();
+        void'(cast_object.push(.data(object_storage)));
 
-  endclass: adi_api
+        if (local_storage.compare(.object(object_storage)) == 0) begin
+          return 0;
+        end
+      end
+      return 1;
+    endfunction: do_compare
 
+  endclass: adi_fifo_class
 
-  class adi_regmap extends adi_component;
-    function new(
-      input string name,
-      input adi_api parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-  endclass: adi_regmap
-
-endpackage: adi_api_pkg
+endpackage: adi_fifo_class_pkg

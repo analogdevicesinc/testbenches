@@ -6,7 +6,7 @@ Publisher
 Overview
 -------------------------------------------------------------------------------
 
-This class is designed to manage a list of subscribers, has the ability to
+This class is designed to manage a list of subscribers and has the ability to
 notify subscribers with the received data. The class is parameterized with a
 ``data_type``. It is mainly used in VIP monitors, but it can also be integrated
 in other environments as well.

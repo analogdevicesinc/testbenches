@@ -38,6 +38,7 @@
 package i3c_controller_api_pkg;
 
   import logger_pkg::*;
+  import adi_component_pkg::*;
   import adi_api_pkg::*;
   import adi_regmap_i3c_controller_pkg::*;
   import adi_regmap_pkg::*;

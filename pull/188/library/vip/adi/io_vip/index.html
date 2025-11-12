@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="This IO VIP is meant to allow users to control and monitor individual pins or bus of pins synchronously and asynchronously." name="description" />
+<meta content="This IO VIP is meant to allow users to control and monitor each pin individually or group of pins, synchronously or asynchronously." name="description" />
 
     <title>IO VIP &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8e8a900e" />
@@ -174,6 +174,7 @@ Content on this topic
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../regmaps/index.html">Registermaps</a></li>
 <li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../utilities/irq_handler/index.html">IRQ Handler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../utilities/test_harness/index.html">Test Harness</a></li>
 </ul>
 </li>
@@ -214,6 +215,7 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/irq_handler/index.html">IRQ handler</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
@@ -228,6 +230,7 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad7616/index.html">AD7616</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/ad9083/index.html">AD9083</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/adrv9009/index.html">ADRV9009</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/pluto/index.html">PLUTO</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
@@ -255,14 +258,14 @@ Content on this topic
 <span id="id1"></span><h1>IO VIP<a class="headerlink" href="#io-vip" title="Link to this heading"></a></h1>
 <div><section id="hdl-component-diagram">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 516 276" width="516" class="no-background"><rect x="18" y="18" width="480" height="240" rx="18" stroke="#666" fill="none" stroke-width="3" stroke-dasharray="8 16" stroke-linecap="round"/><text style="font: 64px sans-serif" fill="#666" text-anchor="middle" dominant-baseline="middle" x="258.0" y="94.4">?</text><text style="font: 16px sans-serif" fill="#666" text-anchor="middle" dominant-baseline="middle" x="258.0" y="150.4">io_vip IP-XACT not found.</text><text style="font: 12.0px sans-serif" fill="#666" text-anchor="middle" dominant-baseline="middle" x="258.0" y="178.4">Generate it and the documentation:</text><text style="font: 12.0px monospace" fill="#666" text-anchor="middle" dominant-baseline="middle" x="258.0" y="198.4">(cd library/vip/adi/io_vip; make)</text><text style="font: 12.0px monospace" fill="#666" text-anchor="middle" dominant-baseline="middle" x="258.0" y="218.4">(cd docs; make html)</text></svg></section>
-</div><p>This IO VIP is meant to allow users to control and monitor individual pins or
-bus of pins synchronously and asynchronously.</p>
+</div><p>This IO VIP is meant to allow users to control and monitor each pin individually
+or group of pins, synchronously or asynchronously.</p>
 <section id="features">
 <h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Support Master, Slave and Passthrough modes</p></li>
 <li><p>Support runtime switching when in Passthrough mode</p></li>
-<li><p>Bus width of up to 1024</p></li>
+<li><p>Bus width of up to 1024 bits</p></li>
 <li><p>IO synchronization to a clock source</p></li>
 </ul>
 </section>

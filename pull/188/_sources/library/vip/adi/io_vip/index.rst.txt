@@ -5,15 +5,15 @@ IO VIP
 
 .. hdl-component-diagram::
 
-This IO VIP is meant to allow users to control and monitor individual pins or
-bus of pins synchronously and asynchronously.
+This IO VIP is meant to allow users to control and monitor each pin individually
+or group of pins, synchronously or asynchronously.
 
 Features
 --------------------------------------------------------------------------------
 
 * Support Master, Slave and Passthrough modes
 * Support runtime switching when in Passthrough mode
-* Bus width of up to 1024
+* Bus width of up to 1024 bits
 * IO synchronization to a clock source
 
 Files

@@ -10,3 +10,5 @@ SV_DEPS += $(ADI_TB_DIR)/library/vip/amd/axi/s_axi_sequencer.sv
 SV_DEPS += $(ADI_TB_DIR)/library/vip/amd/axi/adi_axi_monitor.sv
 SV_DEPS += $(ADI_TB_DIR)/library/vip/amd/axi/axi_definitions.svh
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/pub_sub_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/utilities/adi_fifo_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/utilities/adi_fifo_primitive_pkg.sv

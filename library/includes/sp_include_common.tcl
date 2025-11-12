@@ -39,10 +39,15 @@ source $ad_tb_dir/library/includes/sp_include_axi.tcl
 adi_sim_project_files [list \
   "$ad_tb_dir/library/utilities/utils.svh" \
   "$ad_tb_dir/library/utilities/logger_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_common_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_vip_pkg.sv" \
-  "$ad_tb_dir/library/utilities/adi_environment_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_object_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_reporter_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_component_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_environment_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_agent_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_driver_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_monitor_pkg.sv" \
+  "$ad_tb_dir/library/base_classes/adi_sequencer_pkg.sv" \
   "$ad_tb_dir/library/utilities/test_harness_env.sv" \
-  "$ad_tb_dir/library/drivers/common/watchdog.sv" \
+  "$ad_tb_dir/library/utilities/watchdog.sv" \
   "system_tb.sv" \
 ]

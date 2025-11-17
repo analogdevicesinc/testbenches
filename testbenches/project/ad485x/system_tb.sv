@@ -35,9 +35,89 @@
 
 `include "utils.svh"
 
-module system_tb();
+`timescale 1ns/1ps
 
-  `TEST_PROGRAM test();
-  test_harness `TH ();
+module system_tb();
+    generate
+
+    reg sys_200m_clk_tb = 1'b0;
+
+    always #2.5 sys_200m_clk_tb = ~sys_200m_clk_tb;
+
+    wire cnvs_tb;
+    wire busy_tb;
+
+    if (`LVDS_CMOS_N == 0) begin //cmos
+        wire scki_tb;
+        wire scko_tb;
+        wire adc_lane_0_tb;
+        wire adc_lane_1_tb;
+        wire adc_lane_2_tb;
+        wire adc_lane_3_tb;
+        wire adc_lane_4_tb;
+        wire adc_lane_5_tb;
+        wire adc_lane_6_tb;
+        wire adc_lane_7_tb;
+//porturile din test program
+        `TEST_PROGRAM test(
+            .scki_tp(scki_tb),
+            .cnvs_tp(cnvs_tb),
+            .busy_tp(busy_tb),
+            .scko_tp(scko_tb),
+            .adc_lane_0_tp(adc_lane_0_tb),
+            .adc_lane_1_tp(adc_lane_1_tb),
+            .adc_lane_2_tp(adc_lane_2_tb),
+            .adc_lane_3_tp(adc_lane_3_tb),
+            .adc_lane_4_tp(adc_lane_4_tb),
+            .adc_lane_5_tp(adc_lane_5_tb),
+            .adc_lane_6_tp(adc_lane_6_tb),
+            .adc_lane_7_tp(adc_lane_7_tb));
+ //porturile din system_bd de la tb+common cu cele de la test_program (wire declarate aici in tb)
+        test_harness `TH (
+            .cnv(cnvs_tb),
+            .busy(busy_tb),
+            .scki(scki_tb),
+            .scko(scko_tb),
+            .adc_lane_0(adc_lane_0_tb),
+            .adc_lane_1(adc_lane_1_tb),
+            .adc_lane_2(adc_lane_2_tb),
+            .adc_lane_3(adc_lane_3_tb),
+            .adc_lane_4(adc_lane_4_tb),
+            .adc_lane_5(adc_lane_5_tb),
+            .adc_lane_6(adc_lane_6_tb),
+            .adc_lane_7(adc_lane_7_tb),
+            .sys_200mhz_clk(sys_200m_clk_tb));
+    end
+    else
+    begin
+      wire scki_p_tb;
+      wire scki_n_tb;
+      wire scko_p_tb;
+      wire scko_n_tb;
+      wire sdo_p_tb;
+      wire sdo_n_tb;
+    //porturile din test program
+        `TEST_PROGRAM test(
+            .scki_p_tp(scki_p_tb),
+            .scki_n_tp(scki_n_tb),
+            .cnvs_tp(cnvs_tb),
+            .busy_tp(busy_tb),
+            .scko_p_tp(scko_p_tb),
+            .scko_n_tp(scko_n_tb),
+            .sdo_p_tp(sdo_p_tb),
+            .sdo_n_tp(sdo_n_tb));
+             //porturile din system_bd de la tb+common cu cele de la test_program (wire declarate aici in tb)
+        test_harness `TH (
+            .cnv(cnvs_tb),
+            .scki_p(scki_p_tb),
+            .scki_n(scki_n_tb),
+            .busy(busy_tb),
+            .scko_p(scko_p_tb),
+            .scko_n(scko_n_tb),
+            .sdo_p(sdo_p_tb),
+            .sdo_n(sdo_n_tb),
+            .sys_200mhz_clk(sys_200m_clk_tb));
+    end
+    endgenerate
 
 endmodule

@@ -39,48 +39,58 @@ global ad_project_params
 set LVDS_CMOS_N $ad_project_params(LVDS_CMOS_N)
 set DEVICE $ad_project_params(DEVICE)
 
-adi_project_files [list \
-    "$ad_hdl_dir/library/common/ad_iobuf.v" 
-]
+set data_width [expr {$DEVICE eq {AD4858} ? 32 : \
+                      $DEVICE eq {AD4857} ? 16 : \
+                      $DEVICE eq {AD4856} ? 32 : \
+                      $DEVICE eq {AD4855} ? 16 : \
+                      $DEVICE eq {AD4854} ? 32 : \
+                      $DEVICE eq {AD4853} ? 16 : \
+                      $DEVICE eq {AD4852} ? 32 : \
+                      $DEVICE eq {AD4851} ? 16 : 32}]
+adi_sim_add_define "PACKET_WIDTH=[format "%d" ${data_width}]"
+
+set numb_of_ch [expr {$DEVICE eq {AD4858} ? 8 : \
+                      $DEVICE eq {AD4857} ? 8 : \
+                      $DEVICE eq {AD4856} ? 8 : \
+                      $DEVICE eq {AD4855} ? 8 : \
+                      $DEVICE eq {AD4854} ? 4 : \
+                      $DEVICE eq {AD4853} ? 4 : \
+                      $DEVICE eq {AD4852} ? 4 : \
+                      $DEVICE eq {AD4851} ? 4 : 8}]
+adi_sim_add_define "NUMB_OF_CH=[format "%d" ${numb_of_ch}]"
+
+set octa_channel [expr {$numb_of_ch eq {8} ? 1 : 0}]
+adi_sim_add_define "OCTA_CHANNEL=[format "%d" ${octa_channel}]"
+
+set resolution [expr {$DEVICE eq {AD4858} ? 20 : \
+                      $DEVICE eq {AD4857} ? 16 :
+                      $DEVICE eq {AD4856} ? 20 :
+                      $DEVICE eq {AD4855} ? 16 :
+                      $DEVICE eq {AD4854} ? 20 :
+                      $DEVICE eq {AD4853} ? 16 :
+                      $DEVICE eq {AD4852} ? 20 :
+                      $DEVICE eq {AD4851} ? 16 : 20}]
+adi_sim_add_define "RESOLUTION=[format "%d" ${resolution}]"
+
+#adi_project_files [list \
+#    "$ad_hdl_dir/library/common/ad_iobuf.v" 
+#]
 
 #
 #  Block design under test
 #
 
-source $ad_hdl_dir//projects/ad485x_fmcz/common/ad485x_fmcz_bd.tcl
+source $ad_hdl_dir/projects/ad485x_fmcz/common/ad485x_fmcz_bd.tcl
 
-if {$LVDS_CMOS_N == "0"} {
-  create_bd_port -dir O scki
-  create_bd_port -dir I scko
-  create_bd_port -dir I adc_lane_0
-  create_bd_port -dir I adc_lane_1
-  create_bd_port -dir I adc_lane_2
-  create_bd_port -dir I adc_lane_3
-  create_bd_port -dir I adc_lane_4
-  create_bd_port -dir I adc_lane_5
-  create_bd_port -dir I adc_lane_6
-  create_bd_port -dir I adc_lane_7
-} else {
-  create_bd_port -dir O scki_p
-  create_bd_port -dir O scki_n
-  create_bd_port -dir I scko_p
-  create_bd_port -dir I scko_n
-  create_bd_port -dir I sdo_p
-  create_bd_port -dir I sdo_n
-}
-
-create_bd_port -dir I busy
-create_bd_port -dir O cnv
-create_bd_port -dir O lvds_cmos_n
-
-create_bd_port -dir O system_cpu_clk
+create_bd_port -dir I sys_200mhz_clk
+ad_connect sys_200m_clk sys_200mhz_clk
 
 #mai verifica acolo la Master_AXI ..
 set BA_AD485X 0x43C00000
-set_property offset $BA_AD485X[get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad485x}]
-adi_sim_add_define "AXI_AD485X_BA=[format "%d" ${BA_AD485X}]" #spi??
+set_property offset $BA_AD485X [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad485x}]
+adi_sim_add_define "AXI_AD485X_BA=[format "%d" ${BA_AD485X}]"
 
-set BA_TX_DMA 0x43E00000
+set BA_DMA 0x43E00000
 set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad485x_dma}]
 adi_sim_add_define "AD485X_DMA_BA=[format "%d" ${BA_DMA}]"
 

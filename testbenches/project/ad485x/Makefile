@@ -7,21 +7,37 @@
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
 include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
+include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
 
 # Remaining test-bench dependencies except test programs
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_adc_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_common_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_clkgen_pkg.sv
+SV_DEPS += $(TB_LIBRARY_PATH)/regmaps/adi_regmap_pwm_gen_pkg.sv
+
+LIB_DEPS += axi_ad485x
+LIB_DEPS += axi_dmac
+LIB_DEPS += axi_clkgen
+LIB_DEPS += axi_pwm_gen
+LIB_DEPS += util_pack/util_cpack2
 
 # default test program
-TP := test_program
+#TP := test_program_cmos
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl
 CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
-#$(warning $(CFG_FILES))
+$(warning $(CFG_FILES))
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
-TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(addprefix $(cfg):, $(TP)))
+#TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(addprefix $(cfg):, $(TP)))
 #TESTS += cfg1:test_program
+TESTS += cfg8_cmos:test_program_cmos
+
+# Serial interface configurations
+TESTS += cfg8_lvds:test_program_lvds
+$(warning $(TESTS))
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 

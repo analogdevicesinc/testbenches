@@ -266,6 +266,7 @@ bit   [7:0]   spi_sclk_pos_counter = 0;
 bit   [7:0]   spi_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
+bit   [31:0]  aux_counter = 32'hABCD_0000;
 
 initial begin
   forever begin
@@ -292,6 +293,7 @@ initial begin
       spi_sclk_pos_counter <= 8'b0;
     end else begin
       spi_sclk_pos_counter <= (spi_sclk_pos_counter == DATA_DLENGTH) ? 0 : spi_sclk_pos_counter+1;
+      aux_counter          <= (spi_sclk_pos_counter == DATA_DLENGTH-1) ? aux_counter + 1 : aux_counter;
     end
   end
 end
@@ -324,8 +326,10 @@ initial begin
       if (m_spi_csn_negedge_s) begin
         // NOTE: assuming queue is empty
         repeat (NUM_OF_WORDS) begin
-          sdi_preg.push_front($urandom);
-          sdi_nreg.push_front($urandom);
+          // sdi_preg.push_front($urandom);
+          // sdi_nreg.push_front($urandom);
+          sdi_preg.push_front(aux_counter);
+          sdi_nreg.push_front(aux_counter);
         end
         #1step; // prevent race condition
         sdi_shiftreg <= (CPOL ^ CPHA) ?

@@ -65,7 +65,7 @@ program test_program (
   inout [(`NUM_OF_CS - 1):0] spi_engine_spi_cs,
   inout spi_engine_spi_clk,
   `ifdef DEF_ECHO_SCLK
-    inout spi_engine_echo_sclk,
+    output reg spi_engine_echo_sclk,
   `endif
   inout [(`NUM_OF_SDI - 1):0] spi_engine_spi_sdi);
 
@@ -262,7 +262,11 @@ program test_program (
   // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
   //---------------------------------------------------------------------------
   `ifdef DEF_ECHO_SCLK
-    assign #(`ECHO_SCLK_DELAY * 1ns) spi_engine_echo_sclk = spi_engine_spi_sclk;
+    initial begin
+      forever @(spi_engine_spi_sclk) begin
+        spi_engine_echo_sclk <= #(`ECHO_SCLK_DELAY * 1ns) spi_engine_spi_sclk;
+      end
+    end
   `endif
 
   //---------------------------------------------------------------------------

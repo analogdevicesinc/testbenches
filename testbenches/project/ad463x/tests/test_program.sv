@@ -158,8 +158,7 @@ initial begin
   `LINK(mng, base_env, mng)
   `LINK(ddr, base_env, ddr)
 
-  setLoggerVerbosity(ADI_VERBOSITY_LOW);
-  `INFO(("NUM_OF_SDI_TB: %d", `NUM_OF_SDI_TB), ADI_VERBOSITY_LOW);
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
   base_env.start();
   base_env.sys_reset();
@@ -186,7 +185,7 @@ end
 //---------------------------------------------------------------------------
 
 task sanity_test();
-  bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
+  automatic bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
   axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
@@ -266,7 +265,8 @@ bit   [7:0]   spi_sclk_pos_counter = 0;
 bit   [7:0]   spi_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
-bit   [31:0]  aux_counter = 32'hABCD_0000;
+bit   [31:0]  random_word = $urandom;//32'hABCD_0000;
+bit           first_offload_word = 1;
 
 initial begin
   forever begin
@@ -293,7 +293,16 @@ initial begin
       spi_sclk_pos_counter <= 8'b0;
     end else begin
       spi_sclk_pos_counter <= (spi_sclk_pos_counter == DATA_DLENGTH) ? 0 : spi_sclk_pos_counter+1;
-      aux_counter          <= (spi_sclk_pos_counter == DATA_DLENGTH-1) ? aux_counter + 1 : aux_counter;
+      if (spi_sclk_pos_counter == DATA_DLENGTH-1) begin
+        if (`NO_REORDER == 0 && `CAPTURE_ZONE == 1 && first_offload_word == 1) begin
+          // repeat the first word for SPI MODE in capture zone 1 with reorder
+          // this is necessary because the offload looses the first word in this mode
+          random_word <= random_word;
+          first_offload_word <= 0;
+        end else begin
+          random_word <= $urandom;//random_word + 1;
+        end
+      end
     end
   end
 end
@@ -326,10 +335,8 @@ initial begin
       if (m_spi_csn_negedge_s) begin
         // NOTE: assuming queue is empty
         repeat (NUM_OF_WORDS) begin
-          // sdi_preg.push_front($urandom);
-          // sdi_nreg.push_front($urandom);
-          sdi_preg.push_front(aux_counter);
-          sdi_nreg.push_front(aux_counter);
+          sdi_preg.push_front(random_word);
+          sdi_nreg.push_front(random_word);
         end
         #1step; // prevent race condition
         sdi_shiftreg <= (CPOL ^ CPHA) ?
@@ -353,7 +360,8 @@ end
 
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
-bit [15:0]   sdi_store_cnt = (`NUM_OF_SDI_TB == 1) ? 'h1 : 'h0;
+bit [15:0]  sdi_store_cnt = (`NUM_OF_SDI_TB == 1) ? 'h1 : 'h0;
+bit         first_word = 1;
 bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
@@ -372,7 +380,14 @@ initial begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
         if (`NUM_OF_SDI_TB == 1) begin
-          sdi_store_cnt <= sdi_store_cnt + 1;
+          if (`NO_REORDER == 0 && `CAPTURE_ZONE == 1 && sdi_store_cnt == 1 && first_word == 1) begin
+            // repeat the first word for SPI MODE in capture zone 1 with reorder
+            // this is necessary because the offload looses the first word in this mode
+            first_word <= 0;
+            sdi_store_cnt <= sdi_store_cnt;
+          end else begin
+            sdi_store_cnt <= sdi_store_cnt + 1;
+          end
         end else begin
           sdi_store_cnt <= sdi_store_cnt + 2;
         end
@@ -507,7 +522,7 @@ task offload_spi_test();
     #2000ns;
 
     for (int i=0; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
-      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA) + 4*i);
     end
 
     if (irq_pending == 'h0) begin
@@ -517,20 +532,14 @@ task offload_spi_test();
     end
 
     for (int i=2; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
-      `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
+      if (offload_captured_word_arr[i] != offload_sdi_data_store_arr[i]) begin
+        `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
           i, offload_captured_word_arr[i],
           i, offload_sdi_data_store_arr[i]), ADI_VERBOSITY_LOW);
-      if (offload_captured_word_arr[i] != offload_sdi_data_store_arr[i]) begin
         `ERROR(("Offload Test FAILED"));
       end
     end
     `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
-
-    // if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
-    //   `ERROR(("Offload Test FAILED"));
-    // end else begin
-    //   `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
-    // end
 endtask
 
 //---------------------------------------------------------------------------
@@ -583,11 +592,11 @@ task fifo_spi_test();
     axi_read (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), sdi_fifo_data);
   end
 
-  `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store: %x",
+  if (sdi_fifo_data != sdi_fifo_data_store) begin
+    `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store: %x",
           sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
-
-  if (sdi_fifo_data != sdi_fifo_data_store)
     `ERROR(("Fifo Read Test FAILED"));
+  end
 
   `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
 endtask

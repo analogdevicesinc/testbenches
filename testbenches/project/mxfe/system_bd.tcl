@@ -55,7 +55,7 @@ adi_sim_add_define "DRP_CLK=drp_clk_vip"
 # Ref clk
 ad_ip_instance clk_vip ref_clk_vip [ list \
   INTERFACE_MODE {MASTER} \
-  FREQ_HZ 250000000 \
+  FREQ_HZ 100000000 \
 ]
 adi_sim_add_define "REF_CLK=ref_clk_vip"
 create_bd_port -dir O ref_clk_out
@@ -64,7 +64,7 @@ ad_connect ref_clk_out ref_clk_vip/clk_out
 # Device clk
 ad_ip_instance clk_vip device_clk_vip [ list \
   INTERFACE_MODE {MASTER} \
-  FREQ_HZ 250000000 \
+  FREQ_HZ 100000000 \
 ]
 adi_sim_add_define "DEVICE_CLK=device_clk_vip"
 create_bd_port -dir O device_clk_out

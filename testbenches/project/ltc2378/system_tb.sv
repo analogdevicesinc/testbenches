@@ -43,29 +43,32 @@ wire ltc2378_spi_sclk;
 wire ltc2378_spi_sdo;
 wire ltc2378_spi_sdi;
 wire ltc2378_spi_cs;
-wire ltc2378_spi_busy;
 wire ltc2378_spi_cnv;
 wire ltc2378_spi_clk;
 wire ltc2378_irq;
+reg ltc2378_ext_clk = 0;
 
 `TEST_PROGRAM test(
 .ltc2378_spi_clk (ltc2378_spi_clk),
 .ltc2378_irq (ltc2378_irq),
-.ltc2378_spi_sdi(ltc2378_spi_sdi),
+.ltc2378_spi_sclk (ltc2378_spi_sclk),
+.ltc2378_spi_sdi (ltc2378_spi_sdi),
+.ltc2378_spi_sdo (ltc2378_spi_sdo),
 .ltc2378_spi_cs (ltc2378_spi_cs),
-.ltc2378_spi_sclk (ltc2378_spi_sclk));
+.ltc2378_spi_cnv (ltc2378_spi_cnv));
 
 test_harness `TH (
 .ltc2378_spi_clk (ltc2378_spi_clk),
 //.irq (),
 .ltc2378_irq(ltc2378_irq),
-.ltc2378_spi_busy(ltc2378_spi_busy),
 .ltc2378_spi_cnv(ltc2378_spi_cnv),
+.ltc2378_ext_clk(ltc2378_ext_clk),
 .ltc2378_spi_sdo (ltc2378_spi_sdo),
 .ltc2378_spi_sdi (ltc2378_spi_sdi),
 .ltc2378_spi_cs (ltc2378_spi_cs),
 .ltc2378_spi_sclk (ltc2378_spi_sclk));
 
-assign ltc2378_spi_busy = ltc2378_spi_cnv;
+// Generate 100MHz external clock for PWM generator
+always #5ns ltc2378_ext_clk = ~ltc2378_ext_clk;
 
 endmodule

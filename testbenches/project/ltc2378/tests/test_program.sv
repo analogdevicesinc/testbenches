@@ -46,6 +46,7 @@ import adi_regmap_pwm_gen_pkg::*;
 import adi_regmap_spi_engine_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -100,11 +101,14 @@ program test_program (
   input ltc2378_spi_sdi,
   input ltc2378_spi_sdo,
   input ltc2378_spi_cs,
-  input ltc2378_spi_cnv,
-  output ltc2378_spi_busy
+  input ltc2378_spi_cnv
+  //output ltc2378_spi_busy  // Not used - busy simulated with PWM offset
   );
 
-test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+test_harness_env base_env;
+
+adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
 // --------------------------
 // Wrapper function for AXI read verify
@@ -113,14 +117,14 @@ task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
 
-  base_env.mng.sequencer.RegReadVerify32(raddr,vdata);
+  base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
 endtask
 
 task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
 
-  base_env.mng.sequencer.RegRead32(raddr,data);
+  base_env.mng.master_sequencer.RegRead32(raddr,data);
 endtask
 
 // --------------------------
@@ -130,7 +134,7 @@ task axi_write(
   input [31:0]  waddr,
   input [31:0]  wdata);
 
-  base_env.mng.sequencer.RegWrite32(waddr,wdata);
+  base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
 endtask
 
 // --------------------------
@@ -139,13 +143,20 @@ endtask
 initial begin
 
   //creating environment
-  base_env = new("Base Environment",
-                  `TH.`SYS_CLK.inst.IF,
-                  `TH.`DMA_CLK.inst.IF,
-                  `TH.`DDR_CLK.inst.IF,
-                  `TH.`SYS_RST.inst.IF,
-                  `TH.`MNG_AXI.inst.IF,
-                  `TH.`DDR_AXI.inst.IF);
+  base_env = new(
+    .name("Base Environment"),
+    .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+    .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+    .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+    .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+    .irq_base_address(`IRQ_C_BA),
+    .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+
+  mng = new("", `TH.`MNG_AXI.inst.IF);
+  ddr = new("", `TH.`DDR_AXI.inst.IF);
+
+  `LINK(mng, base_env, mng)
+  `LINK(ddr, base_env, ddr)
 
   setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
@@ -407,14 +418,14 @@ bit [31:0] offload_captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
 task offload_spi_test();
 
     // Configure DMA
-    base_env.mng.sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
-    base_env.mng.sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_FLAGS),
+    base_env.mng.master_sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1)); // Enable DMA
+    base_env.mng.master_sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_FLAGS),
       `SET_DMAC_FLAGS_TLAST(1) |
       `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1)
       ); // Use TLAST
-    base_env.mng.sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
-    base_env.mng.sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
-    base_env.mng.sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
+    base_env.mng.master_sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH((NUM_OF_TRANSFERS*4)-1)); // X_LENGHTH = 1024-1
+    base_env.mng.master_sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_DEST_ADDRESS), `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA));  // DEST_ADDRESS
+    base_env.mng.master_sequencer.RegWrite32(`LTC2378_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1)); // Submit transfer DMA
 
     // Configure the Offload module
     axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), INST_CFG);
@@ -432,7 +443,38 @@ task offload_spi_test();
     axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     `INFO(("Offload started"), ADI_VERBOSITY_LOW);
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+    // Monitor CNV pulses for debug
+    fork
+      begin
+        repeat(10) begin
+          @(posedge ltc2378_spi_cnv);
+          `INFO(("CNV pulse detected at time %t", $time), ADI_VERBOSITY_LOW);
+        end
+      end
+    join_none
+
+    // Also check if CNV is stuck
+    #1000;
+    if (ltc2378_spi_cnv === 1'bx || ltc2378_spi_cnv === 1'bz) begin
+      `ERROR(("CNV signal is undefined (X or Z)"));
+    end else begin
+      `INFO(("CNV signal initial state: %b", ltc2378_spi_cnv), ADI_VERBOSITY_LOW);
+    end
+
+    // Add timeout and debug output
+    fork
+      begin
+        wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+      end
+      begin
+        repeat(10) begin
+          #10000;
+          `INFO(("Offload progress: %d/%d transfers completed", offload_transfer_cnt, NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
+        end
+        `ERROR(("Offload timeout! Only %d/%d transfers completed", offload_transfer_cnt, NUM_OF_TRANSFERS));
+      end
+    join_any
+    disable fork;
 
     axi_write (`SPI_LTC2378_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     offload_status = 0;
@@ -443,7 +485,7 @@ task offload_spi_test();
 
     for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
       #1
-      offload_captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
     end
 
     if (irq_pending == 'h0) begin
@@ -466,6 +508,8 @@ endtask
 bit   [31:0]  sdi_fifo_data = 0;
 
 task fifo_spi_test();
+  bit [31:0] readback_data;
+  bit [31:0] pwm_base_addr;
 
   // Start spi clk generator
   axi_write (`LTC2378_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
@@ -473,11 +517,53 @@ task fifo_spi_test();
   `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
 );
 
-  // Config cnv
-  axi_write (`LTC2378_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`LTC2378_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('hB4)); // set PWM period (180MHz)
-  axi_write (`LTC2378_PWM_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  // Config PWM generators
+  pwm_base_addr = `LTC2378_PWM_GEN_BA;
+  $display("Configuring PWM at base address 0x%08x", pwm_base_addr);
+
+  // Reset PWM generator (keep it in reset while configuring)
+  axi_write (pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // Assert reset
+
+  // Configure PWM_0 (CNV signal) - Period = 100 (0x64) = 1µs @ 100MHz, Width = 2
+  axi_write (pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD),
+             `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // PWM0 period = 100 cycles
+  axi_write (pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH),
+             `SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH('h2)); // PWM0 width = 2 cycles
+
+  // Configure PWM_1 (Offload trigger) - Same period, with calculated offset
+  // Offset = tCONV(675ns) + TBUSYLH(13ns) + TDSDOBUSYL(5ns) - trigger_delay(80ns) = 613ns = 61 cycles
+  axi_write (pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 4,
+             `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // PWM1 period = 100 cycles
+  axi_write (pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 4,
+             `SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH('h2)); // PWM1 width = 2 cycles
+  axi_write (pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_OFFSET) + 4,
+             `SET_AXI_PWM_GEN_REG_PULSE_X_OFFSET_PULSE_X_OFFSET('h3E)); // PWM1 offset = 62 cycles (620ns)
+
+  // Load configuration (with reset still asserted)
+  axi_write (pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
+
+  // Read back to verify
+  axi_read(pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), readback_data);
+  $display("PWM0 period readback: 0x%08x", readback_data);
+  axi_read(pwm_base_addr + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 4, readback_data);
+  $display("PWM1 period readback: 0x%08x", readback_data);
+
   `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
+
+  // Add a small delay to let PWM start generating pulses
+  #1000;
+
+  // Monitor CNV signal for a bit to ensure it's pulsing
+  fork
+    begin
+      repeat(5) begin
+        @(posedge ltc2378_spi_cnv);
+        $display("CNV pulse detected during FIFO test at time %t", $time);
+      end
+    end
+  join_none
+
+  #500;
 
   // Enable SPI Engine
   axi_write (`SPI_LTC2378_REGMAP_BA  + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));

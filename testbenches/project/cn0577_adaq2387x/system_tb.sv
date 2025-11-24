@@ -49,29 +49,27 @@ module system_tb();
   wire    dco_n;
   wire    cnv;
 
-  // test bench variables
+  `TEST_PROGRAM test(
+     .ref_clk_out (ref_clk_out),
+     .clk_gate (clk_gate),
+     .dco_p (dco_p),
+     .dco_n (dco_n),
+     .da_p (da_p),
+     .da_n (da_n),
+     .db_p (db_p),
+     .db_n (db_n),
+     .cnv (cnv));
 
-    `TEST_PROGRAM test(
-       .ref_clk_out (ref_clk_out),
-       .clk_gate (clk_gate),
-       .dco_p (dco_p),
-       .dco_n (dco_n),
-       .da_p (da_p),
-       .da_n (da_n),
-       .db_p (db_p),
-       .db_n (db_n),
-       .cnv (cnv));
-
-     test_harness `TH (
-       .ref_clk_out (ref_clk_out),
-       .cnv (cnv),
-       .da_n (da_n),
-       .da_p (da_p),
-       .db_n (db_n),
-       .db_p (db_p),
-       .dco_p (dco_p),
-       .dco_n(dco_n),
-       .clk_gate (clk_gate));
+   test_harness `TH (
+     .ref_clk_out (ref_clk_out),
+     .cnv (cnv),
+     .da_n (da_n),
+     .da_p (da_p),
+     .db_n (db_n),
+     .db_p (db_p),
+     .dco_p (dco_p),
+     .dco_n(dco_n),
+     .clk_gate (clk_gate));
 
 endmodule
 

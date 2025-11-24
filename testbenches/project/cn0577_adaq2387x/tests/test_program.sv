@@ -156,8 +156,7 @@ localparam int N = (`TWOLANES == 0 && `ADC_RES == 16) ? 16 :
                    -1; // Error case
 parameter int num_of_dco = N / 2;
 
-// dco delay compared to the reference clk
-//localparam DCO_DELAY = 12;
+// dco delay compared to the reference clk, expressed in ns
 localparam DCO_DELAY = 4;
 
 // ---------------------------------------------------------------------------

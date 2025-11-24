@@ -36,10 +36,7 @@
 global ad_project_params
 
 # system level parameters
-set TWOLANES $ad_project_params(TWOLANES)
-set ADC_RES $ad_project_params(ADC_RES)
 set CN0577_ADAQ2387X_N $ad_project_params(CN0577_ADAQ2387X_N)
-set USE_MMCM $ad_project_params(USE_MMCM)
 
 #
 #  Block design under test
@@ -52,6 +49,8 @@ if {$CN0577_ADAQ2387X_N == 1} {
 }
 
 ad_ip_parameter axi_ltc2387 CONFIG.ADC_INIT_DELAY 0
+
+delete_bd_objs [get_bd_nets sys_200m_clk]
 
 ad_disconnect  sys_200m_clk  axi_ltc2387/delay_clk
 ad_connect     sys_dma_clk   axi_ltc2387/delay_clk

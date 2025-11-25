@@ -216,18 +216,18 @@ assign db_n = r_db_n;
 initial begin
   forever begin
     @(posedge dco_init, negedge dco_init) begin
-        if (`TWOLANES == 1) begin
-          r_da_p = data_shift[`ADC_RES - 1];
-          r_da_n = ~data_shift[`ADC_RES - 1];
-          r_db_p = data_shift[`ADC_RES - 2];
-          r_db_n = ~data_shift[`ADC_RES - 2];
-          data_shift = data_shift << 2;
-        end else begin
-          r_da_p = data_shift[`ADC_RES - 1];
-          r_da_n = ~data_shift[`ADC_RES - 1];
-          data_shift = data_shift << 1;
-        end
+      if (`TWOLANES == 1) begin
+        r_da_p = data_shift[`ADC_RES - 1];
+        r_da_n = ~data_shift[`ADC_RES - 1];
+        r_db_p = data_shift[`ADC_RES - 2];
+        r_db_n = ~data_shift[`ADC_RES - 2];
+        data_shift = data_shift << 2;
+      end else begin
+        r_da_p = data_shift[`ADC_RES - 1];
+        r_da_n = ~data_shift[`ADC_RES - 1];
+        data_shift = data_shift << 1;
       end
+    end
   end
 end
 
@@ -246,6 +246,7 @@ initial begin
   forever begin
     @ (posedge cnv) begin
       data_shift = data_gen;
+      data_gen = $urandom;
     end
   end
 end

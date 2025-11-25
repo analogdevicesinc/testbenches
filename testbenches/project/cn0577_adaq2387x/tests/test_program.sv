@@ -183,12 +183,12 @@ initial begin
   dco_n = 1'b1;
   forever begin
     @(posedge dco_init) begin
-    dco_p <= #DCO_DELAY  dco_init;
-    dco_n <= #DCO_DELAY  ~dco_init;
+    dco_p <= #(DCO_DELAY * 1ns) dco_init;
+    dco_n <= #(DCO_DELAY * 1ns) ~dco_init;
     end
     @(negedge dco_init) begin
-    dco_p <= #DCO_DELAY  dco_init;
-    dco_n <= #DCO_DELAY  ~dco_init;
+    dco_p <= #(DCO_DELAY * 1ns) dco_init;
+    dco_n <= #(DCO_DELAY * 1ns) ~dco_init;
     end
   end
 end
@@ -197,7 +197,7 @@ end
 // Data store
 //---------------------------------------------------------------------------
 
-reg   [`ADC_RES-1:0]  data_gen = 'h3a5a5;
+reg   [`ADC_RES-1:0]  data_gen = 'h3a5c2;
 reg   [`ADC_RES-1:0]  data_shift = 'h0;
 reg                   r_da_p;
 reg                   r_da_n;

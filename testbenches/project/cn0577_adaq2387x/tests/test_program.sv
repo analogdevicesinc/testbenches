@@ -138,7 +138,7 @@ initial begin
   transfer_cnt = 0;
   forever begin
     @(posedge cnv);
-     if (transfer_status) begin
+    if (transfer_status) begin
       transfer_cnt = transfer_cnt + 1;
     end
     @(negedge cnv);
@@ -216,17 +216,17 @@ assign db_n = r_db_n;
 initial begin
   forever begin
     @(posedge dco_init, negedge dco_init) begin
-      if (`TWOLANES == 1) begin
-        r_da_p = data_shift[`ADC_RES - 1];
-        r_da_n = ~data_shift[`ADC_RES - 1];
-        r_db_p = data_shift[`ADC_RES - 2];
-        r_db_n = ~data_shift[`ADC_RES - 2];
-        data_shift = data_shift << 2;
-      end else begin
-        r_da_p = data_shift[`ADC_RES - 1];
-        r_da_n = ~data_shift[`ADC_RES - 1];
-        data_shift = data_shift << 1;
-      end
+    if (`TWOLANES == 1) begin
+      r_da_p = data_shift[`ADC_RES - 1];
+      r_da_n = ~data_shift[`ADC_RES - 1];
+      r_db_p = data_shift[`ADC_RES - 2];
+      r_db_n = ~data_shift[`ADC_RES - 2];
+      data_shift = data_shift << 2;
+    end else begin
+      r_da_p = data_shift[`ADC_RES - 1];
+      r_da_n = ~data_shift[`ADC_RES - 1];
+      data_shift = data_shift << 1;
+    end
     end
   end
 end
@@ -244,7 +244,7 @@ end
 
 initial begin
   forever begin
-    @ (posedge cnv) begin
+    @(posedge cnv) begin
       data_shift = data_gen;
       data_gen = $urandom;
     end
@@ -290,10 +290,10 @@ end
 //---------------------------------------------------------------------------
 
 task sanity_tests();
-    //ltc2387_common_api.sanity_test();
-    dmac_api_inst.sanity_test();
-    pwm_gen_api_inst.sanity_test();
-    `INFO(("Sanity Tests Done"), ADI_VERBOSITY_LOW);
+  //ltc2387_common_api.sanity_test();
+  dmac_api_inst.sanity_test();
+  pwm_gen_api_inst.sanity_test();
+  `INFO(("Sanity Tests Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -307,144 +307,150 @@ bit [31:0] config_SIMPLE = 'h0; // channel static data setup
 
 task data_acquisition_test();
 
-    // Enable all ADC channels
-    for (int i = 0; i < 4; i=i+1) begin
-        ltc2387_adc_api.enable_channel(
-          .channel(i));
-    end
+  // Enable all ADC channels
+  for (int i = 0; i < 4; i=i+1) begin
+    ltc2387_adc_api.enable_channel(
+      .channel(i));
+  end
 
-    // Configure AXI PWM GEN
-    pwm_gen_api_inst.reset(); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  // Configure AXI PWM GEN
+  pwm_gen_api_inst.reset(); // PWM_GEN reset in regmap (ACTIVE HIGH)
 
-    pwm_gen_api_inst.pulse_period_config(
-      .channel(8'd0),
-      .period(32'd26));
+  pwm_gen_api_inst.pulse_period_config(
+    .channel(8'd0),
+    .period(32'd26));
 
-    pwm_gen_api_inst.pulse_width_config(
-      .channel(8'd0),
-      .width(32'd1));
+  pwm_gen_api_inst.pulse_width_config(
+    .channel(8'd0),
+    .width(32'd1));
 
-    pwm_gen_api_inst.pulse_period_config(
-      .channel(8'd1),
-      .period(32'd26));
+  pwm_gen_api_inst.pulse_period_config(
+    .channel(8'd1),
+    .period(32'd26));
 
-    pwm_gen_api_inst.pulse_width_config(
-      .channel(8'd1),
-      .width(num_of_dco));
+  pwm_gen_api_inst.pulse_width_config(
+    .channel(8'd1),
+    .width(num_of_dco));
 
-    pwm_gen_api_inst.pulse_offset_config(
-      .channel(8'd1),
-      .offset(32'd3));
+  pwm_gen_api_inst.pulse_offset_config(
+    .channel(8'd1),
+    .offset(32'd3));
 
-    pwm_gen_api_inst.load_config(); // load AXI_PWM_GEN configuration
-    pwm_gen_api_inst.start();
-    `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
+  pwm_gen_api_inst.load_config(); // load AXI_PWM_GEN configuration
 
-    // Configure DMA
-    dmac_api_inst.set_irq_mask(
-      .transfer_completed(1'b0),
-      .transfer_queued(1'b1));
-    dmac_api_inst.enable_dma();
-    dmac_api_inst.set_flags(
-      .cyclic(1'b0),
-      .tlast(1'b1),
-      .partial_reporting_en(1'b1));
-    dmac_api_inst.set_lengths(
-      .xfer_length_x((NUM_OF_TRANSFERS*4)-1),
-      .xfer_length_y(32'h0));
-    dmac_api_inst.set_dest_addr(`DDR_BA);
+  pwm_gen_api_inst.start();
+  `INFO(("AXI_PWM_GEN started"), ADI_VERBOSITY_LOW);
 
-    // Configure AXI_LTC2387
-    ltc2387_adc_api.reset(
-      .ce_n(0),
-      .mmcm_rstn(0),
-      .rstn(0));
+  // Configure DMA
+  dmac_api_inst.set_irq_mask(
+    .transfer_completed(1'b0),
+    .transfer_queued(1'b1));
 
-    #5000ns;
+  dmac_api_inst.enable_dma();
 
-    ltc2387_adc_api.reset(
-      .ce_n(0),
-      .mmcm_rstn(1),
-      .rstn(1));
+  dmac_api_inst.set_flags(
+    .cyclic(1'b0),
+    .tlast(1'b1),
+    .partial_reporting_en(1'b1));
 
-    @(posedge cnv)
-    #200ns;
+  dmac_api_inst.set_lengths(
+    .xfer_length_x((NUM_OF_TRANSFERS*4)-1),
+    .xfer_length_y(32'h0));
 
-    transfer_status = 1;
+  dmac_api_inst.set_dest_addr(`DDR_BA);
 
-    dmac_api_inst.transfer_start();
+  // Configure AXI_LTC2387
+  ltc2387_adc_api.reset(
+    .ce_n(0),
+    .mmcm_rstn(0),
+    .rstn(0));
 
-    wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
+  #5000ns;
 
-    #100ns;
-    @(negedge cnv);
-    @(posedge ref_clk_out);
-    transfer_status = 0;
+  ltc2387_adc_api.reset(
+    .ce_n(0),
+    .mmcm_rstn(1),
+    .rstn(1));
 
-    //@(posedge system_tb.test_harness.axi_ltc2387_dma.irq);
+  @(posedge cnv)
+  #200ns;
 
-    // Clear interrupt
-    dmac_api_inst.clear_irq_pending(
-      .transfer_completed(1'b1),
-      .transfer_queued(1'b0));
+  transfer_status = 1;
 
-    // Stop pwm gen
-    pwm_gen_api_inst.reset();
-    `INFO(("AXI_PWM_GEN stopped"), ADI_VERBOSITY_LOW);
+  dmac_api_inst.transfer_start();
 
-    // Configure axi_ltc2387
-    ltc2387_adc_api.reset(
-      .ce_n(1'b0),
-      .mmcm_rstn(1'b1),
-      .rstn(1'b1)); // bring out of reset
+  wait(transfer_cnt == 2 * NUM_OF_TRANSFERS );
 
-    ltc2387_adc_api.set_adc_config_wr(
-      .cfg(32'h00002181)); // set static data setup in device's reg 0x21
+  #100ns;
+  @(negedge cnv);
+  @(posedge ref_clk_out);
+  transfer_status = 0;
 
-    ltc2387_adc_api.get_adc_config_wr(
-      .cfg(config_SIMPLE)); // read last config result
-    `INFO(("Config_SIMPLE is set up, ADC_CONFIG_WR contains 0x%h",config_SIMPLE), ADI_VERBOSITY_LOW);
+  //@(posedge system_tb.test_harness.axi_ltc2387_dma.irq);
 
-    ltc2387_adc_api.set_adc_config_control(
-      .cfg(32'h00000001)); // send WR request
+  // Clear interrupt
+  dmac_api_inst.clear_irq_pending(
+    .transfer_completed(1'b1),
+    .transfer_queued(1'b0));
 
-    ltc2387_adc_api.set_adc_config_control(
-      .cfg(config_wr_SIMPLE)); // read last config result
-    `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
+  // Stop pwm gen
+  pwm_gen_api_inst.reset();
+  `INFO(("AXI_PWM_GEN stopped"), ADI_VERBOSITY_LOW);
 
-    ltc2387_adc_api.set_adc_config_control(
-      .cfg(32'h00000000)); // set default control value (no rd/wr request)
+  // Configure axi_ltc2387
+  ltc2387_adc_api.reset(
+    .ce_n(1'b0),
+    .mmcm_rstn(1'b1),
+    .rstn(1'b1)); // bring out of reset
 
-    ltc2387_adc_api.set_adc_config_control(
-      .cfg(config_wr_SIMPLE)); // read last config result
-    `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
+  ltc2387_adc_api.set_adc_config_wr(
+    .cfg(32'h00002181)); // set static data setup in device's reg 0x21
 
-    ltc2387_adc_api.set_adc_config_wr(
-      .cfg(32'h00000000)); // set exit from register mode sequence
+  ltc2387_adc_api.get_adc_config_wr(
+    .cfg(config_SIMPLE)); // read last config result
+  `INFO(("Config_SIMPLE is set up, ADC_CONFIG_WR contains 0x%h",config_SIMPLE), ADI_VERBOSITY_LOW);
 
-    ltc2387_adc_api.set_adc_config_control(
-      .cfg(32'h00000001)); // send WR request
+  ltc2387_adc_api.set_adc_config_control(
+    .cfg(32'h00000001)); // send WR request
 
-    ltc2387_adc_api.set_adc_config_control(
-      .cfg(32'h00000000)); // set default control value (no rd/wr request)
+  ltc2387_adc_api.set_adc_config_control(
+    .cfg(config_wr_SIMPLE)); // read last config result
+  `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
 
-    //set HDL config mode
-    ltc2387_adc_api.set_common_control_3(
-      .crc_en(0),
-      .custom_control('h100)); // set default
+  ltc2387_adc_api.set_adc_config_control(
+    .cfg(32'h00000000)); // set default control value (no rd/wr request)
 
-    #2000ns;
-    for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
-      captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
-    end
+  ltc2387_adc_api.set_adc_config_control(
+    .cfg(config_wr_SIMPLE)); // read last config result
+  `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
 
-    `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
+  ltc2387_adc_api.set_adc_config_wr(
+    .cfg(32'h00000000)); // set exit from register mode sequence
 
-    if (captured_word_arr != dma_data_store_arr) begin
-      `ERROR(("Data Acquisition Test FAILED"));
-    end else begin
-      `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_LOW);
-    end
+  ltc2387_adc_api.set_adc_config_control(
+    .cfg(32'h00000001)); // send WR request
+
+  ltc2387_adc_api.set_adc_config_control(
+    .cfg(32'h00000000)); // set default control value (no rd/wr request)
+
+  //set HDL config mode
+  ltc2387_adc_api.set_common_control_3(
+    .crc_en(0),
+    .custom_control('h100)); // set default
+
+   #2000ns;
+
+  for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
+    captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+  end
+
+  `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);
+
+  if (captured_word_arr != dma_data_store_arr) begin
+    `ERROR(("Data Acquisition Test FAILED"));
+  end else begin
+    `INFO(("Data Acquisition Test PASSED"), ADI_VERBOSITY_LOW);
+  end
 
 endtask
 

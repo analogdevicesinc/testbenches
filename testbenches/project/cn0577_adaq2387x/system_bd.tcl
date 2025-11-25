@@ -50,13 +50,11 @@ if {$CN0577_ADAQ2387X_N == 1} {
 
 ad_ip_parameter axi_ltc2387 CONFIG.ADC_INIT_DELAY 0
 
-delete_bd_objs [get_bd_nets sys_200m_clk]
-
 ad_disconnect  sys_200m_clk  axi_ltc2387/delay_clk
 ad_connect     sys_dma_clk   axi_ltc2387/delay_clk
 
 delete_bd_objs [get_bd_nets ref_clk_1]
-
+delete_bd_objs [get_bd_nets sys_200m_clk]
 
 if {$CN0577_ADAQ2387X_N == 1} {
   # 120MHz ref_clk for cn0577

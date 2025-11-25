@@ -77,33 +77,34 @@ common_api ltc2387_common_api;
 initial begin
 
   //creating environment
-  base_env = new("Base Environment",
-                  `TH.`SYS_CLK.inst.IF,
-                  `TH.`DMA_CLK.inst.IF,
-                  `TH.`DDR_CLK.inst.IF,
-                  `TH.`SYS_RST.inst.IF,
-                  `TH.`MNG_AXI.inst.IF,
-                  `TH.`DDR_AXI.inst.IF);
+  base_env = new(
+    .name("Base Environment"),
+    .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+    .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+    .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+    .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+    .mng_vip_if(`TH.`MNG_AXI.inst.IF),
+    .ddr_vip_if(`TH.`DDR_AXI.inst.IF));
 
   dmac_api_inst = new(
-      "CN0577 DMAC API",
-      base_env.mng.sequencer,
-      `AXI_LTC2387_DMA_BA);
+    .name("CN0577 DMAC API"),
+    .bus(base_env.mng.sequencer),
+    .base_address(`AXI_LTC2387_DMA_BA));
 
   pwm_gen_api_inst = new(
-      "CN0577 AXI PWM GEN API",
-      base_env.mng.sequencer,
-      `AXI_PWM_GEN_BA);
+    .name("CN0577 AXI PWM GEN API"),
+    .bus(base_env.mng.sequencer),
+    .base_address(`AXI_PWM_GEN_BA));
 
   ltc2387_adc_api = new(
-      "LTC2387 ADC Common API",
-      base_env.mng.sequencer,
-      `AXI_LTC2387_BA);
+    .name("LTC2387 ADC Common API"),
+    .bus(base_env.mng.sequencer),
+    .base_address(`AXI_LTC2387_BA));
 
   ltc2387_common_api = new(
-      "LTC2387 Common API",
-      base_env.mng.sequencer,
-      `AXI_LTC2387_BA);
+    .name("LTC2387 Common API)",
+    .bus(base_env.mng.sequencer),
+    .base_address(`AXI_LTC2387_BA));
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 

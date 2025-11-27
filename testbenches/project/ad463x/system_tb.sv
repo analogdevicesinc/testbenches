@@ -44,7 +44,7 @@ module system_tb();
   wire ad463x_spi_cs;
   wire ad463x_spi_sclk;
   wire ad463x_spi_clk;
-  wire [`NUM_OF_SDI-1:0] ad463x_spi_sdi;
+  wire [`NUM_OF_SDI_TB-1:0] ad463x_spi_sdi;
   wire ad463x_spi_sdo;
   wire ad463x_irq;
 
@@ -60,6 +60,7 @@ module system_tb();
     .ad463x_busy(ad463x_busy),
     .ad463x_irq(ad463x_irq),
     .ad463x_cnv(ad463x_cnv),
+    .ad463x_trigger(1'b0),
     .ad463x_echo_sclk(ad463x_echo_sclk),
     .ad463x_ext_clk(ad463x_ext_clk),
     .ad463x_spi_cs(ad463x_spi_cs),

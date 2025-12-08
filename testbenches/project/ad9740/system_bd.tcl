@@ -45,17 +45,22 @@ adi_project_files [list \
 #  Block design under test
 #
 
+# Extract DEVICE from ad_project_params and set as standalone variable
+# This is required because ad9740_fmc_bd.tcl checks [info exists DEVICE]
+if {[info exists ad_project_params(DEVICE)]} {
+  set DEVICE $ad_project_params(DEVICE)
+  puts "system_bd.tcl: Setting DEVICE=$DEVICE from ad_project_params"
+} else {
+  set DEVICE "AD9744"
+  puts "system_bd.tcl: DEVICE not in ad_project_params, defaulting to AD9744"
+}
+
 source $ad_hdl_dir//projects/ad9740_fmc/common/ad9740_fmc_bd.tcl
 
 # Add test-specific VIPs
 
-# Last tasks
-
-set BA_TX_DMA 0x44A40000
-set_property offset $BA_TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad9740_dma}]
-adi_sim_add_define "SPI_ENGINE_TX_DMA_BA=[format "%d" ${BA_TX_DMA}]"
-
-set BA_CLKGEN 0x44B10000
-set_property offset $BA_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ad9740_clkgen}]
-adi_sim_add_define "SPI_ENGINE_AXI_CLKGEN_BA=[format "%d" ${BA_CLKGEN}]"
+# Base address defines for test program
+# Address segments are created by ad9740_fmc_bd.tcl as SEG_data_ad974x_*
+adi_sim_add_define "AD974X_DMA_BA=0x44A40000"
+adi_sim_add_define "AD974X_DAC_BA=0x44A70000"
 

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv_3606115097 " />
+            <top_module name="adc_api_pkg" />
+            <top_module name="adi_api_pkg" />
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_common_pkg" />
+            <top_module name="adi_environment_pkg" />
+            <top_module name="adi_regmap_adc_pkg" />
+            <top_module name="adi_regmap_common_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_vip_pkg" />
+            <top_module name="attributes" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="dma_trans_pkg" />
+            <top_module name="dmac_api_pkg" />
+            <top_module name="glbl" />
+            <top_module name="io_vip_if_base_pkg" />
+            <top_module name="ipif_pkg" />
+            <top_module name="irq_handler_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="math_real" />
+            <top_module name="numeric_std" />
+            <top_module name="pub_sub_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="standard" />
+            <top_module name="std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_misc" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+            <top_module name="vip_agent_typedef_pkg" />
+            <top_module name="vital_primitives" />
+            <top_module name="vital_timing" />
+            <top_module name="vpkg" />
+            <top_module name="watchdog_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="15.305001 us"></ZoomEndTime>
+      <Cursor1Time time="7.710916 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="244"></NameColumnWidth>
+      <ValueColumnWidth column_width="76"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="16" />
+   <wvobject type="logic" fp_name="/system_tb/sync_n">
+      <obj_property name="ElementShortName">sync_n</obj_property>
+      <obj_property name="ObjectShortName">sync_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/dco_p">
+      <obj_property name="ElementShortName">dco_p</obj_property>
+      <obj_property name="ObjectShortName">dco_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/dco_n">
+      <obj_property name="ElementShortName">dco_n</obj_property>
+      <obj_property name="ObjectShortName">dco_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/da_p">
+      <obj_property name="ElementShortName">da_p</obj_property>
+      <obj_property name="ObjectShortName">da_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/da_n">
+      <obj_property name="ElementShortName">da_n</obj_property>
+      <obj_property name="ObjectShortName">da_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/db_p">
+      <obj_property name="ElementShortName">db_p</obj_property>
+      <obj_property name="ObjectShortName">db_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/db_n">
+      <obj_property name="ElementShortName">db_n</obj_property>
+      <obj_property name="ObjectShortName">db_n</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data">
+      <obj_property name="ElementShortName">serdes_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data_d">
+      <obj_property name="ElementShortName">serdes_data_d[15:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_data_d[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_frame">
+      <obj_property name="ElementShortName">serdes_frame[7:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_frame[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_frame_d">
+      <obj_property name="ElementShortName">serdes_frame_d[7:0]</obj_property>
+      <obj_property name="ObjectShortName">serdes_frame_d[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/adc_data_shifted">
+      <obj_property name="ElementShortName">adc_data_shifted[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_shifted[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/frame_shifted">
+      <obj_property name="ElementShortName">frame_shifted[7:0]</obj_property>
+      <obj_property name="ObjectShortName">frame_shifted[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/shift_cnt">
+      <obj_property name="ElementShortName">shift_cnt[2:0]</obj_property>
+      <obj_property name="ObjectShortName">shift_cnt[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/state">
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/adc_data">
+      <obj_property name="ElementShortName">adc_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+</wave_config>

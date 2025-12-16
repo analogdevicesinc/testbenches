@@ -95,8 +95,8 @@ module system_tb();
 
   // Connect test harness (block design) - outputs internal 14-bit bus
   test_harness `TH (
-    .ad974x_clk  (ad974x_clk),
-    .ad974x_data (ad974x_data_int)
+    .ad9740_clk  (ad974x_clk),
+    .ad9740_data (ad974x_data_int)
   );
 
 endmodule

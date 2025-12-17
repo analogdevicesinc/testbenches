@@ -8,9 +8,16 @@
 include ../../../scripts/make_tb_path.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_converter.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_tdd.mk
+
+# Remaining test-bench dependencies except test programs
+SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_tdd_gen_pkg.sv
 
 LIB_DEPS += axi_ada4355
 LIB_DEPS += axi_dmac
+LIB_DEPS += axi_tdd
+LIB_DEPS += axi_sysid
+LIB_DEPS += sysid_rom
 
 # default test programs
 # Format is: <test name>

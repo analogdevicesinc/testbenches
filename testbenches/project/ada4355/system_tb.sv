@@ -37,38 +37,198 @@
 
 `include "utils.svh"
 
-module system_tb ();
+module system_tb();
 
-  wire dco_p;
-  wire dco_n;
-  wire da_p;
-  wire da_n;
-  wire db_p;
-  wire db_n;
-  wire sync_n;
-  wire frame_p;
-  wire frame_n;
+  localparam DCO_HALF_PERIOD = 1; // Period 2 ns -> 500 MHz DCO
+  localparam FRAME_HALF_PERIOD = 4; // Period 8 ns -> 125 MHz Frame
+  localparam BITS_PER_CYCLE = 2 * 2;
+  localparam LATENCY = 3;
 
-  `TEST_PROGRAM test (
-    .dco_p(dco_p),
-    .dco_n(dco_n),
-    .da_p(da_p),
-    .da_n(da_n),
-    .db_p(db_p),
-    .db_n(db_n),
-    .sync_n(sync_n),
-    .frame_p(frame_p),
-    .frame_n(frame_n));
+  // FRAME_SHIFT_CNT: Simulates starting SERDES capture at wrong position in frame pattern
+  // Frame and data arrive together (same timing), but SERDES captures at wrong phase
+  // FSM must detect misalignment and correct via shift_cnt register
+  localparam FRAME_SHIFT_CNT = `FRAME_SHIFT_CNT;
+  localparam FRAME_DELAY = FRAME_HALF_PERIOD + (8 - FRAME_SHIFT_CNT) * DCO_HALF_PERIOD
+                           + ((FRAME_SHIFT_CNT % 2) * DCO_HALF_PERIOD);
+  localparam DATA_DELAY = FRAME_DELAY;
+
+  reg sync_n = 1'b0;
+  reg ssi_clk = 1'b0;
+  reg frame_clk = 1'b1;  // Start HIGH for 0xF0 pattern
+  reg div_clock = 1'b0;
+  reg enable_pattern = 1'b0;
+  reg tdd_ext_sync = 1'b0;  // TDD external sync input (controlled from test_program)
+  reg dco_p = 1'b0;
+  reg dco_n = 1'b1;
+  reg frame_clock_p = 1'b0;
+  reg frame_clock_n = 1'b0;
+  reg late_signal_p = 1'b0;
+  reg late_signal_n = 1'b0;
+
+  `TEST_PROGRAM test();
 
   test_harness `TH (
-    .dco_p(dco_p),
-    .dco_n(dco_n),
-    .d0a_p(da_p),
-    .d0a_n(da_n),
-    .d1a_p(db_p),
-    .d1a_n(db_n),
-    .sync_n(sync_n),
-    .frame_p(frame_p),
-    .frame_n(frame_n));
+
+    .dco_p (dco_p),
+    .dco_n (dco_n),
+    .d0a_p (da_p),
+    .d0a_n (da_n),
+    .d1a_p (db_p),
+    .d1a_n (db_n),
+    .sync_n (sync_n),
+    .frame_p (frame_clock_p),
+    .frame_n (frame_clock_n),
+    .tdd_ext_sync (tdd_ext_sync)
+  );
+
+  reg sync_n_d = 1'b0;
+  // Add some transport delay to simulate PCB and clock chip propagation delay
+  always @(*) sync_n_d <=  #25 sync_n;
+
+  // Add transport delay to the DCO clock to simulate longer internal delay of
+  // the clock path inside the FPGA
+  always @(*) dco_p <=  #3 ssi_clk;
+  always @(*) dco_n <=  #3 ~ssi_clk;
+
+  always @(*) frame_clock_p <= #3.5 frame_clk;
+  always @(*) frame_clock_n <= #3.5 ~frame_clk;
+
+  // Edge counter for frame derivation
+  reg [2:0] ssi_edge_cnt = 3'd0;
+  reg frame_sync_active = 1'b0;
+
+  // SSI clock generator (500 MHz) - derives frame clock to prevent drift
+  initial begin
+    #1;
+    @(posedge sync_n_d);
+    $display("[TB] FRAME_SHIFT_CNT=%0d, FRAME_DELAY=%0d ns", FRAME_SHIFT_CNT, FRAME_DELAY);
+
+    // Initial delay to set frame/data phase offset
+    repeat(FRAME_DELAY + FRAME_HALF_PERIOD) begin
+      #DCO_HALF_PERIOD;
+      ssi_clk = ~ssi_clk;
+    end
+
+    // Toggle frame and start synchronized generation
+    frame_clk = ~frame_clk;
+    ssi_edge_cnt = 3'd0;
+
+    forever begin
+      #DCO_HALF_PERIOD;
+      ssi_clk = ~ssi_clk;
+
+      // Derive frame from SSI: toggle every 4 edges
+      if (ssi_edge_cnt == 3'd3) begin
+        ssi_edge_cnt = 3'd0;
+        #0; // Delta delay
+        frame_clk = ~frame_clk;
+      end else begin
+        ssi_edge_cnt = ssi_edge_cnt + 1;
+      end
+    end
+  end
+
+  initial begin
+    #1;
+    @(posedge sync_n_d);
+    while (sync_n_d) begin
+      div_clock <= ~div_clock;
+      #FRAME_HALF_PERIOD;
+    end
+  end
+
+  always @(*) late_signal_p <= #3 div_clock;
+  always @(*) late_signal_n <= #3 ~div_clock;
+
+  reg [15:0] sample = 16'h1234;
+  reg da_p_int = 1'b0;
+  reg db_p_int = 1'b0;
+  reg da_p = 1'b0;
+  reg da_n = 1'b1;
+  reg db_p = 1'b0;
+  reg db_n = 1'b1;
+
+  // Sine wave generation parameters
+  localparam real PI = 3.14159265358979;
+  localparam SINE_AMPLITUDE = 8191;   // Full 14-bit scale
+  localparam SINE_OFFSET = 8192;      // Mid-scale for 14-bit (2^13)
+  localparam SINE_PERIOD = 64;        // Samples per sine period
+
+  // Function to calculate sine sample value
+  function [15:0] calc_sine_sample;
+    input [31:0] idx;
+    real angle;
+    real sine_val;
+    integer result;
+    begin
+      angle = 2.0 * PI * $itor(idx) / $itor(SINE_PERIOD);
+      sine_val = $sin(angle);
+      result = SINE_OFFSET + $rtoi(sine_val * $itor(SINE_AMPLITUDE));
+      if (result < 0) result = 0;
+      if (result > 16383) result = 16383;
+      calc_sine_sample = result[15:0];
+    end
+  endfunction
+
+  // Using 3.5ns same as frame
+  // This centers data transitions between DCO edges for better setup/hold margins
+  always @(*) da_p <= #3.5 da_p_int;
+  always @(*) da_n <= #3.5 ~da_p_int;
+  always @(*) db_p <= #3.5 db_p_int;
+  always @(*) db_n <= #3.5 ~db_p_int;
+
+  reg [31:0] sample_count = 0;
+
+  initial begin
+    @(posedge sync_n_d);
+
+    sample = calc_sine_sample(0);
+
+    $display("[TB] @%0t: Starting sine wave data generation", $time);
+    $display("[TB] FRAME_SHIFT_CNT=%0d, DATA_DELAY=%0d ns", FRAME_SHIFT_CNT, DATA_DELAY);
+
+    #DATA_DELAY;
+
+    da_p_int <= sample[14];
+    db_p_int <= sample[15];
+
+    forever begin
+      @(posedge ssi_clk);
+      da_p_int <= sample[12];
+      db_p_int <= sample[13];
+
+      @(negedge ssi_clk);
+      da_p_int <= sample[10];
+      db_p_int <= sample[11];
+
+      @(posedge ssi_clk);
+      da_p_int <= sample[8];
+      db_p_int <= sample[9];
+
+      @(negedge ssi_clk);
+      da_p_int <= sample[6];
+      db_p_int <= sample[7];
+
+      @(posedge ssi_clk);
+      da_p_int <= sample[4];
+      db_p_int <= sample[5];
+
+      @(negedge ssi_clk);
+      da_p_int <= sample[2];
+      db_p_int <= sample[3];
+
+      @(posedge ssi_clk);
+      da_p_int <= sample[0];
+      db_p_int <= sample[1];
+
+      @(negedge ssi_clk);
+      sample_count <= sample_count + 1;
+
+      da_p_int <= sample[14];
+      db_p_int <= sample[15];
+
+      sample <= calc_sine_sample(sample_count + 1);
+    end
+  end
 
 endmodule

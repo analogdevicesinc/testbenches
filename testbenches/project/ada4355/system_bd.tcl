@@ -50,6 +50,10 @@ set BA_ADA4355_DMA 0x44A30000
 set_property offset $BA_ADA4355_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ada4355_dma}]
 adi_sim_add_define "ADA4355_DMA_BA=[format "%d" ${BA_ADA4355_DMA}]"
 
+set BA_AXI_TDD 0x44A40000
+set_property offset $BA_AXI_TDD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_tdd_0}]
+adi_sim_add_define "AXI_TDD_BA=[format "%d" ${BA_AXI_TDD}]"
+
 set BA_DDR 0x80000000
 set_property offset $BA_DDR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_mng_ddr_cntlr}]
 adi_sim_add_define "DDR_BA=[format "%d" ${BA_DDR}]"

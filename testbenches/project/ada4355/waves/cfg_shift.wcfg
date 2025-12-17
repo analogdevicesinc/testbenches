@@ -5,7 +5,6 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
-            <top_module name="\$unit_logger_pkg_sv_3606115097 " />
             <top_module name="adc_api_pkg" />
             <top_module name="adi_api_pkg" />
             <top_module name="adi_axi_agent_pkg" />
@@ -18,8 +17,9 @@
             <top_module name="adi_regmap_pkg" />
             <top_module name="adi_vip_pkg" />
             <top_module name="attributes" />
-            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_tdd_pkg" />
             <top_module name="axi_vip_pkg" />
+            <top_module name="common_api_pkg" />
             <top_module name="dma_trans_pkg" />
             <top_module name="dmac_api_pkg" />
             <top_module name="glbl" />
@@ -39,9 +39,7 @@
             <top_module name="std_logic_misc" />
             <top_module name="std_logic_unsigned" />
             <top_module name="system_tb" />
-            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
             <top_module name="test_harness_env_pkg" />
-            <top_module name="test_harness_mng_axi_vip_0_pkg" />
             <top_module name="textio" />
             <top_module name="vcomponents" />
             <top_module name="vip_agent_typedef_pkg" />
@@ -54,18 +52,30 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="15.305001 us"></ZoomEndTime>
-      <Cursor1Time time="7.710916 us"></Cursor1Time>
+      <ZoomStartTime time="3.045000 us"></ZoomStartTime>
+      <ZoomEndTime time="18.295001 us"></ZoomEndTime>
+      <Cursor1Time time="37.795000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="244"></NameColumnWidth>
-      <ValueColumnWidth column_width="76"></ValueColumnWidth>
+      <NameColumnWidth column_width="398"></NameColumnWidth>
+      <ValueColumnWidth column_width="103"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="16" />
-   <wvobject type="logic" fp_name="/system_tb/sync_n">
-      <obj_property name="ElementShortName">sync_n</obj_property>
-      <obj_property name="ObjectShortName">sync_n</obj_property>
+   <WVObjectSize size="81" />
+   <wvobject type="logic" fp_name="/system_tb/ssi_clk">
+      <obj_property name="ElementShortName">ssi_clk</obj_property>
+      <obj_property name="ObjectShortName">ssi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/frame_clk">
+      <obj_property name="ElementShortName">frame_clk</obj_property>
+      <obj_property name="ObjectShortName">frame_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/div_clock">
+      <obj_property name="ElementShortName">div_clock</obj_property>
+      <obj_property name="ObjectShortName">div_clock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/enable_pattern">
+      <obj_property name="ElementShortName">enable_pattern</obj_property>
+      <obj_property name="ObjectShortName">enable_pattern</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/dco_p">
       <obj_property name="ElementShortName">dco_p</obj_property>
@@ -74,6 +84,46 @@
    <wvobject type="logic" fp_name="/system_tb/dco_n">
       <obj_property name="ElementShortName">dco_n</obj_property>
       <obj_property name="ObjectShortName">dco_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/frame_clock_p">
+      <obj_property name="ElementShortName">frame_clock_p</obj_property>
+      <obj_property name="ObjectShortName">frame_clock_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/frame_clock_n">
+      <obj_property name="ElementShortName">frame_clock_n</obj_property>
+      <obj_property name="ObjectShortName">frame_clock_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/late_signal_p">
+      <obj_property name="ElementShortName">late_signal_p</obj_property>
+      <obj_property name="ObjectShortName">late_signal_p</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/late_signal_n">
+      <obj_property name="ElementShortName">late_signal_n</obj_property>
+      <obj_property name="ObjectShortName">late_signal_n</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/sync_n_d">
+      <obj_property name="ElementShortName">sync_n_d</obj_property>
+      <obj_property name="ObjectShortName">sync_n_d</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/ssi_edge_cnt">
+      <obj_property name="ElementShortName">ssi_edge_cnt[2:0]</obj_property>
+      <obj_property name="ObjectShortName">ssi_edge_cnt[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/frame_sync_active">
+      <obj_property name="ElementShortName">frame_sync_active</obj_property>
+      <obj_property name="ObjectShortName">frame_sync_active</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/sample">
+      <obj_property name="ElementShortName">sample[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sample[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/da_p_int">
+      <obj_property name="ElementShortName">da_p_int</obj_property>
+      <obj_property name="ObjectShortName">da_p_int</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/db_p_int">
+      <obj_property name="ElementShortName">db_p_int</obj_property>
+      <obj_property name="ObjectShortName">db_p_int</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/da_p">
       <obj_property name="ElementShortName">da_p</obj_property>
@@ -91,6 +141,10 @@
       <obj_property name="ElementShortName">db_n</obj_property>
       <obj_property name="ObjectShortName">db_n</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/system_tb/sample_count">
+      <obj_property name="ElementShortName">sample_count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sample_count[31:0]</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_data">
       <obj_property name="ElementShortName">serdes_data[15:0]</obj_property>
       <obj_property name="ObjectShortName">serdes_data[15:0]</obj_property>
@@ -106,6 +160,10 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/serdes_frame_d">
       <obj_property name="ElementShortName">serdes_frame_d[7:0]</obj_property>
       <obj_property name="ObjectShortName">serdes_frame_d[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/sync_n">
+      <obj_property name="ElementShortName">sync_n</obj_property>
+      <obj_property name="ObjectShortName">sync_n</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/inst/i_ada4355_interface/adc_data_shifted">
       <obj_property name="ElementShortName">adc_data_shifted[15:0]</obj_property>
@@ -128,5 +186,205 @@
       <obj_property name="ObjectShortName">adc_data[15:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
       <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_0">
+      <obj_property name="ElementShortName">tdd_channel_0[0:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_channel_0[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_1">
+      <obj_property name="ElementShortName">tdd_channel_1[0:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_channel_1[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_channel_2">
+      <obj_property name="ElementShortName">tdd_channel_2[0:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_channel_2[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/sync_in">
+      <obj_property name="ElementShortName">sync_in</obj_property>
+      <obj_property name="ObjectShortName">sync_in</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/sync_out">
+      <obj_property name="ElementShortName">sync_out</obj_property>
+      <obj_property name="ObjectShortName">sync_out</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/resetn">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/s_axi_aclk">
+      <obj_property name="ElementShortName">s_axi_aclk</obj_property>
+      <obj_property name="ObjectShortName">s_axi_aclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/s_axi_aresetn">
+      <obj_property name="ElementShortName">s_axi_aresetn</obj_property>
+      <obj_property name="ObjectShortName">s_axi_aresetn</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ddr_axi_vip/inst/IF/WDATA">
+      <obj_property name="ElementShortName">WDATA[511:0]</obj_property>
+      <obj_property name="ObjectShortName">WDATA[511:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ddr_axi_vip/inst/IF/WVALID">
+      <obj_property name="ElementShortName">WVALID</obj_property>
+      <obj_property name="ObjectShortName">WVALID</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/ddr_axi_vip/inst/IF/WREADY">
+      <obj_property name="ElementShortName">WREADY</obj_property>
+      <obj_property name="ObjectShortName">WREADY</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/ddr_axi_vip/inst/IF/ARADDR">
+      <obj_property name="ElementShortName">ARADDR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ARADDR[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_dma/sync">
+      <obj_property name="ElementShortName">sync</obj_property>
+      <obj_property name="ObjectShortName">sync</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_dma/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_dma/fifo_wr_din">
+      <obj_property name="ElementShortName">fifo_wr_din[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_din[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_counter">
+      <obj_property name="ElementShortName">tdd_counter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_counter[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#D2691E</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_cstate">
+      <obj_property name="ElementShortName">tdd_cstate[1:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_cstate[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider107" type="divider">
+      <obj_property name="label">CH0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /tdd_ch_en">
+      <obj_property name="ElementShortName">tdd_ch_en</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /tdd_ch_set">
+      <obj_property name="ElementShortName">tdd_ch_set</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_set</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /tdd_ch_rst">
+      <obj_property name="ElementShortName">tdd_ch_rst</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /asy_t_high">
+      <obj_property name="ElementShortName">asy_t_high[31:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_t_high[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[0].i_channel /asy_t_low">
+      <obj_property name="ElementShortName">asy_t_low[31:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_t_low[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider107" type="divider">
+      <obj_property name="label">CH1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /tdd_ch_en">
+      <obj_property name="ElementShortName">tdd_ch_en</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /tdd_ch_set">
+      <obj_property name="ElementShortName">tdd_ch_set</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_set</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /tdd_ch_rst">
+      <obj_property name="ElementShortName">tdd_ch_rst</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /t_high">
+      <obj_property name="ElementShortName">t_high[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_high[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /t_low">
+      <obj_property name="ElementShortName">t_low[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_low[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[1].i_channel /enable">
+      <obj_property name="ElementShortName">enable</obj_property>
+      <obj_property name="ObjectShortName">enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider107" type="divider">
+      <obj_property name="label">CH2</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /tdd_ch_en">
+      <obj_property name="ElementShortName">tdd_ch_en</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /tdd_ch_set">
+      <obj_property name="ElementShortName">tdd_ch_set</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_set</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /tdd_ch_rst">
+      <obj_property name="ElementShortName">tdd_ch_rst</obj_property>
+      <obj_property name="ObjectShortName">tdd_ch_rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /out">
+      <obj_property name="ElementShortName">out</obj_property>
+      <obj_property name="ObjectShortName">out</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /t_high">
+      <obj_property name="ElementShortName">t_high[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_high[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /t_low">
+      <obj_property name="ElementShortName">t_low[31:0]</obj_property>
+      <obj_property name="ObjectShortName">t_low[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/\genblk1[2].i_channel /enable">
+      <obj_property name="ElementShortName">enable</obj_property>
+      <obj_property name="ObjectShortName">enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider132" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/asy_tdd_burst_count">
+      <obj_property name="ElementShortName">asy_tdd_burst_count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_tdd_burst_count[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/asy_tdd_startup_delay">
+      <obj_property name="ElementShortName">asy_tdd_startup_delay[31:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_tdd_startup_delay[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/asy_tdd_frame_length">
+      <obj_property name="ElementShortName">asy_tdd_frame_length[31:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_tdd_frame_length[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/asy_tdd_sync_period">
+      <obj_property name="ElementShortName">asy_tdd_sync_period[63:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_tdd_sync_period[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/asy_tdd_channel_pol">
+      <obj_property name="ElementShortName">asy_tdd_channel_pol[2:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_tdd_channel_pol[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/asy_tdd_channel_on">
+      <obj_property name="ElementShortName">asy_tdd_channel_on[0:2][31:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_tdd_channel_on[0:2][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/asy_tdd_channel_off">
+      <obj_property name="ElementShortName">asy_tdd_channel_off[0:2][31:0]</obj_property>
+      <obj_property name="ObjectShortName">asy_tdd_channel_off[0:2][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/tdd_enable">
+      <obj_property name="ElementShortName">tdd_enable</obj_property>
+      <obj_property name="ObjectShortName">tdd_enable</obj_property>
    </wvobject>
 </wave_config>

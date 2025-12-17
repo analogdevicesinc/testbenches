@@ -13,19 +13,30 @@ source "cfgs/${cfg_file}"
 # Set the project name
 set project_name [file rootname $cfg_file]
 
-#set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_program"
+# Set project params
+global ad_project_params
+
+set TDD_EN $ad_project_params(TDD_EN)
+
+# Select test program based on TDD_EN
+if {$TDD_EN == 1} {
+  adi_sim_add_define "TEST_PROGRAM=test_program_tdd"
+} else {
+  adi_sim_add_define "TEST_PROGRAM=test_program"
+}
 
 # Create the project
-adi_sim_project_xilinx $project_name "xc7z020clg484-1" ;
+adi_sim_project_xilinx $project_name "xc7z020clg484-1"
 
 # Source the include files for package dependencies
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_converter.tcl
+source $ad_tb_dir/library/includes/sp_include_tdd.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
- "tests/test_program.sv" \
- ]
+  "tests/test_program.sv" \
+  "tests/test_program_tdd.sv" \
+]
 
 adi_sim_generate $project_name

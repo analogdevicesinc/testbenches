@@ -8,21 +8,17 @@
 include ../../../scripts/make_tb_path.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_converter.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_tdd.mk
 
 LIB_DEPS += axi_ada4355
 LIB_DEPS += axi_dmac
-
-# default test programs
-# Format is: <test name>
-TP := $(notdir $(basename $(wildcard tests/*.sv)))
-
-# config files should have the following format
-#  cfg_<param1>_<param2>.tcl
-CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
+LIB_DEPS += axi_tdd
 
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
-TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(addprefix $(cfg):, $(TP)))
+TESTS += cfg1:test_program
+TESTS += cfg2:test_program
+TESTS += cfg_tdd:test_program_tdd
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 

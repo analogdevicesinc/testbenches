@@ -76,6 +76,22 @@ package tdd_api_pkg;
       this.axi_read(GetAddrs(TDDN_CNTRL_INTERFACE_DESCRIPTION), description);
     endtask
 
+    task set_channel_on(input int channel, input bit [31:0] value);
+      this.axi_write(GetAddrs(TDDN_CNTRL_CH0_ON) + channel * 'h8, value);
+    endtask
+
+    task get_channel_on(input int channel, output logic [31:0] value);
+      this.axi_read(GetAddrs(TDDN_CNTRL_CH0_ON) + channel * 'h8, value);
+    endtask
+
+    task set_channel_off(input int channel, input bit [31:0] value);
+      this.axi_write(GetAddrs(TDDN_CNTRL_CH0_OFF) + channel * 'h8, value);
+    endtask
+
+    task get_channel_off(input int channel, output logic [31:0] value);
+      this.axi_read(GetAddrs(TDDN_CNTRL_CH0_OFF) + channel * 'h8, value);
+    endtask
+
     task set_channel_enable(input bit [31:0] enable);
       this.axi_write(GetAddrs(TDDN_CNTRL_CHANNEL_ENABLE), `SET_TDDN_CNTRL_CHANNEL_ENABLE_CHANNEL_ENABLE(enable));
     endtask

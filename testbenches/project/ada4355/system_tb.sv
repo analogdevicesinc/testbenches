@@ -49,26 +49,56 @@ module system_tb ();
   wire frame_p;
   wire frame_n;
 
-  `TEST_PROGRAM test (
-    .dco_p(dco_p),
-    .dco_n(dco_n),
-    .da_p(da_p),
-    .da_n(da_n),
-    .db_p(db_p),
-    .db_n(db_n),
-    .sync_n(sync_n),
-    .frame_p(frame_p),
-    .frame_n(frame_n));
+  generate
+  if (`TDD_EN == 1) begin
+    wire tdd_ext_sync;
 
-  test_harness `TH (
-    .dco_p(dco_p),
-    .dco_n(dco_n),
-    .d0a_p(da_p),
-    .d0a_n(da_n),
-    .d1a_p(db_p),
-    .d1a_n(db_n),
-    .sync_n(sync_n),
-    .frame_p(frame_p),
-    .frame_n(frame_n));
+    `TEST_PROGRAM test (
+      .dco_p(dco_p),
+      .dco_n(dco_n),
+      .da_p(da_p),
+      .da_n(da_n),
+      .db_p(db_p),
+      .db_n(db_n),
+      .sync_n(sync_n),
+      .frame_p(frame_p),
+      .frame_n(frame_n),
+      .tdd_ext_sync(tdd_ext_sync));
 
+    test_harness `TH (
+      .dco_p(dco_p),
+      .dco_n(dco_n),
+      .d0a_p(da_p),
+      .d0a_n(da_n),
+      .d1a_p(db_p),
+      .d1a_n(db_n),
+      .sync_n(sync_n),
+      .frame_p(frame_p),
+      .frame_n(frame_n),
+      .trig_fmc_in(tdd_ext_sync),
+      .trig_fmc_out());
+  end else begin
+    `TEST_PROGRAM test (
+      .dco_p(dco_p),
+      .dco_n(dco_n),
+      .da_p(da_p),
+      .da_n(da_n),
+      .db_p(db_p),
+      .db_n(db_n),
+      .sync_n(sync_n),
+      .frame_p(frame_p),
+      .frame_n(frame_n));
+
+    test_harness `TH (
+      .dco_p(dco_p),
+      .dco_n(dco_n),
+      .d0a_p(da_p),
+      .d0a_n(da_n),
+      .d1a_p(db_p),
+      .d1a_n(db_n),
+      .sync_n(sync_n),
+      .frame_p(frame_p),
+      .frame_n(frame_n));
+  end
+  endgenerate
 endmodule

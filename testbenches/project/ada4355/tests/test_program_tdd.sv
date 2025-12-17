@@ -40,6 +40,7 @@ import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
 import dmac_api_pkg::*;
 import adc_api_pkg::*;
+import tdd_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -53,7 +54,7 @@ localparam FRAME_DELAY = FRAME_HALF_PERIOD + (8 - `FRAME_SHIFT_CNT) * DCO_HALF_P
                          + ((`FRAME_SHIFT_CNT % 2) * DCO_HALF_PERIOD);
 localparam DATA_DELAY = FRAME_DELAY;
 
-program test_program (
+program test_program_tdd (
   output reg dco_p,
   output reg dco_n,
   output reg da_p,
@@ -62,7 +63,8 @@ program test_program (
   output reg db_n,
   output reg sync_n,
   output reg frame_p,
-  output reg frame_n
+  output reg frame_n,
+  output reg tdd_ext_sync
 );
 
   timeunit 1ns;
@@ -85,6 +87,7 @@ program test_program (
   // API instances
   dmac_api rx_dma_api;
   adc_api rx_adc_api;
+  tdd_api tdd;
 
   //---------------------------------------------------------------------------
   // Internal signals for stimulus generation
@@ -98,6 +101,69 @@ program test_program (
   reg da_p_int = 1'b0;
   reg db_p_int = 1'b0;
   reg [31:0] sample_count = 0;
+
+  //---------------------------------------------------------------------------
+  // TDD LiDAR debug markers
+  //---------------------------------------------------------------------------
+  reg tdd_ch0_d = 0;
+  reg [15:0] sample_at_laser_fire = 0;
+  reg [15:0] sample_at_gate_open = 0;
+  reg [31:0] samples_captured_count = 0;
+  reg laser_fired_marker = 0;
+  reg gate_opened_marker = 0;
+  reg tdd_ch1_d = 0;
+  reg dma_capture_active = 0;
+  reg dma_ch1_d = 0;
+
+  // CH0 (laser trigger) rising edge detection + marker
+  initial forever begin
+    @(posedge `TH.axi_tdd_0.clk);
+    if (`TH.axi_tdd_0.tdd_channel_0 && !tdd_ch0_d) begin
+      sample_at_laser_fire = `TH.axi_ada4355_adc.adc_data[15:0];
+      laser_fired_marker = 1'b1;
+      `INFO(("LASER FIRED at sample_count=%0d, adc_data=0x%04h",
+              sample_count, `TH.axi_ada4355_adc.adc_data[15:0]), ADI_VERBOSITY_LOW);
+    end else begin
+      laser_fired_marker = 1'b0;
+    end
+    tdd_ch0_d = `TH.axi_tdd_0.tdd_channel_0;
+  end
+
+  // CH1 (DMA sync) rising edge detection + marker
+  initial forever begin
+    @(posedge `TH.axi_tdd_0.clk);
+    if (`TH.axi_tdd_0.tdd_channel_1 && !tdd_ch1_d) begin
+      sample_at_gate_open = `TH.axi_ada4355_adc.adc_data[15:0];
+      gate_opened_marker = 1'b1;
+      `INFO(("ADC GATE OPENED at sample_count=%0d, adc_data=0x%04h",
+              sample_count, `TH.axi_ada4355_adc.adc_data[15:0]), ADI_VERBOSITY_LOW);
+    end else begin
+      gate_opened_marker = 1'b0;
+    end
+    tdd_ch1_d = `TH.axi_tdd_0.tdd_channel_1;
+  end
+
+  // DMA capture counter - tracks actual samples written after sync trigger
+  initial forever begin
+    @(posedge `TH.axi_ada4355_dma.fifo_wr_clk);
+    if (`TH.axi_tdd_0.tdd_channel_1 && !dma_ch1_d) begin
+      dma_capture_active = 1;
+      samples_captured_count = 0;
+    end else if (dma_capture_active && `TH.axi_ada4355_dma.fifo_wr_en) begin
+      samples_captured_count = samples_captured_count + 1;
+      if (samples_captured_count < 3) begin
+        `INFO(("SAMPLE CAPTURED #%0d: 0x%04h", samples_captured_count, `TH.axi_ada4355_dma.fifo_wr_din), ADI_VERBOSITY_LOW);
+      end
+    end
+    dma_ch1_d = `TH.axi_tdd_0.tdd_channel_1;
+  end
+
+  //---------------------------------------------------------------------------
+  // Initialize TDD external sync to avoid x in CDC synchronizer
+  //---------------------------------------------------------------------------
+  initial begin
+    tdd_ext_sync = 1'b0;
+  end
 
   //---------------------------------------------------------------------------
   // Transport delay for sync_n (simulates PCB and clock chip propagation)
@@ -293,6 +359,10 @@ initial begin
                    .bus(env.mng.master_sequencer),
                    .base_address(`ADA4355_ADC_BA));
 
+  tdd = new(.name("TDD API"),
+            .bus(env.mng.master_sequencer),
+            .base_address(`AXI_TDD_BA));
+
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
   env.start();
 
@@ -304,6 +374,8 @@ initial begin
   dma_test();
 
   resync();
+
+  tdd_lidar_test();
 
   env.stop();
   `INFO(("Test Done"), ADI_VERBOSITY_NONE);
@@ -418,6 +490,23 @@ task dma_test();
 
   `INFO(("Link Setup Done"), ADI_VERBOSITY_LOW);
 
+  // Configure TDD for basic DMA test
+  // Channel 1: DMA sync pulse - required because DMA has SYNC_TRANSFER_START=1
+  // Use software sync to trigger AFTER DMA is armed
+  tdd.set_control(.sync_soft(0), .sync_ext(0), .sync_int(0), .sync_rst(0), .enable(0));
+  tdd.set_startup_delay(0);
+  tdd.set_frame_length(32'hFFFFFFFF);
+  tdd.set_burst_count(1);
+
+  // Channel 1: Generate sync pulse for DMA (pulse at start of frame)
+  tdd.set_channel_on(.channel(1), .value(10));
+  tdd.set_channel_off(.channel(1), .value(20));
+
+  tdd.set_channel_enable(32'h2);
+  tdd.set_channel_polarity(32'h0);
+
+  `INFO(("TDD configured (not enabled yet - waiting for DMA setup)"), ADI_VERBOSITY_LOW);
+
   // Configure RX DMA
   rx_dma_api.enable_dma();
   rx_dma_api.set_flags(
@@ -437,6 +526,14 @@ task dma_test();
 
   `INFO(("Enable Pattern Done"), ADI_VERBOSITY_LOW);
 
+  // Now trigger TDD with external sync (DMA is armed and waiting for sync pulse)
+  tdd.set_control(.sync_soft(0), .sync_ext(1), .sync_int(0), .sync_rst(0), .enable(1));
+
+  #200ns;  // Wait for TDD FSM to reach ARMED state
+
+  trigger_tdd_sync();  // Pulse external sync via testbench
+  `INFO(("TDD triggered with external sync - CH1 pulse will trigger DMA"), ADI_VERBOSITY_LOW);
+
   // Wait for DMA transfer to complete
   rx_dma_api.wait_transfer_done(.transfer_id(transfer_id), .timeut_in_us(5000));
 
@@ -451,6 +548,7 @@ task dma_test();
     .length(TRANSFER_LENGTH/4)
   );
 
+  disable_tdd();
   `INFO(("DMA test complete"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -543,6 +641,125 @@ task dump_raw_data(input bit [31:0] address, input int length = 16);
            i, current_address, captured_word, sample_hi, sample_lo), ADI_VERBOSITY_LOW);
   end
   `INFO(("=== END RAW DATA DUMP ==="), ADI_VERBOSITY_LOW);
+endtask
+
+task disable_tdd();
+  `INFO(("Disabling TDD"), ADI_VERBOSITY_LOW);
+  tdd.set_channel_enable(32'h0);
+  tdd.set_control(.sync_soft(0), .sync_ext(0), .sync_int(0), .sync_rst(1), .enable(0));
+  #50ns;
+  tdd.set_control(.sync_soft(0), .sync_ext(0), .sync_int(0), .sync_rst(0), .enable(0));
+endtask
+
+task trigger_tdd_sync();
+  `INFO(("Triggering TDD external sync pulse"), ADI_VERBOSITY_LOW);
+  tdd_ext_sync = 1'b1;
+  #50ns;
+  tdd_ext_sync = 1'b0;
+  `INFO(("TDD sync pulse complete"), ADI_VERBOSITY_LOW);
+endtask
+
+// --------------------------
+// TDD LiDAR test procedure
+// --------------------------
+task tdd_lidar_test();
+  logic [3:0] transfer_id;
+  bit [31:0] val;
+
+  localparam LASER_ON_TIME = 0;
+  localparam LASER_OFF_TIME = 2;
+  localparam GATE_ON_TIME = 13;
+  localparam FRAME_LENGTH = 12500;
+
+  localparam CAPTURE_SAMPLES = 12;
+  localparam TRANSFER_LENGTH = CAPTURE_SAMPLES * 2;
+  localparam DMA_DEST_ADDR = `DDR_BA + 32'h00003000;
+
+  `INFO(("=== TDD LiDAR Test Started (Realistic Timing) ==="), ADI_VERBOSITY_LOW);
+  `INFO(("LiDAR parameters: Laser pulse 0-%0d, DMA sync at %0d (%0d samples)",
+         LASER_OFF_TIME, GATE_ON_TIME, CAPTURE_SAMPLES), ADI_VERBOSITY_LOW);
+  `INFO(("Physics: DMA triggered at %0dns (~15m reflection)",
+         GATE_ON_TIME * 8), ADI_VERBOSITY_LOW);
+
+  link_setup();
+
+  // Force frame to end quickly so FSM can reach IDLE
+  tdd.set_frame_length(10);
+
+  tdd.set_channel_enable(32'h0);
+  tdd.set_control(.sync_soft(0), .sync_ext(0), .sync_int(0), .sync_rst(0), .enable(0));
+
+  `INFO(("TDD reset complete, configuring for LiDAR operation"), ADI_VERBOSITY_LOW);
+
+  // Use SYNC_RST to reset TDD FSM
+  tdd.set_control(.sync_soft(0), .sync_ext(0), .sync_int(0), .sync_rst(1), .enable(0));
+  #200ns;
+  tdd.set_control(.sync_soft(0), .sync_ext(0), .sync_int(0), .sync_rst(0), .enable(0));
+  #200ns;
+
+  // Configure timing
+  tdd.set_startup_delay(0);
+  tdd.set_frame_length(FRAME_LENGTH);
+  tdd.set_burst_count(1);
+
+  // CH0: Laser trigger pulse
+  tdd.set_channel_on(.channel(0), .value(LASER_ON_TIME));
+  tdd.set_channel_off(.channel(0), .value(LASER_OFF_TIME));
+
+  // CH1: DMA sync
+  tdd.set_channel_on(.channel(1), .value(GATE_ON_TIME));
+  tdd.set_channel_off(.channel(1), .value(GATE_ON_TIME + 10));
+
+  // Enable CH0 + CH1
+  tdd.set_channel_enable(32'h3);
+  tdd.set_channel_polarity(32'h0);
+
+  `INFO(("TDD configured: FRAME=%0d, CH0 laser 0-%0d, CH1 sync %0d-%0d",
+         FRAME_LENGTH, LASER_OFF_TIME, GATE_ON_TIME, GATE_ON_TIME + 10), ADI_VERBOSITY_LOW);
+
+  rx_dma_api.set_control(4'b0000);  // Disable DMA
+
+  rx_dma_api.enable_dma();
+  rx_dma_api.set_flags(
+    .cyclic(1'b0),
+    .tlast(1'b1),
+    .partial_reporting_en(1'b0));
+  rx_dma_api.set_lengths(.xfer_length_x(TRANSFER_LENGTH-1), .xfer_length_y(0));
+  rx_dma_api.set_dest_addr(.xfer_addr(DMA_DEST_ADDR));
+
+  rx_dma_api.transfer_id_get(transfer_id);
+  rx_dma_api.transfer_start();
+
+  `INFO(("DMA Started (transfer_id=%0d)", transfer_id), ADI_VERBOSITY_LOW);
+
+  enable_pattern();
+
+  `INFO(("Pattern enabled"), ADI_VERBOSITY_LOW);
+
+  // Trigger TDD with SYNC_EXT mode
+  tdd.set_control(.sync_soft(0), .sync_ext(1), .sync_int(0), .sync_rst(0), .enable(1));
+  #200ns;
+  trigger_tdd_sync();
+  `INFO(("TDD triggered with external sync"), ADI_VERBOSITY_LOW);
+
+  // Debug: Read back TDD registers
+  tdd.get_channel_enable(val);
+  `INFO(("TDD_CHANNEL_ENABLE: 0x%08h (expect 0x3)", val), ADI_VERBOSITY_LOW);
+
+  // Wait for DMA
+  rx_dma_api.wait_transfer_done(.transfer_id(transfer_id), .timeut_in_us(5000));
+
+  `INFO(("DMA Transfer Complete"), ADI_VERBOSITY_LOW);
+
+  dump_raw_data(.address(DMA_DEST_ADDR), .length(TRANSFER_LENGTH/4));
+
+  check_captured_data(
+    .address(DMA_DEST_ADDR),
+    .length(TRANSFER_LENGTH/4));
+
+  disable_tdd();
+
+  `INFO(("=== TDD LiDAR Test Complete ==="), ADI_VERBOSITY_LOW);
 endtask
 
 endprogram

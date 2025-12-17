@@ -63,6 +63,7 @@ module system_tb #(
   reg frame_clk = 1'b1;  // Start HIGH for 0xF0 pattern
   reg div_clock = 1'b0;
   reg enable_pattern = 1'b0;
+  reg tdd_ext_sync = 1'b0;  // TDD external sync input (controlled from test_program)
   reg dco_p = 1'b0;
   reg dco_n = 1'b1;
   reg frame_clock_p = 1'b0;
@@ -82,7 +83,8 @@ module system_tb #(
     .d1a_n (db_n),
     .sync_n (sync_n),
     .frame_p (frame_clock_p),
-    .frame_n (frame_clock_n)
+    .frame_n (frame_clock_n),
+    .tdd_ext_sync (tdd_ext_sync)
   );
 
   reg sync_n_d = 1'b0;

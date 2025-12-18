@@ -332,7 +332,6 @@ initial begin
   // Extended delay to observe FSM stability after resync
   #5000ns;
 
-  // DIAGNOSTIC: Try a full system reset between tests
   `INFO(("Performing system reset before tdd_lidar_test"), ADI_VERBOSITY_NONE);
   env.sys_reset();
   #1000ns;
@@ -623,6 +622,98 @@ task dump_raw_data(input bit [31:0] address, input int length = 16);
 endtask
 
 // --------------------------
+// LiDAR-specific data verification
+// --------------------------
+// Verifies that captured data matches the expected sine wave samples
+// based on when the laser fired and the time-of-flight delay.
+//
+// The verification logic:
+//   1. Read laser_fire_sample_idx from testbench (sample index when CH0 fired)
+//   2. Expected first captured sample = laser_fire_sample_idx + time_of_flight_samples
+//   3. Compare each captured sample against calc_expected_sine(expected_idx + i)
+//
+task check_lidar_captured_data(
+  bit [31:0] address,
+  int length,
+  int time_of_flight_samples
+);
+  // Sine wave parameters (must match system_tb.sv)
+  localparam real PI = 3.14159265358979;
+  localparam int SINE_AMPLITUDE = 8191;
+  localparam int SINE_OFFSET = 8192;
+  localparam int SINE_PERIOD = 64;
+
+  // Pipeline latency compensation:
+  // - sample_count increments in testbench on negedge ssi_clk
+  // - TDD counter runs on axi_tdd_0.clk (125 MHz, same as adc_clk_div)
+  // - ADC interface has internal pipeline stages
+  // - DMA FIFO write has latency
+  // Measured offset: captured data starts 4 samples earlier than expected
+  localparam int PIPELINE_LATENCY = 4;
+
+  bit [31:0] current_address;
+  bit [31:0] captured_word;
+  bit [15:0] sample_lo, sample_hi;
+  bit [15:0] expected_lo, expected_hi;
+  int errors = 0;
+  int sample_index;
+  int laser_sample_idx;
+  int expected_start_idx;
+
+  // Read the laser fire sample index from testbench
+  laser_sample_idx = system_tb.laser_fire_sample_idx;
+  // Adjust for pipeline latency: data arrives PIPELINE_LATENCY samples earlier
+  expected_start_idx = laser_sample_idx + time_of_flight_samples - PIPELINE_LATENCY;
+
+  `INFO(("=== LiDAR Data Verification ==="), ADI_VERBOSITY_NONE);
+  `INFO(("Laser fired at sample_count = %0d", laser_sample_idx), ADI_VERBOSITY_NONE);
+  `INFO(("Time-of-flight delay = %0d samples, pipeline latency = %0d samples",
+         time_of_flight_samples, PIPELINE_LATENCY), ADI_VERBOSITY_NONE);
+  `INFO(("Expected first captured sample index = %0d (laser + ToF - latency)", expected_start_idx), ADI_VERBOSITY_NONE);
+  `INFO(("Checking %0d words (%0d samples) at address 0x%h", length, length*2, address), ADI_VERBOSITY_NONE);
+
+  for (int i = 0; i < length; i = i + 1) begin
+    current_address = address + (i * 4);
+    captured_word = env.ddr.slave_sequencer.BackdoorRead32(current_address);
+
+    // Extract the two 16-bit samples from the 32-bit word
+    sample_lo = captured_word[15:0];
+    sample_hi = captured_word[31:16];
+
+    // Calculate expected sine values based on laser fire timing
+    // Each word contains 2 samples: sample[2*i] and sample[2*i+1]
+    sample_index = 2 * i;
+    expected_lo = calc_expected_sine(expected_start_idx + sample_index);
+    expected_hi = calc_expected_sine(expected_start_idx + sample_index + 1);
+
+    // Verify samples match expected sine values
+    if (sample_lo !== expected_lo) begin
+      `ERROR(("Word %0d [15:0]: Got 0x%04h, expected 0x%04h (sine idx=%0d)",
+              i, sample_lo, expected_lo, (expected_start_idx + sample_index) % SINE_PERIOD));
+      errors++;
+    end
+    if (sample_hi !== expected_hi) begin
+      `ERROR(("Word %0d [31:16]: Got 0x%04h, expected 0x%04h (sine idx=%0d)",
+              i, sample_hi, expected_hi, (expected_start_idx + sample_index + 1) % SINE_PERIOD));
+      errors++;
+    end
+
+    // Log first few samples
+    if (i < 3) begin
+      `INFO(("Word %0d: captured=0x%08h -> [15:0]=0x%04h (exp 0x%04h), [31:16]=0x%04h (exp 0x%04h)",
+             i, captured_word, sample_lo, expected_lo, sample_hi, expected_hi), ADI_VERBOSITY_NONE);
+    end
+  end
+
+  if (errors == 0) begin
+    `INFO(("LiDAR Verification: PASSED - All %0d samples match expected time-of-flight offset", length*2), ADI_VERBOSITY_NONE);
+  end else begin
+    `ERROR(("LiDAR Verification: FAILED - %0d errors found", errors));
+  end
+
+endtask
+
+// --------------------------
 // TDD Configuration for LiDAR
 // --------------------------
 // Configure TDD controller for LiDAR time-of-flight measurements
@@ -879,9 +970,11 @@ begin
   // TRANSFER_LENGTH = 32 bytes, each word is 4 bytes, so 8 words to check
   dump_raw_data(.address(DMA_DEST_ADDR), .length(TRANSFER_LENGTH/4));
 
-  check_captured_data(
+  // LiDAR-specific verification: check captured data matches expected offset from laser pulse
+  check_lidar_captured_data(
     .address(DMA_DEST_ADDR),
-    .length(TRANSFER_LENGTH/4));
+    .length(TRANSFER_LENGTH/4),
+    .time_of_flight_samples(GATE_ON_TIME));  // Data should start at laser_sample + GATE_ON_TIME
 
   disable_tdd();
 

@@ -179,6 +179,71 @@ module system_tb();
 
   reg [31:0] sample_count = 0;
 
+  // LiDAR verification: capture sample_count when laser (CH0) fires
+  // This allows test_program to verify captured data matches expected offset
+  reg [31:0] laser_fire_sample_idx = 0;
+  wire tdd_ch0_rising;
+  reg tdd_ch0_d = 0;
+
+  // Debug signals for waveform visibility
+  reg [15:0] sample_at_laser_fire = 0;    // Sample value when laser fires
+  reg [15:0] sample_at_gate_open = 0;     // Sample value when ADC gate opens
+  reg [31:0] samples_captured_count = 0;  // Count of samples captured during gate
+  reg laser_fired_marker = 0;             // Pulse when laser fires
+  reg gate_opened_marker = 0;             // Pulse when gate opens
+
+  // Detect rising edge of CH0 (laser trigger)
+  always @(posedge `TH.axi_tdd_0.clk) begin
+    tdd_ch0_d <= `TH.axi_tdd_0.tdd_channel_0;
+  end
+  assign tdd_ch0_rising = `TH.axi_tdd_0.tdd_channel_0 && !tdd_ch0_d;
+
+  // Capture sample_count when laser fires
+  always @(posedge `TH.axi_tdd_0.clk) begin
+    if (tdd_ch0_rising) begin
+      laser_fire_sample_idx <= sample_count;
+      // Capture adc_data (ADC interface output) instead of testbench sample
+      // This is synchronized to the same clock domain (125 MHz)
+      sample_at_laser_fire <= `TH.axi_ada4355_adc.adc_data[15:0];
+      laser_fired_marker <= 1'b1;
+      $display("[TB] @%0t: LASER FIRED at sample_count=%0d, adc_data=0x%04h",
+               $time, sample_count, `TH.axi_ada4355_adc.adc_data[15:0]);
+    end else begin
+      laser_fired_marker <= 1'b0;
+    end
+  end
+
+  // Track when ADC gate opens (CH1 rising edge)
+  reg tdd_ch1_d = 0;
+  wire tdd_ch1_rising;
+  always @(posedge `TH.axi_tdd_0.clk) begin
+    tdd_ch1_d <= `TH.axi_tdd_0.tdd_channel_1;
+  end
+  assign tdd_ch1_rising = `TH.axi_tdd_0.tdd_channel_1 && !tdd_ch1_d;
+
+  always @(posedge `TH.axi_tdd_0.clk) begin
+    if (tdd_ch1_rising) begin
+      // Capture adc_data (ADC interface output) instead of testbench sample
+      sample_at_gate_open <= `TH.axi_ada4355_adc.adc_data[15:0];
+      gate_opened_marker <= 1'b1;
+      samples_captured_count <= 0;
+      $display("[TB] @%0t: ADC GATE OPENED at sample_count=%0d, adc_data=0x%04h",
+               $time, sample_count, `TH.axi_ada4355_adc.adc_data[15:0]);
+    end else begin
+      gate_opened_marker <= 1'b0;
+    end
+  end
+
+  // Count samples captured while gate is open
+  always @(posedge `TH.axi_ada4355_dma.fifo_wr_clk) begin
+    if (`TH.axi_ada4355_dma.fifo_wr_en) begin
+      samples_captured_count <= samples_captured_count + 1;
+      if (samples_captured_count < 3) begin
+        $display("[TB] @%0t: SAMPLE CAPTURED #%0d: 0x%04h", $time, samples_captured_count, `TH.axi_ada4355_dma.fifo_wr_din);
+      end
+    end
+  end
+
   initial begin
     @(posedge sync_n_d);
 

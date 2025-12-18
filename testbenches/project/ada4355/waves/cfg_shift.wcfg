@@ -52,15 +52,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="3.045000 us"></ZoomStartTime>
-      <ZoomEndTime time="18.295001 us"></ZoomEndTime>
-      <Cursor1Time time="37.795000 us"></Cursor1Time>
+      <ZoomStartTime time="9.290000 us"></ZoomStartTime>
+      <ZoomEndTime time="15.650001 us"></ZoomEndTime>
+      <Cursor1Time time="14.740000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="398"></NameColumnWidth>
-      <ValueColumnWidth column_width="103"></ValueColumnWidth>
+      <NameColumnWidth column_width="253"></NameColumnWidth>
+      <ValueColumnWidth column_width="86"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="81" />
+   <WVObjectSize size="92" />
    <wvobject type="logic" fp_name="/system_tb/ssi_clk">
       <obj_property name="ElementShortName">ssi_clk</obj_property>
       <obj_property name="ObjectShortName">ssi_clk</obj_property>
@@ -116,6 +116,8 @@
    <wvobject type="array" fp_name="/system_tb/sample">
       <obj_property name="ElementShortName">sample[15:0]</obj_property>
       <obj_property name="ObjectShortName">sample[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/da_p_int">
       <obj_property name="ElementShortName">da_p_int</obj_property>
@@ -243,14 +245,6 @@
       <obj_property name="ElementShortName">sync</obj_property>
       <obj_property name="ObjectShortName">sync</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_dma/fifo_wr_en">
-      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_dma/fifo_wr_din">
-      <obj_property name="ElementShortName">fifo_wr_din[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_din[15:0]</obj_property>
-   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_counter">
       <obj_property name="ElementShortName">tdd_counter[31:0]</obj_property>
       <obj_property name="ObjectShortName">tdd_counter[31:0]</obj_property>
@@ -260,6 +254,47 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_cstate">
       <obj_property name="ElementShortName">tdd_cstate[1:0]</obj_property>
       <obj_property name="ObjectShortName">tdd_cstate[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider200" type="divider">
+      <obj_property name="label">LiDAR Debug Markers</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">#FF00FF</obj_property>
+      <obj_property name="TextColor">#FFFFFF</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/laser_fired_marker">
+      <obj_property name="ElementShortName">laser_fired_marker</obj_property>
+      <obj_property name="ObjectShortName">laser_fired_marker</obj_property>
+      <obj_property name="CustomSignalColor">#FF0000</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/gate_opened_marker">
+      <obj_property name="ElementShortName">gate_opened_marker</obj_property>
+      <obj_property name="ObjectShortName">gate_opened_marker</obj_property>
+      <obj_property name="CustomSignalColor">#00FF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/sample_at_laser_fire">
+      <obj_property name="ElementShortName">sample_at_laser_fire[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sample_at_laser_fire[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FF0000</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/sample_at_gate_open">
+      <obj_property name="ElementShortName">sample_at_gate_open[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sample_at_gate_open[15:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/samples_captured_count">
+      <obj_property name="ElementShortName">samples_captured_count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">samples_captured_count[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/adc_data">
+      <obj_property name="ElementShortName">adc_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
    </wvobject>
    <wvobject fp_name="divider107" type="divider">
       <obj_property name="label">CH0</obj_property>
@@ -386,5 +421,33 @@
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/tdd_enable">
       <obj_property name="ElementShortName">tdd_enable</obj_property>
       <obj_property name="ObjectShortName">tdd_enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider124" type="divider">
+      <obj_property name="label">LiDAR capture</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_counter">
+      <obj_property name="ElementShortName">tdd_counter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_counter[31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#D2691E</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/tdd_channel">
+      <obj_property name="ElementShortName">tdd_channel[2:0]</obj_property>
+      <obj_property name="ObjectShortName">tdd_channel[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_dma/inst/sync">
+      <obj_property name="ElementShortName">sync</obj_property>
+      <obj_property name="ObjectShortName">sync</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ada4355_dma/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_dma/fifo_wr_din">
+      <obj_property name="ElementShortName">fifo_wr_din[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_din[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
    </wvobject>
 </wave_config>

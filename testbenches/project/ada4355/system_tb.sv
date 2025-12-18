@@ -221,12 +221,16 @@ module system_tb();
   end
   assign tdd_ch1_rising = `TH.axi_tdd_0.tdd_channel_1 && !tdd_ch1_d;
 
+  // Track when ADC gate opens and closes
+  reg tdd_ch1_active = 0;  // Holds gate state for synchronization
+
   always @(posedge `TH.axi_tdd_0.clk) begin
+    tdd_ch1_active <= `TH.axi_tdd_0.tdd_channel_1;
+
     if (tdd_ch1_rising) begin
       // Capture adc_data (ADC interface output) instead of testbench sample
       sample_at_gate_open <= `TH.axi_ada4355_adc.adc_data[15:0];
       gate_opened_marker <= 1'b1;
-      samples_captured_count <= 0;
       $display("[TB] @%0t: ADC GATE OPENED at sample_count=%0d, adc_data=0x%04h",
                $time, sample_count, `TH.axi_ada4355_adc.adc_data[15:0]);
     end else begin
@@ -235,8 +239,12 @@ module system_tb();
   end
 
   // Count samples captured while gate is open
+  // Use same clock as DMA write to avoid clock domain crossing
   always @(posedge `TH.axi_ada4355_dma.fifo_wr_clk) begin
-    if (`TH.axi_ada4355_dma.fifo_wr_en) begin
+    // Reset counter when gate is not active (synchronous to fifo_wr_clk)
+    if (!tdd_ch1_active) begin
+      samples_captured_count <= 0;
+    end else if (`TH.axi_ada4355_dma.fifo_wr_en) begin
       samples_captured_count <= samples_captured_count + 1;
       if (samples_captured_count < 3) begin
         $display("[TB] @%0t: SAMPLE CAPTURED #%0d: 0x%04h", $time, samples_captured_count, `TH.axi_ada4355_dma.fifo_wr_din);

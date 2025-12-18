@@ -408,6 +408,8 @@ task resync();
   // Optionally also write to the register for consistency with real HW flow
   rx_adc_api.axi_read(GetAddrs(ADC_COMMON_REG_CNTRL), current_val);
   rx_adc_api.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL), current_val | 32'h8);
+
+end
 endtask
 
 // --------------------------
@@ -713,66 +715,6 @@ task check_lidar_captured_data(
 
 endtask
 
-// --------------------------
-// TDD Configuration for LiDAR
-// --------------------------
-// Configure TDD controller for LiDAR time-of-flight measurements
-// Channel 0: Laser trigger
-// Channel 1: ADC gate (gates ADC valid signal)
-// Channel 2: DMA sync
-task configure_tdd_lidar(
-  input int laser_on_time,      // When to trigger laser (in adc_clk cycles)
-  input int laser_pulse_width,  // Laser pulse duration
-  input int adc_gate_on,        // When to start ADC capture
-  input int adc_gate_off,       // When to stop ADC capture
-  input int frame_length        // Total frame length
-);
-begin
-  `INFO(("Configuring TDD for LiDAR"), ADI_VERBOSITY_LOW);
-
-  // Completely disable and reset TDD before reconfiguration
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h0);  // Disable channels first
-  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h2);  // Assert SYNC_RST (bit 1)
-  #100ns;  // Wait for reset to propagate
-  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);  // Clear all control bits
-  #100ns;  // Wait for TDD to fully stop
-
-  // Configure timing parameters
-  env.mng.master_sequencer.RegWrite32(TDD_STARTUP_DELAY, 0);
-  env.mng.master_sequencer.RegWrite32(TDD_FRAME_LENGTH, frame_length);
-  env.mng.master_sequencer.RegWrite32(TDD_BURST_COUNT, 1);  // Single burst
-
-  // Channel 0: Laser trigger
-  env.mng.master_sequencer.RegWrite32(TDD_CH0_ON, laser_on_time);
-  env.mng.master_sequencer.RegWrite32(TDD_CH0_OFF, laser_on_time + laser_pulse_width);
-
-  // Channel 1: ADC gate
-  env.mng.master_sequencer.RegWrite32(TDD_CH1_ON, adc_gate_on);
-  env.mng.master_sequencer.RegWrite32(TDD_CH1_OFF, adc_gate_off);
-
-  // Channel 2: DMA sync - must pulse at START of frame (SYNC_TRANSFER_START requirement)
-  // DMA needs sync at frame beginning, then waits for data from gated CH1
-  env.mng.master_sequencer.RegWrite32(TDD_CH2_ON, 10);
-  env.mng.master_sequencer.RegWrite32(TDD_CH2_OFF, 20);
-
-  // Enable all 3 channels
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h7);  // bits [2:0] = 1
-
-  // Set polarity (all active high)
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_POLARITY, 32'h0);
-
-  // TDD configured but NOT enabled - will be triggered with software sync after DMA is armed
-  // (Control register will be written by caller with ENABLE + SYNC_SOFT)
-
-  `INFO(("TDD Configuration:"), ADI_VERBOSITY_LOW);
-  `INFO(("  Frame length: %0d cycles", frame_length), ADI_VERBOSITY_LOW);
-  `INFO(("  Laser: ON=%0d, OFF=%0d", laser_on_time, laser_on_time + laser_pulse_width), ADI_VERBOSITY_LOW);
-  `INFO(("  ADC gate: ON=%0d, OFF=%0d", adc_gate_on, adc_gate_off), ADI_VERBOSITY_LOW);
-  `INFO(("  DMA sync: ON=10, OFF=20 (at frame start for SYNC_TRANSFER_START)"), ADI_VERBOSITY_LOW);
-  `INFO(("  TDD configured but not enabled (waiting for DMA setup)"), ADI_VERBOSITY_LOW);
-end
-endtask
-
 // Disable TDD controller
 task disable_tdd();
 begin
@@ -797,31 +739,6 @@ begin
   #5ns;
   release system_tb.tdd_ext_sync;  // Release force to return to normal operation
   `INFO(("TDD sync pulse complete"), ADI_VERBOSITY_LOW);
-end
-endtask
-
-// Wait for TDD counter to reach 0
-// This is critical for gated operations - counter must start at 0 so channels transition at correct times
-task wait_for_tdd_counter_zero();
-  bit [31:0] counter_val;
-  int timeout_count = 0;
-  localparam TDD_COUNTER_STATUS = TDD_BASE + 'h58;
-begin
-  `INFO(("Waiting for TDD counter to reach 0..."), ADI_VERBOSITY_NONE);
-
-  // Poll counter register until it equals 0
-  counter_val = 32'hFFFFFFFF;
-  while (counter_val != 0 && timeout_count < 10000) begin
-    env.mng.master_sequencer.RegRead32(TDD_COUNTER_STATUS, counter_val);
-    timeout_count++;
-    #100ns;  // Poll interval
-  end
-
-  if (counter_val == 0) begin
-    `INFO(("TDD counter reached 0 (polls=%0d)", timeout_count), ADI_VERBOSITY_NONE);
-  end else begin
-    `ERROR(("TIMEOUT waiting for TDD counter=0! Last value=0x%08h after %0d polls", counter_val, timeout_count));
-  end
 end
 endtask
 

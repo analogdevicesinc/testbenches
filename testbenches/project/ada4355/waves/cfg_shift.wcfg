@@ -52,15 +52,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="38,692.200 ns"></ZoomStartTime>
-      <ZoomEndTime time="38,756.201 ns"></ZoomEndTime>
+      <ZoomStartTime time="38,733.800 ns"></ZoomStartTime>
+      <ZoomEndTime time="38,885.501 ns"></ZoomEndTime>
       <Cursor1Time time="38,800.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="253"></NameColumnWidth>
-      <ValueColumnWidth column_width="82"></ValueColumnWidth>
+      <ValueColumnWidth column_width="78"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="93" />
+   <WVObjectSize size="92" />
    <wvobject type="logic" fp_name="/system_tb/ssi_clk">
       <obj_property name="ElementShortName">ssi_clk</obj_property>
       <obj_property name="ObjectShortName">ssi_clk</obj_property>
@@ -294,11 +294,6 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_ada4355_adc/adc_data">
       <obj_property name="ElementShortName">adc_data[15:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data[15:0]</obj_property>
-      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/sample">
-      <obj_property name="ElementShortName">sample[15:0]</obj_property>
-      <obj_property name="ObjectShortName">sample[15:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
    </wvobject>
    <wvobject fp_name="divider107" type="divider">

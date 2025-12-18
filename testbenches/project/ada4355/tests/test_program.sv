@@ -32,8 +32,6 @@
 //
 // ***************************************************************************
 // ***************************************************************************
-//
-//
 
 `include "utils.svh"
 
@@ -94,7 +92,6 @@ program test_program;
 
   bit [31:0] val;
 
-
 // --------------------------
 // Main procedure
 // --------------------------
@@ -116,8 +113,6 @@ initial begin
 
   `LINK(mng, env, mng)
   `LINK(ddr, env, ddr)
-
-  // Initialize API instances
   rx_dma_api = new(.name("RX DMA API"),
                    .bus(env.mng.master_sequencer),
                    .base_address(`ADA4355_DMA_BA));
@@ -130,32 +125,22 @@ initial begin
                       .bus(env.mng.master_sequencer),
                       .base_address(BASE));
 
-  setLoggerVerbosity(ADI_VERBOSITY_LOW);  // Enable test-level debugging messages
+  setLoggerVerbosity(ADI_VERBOSITY_LOW);
   env.start();
-
-  // System reset
   env.sys_reset();
 
   sanity_test;
 
   dma_test;
-
   #1000ns;
-
   resync;
-
-  // Extended delay to observe FSM stability after resync
   #5000ns;
 
   `INFO(("Performing system reset before tdd_lidar_test"), ADI_VERBOSITY_NONE);
   env.sys_reset();
   #1000ns;
-
-  // TDD LiDAR test - Complete sequence with timing control
   tdd_lidar_test;
-
   #1000ns;
-
   `INFO(("All Tests Complete"), ADI_VERBOSITY_NONE);
   $finish;
 
@@ -167,13 +152,9 @@ end
 
 task sanity_test;
 begin
-  // check ADC VERSION
   env.mng.master_sequencer.RegReadVerify32(BASE + GetAddrs(COMMON_REG_VERSION),
                   `SET_COMMON_REG_VERSION_VERSION('h000a0300));
-
-  // Run DMA sanity test
   rx_dma_api.sanity_test();
-
   `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
 end
 endtask
@@ -184,8 +165,6 @@ endtask
 
 task link_setup;
 begin
-
-  // Configure Rx interface
   rx_adc_api.set_common_control(
     .pin_mode(1'b0),
     .ddr_edgesel(1'b0),
@@ -195,13 +174,9 @@ begin
     .symb_8_16b(1'b0),
     .symb_op(1'b0),
     .sdr_ddr_n(sdr_ddr_n));
-
-  // pull out RX of reset
   rx_adc_api.reset(.ce_n(1'b1), .mmcm_rstn(1'b1), .rstn(1'b1));
-
   force system_tb.sync_n = 1'b1;
   #10ns;
-
 end
 endtask
 
@@ -315,7 +290,7 @@ begin
   // Configure TDD for basic DMA test (hardware requires TDD for data flow)
   // Channel 1: ADC gate - keep HIGH to pass all ADC data (fifo_wr_en = adc_valid AND tdd_ch1)
   // Channel 2: DMA sync pulse - required because DMA has SYNC_TRANSFER_START=1
-  // We'll configure TDD but use software sync to trigger AFTER DMA is armed
+  // Use software sync to trigger AFTER DMA is armed
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);              // Disable during config
   env.mng.master_sequencer.RegWrite32(TDD_STARTUP_DELAY, 0);
   env.mng.master_sequencer.RegWrite32(TDD_FRAME_LENGTH, 32'hFFFFFFFF);  // Very long frame
@@ -355,7 +330,9 @@ begin
 
   // Now trigger TDD with external sync (DMA is armed and waiting for sync pulse)
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h9);  // ENABLE + SYNC_EXT
+
   #200ns;  // Wait for TDD FSM to reach ARMED state
+
   trigger_tdd_sync();  // Pulse external sync via testbench
   `INFO(("TDD triggered with external sync - CH2 pulse will trigger DMA"), ADI_VERBOSITY_LOW);
 
@@ -373,7 +350,6 @@ begin
     .length(TRANSFER_LENGTH/4)
   );
 
-  // Disable TDD after test completes
   disable_tdd();
   `INFO(("DMA test complete - TDD disabled"), ADI_VERBOSITY_LOW);
 
@@ -618,7 +594,6 @@ task check_lidar_captured_data(
 
 endtask
 
-// Disable TDD controller
 task disable_tdd();
 begin
   `INFO(("Disabling TDD"), ADI_VERBOSITY_LOW);
@@ -734,12 +709,10 @@ begin
          FRAME_LENGTH, LASER_OFF_TIME, GATE_ON_TIME, GATE_OFF_TIME,
          GATE_ON_TIME, GATE_ON_TIME + 10), ADI_VERBOSITY_NONE);
 
-  // CRITICAL: Properly reset DMA before starting new transfer
-  // The disable_dma() API is broken - it clears PAUSE instead of ENABLE
-  // When ENABLE goes LOW, DMA goes through full reset sequence (STATE_DO_RESET -> STATE_RESET)
-  // Need to wait for reset to complete before re-enabling
   rx_dma_api.set_control(4'b0000);  // Disable DMA (ENABLE=0) - triggers needs_reset
+
   #1000ns;  // Wait for full DMA reset sequence to complete (multiple clock domains)
+
   rx_dma_api.enable_dma();
   rx_dma_api.set_flags(
     .cyclic(1'b0),

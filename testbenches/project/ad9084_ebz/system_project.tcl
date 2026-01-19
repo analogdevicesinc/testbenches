@@ -14,8 +14,8 @@ source "cfgs/${cfg_file}"
 set project_name [file rootname $cfg_file]
 
 # Create the project
-#adi_sim_project_xilinx $project_name "xcvc1902-vsva2197-2MP-e-S"
-adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
+adi_sim_project_xilinx $project_name "xcvc1902-vsva2197-2MP-e-S"
+#adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_jesd.tcl

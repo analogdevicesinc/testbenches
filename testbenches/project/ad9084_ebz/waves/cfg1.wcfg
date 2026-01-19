@@ -3,7 +3,7 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="system_tb_behav.wdb" id="1">
+      <db_ref path="/export/data/podgori/fsrc/hdl/testbenches/testbenches/project/ad9084_ebz/runs/cfg1/cfg1.sim/sim_1/behav/xsim/system_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="adi_api_pkg" />
             <top_module name="adi_axi_agent_pkg" />
@@ -18,13 +18,13 @@
             <top_module name="adi_regmap_jesd_tx_pkg" />
             <top_module name="adi_regmap_pkg" />
             <top_module name="adi_regmap_tdd_gen_pkg" />
-            <top_module name="adi_regmap_xcvr_pkg" />
             <top_module name="adi_vip_pkg" />
-            <top_module name="adi_xcvr_pkg" />
             <top_module name="attributes" />
             <top_module name="axi_vip_pkg" />
             <top_module name="glbl" />
+            <top_module name="io_vip_if_base_pkg" />
             <top_module name="ipif_pkg" />
+            <top_module name="irq_handler_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
             <top_module name="math_real" />
@@ -41,6 +41,7 @@
             <top_module name="test_harness_env_pkg" />
             <top_module name="textio" />
             <top_module name="vcomponents" />
+            <top_module name="vip_agent_typedef_pkg" />
             <top_module name="vital_primitives" />
             <top_module name="vital_timing" />
             <top_module name="vpkg" />
@@ -50,102 +51,142 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="261,679.200000 ns"></ZoomStartTime>
-      <ZoomEndTime time="261,742.400001 ns"></ZoomEndTime>
-      <Cursor1Time time="261,704.500000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000000 us"></ZoomStartTime>
+      <ZoomEndTime time="265.000000001 us"></ZoomEndTime>
+      <Cursor1Time time="37.890000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="243"></NameColumnWidth>
-      <ValueColumnWidth column_width="225"></ValueColumnWidth>
+      <ValueColumnWidth column_width="221"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="188" />
+   <WVObjectSize size="117" />
    <wvobject fp_name="divider26" type="divider">
       <obj_property name="label">TX DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_src_axi">
-      <obj_property name="ElementShortName">m_src_axi</obj_property>
-      <obj_property name="ObjectShortName">m_src_axi</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_src_axi_aclk">
+      <obj_property name="ElementShortName">m_src_axi_aclk</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_aclk</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_axis">
-      <obj_property name="ElementShortName">m_axis</obj_property>
-      <obj_property name="ObjectShortName">m_axis</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_src_axi_rready">
+      <obj_property name="ElementShortName">m_src_axi_rready</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_rready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_src_axi_rvalid">
+      <obj_property name="ElementShortName">m_src_axi_rvalid</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_rvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_src_axi_rdata">
+      <obj_property name="ElementShortName">m_src_axi_rdata[511:0]</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_rdata[511:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_src_axi_rlast">
+      <obj_property name="ElementShortName">m_src_axi_rlast</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi_rlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider285" type="divider">
+      <obj_property name="label">___</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_axis_aclk">
+      <obj_property name="ElementShortName">m_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">m_axis_aclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_axis_ready">
+      <obj_property name="ElementShortName">m_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_axis_valid">
+      <obj_property name="ElementShortName">m_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_axis_data">
+      <obj_property name="ElementShortName">m_axis_data[511:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_data[511:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_tx_dma/m_axis_last">
+      <obj_property name="ElementShortName">m_axis_last</obj_property>
+      <obj_property name="ObjectShortName">m_axis_last</obj_property>
    </wvobject>
    <wvobject fp_name="divider56" type="divider">
       <obj_property name="label">TX DO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/apollo_tx_data_offload/s_axis">
-      <obj_property name="ElementShortName">s_axis</obj_property>
-      <obj_property name="ObjectShortName">s_axis</obj_property>
-      <obj_property name="children_use_element_short_name">true</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
-      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="CustomSignalColor">#00E600</obj_property>
-      <obj_property name="Render_Data">/system_tb/test_harness/apollo_tx_data_offload/s_axis.streamWaveData</obj_property>
-      <obj_property name="Number_Overlay">2</obj_property>
-      <obj_property name="Overlay_Object_0">/system_tb/test_harness/apollo_tx_data_offload/s_axis.linkStarve</obj_property>
-      <obj_property name="Overlay_Color_0">#99E600</obj_property>
-      <obj_property name="Overlay_Object_1">/system_tb/test_harness/apollo_tx_data_offload/s_axis.linkStall</obj_property>
-      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
-      <obj_property name="Detail_Data">/system_tb/test_harness/apollo_tx_data_offload/s_axis.streamTooltipData</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/apollo_tx_data_offload/s_axis_aclk">
+      <obj_property name="ElementShortName">s_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">s_axis_aclk</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/apollo_tx_data_offload/m_axis">
-      <obj_property name="ElementShortName">m_axis</obj_property>
-      <obj_property name="ObjectShortName">m_axis</obj_property>
-      <obj_property name="children_use_element_short_name">true</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
-      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="CustomSignalColor">#00E600</obj_property>
-      <obj_property name="Render_Data">/system_tb/test_harness/apollo_tx_data_offload/m_axis.streamWaveData</obj_property>
-      <obj_property name="Number_Overlay">2</obj_property>
-      <obj_property name="Overlay_Object_0">/system_tb/test_harness/apollo_tx_data_offload/m_axis.linkStarve</obj_property>
-      <obj_property name="Overlay_Color_0">#99E600</obj_property>
-      <obj_property name="Overlay_Object_1">/system_tb/test_harness/apollo_tx_data_offload/m_axis.linkStall</obj_property>
-      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
-      <obj_property name="Detail_Data">/system_tb/test_harness/apollo_tx_data_offload/m_axis.streamTooltipData</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/apollo_tx_data_offload/s_axis_tready">
+      <obj_property name="ElementShortName">s_axis_tready</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/apollo_tx_data_offload/s_axis_tvalid">
+      <obj_property name="ElementShortName">s_axis_tvalid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/apollo_tx_data_offload/s_axis_tdata">
+      <obj_property name="ElementShortName">s_axis_tdata[511:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tdata[511:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/apollo_tx_data_offload/s_axis_tlast">
+      <obj_property name="ElementShortName">s_axis_tlast</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider295" type="divider">
+      <obj_property name="label">___</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/apollo_tx_data_offload/m_axis_aclk">
+      <obj_property name="ElementShortName">m_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">m_axis_aclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/apollo_tx_data_offload/m_axis_tready">
+      <obj_property name="ElementShortName">m_axis_tready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_tready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/apollo_tx_data_offload/m_axis_tvalid">
+      <obj_property name="ElementShortName">m_axis_tvalid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_tvalid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/apollo_tx_data_offload/m_axis_tdata">
+      <obj_property name="ElementShortName">m_axis_tdata[511:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_tdata[511:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider75" type="divider">
       <obj_property name="label">TX FSRC</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/fsrc_tx/s_axis">
-      <obj_property name="ElementShortName">s_axis</obj_property>
-      <obj_property name="ObjectShortName">s_axis</obj_property>
-      <obj_property name="children_use_element_short_name">true</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
-      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="CustomSignalColor">#00E600</obj_property>
-      <obj_property name="Render_Data">/system_tb/test_harness/fsrc_tx/s_axis.streamWaveData</obj_property>
-      <obj_property name="Number_Overlay">2</obj_property>
-      <obj_property name="Overlay_Object_0">/system_tb/test_harness/fsrc_tx/s_axis.linkStarve</obj_property>
-      <obj_property name="Overlay_Color_0">#99E600</obj_property>
-      <obj_property name="Overlay_Object_1">/system_tb/test_harness/fsrc_tx/s_axis.linkStall</obj_property>
-      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
-      <obj_property name="Detail_Data">/system_tb/test_harness/fsrc_tx/s_axis.streamTooltipData</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/fsrc_tx/m_axis">
-      <obj_property name="ElementShortName">m_axis</obj_property>
-      <obj_property name="ObjectShortName">m_axis</obj_property>
-      <obj_property name="children_use_element_short_name">true</obj_property>
-      <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
-      <obj_property name="EnumTransactionColorTable">fff,fff=blank</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="CustomSignalColor">#00E600</obj_property>
-      <obj_property name="Render_Data">/system_tb/test_harness/fsrc_tx/m_axis.streamWaveData</obj_property>
-      <obj_property name="Number_Overlay">2</obj_property>
-      <obj_property name="Overlay_Object_0">/system_tb/test_harness/fsrc_tx/m_axis.linkStarve</obj_property>
-      <obj_property name="Overlay_Color_0">#99E600</obj_property>
-      <obj_property name="Overlay_Object_1">/system_tb/test_harness/fsrc_tx/m_axis.linkStall</obj_property>
-      <obj_property name="Overlay_Color_1">#E64C00</obj_property>
-      <obj_property name="Detail_Data">/system_tb/test_harness/fsrc_tx/m_axis.streamTooltipData</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/s_axis_valid">
+      <obj_property name="ElementShortName">s_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/s_axis_ready">
+      <obj_property name="ElementShortName">s_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/s_axis_data">
+      <obj_property name="ElementShortName">s_axis_data[511:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_data[511:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider303" type="divider">
+      <obj_property name="label">___</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/m_axis_valid">
+      <obj_property name="ElementShortName">m_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/m_axis_ready">
+      <obj_property name="ElementShortName">m_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/m_axis_data">
+      <obj_property name="ElementShortName">m_axis_data[511:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_data[511:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider90" type="divider">
       <obj_property name="label">TX UPACK</obj_property>
@@ -167,6 +208,22 @@
       <obj_property name="ElementShortName">enable_3</obj_property>
       <obj_property name="ObjectShortName">enable_3</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_4">
+      <obj_property name="ElementShortName">enable_4</obj_property>
+      <obj_property name="ObjectShortName">enable_4</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_5">
+      <obj_property name="ElementShortName">enable_5</obj_property>
+      <obj_property name="ObjectShortName">enable_5</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_6">
+      <obj_property name="ElementShortName">enable_6</obj_property>
+      <obj_property name="ObjectShortName">enable_6</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_7">
+      <obj_property name="ElementShortName">enable_7</obj_property>
+      <obj_property name="ObjectShortName">enable_7</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_0">
       <obj_property name="ElementShortName">fifo_rd_data_0[63:0]</obj_property>
       <obj_property name="ObjectShortName">fifo_rd_data_0[63:0]</obj_property>
@@ -182,6 +239,22 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_3">
       <obj_property name="ElementShortName">fifo_rd_data_3[63:0]</obj_property>
       <obj_property name="ObjectShortName">fifo_rd_data_3[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_4">
+      <obj_property name="ElementShortName">fifo_rd_data_4[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_4[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_5">
+      <obj_property name="ElementShortName">fifo_rd_data_5[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_5[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_6">
+      <obj_property name="ElementShortName">fifo_rd_data_6[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_6[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_7">
+      <obj_property name="ElementShortName">fifo_rd_data_7[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_7[63:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider99" type="divider">
       <obj_property name="label">RX FSRC</obj_property>
@@ -207,6 +280,22 @@
       <obj_property name="ElementShortName">adc_data_in_3[63:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data_in_3[63:0]</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_in_4">
+      <obj_property name="ElementShortName">adc_data_in_4[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_in_4[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_in_5">
+      <obj_property name="ElementShortName">adc_data_in_5[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_in_5[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_in_6">
+      <obj_property name="ElementShortName">adc_data_in_6[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_in_6[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_in_7">
+      <obj_property name="ElementShortName">adc_data_in_7[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_in_7[63:0]</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_out_valid">
       <obj_property name="ElementShortName">adc_data_out_valid</obj_property>
       <obj_property name="ObjectShortName">adc_data_out_valid</obj_property>
@@ -226,6 +315,22 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_out_3">
       <obj_property name="ElementShortName">adc_data_out_3[63:0]</obj_property>
       <obj_property name="ObjectShortName">adc_data_out_3[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_out_4">
+      <obj_property name="ElementShortName">adc_data_out_4[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_out_4[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_out_5">
+      <obj_property name="ElementShortName">adc_data_out_5[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_out_5[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_out_6">
+      <obj_property name="ElementShortName">adc_data_out_6[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_out_6[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_rx/adc_data_out_7">
+      <obj_property name="ElementShortName">adc_data_out_7[63:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data_out_7[63:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider110" type="divider">
       <obj_property name="label">RX CPACK</obj_property>
@@ -247,6 +352,22 @@
       <obj_property name="ElementShortName">enable_3</obj_property>
       <obj_property name="ObjectShortName">enable_3</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_cpack/enable_4">
+      <obj_property name="ElementShortName">enable_4</obj_property>
+      <obj_property name="ObjectShortName">enable_4</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_cpack/enable_5">
+      <obj_property name="ElementShortName">enable_5</obj_property>
+      <obj_property name="ObjectShortName">enable_5</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_cpack/enable_6">
+      <obj_property name="ElementShortName">enable_6</obj_property>
+      <obj_property name="ObjectShortName">enable_6</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_cpack/enable_7">
+      <obj_property name="ElementShortName">enable_7</obj_property>
+      <obj_property name="ObjectShortName">enable_7</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_cpack/fifo_wr_data_0">
       <obj_property name="ElementShortName">fifo_wr_data_0[63:0]</obj_property>
       <obj_property name="ObjectShortName">fifo_wr_data_0[63:0]</obj_property>
@@ -262,6 +383,22 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_cpack/fifo_wr_data_3">
       <obj_property name="ElementShortName">fifo_wr_data_3[63:0]</obj_property>
       <obj_property name="ObjectShortName">fifo_wr_data_3[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_cpack/fifo_wr_data_4">
+      <obj_property name="ElementShortName">fifo_wr_data_4[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_4[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_cpack/fifo_wr_data_5">
+      <obj_property name="ElementShortName">fifo_wr_data_5[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_5[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_cpack/fifo_wr_data_6">
+      <obj_property name="ElementShortName">fifo_wr_data_6[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_6[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_cpack/fifo_wr_data_7">
+      <obj_property name="ElementShortName">fifo_wr_data_7[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_7[63:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_cpack/packed_fifo_wr_en">
       <obj_property name="ElementShortName">packed_fifo_wr_en</obj_property>
@@ -303,615 +440,92 @@
       <obj_property name="ElementShortName">s_axis_tvalid</obj_property>
       <obj_property name="ObjectShortName">s_axis_tvalid</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/apollo_rx_data_offload/m_axis">
-      <obj_property name="ElementShortName">m_axis</obj_property>
-      <obj_property name="ObjectShortName">m_axis</obj_property>
-   </wvobject>
    <wvobject fp_name="divider139" type="divider">
       <obj_property name="label">RX DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/s_axis">
-      <obj_property name="ElementShortName">s_axis</obj_property>
-      <obj_property name="ObjectShortName">s_axis</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/s_axis_aclk">
+      <obj_property name="ElementShortName">s_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">s_axis_aclk</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/m_dest_axi">
-      <obj_property name="ElementShortName">m_dest_axi</obj_property>
-      <obj_property name="ObjectShortName">m_dest_axi</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider318" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider468" type="divider">
-      <obj_property name="label">FSRC ANALYSIS</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/s_axis_valid">
-      <obj_property name="ElementShortName">s_axis_valid</obj_property>
-      <obj_property name="ObjectShortName">s_axis_valid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/s_axis_ready">
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/s_axis_ready">
       <obj_property name="ElementShortName">s_axis_ready</obj_property>
       <obj_property name="ObjectShortName">s_axis_ready</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/s_axis_data">
-      <obj_property name="ElementShortName">s_axis_data[511:0]</obj_property>
-      <obj_property name="ObjectShortName">s_axis_data[511:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider352" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/m_axis_valid">
-      <obj_property name="ElementShortName">m_axis_valid</obj_property>
-      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/m_axis_ready">
-      <obj_property name="ElementShortName">m_axis_ready</obj_property>
-      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/m_axis_data">
-      <obj_property name="ElementShortName">m_axis_data[511:0]</obj_property>
-      <obj_property name="ObjectShortName">m_axis_data[511:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider345" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/ACCUM_WIDTH">
-      <obj_property name="ElementShortName">ACCUM_WIDTH[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ACCUM_WIDTH[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/NUM_OF_CHANNELS">
-      <obj_property name="ElementShortName">NUM_OF_CHANNELS[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NUM_OF_CHANNELS[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/SAMPLES_PER_CHANNEL">
-      <obj_property name="ElementShortName">SAMPLES_PER_CHANNEL[31:0]</obj_property>
-      <obj_property name="ObjectShortName">SAMPLES_PER_CHANNEL[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/SAMPLE_DATA_WIDTH">
-      <obj_property name="ElementShortName">SAMPLE_DATA_WIDTH[31:0]</obj_property>
-      <obj_property name="ObjectShortName">SAMPLE_DATA_WIDTH[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/NUM_SAMPLES">
-      <obj_property name="ElementShortName">NUM_SAMPLES[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NUM_SAMPLES[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-      <obj_property name="CustomSignalColor">#F0E68C</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider474" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/TX_FSRC_ACCUM_WIDTH">
-      <obj_property name="ElementShortName">TX_FSRC_ACCUM_WIDTH[31:0]</obj_property>
-      <obj_property name="ObjectShortName">TX_FSRC_ACCUM_WIDTH[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="other" fp_name="/system_tb/test/TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO">
-      <obj_property name="ElementShortName">TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO</obj_property>
-      <obj_property name="ObjectShortName">TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test/TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED">
-      <obj_property name="ElementShortName">TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED[55:0]</obj_property>
-      <obj_property name="ObjectShortName">TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_regmap/ACCUM_WIDTH">
-      <obj_property name="ElementShortName">ACCUM_WIDTH[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ACCUM_WIDTH[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-      <obj_property name="CustomSignalColor">#F0E68C</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider575" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/set_val">
-      <obj_property name="ElementShortName">set_val[31:0][55:0]</obj_property>
-      <obj_property name="ObjectShortName">set_val[31:0][55:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/add_val">
-      <obj_property name="ElementShortName">add_val[55:0]</obj_property>
-      <obj_property name="ObjectShortName">add_val[55:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider358" type="divider">
-      <obj_property name="label">[0]</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[0].accum_set /set">
-      <obj_property name="ElementShortName">set</obj_property>
-      <obj_property name="ObjectShortName">set</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[0].accum_set /add">
-      <obj_property name="ElementShortName">add</obj_property>
-      <obj_property name="ObjectShortName">add</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[0].accum_set /add_val">
-      <obj_property name="ElementShortName">add_val[55:0]</obj_property>
-      <obj_property name="ObjectShortName">add_val[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[0].accum_set /accum">
-      <obj_property name="ElementShortName">accum[55:0]</obj_property>
-      <obj_property name="ObjectShortName">accum[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[0].accum_set /overflow">
-      <obj_property name="ElementShortName">overflow</obj_property>
-      <obj_property name="ObjectShortName">overflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider364" type="divider">
-      <obj_property name="label">[1]</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[1].accum_set /set">
-      <obj_property name="ElementShortName">set</obj_property>
-      <obj_property name="ObjectShortName">set</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[1].accum_set /add">
-      <obj_property name="ElementShortName">add</obj_property>
-      <obj_property name="ObjectShortName">add</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[1].accum_set /add_val">
-      <obj_property name="ElementShortName">add_val[55:0]</obj_property>
-      <obj_property name="ObjectShortName">add_val[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[1].accum_set /accum">
-      <obj_property name="ElementShortName">accum[55:0]</obj_property>
-      <obj_property name="ObjectShortName">accum[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[1].accum_set /overflow">
-      <obj_property name="ElementShortName">overflow</obj_property>
-      <obj_property name="ObjectShortName">overflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider370" type="divider">
-      <obj_property name="label">[2]</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[2].accum_set /set">
-      <obj_property name="ElementShortName">set</obj_property>
-      <obj_property name="ObjectShortName">set</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[2].accum_set /add">
-      <obj_property name="ElementShortName">add</obj_property>
-      <obj_property name="ObjectShortName">add</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[2].accum_set /add_val">
-      <obj_property name="ElementShortName">add_val[55:0]</obj_property>
-      <obj_property name="ObjectShortName">add_val[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[2].accum_set /accum">
-      <obj_property name="ElementShortName">accum[55:0]</obj_property>
-      <obj_property name="ObjectShortName">accum[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[2].accum_set /overflow">
-      <obj_property name="ElementShortName">overflow</obj_property>
-      <obj_property name="ObjectShortName">overflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider376" type="divider">
-      <obj_property name="label">[3]</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[3].accum_set /set">
-      <obj_property name="ElementShortName">set</obj_property>
-      <obj_property name="ObjectShortName">set</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[3].accum_set /add">
-      <obj_property name="ElementShortName">add</obj_property>
-      <obj_property name="ObjectShortName">add</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[3].accum_set /add_val">
-      <obj_property name="ElementShortName">add_val[55:0]</obj_property>
-      <obj_property name="ObjectShortName">add_val[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[3].accum_set /accum">
-      <obj_property name="ElementShortName">accum[55:0]</obj_property>
-      <obj_property name="ObjectShortName">accum[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/\accum_gen[3].accum_set /overflow">
-      <obj_property name="ElementShortName">overflow</obj_property>
-      <obj_property name="ObjectShortName">overflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider382" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/enable">
-      <obj_property name="ElementShortName">enable</obj_property>
-      <obj_property name="ObjectShortName">enable</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/ext_trig_en">
-      <obj_property name="ElementShortName">ext_trig_en</obj_property>
-      <obj_property name="ObjectShortName">ext_trig_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider449" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/m_axis_ready">
-      <obj_property name="ElementShortName">m_axis_ready</obj_property>
-      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/m_axis_valid">
-      <obj_property name="ElementShortName">m_axis_valid</obj_property>
-      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/m_axis_data">
-      <obj_property name="ElementShortName">m_axis_data[511:0]</obj_property>
-      <obj_property name="ObjectShortName">m_axis_data[511:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider465" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/data_out_s">
-      <obj_property name="ElementShortName">data_out_s[511:0]</obj_property>
-      <obj_property name="ObjectShortName">data_out_s[511:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/data_out_valid_s">
-      <obj_property name="ElementShortName">data_out_valid_s</obj_property>
-      <obj_property name="ObjectShortName">data_out_valid_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider456" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_data">
-      <obj_property name="ElementShortName">out_data[511:0]</obj_property>
-      <obj_property name="ObjectShortName">out_data[511:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_valid">
-      <obj_property name="ElementShortName">out_valid</obj_property>
-      <obj_property name="ObjectShortName">out_valid</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider459" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_data_deinterleaved">
-      <obj_property name="ElementShortName">out_data_deinterleaved[511:0]</obj_property>
-      <obj_property name="ObjectShortName">out_data_deinterleaved[511:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider198" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_data_arr">
-      <obj_property name="ElementShortName">out_data_arr[7:0][63:0]</obj_property>
-      <obj_property name="ObjectShortName">out_data_arr[7:0][63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider347" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_fifo_in_ready">
-      <obj_property name="ElementShortName">out_fifo_in_ready[7:0]</obj_property>
-      <obj_property name="ObjectShortName">out_fifo_in_ready[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_fifo_in_ready_next">
-      <obj_property name="ElementShortName">out_fifo_in_ready_next[7:0]</obj_property>
-      <obj_property name="ObjectShortName">out_fifo_in_ready_next[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_fifo_in_data">
-      <obj_property name="ElementShortName">out_fifo_in_data[7:0][63:0]</obj_property>
-      <obj_property name="ObjectShortName">out_fifo_in_data[7:0][63:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_fifo_in_valid">
-      <obj_property name="ElementShortName">out_fifo_in_valid[7:0]</obj_property>
-      <obj_property name="ObjectShortName">out_fifo_in_valid[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider838" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_ready">
-      <obj_property name="ElementShortName">out_ready</obj_property>
-      <obj_property name="ObjectShortName">out_ready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_valid_s">
-      <obj_property name="ElementShortName">out_valid_s[7:0]</obj_property>
-      <obj_property name="ObjectShortName">out_valid_s[7:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/out_data">
-      <obj_property name="ElementShortName">out_data[511:0]</obj_property>
-      <obj_property name="ObjectShortName">out_data[511:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider317" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/in_fifo_out_data">
-      <obj_property name="ElementShortName">in_fifo_out_data[7:0][63:0]</obj_property>
-      <obj_property name="ObjectShortName">in_fifo_out_data[7:0][63:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="divider469" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/fsrc_out_data">
-      <obj_property name="ElementShortName">fsrc_out_data[7:0][63:0]</obj_property>
-      <obj_property name="ObjectShortName">fsrc_out_data[7:0][63:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFD700</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="divider847" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/holes_data_d[1]">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[1][3:0]</obj_property>
-      <obj_property name="ObjectShortName">[1][3:0]</obj_property>
-      <obj_property name="label">holes_data_d[1][3:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/holes_data_d[1][3]">
-         <obj_property name="ElementShortName">[3]</obj_property>
-         <obj_property name="ObjectShortName">[3]</obj_property>
-         <obj_property name="CustomSignalColor">#E0FFFF</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/holes_data_d[1][2]">
-         <obj_property name="ElementShortName">[2]</obj_property>
-         <obj_property name="ObjectShortName">[2]</obj_property>
-         <obj_property name="CustomSignalColor">#E0FFFF</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/holes_data_d[1][1]">
-         <obj_property name="ElementShortName">[1]</obj_property>
-         <obj_property name="ObjectShortName">[1]</obj_property>
-         <obj_property name="CustomSignalColor">#E0FFFF</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/holes_data_d[1][0]">
-         <obj_property name="ElementShortName">[0]</obj_property>
-         <obj_property name="ObjectShortName">[0]</obj_property>
-         <obj_property name="CustomSignalColor">#E0FFFF</obj_property>
-         <obj_property name="UseCustomSignalColor">true</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="divider313" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/out_ready">
-      <obj_property name="ElementShortName">out_ready</obj_property>
-      <obj_property name="ObjectShortName">out_ready</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/out_valid">
-      <obj_property name="ElementShortName">out_valid</obj_property>
-      <obj_property name="ObjectShortName">out_valid</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/out_data">
-      <obj_property name="ElementShortName">out_data[7:0][63:0]</obj_property>
-      <obj_property name="ObjectShortName">out_data[7:0][63:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="divider300" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/data_stored">
-      <obj_property name="ElementShortName">data_stored[7:0][11:0][15:0]</obj_property>
-      <obj_property name="ObjectShortName">data_stored[7:0][11:0][15:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="divider591" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/data_shift_holes_xfer">
-      <obj_property name="ElementShortName">data_shift_holes_xfer</obj_property>
-      <obj_property name="ObjectShortName">data_shift_holes_xfer</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/non_holes_cnt_total_per_word_d">
-      <obj_property name="ElementShortName">non_holes_cnt_total_per_word_d[3:0][2:0]</obj_property>
-      <obj_property name="ObjectShortName">non_holes_cnt_total_per_word_d[3:0][2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider844" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/NUM_OF_CHANNELS">
-      <obj_property name="ElementShortName">NUM_OF_CHANNELS[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NUM_OF_CHANNELS[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/SAMPLES_PER_CHANNEL">
-      <obj_property name="ElementShortName">SAMPLES_PER_CHANNEL[31:0]</obj_property>
-      <obj_property name="ObjectShortName">SAMPLES_PER_CHANNEL[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/SAMPLE_DATA_WIDTH">
-      <obj_property name="ElementShortName">SAMPLE_DATA_WIDTH[31:0]</obj_property>
-      <obj_property name="ObjectShortName">SAMPLE_DATA_WIDTH[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider606" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/non_holes_cnt_total_per_word">
-      <obj_property name="ElementShortName">non_holes_cnt_total_per_word[3:0][2:0]</obj_property>
-      <obj_property name="ObjectShortName">non_holes_cnt_total_per_word[3:0][2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider612" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_make_holes/holes_data_d[0]">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">[0][3:0]</obj_property>
-      <obj_property name="ObjectShortName">[0][3:0]</obj_property>
-      <obj_property name="label">holes_data_d[0][3:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="divider834" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/holes_data">
-      <obj_property name="ElementShortName">holes_data[31:0]</obj_property>
-      <obj_property name="ObjectShortName">holes_data[31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="divider463" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/fsrc_data_en">
-      <obj_property name="ElementShortName">fsrc_data_en</obj_property>
-      <obj_property name="ObjectShortName">fsrc_data_en</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/holes_n">
-      <obj_property name="ElementShortName">holes_n[31:0]</obj_property>
-      <obj_property name="ObjectShortName">holes_n[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider579" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/reset">
-      <obj_property name="ElementShortName">reset</obj_property>
-      <obj_property name="ObjectShortName">reset</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/set_val">
-      <obj_property name="ElementShortName">set_val[31:0][55:0]</obj_property>
-      <obj_property name="ObjectShortName">set_val[31:0][55:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/set">
-      <obj_property name="ElementShortName">set</obj_property>
-      <obj_property name="ObjectShortName">set</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/add_val">
-      <obj_property name="ElementShortName">add_val[55:0]</obj_property>
-      <obj_property name="ObjectShortName">add_val[55:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/add">
-      <obj_property name="ElementShortName">add</obj_property>
-      <obj_property name="ObjectShortName">add</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/fsrc_tx/inst/i_tx_fsrc/tx_fsrc_sample_en_gen/overflow">
-      <obj_property name="ElementShortName">overflow[31:0]</obj_property>
-      <obj_property name="ObjectShortName">overflow[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider588" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider618" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/reset">
-      <obj_property name="ElementShortName">reset</obj_property>
-      <obj_property name="ObjectShortName">reset</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_0">
-      <obj_property name="ElementShortName">enable_0</obj_property>
-      <obj_property name="ObjectShortName">enable_0</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_1">
-      <obj_property name="ElementShortName">enable_1</obj_property>
-      <obj_property name="ObjectShortName">enable_1</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_2">
-      <obj_property name="ElementShortName">enable_2</obj_property>
-      <obj_property name="ObjectShortName">enable_2</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_3">
-      <obj_property name="ElementShortName">enable_3</obj_property>
-      <obj_property name="ObjectShortName">enable_3</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_4">
-      <obj_property name="ElementShortName">enable_4</obj_property>
-      <obj_property name="ObjectShortName">enable_4</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_5">
-      <obj_property name="ElementShortName">enable_5</obj_property>
-      <obj_property name="ObjectShortName">enable_5</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_6">
-      <obj_property name="ElementShortName">enable_6</obj_property>
-      <obj_property name="ObjectShortName">enable_6</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/enable_7">
-      <obj_property name="ElementShortName">enable_7</obj_property>
-      <obj_property name="ObjectShortName">enable_7</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider626" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider826" type="divider">
-      <obj_property name="label">__________</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/s_axis_valid">
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/s_axis_valid">
       <obj_property name="ElementShortName">s_axis_valid</obj_property>
       <obj_property name="ObjectShortName">s_axis_valid</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/util_apollo_upack/s_axis_ready">
-      <obj_property name="ElementShortName">s_axis_ready</obj_property>
-      <obj_property name="ObjectShortName">s_axis_ready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/s_axis_data">
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/s_axis_data">
       <obj_property name="ElementShortName">s_axis_data[511:0]</obj_property>
       <obj_property name="ObjectShortName">s_axis_data[511:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="divider600" type="divider">
-      <obj_property name="label">__________</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/s_axis_last">
+      <obj_property name="ElementShortName">s_axis_last</obj_property>
+      <obj_property name="ObjectShortName">s_axis_last</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider309" type="divider">
+      <obj_property name="label">___</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_0">
-      <obj_property name="ElementShortName">fifo_rd_data_0[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_0[63:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/m_dest_axi_aclk">
+      <obj_property name="ElementShortName">m_dest_axi_aclk</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_aclk</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_1">
-      <obj_property name="ElementShortName">fifo_rd_data_1[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_1[63:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/m_dest_axi_wready">
+      <obj_property name="ElementShortName">m_dest_axi_wready</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wready</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_2">
-      <obj_property name="ElementShortName">fifo_rd_data_2[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_2[63:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/m_dest_axi_wvalid">
+      <obj_property name="ElementShortName">m_dest_axi_wvalid</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wvalid</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_3">
-      <obj_property name="ElementShortName">fifo_rd_data_3[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_3[63:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/m_dest_axi_wdata">
+      <obj_property name="ElementShortName">m_dest_axi_wdata[511:0]</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wdata[511:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_4">
-      <obj_property name="ElementShortName">fifo_rd_data_4[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_4[63:0]</obj_property>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_apollo_rx_dma/m_dest_axi_wlast">
+      <obj_property name="ElementShortName">m_dest_axi_wlast</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi_wlast</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_5">
-      <obj_property name="ElementShortName">fifo_rd_data_5[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_5[63:0]</obj_property>
+   <wvobject fp_name="divider339" type="divider">
+      <obj_property name="label">ANALYSIS</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_6">
-      <obj_property name="ElementShortName">fifo_rd_data_6[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_6[63:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_tpl_core/enable">
+      <obj_property name="ElementShortName">enable[7:0]</obj_property>
+      <obj_property name="ObjectShortName">enable[7:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/util_apollo_upack/fifo_rd_data_7">
-      <obj_property name="ElementShortName">fifo_rd_data_7[63:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_7[63:0]</obj_property>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_0">
+      <obj_property name="ElementShortName">dac_enable_0[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_0[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_1">
+      <obj_property name="ElementShortName">dac_enable_1[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_1[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_2">
+      <obj_property name="ElementShortName">dac_enable_2[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_2[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_3">
+      <obj_property name="ElementShortName">dac_enable_3[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_3[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_4">
+      <obj_property name="ElementShortName">dac_enable_4[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_4[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_5">
+      <obj_property name="ElementShortName">dac_enable_5[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_5[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_6">
+      <obj_property name="ElementShortName">dac_enable_6[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_6[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/tx_apollo_tpl_core/dac_enable_7">
+      <obj_property name="ElementShortName">dac_enable_7[0:0]</obj_property>
+      <obj_property name="ObjectShortName">dac_enable_7[0:0]</obj_property>
    </wvobject>
 </wave_config>

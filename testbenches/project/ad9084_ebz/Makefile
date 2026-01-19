@@ -17,7 +17,7 @@ SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_dac_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_common_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_adc_pkg.sv
 
-#ENV_DEPS += $(HDL_LIBRARY_PATH)/util_cdc/sync_bits.v
+ENV_DEPS += $(ADI_HDL_DIR)/library/util_cdc/sync_bits.v
 
 LIB_DEPS += axi_dmac
 LIB_DEPS += axi_fsrc/axi_fsrc_rx

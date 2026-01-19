@@ -76,14 +76,17 @@ adi_sim_add_define "SYSREF_CLK=sysref_clk_vip"
 create_bd_port -dir O sysref_clk_out
 ad_connect sysref_clk_out sysref_clk_vip/clk_out
 
-#adi_project_files [list \
-#    "$ad_hdl_dir/library/util_cdc/sync_bits.v" \
-#]
+adi_project_files [list \
+    "$ad_hdl_dir/library/util_cdc/sync_bits.v" \
+]
 
 #
 #  Block design under test
 #
 #
+set ADI_PHY_SEL 0
+set MAX_NUMBER_OF_QUADS 3
+set TRANSCEIVER_TYPE GTY
 set ASYMMETRIC_A_B_MODE 0
 set FSRC_ENABLE 1
 set ACCUM_WIDTH 56
@@ -103,17 +106,17 @@ set RX_DMA 0x7C420000
 set_property offset $RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_apollo_rx_dma}]
 adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMA}]"
 
-set RX_XCVR 0x44A60000
-set_property offset $RX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_apollo_rx_xcvr}]
-adi_sim_add_define "RX_XCVR_BA=[format "%d" ${RX_XCVR}]"
+#set RX_XCVR 0x44A60000
+#set_property offset $RX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_apollo_rx_xcvr}]
+#adi_sim_add_define "RX_XCVR_BA=[format "%d" ${RX_XCVR}]"
 
 set TX_DMA 0x7C430000
 set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_apollo_tx_dma}]
 adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMA}]"
 
-set TX_XCVR 0x44B60000
-set_property offset $TX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_apollo_tx_xcvr}]
-adi_sim_add_define "TX_XCVR_BA=[format "%d" ${TX_XCVR}]"
+#set TX_XCVR 0x44B60000
+#set_property offset $TX_XCVR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_apollo_tx_xcvr}]
+#adi_sim_add_define "TX_XCVR_BA=[format "%d" ${TX_XCVR}]"
 
 set AXI_JESD_RX 0x44A90000
 set_property offset $AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_apollo_rx_jesd}]

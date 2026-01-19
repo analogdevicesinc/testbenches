@@ -72,10 +72,10 @@ program test_program;
   parameter TDD_FRAME_LENGTH = TDD_BASE + 'h54;
   parameter TDD_CH0_ON = TDD_BASE + 'h80;   // Laser trigger ON
   parameter TDD_CH0_OFF = TDD_BASE + 'h84;  // Laser trigger OFF
-  parameter TDD_CH1_ON = TDD_BASE + 'h88;   // ADC gate ON
-  parameter TDD_CH1_OFF = TDD_BASE + 'h8C;  // ADC gate OFF
-  parameter TDD_CH2_ON = TDD_BASE + 'h90;   // DMA sync ON
-  parameter TDD_CH2_OFF = TDD_BASE + 'h94;  // DMA sync OFF
+  parameter TDD_CH1_ON = TDD_BASE + 'h88;   // DMA sync ON
+  parameter TDD_CH1_OFF = TDD_BASE + 'h8C;  // DMA sync OFF
+  parameter TDD_CH2_ON = TDD_BASE + 'h90;   // [UNUSED]
+  parameter TDD_CH2_OFF = TDD_BASE + 'h94;  // [UNUSED]
 
   // Module-level variables used in tasks
   int num_lanes = 2;
@@ -287,24 +287,20 @@ begin
 
   #1us;
 
-  // Configure TDD for basic DMA test (hardware requires TDD for data flow)
-  // Channel 1: ADC gate - keep HIGH to pass all ADC data (fifo_wr_en = adc_valid AND tdd_ch1)
-  // Channel 2: DMA sync pulse - required because DMA has SYNC_TRANSFER_START=1
+  // Configure TDD for basic DMA test
+  // Channel 1: DMA sync pulse - required because DMA has SYNC_TRANSFER_START=1
+  // Note: adc_valid is now connected directly to DMA (no gate logic)
   // Use software sync to trigger AFTER DMA is armed
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);              // Disable during config
   env.mng.master_sequencer.RegWrite32(TDD_STARTUP_DELAY, 0);
   env.mng.master_sequencer.RegWrite32(TDD_FRAME_LENGTH, 32'hFFFFFFFF);  // Very long frame
   env.mng.master_sequencer.RegWrite32(TDD_BURST_COUNT, 1);              // Single burst
 
-  // Channel 1: Keep HIGH continuously for ADC gate
-  env.mng.master_sequencer.RegWrite32(TDD_CH1_ON, 0);
-  env.mng.master_sequencer.RegWrite32(TDD_CH1_OFF, 32'hFFFFFFFF);
+  // Channel 1: Generate sync pulse for DMA (pulse at start of frame)
+  env.mng.master_sequencer.RegWrite32(TDD_CH1_ON, 10);
+  env.mng.master_sequencer.RegWrite32(TDD_CH1_OFF, 20);
 
-  // Channel 2: Generate sync pulse for DMA (pulse at start of frame)
-  env.mng.master_sequencer.RegWrite32(TDD_CH2_ON, 10);
-  env.mng.master_sequencer.RegWrite32(TDD_CH2_OFF, 20);
-
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h6);       // Enable CH1 + CH2 (bits 1,2)
+  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h2);       // Enable CH1 only (bit 1)
   env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_POLARITY, 32'h0);     // Active high
 
   `INFO(("TDD configured (not enabled yet - waiting for DMA setup)"), ADI_VERBOSITY_LOW);
@@ -626,7 +622,9 @@ endtask
 // Simulates real LiDAR time-of-flight measurement:
 //   1. CH0 fires laser pulse at T=0
 //   2. Light travels to target and reflects back (time-of-flight delay)
-//   3. CH1 opens ADC gate to capture reflected signal
+//   3. CH1 DMA sync triggers capture when reflection arrives
+//   Note: adc_valid connected directly to DMA (no gate logic)
+//         DMA captures based on TRANSFER_LENGTH after sync
 //
 // Physics (from Picture105.png):
 //   Speed of light = 3×10^8 m/s
@@ -645,19 +643,19 @@ task tdd_lidar_test;
   localparam GATE_OFF_TIME = 25;          // Gate closes at 200ns (~30m reflection)
   localparam FRAME_LENGTH = 12500;        // 100µs frame (12500 cycles)
 
-  // Capture window = 25 - 13 = 12 samples
-  // 12 samples × 2 bytes = 24 bytes
-  // DMA transfer length MUST match gated samples or it will hang waiting for more data!
-  localparam CAPTURE_SAMPLES = GATE_OFF_TIME - GATE_ON_TIME;  // 12 samples
-  localparam TRANSFER_LENGTH = CAPTURE_SAMPLES * 2;           // 24 bytes (12 samples × 2 bytes)
+  // Capture window = 12 samples (determined by TRANSFER_LENGTH)
+  // DMA starts capturing at GATE_ON_TIME (sync pulse)
+  // DMA stops after TRANSFER_LENGTH bytes
+  localparam CAPTURE_SAMPLES = 12;                     // Number of samples to capture
+  localparam TRANSFER_LENGTH = CAPTURE_SAMPLES * 2;    // 24 bytes (12 samples × 2 bytes)
   localparam DMA_DEST_ADDR = `DDR_BA + 32'h00003000;
 begin
 
   `INFO(("=== TDD LiDAR Test Started (Realistic Timing) ==="), ADI_VERBOSITY_NONE);
-  `INFO(("LiDAR parameters: Laser pulse 0-%0d, ADC gate %0d-%0d (%0d samples)",
-         LASER_OFF_TIME, GATE_ON_TIME, GATE_OFF_TIME, CAPTURE_SAMPLES), ADI_VERBOSITY_NONE);
-  `INFO(("Physics: Gate opens at %0dns (~15m), closes at %0dns (~30m)",
-         GATE_ON_TIME * 8, GATE_OFF_TIME * 8), ADI_VERBOSITY_NONE);
+  `INFO(("LiDAR parameters: Laser pulse 0-%0d, DMA sync at %0d (%0d samples)",
+         LASER_OFF_TIME, GATE_ON_TIME, CAPTURE_SAMPLES), ADI_VERBOSITY_NONE);
+  `INFO(("Physics: DMA triggered at %0dns (~15m reflection)",
+         GATE_ON_TIME * 8), ADI_VERBOSITY_NONE);
 
   link_setup;
 
@@ -673,7 +671,7 @@ begin
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);  // Disable TDD (ENABLE=0)
   #1000ns;  // Wait for FSM to reach IDLE and counter to reset to 0
 
-  `INFO(("TDD reset complete, configuring for gated operation"), ADI_VERBOSITY_NONE);
+  `INFO(("TDD reset complete, configuring for LiDAR operation"), ADI_VERBOSITY_NONE);
 
   // Use SYNC_RST to reset TDD FSM and channels to known state
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h2);  // Assert SYNC_RST (bit 1)
@@ -690,24 +688,19 @@ begin
   env.mng.master_sequencer.RegWrite32(TDD_CH0_ON, LASER_ON_TIME);
   env.mng.master_sequencer.RegWrite32(TDD_CH0_OFF, LASER_OFF_TIME);
 
-  // CH1: ADC gate - opens after time-of-flight delay to capture reflections
+  // CH1: DMA sync - trigger when reflection arrives to start capturing
   env.mng.master_sequencer.RegWrite32(TDD_CH1_ON, GATE_ON_TIME);
-  env.mng.master_sequencer.RegWrite32(TDD_CH1_OFF, GATE_OFF_TIME);
+  env.mng.master_sequencer.RegWrite32(TDD_CH1_OFF, GATE_ON_TIME + 10);  // 10-cycle sync pulse
 
-  // CH2: DMA sync - trigger at same time as ADC gate opens
-  env.mng.master_sequencer.RegWrite32(TDD_CH2_ON, GATE_ON_TIME);
-  env.mng.master_sequencer.RegWrite32(TDD_CH2_OFF, GATE_ON_TIME + 10);  // 10-cycle sync pulse
-
-  // Enable CH0 (laser) + CH1 (ADC gate) + CH2 (DMA sync)
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h7);  // All 3 channels
+  // Enable CH0 (laser) + CH1 (DMA sync)
+  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h3);  // CH0 + CH1 (bits 0,1)
   env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_POLARITY, 32'h0);
 
   // Wait for settings to settle
   #100ns;
 
-  `INFO(("TDD configured: FRAME=%0d, CH0 laser 0-%0d, CH1 gate %0d-%0d, CH2 sync %0d-%0d",
-         FRAME_LENGTH, LASER_OFF_TIME, GATE_ON_TIME, GATE_OFF_TIME,
-         GATE_ON_TIME, GATE_ON_TIME + 10), ADI_VERBOSITY_NONE);
+  `INFO(("TDD configured: FRAME=%0d, CH0 laser 0-%0d, CH1 sync %0d-%0d",
+         FRAME_LENGTH, LASER_OFF_TIME, GATE_ON_TIME, GATE_ON_TIME + 10), ADI_VERBOSITY_NONE);
 
   rx_dma_api.set_control(4'b0000);  // Disable DMA (ENABLE=0) - triggers needs_reset
 
@@ -741,7 +734,7 @@ begin
   env.mng.master_sequencer.RegRead32(TDD_CONTROL, val);
   `INFO(("TDD_CONTROL after sync: 0x%08h", val), ADI_VERBOSITY_NONE);
   env.mng.master_sequencer.RegRead32(TDD_CHANNEL_ENABLE, val);
-  `INFO(("TDD_CHANNEL_ENABLE: 0x%08h (expect 0x7)", val), ADI_VERBOSITY_NONE);
+  `INFO(("TDD_CHANNEL_ENABLE: 0x%08h (expect 0x3)", val), ADI_VERBOSITY_NONE);
   env.mng.master_sequencer.RegRead32(TDD_CH0_ON, val);
   `INFO(("TDD_CH0_ON: 0x%08h (expect %0d=0x%02h)", val, LASER_ON_TIME, LASER_ON_TIME), ADI_VERBOSITY_NONE);
   env.mng.master_sequencer.RegRead32(TDD_CH0_OFF, val);
@@ -749,11 +742,7 @@ begin
   env.mng.master_sequencer.RegRead32(TDD_CH1_ON, val);
   `INFO(("TDD_CH1_ON: 0x%08h (expect %0d=0x%02h)", val, GATE_ON_TIME, GATE_ON_TIME), ADI_VERBOSITY_NONE);
   env.mng.master_sequencer.RegRead32(TDD_CH1_OFF, val);
-  `INFO(("TDD_CH1_OFF: 0x%08h (expect %0d=0x%02h)", val, GATE_OFF_TIME, GATE_OFF_TIME), ADI_VERBOSITY_NONE);
-  env.mng.master_sequencer.RegRead32(TDD_CH2_ON, val);
-  `INFO(("TDD_CH2_ON: 0x%08h (expect %0d=0x%02h)", val, GATE_ON_TIME, GATE_ON_TIME), ADI_VERBOSITY_NONE);
-  env.mng.master_sequencer.RegRead32(TDD_CH2_OFF, val);
-  `INFO(("TDD_CH2_OFF: 0x%08h (expect %0d=0x%02h)", val, GATE_ON_TIME + 10, GATE_ON_TIME + 10), ADI_VERBOSITY_NONE);
+  `INFO(("TDD_CH1_OFF: 0x%08h (expect %0d=0x%02h)", val, GATE_ON_TIME + 10, GATE_ON_TIME + 10), ADI_VERBOSITY_NONE);
 
   // Wait for DMA
   rx_dma_api.wait_transfer_done(.transfer_id(transfer_id), .timeut_in_us(5000));

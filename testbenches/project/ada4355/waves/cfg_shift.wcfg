@@ -52,15 +52,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="38,733.800 ns"></ZoomStartTime>
-      <ZoomEndTime time="38,885.501 ns"></ZoomEndTime>
-      <Cursor1Time time="38,800.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="64.801 ns"></ZoomEndTime>
+      <Cursor1Time time="0.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="253"></NameColumnWidth>
-      <ValueColumnWidth column_width="78"></ValueColumnWidth>
+      <ValueColumnWidth column_width="74"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="92" />
+   <WVObjectSize size="93" />
    <wvobject type="logic" fp_name="/system_tb/ssi_clk">
       <obj_property name="ElementShortName">ssi_clk</obj_property>
       <obj_property name="ObjectShortName">ssi_clk</obj_property>
@@ -213,10 +213,6 @@
       <obj_property name="ElementShortName">resetn</obj_property>
       <obj_property name="ObjectShortName">resetn</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/s_axi_aclk">
       <obj_property name="ElementShortName">s_axi_aclk</obj_property>
       <obj_property name="ObjectShortName">s_axi_aclk</obj_property>
@@ -245,6 +241,10 @@
       <obj_property name="ElementShortName">sync</obj_property>
       <obj_property name="ObjectShortName">sync</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/system_tb/sample_count">
+      <obj_property name="ElementShortName">sample_count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sample_count[31:0]</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_counter">
       <obj_property name="ElementShortName">tdd_counter[31:0]</obj_property>
       <obj_property name="ObjectShortName">tdd_counter[31:0]</obj_property>
@@ -254,6 +254,10 @@
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_tdd_0/tdd_core/inst/i_counter/tdd_cstate">
       <obj_property name="ElementShortName">tdd_cstate[1:0]</obj_property>
       <obj_property name="ObjectShortName">tdd_cstate[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_tdd_0/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
    <wvobject fp_name="divider200" type="divider">
       <obj_property name="label">LiDAR Debug Markers</obj_property>

@@ -24,6 +24,7 @@ LIB_DEPS += axi_fsrc/axi_fsrc_rx
 LIB_DEPS += axi_fsrc/axi_fsrc_tx
 LIB_DEPS += axi_fsrc/axi_fsrc_sequencer
 LIB_DEPS += axi_tdd
+LIB_DEPS += axi_adf4030
 LIB_DEPS += data_offload
 LIB_DEPS += jesd204/ad_ip_jesd204_tpl_dac
 LIB_DEPS += jesd204/axi_jesd204_tx

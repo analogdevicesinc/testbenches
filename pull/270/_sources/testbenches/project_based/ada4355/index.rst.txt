@@ -78,12 +78,14 @@ CPU/Memory interconnect addresses
 
 Below are the CPU/Memory interconnect addresses used in this project:
 
-=================  ===========
-Instance           Address
-=================  ===========
-axi_ada4355_adc    0x44A0_0000
-axi_ada4355_dma    0x44A3_0000
-=================  ===========
+====================  ===========
+Instance              Address
+====================  ===========
+axi_intc              0x4120_0000
+axi_ada4355_adc       0x44A0_0000
+axi_ada4355_dma       0x44A3_0000
+ddr_axi_vip           0x8000_0000
+====================  ===========
 
 Interrupts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +117,8 @@ Sanity test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This test is used to check the communication with the AXI ADC module of the
-ADA4355 interface, by reading the core VERSION register.
+ADA4355 interface, by reading the core VERSION register. The sanity test is
+also performed for the DMA.
 
 DMA test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,7 +134,7 @@ The steps of this test are:
 * Start the DMA transfer
 * Enable the frame pattern for data alignment
 * Wait for DMA transfer completion
-* Verify captured data matches the expected sine wave pattern
+* Verify that captured data matches the expected sine wave pattern
 
 Resync test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -142,7 +145,7 @@ The steps of this test are:
 
 * Pulse sync_n low to trigger FSM reset
 * Wait for FSM to complete alignment search
-* Verify FSM has re-aligned correctly
+* Verify that the FSM has re-aligned correctly
 
 Building the testbench
 -------------------------------------------------------------------------------
@@ -234,9 +237,6 @@ HDL related dependencies forming the DUT
    * - SYSID_ROM
      - :git-hdl:`library/sysid_rom`
      - :external+hdl:ref:`axi_sysid`
-   * - UTIL_I2C_MIXER
-     - :git-hdl:`library/util_i2c_mixer <library/util_i2c_mixer>`
-     - ---
 
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

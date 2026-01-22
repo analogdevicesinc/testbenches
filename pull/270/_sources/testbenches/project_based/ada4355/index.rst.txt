@@ -225,18 +225,6 @@ HDL related dependencies forming the DUT
    * - AXI_DMAC
      - :git-hdl:`library/axi_dmac`
      - :external+hdl:ref:`axi_dmac`
-   * - AXI_HDMI_TX
-     - :git-hdl:`library/axi_hdmi_tx`
-     - :external+hdl:ref:`axi_hdmi_tx`
-   * - AXI_I2S_ADI
-     - :git-hdl:`library/axi_i2s_adi`
-     - ---
-   * - AXI_SPDIF_TX
-     - :git-hdl:`library/axi_spdif_tx`
-     - ---
-   * - SYSID_ROM
-     - :git-hdl:`library/sysid_rom`
-     - :external+hdl:ref:`axi_sysid`
 
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

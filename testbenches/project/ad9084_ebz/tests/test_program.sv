@@ -207,7 +207,7 @@ program test_program;
     // NS is 0 (NS_PARAM = 0)
     base_env.mng.master_sequencer.RegWrite32(`FSRC_TX_BA + 'h18, 32'hFF); // CONV_MAS
     `INFO(("sample_rate_fixed %h", TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED), ADI_VERBOSITY_NONE);
-    for (int i = 0; i <= 15; i++) begin
+    for (int i = 0; i < 32; i++) begin // NUM_OF_CHANNELS * SAMPLES_PER_CHANNEL
       val64 = (~TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED + 64'b1) + (i * TX_FSRC_CHANNEL_TO_SAMPLE_RATE_RATIO_FIXED);
       `INFO(("val64 %h", val64), ADI_VERBOSITY_NONE);
       base_env.mng.master_sequencer.RegWrite32(`FSRC_TX_BA + 'h28, val64[31:0]);

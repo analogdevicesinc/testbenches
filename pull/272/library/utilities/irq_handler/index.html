@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The purpose of this class is to provide an object that can simulate a processor interrupt handler. The class relies on the AXI Interrupt Controller from AMD and it uses an IO VIP to monitor the IRQ pin." name="description" />
+
+    <title>IRQ Handler &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script async="async" src="../../../_static/app.umd.js?v=46a18818"></script>
+    <link rel="icon" href="../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Test Harness" href="../test_harness/index.html" />
+    <link rel="prev" title="Utilities" href="../index.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">IRQ Handler</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#function-new">function new();</a></li>
+<li><a class="reference internal" href="#function-void-enable-software-testing">function void enable_software_testing();</a></li>
+<li><a class="reference internal" href="#task-software-irq-testing">task software_irq_testing();</a></li>
+<li><a class="reference internal" href="#task-start">task start();</a></li>
+<li><a class="reference internal" href="#function-event-register-device-input-int-position">function event register_device(input int position);</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../../drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">IRQ Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../vip/adi/io_vip/index.html">IO VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../testbenches/index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../../testbenches/ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../../testbenches/project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ada4355/index.html">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/ltc2378/index.html">LTC2378-20</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../testbenches/project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Library</a></li><li><a href="../index.html">Utilities</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="irq-handler">
+<span id="id1"></span><h1>IRQ Handler<a class="headerlink" href="#irq-handler" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The purpose of this class is to provide an object that can simulate a processor
+interrupt handler. The class relies on the AXI Interrupt Controller from AMD and
+it uses an IO VIP to monitor the IRQ pin.</p>
+<div class="svg align-center"><?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.6.9-HEAD" preserveAspectRatio="xMidYMid meet" viewBox="0 0 730 1158"><svg class="d2-3607434256 d2-svg" width="730" height="1158" viewBox="-89 -89 730 1158"><rect x="-89.000000" y="-89.000000" width="730.000000" height="1158.000000" rx="0.000000" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-3607434256 .text-mono {
+	font-family: "d2-3607434256-font-mono";
+}
+@font-face {
+	font-family: d2-3607434256-font-mono;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-3607434256 .fill-N1{fill:#0A0F25;}
+		.d2-3607434256 .fill-N2{fill:#676C7E;}
+		.d2-3607434256 .fill-N3{fill:#9499AB;}
+		.d2-3607434256 .fill-N4{fill:#CFD2DD;}
+		.d2-3607434256 .fill-N5{fill:#DEE1EB;}
+		.d2-3607434256 .fill-N6{fill:#EEF1F8;}
+		.d2-3607434256 .fill-N7{fill:#FFFFFF;}
+		.d2-3607434256 .fill-B1{fill:#0D32B2;}
+		.d2-3607434256 .fill-B2{fill:#0D32B2;}
+		.d2-3607434256 .fill-B3{fill:#E3E9FD;}
+		.d2-3607434256 .fill-B4{fill:#E3E9FD;}
+		.d2-3607434256 .fill-B5{fill:#EDF0FD;}
+		.d2-3607434256 .fill-B6{fill:#F7F8FE;}
+		.d2-3607434256 .fill-AA2{fill:#4A6FF3;}
+		.d2-3607434256 .fill-AA4{fill:#EDF0FD;}
+		.d2-3607434256 .fill-AA5{fill:#F7F8FE;}
+		.d2-3607434256 .fill-AB4{fill:#EDF0FD;}
+		.d2-3607434256 .fill-AB5{fill:#F7F8FE;}
+		.d2-3607434256 .stroke-N1{stroke:#0A0F25;}
+		.d2-3607434256 .stroke-N2{stroke:#676C7E;}
+		.d2-3607434256 .stroke-N3{stroke:#9499AB;}
+		.d2-3607434256 .stroke-N4{stroke:#CFD2DD;}
+		.d2-3607434256 .stroke-N5{stroke:#DEE1EB;}
+		.d2-3607434256 .stroke-N6{stroke:#EEF1F8;}
+		.d2-3607434256 .stroke-N7{stroke:#FFFFFF;}
+		.d2-3607434256 .stroke-B1{stroke:#0D32B2;}
+		.d2-3607434256 .stroke-B2{stroke:#0D32B2;}
+		.d2-3607434256 .stroke-B3{stroke:#E3E9FD;}
+		.d2-3607434256 .stroke-B4{stroke:#E3E9FD;}
+		.d2-3607434256 .stroke-B5{stroke:#EDF0FD;}
+		.d2-3607434256 .stroke-B6{stroke:#F7F8FE;}
+		.d2-3607434256 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-3607434256 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-3607434256 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-3607434256 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-3607434256 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-3607434256 .background-color-N1{background-color:#0A0F25;}
+		.d2-3607434256 .background-color-N2{background-color:#676C7E;}
+		.d2-3607434256 .background-color-N3{background-color:#9499AB;}
+		.d2-3607434256 .background-color-N4{background-color:#CFD2DD;}
+		.d2-3607434256 .background-color-N5{background-color:#DEE1EB;}
+		.d2-3607434256 .background-color-N6{background-color:#EEF1F8;}
+		.d2-3607434256 .background-color-N7{background-color:#FFFFFF;}
+		.d2-3607434256 .background-color-B1{background-color:#0D32B2;}
+		.d2-3607434256 .background-color-B2{background-color:#0D32B2;}
+		.d2-3607434256 .background-color-B3{background-color:#E3E9FD;}
+		.d2-3607434256 .background-color-B4{background-color:#E3E9FD;}
+		.d2-3607434256 .background-color-B5{background-color:#EDF0FD;}
+		.d2-3607434256 .background-color-B6{background-color:#F7F8FE;}
+		.d2-3607434256 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-3607434256 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-3607434256 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-3607434256 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-3607434256 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-3607434256 .color-N1{color:#0A0F25;}
+		.d2-3607434256 .color-N2{color:#676C7E;}
+		.d2-3607434256 .color-N3{color:#9499AB;}
+		.d2-3607434256 .color-N4{color:#CFD2DD;}
+		.d2-3607434256 .color-N5{color:#DEE1EB;}
+		.d2-3607434256 .color-N6{color:#EEF1F8;}
+		.d2-3607434256 .color-N7{color:#FFFFFF;}
+		.d2-3607434256 .color-B1{color:#0D32B2;}
+		.d2-3607434256 .color-B2{color:#0D32B2;}
+		.d2-3607434256 .color-B3{color:#E3E9FD;}
+		.d2-3607434256 .color-B4{color:#E3E9FD;}
+		.d2-3607434256 .color-B5{color:#EDF0FD;}
+		.d2-3607434256 .color-B6{color:#F7F8FE;}
+		.d2-3607434256 .color-AA2{color:#4A6FF3;}
+		.d2-3607434256 .color-AA4{color:#EDF0FD;}
+		.d2-3607434256 .color-AA5{color:#F7F8FE;}
+		.d2-3607434256 .color-AB4{color:#EDF0FD;}
+		.d2-3607434256 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-3607434256);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-3607434256);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-3607434256);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-3607434256);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-3607434256);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-3607434256);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-3607434256);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-3607434256);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><g class="YWRpX3JlcG9ydGVy"><g class="shape" ><rect x="170.000000" y="12.000000" width="276.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="170.000000" y="12.000000" width="276.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="308.000000" y="62.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_reporter</text><line x1="170.000000" x2="446.000000" y1="104.000000" y2="104.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="YWRpX2NvbXBvbmVudA=="><g class="shape" ><rect x="163.000000" y="174.000000" width="291.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="163.000000" y="174.000000" width="291.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="308.500000" y="224.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">adi_component</text><line x1="163.000000" x2="454.000000" y1="266.000000" y2="266.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="bV9heGlfc2VxdWVuY2Vy"><g class="shape" ><rect x="12.000000" y="876.000000" width="319.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="12.000000" y="876.000000" width="319.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="171.500000" y="926.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">m_axi_sequencer</text><line x1="12.000000" x2="331.000000" y1="968.000000" y2="968.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="aW9fdmlw"><g class="shape" ><rect x="351.000000" y="876.000000" width="189.000000" height="92.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="351.000000" y="876.000000" width="189.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="445.500000" y="926.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">io_vip</text><line x1="351.000000" x2="540.000000" y1="968.000000" y2="968.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /></g></g><g class="aXJxX2hhbmRsZXI="><g class="shape" ><rect x="85.000000" y="336.000000" width="446.000000" height="460.000000" stroke="#0A0F25" fill="#FFFFFF" class=" stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="85.000000" y="336.000000" width="446.000000" height="92.000000" fill="#0A0F25" class="class_header fill-N1" /><text x="308.000000" y="386.500000" fill="#FFFFFF" class="text-mono fill-N7" style="text-anchor:middle;font-size:24px;">irq_handler</text><text x="95.000000" y="456.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="115.000000" y="456.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">irq_vip_if</text><text x="511.000000" y="456.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="95.000000" y="502.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="115.000000" y="502.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">irq_event_list</text><text x="511.000000" y="502.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="95.000000" y="548.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="115.000000" y="548.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">irq_valid_list</text><text x="511.000000" y="548.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><text x="95.000000" y="594.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">#</text><text x="115.000000" y="594.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">software_testing</text><text x="511.000000" y="594.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="85.000000" x2="531.000000" y1="612.000000" y2="612.000000" stroke="#0A0F25" class=" stroke-N1" style="stroke-width:1" /><text x="95.000000" y="640.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="115.000000" y="640.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">enable_software_testing()</text><text x="511.000000" y="640.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="95.000000" y="686.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="115.000000" y="686.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">software_irq_testing()</text><text x="511.000000" y="686.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="95.000000" y="732.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="115.000000" y="732.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">start()</text><text x="511.000000" y="732.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text><text x="95.000000" y="778.000000" fill="#0D32B2" class="text-mono fill-B2" style="text-anchor:start;font-size:20px">+</text><text x="115.000000" y="778.000000" fill="#0A0F25" class="text-mono fill-N1" style="text-anchor:start;font-size:20px">register_device()</text><text x="511.000000" y="778.000000" fill="#4A6FF3" class="text-mono fill-AA2" style="text-anchor:end;font-size:20px">void</text></g></g><g class="KGFkaV9yZXBvcnRlciAmbHQ7LSBhZGlfY29tcG9uZW50KVswXQ=="><marker id="mk-d2-3607434256-2954633863" markerWidth="13.000000" markerHeight="15.000000" refX="3.000000" refY="7.500000" viewBox="0.000000 0.000000 13.000000 15.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="12.000000,1.000000 1.000000,7.500000 12.000000,14.000000" stroke="#0D32B2" fill="#FFFFFF" class="connection stroke-B1 fill-N7" stroke-width="2" /> </marker><path d="M 308.500000 108.000000 L 308.500000 172.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-3607434256-2954633863)" mask="url(#d2-3607434256)" /></g><g class="KGFkaV9jb21wb25lbnQgJmx0Oy0gaXJxX2hhbmRsZXIpWzBd"><path d="M 308.500000 270.000000 L 308.500000 334.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-3607434256-2954633863)" mask="url(#d2-3607434256)" /></g><g class="KGlycV9oYW5kbGVyICZsdDstIG1fYXhpX3NlcXVlbmNlcilbMF0="><marker id="mk-d2-3607434256-2527347617" markerWidth="24.200000" markerHeight="18.000000" refX="3.950000" refY="9.000000" viewBox="0.000000 0.000000 24.200000 18.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="2.750000,9.000000 13.200000,2.250000 24.200000,9.000000 13.200000,15.750000" stroke="#0D32B2" fill="#FFFFFF" class="connection stroke-B1 fill-N7" stroke-width="2" /> </marker><path d="M 171.500000 800.000000 L 171.500000 874.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-3607434256-2527347617)" mask="url(#d2-3607434256)" /></g><g class="KGlycV9oYW5kbGVyICZsdDstIGlvX3ZpcClbMF0="><marker id="mk-d2-3607434256-765394478" markerWidth="22.000000" markerHeight="14.000000" refX="3.000000" refY="7.000000" viewBox="0.000000 0.000000 22.000000 14.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,7.000000 11.000000,0.000000 22.000000,7.000000 11.000000,14.000000" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 445.500000 800.000000 L 445.500000 874.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-d2-3607434256-765394478)" mask="url(#d2-3607434256)" /></g><mask id="d2-3607434256" maskUnits="userSpaceOnUse" x="-89" y="-89" width="730" height="1158">
+<rect x="-89" y="-89" width="730" height="1158" fill="white"></rect>
+
+</mask></svg></svg></div></section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading"></a></h2>
+<p>None are available for direct external access.</p>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<section id="function-new">
+<h3>function new();<a class="headerlink" href="#function-new" title="Link to this heading"></a></h3>
+<p>Creates the irq_handler object. It requires a name, a master AXI sequencer
+reference object with which it accesses the interrupt controller, the address of
+the controller, the IO VIP interface handler and a parent if it’s the case.</p>
+</section>
+<section id="function-void-enable-software-testing">
+<h3>function void enable_software_testing();<a class="headerlink" href="#function-void-enable-software-testing" title="Link to this heading"></a></h3>
+<p>Enables software testing.</p>
+</section>
+<section id="task-software-irq-testing">
+<h3>task software_irq_testing();<a class="headerlink" href="#task-software-irq-testing" title="Link to this heading"></a></h3>
+<p>Triggeres a software interrupt test, which can be used to verify certain
+functions at system powerup.</p>
+</section>
+<section id="task-start">
+<h3>task start();<a class="headerlink" href="#task-start" title="Link to this heading"></a></h3>
+<p>Starts the IRQ handler, which configures and enables the interrupt controller.
+After that, it monitors the IO VIP, waiting for the arrival of interrupts. Once
+triggered, it goes over the list of triggered interrupts and signals the
+responsible classes to handle their respective interrupt. If software testing is
+enabled, it will automatically trigger a software interrupt after starting the
+monitor.</p>
+</section>
+<section id="function-event-register-device-input-int-position">
+<h3>function event register_device(input int position);<a class="headerlink" href="#function-event-register-device-input-int-position" title="Link to this heading"></a></h3>
+<p>Registers an event reference for an object, that has an interrupt signal
+connected to the controller. Gives a fatal error if a device is already
+registered in the same location.</p>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Declare the irq handler, set up with the required parameters</p></li>
+<li><p>Registers all devices that are connected to the interrupt controller</p></li>
+<li><p>Optionally enable software interrupt</p></li>
+<li><p>Start the irq handler</p></li>
+</ul>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Utilities</a>
+    <a href="../test_harness/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Test Harness</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

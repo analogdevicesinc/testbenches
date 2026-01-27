@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="The purpose of this testbench is to validate the SPI interface functionality of the projects/ltc2378_fmc reference design." name="description" />
 
-    <title>LTC2378-20 &#8212; Testbenches  documentation</title>
+    <title>LTC2378 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5d595293" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -95,7 +95,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">LTC2378-20</a><ul>
+<li><a class="reference internal" href="#">LTC2378</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -241,7 +241,7 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">LTC2378-20</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">LTC2378</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
 </ul>
@@ -264,19 +264,19 @@ Content on this topic
 </div>
           <div class="body" role="main">
             
-  <section id="ltc2378-20">
-<span id="ltc2378"></span><h1>LTC2378-20<a class="headerlink" href="#ltc2378-20" title="Link to this heading"></a></h1>
+  <section id="ltc2378">
+<span id="id1"></span><h1>LTC2378<a class="headerlink" href="#ltc2378" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>The purpose of this testbench is to validate the SPI interface functionality
 of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/ltc2378_fmc" target="_blank">projects/ltc2378_fmc</a> reference design.</p>
 <p>The entire HDL documentation can be found here
-<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/ltc2378_fmc/index.html#ltc2378-fmc" target="_blank" title="(in HDL)"><span class="xref std std-ref">LTC2378-20 HDL project</span></a>.</p>
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/ltc2378_fmc/index.html#ltc2378-fmc" target="_blank" title="(in HDL)"><span class="xref std std-ref">LTC2378 HDL project</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The testbench block design includes part of the LTC2378-FMC HDL reference design,
-along with VIPs used for clocking, reset, PS and DDR simulations.</p>
+<p>The testbench block design includes part of the LTC2378-FMC HDL reference
+design, along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
 <p>The data path and clock domains are depicted in the below diagram:</p>
@@ -287,24 +287,19 @@ along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
 <p>The following parameters of this project can be configured:</p>
 <ul class="simple">
-<li><p>DATA_WIDTH: defines the SPI data width in bits:
-Default: 32</p></li>
-<li><p>DATA_DLENGTH: defines the actual data length being transferred:
-Default: 20 (for LTC2378-20)</p></li>
-<li><p>NUM_OF_CS: defines the number of chip select lines:
-Default: 1</p></li>
+<li><p>DATA_WIDTH: defines the SPI data width in bits</p></li>
+<li><p>DATA_DLENGTH: defines the actual data length being transferred</p></li>
+<li><p>NUM_OF_CS: defines the number of chip select lines</p></li>
 <li><p>THREE_WIRE: enables three-wire SPI mode:
-Options: 0 - Four-wire mode (default), 1 - Three-wire mode</p></li>
+Options: 0 - Four-wire mode, 1 - Three-wire mode</p></li>
 <li><p>CPOL: defines the SPI clock polarity:
-Options: 0 - Clock idle state is low (default), 1 - Clock idle state is high</p></li>
+Options: 0 - Clock idle state is low, 1 - Clock idle state is high</p></li>
 <li><p>CPHA: defines the SPI clock phase:
-Options: 0 - Data captured on first edge, 1 - Data captured on second edge (default)</p></li>
-<li><p>CLOCK_DIVIDER: defines the SPI clock divider:
-Default: 0</p></li>
-<li><p>NUM_OF_WORDS: defines the number of words per transfer:
-Default: 1</p></li>
+Options: 0 - Data captured on first edge, 1 - Data captured on second edge</p></li>
+<li><p>CLOCK_DIVIDER: defines the SPI clock divider value</p></li>
+<li><p>NUM_OF_WORDS: defines the number of words per transfer</p></li>
 <li><p>SDO_IDLE_STATE: defines the SDO idle state:
-Options: 0 - Low (default), 1 - High</p></li>
+Options: 0 - Low, 1 - High</p></li>
 </ul>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
@@ -350,7 +345,7 @@ mode</p></th>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
 <td><p>Tests the SPI Engine interface and DMA transfer
-capabilities for LTC2378-20 ADC data acquisition.</p></td>
+capabilities for LTC2378 ADC data acquisition.</p></td>
 </tr>
 </tbody>
 </table>
@@ -372,19 +367,22 @@ capabilities for LTC2378-20 ADC data acquisition.</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>spi_ltc2378_axi_regmap</p></td>
+<tr class="row-even"><td><p>axi_intc</p></td>
+<td><p>0x4120_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>spi_ltc2378_axi_regmap</p></td>
 <td><p>0x44A0_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>ltc2378_dma</p></td>
+<tr class="row-even"><td><p>ltc2378_dma</p></td>
 <td><p>0x44A3_0000</p></td>
 </tr>
-<tr class="row-even"><td><p>spi_clkgen</p></td>
+<tr class="row-odd"><td><p>spi_clkgen</p></td>
 <td><p>0x44A7_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>ltc2378_trigger_gen</p></td>
+<tr class="row-even"><td><p>ltc2378_trigger_gen</p></td>
 <td><p>0x44B0_0000</p></td>
 </tr>
-<tr class="row-even"><td><p>ddr_axi_vip</p></td>
+<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
 <td><p>0x8000_0000</p></td>
 </tr>
 </tbody>
@@ -443,16 +441,23 @@ proceeding with more complex tests.</p>
 Execution module in FIFO mode.</p>
 <p>The steps of this test are:</p>
 <ul class="simple">
-<li><p>Start the SPI clock generator (axi_clkgen) to provide the SPI interface clock</p></li>
-<li><p>Configure the conversion signal generator (axi_pwm_gen) to generate periodic
-CNV pulses:</p>
+<li><p>Start the SPI clock generator (axi_clkgen) to provide the SPI interface
+clock</p></li>
+<li><p>Configure the conversion signal generator (axi_pwm_gen) to generate
+periodic CNV pulses:</p>
 <ul>
-<li><p>PWM_0 generates the CNV signal with 1µs period (100MHz clock, period=100 cycles)</p></li>
-<li><p>PWM_1 generates the offload trigger with appropriate timing offset (620ns = 62 cycles)</p></li>
-<li><p>This timing accounts for tCONV + TBUSYLH + TDSDOBUSYL delays</p></li>
+<li><p>PWM_0 generates the CNV signal with 1µs period (100MHz clock,
+period=100 cycles)</p></li>
+<li><p>PWM_1 generates the offload trigger with appropriate timing offset
+(620ns = 62 cycles)</p>
+<ul>
+<li><p>This timing accounts for tCONV + tBUSYLH + tDSOBUSYL delays</p></li>
 </ul>
 </li>
-<li><p>Enable the SPI Engine and configure the Execution module with transfer parameters</p></li>
+</ul>
+</li>
+<li><p>Enable the SPI Engine and configure the Execution module with transfer
+parameters</p></li>
 <li><p>Set up the interrupt mask to enable SYNC and offload SYNC interrupts</p></li>
 <li><p>Write test data (0xDEAD) to the SDO FIFO</p></li>
 <li><p>Generate a FIFO transaction using SPI Engine commands:</p>
@@ -465,7 +470,8 @@ CNV pulses:</p>
 </li>
 <li><p>Wait for the SYNC interrupt to indicate transfer completion</p></li>
 <li><p>Read back the captured data from the SDI FIFO using the PEEK register</p></li>
-<li><p>Compare the received data with the expected pattern generated by the testbench BFM</p></li>
+<li><p>Compare the received data with the expected pattern generated by the
+testbench BFM</p></li>
 </ul>
 </section>
 <section id="offload-spi-test">
@@ -495,7 +501,7 @@ for autonomous data acquisition triggered by external events.</p>
 </ul>
 </li>
 <li><p>Start the offload module to begin autonomous operation</p></li>
-<li><p>Wait for NUM_OF_TRANSFERS (4) acquisitions to complete</p></li>
+<li><p>Wait for all transfers (NUM_OF_TRANSFERS - 4) to complete</p></li>
 <li><p>Stop the offload module</p></li>
 <li><p>Read back the captured data from DDR memory using backdoor access</p></li>
 <li><p>Verify that:</p>

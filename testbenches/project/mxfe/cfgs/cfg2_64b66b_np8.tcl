@@ -24,3 +24,7 @@ set ad_project_params(TX_JESD_F) 1
 set ad_project_params(TX_JESD_K) 256
 
 set ad_project_params(TDD_SUPPORT) 0
+
+set xilinx_boards {"zc706" "zcu102" "zed" "kcu105" "vck190" "vcu118" "vpk180"}
+set chosen_board [lindex $xilinx_boards [expr {int(rand() * [llength $xilinx_boards])}]]
+set ad_project_params(FPGA_BOARD) $chosen_board

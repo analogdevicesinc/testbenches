@@ -13,8 +13,10 @@ source "cfgs/${cfg_file}"
 # Set the project name
 set project_name [file rootname $cfg_file]
 
+set xcvr_config_required 0
+
 # Create the project
-adi_sim_project_xilinx $project_name "xczu9eg-ffvb1156-2-e"
+adi_sim_project_xilinx $project_name
 
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_converter.tcl

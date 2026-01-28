@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="The purpose of this testbench is to test the framelock synchronisation feature of the library/axi_dmac." name="description" />
+<meta content="The purpose of this testbench is to validate the SPI interface functionality of the projects/ltc2378_fmc reference design." name="description" />
 
-    <title>DMA Framelock &#8212; Testbenches  documentation</title>
+    <title>LTC2378 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5d595293" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -14,8 +14,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="DMA Loopback" href="../dma_loopback/index.html" />
-    <link rel="prev" title="Base" href="../base/index.html" />
+    <link rel="next" title="PLUTO" href="../pluto/index.html" />
+    <link rel="prev" title="FMCOMMS2" href="../fmcomms2/index.html" />
    
   
   
@@ -95,7 +95,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">DMA Framelock</a><ul>
+<li><a class="reference internal" href="#">LTC2378</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -105,18 +105,21 @@
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
+<li><a class="reference internal" href="#cpu-memory-interconnect-addresses">CPU/Memory interconnect addresses</a></li>
 <li><a class="reference internal" href="#interrupts">Interrupts</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
-<li><a class="reference internal" href="#environment-bring-up">Environment Bring up</a></li>
-<li><a class="reference internal" href="#dma-testing">DMA testing</a></li>
+<li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
+<li><a class="reference internal" href="#sanity-test">Sanity test</a></li>
+<li><a class="reference internal" href="#fifo-spi-test">FIFO SPI test</a></li>
+<li><a class="reference internal" href="#offload-spi-test">Offload SPI test</a></li>
 <li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
 <li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#hdl-related-dependencies-forming-the-dut">HDL related dependencies forming the DUT</a></li>
 <li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
 </ul>
 </li>
@@ -213,34 +216,34 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../axis_sequencers/index.html">AXIS Sequencers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">DMA Framelock</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../dma_loopback/index.html">DMA Loopback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../dma_sg/index.html">DMA Scatter-Gather</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../i3c_controller/index.html">I3C Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../irq_handler/index.html">IRQ handler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../jesd_loopback/index.html">JESD Loopback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo/index.html">Util AXIS FIFO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../util_pack/index.html">Util Pack</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_pack/index.html">Util Pack</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad463x/index.html">AD463x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad57xx/index.html">AD57XX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad738x/index.html">AD738x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7606/index.html">AD7606</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7616/index.html">AD7616</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad9083/index.html">AD9083</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ada4355/index.html">ADA4355</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9001/index.html">ADRV9001</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9009/index.html">ADRV9009</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/fmcomms2/index.html">FMCOMMS2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ltc2378/index.html">LTC2378</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/pluto/index.html">PLUTO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ada4355/index.html">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">LTC2378</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
 </ul>
 </li>
 </ul>
@@ -257,92 +260,77 @@ Content on this topic
       <div class="documentwrapper">
         <div class="bodywrapper" id="top-anchor">
           <div class="body-header">
-  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">IP Based</a></li></ol></nav>
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">Project Based</a></li></ol></nav>
 </div>
           <div class="body" role="main">
             
-  <section id="dma-framelock">
-<span id="dma-flock"></span><h1>DMA Framelock<a class="headerlink" href="#dma-framelock" title="Link to this heading"></a></h1>
+  <section id="ltc2378">
+<span id="id1"></span><h1>LTC2378<a class="headerlink" href="#ltc2378" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The purpose of this testbench is to test the framelock synchronisation feature
-of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a>.</p>
-<p>This feature adds support for multiple 2D frame buffers, which are used in a
-cyclic way. On the same set of buffers, a second DMAC core can operate.
-The “Framelock” mechanism ensures no buffer is accessed by two DMACs at the same
-time.</p>
-<p>The entire HDL documentation can be found at
-<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a>.</p>
+<p>The purpose of this testbench is to validate the SPI interface functionality
+of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/ltc2378_fmc" target="_blank">projects/ltc2378_fmc</a> reference design.</p>
+<p>The entire HDL documentation can be found here
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/ltc2378_fmc/index.html#ltc2378-fmc" target="_blank" title="(in HDL)"><span class="xref std std-ref">LTC2378 HDL project</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The block design is based on the test harness with the addition of:</p>
-<ul class="simple">
-<li><p>Two DMAs, one with the role of writer (stream to memory-mapped)
-and the other with the role of reader (memory-mapped to stream).</p></li>
-<li><p>Two AXI4Stream VIPs, to produce and consume the generated test pattern.</p></li>
-</ul>
-<p>A known test pattern is provided to the writer and propagated to the reader,
-and is monitored to check if the output matches the expected output.</p>
+<p>The testbench block design includes part of the LTC2378-FMC HDL reference
+design, along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
-<a class="reference internal image-reference" href="../../../_images/block_diagram.svg"><img alt="DMAC Framelock/Testbench block diagram" class="align-center" src="../../../_images/block_diagram.svg" width="500" />
+<p>The data path and clock domains are depicted in the below diagram:</p>
+<a class="reference internal image-reference" href="../../../_images/ltc2378_testbench_diagram.svg"><img alt="LTC2378/Testbench block diagram" class="align-center" src="../../../_images/ltc2378_testbench_diagram.svg" width="800" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
-<p>The following parameters of this project that can be configured:</p>
+<p>The following parameters of this project can be configured:</p>
 <ul class="simple">
-<li><p>M_DMA_CFG_MAX_NUM_FRAMES_WIDTH: defines the max number of buffer as a power of two.
-Valid values are between 2 (4 buffers) and 5 (32 buffers).</p></li>
-<li><p>M/S_DMA_CFG_AUTORUN: enables autorun mode to initiate transfers without software intervention.</p></li>
-<li><p>M_DMA_CFG_USE_EXT_SYNC: enables external synchronization support for the writer.</p></li>
-<li><p>S_DMA_CFG_USE_EXT_SYMC: enables external synchronization support for the reader.</p></li>
-<li><p>SRC/DST_AXIS_VIP_CFG_TDATA_NUM_BYTES: defines the <code class="docutils literal notranslate"><span class="pre">axi4stream_vip</span></code> TDATA_NUM_BYTES
-and is also used to compute the time in cycles for a frame duration.</p></li>
+<li><p>DATA_WIDTH: defines the SPI data width in bits</p></li>
+<li><p>DATA_DLENGTH: defines the actual data length being transferred</p></li>
+<li><p>NUM_OF_CS: defines the number of chip select lines</p></li>
+<li><p>THREE_WIRE: enables three-wire SPI mode:
+Options: 0 - Four-wire mode, 1 - Three-wire mode</p></li>
+<li><p>CPOL: defines the SPI clock polarity:
+Options: 0 - Clock idle state is low, 1 - Clock idle state is high</p></li>
+<li><p>CPHA: defines the SPI clock phase:
+Options: 0 - Data captured on first edge, 1 - Data captured on second edge</p></li>
+<li><p>CLOCK_DIVIDER: defines the SPI clock divider value</p></li>
+<li><p>NUM_OF_WORDS: defines the number of words per transfer</p></li>
+<li><p>SDO_IDLE_STATE: defines the SDO idle state:
+Options: 0 - Low, 1 - High</p></li>
 </ul>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
-<p>The following are the available configuration files along with their
-corresponding parameter values:</p>
-<div class="table-wrapper docutils container">
+<p>The following configuration file is available:</p>
+<blockquote>
+<div><div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>cfg1</p></th>
-<th class="head"><p>cfg2_fsync</p></th>
-<th class="head"><p>cfg3_fsync_autorun</p></th>
+<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration
+mode</p></th>
+<th class="head" colspan="5"><p>Parameters</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>DATA_WIDTH</p></th>
+<th class="head"><p>DATA_DLENGTH</p></th>
+<th class="head"><p>CPOL</p></th>
+<th class="head"><p>CPHA</p></th>
+<th class="head"><p>NUM_OF_CS</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>MAX_NUM_FRAMES_WIDTH</p></td>
-<td><p>4</p></td>
-<td><p>4</p></td>
-<td><p>4</p></td>
-</tr>
-<tr class="row-odd"><td><p>AUTORUN</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>M_USE_EXT_SYNC</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>S_USE_EXT_SYNC</p></td>
+<tr class="row-odd"><td><p>cfg1</p></td>
+<td><p>32</p></td>
+<td><p>20</p></td>
 <td><p>0</p></td>
 <td><p>1</p></td>
 <td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>TDATA_NUM_BYTES</p></td>
-<td><p>8</p></td>
-<td><p>8</p></td>
-<td><p>8</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+</div></blockquote>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
@@ -356,10 +344,8 @@ corresponding parameter values:</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Test the framelock without external synchronization.</p></td>
-</tr>
-<tr class="row-odd"><td><p>test_program_frame_delay</p></td>
-<td><p>Test the framelock with synchronization stimulus delayed.</p></td>
+<td><p>Tests the SPI Engine interface and DMA transfer
+capabilities for LTC2378 ADC data acquisition.</p></td>
 </tr>
 </tbody>
 </table>
@@ -367,34 +353,12 @@ corresponding parameter values:</p>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
-<p>The configuration files are compatible with the following test programs:</p>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Test program</p></th>
-<th class="head"><p>cfg1</p></th>
-<th class="head"><p>cfg2_fsync</p></th>
-<th class="head"><p>cfg3_fsync_autorun</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>test_program</p></td>
-<td><p>✓</p></td>
-<td><p>✗</p></td>
-<td><p>✗</p></td>
-</tr>
-<tr class="row-odd"><td><p>test_program_frame_delay</p></td>
-<td><p>✗</p></td>
-<td><p>✓</p></td>
-<td><p>✓</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<p>The test program is compatible with all of the above mentioned configurations.</p>
 </section>
 </section>
-<section id="cpu-memory-interconnects-addresses">
-<h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading"></a></h3>
+<section id="cpu-memory-interconnect-addresses">
+<h3>CPU/Memory interconnect addresses<a class="headerlink" href="#cpu-memory-interconnect-addresses" title="Link to this heading"></a></h3>
+<p>Below are the CPU/Memory interconnect addresses used in this project:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -403,14 +367,23 @@ corresponding parameter values:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>ddr_axi_vip</p></td>
+<tr class="row-even"><td><p>axi_intc</p></td>
+<td><p>0x4120_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>spi_ltc2378_axi_regmap</p></td>
+<td><p>0x44A0_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ltc2378_dma</p></td>
+<td><p>0x44A3_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>spi_clkgen</p></td>
+<td><p>0x44A7_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ltc2378_trigger_gen</p></td>
+<td><p>0x44B0_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
 <td><p>0x8000_0000</p></td>
-</tr>
-<tr class="row-odd"><td><p>dut_rx_dmac</p></td>
-<td><p>0x7C42_0000</p></td>
-</tr>
-<tr class="row-even"><td><p>dut_tx_dmac</p></td>
-<td><p>0x7C43_0000</p></td>
 </tr>
 </tbody>
 </table>
@@ -418,6 +391,7 @@ corresponding parameter values:</p>
 </section>
 <section id="interrupts">
 <h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
+<p>Below are the Programmable Logic interrupts used in this project:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -426,10 +400,10 @@ corresponding parameter values:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>dut_tx_dma</p></td>
+<tr class="row-even"><td><p>ltc2378_dma</p></td>
 <td><p>13</p></td>
 </tr>
-<tr class="row-odd"><td><p>dut_rx_dma</p></td>
+<tr class="row-odd"><td><p>spi_ltc2378</p></td>
 <td><p>12</p></td>
 </tr>
 </tbody>
@@ -439,55 +413,104 @@ corresponding parameter values:</p>
 </section>
 <section id="test-stimulus">
 <h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
-<p>The AXI4Stream Manager provides a test pattern that is propagated to the
-AXI4Stream Subordinate.</p>
-<p>The test program prepares the environment and the DMAs under test.</p>
-<section id="environment-bring-up">
-<h3>Environment Bring up<a class="headerlink" href="#environment-bring-up" title="Link to this heading"></a></h3>
-<p>The steps of the environment bring up are:</p>
+<p>The test program is structured into several tests as follows:</p>
+<section id="environment-bringup">
+<h3>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
+<p>The steps of the environment bringup are:</p>
 <ul class="simple">
-<li><p>Create the environment.</p></li>
-<li><p>Start the environment.</p></li>
-<li><p>Start the clocks.</p></li>
-<li><p>Assert the resets.</p></li>
+<li><p>Create the environment</p></li>
+<li><p>Start the environment</p></li>
+<li><p>Start the clocks (including external 100MHz clock VIP for PWM generator)</p></li>
+<li><p>Assert the resets</p></li>
 </ul>
 </section>
-<section id="dma-testing">
-<h3>DMA testing<a class="headerlink" href="#dma-testing" title="Link to this heading"></a></h3>
+<section id="sanity-test">
+<h3>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h3>
+<p>This test verifies basic communication with the AXI register maps by:</p>
 <ul class="simple">
-<li><p>Initializes the sequencers, monitors and scoreboards.</p></li>
-<li><p>Initiate DMA APIs for writer and reader.</p></li>
-<li><p>Do sanity test on DMA’s scratch and ID register.</p></li>
-<li><p>Do single tests on variant number of frames, distance and clock frequencies:</p>
+<li><p>Reading the VERSION register from the SPI Engine AXI interface</p></li>
+<li><p>Testing SCRATCH register read/write functionality</p></li>
+<li><p>Performing sanity tests on the DMA and PWM generator interfaces</p></li>
+</ul>
+<p>This ensures that the AXI bus communication is working correctly before
+proceeding with more complex tests.</p>
+</section>
+<section id="fifo-spi-test">
+<h3>FIFO SPI test<a class="headerlink" href="#fifo-spi-test" title="Link to this heading"></a></h3>
+<p>The FIFO SPI test verifies simple serial transfers made through the SPI Engine
+Execution module in FIFO mode.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Start the SPI clock generator (axi_clkgen) to provide the SPI interface
+clock</p></li>
+<li><p>Configure the conversion signal generator (axi_pwm_gen) to generate
+periodic CNV pulses:</p>
 <ul>
-<li><p>Remove backpressure at AXIS destination and DDR.</p></li>
-<li><p>Obtain randomized DMA sequence.</p></li>
-<li><p>Enable sequencer test data generation.</p></li>
-<li><p>Configure control and flags of the DMA.</p></li>
-<li><p>Submit the DMA sequence.</p></li>
-<li><p>Generate synchronisation stimulus (if enabled).</p></li>
-<li><p>Wait the number of frames are generated.</p></li>
+<li><p>PWM_0 generates the CNV signal with 1µs period (100MHz clock,
+period=100 cycles)</p></li>
+<li><p>PWM_1 generates the offload trigger with appropriate timing offset
+(620ns = 62 cycles)</p>
+<ul>
+<li><p>This timing accounts for tCONV + tBUSYLH + tDSOBUSYL delays</p></li>
 </ul>
 </li>
 </ul>
-<p>The transmitted data is the frame number, occupying a single byte and repeated
-on all other bytes of the frame.
-The scoreboard asserts if the first data beat is equal or higher than the
-previous frame number, since the framelock shall repeat or skip frames
-depending on the clock ratios between the writer and reader.
-Then asserts if all bytes in the frame are equal to the first byte.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The testbench may end before the last frame is fully transferred at the
-reader stream interface.</p>
-</div>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
-<p>Not all values yield valid configuration.</p>
-<p>In particular, in dynamic mode, the reader may read a buffer being currently
-accessed by the writer if the number of frames and distance are close enough
-to cause the reader to be the total number of frames behind.</p>
-</div>
+</li>
+<li><p>Enable the SPI Engine and configure the Execution module with transfer
+parameters</p></li>
+<li><p>Set up the interrupt mask to enable SYNC and offload SYNC interrupts</p></li>
+<li><p>Write test data (0xDEAD) to the SDO FIFO</p></li>
+<li><p>Generate a FIFO transaction using SPI Engine commands:</p>
+<ul>
+<li><p>Assert chip select</p></li>
+<li><p>Transfer data word</p></li>
+<li><p>De-assert chip select</p></li>
+<li><p>Generate SYNC interrupt</p></li>
+</ul>
+</li>
+<li><p>Wait for the SYNC interrupt to indicate transfer completion</p></li>
+<li><p>Read back the captured data from the SDI FIFO using the PEEK register</p></li>
+<li><p>Compare the received data with the expected pattern generated by the
+testbench BFM</p></li>
+</ul>
+</section>
+<section id="offload-spi-test">
+<h3>Offload SPI test<a class="headerlink" href="#offload-spi-test" title="Link to this heading"></a></h3>
+<p>The Offload SPI test verifies the SPI Engine Offload module functionality
+for autonomous data acquisition triggered by external events.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Configure the DMA for data transfer:</p>
+<ul>
+<li><p>Enable DMA</p></li>
+<li><p>Set flags (non-cyclic, TLAST enabled, partial reporting enabled)</p></li>
+<li><p>Set transfer length (NUM_OF_TRANSFERS * 4 bytes)</p></li>
+<li><p>Set destination address in DDR memory</p></li>
+<li><p>Start the DMA transfer</p></li>
+</ul>
+</li>
+<li><p>Configure the Offload module with SPI Engine command sequence:</p>
+<ul>
+<li><p>Configuration command (INST_CFG)</p></li>
+<li><p>Prescaler setting (INST_PRESCALE)</p></li>
+<li><p>Data length configuration (INST_DLENGTH)</p></li>
+<li><p>Assert chip select</p></li>
+<li><p>Read command (INST_RD)</p></li>
+<li><p>De-assert chip select</p></li>
+<li><p>SYNC command with ID=2 to generate interrupt</p></li>
+</ul>
+</li>
+<li><p>Start the offload module to begin autonomous operation</p></li>
+<li><p>Wait for all transfers (NUM_OF_TRANSFERS - 4) to complete</p></li>
+<li><p>Stop the offload module</p></li>
+<li><p>Read back the captured data from DDR memory using backdoor access</p></li>
+<li><p>Verify that:</p>
+<ul>
+<li><p>Interrupts were properly generated (IRQ test)</p></li>
+<li><p>Captured data matches the expected SDI pattern from the BFM (Offload test)</p></li>
+</ul>
+</li>
+</ul>
 </section>
 <section id="stop-the-environment">
 <h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
@@ -501,35 +524,37 @@ to cause the reader to be the total number of frames behind.</p>
 <p>The testbench is built upon ADI’s generic HDL reference design framework.
 ADI does not distribute compiled files of these projects so they must be built
 from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">here</a>,
-with the specified hierarchy described at <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
+with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
 To get the source you must
 <a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank">clone</a>
 the HDL repository, and then build the project as follows:</p>
 <p><strong>Linux/Cygwin/WSL</strong></p>
 <p><em>Example 1</em></p>
-<p>Building and simulating the testbench using only the command line.</p>
+<p>Build all the possible combinations of tests and configurations, using only the
+command line.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/dma_flock
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ltc2378
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/dma_flock$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ltc2378$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p><em>Example 2</em></p>
-<p>Building and simulating the testbench using the Vivado GUI. This command will
-launch Vivado, will run the simulation and display the waveforms.</p>
+<p>Build all the possible combinations of tests and configurations, using the
+Vivado GUI. This command will launch Vivado, will run the simulation and display
+the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/dma_flock
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ltc2378
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/dma_flock$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ltc2378$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -542,16 +567,16 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/dma_flock
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ltc2378
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/dma_flock$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ltc2378$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
-<div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+<div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
 specific build has its own folder named after the configuration file’s name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):</p>
@@ -561,9 +586,8 @@ clean folder (no runs folder available):</p>
 </section>
 <section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
-<section id="testbenches-related-dependencies">
-<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
-<p>HDL related dependencies forming the DUT</p>
+<section id="hdl-related-dependencies-forming-the-dut">
+<h3>HDL related dependencies forming the DUT<a class="headerlink" href="#hdl-related-dependencies-forming-the-dut" title="Link to this heading"></a></h3>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
@@ -578,13 +602,40 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AXI_DMAC</p></td>
+<tr class="row-even"><td><p>AXI_CLKGEN</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_clkgen" target="_blank">library/axi_clkgen</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_clkgen/index.html#axi-clkgen" target="_blank" title="(in HDL)"><span>AXI CLK Generator</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_DMAC</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
 <td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_PWM_GEN</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_pwm_gen" target="_blank">library/axi_pwm_gen</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_pwm_gen/index.html#axi-pwm-gen" target="_blank" title="(in HDL)"><span>AXI PWM Generator</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_SPI_ENGINE</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/axi_spi_engine" target="_blank">library/spi_engine/axi_spi_engine</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/axi_spi_engine.html#spi-engine-axi" target="_blank" title="(in HDL)"><span>AXI SPI Engine Module</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>SPI_ENGINE_EXECUTION</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_execution" target="_blank">library/spi_engine/spi_engine_execution</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_execution.html#spi-engine-execution" target="_blank" title="(in HDL)"><span>SPI Engine Execution Module</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI_ENGINE_INTERCONNECT</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_interconnect" target="_blank">library/spi_engine/spi_engine_interconnect</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_interconnect.html#spi-engine-interconnect" target="_blank" title="(in HDL)"><span>SPI Engine Interconnect Module</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>SPI_ENGINE_OFFLOAD</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_offload" target="_blank">library/spi_engine/spi_engine_offload</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_offload.html#spi-engine-offload" target="_blank" title="(in HDL)"><span>SPI Engine Offload Module</span></a></p></td>
 </tr>
 </tbody>
 </table>
 </div>
+</section>
+<section id="testbenches-related-dependencies">
+<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
 <p>Common with most testbenches:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
@@ -650,24 +701,44 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>M_AXIS_SEQUENCER</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axis_sequencer.sv" target="_blank">library/vip/amd/m_axis_sequencer.sv</a></p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_CLKGEN_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_clkgen_pkg.sv" target="_blank">library/regmaps/adi_regmap_clkgen_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>S_AXIS_SEQUENCER</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axis_sequencer.sv" target="_blank">library/vip/amd/s_axis_sequencer.sv</a></p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>DMA_TRANS</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv" target="_blank">library/drivers/dmac/dma_trans.sv</a></p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv" target="_blank">library/regmaps/adi_regmap_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>DMAC_API</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_PWM_GEN_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pwm_gen_pkg.sv" target="_blank">library/regmaps/adi_regmap_pwm_gen_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_SPI_ENGINE_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_spi_engine_pkg.sv" target="_blank">library/regmaps/adi_regmap_spi_engine_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>CLK_GEN_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/clk_gen/clk_gen_api.sv" target="_blank">library/drivers/clk_gen/clk_gen_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>DMAC_API</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
+<tr class="row-odd"><td><p>PWM_GEN_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/pwm_gen/pwm_gen_api.sv" target="_blank">library/drivers/pwm_gen/pwm_gen_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI_ENGINE_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/spi_engine/spi_engine_api.sv" target="_blank">library/drivers/spi_engine/spi_engine_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI_ENGINE_INSTR_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/spi_engine/spi_engine_instr_pkg.sv" target="_blank">library/drivers/spi_engine/spi_engine_instr_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
 </tbody>
@@ -695,8 +766,8 @@ are, the lower the chances to receive support from <a class="icon link reference
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../base/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Base</a>
-    <a href="../dma_loopback/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">DMA Loopback</a>
+    <a href="../fmcomms2/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">FMCOMMS2</a>
+    <a href="../pluto/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">PLUTO</a>
               </div>
           
         </div>

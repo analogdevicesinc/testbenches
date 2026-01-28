@@ -3,7 +3,8 @@ global ad_project_params
 set ad_project_params(LINK_MODE) 1
 
 set ad_project_params(REF_CLK_RATE) 500
-set ad_project_params(LANE_RATE) 10
+#set ad_project_params(LANE_RATE) 10
+set ad_project_params(PLL_TYPE) QPLL0
 
 set ad_project_params(DAC_OFFLOAD_TYPE) 0
 set ad_project_params(DAC_OFFLOAD_SIZE) [expr 2*1024*1024]
@@ -29,3 +30,6 @@ set ad_project_params(RX_OS_JESD_S) 1
 set ad_project_params(RX_OS_JESD_NP) 16
 set ad_project_params(RX_OS_JESD_F) 4
 set ad_project_params(RX_OS_JESD_K) 32
+
+set ad_project_params(FPGA_PART) "xczu9eg-ffvb1156-2-e"
+#set ad_project_params(FPGA_BOARD) "zcu102"

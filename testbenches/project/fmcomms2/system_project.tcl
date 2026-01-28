@@ -13,8 +13,6 @@ source "cfgs/${cfg_file}"
 # Set the project name
 set project_name [file rootname $cfg_file]
 
-set xcvr_config_required 0
-
 # Create the project
 adi_sim_project_xilinx $project_name
 

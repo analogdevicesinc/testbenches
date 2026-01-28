@@ -22,3 +22,5 @@ set ad_project_params(TX_JESD_S) 1
 set ad_project_params(TX_JESD_NP) 16
 set ad_project_params(TX_JESD_F) 8
 set ad_project_params(TX_JESD_K) 32
+
+set ad_project_params(FPGA_BOARD) "zcu102"

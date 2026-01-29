@@ -8,3 +8,6 @@ set ad_project_params(SYMB_OP) 0
 set ad_project_params(SYMB_8_16B) 0
 set ad_project_params(DDS_DISABLE) 0
 
+set xilinx_boards {"zc706" "zcu102" "zed"}
+set chosen_board [lindex $xilinx_boards [expr {int(rand() * [llength $xilinx_boards])}]]
+set ad_project_params(FPGA_BOARD) $chosen_board

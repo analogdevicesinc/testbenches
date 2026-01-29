@@ -30,3 +30,4 @@ set ad_project_params(TX_NUM_LINKS)  4
 
 set ad_project_params(DAC_TPL_XBAR_ENABLE)  0
 
+set ad_project_params(FPGA_BOARD) "vcu118"

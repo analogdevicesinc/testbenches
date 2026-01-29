@@ -5,9 +5,9 @@
    style="shape-rendering:crispEdges"
    id="svg6470"
    version="1.1"
-   viewBox="0 0 1100.0001 580"
-   height="580"
-   width="1100"
+   viewBox="0 0 1000.0001 720"
+   height="720"
+   width="1000"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -1592,86 +1592,6 @@
          transform="scale(0.4)" />
     </marker>
     <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
-       id="marker1216-8-3-7-3-1"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM"
-       inkscape:collect="always">
-      <path
-         transform="scale(0.4)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path1214-9-5-7-4-0"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
-       id="marker1216-8-3-7-3-9"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM"
-       inkscape:collect="always">
-      <path
-         transform="scale(0.4)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path1214-9-5-7-4-7"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
-       id="marker1216-8-3-7-3"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM"
-       inkscape:collect="always">
-      <path
-         transform="scale(0.4)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path1214-9-5-7-4"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
-       id="marker1216-8-3-7"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM"
-       inkscape:collect="always">
-      <path
-         transform="scale(0.4)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path1214-9-5-7"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
-       id="marker1216-8-3"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM"
-       inkscape:collect="always">
-      <path
-         transform="scale(0.4)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path1214-9-5"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
        inkscape:stockid="TriangleInM"
        orient="auto"
        refY="0"
@@ -1764,22 +1684,6 @@
     <marker
        inkscape:isstock="true"
        style="overflow:visible"
-       id="marker1216-2"
-       refX="0"
-       refY="0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM"
-       inkscape:collect="always">
-      <path
-         transform="scale(0.4)"
-         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path1214-11"
-         inkscape:connector-curvature="0" />
-    </marker>
-    <marker
-       inkscape:isstock="true"
-       style="overflow:visible"
        id="marker1216-9-2"
        refX="0"
        refY="0"
@@ -1791,6 +1695,252 @@
          d="M 5.77,0 -2.88,5 V -5 Z"
          id="path1214-1-91"
          inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-1"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM"
+       inkscape:collect="always">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-2"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-9-53"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-1-2"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInM-7-1-8-5"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4660-1-6-1-1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(-0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInM-7-1-8-5-1"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4660-1-6-1-1-8"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(-0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInM-7-1-8-5-0"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4660-1-6-1-1-0"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(-0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInM-7-1-8-5-1-7"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4660-1-6-1-1-8-1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(-0.4)" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-91"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM"
+       inkscape:collect="always">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-57"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-9-5"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-1-45"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-35"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM"
+       inkscape:collect="always">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-9"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-9-9-87"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-1-9-44"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInM-7-1-8-4"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4660-1-6-1-2"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(-0.4)" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-8-3"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM"
+       inkscape:collect="always">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-9-5"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-8-3-2"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM"
+       inkscape:collect="always">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-9-5-6"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker1216-8-3-7-3-1"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="TriangleOutM"
+       inkscape:collect="always">
+      <path
+         transform="scale(0.4)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1214-9-5-7-4-0"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInM-7-1-5-5"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4660-1-6-9-8"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(-0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleInM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleInM-7-1-8-0-1"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4660-1-6-1-7-7"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(-0.4)" />
     </marker>
   </defs>
   <sodipodi:namedview
@@ -1807,9 +1957,9 @@
      showgrid="true"
      inkscape:current-layer="g11134"
      inkscape:document-units="px"
-     inkscape:cy="227.28432"
-     inkscape:cx="452.04327"
-     inkscape:zoom="0.98994949"
+     inkscape:cy="402.14286"
+     inkscape:cx="441.78571"
+     inkscape:zoom="1.4"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -1821,7 +1971,7 @@
      inkscape:deskcolor="#d1d1d1">
     <inkscape:grid
        originy="140.74579"
-       originx="190.74608"
+       originx="190.7462"
        id="grid7015"
        type="xygrid" />
   </sodipodi:namedview>
@@ -1842,16 +1992,16 @@
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <rect
-       y="462.58408"
-       x="-169.78574"
-       height="545.12476"
-       width="1059.6832"
+       y="462.62714"
+       x="-162.02838"
+       height="683.61005"
+       width="943.88287"
        id="rect4477"
-       style="display:inline;opacity:1;fill:#000000;fill-opacity:0;fill-rule:nonzero;stroke:#000000;stroke-width:1.51409;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
+       style="display:inline;opacity:1;fill:#000000;fill-opacity:0;fill-rule:nonzero;stroke:#000000;stroke-width:1.60021;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
     <g
        id="g11134"
        style="display:inline;shape-rendering:crispEdges;enable-background:new"
-       transform="matrix(1.1787565,0,0,1.1091093,-74.00222,661.00972)">
+       transform="matrix(1.1787565,0,0,1.1091093,-182.00222,661.00972)">
       <text
          xml:space="preserve"
          style="font-style:normal;font-weight:normal;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1865,12 +2015,12 @@
       <rect
          inkscape:export-ydpi="96"
          inkscape:export-xdpi="96"
-         y="-144.70979"
-         x="606.23438"
-         height="446.42651"
-         width="188.88332"
+         y="-144.58466"
+         x="606.36011"
+         height="562.09937"
+         width="188.63182"
          id="rect4488"
-         style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2.13727;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
+         style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2.39663;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
       <text
          xml:space="preserve"
          style="font-style:normal;font-weight:normal;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
@@ -1885,12 +2035,12 @@
       <rect
          inkscape:export-ydpi="96"
          inkscape:export-xdpi="96"
-         y="-74.448906"
-         x="629.78156"
-         height="359.45648"
-         width="143.92862"
+         y="-74.32888"
+         x="629.90228"
+         height="475.13956"
+         width="143.68716"
          id="rect4488-3"
-         style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.67412;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
+         style="display:inline;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.92313;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
       <text
          xml:space="preserve"
          style="font-style:normal;font-weight:normal;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
@@ -1943,7 +2093,7 @@
          inkscape:export-ydpi="96"
          inkscape:export-xdpi="96"
          y="12.800156"
-         x="-48.357376"
+         x="51.748142"
          height="138.91609"
          width="25.810722"
          id="rect4487-0"
@@ -1953,19 +2103,19 @@
          inkscape:export-xdpi="96"
          transform="rotate(-90)"
          id="text4489-3"
-         y="-28.98402"
+         y="71.12149"
          x="-120.36315"
          style="font-style:normal;font-weight:normal;font-size:12px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
          xml:space="preserve"><tspan
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.5px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:1px"
-           y="-28.98402"
+           y="71.12149"
            x="-120.36315"
            id="tspan4491-1"
            sodipodi:role="line">DDR VIP</tspan></text>
       <rect
          inkscape:export-ydpi="96"
          inkscape:export-xdpi="96"
-         y="17.515961"
+         y="132.89171"
          x="-113.37174"
          height="239.93324"
          width="26.907429"
@@ -1978,12 +2128,12 @@
          transform="scale(0.94091469,1.0627956)"
          id="text4489-3-4"
          y="-86.174828"
-         x="98.718536"
+         x="221.3396"
          style="font-style:normal;font-weight:normal;font-size:12px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
          xml:space="preserve"><tspan
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.5px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:1px"
            y="-86.174828"
-           x="98.718536"
+           x="221.3396"
            id="tspan4491-1-5"
            sodipodi:role="line">PS AXI VIP</tspan></text>
       <rect
@@ -1996,12 +2146,12 @@
       <rect
          inkscape:export-ydpi="96"
          inkscape:export-xdpi="96"
-         y="-147.26329"
-         x="-61.046303"
-         height="447.70627"
-         width="619.86853"
+         y="-147.23528"
+         x="35.93837"
+         height="566.14941"
+         width="522.85364"
          id="rect6078-5-7"
-         style="display:inline;fill:none;fill-opacity:1;stroke:#3f4b55;stroke-width:2.30909;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
+         style="display:inline;fill:none;fill-opacity:1;stroke:#3f4b55;stroke-width:2.38478;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
       <text
          xml:space="preserve"
          style="font-style:normal;font-weight:normal;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
@@ -2014,27 +2164,27 @@
            y="-126.5388"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.5px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:1">TOP MODULE</tspan></text>
       <rect
-         style="display:inline;fill:#000000;fill-opacity:0;fill-rule:nonzero;stroke:#000000;stroke-width:1.30594;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         style="display:inline;fill:#000000;fill-opacity:0;fill-rule:nonzero;stroke:#000000;stroke-width:1.34237;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
          id="rect4477-5"
-         width="499.39697"
-         height="333.00134"
-         x="20.094223"
-         y="-47.814392" />
+         width="390.29868"
+         height="450.19269"
+         x="129.18027"
+         y="-47.804466" />
       <text
          xml:space="preserve"
          style="font-style:normal;font-weight:normal;font-size:7.52093px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:0.858696;stroke:none;stroke-width:0.626745px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         x="504.00455"
+         x="486.51279"
          y="-57.656887"
          id="text4482-5"
          transform="scale(0.97000757,1.0309198)"><tspan
            sodipodi:role="line"
-           x="504.00455"
+           x="486.51279"
            y="-57.656887"
            id="tspan4486-0"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5349px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:0.858696;stroke-width:0.626745px">CN0577</tspan></text>
       <g
          id="g4600"
-         transform="matrix(0.60794708,0,0,0.64612349,16.2041,-355.10412)"
+         transform="matrix(0.60794708,0,0,0.64612349,131.57985,-355.10412)"
          style="display:inline;shape-rendering:crispEdges;enable-background:new">
         <rect
            y="433.5928"
@@ -2056,8 +2206,8 @@
              style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial">Receive path</tspan></text>
       </g>
       <path
-         style="display:inline;fill:#ff6600;fill-opacity:0;fill-rule:evenodd;stroke:#915f00;stroke-width:1.1242;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.24839, 2.24839;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         d="m 101.67267,-71.755079 h 15.90569"
+         style="display:inline;fill:#ff6600;fill-opacity:0;fill-rule:evenodd;stroke:#3f4b55;stroke-width:1.1242;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.24839, 2.24839;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         d="m 217.04827,-71.755079 h 15.90569"
          id="path6969"
          inkscape:connector-curvature="0" />
       <text
@@ -2075,13 +2225,13 @@
       <text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.52093px;line-height:0%;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.626745px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         x="124.66187"
+         x="243.60481"
          y="-66.84388"
          id="text8054"
          transform="scale(0.97000757,1.0309198)"><tspan
            sodipodi:role="line"
            id="tspan8056"
-           x="124.66187"
+           x="243.60481"
            y="-66.84388"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.83432px;line-height:1.25;font-family:Arial;-inkscape-font-specification:Arial;stroke-width:0.626745px">Clock domain</tspan></text>
       <text
@@ -2108,74 +2258,35 @@
            id="tspan4313"
            sodipodi:role="line"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.381px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';stroke-width:0.892068px" /></text>
-      <rect
-         style="display:inline;vector-effect:none;fill:none;fill-opacity:1;stroke:#915f00;stroke-width:1.42843;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:1.42843, 4.28531;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         id="rect6078"
-         width="371.89899"
-         height="242.70641"
-         x="124.68616"
-         y="-29.980389"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png" />
-      <rect
-         style="display:inline;fill:none;fill-opacity:1;stroke:#915f00;stroke-width:1.6461;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:1.6461, 4.93832;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         id="rect6057"
-         width="58.805683"
-         height="244.30363"
-         x="54.70929"
-         y="-30.028305"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png" />
-      <rect
-         y="17.248827"
-         x="105.25572"
-         height="130.50337"
-         width="30.041416"
-         id="rect5786"
-         style="display:inline;vector-effect:none;fill:#ffcccc;fill-opacity:1;fill-rule:nonzero;stroke:#a01414;stroke-width:0.760633;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;shape-rendering:crispEdges;enable-background:new"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png" />
+      <g
+         id="g5654-2-6"
+         style="display:inline;fill:#a01414;fill-opacity:1;stroke:#a01414;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         transform="matrix(1.5184257,0,0,0.91602546,-52.169146,-544.73145)" />
       <text
-         transform="matrix(0,-1.0268559,0.97384647,0,0,0)"
-         id="text5788"
-         y="128.84586"
-         x="-100.71933"
-         style="font-style:normal;font-weight:normal;font-size:10.7048px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#28170b;fill-opacity:1;stroke:none;stroke-width:0.892068px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         id="text11366-4-8-2"
+         y="70.72496"
+         x="240.22522"
+         style="font-style:normal;font-weight:normal;font-size:10.7048px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
          xml:space="preserve"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15.6112px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#28170b;stroke:none;stroke-width:0.892068px;stroke-opacity:1"
-           y="128.84586"
-           x="-100.71933"
-           id="tspan5790"
-           sodipodi:role="line">DMA</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.51542px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="62.366692"
-         y="191.382"
-         id="text6100-6"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          transform="scale(0.97384647,1.0268559)"><tspan
+           id="tspan11370-7-5"
+           y="70.72496"
+           x="240.22522"
            sodipodi:role="line"
-           id="tspan6098-9"
-           x="62.366692"
-           y="191.382"
-           style="stroke-width:0.892068"> dma_clk</tspan><tspan
-           sodipodi:role="line"
-           x="62.366692"
-           y="203.27628"
-           style="stroke-width:0.892068"
-           id="tspan5123">= 100MHz</tspan></text>
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:11.1509px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;stroke-width:0.892068px" /></text>
+      <rect
+         style="display:inline;vector-effect:none;fill:none;fill-opacity:1;stroke:#3f4b55;stroke-width:1.36152;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:1.36152, 4.08459;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         id="rect6078"
+         width="343.21518"
+         height="238.93088"
+         x="150.37555"
+         y="-35.129566"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png" />
       <g
          id="g1985"
-         transform="matrix(0.69709706,0,0,0.73504207,60.024791,-441.5482)"
+         transform="matrix(0.68073896,0,0,0.72348628,67.254732,-440.20691)"
          style="shape-rendering:crispEdges"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
@@ -2206,23 +2317,23 @@
       </g>
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.02773px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.846349;shape-rendering:crispEdges;enable-background:new"
-         x="119.92347"
-         y="215.0275"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.85077px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.829759;shape-rendering:crispEdges;enable-background:new"
+         x="391.48987"
+         y="198.17044"
          id="text6100"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36"
-         transform="scale(1.026659,0.97403325)"
+         transform="scale(1.0226119,0.9778881)"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"><tspan
            sodipodi:role="line"
-           x="119.92347"
-           y="215.0275"
-           style="stroke-width:0.846349"
+           x="391.48987"
+           y="198.17044"
+           style="stroke-width:0.829759"
            id="tspan5125">  ref_clk = 120MHz</tspan></text>
       <g
-         transform="matrix(0.7173872,0,0,1.0623977,513.33641,-733.56047)"
+         transform="matrix(0.71655904,0,0,1.0455971,512.45509,-727.55283)"
          style="display:inline;shape-rendering:crispEdges;enable-background:new"
-         id="adc_core-0"
+         id="adc_core-5"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36">
@@ -2250,38 +2361,8 @@
              sodipodi:role="line">LTC2387 CORE</tspan></text>
       </g>
       <g
-         id="g5654"
-         style="display:inline;fill:#a01414;fill-opacity:1;stroke:#a01414;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         transform="matrix(4.1009995,0,0,0.85718058,-556.42903,-385.53793)"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36">
-        <path
-           inkscape:connector-curvature="0"
-           id="path5656"
-           d="m 130.73551,546.2302 9.89713,14.86246 v -6.81196 l 20.18849,-3e-5 c 0,-16.09794 0,0 0,-16.09794 l -20.18849,3e-5 v -6.81196 l -9.89713,14.86246"
-           style="fill:#a01414;fill-opacity:1;fill-rule:evenodd;stroke:#a01414;stroke-width:0.993693px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
-           sodipodi:nodetypes="cccccccc" />
-      </g>
-      <g
-         id="g5654-2-6"
-         style="display:inline;fill:#a01414;fill-opacity:1;stroke:#a01414;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         transform="matrix(1.5184257,0,0,0.91602546,-52.169146,-544.73145)" />
-      <text
-         id="text11366-4-8-2"
-         y="70.72496"
-         x="240.22522"
-         style="font-style:normal;font-weight:normal;font-size:10.7048px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         xml:space="preserve"
-         transform="scale(0.97384647,1.0268559)"><tspan
-           id="tspan11370-7-5"
-           y="70.72496"
-           x="240.22522"
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:11.1509px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;stroke-width:0.892068px" /></text>
-      <g
          id="g21139"
-         transform="matrix(0.86873744,0,0,0.91602546,-26.162462,-26.085669)"
+         transform="matrix(0.84835163,0,0,0.90162439,-20.939709,-31.276012)"
          style="shape-rendering:crispEdges"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
@@ -2290,29 +2371,153 @@
            sodipodi:nodetypes="cc"
            inkscape:connector-curvature="0"
            id="path1206"
-           d="m 726.98374,72.801587 -229.69085,0"
-           style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-2)" />
+           d="M 739.35054,58.801587 H 501.29289"
+           style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-1)" />
         <path
            sodipodi:nodetypes="cc"
            inkscape:connector-curvature="0"
            id="path1206-9"
-           d="M 727.69085,84.09448 498,84.09448"
-           style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-9-2);shape-rendering:crispEdges;enable-background:new" />
+           d="M 739.19903,80.09448 502,80.09448"
+           style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-9-53);shape-rendering:crispEdges;enable-background:new" />
         <text
            id="text2401"
-           y="67.094482"
-           x="522"
+           y="53.194988"
+           x="525.17157"
            style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
            xml:space="preserve"><tspan
              style="font-size:13.3333px"
-             y="67.094482"
-             x="522"
+             y="53.194988"
+             x="525.17157"
              id="tspan2399"
-             sodipodi:role="line">DA (p/n)</tspan></text>
+             sodipodi:role="line">da_p</tspan></text>
+        <text
+           id="text2401-7-2"
+           y="426.47849"
+           x="583.52106"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="426.47849"
+             x="583.52106"
+             id="tspan2399-6-3"
+             sodipodi:role="line">cnv_p</tspan></text>
+        <text
+           id="text2401-7-2-6"
+           y="447.72485"
+           x="583.7674"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="447.72485"
+             x="583.7674"
+             id="tspan2399-6-3-9"
+             sodipodi:role="line">cnv_n</tspan></text>
+        <text
+           id="text2401-7-7"
+           y="400.69781"
+           x="186.31116"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="400.69781"
+             x="186.31116"
+             id="tspan2399-6-2"
+             sodipodi:role="line">clk_gate</tspan></text>
+        <text
+           id="text2401-65"
+           y="73.087158"
+           x="523.87592"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="73.087158"
+             x="523.87592"
+             id="tspan2399-9"
+             sodipodi:role="line">da_n</tspan></text>
+        <text
+           id="text2401-7-03-8"
+           y="379.39697"
+           x="589.19189"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="379.39697"
+             x="589.19189"
+             id="tspan2399-6-98-8"
+             sodipodi:role="line">clk_p</tspan></text>
+        <path
+           style="display:inline;fill:none;stroke:#000000;stroke-width:1.67757;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1-8-5);shape-rendering:crispEdges;enable-background:new"
+           d="m 732.85181,383.52992 -193.90081,0.25"
+           id="path8769-9-1-7"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc"
+           inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+           inkscape:export-xdpi="224.36"
+           inkscape:export-ydpi="224.36" />
+        <text
+           id="text2401-7-03-8-1"
+           y="398.60141"
+           x="588.36182"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="398.60141"
+             x="588.36182"
+             id="tspan2399-6-98-8-6"
+             sodipodi:role="line">clk_n</tspan></text>
+        <path
+           style="display:inline;fill:none;stroke:#000000;stroke-width:1.67757;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1-8-5-1);shape-rendering:crispEdges;enable-background:new"
+           d="m 732.65044,403.23436 -185.06198,0.25"
+           id="path8769-9-1-7-9"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc"
+           inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+           inkscape:export-xdpi="224.36"
+           inkscape:export-ydpi="224.36" />
+        <path
+           style="display:inline;fill:none;stroke:#000000;stroke-width:1.67757;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1-8-5-0);shape-rendering:crispEdges;enable-background:new"
+           d="M 733.21866,436.45886 540.03213,434.566"
+           id="path8769-9-1-7-5"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc"
+           inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+           inkscape:export-xdpi="224.36"
+           inkscape:export-ydpi="224.36" />
+        <path
+           style="display:inline;fill:none;stroke:#000000;stroke-width:1.67757;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1-8-5-1-7);shape-rendering:crispEdges;enable-background:new"
+           d="m 733.73157,454.02044 -185.06198,0.25"
+           id="path8769-9-1-7-9-5"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc"
+           inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+           inkscape:export-xdpi="224.36"
+           inkscape:export-ydpi="224.36" />
+        <text
+           id="text2401-4-6"
+           y="214.38168"
+           x="274.91586"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="214.38168"
+             x="274.91586"
+             id="tspan2399-84-2"
+             sodipodi:role="line">sampling_clk = ref_clk</tspan></text>
+        <text
+           id="text2401-7-7-2"
+           y="376.98679"
+           x="312.01508"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="376.98679"
+             x="312.01508"
+             id="tspan2399-6-2-5"
+             sodipodi:role="line">sampling_clk_s</tspan></text>
       </g>
       <g
-         id="g15320"
-         transform="matrix(0.86873744,0,0,0.91602546,-26.776703,-64.558749)"
+         id="g21139-3"
+         transform="matrix(0.84835163,0,0,0.90162439,-16.093151,17.856188)"
          style="shape-rendering:crispEdges"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
@@ -2320,75 +2525,97 @@
         <path
            sodipodi:nodetypes="cc"
            inkscape:connector-curvature="0"
-           id="path1206-1-0-81"
-           d="m 728.18407,197.09448 -230.18407,0"
-           style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-0-3-32);shape-rendering:crispEdges;enable-background:new" />
+           id="path1206-5"
+           d="m 733.33024,58.801587 -236.03735,0"
+           style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-91)" />
         <path
            sodipodi:nodetypes="cc"
            inkscape:connector-curvature="0"
-           id="path1206-1-0-8-3"
-           d="m 728.18407,209.09448 -230.18407,0"
-           style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-0-3-9-0);shape-rendering:crispEdges;enable-background:new" />
+           id="path1206-9-2"
+           d="M 733.17872,80.09448 498,80.09448"
+           style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-9-5);shape-rendering:crispEdges;enable-background:new" />
         <text
-           id="text2401-1-7-3"
-           y="191.09448"
-           x="522.70721"
-           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges;enable-background:new"
+           id="text2401-2"
+           y="53.194988"
+           x="519.17157"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
            xml:space="preserve"><tspan
              style="font-size:13.3333px"
-             y="191.09448"
-             x="522.70721"
-             id="tspan2399-1-6-6"
-             sodipodi:role="line">DCO (p/n)</tspan></text>
+             y="53.194988"
+             x="519.17157"
+             id="tspan2399-8"
+             sodipodi:role="line">db_p</tspan></text>
+        <text
+           id="text2401-65-6"
+           y="73.087158"
+           x="517.87592"
+           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+           xml:space="preserve"><tspan
+             style="font-size:13.3333px"
+             y="73.087158"
+             x="517.87592"
+             id="tspan2399-9-8"
+             sodipodi:role="line">db_n</tspan></text>
+        <g
+           id="g21139-4"
+           transform="translate(-3.0294378,55.157899)"
+           style="shape-rendering:crispEdges"
+           inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+           inkscape:export-xdpi="224.36"
+           inkscape:export-ydpi="224.36">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path1206-1"
+             d="m 736.34039,58.801587 -237.0475,0"
+             style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-35)" />
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path1206-9-7"
+             d="M 736.18887,80.09448 500,80.09448"
+             style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-9-9-87);shape-rendering:crispEdges;enable-background:new" />
+          <text
+             id="text2401-8"
+             y="53.194988"
+             x="521.17157"
+             style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+             xml:space="preserve"><tspan
+               style="font-size:13.3333px"
+               y="53.194988"
+               x="521.17157"
+               id="tspan2399-1"
+               sodipodi:role="line">dco_p</tspan></text>
+          <text
+             id="text2401-65-65"
+             y="73.087158"
+             x="519.87592"
+             style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges"
+             xml:space="preserve"><tspan
+               style="font-size:13.3333px"
+               y="73.087158"
+               x="519.87592"
+               id="tspan2399-9-1"
+               sodipodi:role="line">dco_n</tspan></text>
+        </g>
       </g>
       <g
          id="g5654-7"
          style="display:inline;fill:#a01414;fill-opacity:1;stroke:#a01414;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
-         transform="matrix(3.6637039,0,0,0.85284952,-338.59556,-383.56513)"
+         transform="matrix(3.5777313,0,0,0.83944165,-322.0116,-383.13541)"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36">
         <path
            inkscape:connector-curvature="0"
            id="path5656-3"
-           d="m 129.5988,546.58376 9.92857,14.85359 v -6.8079 l 49.94304,-3e-5 V 538.5411 l -49.94304,3e-5 v -6.8079 l -9.92857,14.85359"
+           d="m 112.52616,546.58376 9.92857,14.85359 v -6.8079 l 67.42854,-3e-5 V 538.5411 l -67.42854,3e-5 v -6.8079 l -9.92857,14.85359"
            style="fill:#a01414;fill-opacity:1;fill-rule:evenodd;stroke:#a01414;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            sodipodi:nodetypes="cccccccc" />
       </g>
       <g
-         id="g15302"
-         transform="matrix(0.86873744,0,0,0.91602546,-25.645614,-44.406188)"
-         style="shape-rendering:crispEdges"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36">
-        <path
-           sodipodi:nodetypes="cc"
-           inkscape:connector-curvature="0"
-           id="path1206-3"
-           d="m 726.88207,132.10721 -230.18407,0"
-           style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-7);shape-rendering:crispEdges;enable-background:new" />
-        <path
-           sodipodi:nodetypes="cc"
-           inkscape:connector-curvature="0"
-           id="path1206-9-5"
-           d="m 726.38885,144.10721 -229.69085,0"
-           style="display:inline;opacity:1;fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-9-3-2);shape-rendering:crispEdges;enable-background:new" />
-        <text
-           id="text2401-6"
-           y="126.40012"
-           x="521.40521"
-           style="font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;shape-rendering:crispEdges;enable-background:new"
-           xml:space="preserve"><tspan
-             style="font-size:13.3333px"
-             y="126.40012"
-             x="521.40521"
-             id="tspan2399-2"
-             sodipodi:role="line">DB (p/n)</tspan></text>
-      </g>
-      <g
          id="g8767"
-         transform="matrix(0.81252692,0,0,0.88343128,45.464092,-86.115147)"
+         transform="matrix(0.79346014,0,0,0.86954263,-8.0456024,3.4071884)"
          style="shape-rendering:crispEdges"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
@@ -2401,25 +2628,37 @@
            id="rect5786-1-2-0-7"
            width="37.071289"
            height="152.9557"
-           x="-404.79993"
+           x="-429.68542"
            y="216.3094" />
         <text
            xml:space="preserve"
            style="font-style:normal;font-weight:normal;font-size:12.7234px;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.06027px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
            x="234.97099"
-           y="381.315"
+           y="405.30914"
            id="text4964-9-0-2-5"
-           transform="scale(0.96417826,1.0371526)"><tspan
+           transform="scale(0.96417827,1.0371526)"><tspan
              sodipodi:role="line"
              id="tspan4966-9-9-3-9"
              x="234.97099"
-             y="381.315"
+             y="405.30914"
              style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.9118px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke-width:1.06027px">AXI_PWM_GEN</tspan></text>
       </g>
+      <text
+         id="text2401-7-03-3"
+         y="308.37042"
+         x="386.39212"
+         style="font-style:normal;font-weight:normal;font-size:13.9933px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges"
+         xml:space="preserve"
+         transform="scale(0.97000757,1.0309198)"><tspan
+           style="font-size:11.6611px;stroke-width:0.874582"
+           y="308.37042"
+           x="386.39212"
+           id="tspan2399-6-98-6"
+           sodipodi:role="line">ltc_clk</tspan></text>
       <path
-         style="fill:none;stroke:#000000;stroke-width:1.4945;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker9011);shape-rendering:crispEdges"
-         d="m 605.12464,245.91156 -255.07059,0"
-         id="path8769"
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.46717;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1-8-4);shape-rendering:crispEdges;enable-background:new"
+         d="M 415.82372,321.63155 H 363.95758"
+         id="path8769-9-1-91"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
@@ -2427,106 +2666,37 @@
          inkscape:export-ydpi="224.36" />
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.51542px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="417.21841"
-         y="235.54062"
-         id="text6100-2"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         transform="scale(0.97384647,1.0268559)"><tspan
-           sodipodi:role="line"
-           x="417.21841"
-           y="235.54062"
-           style="stroke-width:0.892068"
-           id="tspan5125-2">ref_clk = 120MHz</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.51542px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="424.18671"
-         y="219.12242"
-         id="text6100-2-2"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         transform="scale(0.97384647,1.0268559)"><tspan
-           sodipodi:role="line"
-           x="424.18671"
-           y="219.12242"
-           style="stroke-width:0.892068"
-           id="tspan5125-2-3">sampling_clk</tspan></text>
-      <path
-         style="display:inline;fill:none;stroke:#000000;stroke-width:1.4965;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1);shape-rendering:crispEdges;enable-background:new"
-         d="m 601.20551,262.66837 -255.16228,0"
-         id="path8769-9"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cc"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36" />
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.51542px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="249.13219"
-         y="203.63641"
-         id="text6100-2-7"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         transform="scale(0.97384647,1.0268559)"><tspan
-           sodipodi:role="line"
-           x="249.13219"
-           y="203.63641"
-           style="stroke-width:0.892068"
-           id="tspan10617">clk_gate</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:14.2731px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="439.62067"
-         y="253.68475"
-         id="text2401-1-7-3-9-9-8"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         transform="scale(0.97384647,1.0268559)"><tspan
-           sodipodi:role="line"
-           id="tspan2399-1-6-6-1-2-4"
-           x="439.62067"
-           y="253.68475"
-           style="font-size:11.8942px;stroke-width:0.892068">cnv</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.13655px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="325.91684"
-         y="258.19501"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.99666px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges;enable-background:new"
+         x="266.99457"
+         y="359.86624"
          id="text2401-1-7-3-9-9-8-2"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36"
-         transform="scale(0.97384647,1.0268559)"><tspan
+         transform="scale(0.97000757,1.0309198)"><tspan
            sodipodi:role="line"
            id="tspan2399-1-6-6-1-2-4-1"
-           x="325.91684"
-           y="258.19501"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.13655px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.892068">pwm_0</tspan></text>
+           x="266.99457"
+           y="359.86624"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.99666px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.874582">pwm_0</tspan></text>
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.13655px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="236.34727"
-         y="239.71472"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.99666px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges;enable-background:new"
+         x="182.89764"
+         y="341.52966"
          id="text2401-1-7-3-9-9-8-2-6"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36"
-         transform="scale(0.97384647,1.0268559)"><tspan
+         transform="scale(0.97000757,1.0309198)"><tspan
            sodipodi:role="line"
            id="tspan2399-1-6-6-1-2-4-1-4"
-           x="236.34727"
-           y="239.71472"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.13655px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.892068">pwm_1</tspan></text>
+           x="182.89764"
+           y="341.52966"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.99666px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.874582">pwm_1</tspan></text>
       <path
-         style="display:inline;fill:none;stroke:#000000;stroke-width:1.67476;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3);shape-rendering:crispEdges;enable-background:new"
-         d="M 238.60395,238.20567 V 182.21982"
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.64193;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3);shape-rendering:crispEdges;enable-background:new"
+         d="M 192.43893,343.38316 V 173.75469"
          id="path1206-7-8"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc"
@@ -2534,27 +2704,9 @@
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36" />
       <path
-         style="display:inline;fill:none;stroke:#000000;stroke-width:1.65364;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3-7);shape-rendering:crispEdges;enable-background:new"
-         d="M 365.2934,245.16622 V 182.44814"
-         id="path1206-7-8-6"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cc"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36" />
-      <path
-         style="display:inline;fill:none;stroke:#000000;stroke-width:1.48975;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3-7-3);shape-rendering:crispEdges;enable-background:new"
-         d="m 407.90633,228.22524 193.33118,-0.0623"
-         id="path1206-7-8-6-5"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cc"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36" />
-      <path
-         style="display:inline;fill:none;stroke:#000000;stroke-width:1.48975;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3-7-3-9);shape-rendering:crispEdges;enable-background:new"
-         d="m 366.26694,223.39985 20.52417,-0.12162"
-         id="path1206-7-8-6-5-1"
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.64193;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3-2);shape-rendering:crispEdges;enable-background:new"
+         d="m 322.22911,260.76868 v -86.6823"
+         id="path1206-7-8-5"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
@@ -2563,7 +2715,7 @@
       <g
          id="g6577"
          style="display:inline;shape-rendering:crispEdges;enable-background:new"
-         transform="matrix(1.1944004,0,0,1.3286259,-229.75302,-734.99557)"
+         transform="matrix(1.1663726,0,0,1.3077382,-215.72316,-729.04092)"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36">
@@ -2575,102 +2727,246 @@
            transform="translate(1.9279233e-5,1.2996646)">
           <rect
              transform="rotate(-90)"
-             y="356.43604"
-             x="-675.08759"
-             height="84.853607"
-             width="47.092808"
+             y="356.31552"
+             x="-660.729"
+             height="85.094643"
+             width="32.854107"
              id="rect11202"
-             style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#a01414;stroke-width:1.43409;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
+             style="display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#a01414;stroke-width:1.19953;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new" />
           <text
              id="text11366"
-             y="647.966"
+             y="639.69257"
              x="397.42487"
              style="font-style:normal;font-weight:normal;line-height:0%;font-family:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              xml:space="preserve"><tspan
                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:9.46533px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1"
-               y="647.966"
+               y="639.69257"
                x="397.42487"
                id="tspan11368"
                sodipodi:role="line">DATA</tspan><tspan
                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:9.46533px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1"
                id="tspan11370"
-               y="659.79767"
+               y="651.52423"
                x="397.42487"
                sodipodi:role="line">MONITORING</tspan></text>
         </g>
       </g>
       <text
          xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:14.492px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.905744;shape-rendering:crispEdges;enable-background:new"
-         x="60.080853"
-         y="86.763786"
-         id="text2401-61-1-54-8"
-         transform="scale(0.98965719,1.0104509)"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"><tspan
-           sodipodi:role="line"
-           id="tspan2399-9-2-70-3"
-           x="60.080853"
-           y="86.763786"
-           style="stroke-width:0.905744">16/32</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:14.2731px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.892068;shape-rendering:crispEdges;enable-background:new"
-         x="268.05264"
-         y="84.630676"
+         style="font-style:normal;font-weight:normal;font-size:13.9933px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges;enable-background:new"
+         x="271.70413"
+         y="77.539421"
          id="text2401-61-1-5-5"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36"
-         transform="scale(0.97384647,1.0268559)"><tspan
+         transform="scale(0.97000757,1.0309198)"><tspan
            sodipodi:role="line"
            id="tspan2399-9-2-7-4"
-           x="268.05264"
-           y="84.630676"
-           style="stroke-width:0.892068">16/18</tspan></text>
-      <ellipse
-         style="fill:#000000;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
-         id="path5471-9"
-         cx="365.29395"
-         cy="245.16624"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         rx="3.0714507"
-         ry="3.2386379" />
-      <ellipse
-         style="fill:#000000;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
-         id="path5471-9-9"
-         cx="365.45541"
-         cy="223.60583"
-         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
-         inkscape:export-xdpi="224.36"
-         inkscape:export-ydpi="224.36"
-         rx="3.0714507"
-         ry="3.2386379" />
+           x="271.70413"
+           y="77.539421"
+           style="stroke-width:0.874582">16/18</tspan></text>
       <ellipse
          style="fill:#000000;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
          id="path5471-9-9-1"
-         cx="238.60414"
-         cy="231.70245"
+         cx="192.43924"
+         cy="327.41129"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36"
-         rx="3.0714507"
-         ry="3.2386379" />
+         rx="2.9993761"
+         ry="3.1877224" />
       <path
-         style="fill:none;stroke:#000000;stroke-width:1.51227;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges"
-         d="m 391.46766,219.04893 v 18.14839 c 7.2814,-0.3919 15.28071,-2.64064 15.36081,-8.78149 0.0814,-6.23622 -6.90268,-9.36073 -15.36081,-9.3669 z"
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.46174;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3-7-3-1);shape-rendering:crispEdges;enable-background:new"
+         d="m 193.21692,327.98988 139.54674,-0.99635"
+         id="path1206-7-8-6-5-7"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36" />
+      <text
+         id="text2401-7-5-0"
+         y="244.8006"
+         x="298.67545"
+         style="font-style:normal;font-weight:normal;font-size:13.9933px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges"
+         xml:space="preserve"
+         transform="scale(0.97000757,1.0309198)"><tspan
+           style="font-size:11.6611px;stroke-width:0.874582"
+           y="244.8006"
+           x="298.67545"
+           id="tspan2399-6-1-77"
+           sodipodi:role="line">clk_s</tspan></text>
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.46521;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges"
+         d="M 363.49813,260.23412 H 321.40572"
+         id="path8769-0"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36" />
+      <text
+         id="text2401-7-2-2"
+         y="353.52725"
+         x="404.10181"
+         style="font-style:normal;font-weight:normal;font-size:13.9933px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges"
+         xml:space="preserve"
+         transform="scale(0.97000757,1.0309198)"><tspan
+           style="font-size:11.6611px;stroke-width:0.874582"
+           y="353.52725"
+           x="404.10181"
+           id="tspan2399-6-3-0"
+           sodipodi:role="line">cnv</tspan></text>
+      <path
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.46717;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1-5-5);shape-rendering:crispEdges;enable-background:new"
+         d="M 416.55301,368.73132 H 285.29793"
+         id="path8769-9-5-6"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36" />
+      <path
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.46717;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#TriangleInM-7-1-8-0-1);shape-rendering:crispEdges;enable-background:new"
+         d="m 332.16699,313.30213 -93.87682,-0.0797"
+         id="path8769-9-1-9-2"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36" />
+      <path
+         style="display:inline;fill:none;stroke:#000000;stroke-width:1.46055;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         d="m 238.92196,169.15377 0.11263,143.70335"
+         id="path1206-7-8-6-5-1-9-0-4-4"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.74916;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges"
+         d="m 336.33698,303.2336 v 35.38667 c 12.93154,-0.76415 27.13807,-5.14887 27.28034,-17.12259 0.14457,-12.15972 -12.25896,-18.25207 -27.28034,-18.26408 z"
          id="path5279"
          sodipodi:nodetypes="ccac"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
          inkscape:export-xdpi="224.36"
          inkscape:export-ydpi="224.36" />
       <path
-         style="display:inline;fill:none;stroke:#000000;stroke-width:1.49096;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1216-8-3-7-3-1);shape-rendering:crispEdges;enable-background:new"
-         d="m 239.37816,232.06574 147.50722,-0.0406"
-         id="path1206-7-8-6-5-7"
+         style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.94378;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         d="m 449.51099,368.10866 -29.00527,-17.83216 0.36256,35.0797 z"
+         id="path29409-9-5-2-5"
+         inkscape:connector-curvature="0" />
+      <ellipse
+         style="fill:#040404;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
+         id="path5471-9-9-1-2-8-4"
+         cx="441.02573"
+         cy="377.71753"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36"
+         rx="3.7492199"
+         ry="3.8252673" />
+      <ellipse
+         style="fill:#f7f7f7;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
+         id="path5471-9-9-1-2-8-8-0"
+         cx="441.06326"
+         cy="377.75748"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36"
+         rx="2.961884"
+         ry="2.9087968" />
+      <path
+         style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.94378;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         d="m 449.05936,322.40507 -29.00527,-17.83216 0.36256,35.07969 z"
+         id="path29409-9-5-2-5-9"
+         inkscape:connector-curvature="0" />
+      <ellipse
+         style="fill:#040404;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
+         id="path5471-9-9-1-2-8-4-7"
+         cx="440.5741"
+         cy="332.01392"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36"
+         rx="3.7492199"
+         ry="3.8252673" />
+      <ellipse
+         style="fill:#f7f7f7;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
+         id="path5471-9-9-1-2-8-8-0-8"
+         cx="440.61163"
+         cy="332.05386"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36"
+         rx="2.961884"
+         ry="2.9087968" />
+      <path
+         style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.94378;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges;enable-background:new"
+         d="m 363.17241,260.21826 29.00527,-17.83217 -0.36256,35.0797 z"
+         id="path29409-9-5-2-5-9-5"
+         inkscape:connector-curvature="0" />
+      <ellipse
+         style="fill:#040404;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
+         id="path5471-9-9-1-2-8-4-7-6"
+         cx="-396.52551"
+         cy="269.81903"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36"
+         rx="3.7492199"
+         ry="3.8252673"
+         transform="scale(-1,1)" />
+      <ellipse
+         style="fill:#f7f7f7;fill-opacity:1;stroke:#3e6de1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;shape-rendering:crispEdges"
+         id="path5471-9-9-1-2-8-8-0-8-0"
+         cx="-396.64703"
+         cy="269.80264"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36"
+         rx="2.961884"
+         ry="2.9087968"
+         transform="scale(-1,1)" />
+      <text
+         id="text2401-7-5"
+         y="242.12042"
+         x="476.21667"
+         style="font-style:normal;font-weight:normal;font-size:13.9933px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges"
+         xml:space="preserve"
+         transform="scale(0.97000757,1.0309198)"><tspan
+           style="font-size:11.6611px;stroke-width:0.874582"
+           y="242.12042"
+           x="476.21667"
+           id="tspan2399-6-1"
+           sodipodi:role="line">ref_clk_p</tspan></text>
+      <text
+         id="text2401-7-5-5"
+         y="258.38467"
+         x="476.22586"
+         style="font-style:normal;font-weight:normal;font-size:13.9933px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.874582;shape-rendering:crispEdges"
+         xml:space="preserve"
+         transform="scale(0.97000757,1.0309198)"><tspan
+           style="font-size:11.6611px;stroke-width:0.874582"
+           y="258.38467"
+           x="476.22586"
+           id="tspan2399-6-1-7"
+           sodipodi:role="line">ref_clk_n</tspan></text>
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.46521;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges"
+         d="m 605.38548,254.6535 -212.66611,0"
+         id="path8769"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc"
+         inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"
+         inkscape:export-xdpi="224.36"
+         inkscape:export-ydpi="224.36" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.46521;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;shape-rendering:crispEdges"
+         d="m 605.62903,269.88117 -205.88972,0.23908"
+         id="path8769-2"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc"
          inkscape:export-filename="C:\workspace\ad\ghdl\docs\block_diagrams\cn0577\cn0577_block_diagram.png"

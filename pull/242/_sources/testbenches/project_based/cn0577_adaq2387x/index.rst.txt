@@ -7,11 +7,11 @@ Overview
 -------------------------------------------------------------------------------
 
 The purpose of this testbench is to validate the of the
-:git-hdl:`projects/cn0577` and :git-hdl:`projects/adaq2387x` reference designs.
+:git-hdl:`projects/cn0577` and :git-hdl:`projects/adaq23875` reference designs.
 
 The entire HDL documentation can be found here
 :external+hdl:ref:`CN0577 HDL project <cn0577>` and here
-:external+hdl:ref:`ADAQ2387X HDL project <adaq2387x>`.
+:external+hdl:ref:`ADAQ2387X HDL project <adaq23875>`.
 
 Block design
 -------------------------------------------------------------------------------
@@ -19,18 +19,31 @@ Block design
 The testbench block design includes part of the CN0577/ ADAQ2387X HDL reference
 designs, along with VIPs used for clocking, reset, PS and DDR simulations.
 
-Block diagram
+Block diagrams
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The data path and clock domains are depicted in the below diagram:
+The data path and clock domains are depicted in the below diagrams:
 
-CN0577/ ADAQ2387X Testbench block diagram 
+CN0577 Testbench block diagram
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ./cn0577_tb.svg
    :width: 800
    :align: center
-   :alt: CN0577/Testbench block diagram
+   :alt: CN0577 Testbench block diagram
+
+ADAQ2387X Testbench block diagrams
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: ./adaq2387x_default_tb.svg
+   :width: 800
+   :align: center
+   :alt: ADAQ2387X Testbench block diagram - default clocking
+
+.. image:: ./adaq2387x_mmcm_tb.svg
+   :width: 800
+   :align: center
+   :alt: ADAQ2387X Testbench block diagram - using CLK_WIZARD for sampling clk
 
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,7 +58,15 @@ The following parameter of this project that can be configured:
    Options: 0 - 100MHz, 1 - 120MHz
 -  CN0577_ADAQ2387X_N: selects the HDL project
    Options: 0 - ADAQ2387X, 1 - CN0577
- 
+
+.. important::
+
+   The **ADC_RES** and **USE_MMCM** parameters only apply to the ADAQ2387X
+   design. When the CN0577 design is selected, the ADC resolution is always
+   18 bits, and the reference clock is always 120 MHz (USE_MMCM = 0). These
+   parameters are not present in the CN0577 HDL. They exist only to keep the
+   testbench interface consistent across both designs.
+
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -133,7 +154,7 @@ Sanity tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This set of sanity tests for the common ADC API, axi_dmac and axi_pwm_gen
-IPs verifies the *version* and *scratch* registers. 
+IPs verifies the *version* and *scratch* registers.
 
 Data acquisition test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta content="The purpose of this testbench is to validate the of the projects/cn0577 and projects/adaq23875 reference designs." name="description" />
 
-    <title>CN0577/ ADAQ2387X &#8212; Testbenches  documentation</title>
+    <title>CN0577/ADAQ2387X &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5d595293" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -95,7 +95,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">CN0577/ ADAQ2387X</a><ul>
+<li><a class="reference internal" href="#">CN0577/ADAQ2387X</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagrams">Block diagrams</a><ul>
@@ -246,7 +246,7 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../ada4355/index.html">ADA4355</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">CN0577/ ADAQ2387X</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CN0577/ADAQ2387X</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ltc2378/index.html">LTC2378</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
@@ -272,7 +272,7 @@ Content on this topic
           <div class="body" role="main">
             
   <section id="cn0577-adaq2387x">
-<span id="id1"></span><h1>CN0577/ ADAQ2387X<a class="headerlink" href="#cn0577-adaq2387x" title="Link to this heading"></a></h1>
+<span id="id1"></span><h1>CN0577/ADAQ2387X<a class="headerlink" href="#cn0577-adaq2387x" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>The purpose of this testbench is to validate the of the
@@ -283,7 +283,7 @@ Content on this topic
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The testbench block design includes part of the CN0577/ ADAQ2387X HDL reference
+<p>The testbench block design includes part of the CN0577/ADAQ2387X HDL reference
 designs, along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <section id="block-diagrams">
 <h3>Block diagrams<a class="headerlink" href="#block-diagrams" title="Link to this heading"></a></h3>
@@ -308,7 +308,7 @@ designs, along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <li><p>TWOLANES: defines the device’s number of data lanes:
 Options: 0 - One lane, 1 - Two lanes</p></li>
 <li><p>ADC_RES: defines the device’s resolution in bits:
-Options: 16 - 16 bits, 18 - 18 bits</p></li>
+Options: 16, 18</p></li>
 <li><p>USE_MMCM: defines the ref clk value in MHz:
 Options: 0 - 100MHz, 1 - 120MHz</p></li>
 <li><p>CN0577_ADAQ2387X_N: selects the HDL project
@@ -332,7 +332,9 @@ testbench interface consistent across both designs.</p>
 <tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
 <th class="head" colspan="4"><p>Parameters</p></th>
 </tr>
-<tr class="row-even"><th class="head" colspan="3"><p>TWOLANES | ADC_RES | USE_MMCM</p></th>
+<tr class="row-even"><th class="head"><p>TWOLANES</p></th>
+<th class="head"><p>ADC_RES</p></th>
+<th class="head"><p>USE_MMCM</p></th>
 <th class="head"><p>CN0577_ADAQ2387X_N</p></th>
 </tr>
 </thead>
@@ -390,7 +392,7 @@ testbench interface consistent across both designs.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Tests the cn0577/ adaq2387x design capabilities.</p></td>
+<td><p>Tests the cn0577/adaq2387x design capabilities.</p></td>
 </tr>
 </tbody>
 </table>
@@ -479,18 +481,25 @@ IPs verifies the <em>version</em> and <em>scratch</em> registers.</p>
 <li><p>Configure the axi_ltc2387 IP</p></li>
 <li><p>Submit a DMA transfer</p></li>
 <li><p>Stop the PWM generator</p></li>
-<li><p>Configure axi_ltc2387 IP
-* ADC common core out of reset
-* Set static data setup in device’s reg 0x21
-* Read last config result
-* Send WR request
-* Read last config result
-* Set default control value (no RD/WR request)
-* Read last config result
-* Set exit from register mode sequence
-* Send WR request
-* Set default control value (no RD/WR request)
-* Set HDL config mode - default</p></li>
+<li><p>Configure axi_ltc2387 IP</p>
+<ul>
+<li><p>Bring ADC common core out of reset</p></li>
+<li><p>Load configuration register 0x21 of the ADC with a static data setup value</p></li>
+<li><p>Read back ADC_CONFIG_WR to verify the staged configuration</p></li>
+<li><p>Trigger a write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1</p></li>
+<li><p>Read last config result</p></li>
+<li><p>Clear the control register to the idle (no RD/WR request)</p></li>
+<li><p>Read back ADC_CONFIG_CTRL to verify that the control interface has returned
+to its default (idle) state after clearing the request bit</p></li>
+<li><p>Clear the ADC model’s configuration write register (ADC_CONFIG_WR) to exit
+the register mode programming sequence.</p></li>
+<li><p>Trigger a new write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1</p></li>
+<li><p>Clear the control register to the idle (no RD/WR request)</p></li>
+<li><p>Set the HDL common control register (COMMON_CONTROL_3): disable CRC
+checking and apply the default project-specific control flags
+(custom_control = 0x100) to enter the HDL configuration mode</p></li>
+</ul>
+</li>
 <li><p>Capture and compare the data</p></li>
 </ul>
 </section>
@@ -676,41 +685,21 @@ clean folder (no runs folder available):</p>
 <td><p>—</p></td>
 <td><p><a class="reference internal" href="../../../library/vip/amd/axi_vip/index.html#xilinx-axi-vip"><span class="std std-ref">Xilinx AXI Verification IP (VIP)</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>AXI4STREAM_VIP_PKG</p></td>
-<td><p>—</p></td>
-<td><p><a class="icon link reference external" href="https://www.xilinx.com/products/intellectual-property/axi-stream-vip.html" target="_blank">AXI Stream Verification IP (VIP)</a></p></td>
-</tr>
-<tr class="row-odd"><td><p>COMMON_API_PKG</p></td>
+<tr class="row-even"><td><p>COMMON_API_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/common_api_pkg.sv" target="_blank">library/drivers/common_api_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>DMA_TRANS</p></td>
+<tr class="row-odd"><td><p>DMA_TRANS</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv" target="_blank">library/drivers/dmac/dma_trans.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>DMAC_API</p></td>
+<tr class="row-even"><td><p>DMAC_API</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
 <td><p><a class="reference internal" href="../../../library/drivers/dmac/index.html#dmac"><span class="std std-ref">DMAC</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>LOGGER_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/logger_pkg.sv" target="_blank">library/utilities/logger_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>M_AXIS_SEQUENCER</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axis_sequencer.sv" target="_blank">library/vip/amd/m_axis_sequencer.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>PWM_GEN_API_PKG</p></td>
+<tr class="row-odd"><td><p>PWM_GEN_API_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/pwm_gen_api_pkg.sv" target="_blank">library/drivers/pwm_gen_api_pkg.sv</a></p></td>
 <td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>S_AXIS_SEQUENCER</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axis_sequencer.sv" target="_blank">library/vip/amd/s_axis_sequencer.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>TEST_HARNESS_ENV_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/test_harness_eng_pkg.sv" target="_blank">library/utilities/test_harness_eng_pkg.sv</a></p></td>
-<td><p><a class="reference internal" href="../../../library/utilities/test_harness/index.html#test-harness"><span class="std std-ref">Test Harness</span></a></p></td>
 </tr>
 </tbody>
 </table>

@@ -1,6 +1,6 @@
 .. _cn0577_adaq2387x:
 
-CN0577/ ADAQ2387X
+CN0577/ADAQ2387X
 ================================================================================
 
 Overview
@@ -16,7 +16,7 @@ The entire HDL documentation can be found here
 Block design
 -------------------------------------------------------------------------------
 
-The testbench block design includes part of the CN0577/ ADAQ2387X HDL reference
+The testbench block design includes part of the CN0577/ADAQ2387X HDL reference
 designs, along with VIPs used for clocking, reset, PS and DDR simulations.
 
 Block diagrams
@@ -53,7 +53,7 @@ The following parameter of this project that can be configured:
 -  TWOLANES: defines the device's number of data lanes:
    Options: 0 - One lane, 1 - Two lanes
 -  ADC_RES: defines the device's resolution in bits:
-   Options: 16 - 16 bits, 18 - 18 bits
+   Options: 16, 18
 -  USE_MMCM: defines the ref clk value in MHz:
    Options: 0 - 100MHz, 1 - 120MHz
 -  CN0577_ADAQ2387X_N: selects the HDL project
@@ -74,7 +74,7 @@ The following configuration files are available:
 
    +--------------------------+----------------------------------------------------+
    | Configuration mode       | Parameters                                         |
-   |                          +-------------------------------+--------------------+
+   |                          +----------+---------+----------+--------------------+
    |                          | TWOLANES | ADC_RES | USE_MMCM | CN0577_ADAQ2387X_N |
    +==========================+==========+=========+==========+====================+
    | cfg_adaq2387x_1lane_16b  | 0        | 16      | 0        | 0                  |
@@ -95,11 +95,11 @@ Tests
 
 The following test program files are available:
 
-============  ================================================
+============  ===============================================
 Test program  Usage
-============  ================================================
-test_program  Tests the cn0577/ adaq2387x design capabilities.
-============  ================================================
+============  ===============================================
+test_program  Tests the cn0577/adaq2387x design capabilities.
+============  ===============================================
 
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -166,17 +166,23 @@ Data acquisition test
 * Submit a DMA transfer
 * Stop the PWM generator
 * Configure axi_ltc2387 IP
-  * ADC common core out of reset
-  * Set static data setup in device's reg 0x21
+
+  * Bring ADC common core out of reset
+  * Load configuration register 0x21 of the ADC with a static data setup value
+  * Read back ADC_CONFIG_WR to verify the staged configuration
+  * Trigger a write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1
   * Read last config result
-  * Send WR request
-  * Read last config result
-  * Set default control value (no RD/WR request)
-  * Read last config result
-  * Set exit from register mode sequence
-  * Send WR request
-  * Set default control value (no RD/WR request)
-  * Set HDL config mode - default
+  * Clear the control register to the idle (no RD/WR request)
+  * Read back ADC_CONFIG_CTRL to verify that the control interface has returned
+    to its default (idle) state after clearing the request bit
+  * Clear the ADC model’s configuration write register (ADC_CONFIG_WR) to exit
+    the register mode programming sequence.
+  * Trigger a new write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1
+  * Clear the control register to the idle (no RD/WR request)
+  * Set the HDL common control register (COMMON_CONTROL_3): disable CRC
+    checking and apply the default project-specific control flags
+    (custom_control = 0x100) to enter the HDL configuration mode
+
 * Capture and compare the data
 
 Stop the environment
@@ -266,7 +272,6 @@ HDL related dependencies forming the DUT
      - :git-hdl:`library/axi_pwm_gen`
      - :external+hdl:ref:`axi_pwm_gen`
 
-
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -287,9 +292,6 @@ Testbench specific dependencies:
    * - AXI_VIP_PKG
      - ---
      - :ref:`xilinx_axi_vip`
-   * - AXI4STREAM_VIP_PKG
-     - ---
-     - :xilinx:`AXI Stream Verification IP (VIP) <products/intellectual-property/axi-stream-vip.html>`
    * - COMMON_API_PKG
      - :git-testbenches:`library/drivers/common_api_pkg.sv`
      - ---
@@ -299,21 +301,9 @@ Testbench specific dependencies:
    * - DMAC_API
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - :ref:`dmac`
-   * - LOGGER_PKG
-     - :git-testbenches:`library/utilities/logger_pkg.sv`
-     - ---
-   * - M_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/m_axis_sequencer.sv`
-     - ---
    * - PWM_GEN_API_PKG
      - :git-testbenches:`library/drivers/pwm_gen_api_pkg.sv`
      - ---
-   * - S_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/s_axis_sequencer.sv`
-     - ---
-   * - TEST_HARNESS_ENV_PKG
-     - :git-testbenches:`library/utilities/test_harness_eng_pkg.sv`
-     - :ref:`test_harness`
 
 .. include:: ../../../common/more_information.rst
 

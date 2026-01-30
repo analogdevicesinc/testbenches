@@ -32,18 +32,13 @@ CN0577 Testbench block diagram
    :align: center
    :alt: CN0577 Testbench block diagram
 
-ADAQ2387X Testbench block diagrams
+ADAQ2387X Testbench block diagram
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: ./adaq2387x_default_tb.svg
+.. image:: ./adaq2387x_tb.svg
    :width: 800
    :align: center
-   :alt: ADAQ2387X Testbench block diagram - default clocking
-
-.. image:: ./adaq2387x_mmcm_tb.svg
-   :width: 800
-   :align: center
-   :alt: ADAQ2387X Testbench block diagram - using CLK_WIZARD for sampling clk
+   :alt: ADAQ2387X Testbench block diagram
 
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

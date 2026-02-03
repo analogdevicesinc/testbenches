@@ -204,4 +204,4 @@ ad_connect axi_intc/irq irq_vip/i
 set DDR_BASE 0x80000000
 create_bd_addr_seg -range ${DDR_BASE} -offset ${DDR_BASE} [get_bd_addr_spaces /mng_axi_vip/Master_AXI] \
   [get_bd_addr_segs ddr_axi_vip/S_AXI/Reg] SEG_mng_ddr_cntlr
-adi_sim_add_define "DDR_BA=[format "%d" ${DDR_BASE}]"
+adi_sim_add_define "DDR_BA='h[format "%X" ${DDR_BASE}]"

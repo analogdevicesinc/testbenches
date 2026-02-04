@@ -3,6 +3,8 @@
 ### SPDX short identifier: ADIBSD
 ###############################################################################
 
+global ad_project_params
+
 source $ad_hdl_dir/library/spi_engine/scripts/spi_engine.tcl
 
 set data_width              $ad_project_params(DATA_WIDTH)
@@ -31,6 +33,10 @@ spi_engine_create $hier_spi_engine  $data_width $async_spi_clk $offload_en \
                                     $cmd_mem_addr_width $data_mem_addr_width \
                                     $sdi_fifo_addr_width $sdo_fifo_addr_width \
                                     $sync_fifo_addr_width $cmd_fifo_addr_width
+
+if {$ad_project_params(ECHO_SCLK)} {
+  ad_ip_parameter $hier_spi_engine/${hier_spi_engine}_execution CONFIG.DEFAULT_SPI_CFG [expr ($ad_project_params(CPOL) * 2) + $ad_project_params(CPHA)]
+}
 
 ad_ip_instance axi_clkgen spi_clkgen
 ad_ip_parameter spi_clkgen CONFIG.CLK0_DIV 5

@@ -25,6 +25,7 @@ source $ad_tb_dir/library/includes/sp_include_clk_gen.tcl
 # Add test files to the project
 adi_sim_project_files [list \
  "spi_environment.sv" \
+ "tests/test_backpressure.sv" \
  "tests/test_program.sv" \
  "tests/test_sleep_delay.sv" \
  "tests/test_slowdata.sv" \

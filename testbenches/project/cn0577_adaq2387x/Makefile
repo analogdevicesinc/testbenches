@@ -6,9 +6,9 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_common.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_dmac.mk
-include $(TB_LIBRARY_PATH)/includes/Makeinclude_converter.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_common.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_converter.mk
 
 # Remaining test-bench dependencies except test programs
 

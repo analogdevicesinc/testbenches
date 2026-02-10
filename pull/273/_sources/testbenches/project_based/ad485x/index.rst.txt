@@ -180,7 +180,7 @@ The following runtime parameters can be configured at the beginning of each
 test program:
 
 -  packet_format: Defines the packet format mode.
-   Options: 0, 1, 2, 3 (default: 0)
+   Options: 0, 1, 2, 3 (default: 1)
 
    +---------------+-------------------+-------------------+
    | packet_format | AD4851/3/5/7      | AD4852/4/6/8      |

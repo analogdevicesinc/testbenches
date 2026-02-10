@@ -167,13 +167,12 @@ Data acquisition test
   * Read back ADC_CONFIG_WR to verify the staged configuration
   * Trigger a write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1
   * Read last config result
-  * Clear the control register to the idle (no RD/WR request)
+  * Return to idle state (no RD/WR requests)
   * Read back ADC_CONFIG_CTRL to verify that the control interface has returned
     to its default (idle) state after clearing the request bit
-  * Clear the ADC model’s configuration write register (ADC_CONFIG_WR) to exit
-    the register mode programming sequence.
+  * Return to idle state (no RD/WR requests)
   * Trigger a new write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1
-  * Clear the control register to the idle (no RD/WR request)
+  * Return to idle state (no RD/WR requests)
   * Set the HDL common control register (COMMON_CONTROL_3): disable CRC
     checking and apply the default project-specific control flags
     (custom_control = 0x100) to enter the HDL configuration mode

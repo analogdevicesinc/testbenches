@@ -8,7 +8,7 @@
 
     <title>CN0577/ADAQ2387X &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script async="async" src="../../../_static/app.umd.js?v=46a18818"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
@@ -486,13 +486,12 @@ IPs verifies the <em>version</em> and <em>scratch</em> registers.</p>
 <li><p>Read back ADC_CONFIG_WR to verify the staged configuration</p></li>
 <li><p>Trigger a write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1</p></li>
 <li><p>Read last config result</p></li>
-<li><p>Clear the control register to the idle (no RD/WR request)</p></li>
+<li><p>Return to idle state (no RD/WR requests)</p></li>
 <li><p>Read back ADC_CONFIG_CTRL to verify that the control interface has returned
 to its default (idle) state after clearing the request bit</p></li>
-<li><p>Clear the ADC model’s configuration write register (ADC_CONFIG_WR) to exit
-the register mode programming sequence.</p></li>
+<li><p>Return to idle state (no RD/WR requests)</p></li>
 <li><p>Trigger a new write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1</p></li>
-<li><p>Clear the control register to the idle (no RD/WR request)</p></li>
+<li><p>Return to idle state (no RD/WR requests)</p></li>
 <li><p>Set the HDL common control register (COMMON_CONTROL_3): disable CRC
 checking and apply the default project-specific control flags
 (custom_control = 0x100) to enter the HDL configuration mode</p></li>

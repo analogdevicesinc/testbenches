@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="The purpose of this testbench is to give engineers a sandbox testbench, where they can test the interrupt request handler class." name="description" />
+<meta content="The purpose of this testbench is to validate the of the projects/cn0577 and projects/adaq23875 reference designs." name="description" />
 
-    <title>IRQ handler &#8212; Testbenches  documentation</title>
+    <title>CN0577/ADAQ2387X &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -14,8 +14,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="JESD Loopback" href="../jesd_loopback/index.html" />
-    <link rel="prev" title="I3C Controller" href="../i3c_controller/index.html" />
+    <link rel="next" title="FMCOMMS2" href="../fmcomms2/index.html" />
+    <link rel="prev" title="ADRV9009" href="../adrv9009/index.html" />
    
   
   
@@ -95,29 +95,37 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">IRQ handler</a><ul>
+<li><a class="reference internal" href="#">CN0577/ADAQ2387X</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
-<li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
+<li><a class="reference internal" href="#block-diagrams">Block diagrams</a><ul>
+<li><a class="reference internal" href="#cn0577-testbench-block-diagram">CN0577 Testbench block diagram</a></li>
+<li><a class="reference internal" href="#adaq2387x-testbench-block-diagram">ADAQ2387X Testbench block diagram</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#configuration-parameters-and-modes">Configuration parameters and modes</a><ul>
-<li><a class="reference internal" href="#build-parameters">Build parameters</a></li>
 <li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
 <li><a class="reference internal" href="#tests">Tests</a></li>
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
+<li><a class="reference internal" href="#cpu-memory-interconnect-addresses">CPU/Memory interconnect addresses</a></li>
 <li><a class="reference internal" href="#interrupts">Interrupts</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
-<li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
-<li><a class="reference internal" href="#irq-handler-testing">IRQ handler testing</a></li>
-<li><a class="reference internal" href="#priority-packet-generation-testing">Priority packet generation testing</a></li>
+<li><a class="reference internal" href="#parallel-test-program">Parallel test program</a><ul>
+<li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
+<li><a class="reference internal" href="#sanity-tests">Sanity tests</a></li>
+<li><a class="reference internal" href="#data-acquisition-test">Data acquisition test</a></li>
+<li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-the-test-bench">Building the test bench</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
 <li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#hdl-related-dependencies-forming-the-dut">HDL related dependencies forming the DUT</a></li>
 <li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
 </ul>
 </li>
@@ -214,35 +222,35 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../axis_sequencers/index.html">AXIS Sequencers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../dma_flock/index.html">DMA Framelock</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../dma_loopback/index.html">DMA Loopback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../dma_sg/index.html">DMA Scatter-Gather</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../i3c_controller/index.html">I3C Controller</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">IRQ handler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../jesd_loopback/index.html">JESD Loopback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo/index.html">Util AXIS FIFO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../util_pack/index.html">Util Pack</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_pack/index.html">Util Pack</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad463x/index.html">AD463x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad57xx/index.html">AD57XX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad738x/index.html">AD738x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7606/index.html">AD7606</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7616/index.html">AD7616</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad9083/index.html">AD9083</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ada4355/index.html">ADA4355</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9001/index.html">ADRV9001</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9009/index.html">ADRV9009</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/cn0577_adaq2387x/index.html">CN0577/ADAQ2387X</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/fmcomms2/index.html">FMCOMMS2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/ltc2378/index.html">LTC2378</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/pluto/index.html">PLUTO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ada4355/index.html">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CN0577/ADAQ2387X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ltc2378/index.html">LTC2378</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
 </ul>
 </li>
 </ul>
@@ -259,45 +267,120 @@ Content on this topic
       <div class="documentwrapper">
         <div class="bodywrapper" id="top-anchor">
           <div class="body-header">
-  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">IP Based</a></li></ol></nav>
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">Project Based</a></li></ol></nav>
 </div>
           <div class="body" role="main">
             
-  <section id="irq-handler">
-<span id="irq-handler-tb"></span><h1>IRQ handler<a class="headerlink" href="#irq-handler" title="Link to this heading"></a></h1>
+  <section id="cn0577-adaq2387x">
+<span id="id1"></span><h1>CN0577/ADAQ2387X<a class="headerlink" href="#cn0577-adaq2387x" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The purpose of this testbench is to give engineers a sandbox testbench, where
-they can test the interrupt request handler class.</p>
+<p>The purpose of this testbench is to validate the of the
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/cn0577" target="_blank">projects/cn0577</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/adaq23875" target="_blank">projects/adaq23875</a> reference designs.</p>
+<p>The entire HDL documentation can be found here
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/cn0577/index.html#cn0577" target="_blank" title="(in HDL)"><span class="xref std std-ref">CN0577 HDL project</span></a> and here
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/adaq23875/index.html#adaq23875" target="_blank" title="(in HDL)"><span class="xref std std-ref">ADAQ2387X HDL project</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The block design is based on the test harness with the addition of an IO VIP.
-The VIP is configure to be in master mode and connected to the interrupt
-controller’s bit 0 position.</p>
-<section id="block-diagram">
-<h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
-<a class="reference internal image-reference" href="../../../_images/irq_handler_tb.svg"><img alt="IRQ_Handler/Testbench block diagram" class="align-center" src="../../../_images/irq_handler_tb.svg" width="800" />
+<p>The testbench block design includes part of the CN0577/ADAQ2387X HDL reference
+designs, along with VIPs used for clocking, reset, PS and DDR simulations.</p>
+<section id="block-diagrams">
+<h3>Block diagrams<a class="headerlink" href="#block-diagrams" title="Link to this heading"></a></h3>
+<p>The data path and clock domains are depicted in the below diagrams:</p>
+<section id="cn0577-testbench-block-diagram">
+<h4>CN0577 Testbench block diagram<a class="headerlink" href="#cn0577-testbench-block-diagram" title="Link to this heading"></a></h4>
+<a class="reference internal image-reference" href="../../../_images/cn0577_tb.svg"><img alt="CN0577 Testbench block diagram" class="align-center" src="../../../_images/cn0577_tb.svg" width="800" />
 </a>
+</section>
+<section id="adaq2387x-testbench-block-diagram">
+<h4>ADAQ2387X Testbench block diagram<a class="headerlink" href="#adaq2387x-testbench-block-diagram" title="Link to this heading"></a></h4>
+<a class="reference internal image-reference" href="../../../_images/adaq2387x_tb.svg"><img alt="ADAQ2387X Testbench block diagram" class="align-center" src="../../../_images/adaq2387x_tb.svg" width="800" />
+</a>
+</section>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
-<p>There are no parameters that can be configured in the testbench configuration
-files.</p>
-<section id="build-parameters">
-<h4>Build parameters<a class="headerlink" href="#build-parameters" title="Link to this heading"></a></h4>
-<p>There are no build parameters for this testbench.</p>
-</section>
+<p>The following parameter of this project that can be configured:</p>
+<ul class="simple">
+<li><p>TWOLANES: defines the device’s number of data lanes:
+Options: 0 - One lane, 1 - Two lanes</p></li>
+<li><p>ADC_RES: defines the device’s resolution in bits:
+Options: 16, 18</p></li>
+<li><p>USE_MMCM: defines the ref clk value in MHz:
+Options: 0 - 100MHz, 1 - 120MHz</p></li>
+<li><p>CN0577_ADAQ2387X_N: selects the HDL project
+Options: 0 - ADAQ2387X, 1 - CN0577</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The <strong>ADC_RES</strong> and <strong>USE_MMCM</strong> parameters only apply to the ADAQ2387X
+design. When the CN0577 design is selected, the ADC resolution is always
+18 bits, and the reference clock is always 120 MHz (USE_MMCM = 0). These
+parameters are not present in the CN0577 HDL. They exist only to keep the
+testbench interface consistent across both designs.</p>
+</div>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
-<p>As this is a sandbox testbench, engineers are encouraged to change parameters
-and see what happens in the simulation. Since there are no parameters available
-for edit, the coniguration file’s purpose is to give the testbench instance a
-name.</p>
+<p>The following configuration files are available:</p>
+<blockquote>
+<div><div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
+<th class="head" colspan="4"><p>Parameters</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>TWOLANES</p></th>
+<th class="head"><p>ADC_RES</p></th>
+<th class="head"><p>USE_MMCM</p></th>
+<th class="head"><p>CN0577_ADAQ2387X_N</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>cfg_adaq2387x_1lane_16b</p></td>
+<td><p>0</p></td>
+<td><p>16</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_adaq2387x_1lane_18b</p></td>
+<td><p>0</p></td>
+<td><p>18</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_adaq2387x_2lanes_16b</p></td>
+<td><p>1</p></td>
+<td><p>16</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_adaq2387x_2lanes_18b</p></td>
+<td><p>1</p></td>
+<td><p>18</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_cn0577_1lane</p></td>
+<td><p>0</p></td>
+<td><p>18</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_cn0577_2lanes</p></td>
+<td><p>1</p></td>
+<td><p>18</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div></blockquote>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
-<p>The following test program file is available:</p>
+<p>The following test program files are available:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -307,7 +390,7 @@ name.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Creates a basic test stimulus.</p></td>
+<td><p>Tests the cn0577/adaq2387x design capabilities.</p></td>
 </tr>
 </tbody>
 </table>
@@ -315,11 +398,12 @@ name.</p>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
-<p>The test program is compatible with the configuration.</p>
+<p>The above test program is compatible with all the configurations.</p>
 </section>
 </section>
-<section id="cpu-memory-interconnects-addresses">
-<h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading"></a></h3>
+<section id="cpu-memory-interconnect-addresses">
+<h3>CPU/Memory interconnect addresses<a class="headerlink" href="#cpu-memory-interconnect-addresses" title="Link to this heading"></a></h3>
+<p>Below are the CPU/Memory interconnect addresses used in this project:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -331,7 +415,16 @@ name.</p>
 <tr class="row-even"><td><p>axi_intc</p></td>
 <td><p>0x4120_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
+<tr class="row-odd"><td><p>axi_ltc2387</p></td>
+<td><p>0x44A0_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_ltc2387_dma</p></td>
+<td><p>0x44A3_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_pwm_gen</p></td>
+<td><p>0x44A6_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ddr_axi_vip</p></td>
 <td><p>0x8000_0000</p></td>
 </tr>
 </tbody>
@@ -340,6 +433,7 @@ name.</p>
 </section>
 <section id="interrupts">
 <h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
+<p>Below are the Programmable Logic interrupts used in this project:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -348,8 +442,8 @@ name.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>irq_test_vip</p></td>
-<td><p>0</p></td>
+<tr class="row-even"><td><p>axi_ltc2387_dma</p></td>
+<td><p>13</p></td>
 </tr>
 </tbody>
 </table>
@@ -358,74 +452,98 @@ name.</p>
 </section>
 <section id="test-stimulus">
 <h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
-<p>The test program is responsible for configuring and running the sequencers.</p>
+<section id="parallel-test-program">
+<h3>Parallel test program<a class="headerlink" href="#parallel-test-program" title="Link to this heading"></a></h3>
+<p>The test program is structured into several tests as follows:</p>
 <section id="environment-bringup">
-<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
+<h4>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h4>
 <p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
-<li><p>Link the agents</p></li>
-<li><p>Instantiate the IRQ handler class</p></li>
 <li><p>Start the environment</p></li>
 <li><p>Start the clocks</p></li>
 <li><p>Assert the resets</p></li>
 </ul>
 </section>
-<section id="irq-handler-testing">
-<h3>IRQ handler testing<a class="headerlink" href="#irq-handler-testing" title="Link to this heading"></a></h3>
+<section id="sanity-tests">
+<h4>Sanity tests<a class="headerlink" href="#sanity-tests" title="Link to this heading"></a></h4>
+<p>This set of sanity tests for the common ADC API, axi_dmac and axi_pwm_gen
+IPs verifies the <em>version</em> and <em>scratch</em> registers.</p>
+</section>
+<section id="data-acquisition-test">
+<h4>Data acquisition test<a class="headerlink" href="#data-acquisition-test" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>Register the IO VIP device event to the IRQ handler</p></li>
-<li><p>Start the IRQ handler class</p></li>
-<li><p>Create a subthread to catch the triggered event from IRQ handler</p></li>
-<li><p>Generate an IRQ and see if the subthread is triggered</p></li>
+<li><p>Enable all ADC channels</p></li>
+<li><p>Configure the PWM generator (axi_pwmgen)</p></li>
+<li><p>Configure the DMA</p></li>
+<li><p>Configure the axi_ltc2387 IP</p></li>
+<li><p>Submit a DMA transfer</p></li>
+<li><p>Stop the PWM generator</p></li>
+<li><p>Configure axi_ltc2387 IP</p>
+<ul>
+<li><p>Bring ADC common core out of reset</p></li>
+<li><p>Load configuration register 0x21 of the ADC with a static data setup value</p></li>
+<li><p>Read back ADC_CONFIG_WR to verify the staged configuration</p></li>
+<li><p>Trigger a write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1</p></li>
+<li><p>Read last config result</p></li>
+<li><p>Return to idle state (no RD/WR requests)</p></li>
+<li><p>Read back ADC_CONFIG_CTRL to verify that the control interface has returned
+to its default (idle) state after clearing the request bit</p></li>
+<li><p>Return to idle state (no RD/WR requests)</p></li>
+<li><p>Trigger a new write request pulse by setting bit 0 of ADC_CONFIG_CTRL to 1</p></li>
+<li><p>Return to idle state (no RD/WR requests)</p></li>
+<li><p>Set the HDL common control register (COMMON_CONTROL_3): disable CRC
+checking and apply the default project-specific control flags
+(custom_control = 0x100) to enter the HDL configuration mode</p></li>
+</ul>
+</li>
+<li><p>Capture and compare the data</p></li>
 </ul>
 </section>
-<section id="priority-packet-generation-testing">
-<h3>Priority packet generation testing<a class="headerlink" href="#priority-packet-generation-testing" title="Link to this heading"></a></h3>
+<section id="stop-the-environment">
+<h4>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>Create 10 priority and 10 non-priority packets at the same time and check if
-the priority packets are processed first.</p></li>
+<li><p>Stop the clocks</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Priority packet processing order is checked manually.</p>
-</div>
 </section>
 </section>
-<section id="building-the-test-bench">
-<h2>Building the test bench<a class="headerlink" href="#building-the-test-bench" title="Link to this heading"></a></h2>
+</section>
+<section id="building-the-testbench">
+<h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
 <p>The testbench is built upon ADI’s generic HDL reference design framework.
 ADI does not distribute compiled files of these projects so they must be built
 from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">here</a>,
 with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
 To get the source you must
 <a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank">clone</a>
-the HDL repository, and then build the project as follows:</p>
+the HDL repository, and then build the project as follows:.</p>
 <p><strong>Linux/Cygwin/WSL</strong></p>
 <p><em>Example 1</em></p>
-<p>Building and simulating the testbench using only the command line.</p>
+<p>Build all the possible combinations of tests and configurations, using only the
+command line.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/irq_handler
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/cn0577_adaq2387x
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/irq_handler$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/cn0577_adaq2387x$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p><em>Example 2</em></p>
-<p>Building and simulating the testbench using the Vivado GUI. This command will
-launch Vivado, will run the simulation and display the waveforms.</p>
+<p>Build all the possible combinations of tests and configurations, using the
+Vivado GUI. This command will launch Vivado, will run the simulation and display
+the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/irq_handler
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/cn0577_adaq2387x
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/irq_handler$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/cn0577_adaq2387x$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -438,25 +556,57 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/irq_handler
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/cn0577_adaq2387x
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/irq_handler$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/cn0577_adaq2387x$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_adaq2387x_2lanes_18b<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
-<div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
-specific build has its own folder named after the configuration file’s name.
+<div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+specific build has it’s own folder named after the configuration file’s name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):</p>
-<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg1</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_adaq2387x_2lanes_18b</span></code></p>
 <p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
-<p><code class="docutils literal notranslate"><span class="pre">cfg1</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg_adaq2387x_2lanes_18b</span></code></p>
 </section>
 <section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
+<section id="hdl-related-dependencies-forming-the-dut">
+<h3>HDL related dependencies forming the DUT<a class="headerlink" href="#hdl-related-dependencies-forming-the-dut" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IP name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AXI_LTC2387</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ltc2387" target="_blank">library/axi_ltc2387</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_ltc2387/index.html#axi-ltc2387" target="_blank" title="(in HDL)"><span>AXI LTC2387</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_DMAC</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_PWM_GEN</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_pwm_gen" target="_blank">library/axi_pwm_gen</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_pwm_gen/index.html#axi-pwm-gen" target="_blank" title="(in HDL)"><span>AXI PWM Generator</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="testbenches-related-dependencies">
 <h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
 <p>Common with most testbenches:</p>
@@ -509,7 +659,48 @@ clean folder (no runs folder available):</p>
 </tbody>
 </table>
 </div>
-<p>Testbench specific dependencies: None</p>
+<p>Testbench specific dependencies:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ADC_API_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/adc_api_pkg.sv" target="_blank">library/drivers/adc_api_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_VIP_PKG</p></td>
+<td><p>—</p></td>
+<td><p><a class="reference internal" href="../../../library/vip/amd/axi_vip/index.html#xilinx-axi-vip"><span class="std std-ref">Xilinx AXI Verification IP (VIP)</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>COMMON_API_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/common_api_pkg.sv" target="_blank">library/drivers/common_api_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>DMA_TRANS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv" target="_blank">library/drivers/dmac/dma_trans.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>DMAC_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/drivers/dmac/index.html#dmac"><span class="std std-ref">DMAC</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>PWM_GEN_API_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/pwm_gen_api_pkg.sv" target="_blank">library/drivers/pwm_gen_api_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 </section>
 <section id="more-information">
@@ -532,8 +723,8 @@ are, the lower the chances to receive support from <a class="icon link reference
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../i3c_controller/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">I3C Controller</a>
-    <a href="../jesd_loopback/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">JESD Loopback</a>
+    <a href="../adrv9009/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADRV9009</a>
+    <a href="../fmcomms2/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">FMCOMMS2</a>
               </div>
           
         </div>

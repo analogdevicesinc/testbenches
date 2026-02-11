@@ -7,6 +7,7 @@ source $ad_hdl_dir/library/spi_engine/scripts/spi_engine.tcl
 
 set data_width              $ad_project_params(DATA_WIDTH)
 set async_spi_clk           $ad_project_params(ASYNC_SPI_CLK)
+set offload_en              1; # offload capability is needed for the testbenches
 set num_cs                  $ad_project_params(NUM_OF_CS)
 set num_sdi                 $ad_project_params(NUM_OF_SDI)
 set num_sdo                 $ad_project_params(NUM_OF_SDO)
@@ -24,8 +25,9 @@ create_bd_intf_port -mode Monitor -vlnv analog.com:interface:spi_engine_rtl:1.0 
 
 set hier_spi_engine spi_engine
 
-spi_engine_create $hier_spi_engine  $data_width $async_spi_clk $num_cs $num_sdi  \
-                                    $num_sdo $sdi_delay $echo_sclk $sdo_streaming \
+spi_engine_create $hier_spi_engine  $data_width $async_spi_clk $offload_en \
+                                    $num_cs $num_sdi $num_sdo $sdi_delay \
+                                    $echo_sclk $sdo_streaming \
                                     $cmd_mem_addr_width $data_mem_addr_width \
                                     $sdi_fifo_addr_width $sdo_fifo_addr_width \
                                     $sync_fifo_addr_width $cmd_fifo_addr_width

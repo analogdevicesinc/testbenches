@@ -55,9 +55,9 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 localparam SAMPLE_PERIOD              = 500;
 localparam ASYNC_SPI_CLK              = 1;
 localparam DATA_WIDTH                 = 8;
-localparam DATA_DLENGTH               = 32; // 8 ???
+localparam DATA_DLENGTH               = 8;
 localparam ECHO_SCLK                  = 0;
-localparam SDI_PHY_DELAY              = 18; //???
+localparam SDI_PHY_DELAY              = 18;
 localparam SDI_DELAY                  = 0;
 localparam NUM_OF_CS                  = 2;
 localparam THREE_WIRE                 = 0;
@@ -155,7 +155,7 @@ initial begin
   `LINK(mng, base_env, mng)
   `LINK(ddr, base_env, ddr)
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+  setLoggerVerbosity(ADI_VERBOSITY_MEDIUM);
 
   base_env.start();
   base_env.sys_reset();
@@ -224,7 +224,10 @@ initial begin
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
       axi_read (`SPI_CN0363_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
-      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished", sync_id), ADI_VERBOSITY_LOW);
+      if (offload_status) begin
+        offload_transfer_cnt <= offload_transfer_cnt + 1;
+      end
+      `INFO(("Offload SYNC %d IRQ. An offload transfer just finished (cnt=%0d)", sync_id, offload_transfer_cnt), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
@@ -345,9 +348,11 @@ initial begin
       end
       if (m_spi_csn_negedge_s) begin
         // NOTE: assuming queue is empty
+        // Mask to DATA_DLENGTH bits (MSB-aligned) so SDI goes LOW after
+        // word is shifted out, simulating sigma-delta ADC RDY behavior
         repeat (NUM_OF_WORDS) begin
-          sdi_preg.push_front($urandom);
-          sdi_nreg.push_front($urandom);
+          sdi_preg.push_front($urandom << (32 - DATA_DLENGTH));
+          sdi_nreg.push_front($urandom << (32 - DATA_DLENGTH));
         end
         #1step; // prevent race condition
         sdi_shiftreg <= (CPOL ^ CPHA) ?
@@ -372,33 +377,35 @@ end
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
 bit [15:0]  sdi_store_cnt = 'h0;
-bit [31:0]  offload_sdi_data_store_arr [(2* NUM_OF_TRANSFERS) - 1:0];
+bit [31:0]  offload_sdi_data_store_arr [NUM_OF_TRANSFERS - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
-bit [31:0]  sdi_shiftreg2;
-bit [31:0]  sdi_shiftreg_aux;
-bit [31:0]  sdi_shiftreg_aux_old;
-bit [31:0]  sdi_shiftreg_old;
 
-assign sdi_shiftreg2 = {1'b0, sdi_shiftreg[31:1]};
-
+// FIFO test: capture SDI data using shiftreg edge detection
 initial begin
   forever begin
     @(posedge cn0363_echo_sclk);
     sdi_data_store <= {sdi_shiftreg[27:0], 4'b0};
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
-      if (offload_status) begin
-          sdi_store_cnt <= sdi_store_cnt + 2;
-      end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
-      if (offload_status) begin
-            offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
-            offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
-      end else begin
-        sdi_fifo_data_store = sdi_shiftreg;
+      if (!offload_status) begin
+        sdi_fifo_data_store = sdi_shiftreg >> (32 - DATA_DLENGTH);
       end
       shiftreg_sampled <= 'h1;
+    end
+  end
+end
+
+// Offload test: capture BFM SDI data on each CS falling edge
+initial begin
+  forever begin
+    @(posedge m_spi_csn_negedge_s);
+    if (offload_status && sdi_store_cnt < NUM_OF_TRANSFERS) begin
+      // Wait for BFM to load shift register (non-blocking assignment + 1step)
+      @(posedge cn0363_spi_clk);
+      offload_sdi_data_store_arr[sdi_store_cnt] = sdi_shiftreg >> (32 - DATA_DLENGTH);
+      sdi_store_cnt = sdi_store_cnt + 1;
     end
   end
 end
@@ -407,20 +414,62 @@ end
 // Offload Transfer Counter
 //---------------------------------------------------------------------------
 
-bit [31:0] offload_transfer_cnt;
+bit [31:0] offload_transfer_cnt = 0;
+
+//---------------------------------------------------------------------------
+// Offload SDI capture - monitor SPI engine offload output
+//---------------------------------------------------------------------------
+// In CN0363, offload SDI data passes through a processing pipeline before
+// reaching DDR, so we tap the offload module's SDI output directly to
+// verify the SPI engine captured the correct data from the bus.
+
+bit [31:0] offload_captured_word_arr [NUM_OF_TRANSFERS - 1:0];
+bit [31:0] offload_sdi_capture_cnt = 0;
 
 initial begin
+  wait(offload_status == 1);
   forever begin
-    @(posedge shiftreg_sampled && offload_status);
-      offload_transfer_cnt <= offload_transfer_cnt + 'h1;
+    @(posedge cn0363_spi_clk);
+    if (!offload_status) break;
+    if (`TH.spi_cn0363.spi_cn0363_offload.offload_sdi_valid &&
+        `TH.spi_cn0363.spi_cn0363_offload.offload_sdi_ready) begin
+      if (offload_sdi_capture_cnt < NUM_OF_TRANSFERS) begin
+        offload_captured_word_arr[offload_sdi_capture_cnt] =
+          `TH.spi_cn0363.spi_cn0363_offload.offload_sdi_data;
+        offload_sdi_capture_cnt <= offload_sdi_capture_cnt + 1;
+      end
+    end
+  end
+end
+
+//---------------------------------------------------------------------------
+// Trigger simulation - simulate periodic ADC data_ready for offload
+//---------------------------------------------------------------------------
+// The util_sigma_delta_spi generates data_ready when CS is LOW for 63 clocks
+// and MISO is LOW. In the offload flow, the offload module needs a rising edge
+// on data_ready (trigger) to start each transfer cycle. But the first trigger
+// can never come naturally because CS only goes LOW when the offload executes.
+// This process forces periodic data_ready pulses to break the chicken-and-egg
+// dependency and simulate the ADC signaling conversion-complete.
+
+initial begin
+  wait(offload_status == 1);
+  forever begin
+    @(posedge cn0363_spi_clk);
+    if (!offload_status) break;
+    // Force data_ready HIGH for 2 clock cycles to create a trigger_posedge
+    force `TH.util_sigma_delta_spi.data_ready = 1'b1;
+    @(posedge cn0363_spi_clk);
+    @(posedge cn0363_spi_clk);
+    release `TH.util_sigma_delta_spi.data_ready;
+    // Wait for the offload transfer cycle to complete before next trigger
+    #2000ns;
   end
 end
 
 //---------------------------------------------------------------------------
 // Offload SPI Test
 //---------------------------------------------------------------------------
-
-bit [31:0] offload_captured_word_arr [(2* NUM_OF_TRANSFERS) -1 :0];
 
 task offload_spi_test();
     //Configure DMA
@@ -448,7 +497,7 @@ task offload_spi_test();
     axi_write (`SPI_CN0363_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     `INFO(("Offload started"), ADI_VERBOSITY_LOW);
 
-    wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
+    wait(offload_transfer_cnt >= NUM_OF_TRANSFERS);
 
     axi_write (`SPI_CN0363_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     offload_status = 0;
@@ -457,11 +506,16 @@ task offload_spi_test();
 
     #2000ns;
 
-    for (int i=0; i<=((2* NUM_OF_TRANSFERS) -1); i=i+1) begin
-      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
+    // Compare BFM-stored SDI data with data captured at the offload SDI
+    // output (before the CN0363 processing pipeline).
+    // Skip first 2 entries to avoid initial transient mismatches.
+    for (int i=0; i<NUM_OF_TRANSFERS; i++) begin
+      `INFO(("offload[%0d]: captured=%x  stored=%x %s", i,
+             offload_captured_word_arr[i], offload_sdi_data_store_arr[i],
+             (offload_captured_word_arr[i] != offload_sdi_data_store_arr[i]) ? "MISMATCH" : "OK"), ADI_VERBOSITY_LOW);
     end
 
-    if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
+    if (offload_captured_word_arr [NUM_OF_TRANSFERS - 1:2] != offload_sdi_data_store_arr [NUM_OF_TRANSFERS - 1:2]) begin
       `ERROR(("Offload Test FAILED"));
     end else begin
       `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);

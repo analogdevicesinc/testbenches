@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_logger_pkg_sv_4244767608 " />
+            <top_module name="adi_api_pkg" />
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_common_pkg" />
+            <top_module name="adi_environment_pkg" />
+            <top_module name="adi_regmap_clkgen_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
+            <top_module name="adi_regmap_pkg" />
+            <top_module name="adi_regmap_pwm_gen_pkg" />
+            <top_module name="adi_regmap_spi_engine_pkg" />
+            <top_module name="adi_vip_pkg" />
+            <top_module name="attributes" />
+            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="io_vip_if_base_pkg" />
+            <top_module name="ipif_pkg" />
+            <top_module name="irq_handler_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="math_real" />
+            <top_module name="numeric_std" />
+            <top_module name="pub_sub_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="standard" />
+            <top_module name="std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_misc" />
+            <top_module name="std_logic_signed" />
+            <top_module name="std_logic_textio" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+            <top_module name="vip_agent_typedef_pkg" />
+            <top_module name="vital_primitives" />
+            <top_module name="vital_timing" />
+            <top_module name="vpkg" />
+            <top_module name="watchdog_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="20,605.833 ns"></ZoomStartTime>
+      <ZoomEndTime time="21,084.834 ns"></ZoomEndTime>
+      <Cursor1Time time="21,005.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="350"></NameColumnWidth>
+      <ValueColumnWidth column_width="146"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="24" />
+   <wvobject fp_name="divider0" type="divider">
+      <obj_property name="ElementShortName">System</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/sys_clk_vip/inst/clk_out">
+      <obj_property name="ElementShortName">clk_out</obj_property>
+      <obj_property name="ObjectShortName">clk_out</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/cn0363_spi_clk">
+      <obj_property name="ElementShortName">cn0363_spi_clk</obj_property>
+      <obj_property name="ObjectShortName">cn0363_spi_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/cn0363_irq">
+      <obj_property name="ElementShortName">cn0363_irq</obj_property>
+      <obj_property name="ObjectShortName">cn0363_irq</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider1" type="divider">
+      <obj_property name="ElementShortName">SPI Interface</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/cn0363_spi_sclk">
+      <obj_property name="ElementShortName">cn0363_spi_sclk</obj_property>
+      <obj_property name="ObjectShortName">cn0363_spi_sclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/cn0363_spi_sdo">
+      <obj_property name="ElementShortName">cn0363_spi_sdo</obj_property>
+      <obj_property name="ObjectShortName">cn0363_spi_sdo</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/cn0363_spi_sdi">
+      <obj_property name="ElementShortName">cn0363_spi_sdi</obj_property>
+      <obj_property name="ObjectShortName">cn0363_spi_sdi</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/cn0363_spi_cs">
+      <obj_property name="ElementShortName">cn0363_spi_cs[1:0]</obj_property>
+      <obj_property name="ObjectShortName">cn0363_spi_cs[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider2" type="divider">
+      <obj_property name="ElementShortName">util_sigma_delta_spi</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_sigma_delta_spi/data_ready">
+      <obj_property name="ElementShortName">data_ready</obj_property>
+      <obj_property name="ObjectShortName">data_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_sigma_delta_spi/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_sigma_delta_spi/resetn">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider3" type="divider">
+      <obj_property name="ElementShortName">SPI Engine (spi_cn0363)</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/irq">
+      <obj_property name="ElementShortName">irq</obj_property>
+      <obj_property name="ObjectShortName">irq</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/trigger">
+      <obj_property name="ElementShortName">trigger</obj_property>
+      <obj_property name="ObjectShortName">trigger</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider4" type="divider">
+      <obj_property name="ElementShortName">SPI Engine Interconnect</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_interconnect/interconnect_dir">
+      <obj_property name="ElementShortName">interconnect_dir</obj_property>
+      <obj_property name="ObjectShortName">interconnect_dir</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_interconnect/s1_cmd_valid">
+      <obj_property name="ElementShortName">s1_cmd_valid</obj_property>
+      <obj_property name="ObjectShortName">s1_cmd_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_interconnect/s1_cmd_ready">
+      <obj_property name="ElementShortName">s1_cmd_ready</obj_property>
+      <obj_property name="ObjectShortName">s1_cmd_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_interconnect/s1_cmd_data">
+      <obj_property name="ElementShortName">s1_cmd_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">s1_cmd_data[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_interconnect/m_cmd_valid">
+      <obj_property name="ElementShortName">m_cmd_valid</obj_property>
+      <obj_property name="ObjectShortName">m_cmd_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_interconnect/m_cmd_ready">
+      <obj_property name="ElementShortName">m_cmd_ready</obj_property>
+      <obj_property name="ObjectShortName">m_cmd_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider5" type="divider">
+      <obj_property name="ElementShortName">SPI Engine Offload</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_offload/ctrl_enable">
+      <obj_property name="ElementShortName">ctrl_enable</obj_property>
+      <obj_property name="ObjectShortName">ctrl_enable</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_offload/ctrl_enabled">
+      <obj_property name="ElementShortName">ctrl_enabled</obj_property>
+      <obj_property name="ObjectShortName">ctrl_enabled</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_offload/spi_active">
+      <obj_property name="ElementShortName">spi_active</obj_property>
+      <obj_property name="ObjectShortName">spi_active</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider6" type="divider">
+      <obj_property name="ElementShortName">SPI Engine Execution</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_execution/cmd_valid">
+      <obj_property name="ElementShortName">cmd_valid</obj_property>
+      <obj_property name="ObjectShortName">cmd_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_execution/cmd_ready">
+      <obj_property name="ElementShortName">cmd_ready</obj_property>
+      <obj_property name="ObjectShortName">cmd_ready</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_execution/cmd">
+      <obj_property name="ElementShortName">cmd[15:0]</obj_property>
+      <obj_property name="ObjectShortName">cmd[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_axi_regmap/inst/sync_valid">
+      <obj_property name="ElementShortName">sync_valid</obj_property>
+      <obj_property name="ObjectShortName">sync_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/spi_cn0363/spi_cn0363_axi_regmap/inst/sync_data">
+      <obj_property name="ElementShortName">sync_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sync_data[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider7" type="divider">
+      <obj_property name="ElementShortName">Test Program</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/sync_id">
+      <obj_property name="ElementShortName">sync_id[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sync_id[7:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/irq_pending">
+      <obj_property name="ElementShortName">irq_pending[4:0]</obj_property>
+      <obj_property name="ObjectShortName">irq_pending[4:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/offload_status">
+      <obj_property name="ElementShortName">offload_status</obj_property>
+      <obj_property name="ObjectShortName">offload_status</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/offload_transfer_cnt">
+      <obj_property name="ElementShortName">offload_transfer_cnt[31:0]</obj_property>
+      <obj_property name="ObjectShortName">offload_transfer_cnt[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+</wave_config>

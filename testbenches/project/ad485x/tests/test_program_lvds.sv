@@ -118,9 +118,9 @@ program test_program_lvds (
   //      0          16 bits        20 bits
   //      1          24 bits        24 bits
   //     2/3           ---          32 bits
-  reg         [ 1:0]     packet_format = 1;
-  reg                    oversampling_en = 0;
-  reg                    crc_en = 0;
+  reg         [ 1:0]     packet_format = `PACKET_FORMAT;
+  reg                    oversampling_en = `OS_EN;
+  reg                    crc_en = `CRC_EN;
   reg         [31:0]     testpattern_en = 1;
 
   reg         [ 7:0]     adc_custom_ctrl = 0;
@@ -159,13 +159,11 @@ program test_program_lvds (
 
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
     current_process = process::self();
     current_process_random_state = current_process.get_randstate();
     `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
-
-    `TH.sys_200m_clk_vip.inst.IF.start_clock();
 
     // Create environment
     base_env = new(
@@ -210,6 +208,8 @@ program test_program_lvds (
                         base_env.mng.master_sequencer,
                         `AXI_AD485X_BA);
 
+    `TH.sys_200m_clk_vip.inst.IF.start_clock();
+
     base_env.start();
     base_env.sys_reset();
     base_env.irq_handler.start();
@@ -228,6 +228,8 @@ program test_program_lvds (
 
     base_env.stop();
 
+    `TH.sys_200m_clk_vip.inst.IF.stop_clock();
+
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
 
@@ -238,35 +240,33 @@ program test_program_lvds (
     dma_api.sanity_test();
     pwm_api.sanity_test();
     // common_api_ad485x.sanity_test();
-    // adc_api_ad485x.sanity_test();
   endtask: sanity_test
 
   task configure_axi();
-    // Reset ADC core first
-    adc_api_ad485x.axi_write(GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(0));
-    adc_api_ad485x.axi_write(GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    adc_api_ad485x.reset(.ce_n(1'b0), .mmcm_rstn(1'b1), .rstn(1'b1));
 
     // Configure ADC parameters
     adc_custom_ctrl[2] = oversampling_en;
     adc_custom_ctrl[1:0] = packet_format;
 
-    adc_api_ad485x.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL_3), `SET_ADC_COMMON_REG_CNTRL_3_CRC_EN(crc_en) | `SET_ADC_COMMON_REG_CNTRL_3_CUSTOM_CONTROL(adc_custom_ctrl));
-    adc_api_ad485x.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL), `SET_ADC_COMMON_REG_CNTRL_NUM_LANES(1));
+    adc_api_ad485x.set_common_control(
+      .pin_mode(1'b0),
+      .ddr_edgesel(1'b0),
+      .r1_mode(1'b0),
+      .sync(1'b0),
+      .num_lanes(1),
+      .symb_8_16b(1'b0),
+      .symb_op(1'b0),
+      .sdr_ddr_n(1'b0));
 
-    adc_api_ad485x.axi_verify(GetAddrs(ADC_COMMON_REG_CNTRL_3), `SET_ADC_COMMON_REG_CNTRL_3_CRC_EN(crc_en) | `SET_ADC_COMMON_REG_CNTRL_3_CUSTOM_CONTROL(adc_custom_ctrl));
-    adc_api_ad485x.axi_verify(GetAddrs(ADC_COMMON_REG_CNTRL), `SET_ADC_COMMON_REG_CNTRL_NUM_LANES(1));
+    adc_api_ad485x.set_common_control_3(.crc_en(crc_en), .custom_control(adc_custom_ctrl));
   endtask: configure_axi
 
 
   task enable_adc_ch();
     // Enable ADC channels
     for (int i = 0; i < NUMB_OF_CH; i=i+1) begin
-      adc_api_ad485x.axi_write(i*'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
-    end
-
-    // Verify channel enables
-    for (int i = 0; i < NUMB_OF_CH; i=i+1) begin
-      adc_api_ad485x.axi_verify(i*'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+      adc_api_ad485x.enable_channel(i);
     end
   endtask: enable_adc_ch
 
@@ -454,7 +454,7 @@ program test_program_lvds (
 
     // Check the data acquisition completeness
     if (complete_data_aq == 0) begin
-      `INFO(("CRITICAL WARNING: Data transaction doesn't meet the minimum timing requirement between the last SCKI edge and the CNV signal according to the datasheet!"), ADI_VERBOSITY_NONE);
+      `WARNING(("Data transaction doesn't meet the minimum timing requirement between the last SCKI edge and the CNV signal according to the datasheet!"));
     end
   endtask: capture_data
 
@@ -533,10 +533,11 @@ rx_db_i[0] && testpattern_en == 0) begin
           end
         end
 
-        scki_p_d <= scki_p_tp;
-        scki_n_d <= scki_n_tp;
-        scki_p_d2 <= scki_p_d;
-        scki_n_d2 <= scki_n_d;
+        scki_n_d2 = scki_n_d;
+        scki_p_d2 = scki_p_d;
+
+        scki_p_d = scki_p_tp;
+        scki_n_d = scki_n_tp;
     end
   end
 

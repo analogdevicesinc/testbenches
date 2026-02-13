@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2023-2025 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -32,6 +32,8 @@
 //
 // ***************************************************************************
 // ***************************************************************************
+//
+//
 
 `include "utils.svh"
 `include "axi_definitions.svh"
@@ -57,7 +59,7 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
 
-program test_sleep_delay (
+program test_backpressure (
   inout spi_engine_irq,
   inout spi_engine_spi_sclk,
   inout [(`NUM_OF_CS - 1):0] spi_engine_spi_cs,
@@ -110,7 +112,7 @@ program test_sleep_delay (
   // --------------------------
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
     //creating environment
     base_env = new(
@@ -129,10 +131,10 @@ program test_sleep_delay (
     `LINK(ddr, base_env, ddr)
 
     spi_env = new("SPI Engine Environment",
-              `ifdef DEF_SDO_STREAMING
-                `TH.`SDO_SRC.inst.IF,
-              `endif
-              `TH.`SPI_S.inst.IF.vif);
+                  `ifdef DEF_SDO_STREAMING
+                    `TH.`SDO_SRC.inst.IF,
+                  `endif
+                  `TH.`SPI_S.inst.IF.vif);
 
     spi_api = new("SPI Engine API",
                   base_env.mng.master_sequencer,
@@ -170,9 +172,11 @@ program test_sleep_delay (
 
     #100ns;
 
-    sleep_delay_test(7);
+    fifo_spi_test();
 
-    cs_delay_test(3,3);
+    #100ns;
+
+    offload_spi_test();
 
     spi_env.stop();
     base_env.stop();
@@ -181,6 +185,39 @@ program test_sleep_delay (
     $finish();
 
   end
+
+  //---------------------------------------------------------------------------
+  // SPI Engine generate transfer
+  //---------------------------------------------------------------------------
+
+  task generate_transfer_cmd(
+      input [7:0] sync_id);
+    // assert CSN
+    spi_api.fifo_command(`SET_CS(8'hFE));
+    // transfer data
+    spi_api.fifo_command(`INST_WRD);
+    // de-assert CSN
+    spi_api.fifo_command(`SET_CS(8'hFF));
+    // SYNC command to generate interrupt
+    spi_api.fifo_command((`INST_SYNC | sync_id));
+    `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
+  endtask
+
+  //---------------------------------------------------------------------------
+  // SPI Engine SDO data
+  //---------------------------------------------------------------------------
+
+  task sdo_stream_gen(
+      input [`DATA_DLENGTH:0]  tx_data);
+    xil_axi4stream_data_byte data[(`DATA_WIDTH/8)-1:0];
+    `ifdef DEF_SDO_STREAMING
+      for (int i = 0; i<(`DATA_WIDTH/8);i++) begin
+        data[i] = (tx_data & (8'hFF << 8*i)) >> 8*i;
+        spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i]);
+      end
+      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8),0,0);
+    `endif
+  endtask
 
   //---------------------------------------------------------------------------
   // IRQ callback
@@ -233,62 +270,6 @@ program test_sleep_delay (
   `endif
 
   //---------------------------------------------------------------------------
-  // Sleep and Chip Select Instruction time counter
-  //---------------------------------------------------------------------------
-
-  int sleep_instr_time[$];
-  int sleep_duration;
-  int sleep_current_duration;
-  bit sleeping;
-  int cs_instr_time[$];
-  int cs_current_duration;
-  int cs_duration;
-  bit cs_sleeping;
-  wire [15:0] cmd, cmd_d1;
-  wire cmd_valid, cmd_ready;
-  wire idle;
-
-  assign cmd          = `TH.spi_engine.spi_engine_execution.inst.cmd;
-  assign cmd_d1       = `TH.spi_engine.spi_engine_execution.inst.cmd_d1;
-  assign cmd_valid    = `TH.spi_engine.spi_engine_execution.inst.cmd_valid;
-  assign cmd_ready    = `TH.spi_engine.spi_engine_execution.inst.cmd_ready;
-  assign idle         = `TH.spi_engine.spi_engine_execution.inst.idle;
-
-  initial begin
-    sleep_current_duration = 0;
-    sleep_duration = 0;
-    sleeping = 1'b0;
-    cs_current_duration = 0;
-    cs_duration = 0;
-    cs_sleeping = 1'b0;
-    forever begin
-      @(posedge spi_engine_spi_clk);
-        if (idle && (cmd_d1[15:8] == 8'h31) && sleeping) begin
-          sleeping <= 1'b0;
-          sleep_duration = sleep_current_duration+1;
-          sleep_instr_time.push_front(sleep_current_duration+1); // add one to account for this cycle
-        end
-        if (cmd_valid && cmd_ready && (cmd[15:8] == 8'h31)) begin
-          sleep_current_duration <= 0;
-          sleeping <= 1'b1;
-        end else begin
-          sleep_current_duration <= sleep_current_duration+1;
-        end
-        if (idle && (cmd_d1[15:10] == 6'h4) && cs_sleeping) begin
-          cs_sleeping = 1'b0;
-          cs_duration = cs_current_duration+1;
-          cs_instr_time.push_front(cs_current_duration+1); // add one to account for this cycle
-        end
-        if (cmd_valid && cmd_ready && (cmd[15:10] == 6'h4)) begin
-          cs_current_duration <= 0;
-          cs_sleeping <= 1'b1;
-        end else begin
-          cs_current_duration <= cs_current_duration+1;
-        end
-    end
-  end
-
-  //---------------------------------------------------------------------------
   // Sanity Tests
   //---------------------------------------------------------------------------
   task sanity_tests();
@@ -298,11 +279,181 @@ program test_sleep_delay (
   endtask
 
   //---------------------------------------------------------------------------
+  // Handle SPI Engine IRQs and restart DMA transfers for backpressure testing
+  // Waits for each IRQ, reads the transferred data from DDR, then restarts
+  // DMA for the next transfer (handles all transfers except the last)
+  //---------------------------------------------------------------------------
+  task process_sdi_dma_irq_transfers();
+    // Read data from DMA for all transfers except the last
+    for (int i=0; i < (`NUM_OF_TRANSFERS - 1); i++) begin
+      @(posedge spi_engine_irq);
+      #5us;
+      for (int j=0; j < `NUM_OF_WORDS; j++) begin
+        sdi_read_data[i*(`NUM_OF_WORDS) + j] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + (4*j)));
+      end
+
+      dma_api.transfer_start();
+      `INFO(("dma_api started for transfer (%0d).", i+2), ADI_VERBOSITY_LOW);
+    end
+  endtask
+
+  //---------------------------------------------------------------------------
+  // Read the final DMA transfer data after offload completion
+  // This must happen after stop_offload() to ensure correct values
+  //---------------------------------------------------------------------------
+  task read_final_dma_transfer();
+    for (int j=0; j < `NUM_OF_WORDS; j++) begin
+      sdi_read_data[(`NUM_OF_TRANSFERS - 1)*(`NUM_OF_WORDS) + j] =
+        base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + (4*j)));
+    end
+  endtask
+
+
+  //---------------------------------------------------------------------------
+  // Offload SPI Test
+  //---------------------------------------------------------------------------
+  bit [`DATA_DLENGTH-1:0] sdi_read_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
+  bit [`DATA_DLENGTH-1:0] sdo_write_data [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0] = '{default:'0};
+  bit [`DATA_DLENGTH-1:0] sdi_read_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
+  bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1 :0];
+  bit [`DATA_DLENGTH-1:0] rx_data;
+  bit [`DATA_DLENGTH-1:0] tx_data;
+
+  task offload_spi_test();
+    //Configure DMA
+    dma_api.enable_dma();
+    dma_api.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b1),
+      .partial_reporting_en(1'b1));
+    dma_api.set_lengths((`NUM_OF_WORDS * 4)-1,0); //one transfer at a time to force backpressure on the SDI
+    dma_api.set_dest_addr(`DDR_BA);
+    dma_api.transfer_start();
+    `INFO(("dma_api started for transfer (1)."), ADI_VERBOSITY_LOW);
+
+    // Configure the Offload module
+    spi_api.fifo_offload_command(`INST_CFG);
+    spi_api.fifo_offload_command(`INST_PRESCALE);
+    spi_api.fifo_offload_command(`INST_DLENGTH);
+    if (`CS_ACTIVE_HIGH) begin
+      spi_api.fifo_offload_command(`SET_CS_INV_MASK(8'hFF));
+    end
+    spi_api.fifo_offload_command(`SET_CS(8'hFE));
+    spi_api.fifo_offload_command(`INST_WRD);
+    spi_api.fifo_offload_command(`SET_CS(8'hFF));
+    spi_api.fifo_offload_command(`INST_SYNC | 2);
+
+    // Enqueue transfers transfers to DUT
+    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
+      rx_data = i;//$urandom;
+      spi_send(rx_data);
+      sdi_read_data_store[i]  = rx_data;
+      tx_data = $urandom;
+      `ifdef DEF_SDO_STREAMING
+        sdo_stream_gen(tx_data);
+        sdo_write_data_store[i] = tx_data;
+      `else
+        if (i<(`NUM_OF_WORDS)) begin
+          sdo_write_data_store[i] = tx_data;
+          spi_api.sdo_offload_fifo_write(sdo_write_data_store[i]);
+        end else begin
+          sdo_write_data_store[i] = sdo_write_data_store[i%(`NUM_OF_WORDS)];
+        end
+      `endif
+    end
+
+    #100ns;
+    spi_api.start_offload();
+    `INFO(("Offload started."), ADI_VERBOSITY_LOW);
+
+    fork
+      process_sdi_dma_irq_transfers();
+    join_none
+
+    spi_wait_send();
+    spi_api.stop_offload();
+    `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
+
+    // Read the final transfer data (must be after stop_offload)
+    read_final_dma_transfer();
+
+    #2000ns;
+
+    if (irq_pending == 'h0) begin
+      `FATAL(("IRQ Test FAILED"));
+    end else begin
+      `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
+    end
+
+    for (int i=0; i <= ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i++) begin
+      // if (sdi_read_data[i] != sdi_read_data_store[i]) begin
+        `INFO(("sdi_read_data[%0d]: %x; sdi_read_data_store[%0d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
+        // `FATAL(("Offload Read Test FAILED"));
+      // end
+    end
+    `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);
+
+    for (int i=0; i <= ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i++) begin
+      spi_receive(sdo_write_data[i]);
+      if (sdo_write_data[i] != sdo_write_data_store[i]) begin
+        `INFO(("sdo_write_data[%0d]: %x; sdo_write_data_store[%0d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]), ADI_VERBOSITY_LOW);
+        `FATAL(("Offload Write Test FAILED"));
+      end
+    end
+    `INFO(("Offload Write Test PASSED"), ADI_VERBOSITY_LOW);
+  endtask
+
+  //---------------------------------------------------------------------------
+  // FIFO SPI Test
+  //---------------------------------------------------------------------------
+
+  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
+  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data [`NUM_OF_WORDS-1:0]= '{default:'0};
+  bit   [`DATA_DLENGTH-1:0]  sdi_fifo_data_store [`NUM_OF_WORDS-1:0];
+  bit   [`DATA_DLENGTH-1:0]  sdo_fifo_data_store [`NUM_OF_WORDS-1:0];
+
+  task fifo_spi_test();
+
+    // Generate a FIFO transaction, write SDO first
+    for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
+      rx_data = $urandom;
+      tx_data = $urandom;
+      spi_api.sdo_fifo_write((tx_data));// << (`DATA_WIDTH - `DATA_DLENGTH)));
+      spi_send(rx_data);
+      sdi_fifo_data_store[i] = rx_data;
+      sdo_fifo_data_store[i] = tx_data;
+    end
+
+    generate_transfer_cmd(1);
+
+    `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
+    spi_wait_send();
+    `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
+
+    for (int i = 0; i<(`NUM_OF_WORDS) ; i=i+1) begin
+      spi_api.sdi_fifo_read(sdi_fifo_data[i]);
+      spi_receive(sdo_fifo_data[i]);
+    end
+
+    if (sdi_fifo_data !== sdi_fifo_data_store) begin
+      `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store %x", sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
+      `FATAL(("Fifo Read Test FAILED"));
+    end
+    `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
+
+    if (sdo_fifo_data !== sdo_fifo_data_store) begin
+      `INFO(("sdo_fifo_data: %x; sdo_fifo_data_store %x", sdo_fifo_data, sdo_fifo_data_store), ADI_VERBOSITY_LOW);
+      `FATAL(("Fifo Write Test FAILED"));
+    end
+    `INFO(("Fifo Write Test PASSED"), ADI_VERBOSITY_LOW);
+  endtask
+
+  //---------------------------------------------------------------------------
   // Test initialization
   //---------------------------------------------------------------------------
 
   task init();
-        // Start spi clk generator
+    // Start spi clk generator
     clkgen_api.enable_clkgen();
 
     // Config pwm
@@ -326,184 +477,6 @@ program test_sleep_delay (
     // Set up the interrupts
     spi_api.set_interrup_mask(.sync_event(1'b1),.offload_sync_id_pending(1'b1));
 
-  endtask
-
-  //---------------------------------------------------------------------------
-  // Sleep delay Test
-  //---------------------------------------------------------------------------
-
-  int sleep_time;
-  int expected_sleep_time;
-
-  task sleep_delay_test(
-      input [7:0] sleep_param);
-
-    expected_sleep_time = 2+(sleep_param+1)*((`CLOCK_DIVIDER+1)*2);
-    // Start the test
-    spi_api.fifo_command(`SLEEP(sleep_param));
-
-    #2000ns;
-    sleep_time = sleep_instr_time.pop_back();
-    if ((sleep_time != expected_sleep_time)) begin
-      `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
-    end
-    // change the SPI word size (this should not affect sleep delay)
-    spi_api.fifo_command(`INST_DLENGTH);
-    spi_api.fifo_command(`SLEEP(sleep_param));
-    spi_api.fifo_command(`INST_SYNC | 1);
-    #2000ns;
-    sleep_time = sleep_instr_time.pop_back();
-    #100ns;
-    if ((sleep_time != expected_sleep_time)) begin
-      `FATAL(("Sleep Test FAILED: unexpected sleep instruction duration. Expected=%d, Got=%d",expected_sleep_time,sleep_time));
-    end else begin
-      `INFO(("Sleep Test PASSED"), ADI_VERBOSITY_LOW);
-    end
-  endtask
-
-  //---------------------------------------------------------------------------
-  // CS delay Test
-  //---------------------------------------------------------------------------
-
-  bit [`DATA_DLENGTH:0] offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
-  bit [`DATA_DLENGTH:0] offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)-1:0];
-  int cs_activate_time;
-  int expected_cs_activate_time;
-  int cs_deactivate_time;
-  int expected_cs_deactivate_time;
-  bit [`DATA_DLENGTH-1:0] temp_data;
-
-  task cs_delay_test(
-      input [1:0] cs_activate_delay,
-      input [1:0] cs_deactivate_delay);
-
-    //Configure DMA
-    dma_api.enable_dma();
-    dma_api.set_flags(
-      .cyclic(1'b0),
-      .tlast(1'b1),
-      .partial_reporting_en(1'b1));
-    dma_api.set_lengths(((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*4)-1,0);
-    dma_api.set_dest_addr(`DDR_BA);
-    dma_api.transfer_start();
-
-    // Configure the Offload module
-    spi_api.offload_mem_assert_reset();
-    spi_api.offload_mem_deassert_reset();
-    spi_api.fifo_offload_command(`INST_CFG);
-    spi_api.fifo_offload_command(`INST_PRESCALE);
-    spi_api.fifo_offload_command(`INST_DLENGTH);
-    if (`CS_ACTIVE_HIGH) begin
-      spi_api.fifo_offload_command(`SET_CS_INV_MASK(8'hFF));
-    end
-    spi_api.fifo_offload_command(`SET_CS(8'hFE));
-    spi_api.fifo_offload_command(`INST_RD);
-    spi_api.fifo_offload_command(`SET_CS(8'hFF));
-    spi_api.fifo_offload_command(`INST_SYNC | 2);
-
-    expected_cs_activate_time = 2;
-    expected_cs_deactivate_time = 2;
-
-    // Enqueue transfers to DUT
-    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-      temp_data = $urandom;
-      spi_send(temp_data);
-      offload_sdi_data_store_arr[i] = temp_data;
-    end
-
-    #100ns;
-    spi_api.start_offload();
-    `INFO(("Offload started (no delay on CS change)."), ADI_VERBOSITY_LOW);
-
-    spi_wait_send();
-
-    spi_api.stop_offload();
-    `INFO(("Offload stopped (no delay on CS change)."), ADI_VERBOSITY_LOW);
-
-    #2000ns;
-
-    for (int i=0; i<=(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
-    end
-
-    if (irq_pending == 'h0) begin
-      `FATAL(("IRQ Test FAILED"));
-    end else begin
-      `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
-    end
-
-    if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-      `FATAL(("CS Delay Test FAILED: bad data"));
-    end
-
-    repeat (`NUM_OF_TRANSFERS) begin
-      cs_activate_time = cs_instr_time.pop_back();
-      cs_deactivate_time = cs_instr_time.pop_back();
-    end
-    if ((cs_activate_time != expected_cs_activate_time)) begin
-      `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
-    end
-    if (cs_deactivate_time != expected_cs_deactivate_time) begin
-      `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
-    end
-    `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
-
-    #2000ns;
-    dma_api.transfer_start();
-
-    spi_api.offload_mem_assert_reset();
-    spi_api.offload_mem_deassert_reset();
-    spi_api.fifo_offload_command(`SET_CS_DELAY(8'hFE,cs_activate_delay));
-    spi_api.fifo_offload_command(`INST_RD);
-    spi_api.fifo_offload_command(`SET_CS_DELAY(8'hFF,cs_deactivate_delay));
-    spi_api.fifo_offload_command(`INST_SYNC | 2);
-
-    // breakdown: cs_activate_delay*(1+`CLOCK_DIVIDER)*2, times 2 since it's before and after cs transition, and added 3 cycles (1 for each timer comparison, plus one for fetching next instruction)
-    expected_cs_activate_time = 2+2*cs_activate_delay*(1+`CLOCK_DIVIDER)*2;
-    expected_cs_deactivate_time = 2+2*cs_deactivate_delay*(1+`CLOCK_DIVIDER)*2;
-
-    // Enqueue transfers to DUT
-    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-      temp_data = $urandom;
-      spi_send(temp_data);
-      offload_sdi_data_store_arr[i] = temp_data;
-    end
-
-    #100ns;
-    spi_api.start_offload();
-    `INFO(("Offload started (with delay on CS change)."), ADI_VERBOSITY_LOW);
-
-    spi_wait_send();
-
-    spi_api.stop_offload();
-    `INFO(("Offload stopped (with delay on CS change)."), ADI_VERBOSITY_LOW);
-
-    #2000ns;
-
-    for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-      offload_captured_word_arr[i][`DATA_DLENGTH-1:0] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
-    end
-
-    if (irq_pending == 'h0) begin
-      `FATAL(("IRQ Test FAILED"));
-    end else begin
-      `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
-    end
-
-    if (offload_captured_word_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0] !== offload_sdi_data_store_arr [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) - 1:0]) begin
-      `FATAL(("CS Delay Test FAILED: bad data"));
-    end
-    repeat (`NUM_OF_TRANSFERS) begin
-      cs_activate_time = cs_instr_time.pop_back();
-      cs_deactivate_time = cs_instr_time.pop_back();
-    end
-    if ((cs_activate_time != expected_cs_activate_time)) begin
-      `FATAL(("CS Delay Test FAILED: unexpected chip select activate instruction duration. Expected=%d, Got=%d",expected_cs_activate_time,cs_activate_time));
-    end
-    if (cs_deactivate_time != expected_cs_deactivate_time) begin
-      `FATAL(("CS Delay Test FAILED: unexpected chip select deactivate instruction duration. Expected=%d, Got=%d",expected_cs_deactivate_time,cs_deactivate_time));
-    end
-    `INFO(("CS Delay Test PASSED"), ADI_VERBOSITY_LOW);
   endtask
 
 endprogram

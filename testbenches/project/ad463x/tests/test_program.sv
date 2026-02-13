@@ -100,7 +100,7 @@ program test_program (
   input ad463x_spi_sclk,
   input ad463x_spi_cs,
   input ad463x_spi_clk,
-  input [(`NUM_OF_SDI - 1):0] ad463x_spi_sdi);
+  input [(`NUM_OF_SDI_TB - 1):0] ad463x_spi_sdi);
 
   timeunit 1ns;
   timeprecision 1ps;
@@ -185,7 +185,7 @@ end
 //---------------------------------------------------------------------------
 
 task sanity_test();
-  bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
+  automatic bit [31:0] pcore_version = (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_PATCH)
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
   axi_read_v (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
@@ -265,6 +265,8 @@ bit   [7:0]   spi_sclk_pos_counter = 0;
 bit   [7:0]   spi_sclk_neg_counter = 0;
 bit   [31:0]  sdi_preg[$];
 bit   [31:0]  sdi_nreg[$];
+bit   [31:0]  random_word = $urandom;//32'hABCD_0000;
+bit           first_offload_word = 1;
 
 initial begin
   forever begin
@@ -276,7 +278,7 @@ end
 assign m_spi_csn_negedge_s = ~m_spi_csn_int_s & m_spi_csn_int_d;
 
 genvar i;
-for (i = 0; i < `NUM_OF_SDI; i++) begin
+for (i = 0; i < `NUM_OF_SDI_TB; i++) begin
   assign ad463x_spi_sdi[i] = sdi_shiftreg[31]; // all SDI lanes got the same data
 end
 
@@ -291,6 +293,16 @@ initial begin
       spi_sclk_pos_counter <= 8'b0;
     end else begin
       spi_sclk_pos_counter <= (spi_sclk_pos_counter == DATA_DLENGTH) ? 0 : spi_sclk_pos_counter+1;
+      if (spi_sclk_pos_counter == DATA_DLENGTH-1) begin
+        if (`NO_REORDER == 0 && `CAPTURE_ZONE == 1 && first_offload_word == 1) begin
+          // repeat the first word for SPI MODE in capture zone 1 with reorder
+          // this is necessary because the offload looses the first word in this mode
+          random_word <= random_word;
+          first_offload_word <= 0;
+        end else begin
+          random_word <= $urandom;//random_word + 1;
+        end
+      end
     end
   end
 end
@@ -323,8 +335,8 @@ initial begin
       if (m_spi_csn_negedge_s) begin
         // NOTE: assuming queue is empty
         repeat (NUM_OF_WORDS) begin
-          sdi_preg.push_front($urandom);
-          sdi_nreg.push_front($urandom);
+          sdi_preg.push_front(random_word);
+          sdi_nreg.push_front(random_word);
         end
         #1step; // prevent race condition
         sdi_shiftreg <= (CPOL ^ CPHA) ?
@@ -348,7 +360,8 @@ end
 
 bit         offload_status = 0;
 bit         shiftreg_sampled = 0;
-bit [15:0]   sdi_store_cnt = (`NUM_OF_SDI == 1) ? 'h1 : 'h0;
+bit [15:0]  sdi_store_cnt = (`NUM_OF_SDI_TB == 1) ? 'h1 : 'h0;
+bit         first_word = 1;
 bit [31:0]  offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:0];
 bit [31:0]  sdi_fifo_data_store;
 bit [31:0]  sdi_data_store;
@@ -366,15 +379,22 @@ initial begin
     if (sdi_data_store == 'h0 && shiftreg_sampled == 'h1 && sdi_shiftreg != 'h0) begin
       shiftreg_sampled <= 'h0;
       if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
-          sdi_store_cnt <= sdi_store_cnt + 1;
+        if (`NUM_OF_SDI_TB == 1) begin
+          if (`NO_REORDER == 0 && `CAPTURE_ZONE == 1 && sdi_store_cnt == 1 && first_word == 1) begin
+            // repeat the first word for SPI MODE in capture zone 1 with reorder
+            // this is necessary because the offload looses the first word in this mode
+            first_word <= 0;
+            sdi_store_cnt <= sdi_store_cnt;
+          end else begin
+            sdi_store_cnt <= sdi_store_cnt + 1;
+          end
         end else begin
           sdi_store_cnt <= sdi_store_cnt + 2;
         end
       end
     end else if (shiftreg_sampled == 'h0 && sdi_data_store != 'h0) begin
       if (offload_status) begin
-        if (`NUM_OF_SDI == 1) begin
+        if (`NUM_OF_SDI_TB == 1) begin
           sdi_shiftreg_old <= sdi_shiftreg;
           if (`NO_REORDER == 0) begin
             if (sdi_store_cnt [0] == 'h1 ) begin
@@ -388,7 +408,7 @@ initial begin
           end else if (`NO_REORDER == 1) begin
             offload_sdi_data_store_arr[sdi_store_cnt-1] = sdi_shiftreg;
           end
-        end else if (`NUM_OF_SDI == 2) begin
+        end else if (`NUM_OF_SDI_TB == 2) begin
           if (`DDR_EN == 1) begin
             for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
               offload_sdi_data_store_arr [sdi_store_cnt][(j*2)+:2] = {sdi_shiftreg2[j], sdi_shiftreg[j]};
@@ -398,7 +418,7 @@ initial begin
             offload_sdi_data_store_arr [sdi_store_cnt] = sdi_shiftreg;
             offload_sdi_data_store_arr [sdi_store_cnt + 1] = sdi_shiftreg;
           end
-        end else if (`NUM_OF_SDI == 4) begin
+        end else if (`NUM_OF_SDI_TB == 4) begin
           if (`DDR_EN == 1) begin
             for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
               offload_sdi_data_store_arr [sdi_store_cnt][(j*4)+:4] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j]};
@@ -412,7 +432,7 @@ initial begin
               offload_sdi_data_store_arr[sdi_store_cnt + 1][2*i+1] = sdi_shiftreg[i];
             end
           end
-        end else if (`NUM_OF_SDI == 8) begin
+        end else if (`NUM_OF_SDI_TB == 8) begin
           if (`DDR_EN == 1) begin
             for (int j=0; j<DATA_WIDTH/2; j=j+1) begin
               offload_sdi_data_store_arr [sdi_store_cnt][(j*8)+:8] = {sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg2[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j], sdi_shiftreg[j]};
@@ -488,7 +508,7 @@ task offload_spi_test();
     axi_write (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
     `INFO(("Offload started"), ADI_VERBOSITY_LOW);
 
-    if (`NUM_OF_SDI == 1) begin
+    if (`NUM_OF_SDI_TB == 1) begin
       wait(offload_transfer_cnt == 2*NUM_OF_TRANSFERS);
     end else begin
       wait(offload_transfer_cnt == NUM_OF_TRANSFERS);
@@ -502,7 +522,7 @@ task offload_spi_test();
     #2000ns;
 
     for (int i=0; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
-      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
+      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA) + 4*i);
     end
 
     if (irq_pending == 'h0) begin
@@ -511,11 +531,15 @@ task offload_spi_test();
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    if (offload_captured_word_arr [(2 * NUM_OF_TRANSFERS) - 1:2] != offload_sdi_data_store_arr [(2 * NUM_OF_TRANSFERS) - 1:2]) begin
-      `ERROR(("Offload Test FAILED"));
-    end else begin
-      `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
+    for (int i=2; i<=((2 * NUM_OF_TRANSFERS) -1); i=i+1) begin
+      if (offload_captured_word_arr[i] != offload_sdi_data_store_arr[i]) begin
+        `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
+          i, offload_captured_word_arr[i],
+          i, offload_sdi_data_store_arr[i]), ADI_VERBOSITY_LOW);
+        `ERROR(("Offload Test FAILED"));
+      end
     end
+    `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -568,8 +592,11 @@ task fifo_spi_test();
     axi_read (`SPI_AD469X_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SDI_FIFO_PEEK), sdi_fifo_data);
   end
 
-  if (sdi_fifo_data != sdi_fifo_data_store)
+  if (sdi_fifo_data != sdi_fifo_data_store) begin
+    `INFO(("sdi_fifo_data: %x; sdi_fifo_data_store: %x",
+          sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
     `ERROR(("Fifo Read Test FAILED"));
+  end
 
   `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
 endtask

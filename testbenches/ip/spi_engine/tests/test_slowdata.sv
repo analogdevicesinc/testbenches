@@ -320,12 +320,12 @@ program test_slowdata (
       // IRQ launched by Offload SYNC command
       if (spi_api.check_irq_offload_sync_id_pending(irq_pending)) begin
         spi_api.get_sync_id(sync_id);
-        `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.",  sync_id), ADI_VERBOSITY_LOW);
+        `INFO(("Offload SYNC %0d IRQ. An offload transfer just finished.",  sync_id), ADI_VERBOSITY_LOW);
       end
       // IRQ launched by SYNC command
       if (spi_api.check_irq_sync_event(irq_pending)) begin
         spi_api.get_sync_id(sync_id);
-        `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
+        `INFO(("SYNC %0d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
       end
       // IRQ launched by SDI FIFO
       if (spi_api.check_irq_sdi_almost_full(irq_pending)) begin
@@ -579,7 +579,7 @@ program test_slowdata (
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
       sdi_read_data[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
       if (sdi_read_data[i] != sdi_read_data_store[i]) begin
-        `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
+        `INFO(("sdi_read_data[%0d]: %x; sdi_read_data_store[%0d]: %x", i, sdi_read_data[i], i, sdi_read_data_store[i]), ADI_VERBOSITY_LOW);
         `FATAL(("Offload Read Test FAILED"));
       end
     end
@@ -588,7 +588,7 @@ program test_slowdata (
     for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
       spi_receive(sdo_write_data[i]);
       if (sdo_write_data[i] != sdo_write_data_store[i]) begin
-        `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]), ADI_VERBOSITY_LOW);
+        `INFO(("sdo_write_data[%0d]: %x; sdo_write_data_store[%0d]: %x", i, sdo_write_data[i], i, sdo_write_data_store[i]), ADI_VERBOSITY_LOW);
         `FATAL(("Offload Write Test FAILED"));
       end
     end

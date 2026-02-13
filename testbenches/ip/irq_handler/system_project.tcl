@@ -7,14 +7,14 @@ if {$argc < 1} {
   set cfg_file [lindex $argv 0]
 }
 
-# Read config file 
+# Read config file
 source "cfgs/${cfg_file}"
 
 # Set the project name
 set project_name [file rootname $cfg_file]
 
 # Create the project
-adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
+adi_sim_project_xilinx $project_name
 
 # Add test files to the project
 adi_sim_project_files [list \

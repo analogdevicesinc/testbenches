@@ -1,25 +1,35 @@
 global ad_project_params
 
-# Source data generation mode
+#------------------------------------------------------------------------------
+# AXI4 Stream VIP Configuration
+#------------------------------------------------------------------------------
 
-# 1) - 1 descriptor
-# 2) - Multiple descriptors
-# 3) - Infinite descriptors
-set ad_project_params(SRC_DESCRIPTORS) 3
+# Data width in bits (must be multiple of 8)
+set ad_project_params(DATA_WIDTH) 32
 
-# #) - Inter-beat valid delays
-set ad_project_params(SRC_TRANSACTION_DELAY) 0
+# Enable TKEEP signal (0 - disabled, 1 - enabled)
+set ad_project_params(TKEEP_EN) 1
 
-# #) - Inter-descriptor valid delays
-set ad_project_params(SRC_PACKET_DELAY) 0
+# Enable TSTRB signal (0 - disabled, 1 - enabled)
+set ad_project_params(TSTRB_EN) 0
 
+# Enable TLAST signal (0 - disabled, 1 - enabled)
+set ad_project_params(TLAST_EN) 1
 
-# Destination data generation mode
+# Enable TUSER signal (0 - disabled, 1 - enabled)
+set ad_project_params(TUSER_EN) 0
 
-# 1) - Backpressure
-# 2) - No Backpressure
-set ad_project_params(DEST_BACKPRESSURE) 2
+# Enable TID signal (0 - disabled, 1 - enabled)
+set ad_project_params(TID_EN) 0
 
-# #) - Inter-beat ready delays high and low time
-set ad_project_params(DEST_TRANSACTION_HIGH) 1
-set ad_project_params(DEST_TRANSACTION_LOW) 5
+# Enable TDEST signal (0 - disabled, 1 - enabled)
+set ad_project_params(TDEST_EN) 0
+
+# TUSER width in bits (1-8, only used if TUSER_EN is 1)
+set ad_project_params(TUSER_WIDTH) 1
+
+# TID width in bits (1-8, only used if TID_EN is 1)
+set ad_project_params(TID_WIDTH) 1
+
+# TDEST width in bits (1-8, only used if TDEST_EN is 1)
+set ad_project_params(TDEST_WIDTH) 1

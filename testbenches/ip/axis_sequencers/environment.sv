@@ -69,14 +69,101 @@ package environment_pkg;
 
     //============================================================================
     // Configure environment
-    //   - Configure the sequencer VIPs with an initial configuration before starting them
+    //   - Configure the sequencer VIPs with parameters from the configuration file
     //============================================================================
-    task configure();
-      // source stub
-      this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
+    task configure(
+      // Source (Master) configuration
+      input int src_stop_policy = 2,
+      input int src_transaction_delay = 0,
+      input int src_packet_delay = 0,
+      input int src_frame_delay = 0,
+      input int src_sequence_delay = 0,
+      input bit src_repeat_mode = 0,
+      input bit src_inactive_drive_0 = 0,
+      // Destination (Slave) configuration
+      input int dest_ready_mode = 1,
+      input bit dest_use_variable_ranges = 0,
+      input int dest_high_time = 1,
+      input int dest_low_time = 1,
+      input int dest_high_time_min = 1,
+      input int dest_high_time_max = 5,
+      input int dest_low_time_min = 1,
+      input int dest_low_time_max = 5,
+      input int dest_event_count = 1,
+      input int dest_event_count_min = 1,
+      input int dest_event_count_max = 5
+    );
 
-      // destination stub
-      this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      //------------------------------------------------------------------------
+      // Source (Master) Configuration
+      //------------------------------------------------------------------------
+
+      // Set source delays
+      this.src_axis_agent.master_sequencer.set_transaction_delay(src_transaction_delay);
+      this.src_axis_agent.master_sequencer.set_packet_delay(src_packet_delay);
+      this.src_axis_agent.master_sequencer.set_frame_delay(src_frame_delay);
+      this.src_axis_agent.master_sequencer.set_sequence_delay(src_sequence_delay);
+
+      // Set repeat transaction mode
+      this.src_axis_agent.master_sequencer.set_repeat_transaction_mode(src_repeat_mode);
+
+      // Set inactive drive output to 0
+      if (src_inactive_drive_0) begin
+        this.src_axis_agent.master_sequencer.set_inactive_drive_output_0();
+      end
+
+      // Set source stop policy
+      case (src_stop_policy)
+        1: this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_TRANSACTION);
+        2: this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
+        3: this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_FRAME);
+        4: this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_SEQUENCE);
+        5: this.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_QUEUE);
+        default: `FATAL(("Source stop policy parameter incorrect!"));
+      endcase
+
+      //------------------------------------------------------------------------
+      // Destination (Slave) Configuration
+      //------------------------------------------------------------------------
+
+      // Set destination ready generation mode
+      case (dest_ready_mode)
+        1: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+        2: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
+        3: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_EVENTS);
+        4: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_OSC);
+        5: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_RANDOM);
+        6: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_AFTER_VALID_SINGLE);
+        7: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_AFTER_VALID_EVENTS);
+        8: this.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_AFTER_VALID_OSC);
+        default: `FATAL(("Destination ready mode parameter incorrect!"));
+      endcase
+
+      // Set variable ranges mode
+      if (dest_use_variable_ranges) begin
+        this.dst_axis_agent.slave_sequencer.set_use_variable_ranges();
+      end else begin
+        this.dst_axis_agent.slave_sequencer.clr_use_variable_ranges();
+      end
+
+      // Set high times
+      this.dst_axis_agent.slave_sequencer.set_high_time(dest_high_time);
+      this.dst_axis_agent.slave_sequencer.set_high_time_range(
+        .high_time_min(dest_high_time_min),
+        .high_time_max(dest_high_time_max));
+
+      // Set low times
+      this.dst_axis_agent.slave_sequencer.set_low_time(dest_low_time);
+      this.dst_axis_agent.slave_sequencer.set_low_time_range(
+        .low_time_min(dest_low_time_min),
+        .low_time_max(dest_low_time_max));
+
+      // Set event counts
+      this.dst_axis_agent.slave_sequencer.set_event_count(dest_event_count);
+      this.dst_axis_agent.slave_sequencer.set_event_count_range(
+        .event_count_min(dest_event_count_min),
+        .event_count_max(dest_event_count_max));
+
     endtask
 
     //============================================================================

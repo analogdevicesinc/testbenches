@@ -58,7 +58,85 @@ program test_program;
   timeunit 1ns;
   timeprecision 1ps;
 
-  // declare the class instances
+  //============================================================================
+  // Source (Master) Sequencer Configuration
+  //============================================================================
+
+  // Source data generation mode (determines how descriptors are handled)
+  // 1 - Single descriptor
+  // 2 - Multiple descriptors
+  // 3 - Infinite descriptors
+  localparam int SRC_DESCRIPTORS = 3;
+
+  // Source stop policy
+  // 1 - STOP_POLICY_TRANSACTION
+  // 2 - STOP_POLICY_PACKET
+  // 3 - STOP_POLICY_FRAME
+  // 4 - STOP_POLICY_SEQUENCE
+  // 5 - STOP_POLICY_QUEUE
+  localparam int SRC_STOP_POLICY = 2;
+
+  // Inter-beat valid delays (transaction delay)
+  localparam int SRC_TRANSACTION_DELAY = 0;
+
+  // Inter-packet valid delays
+  localparam int SRC_PACKET_DELAY = 0;
+
+  // Inter-frame valid delays
+  localparam int SRC_FRAME_DELAY = 0;
+
+  // Inter-sequence valid delays
+  localparam int SRC_SEQUENCE_DELAY = 0;
+
+  // Repeat transaction mode (0 - disabled, 1 - enabled)
+  localparam bit SRC_REPEAT_MODE = 0;
+
+  // Drive output to 0 when inactive (0 - disabled, 1 - enabled)
+  localparam bit SRC_INACTIVE_DRIVE_0 = 0;
+
+  //============================================================================
+  // Destination (Slave) Sequencer Configuration
+  //============================================================================
+
+  // Destination ready generation mode
+  // 1 - XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE
+  // 2 - XIL_AXI4STREAM_READY_GEN_SINGLE
+  // 3 - XIL_AXI4STREAM_READY_GEN_EVENTS
+  // 4 - XIL_AXI4STREAM_READY_GEN_OSC
+  // 5 - XIL_AXI4STREAM_READY_GEN_RANDOM
+  // 6 - XIL_AXI4STREAM_READY_GEN_AFTER_VALID_SINGLE
+  // 7 - XIL_AXI4STREAM_READY_GEN_AFTER_VALID_EVENTS
+  // 8 - XIL_AXI4STREAM_READY_GEN_AFTER_VALID_OSC
+  localparam int DEST_READY_MODE = 1;
+
+  // Use variable high/low time ranges (0 - use fixed times, 1 - use ranges)
+  localparam bit DEST_USE_VARIABLE_RANGES = 0;
+
+  // Fixed high time (used when DEST_USE_VARIABLE_RANGES is 0)
+  localparam int DEST_HIGH_TIME = 1;
+
+  // Fixed low time (used when DEST_USE_VARIABLE_RANGES is 0)
+  localparam int DEST_LOW_TIME = 5;
+
+  // High time range (used when DEST_USE_VARIABLE_RANGES is 1)
+  localparam int DEST_HIGH_TIME_MIN = 1;
+  localparam int DEST_HIGH_TIME_MAX = 5;
+
+  // Low time range (used when DEST_USE_VARIABLE_RANGES is 1)
+  localparam int DEST_LOW_TIME_MIN = 1;
+  localparam int DEST_LOW_TIME_MAX = 5;
+
+  // Event count (fixed value)
+  localparam int DEST_EVENT_COUNT = 1;
+
+  // Event count range (used when DEST_USE_VARIABLE_RANGES is 1)
+  localparam int DEST_EVENT_COUNT_MIN = 1;
+  localparam int DEST_EVENT_COUNT_MAX = 5;
+
+  //============================================================================
+  // Class Instances
+  //============================================================================
+
   test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
   axis_sequencer_environment #(`AXIS_VIP_PARAMS(test_harness, src_axis), `AXIS_VIP_PARAMS(test_harness, dst_axis)) axis_seq_env;
 
@@ -91,19 +169,29 @@ program test_program;
 
     base_env.sys_reset();
 
-    axis_seq_env.configure();
-
-    axis_seq_env.src_axis_agent.master_sequencer.set_transaction_delay(`SRC_TRANSACTION_DELAY);
-    axis_seq_env.src_axis_agent.master_sequencer.set_packet_delay(`SRC_PACKET_DELAY);
-
-    axis_seq_env.dst_axis_agent.slave_sequencer.set_high_time(`DEST_TRANSACTION_HIGH);
-    axis_seq_env.dst_axis_agent.slave_sequencer.set_low_time(`DEST_TRANSACTION_LOW);
-
-    case (`DEST_BACKPRESSURE)
-      1: axis_seq_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_SINGLE);
-      2: axis_seq_env.dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
-      default: `FATAL(("Destination backpressure mode parameter incorrect!"));
-    endcase
+    // Configure environment with local parameters
+    axis_seq_env.configure(
+      // Source (Master) configuration
+      .src_stop_policy(SRC_STOP_POLICY),
+      .src_transaction_delay(SRC_TRANSACTION_DELAY),
+      .src_packet_delay(SRC_PACKET_DELAY),
+      .src_frame_delay(SRC_FRAME_DELAY),
+      .src_sequence_delay(SRC_SEQUENCE_DELAY),
+      .src_repeat_mode(SRC_REPEAT_MODE),
+      .src_inactive_drive_0(SRC_INACTIVE_DRIVE_0),
+      // Destination (Slave) configuration
+      .dest_ready_mode(DEST_READY_MODE),
+      .dest_use_variable_ranges(DEST_USE_VARIABLE_RANGES),
+      .dest_high_time(DEST_HIGH_TIME),
+      .dest_low_time(DEST_LOW_TIME),
+      .dest_high_time_min(DEST_HIGH_TIME_MIN),
+      .dest_high_time_max(DEST_HIGH_TIME_MAX),
+      .dest_low_time_min(DEST_LOW_TIME_MIN),
+      .dest_low_time_max(DEST_LOW_TIME_MAX),
+      .dest_event_count(DEST_EVENT_COUNT),
+      .dest_event_count_min(DEST_EVENT_COUNT_MIN),
+      .dest_event_count_max(DEST_EVENT_COUNT_MAX)
+    );
 
     axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, src_axis));
     axis_rand_cfg = new();
@@ -124,30 +212,25 @@ program test_program;
 
     axis_packet.randomize_packet();
 
-    case (`SRC_DESCRIPTORS)
+    // Add packets based on descriptor mode
+    case (SRC_DESCRIPTORS)
       1: begin
-        axis_seq_env.src_axis_agent.master_sequencer.set_repeat_transaction_mode(0);
-        axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_TRANSACTION);
+        // Single descriptor mode
         axis_seq_env.src_axis_agent.master_sequencer.add_packet(axis_packet);
-
         send_data_wd = new("Axis Sequencer Watchdog", 1000, "Send data");
       end
       2: begin
-        axis_seq_env.src_axis_agent.master_sequencer.set_repeat_transaction_mode(0);
-        axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_QUEUE);
+        // Multiple descriptors mode
         repeat (10) begin
           axis_packet.randomize_packet();
           axis_seq_env.src_axis_agent.master_sequencer.add_packet(axis_packet);
         end
-
         send_data_wd = new("Axis Sequencer Watchdog", 30000, "Send data");
       end
       3: begin
-        axis_seq_env.src_axis_agent.master_sequencer.set_repeat_transaction_mode(1);
-        axis_seq_env.src_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
+        // Infinite descriptors mode (requires SRC_REPEAT_MODE=1)
         axis_packet.randomize_packet();
         axis_seq_env.src_axis_agent.master_sequencer.add_packet(axis_packet);
-
         send_data_wd = new("Axis Sequencer Watchdog", 20000, "Send data");
       end
       default: `FATAL(("Source descriptor parameter incorrect!"));
@@ -159,7 +242,7 @@ program test_program;
 
     #100ns;
 
-    case (`SRC_DESCRIPTORS)
+    case (SRC_DESCRIPTORS)
       1: //axis_seq_env.src_axis_agent.master_sequencer.beat_sent();
         axis_seq_env.src_axis_agent.master_sequencer.packet_sent();
       2: axis_seq_env.src_axis_agent.master_sequencer.wait_empty_sequences();

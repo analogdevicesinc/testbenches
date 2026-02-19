@@ -443,7 +443,7 @@ program test_program_drg (
 
     // Configure ramp delays
     axi_write(reg_addr(REG_BST_DELAY), 32'd250);    // Before start delay
-    axi_write(reg_addr(REG_ALR_DELAY), 32'd500);     // After level reached delay
+    axi_write(reg_addr(REG_ALR_DELAY), 32'd75);     // After level reached delay
     axi_write(reg_addr(REG_BURST_DELAY), 32'd200);  // Burst delay
     axi_write(reg_addr(REG_RAMP_BURSTS), 32'd5);    // Number of bursts
 
@@ -485,11 +485,8 @@ program test_program_drg (
         @(posedge sync_clk_tp);
         timeout--;
       end
-      if (timeout > 0) begin
-        `INFO(("  drctl asserted for ramp up - PASSED"), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  drctl not asserted within 10us"));
-        test_passed = 0;
+      if (timeout == 0) begin
+        `ERROR(("drctl did not assert within 10us"));
       end
     end
 
@@ -548,17 +545,19 @@ program test_program_drg (
 
       // Set drhold
       axi_write(reg_addr(REG_RAMP_CTRL), 32'h0E);  // drctl_toggle_en=1, drctl_init=1, drhold=1
+      axi_read_v(reg_addr(REG_RAMP_CTRL), 32'h0E);
 
       // Wait for drhold to propagate through CDC
-      #5us;
-
-      `INFO(("  DEBUG: drhold_tp = %b, drctl_tp = %b", drhold_tp, drctl_tp), ADI_VERBOSITY_LOW);
-
-      if (drhold_tp == 1'b1) begin
-        `INFO(("  DRHOLD asserted - PASSED"), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  DRHOLD not asserted"));
-        test_passed = 0;
+      begin
+        int unsigned timeout = 2500; // 10us at 250 MHz
+        while (!drhold_tp && timeout > 0) begin
+          @(posedge sync_clk_tp);
+          timeout--;
+        end
+        if (timeout == 0) begin
+          `ERROR(("drhold did not assert within 10us"));
+          test_passed = 0;
+        end
       end
 
       // Capture counter value NOW that hold is active
@@ -637,7 +636,7 @@ program test_program_drg (
       // Set ramp control: no_dwell_high=1, drctl_toggle_en=1, drctl_init=1
       axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
       read_ramp_ctrl();
-      #2us;
+      #3us;
 
       // Reset DRG model
       reset_drg_counter();

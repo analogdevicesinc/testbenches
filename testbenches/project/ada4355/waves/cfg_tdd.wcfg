@@ -61,21 +61,13 @@
       <ValueColumnWidth column_width="74"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="76" />
-   <wvobject type="logic" fp_name="/system_tb/ssi_clk">
+   <wvobject type="logic" fp_name="/system_tb/test/ssi_clk">
       <obj_property name="ElementShortName">ssi_clk</obj_property>
       <obj_property name="ObjectShortName">ssi_clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clk">
+   <wvobject type="logic" fp_name="/system_tb/test/frame_clk">
       <obj_property name="ElementShortName">frame_clk</obj_property>
       <obj_property name="ObjectShortName">frame_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/div_clock">
-      <obj_property name="ElementShortName">div_clock</obj_property>
-      <obj_property name="ObjectShortName">div_clock</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/enable_pattern">
-      <obj_property name="ElementShortName">enable_pattern</obj_property>
-      <obj_property name="ObjectShortName">enable_pattern</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/dco_p">
       <obj_property name="ElementShortName">dco_p</obj_property>
@@ -85,45 +77,25 @@
       <obj_property name="ElementShortName">dco_n</obj_property>
       <obj_property name="ObjectShortName">dco_n</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clock_p">
-      <obj_property name="ElementShortName">frame_clock_p</obj_property>
-      <obj_property name="ObjectShortName">frame_clock_p</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clock_n">
-      <obj_property name="ElementShortName">frame_clock_n</obj_property>
-      <obj_property name="ObjectShortName">frame_clock_n</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/late_signal_p">
-      <obj_property name="ElementShortName">late_signal_p</obj_property>
-      <obj_property name="ObjectShortName">late_signal_p</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/late_signal_n">
-      <obj_property name="ElementShortName">late_signal_n</obj_property>
-      <obj_property name="ObjectShortName">late_signal_n</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/sync_n_d">
+   <wvobject type="logic" fp_name="/system_tb/test/sync_n_d">
       <obj_property name="ElementShortName">sync_n_d</obj_property>
       <obj_property name="ObjectShortName">sync_n_d</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/ssi_edge_cnt">
+   <wvobject type="array" fp_name="/system_tb/test/ssi_edge_cnt">
       <obj_property name="ElementShortName">ssi_edge_cnt[2:0]</obj_property>
       <obj_property name="ObjectShortName">ssi_edge_cnt[2:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_sync_active">
-      <obj_property name="ElementShortName">frame_sync_active</obj_property>
-      <obj_property name="ObjectShortName">frame_sync_active</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/sample">
+   <wvobject type="array" fp_name="/system_tb/test/sample">
       <obj_property name="ElementShortName">sample[15:0]</obj_property>
       <obj_property name="ObjectShortName">sample[15:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
       <obj_property name="CellHeight">100</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/da_p_int">
+   <wvobject type="logic" fp_name="/system_tb/test/da_p_int">
       <obj_property name="ElementShortName">da_p_int</obj_property>
       <obj_property name="ObjectShortName">da_p_int</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/db_p_int">
+   <wvobject type="logic" fp_name="/system_tb/test/db_p_int">
       <obj_property name="ElementShortName">db_p_int</obj_property>
       <obj_property name="ObjectShortName">db_p_int</obj_property>
    </wvobject>
@@ -143,7 +115,7 @@
       <obj_property name="ElementShortName">db_n</obj_property>
       <obj_property name="ObjectShortName">db_n</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/sample_count">
+   <wvobject type="array" fp_name="/system_tb/test/sample_count">
       <obj_property name="ElementShortName">sample_count[31:0]</obj_property>
       <obj_property name="ObjectShortName">sample_count[31:0]</obj_property>
    </wvobject>
@@ -237,7 +209,7 @@
       <obj_property name="ElementShortName">sync</obj_property>
       <obj_property name="ObjectShortName">sync</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/sample_count">
+   <wvobject type="array" fp_name="/system_tb/test/sample_count">
       <obj_property name="ElementShortName">sample_count[31:0]</obj_property>
       <obj_property name="ObjectShortName">sample_count[31:0]</obj_property>
    </wvobject>
@@ -261,31 +233,31 @@
       <obj_property name="BkColor">#FF00FF</obj_property>
       <obj_property name="TextColor">#FFFFFF</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/laser_fired_marker">
+   <wvobject type="logic" fp_name="/system_tb/test/laser_fired_marker">
       <obj_property name="ElementShortName">laser_fired_marker</obj_property>
       <obj_property name="ObjectShortName">laser_fired_marker</obj_property>
       <obj_property name="CustomSignalColor">#FF0000</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/gate_opened_marker">
+   <wvobject type="logic" fp_name="/system_tb/test/gate_opened_marker">
       <obj_property name="ElementShortName">gate_opened_marker</obj_property>
       <obj_property name="ObjectShortName">gate_opened_marker</obj_property>
       <obj_property name="CustomSignalColor">#00FF00</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/sample_at_laser_fire">
+   <wvobject type="array" fp_name="/system_tb/test/sample_at_laser_fire">
       <obj_property name="ElementShortName">sample_at_laser_fire[15:0]</obj_property>
       <obj_property name="ObjectShortName">sample_at_laser_fire[15:0]</obj_property>
       <obj_property name="CustomSignalColor">#FF0000</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/sample_at_gate_open">
+   <wvobject type="array" fp_name="/system_tb/test/sample_at_gate_open">
       <obj_property name="ElementShortName">sample_at_gate_open[15:0]</obj_property>
       <obj_property name="ObjectShortName">sample_at_gate_open[15:0]</obj_property>
       <obj_property name="CustomSignalColor">#00FF00</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/samples_captured_count">
+   <wvobject type="array" fp_name="/system_tb/test/samples_captured_count">
       <obj_property name="ElementShortName">samples_captured_count[31:0]</obj_property>
       <obj_property name="ObjectShortName">samples_captured_count[31:0]</obj_property>
       <obj_property name="CustomSignalColor">#00FFFF</obj_property>

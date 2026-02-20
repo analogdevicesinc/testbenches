@@ -42,11 +42,11 @@
       <obj_property name="ElementShortName">sync_n</obj_property>
       <obj_property name="ObjectShortName">sync_n</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/sync_n_d">
+   <wvobject type="logic" fp_name="/system_tb/test/sync_n_d">
       <obj_property name="ElementShortName">sync_n_d</obj_property>
       <obj_property name="ObjectShortName">sync_n_d</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/ssi_clk">
+   <wvobject type="logic" fp_name="/system_tb/test/ssi_clk">
       <obj_property name="ElementShortName">ssi_clk</obj_property>
       <obj_property name="ObjectShortName">ssi_clk</obj_property>
    </wvobject>
@@ -74,7 +74,7 @@
       <obj_property name="label">Signals</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clk">
+   <wvobject type="logic" fp_name="/system_tb/test/frame_clk">
       <obj_property name="ElementShortName">frame_clk</obj_property>
       <obj_property name="ObjectShortName">frame_clk</obj_property>
    </wvobject>
@@ -83,7 +83,7 @@
       <obj_property name="ObjectShortName">adc_data_shifted[15:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clock_p">
+   <wvobject type="logic" fp_name="/system_tb/test/frame_clock_p">
       <obj_property name="ElementShortName">frame_clock_p</obj_property>
       <obj_property name="ObjectShortName">frame_clock_p</obj_property>
    </wvobject>
@@ -129,7 +129,7 @@
       <obj_property name="ElementShortName">db_p</obj_property>
       <obj_property name="ObjectShortName">db_p</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/frame_clock_p">
+   <wvobject type="logic" fp_name="/system_tb/test/frame_clock_p">
       <obj_property name="ElementShortName">frame_clock_p</obj_property>
       <obj_property name="ObjectShortName">frame_clock_p</obj_property>
    </wvobject>
@@ -281,7 +281,7 @@
       <obj_property name="ElementShortName">shift_cnt[2:0]</obj_property>
       <obj_property name="ObjectShortName">shift_cnt[2:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/final_sample">
+   <wvobject type="array" fp_name="/system_tb/test/final_sample">
       <obj_property name="ElementShortName">final_sample[15:0]</obj_property>
       <obj_property name="ObjectShortName">final_sample[15:0]</obj_property>
    </wvobject>

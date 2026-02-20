@@ -46,23 +46,49 @@ import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
 import dmac_api_pkg::*;
 import adc_api_pkg::*;
-import common_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-program test_program;
+`ifndef FRAME_SHIFT_CNT
+  `define FRAME_SHIFT_CNT 0
+`endif
 
-  // Base address from block design
-  parameter BASE = `ADA4355_ADC_BA;
+//---------------------------------------------------------------------------
+// Timing parameters
+//---------------------------------------------------------------------------
+localparam DCO_HALF_PERIOD = 1;   // Period 2 ns -> 500 MHz DCO
+localparam FRAME_HALF_PERIOD = 4; // Period 8 ns -> 125 MHz Frame
+localparam FRAME_DELAY = FRAME_HALF_PERIOD + (8 - `FRAME_SHIFT_CNT) * DCO_HALF_PERIOD
+                         + ((`FRAME_SHIFT_CNT % 2) * DCO_HALF_PERIOD);
+localparam DATA_DELAY = FRAME_DELAY;
 
-  // Delay control registers offset
-  parameter RX_DELAY_BASE = BASE + 'h02_00 * 4;
+program test_program (
+  output reg dco_p,
+  output reg dco_n,
+  output reg da_p,
+  output reg da_n,
+  output reg db_p,
+  output reg db_n,
+  output reg sync_n,
+  output reg frame_p,
+  output reg frame_n,
+  output reg tdd_ext_sync
+);
 
-  // ADA4355 specific register
-  parameter REGMAP_ENABLE = BASE + 'h00C8;
+  timeunit 1ns;
+  timeprecision 1ps;
 
-`ifdef TDD_EN
+  // Module-level constants used in tasks
+  localparam int num_lanes = 2;
+  localparam int sdr_ddr_n = 0;
+
+  // Sine wave generation parameters
+  localparam real PI = 3.14159265358979;
+  localparam SINE_AMPLITUDE = 8191;   // Full 14-bit scale
+  localparam SINE_OFFSET = 8192;      // Mid-scale for 14-bit (2^13)
+  localparam SINE_PERIOD = 64;        // Samples per sine period
+
   // TDD base address and register offsets
   parameter TDD_BASE = `AXI_TDD_BA;
   parameter TDD_CONTROL = TDD_BASE + 'h40;
@@ -75,11 +101,6 @@ program test_program;
   parameter TDD_CH0_OFF = TDD_BASE + 'h84;  // Laser trigger OFF
   parameter TDD_CH1_ON = TDD_BASE + 'h88;   // DMA sync ON
   parameter TDD_CH1_OFF = TDD_BASE + 'h8C;  // DMA sync OFF
-`endif
-
-  // Module-level variables used in tasks
-  int num_lanes = 2;
-  int sdr_ddr_n = 0;
 
   test_harness_env env;
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
@@ -88,9 +109,248 @@ program test_program;
   // API instances
   dmac_api rx_dma_api;
   adc_api rx_adc_api;
-  common_api rx_common_api;
 
-  bit [31:0] val;
+  //---------------------------------------------------------------------------
+  // Internal signals for stimulus generation
+  //---------------------------------------------------------------------------
+  reg sync_n_d = 1'b0;
+  reg ssi_clk = 1'b0;
+  reg frame_clk = 1'b1;  // Start HIGH for 0xF0 pattern
+  reg [2:0] ssi_edge_cnt = 3'd0;
+
+  reg [15:0] sample;
+  reg da_p_int = 1'b0;
+  reg db_p_int = 1'b0;
+  reg [31:0] sample_count = 0;
+
+  //---------------------------------------------------------------------------
+  // TDD LiDAR debug markers
+  //---------------------------------------------------------------------------
+  reg [31:0] laser_fire_sample_idx = 0;
+  reg tdd_ch0_d = 0;
+  reg [15:0] sample_at_laser_fire = 0;
+  reg [15:0] sample_at_gate_open = 0;
+  reg [31:0] samples_captured_count = 0;
+  reg laser_fired_marker = 0;
+  reg gate_opened_marker = 0;
+  reg tdd_ch1_d = 0;
+  reg dma_capture_active = 0;
+  reg dma_ch1_d = 0;
+
+  // CH0 (laser trigger) rising edge detection + marker
+  initial forever begin
+    @(posedge `TH.axi_tdd_0.clk);
+    if (`TH.axi_tdd_0.tdd_channel_0 && !tdd_ch0_d) begin
+      laser_fire_sample_idx = sample_count;
+      sample_at_laser_fire = `TH.axi_ada4355_adc.adc_data[15:0];
+      laser_fired_marker = 1'b1;
+      $display("[TB] @%0t: LASER FIRED at sample_count=%0d, adc_data=0x%04h",
+               $time, sample_count, `TH.axi_ada4355_adc.adc_data[15:0]);
+    end else begin
+      laser_fired_marker = 1'b0;
+    end
+    tdd_ch0_d = `TH.axi_tdd_0.tdd_channel_0;
+  end
+
+  // CH1 (DMA sync) rising edge detection + marker
+  initial forever begin
+    @(posedge `TH.axi_tdd_0.clk);
+    if (`TH.axi_tdd_0.tdd_channel_1 && !tdd_ch1_d) begin
+      sample_at_gate_open = `TH.axi_ada4355_adc.adc_data[15:0];
+      gate_opened_marker = 1'b1;
+      $display("[TB] @%0t: ADC GATE OPENED at sample_count=%0d, adc_data=0x%04h",
+               $time, sample_count, `TH.axi_ada4355_adc.adc_data[15:0]);
+    end else begin
+      gate_opened_marker = 1'b0;
+    end
+    tdd_ch1_d = `TH.axi_tdd_0.tdd_channel_1;
+  end
+
+  // DMA capture counter - tracks actual samples written after sync trigger
+  initial forever begin
+    @(posedge `TH.axi_ada4355_dma.fifo_wr_clk);
+    if (`TH.axi_tdd_0.tdd_channel_1 && !dma_ch1_d) begin
+      dma_capture_active = 1;
+      samples_captured_count = 0;
+    end else if (dma_capture_active && `TH.axi_ada4355_dma.fifo_wr_en) begin
+      samples_captured_count = samples_captured_count + 1;
+      if (samples_captured_count < 3) begin
+        $display("[TB] @%0t: SAMPLE CAPTURED #%0d: 0x%04h", $time, samples_captured_count, `TH.axi_ada4355_dma.fifo_wr_din);
+      end
+    end
+    dma_ch1_d = `TH.axi_tdd_0.tdd_channel_1;
+  end
+
+  //---------------------------------------------------------------------------
+  // Initialize TDD external sync to avoid x in CDC synchronizer
+  //---------------------------------------------------------------------------
+  initial begin
+    tdd_ext_sync = 1'b0;
+  end
+
+  //---------------------------------------------------------------------------
+  // Transport delay for sync_n (simulates PCB and clock chip propagation)
+  //---------------------------------------------------------------------------
+  initial begin
+    sync_n <= 1'b0;
+    forever begin
+      @(sync_n);
+      sync_n_d <= #25ns sync_n;
+    end
+  end
+
+  //---------------------------------------------------------------------------
+  // Transport delay for DCO clock (simulates internal FPGA clock path delay)
+  //---------------------------------------------------------------------------
+  initial begin
+    dco_p <= 1'b0;
+    dco_n <= 1'b1;
+    forever begin
+      @(ssi_clk);
+      dco_p <= #3ns ssi_clk;
+      dco_n <= #3ns ~ssi_clk;
+    end
+  end
+
+  //---------------------------------------------------------------------------
+  // Transport delay for frame clock
+  //---------------------------------------------------------------------------
+  initial begin
+    frame_p <= 1'b0;
+    frame_n <= 1'b1;
+    forever begin
+      @(frame_clk);
+      frame_p <= #3.5ns frame_clk;
+      frame_n <= #3.5ns ~frame_clk;
+    end
+  end
+
+  //---------------------------------------------------------------------------
+  // Transport delay for data signals
+  //---------------------------------------------------------------------------
+  initial begin
+    da_p <= 1'b0;
+    da_n <= 1'b1;
+    forever begin
+      @(da_p_int);
+      da_p <= #3.5ns da_p_int;
+      da_n <= #3.5ns ~da_p_int;
+    end
+  end
+
+  initial begin
+    db_p <= 1'b0;
+    db_n <= 1'b1;
+    forever begin
+      @(db_p_int);
+      db_p <= #3.5ns db_p_int;
+      db_n <= #3.5ns ~db_p_int;
+    end
+  end
+
+  //---------------------------------------------------------------------------
+  // SSI clock generator (500 MHz) - derives frame clock to prevent drift
+  //---------------------------------------------------------------------------
+  initial begin
+    #1ns;
+    @(posedge sync_n_d);
+    `INFO(("FRAME_SHIFT_CNT=%0d, FRAME_DELAY=%0d ns", `FRAME_SHIFT_CNT, FRAME_DELAY), ADI_VERBOSITY_LOW);
+
+    // Initial delay to set frame/data phase offset
+    repeat(FRAME_DELAY + FRAME_HALF_PERIOD) begin
+      #(DCO_HALF_PERIOD * 1ns);
+      ssi_clk = ~ssi_clk;
+    end
+
+    // Toggle frame and start synchronized generation
+    frame_clk = ~frame_clk;
+    ssi_edge_cnt = 3'd0;
+
+    forever begin
+      #(DCO_HALF_PERIOD * 1ns);
+      ssi_clk = ~ssi_clk;
+
+      // Derive frame from SSI: toggle every 4 edges
+      if (ssi_edge_cnt == 3'd3) begin
+        ssi_edge_cnt = 3'd0;
+        frame_clk = ~frame_clk;
+      end else begin
+        ssi_edge_cnt = ssi_edge_cnt + 1;
+      end
+    end
+  end
+
+  //---------------------------------------------------------------------------
+  // Function to calculate sine sample value
+  //---------------------------------------------------------------------------
+  function [15:0] calc_sine_sample(input [31:0] idx);
+    real angle;
+    real sine_val;
+    integer result;
+    begin
+      angle = 2.0 * PI * $itor(idx) / $itor(SINE_PERIOD);
+      sine_val = $sin(angle);
+      result = SINE_OFFSET + $rtoi(sine_val * $itor(SINE_AMPLITUDE));
+      if (result < 0) result = 0;
+      if (result > 16383) result = 16383;
+      calc_sine_sample = result[15:0];
+    end
+  endfunction
+
+  //---------------------------------------------------------------------------
+  // Data generation - sine wave pattern
+  //---------------------------------------------------------------------------
+  initial begin
+    @(posedge sync_n_d);
+
+    sample = calc_sine_sample(0);
+
+    `INFO(("Starting sine wave data generation"), ADI_VERBOSITY_LOW);
+    `INFO(("FRAME_SHIFT_CNT=%0d, DATA_DELAY=%0d ns", `FRAME_SHIFT_CNT, DATA_DELAY), ADI_VERBOSITY_LOW);
+
+    #(DATA_DELAY * 1ns);
+
+    da_p_int <= sample[14];
+    db_p_int <= sample[15];
+
+    forever begin
+      @(posedge ssi_clk);
+      da_p_int <= sample[12];
+      db_p_int <= sample[13];
+
+      @(negedge ssi_clk);
+      da_p_int <= sample[10];
+      db_p_int <= sample[11];
+
+      @(posedge ssi_clk);
+      da_p_int <= sample[8];
+      db_p_int <= sample[9];
+
+      @(negedge ssi_clk);
+      da_p_int <= sample[6];
+      db_p_int <= sample[7];
+
+      @(posedge ssi_clk);
+      da_p_int <= sample[4];
+      db_p_int <= sample[5];
+
+      @(negedge ssi_clk);
+      da_p_int <= sample[2];
+      db_p_int <= sample[3];
+
+      @(posedge ssi_clk);
+      da_p_int <= sample[0];
+      db_p_int <= sample[1];
+
+      @(negedge ssi_clk);
+      sample_count <= sample_count + 1;
+
+      da_p_int <= sample[14];
+      db_p_int <= sample[15];
+
+      sample <= calc_sine_sample(sample_count + 1);
+    end
+  end
 
 // --------------------------
 // Main procedure
@@ -113,36 +373,38 @@ initial begin
 
   `LINK(mng, env, mng)
   `LINK(ddr, env, ddr)
+
+  // Initialize API instances
   rx_dma_api = new(.name("RX DMA API"),
                    .bus(env.mng.master_sequencer),
                    .base_address(`ADA4355_DMA_BA));
 
   rx_adc_api = new(.name("RX ADC API"),
                    .bus(env.mng.master_sequencer),
-                   .base_address(BASE));
-
-  rx_common_api = new(.name("RX Common API"),
-                      .bus(env.mng.master_sequencer),
-                      .base_address(BASE));
+                   .base_address(`ADA4355_ADC_BA));
 
   setLoggerVerbosity(ADI_VERBOSITY_LOW);
   env.start();
+
+  // System reset
   env.sys_reset();
 
-  sanity_test;
+  sanity_test();
 
-  dma_test;
+  dma_test();
+
   #1000ns;
-  resync;
+
+  resync();
+
+  // Extended delay to observe FSM stability after resync
   #5000ns;
 
-`ifdef TDD_EN
   `INFO(("Performing system reset before tdd_lidar_test"), ADI_VERBOSITY_NONE);
   env.sys_reset();
   #1000ns;
-  tdd_lidar_test;
+  tdd_lidar_test();
   #1000ns;
-`endif
 
   `INFO(("All Tests Complete"), ADI_VERBOSITY_NONE);
   $finish;
@@ -153,21 +415,23 @@ end
 // Sanity test reg interface
 // --------------------------
 
-task sanity_test;
-begin
-  env.mng.master_sequencer.RegReadVerify32(BASE + GetAddrs(COMMON_REG_VERSION),
+task sanity_test();
+  // check ADC VERSION
+  env.mng.master_sequencer.RegReadVerify32(`ADA4355_ADC_BA + GetAddrs(COMMON_REG_VERSION),
                   `SET_COMMON_REG_VERSION_VERSION('h000a0300));
+
+  // Run DMA sanity test
   rx_dma_api.sanity_test();
+
   `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
-end
 endtask
 
 // --------------------------
 // Setup link
 // --------------------------
 
-task link_setup;
-begin
+task link_setup();
+  // Configure Rx interface
   rx_adc_api.set_common_control(
     .pin_mode(1'b0),
     .ddr_edgesel(1'b0),
@@ -177,27 +441,28 @@ begin
     .symb_8_16b(1'b0),
     .symb_op(1'b0),
     .sdr_ddr_n(sdr_ddr_n));
+
+  // pull out RX of reset
   rx_adc_api.reset(.ce_n(1'b1), .mmcm_rstn(1'b1), .rstn(1'b1));
-  force system_tb.sync_n = 1'b1;
+
+  sync_n = 1'b1;
   #10ns;
-end
 endtask
 
-task resync;
-begin
+task resync();
   bit [31:0] current_val;
 
   `INFO(("Triggering resync via sync_n pulse"), ADI_VERBOSITY_LOW);
 
-  // Directly control sync_n via testbench to trigger FSM reset
-  force system_tb.sync_n = 1'b0;
+  // Directly control sync_n to trigger FSM reset
+  sync_n = 1'b0;
 
   // Hold sync_n low for enough time for the FSM to reset
   // serdes_reset shift register needs 10 clock cycles (adc_clk_div = 125MHz = 8ns)
   #100ns;
 
   // Release sync_n to allow FSM to re-align
-  force system_tb.sync_n = 1'b1;
+  sync_n = 1'b1;
 
   // Wait for FSM to complete alignment search
   // FSM takes ~3 cycles per shift value, 8 values max = 24 cycles = ~200ns
@@ -208,24 +473,18 @@ begin
   // Optionally also write to the register for consistency with real HW flow
   rx_adc_api.axi_read(GetAddrs(ADC_COMMON_REG_CNTRL), current_val);
   rx_adc_api.axi_write(GetAddrs(ADC_COMMON_REG_CNTRL), current_val | 32'h8);
-
-end
 endtask
 
 // --------------------------
 // Enable pattern
 // --------------------------
 
-task enable_pattern;
-begin
+task enable_pattern();
   logic sync_stat;
   logic [7:0] frame_shifted_val;
   logic [15:0] adc_data_shifted_val;
   logic [2:0] shift_cnt_val;
   int alignment_errors = 0;
-
-  force system_tb.enable_pattern = 1'b1;
-  `INFO(("Force enable_pattern = 1"), ADI_VERBOSITY_LOW);
 
   rx_adc_api.set_common_control_3(.crc_en(1'b0), .custom_control(8'h2));
 
@@ -243,7 +502,6 @@ begin
   `INFO(("Sync status = %0d", sync_stat), ADI_VERBOSITY_LOW);
 
   // Wait for FSM to stabilize and verify alignment
-  // Add extra margin for stabilization
   repeat(50) @(posedge system_tb.test_harness.axi_ada4355_adc.inst.i_ada4355_interface.adc_clk_div);
 
   // Capture FSM alignment results
@@ -267,33 +525,25 @@ begin
   end else begin
     `ERROR(("FSM Alignment Test: FAILED - %0d errors", alignment_errors));
   end
-
-  force system_tb.enable_pattern = 1'b0;
-  `INFO(("Force enable_pattern = 0"), ADI_VERBOSITY_LOW);
-
-end
 endtask
 
 // --------------------------
 // DMA test procedure
 // --------------------------
 
-task dma_test;
+task dma_test();
   logic [3:0] transfer_id;
   localparam TRANSFER_LENGTH = 64*4;  // 64 samples * 4 bytes
   localparam DMA_DEST_ADDR = `DDR_BA + 32'h00002000;
-begin
 
-  link_setup;
+  link_setup();
 
   `INFO(("Link Setup Done"), ADI_VERBOSITY_LOW);
 
   #1us;
 
-`ifdef TDD_EN
   // Configure TDD for basic DMA test
   // Channel 1: DMA sync pulse - required because DMA has SYNC_TRANSFER_START=1
-  // Note: adc_valid is now connected directly to DMA (no gate logic)
   // Use software sync to trigger AFTER DMA is armed
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);              // Disable during config
   env.mng.master_sequencer.RegWrite32(TDD_STARTUP_DELAY, 0);
@@ -308,7 +558,6 @@ begin
   env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_POLARITY, 32'h0);     // Active high
 
   `INFO(("TDD configured (not enabled yet - waiting for DMA setup)"), ADI_VERBOSITY_LOW);
-`endif
 
   // Configure RX DMA
   rx_dma_api.enable_dma();
@@ -325,11 +574,10 @@ begin
 
   `INFO(("Configure RX DMA Done, transfer_id=%0d", transfer_id), ADI_VERBOSITY_LOW);
 
-  enable_pattern;
+  enable_pattern();
 
   `INFO(("Enable Pattern Done"), ADI_VERBOSITY_LOW);
 
-`ifdef TDD_EN
   // Now trigger TDD with external sync (DMA is armed and waiting for sync pulse)
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h9);  // ENABLE + SYNC_EXT
 
@@ -337,7 +585,6 @@ begin
 
   trigger_tdd_sync();  // Pulse external sync via testbench
   `INFO(("TDD triggered with external sync - CH1 pulse will trigger DMA"), ADI_VERBOSITY_LOW);
-`endif
 
   // Wait for DMA transfer to complete
   rx_dma_api.wait_transfer_done(.transfer_id(transfer_id), .timeut_in_us(5000));
@@ -353,43 +600,26 @@ begin
     .length(TRANSFER_LENGTH/4)
   );
 
-`ifdef TDD_EN
   disable_tdd();
-`endif
   `INFO(("DMA test complete"), ADI_VERBOSITY_LOW);
-
-end
 endtask
 
 // Check captured data - verify sine wave pattern
 // Data format: Each 32-bit word contains 2 x 16-bit samples
 //   Word[31:16] = sample[2*i+1], Word[15:0] = sample[2*i]
-task check_captured_data(bit [31:0] address,
-                         int length = 64);
-
-  // Sine wave parameters (must match system_tb.sv)
-  localparam real PI = 3.14159265358979;
-  localparam int SINE_AMPLITUDE = 8191;
-  localparam int SINE_OFFSET = 8192; // Mid-scale for 14-bit (2^13)
-
-  localparam int SINE_PERIOD = 64;
-  localparam bit LEFT_ALIGNED = 0; // Right-aligned format
+task check_captured_data(input bit [31:0] address,
+                         input int length = 64);
 
   bit [31:0] current_address;
   bit [31:0] captured_word;
   bit [15:0] sample_lo, sample_hi;
   bit [15:0] expected_lo, expected_hi;
-  int errors = 0;
+  static int errors = 0;
   int sample_index;
   int start_offset;
-  bit offset_found = 0;
+  static bit offset_found = 0;
 
   `INFO(("Checking captured SINE WAVE data at address 0x%h, length=%0d words", address, length), ADI_VERBOSITY_LOW);
-  `INFO(("Sine parameters: AMPLITUDE=%0d, OFFSET=%0d, PERIOD=%0d samples (14-bit ADC range)",
-         SINE_AMPLITUDE, SINE_OFFSET, SINE_PERIOD), ADI_VERBOSITY_LOW);
-  `INFO(("Expected range: [%0d, %0d] = [0x%04h, 0x%04h]",
-         SINE_OFFSET - SINE_AMPLITUDE, SINE_OFFSET + SINE_AMPLITUDE,
-         SINE_OFFSET - SINE_AMPLITUDE, SINE_OFFSET + SINE_AMPLITUDE), ADI_VERBOSITY_LOW);
 
   // Auto-detect starting offset by finding which sine sample matches first captured sample
   captured_word = env.ddr.slave_sequencer.BackdoorRead32(address);
@@ -397,7 +627,7 @@ task check_captured_data(bit [31:0] address,
 
   for (int offset = 0; offset < SINE_PERIOD; offset++) begin
     logic [15:0] expected_val;
-    expected_val = calc_expected_sine(offset);
+    expected_val = calc_sine_sample(offset);
 
     if (expected_val == sample_lo) begin
       start_offset = offset;
@@ -424,26 +654,22 @@ task check_captured_data(bit [31:0] address,
     // Each word contains 2 samples: sample[2*i] and sample[2*i+1]
     // Account for start_offset to handle latency between testbench start and DMA capture
     sample_index = 2 * i;
-    expected_lo = calc_expected_sine(start_offset + sample_index);
-    expected_hi = calc_expected_sine(start_offset + sample_index + 1);
+    expected_lo = calc_sine_sample(start_offset + sample_index);
+    expected_hi = calc_sine_sample(start_offset + sample_index + 1);
 
     // Verify samples match expected sine values
     if (sample_lo !== expected_lo) begin
       `ERROR(("Word %0d [15:0]: Address 0x%h Value 0x%h, expected 0x%h (sample %0d, sine_idx=%0d)",
               i, current_address, sample_lo, expected_lo, sample_index, (start_offset + sample_index) % SINE_PERIOD));
-      `ERROR(("  Binary: Got %016b vs Expected %016b, XOR diff: %016b",
-              sample_lo, expected_lo, sample_lo ^ expected_lo));
       errors++;
     end
     if (sample_hi !== expected_hi) begin
       `ERROR(("Word %0d [31:16]: Address 0x%h Value 0x%h, expected 0x%h (sample %0d, sine_idx=%0d)",
               i, current_address, sample_hi, expected_hi, sample_index+1, (start_offset + sample_index + 1) % SINE_PERIOD));
-      `ERROR(("  Binary: Got %016b vs Expected %016b, XOR diff: %016b",
-              sample_hi, expected_hi, sample_hi ^ expected_hi));
       errors++;
     end
 
-    // Log first few samples at higher verbosity
+    // Log first few samples for debugging
     if (i < 5) begin
       `INFO(("Word %0d: 0x%08h -> [15:0]=0x%04h (expect 0x%04h), [31:16]=0x%04h (expect 0x%04h)",
              i, captured_word, sample_lo, expected_lo, sample_hi, expected_hi), ADI_VERBOSITY_LOW);
@@ -451,49 +677,22 @@ task check_captured_data(bit [31:0] address,
   end
 
   if (errors == 0) begin
-    `INFO(("check_captured_data: PASSED - All %0d words match sine wave pattern", length), ADI_VERBOSITY_NONE);
+    `INFO(("check_captured_data: PASSED - All %0d words match sine wave pattern", length), ADI_VERBOSITY_LOW);
   end else begin
     `ERROR(("check_captured_data: FAILED - %0d errors found", errors));
   end
 
 endtask
 
-// Function to calculate expected sine sample value (matches system_tb.sv)
-function [15:0] calc_expected_sine;
-  input int idx;
-  real angle;
-  real sine_val;
-  int result;
-  localparam real PI = 3.14159265358979;
-  localparam int SINE_AMPLITUDE = 8191; // Full 14-bit scale
-  localparam int SINE_OFFSET = 8192; // Mid-scale for 14-bit
-
-  localparam int SINE_PERIOD = 64;
-  localparam bit LEFT_ALIGNED_FUNC = 0; // Right-aligned format
-  begin
-    angle = 2.0 * PI * $itor(idx % SINE_PERIOD) / $itor(SINE_PERIOD);
-    sine_val = $sin(angle);
-    result = SINE_OFFSET + $rtoi(sine_val * $itor(SINE_AMPLITUDE));
-    // Clamp to 14-bit range
-    if (result < 0) result = 0;
-    if (result > 16383) result = 16383;
-    // Left-align: shift 14-bit value to bits [15:2], clear bits [1:0]
-    if (LEFT_ALIGNED_FUNC)
-      calc_expected_sine = (result & 16'h3FFF) << 2;
-    else
-      calc_expected_sine = result[15:0];
-  end
-endfunction
-
 // Debug task: dump raw captured data to analyze bit patterns
-task dump_raw_data(bit [31:0] address, int length = 16);
+task dump_raw_data(input bit [31:0] address, input int length = 16);
   bit [31:0] current_address;
   bit [31:0] captured_word;
   bit [15:0] sample_lo, sample_hi;
 
-  `INFO(("=== RAW DATA DUMP from address 0x%h ===", address), ADI_VERBOSITY_NONE);
-  `INFO(("Word | Address    | Raw 32-bit | [31:16]  | [15:0]"), ADI_VERBOSITY_NONE);
-  `INFO(("-----|------------|------------|----------|----------"), ADI_VERBOSITY_NONE);
+  `INFO(("=== RAW DATA DUMP from address 0x%h ===", address), ADI_VERBOSITY_LOW);
+  `INFO(("Word | Address    | Raw 32-bit | [31:16]  | [15:0]"), ADI_VERBOSITY_LOW);
+  `INFO(("-----|------------|------------|----------|----------"), ADI_VERBOSITY_LOW);
 
   for (int i = 0; i < length; i++) begin
     current_address = address + (i * 4);
@@ -502,40 +701,19 @@ task dump_raw_data(bit [31:0] address, int length = 16);
     sample_hi = captured_word[31:16];
 
     `INFO(("%4d | 0x%08h | 0x%08h | 0x%04h   | 0x%04h",
-           i, current_address, captured_word, sample_hi, sample_lo), ADI_VERBOSITY_NONE);
+           i, current_address, captured_word, sample_hi, sample_lo), ADI_VERBOSITY_LOW);
   end
-  `INFO(("=== END RAW DATA DUMP ==="), ADI_VERBOSITY_NONE);
+  `INFO(("=== END RAW DATA DUMP ==="), ADI_VERBOSITY_LOW);
 endtask
 
-`ifdef TDD_EN
 // --------------------------
 // LiDAR-specific data verification
 // --------------------------
-// Verifies that captured data matches the expected sine wave samples
-// based on when the laser fired and the time-of-flight delay.
-//
-// The verification logic:
-//   1. Read laser_fire_sample_idx from testbench (sample index when CH0 fired)
-//   2. Expected first captured sample = laser_fire_sample_idx + time_of_flight_samples
-//   3. Compare each captured sample against calc_expected_sine(expected_idx + i)
-//
 task check_lidar_captured_data(
-  bit [31:0] address,
-  int length,
-  int time_of_flight_samples
+  input bit [31:0] address,
+  input int length,
+  input int time_of_flight_samples
 );
-  // Sine wave parameters (must match system_tb.sv)
-  localparam real PI = 3.14159265358979;
-  localparam int SINE_AMPLITUDE = 8191;
-  localparam int SINE_OFFSET = 8192;
-  localparam int SINE_PERIOD = 64;
-
-  // Pipeline latency compensation:
-  // - sample_count increments in testbench on negedge ssi_clk
-  // - TDD counter runs on axi_tdd_0.clk (125 MHz, same as adc_clk_div)
-  // - ADC interface has internal pipeline stages
-  // - DMA FIFO write has latency
-  // Measured offset: captured data starts 4 samples earlier than expected
   localparam int PIPELINE_LATENCY = 4;
 
   bit [31:0] current_address;
@@ -547,9 +725,7 @@ task check_lidar_captured_data(
   int laser_sample_idx;
   int expected_start_idx;
 
-  // Read the laser fire sample index from testbench
-  laser_sample_idx = system_tb.laser_fire_sample_idx;
-  // Adjust for pipeline latency: data arrives PIPELINE_LATENCY samples earlier
+  laser_sample_idx = laser_fire_sample_idx;
   expected_start_idx = laser_sample_idx + time_of_flight_samples - PIPELINE_LATENCY;
 
   `INFO(("=== LiDAR Data Verification ==="), ADI_VERBOSITY_NONE);
@@ -563,17 +739,13 @@ task check_lidar_captured_data(
     current_address = address + (i * 4);
     captured_word = env.ddr.slave_sequencer.BackdoorRead32(current_address);
 
-    // Extract the two 16-bit samples from the 32-bit word
     sample_lo = captured_word[15:0];
     sample_hi = captured_word[31:16];
 
-    // Calculate expected sine values based on laser fire timing
-    // Each word contains 2 samples: sample[2*i] and sample[2*i+1]
     sample_index = 2 * i;
-    expected_lo = calc_expected_sine(expected_start_idx + sample_index);
-    expected_hi = calc_expected_sine(expected_start_idx + sample_index + 1);
+    expected_lo = calc_sine_sample(expected_start_idx + sample_index);
+    expected_hi = calc_sine_sample(expected_start_idx + sample_index + 1);
 
-    // Verify samples match expected sine values
     if (sample_lo !== expected_lo) begin
       `ERROR(("Word %0d [15:0]: Got 0x%04h, expected 0x%04h (sine idx=%0d)",
               i, sample_lo, expected_lo, (expected_start_idx + sample_index) % SINE_PERIOD));
@@ -585,7 +757,6 @@ task check_lidar_captured_data(
       errors++;
     end
 
-    // Log first few samples
     if (i < 3) begin
       `INFO(("Word %0d: captured=0x%08h -> [15:0]=0x%04h (exp 0x%04h), [31:16]=0x%04h (exp 0x%04h)",
              i, captured_word, sample_lo, expected_lo, sample_hi, expected_hi), ADI_VERBOSITY_NONE);
@@ -597,72 +768,41 @@ task check_lidar_captured_data(
   end else begin
     `ERROR(("LiDAR Verification: FAILED - %0d errors found", errors));
   end
-
 endtask
 
-`endif // TDD_EN (check_lidar_captured_data)
-
-`ifdef TDD_EN
 task disable_tdd();
-begin
   `INFO(("Disabling TDD"), ADI_VERBOSITY_LOW);
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h0);  // Disable channels first
-  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h2);  // Assert SYNC_RST to reset FSM
-  #50ns;  // Wait for reset
-  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);  // Clear all control bits
-end
+  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h0);
+  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h2);  // Assert SYNC_RST
+  #50ns;
+  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);
 endtask
 
-// Trigger TDD external sync (like Pluto testbench does)
 task trigger_tdd_sync();
-begin
   `INFO(("Triggering TDD external sync pulse"), ADI_VERBOSITY_LOW);
   #5ns;
-  release system_tb.tdd_ext_sync;  // Release any previous force
-  #1ns;
-  force system_tb.tdd_ext_sync = 1'b1;
-  #50ns;  // Hold sync high for 50ns
-  force system_tb.tdd_ext_sync = 1'b0;
+  tdd_ext_sync = 1'b1;
+  #50ns;
+  tdd_ext_sync = 1'b0;
   #5ns;
-  release system_tb.tdd_ext_sync;  // Release force to return to normal operation
   `INFO(("TDD sync pulse complete"), ADI_VERBOSITY_LOW);
-end
 endtask
 
 // --------------------------
-// TDD LiDAR test procedure - REALISTIC TIMING
+// TDD LiDAR test procedure
 // --------------------------
-// Simulates real LiDAR time-of-flight measurement:
-//   1. CH0 fires laser pulse at T=0
-//   2. Light travels to target and reflects back (time-of-flight delay)
-//   3. CH1 DMA sync triggers capture when reflection arrives
-//   Note: adc_valid connected directly to DMA (no gate logic)
-//         DMA captures based on TRANSFER_LENGTH after sync
-//
-// Physics (from Picture105.png):
-//   Speed of light = 3×10^8 m/s
-//   Round trip time = 2 × distance / speed_of_light
-//   At 125 MHz clock (8ns period):
-//     15m reflection = 100ns = 13 clock cycles
-//     30m reflection = 200ns = 25 clock cycles
-//
-task tdd_lidar_test;
+task tdd_lidar_test();
   logic [3:0] transfer_id;
+  bit [31:0] val;
 
-  // LiDAR timing parameters (in clock cycles at 125 MHz)
-  localparam LASER_ON_TIME = 0;           // Laser fires at T=0
-  localparam LASER_OFF_TIME = 2;          // Laser pulse width = 16ns (2 cycles)
-  localparam GATE_ON_TIME = 13;           // Gate opens at 104ns (~15m reflection)
-  localparam GATE_OFF_TIME = 25;          // Gate closes at 200ns (~30m reflection)
-  localparam FRAME_LENGTH = 12500;        // 100µs frame (12500 cycles)
+  localparam LASER_ON_TIME = 0;
+  localparam LASER_OFF_TIME = 2;
+  localparam GATE_ON_TIME = 13;
+  localparam FRAME_LENGTH = 12500;
 
-  // Capture window = 12 samples (determined by TRANSFER_LENGTH)
-  // DMA starts capturing at GATE_ON_TIME (sync pulse)
-  // DMA stops after TRANSFER_LENGTH bytes
-  localparam CAPTURE_SAMPLES = 12;                     // Number of samples to capture
-  localparam TRANSFER_LENGTH = CAPTURE_SAMPLES * 2;    // 24 bytes (12 samples × 2 bytes)
+  localparam CAPTURE_SAMPLES = 12;
+  localparam TRANSFER_LENGTH = CAPTURE_SAMPLES * 2;
   localparam DMA_DEST_ADDR = `DDR_BA + 32'h00003000;
-begin
 
   `INFO(("=== TDD LiDAR Test Started (Realistic Timing) ==="), ADI_VERBOSITY_NONE);
   `INFO(("LiDAR parameters: Laser pulse 0-%0d, DMA sync at %0d (%0d samples)",
@@ -670,54 +810,51 @@ begin
   `INFO(("Physics: DMA triggered at %0dns (~15m reflection)",
          GATE_ON_TIME * 8), ADI_VERBOSITY_NONE);
 
-  link_setup;
+  link_setup();
 
   #1us;
 
-  // CRITICAL: Force frame to end quickly so FSM can reach IDLE (counter only resets in IDLE)
-  // Current frame from dma_test has FRAME_LENGTH=0xFFFFFFFF which would take forever
-  // Set frame length to a small value so current frame ends soon
-  env.mng.master_sequencer.RegWrite32(TDD_FRAME_LENGTH, 10);  // Very short frame
-  #1000ns;  // Wait for current frame to end (10 cycles * 8ns = 80ns, add margin)
+  // Force frame to end quickly so FSM can reach IDLE
+  env.mng.master_sequencer.RegWrite32(TDD_FRAME_LENGTH, 10);
+  #1000ns;
 
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h0);  // Disable channels
-  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);  // Disable TDD (ENABLE=0)
-  #1000ns;  // Wait for FSM to reach IDLE and counter to reset to 0
+  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h0);
+  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);
+  #1000ns;
 
   `INFO(("TDD reset complete, configuring for LiDAR operation"), ADI_VERBOSITY_NONE);
 
-  // Use SYNC_RST to reset TDD FSM and channels to known state
-  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h2);  // Assert SYNC_RST (bit 1)
-  #200ns;  // Hold reset
-  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);  // Release reset
-  #200ns;  // Wait for reset to complete
+  // Use SYNC_RST to reset TDD FSM
+  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h2);
+  #200ns;
+  env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h0);
+  #200ns;
 
-  // NOW configure timing (TDD must be disabled for write-protection)
+  // Configure timing
   env.mng.master_sequencer.RegWrite32(TDD_STARTUP_DELAY, 0);
   env.mng.master_sequencer.RegWrite32(TDD_FRAME_LENGTH, FRAME_LENGTH);
-  env.mng.master_sequencer.RegWrite32(TDD_BURST_COUNT, 1);  // Single burst
+  env.mng.master_sequencer.RegWrite32(TDD_BURST_COUNT, 1);
 
   // CH0: Laser trigger pulse
   env.mng.master_sequencer.RegWrite32(TDD_CH0_ON, LASER_ON_TIME);
   env.mng.master_sequencer.RegWrite32(TDD_CH0_OFF, LASER_OFF_TIME);
 
-  // CH1: DMA sync - trigger when reflection arrives to start capturing
+  // CH1: DMA sync
   env.mng.master_sequencer.RegWrite32(TDD_CH1_ON, GATE_ON_TIME);
-  env.mng.master_sequencer.RegWrite32(TDD_CH1_OFF, GATE_ON_TIME + 10);  // 10-cycle sync pulse
+  env.mng.master_sequencer.RegWrite32(TDD_CH1_OFF, GATE_ON_TIME + 10);
 
-  // Enable CH0 (laser) + CH1 (DMA sync)
-  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h3);  // CH0 + CH1 (bits 0,1)
+  // Enable CH0 + CH1
+  env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_ENABLE, 32'h3);
   env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_POLARITY, 32'h0);
 
-  // Wait for settings to settle
   #100ns;
 
   `INFO(("TDD configured: FRAME=%0d, CH0 laser 0-%0d, CH1 sync %0d-%0d",
          FRAME_LENGTH, LASER_OFF_TIME, GATE_ON_TIME, GATE_ON_TIME + 10), ADI_VERBOSITY_NONE);
 
-  rx_dma_api.set_control(4'b0000);  // Disable DMA (ENABLE=0) - triggers needs_reset
+  rx_dma_api.set_control(4'b0000);  // Disable DMA
 
-  #1000ns;  // Wait for full DMA reset sequence to complete (multiple clock domains)
+  #1000ns;
 
   rx_dma_api.enable_dma();
   rx_dma_api.set_flags(
@@ -732,51 +869,38 @@ begin
 
   `INFO(("DMA Started (transfer_id=%0d)", transfer_id), ADI_VERBOSITY_NONE);
 
-  enable_pattern;
+  enable_pattern();
 
   `INFO(("Pattern enabled"), ADI_VERBOSITY_NONE);
 
-  // Trigger TDD with SYNC_EXT mode - MATCH dma_test exactly
+  // Trigger TDD with SYNC_EXT mode
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h9);  // ENABLE + SYNC_EXT
-  #200ns;  // Wait for TDD to reach ARMED state
-  trigger_tdd_sync();  // Trigger immediately like dma_test
+  #200ns;
+  trigger_tdd_sync();
   `INFO(("TDD triggered with external sync"), ADI_VERBOSITY_NONE);
 
-  // Debug: Read back TDD registers to verify configuration
+  // Debug: Read back TDD registers
   #100ns;
   env.mng.master_sequencer.RegRead32(TDD_CONTROL, val);
   `INFO(("TDD_CONTROL after sync: 0x%08h", val), ADI_VERBOSITY_NONE);
   env.mng.master_sequencer.RegRead32(TDD_CHANNEL_ENABLE, val);
   `INFO(("TDD_CHANNEL_ENABLE: 0x%08h (expect 0x3)", val), ADI_VERBOSITY_NONE);
-  env.mng.master_sequencer.RegRead32(TDD_CH0_ON, val);
-  `INFO(("TDD_CH0_ON: 0x%08h (expect %0d=0x%02h)", val, LASER_ON_TIME, LASER_ON_TIME), ADI_VERBOSITY_NONE);
-  env.mng.master_sequencer.RegRead32(TDD_CH0_OFF, val);
-  `INFO(("TDD_CH0_OFF: 0x%08h (expect %0d=0x%02h)", val, LASER_OFF_TIME, LASER_OFF_TIME), ADI_VERBOSITY_NONE);
-  env.mng.master_sequencer.RegRead32(TDD_CH1_ON, val);
-  `INFO(("TDD_CH1_ON: 0x%08h (expect %0d=0x%02h)", val, GATE_ON_TIME, GATE_ON_TIME), ADI_VERBOSITY_NONE);
-  env.mng.master_sequencer.RegRead32(TDD_CH1_OFF, val);
-  `INFO(("TDD_CH1_OFF: 0x%08h (expect %0d=0x%02h)", val, GATE_ON_TIME + 10, GATE_ON_TIME + 10), ADI_VERBOSITY_NONE);
 
   // Wait for DMA
   rx_dma_api.wait_transfer_done(.transfer_id(transfer_id), .timeut_in_us(5000));
 
   `INFO(("DMA Transfer Complete"), ADI_VERBOSITY_NONE);
 
-  // TRANSFER_LENGTH = 32 bytes, each word is 4 bytes, so 8 words to check
   dump_raw_data(.address(DMA_DEST_ADDR), .length(TRANSFER_LENGTH/4));
 
-  // LiDAR-specific verification: check captured data matches expected offset from laser pulse
   check_lidar_captured_data(
     .address(DMA_DEST_ADDR),
     .length(TRANSFER_LENGTH/4),
-    .time_of_flight_samples(GATE_ON_TIME));  // Data should start at laser_sample + GATE_ON_TIME
+    .time_of_flight_samples(GATE_ON_TIME));
 
   disable_tdd();
 
   `INFO(("=== TDD LiDAR Test Complete ==="), ADI_VERBOSITY_NONE);
-
-end
 endtask
-`endif // TDD_EN (disable_tdd, trigger_tdd_sync, tdd_lidar_test)
 
 endprogram

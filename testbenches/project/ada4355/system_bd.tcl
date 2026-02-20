@@ -64,3 +64,8 @@ if {$TDD_EN == 1} {
 set BA_DDR 0x80000000
 set_property offset $BA_DDR [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_mng_ddr_cntlr}]
 adi_sim_add_define "DDR_BA=[format "%d" ${BA_DDR}]"
+
+# Testbench configuration for frame timing offset
+if {[info exists ad_project_params(FRAME_SHIFT_CNT)]} {
+  adi_sim_add_define "FRAME_SHIFT_CNT=$ad_project_params(FRAME_SHIFT_CNT)"
+}

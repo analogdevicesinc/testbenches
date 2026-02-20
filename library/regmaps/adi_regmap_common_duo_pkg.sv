@@ -35,11 +35,15 @@
 /* Auto generated Register Map */
 /* Feb 07 14:25:05 2025 v0.4.1 */
 
-package adi_regmap_common_pkg;
+package adi_regmap_common_duo_pkg;
   import logger_pkg::*;
   import adi_api_pkg::*;
+  import adi_regmap_common_pkg::*;
 
-  class adi_regmap_common extends adi_regmap;
+  class adi_regmap_common_duo extends adi_regmap;
+
+    adi_regmap_common common1;
+    adi_regmap_common common2;
 
     function new(
       input string name,
@@ -50,50 +54,22 @@ package adi_regmap_common_pkg;
 
       super.new(name, address, parent);
 
+      /* Common1 */
+      this.common1 = new("Common1", 'h0000, this);
+
+      /* Common2 */
+      this.common2 = new("Common2", 'h1000, this);
+
       /* Base (common to all cores) */
       // VERSION
       register = this.add_register("VERSION", 'h0);
       register.add_field("VERSION", 31, 0, RO, 'h0);
-
-      // ID
-      register = this.add_register("ID", 'h4);
-      register.add_field("ID", 31, 0, RO, 'h0);
-
-      // SCRATCH
-      register = this.add_register("SCRATCH", 'h8);
-      register.add_field("SCRATCH", 31, 0, RW, 'h0);
-
-      // CONFIG
-      register = this.add_register("CONFIG", 'hc);
-      register.add_field("IQCORRECTION_DISABLE", 0, 0, RO, 'h0);
-      register.add_field("DCFILTER_DISABLE", 1, 1, RO, 'h0);
-      register.add_field("DATAFORMAT_DISABLE", 2, 2, RO, 'h0);
-      register.add_field("USERPORTS_DISABLE", 3, 3, RO, 'h0);
-      register.add_field("MODE_1R1T", 4, 4, RO, 'h0);
-      register.add_field("DELAY_CONTROL_DISABLE", 5, 5, RO, 'h0);
-      register.add_field("DDS_DISABLE", 6, 6, RO, 'h0);
-      register.add_field("CMOS_OR_LVDS_N", 7, 7, RO, 'h0);
-      register.add_field("PPS_RECEIVER_ENABLE", 8, 8, RO, 'h0);
-      register.add_field("SCALECORRECTION_ONLY", 9, 9, RO, 'h0);
-      register.add_field("EXT_SYNC", 12, 12, RO, 'h0);
-      register.add_field("RD_RAW_DATA", 13, 13, RO, 'h0);
-
-      // PPS_IRQ_MASK
-      register = this.add_register("PPS_IRQ_MASK", 'h10);
-      register.add_field("PPS_IRQ_MASK", 0, 0, RW, 'h1);
-
-      // FPGA_INFO
-      register = this.add_register("FPGA_INFO", 'h1c);
-      register.add_field("FPGA_TECHNOLOGY", 31, 24, RO, 'h0);
-      register.add_field("FPGA_FAMILY", 23, 16, RO, 'h0);
-      register.add_field("SPEED_GRADE", 15, 8, RO, 'h0);
-      register.add_field("DEV_PACKAGE", 7, 0, RO, 'h0);
 
       this.init_done();
 
       this.info($sformatf("Initialized"), ADI_VERBOSITY_HIGH);
     endfunction: new
 
-  endclass: adi_regmap_common
+  endclass: adi_regmap_common_duo
 
-endpackage: adi_regmap_common_pkg
+endpackage: adi_regmap_common_duo_pkg

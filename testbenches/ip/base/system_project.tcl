@@ -16,8 +16,12 @@ set project_name [file rootname $cfg_file]
 # Create the project
 adi_sim_project_xilinx $project_name "xcvu9p-flga2104-2L-e"
 
+source $ad_tb_dir/library/includes/sp_include_regmap.tcl
+
 # Add test files to the project
 adi_sim_project_files [list \
+  "$ad_tb_dir/library/regmaps/adi_regmap_common_pkg.sv" \
+  "$ad_tb_dir/library/regmaps/adi_regmap_common_duo_pkg.sv" \
   "tests/test_program.sv" \
 ]
 

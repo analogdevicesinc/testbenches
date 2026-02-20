@@ -38,6 +38,8 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_regmap_common_pkg::*;
+import adi_regmap_common_duo_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -51,10 +53,13 @@ program test_program;
   process current_process;
   string current_process_random_state;
 
+  adi_regmap_common regmap_common;
+  adi_regmap_common_duo regmap_common_duo;
+
 
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
 
     current_process = process::self();
     current_process_random_state = current_process.get_randstate();
@@ -73,6 +78,20 @@ program test_program;
     env.sys_reset();
 
     /* Add stimulus tasks */
+
+    regmap_common = new("Common", 'h1000);
+
+    `INFO(("Reg addr: 0x%0h", regmap_common.get_register("CONFIG").get_address()), ADI_VERBOSITY_NONE);
+    `INFO(("Field value: 0x%0h", regmap_common.get_register("CONFIG").get_field("DDS_DISABLE").get_value()), ADI_VERBOSITY_NONE);
+
+    regmap_common_duo = new("Common Duo", 'h2000);
+
+    `INFO(("Reg addr: 0x%0h", regmap_common_duo.common1.get_register("CONFIG").get_address()), ADI_VERBOSITY_NONE);
+    `INFO(("Field value: 0x%0h", regmap_common_duo.common1.get_register("CONFIG").get_field("DDS_DISABLE").get_value()), ADI_VERBOSITY_NONE);
+    `INFO(("Reg addr: 0x%0h", regmap_common_duo.common2.get_register("CONFIG").get_address()), ADI_VERBOSITY_NONE);
+    `INFO(("Field value: 0x%0h", regmap_common_duo.common2.get_register("CONFIG").get_field("DDS_DISABLE").get_value()), ADI_VERBOSITY_NONE);
+    `INFO(("Reg addr: 0x%0h", regmap_common_duo.get_register("VERSION").get_address()), ADI_VERBOSITY_NONE);
+    `INFO(("Field value: 0x%0h", regmap_common_duo.get_register("VERSION").get_field("VERSION").get_value()), ADI_VERBOSITY_NONE);
 
     env.stop();
 

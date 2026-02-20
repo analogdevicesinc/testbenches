@@ -44,7 +44,9 @@ package adi_api_pkg;
   typedef enum {NA, R, RO, ROV, RW, RW1C, RW1CV, RW1S, W1S, WO} acc_t;
 
   // forward declaration to avoid errors
-  typedef class register_base;
+  typedef class adi_regmap;
+  typedef class adi_register;
+  typedef class adi_field;
 
   class adi_api extends adi_component;
 
@@ -63,20 +65,19 @@ package adi_api_pkg;
       this.address = address;
     endfunction: new
 
-
-    task axi_read(input register_base register);
+    task axi_read(input adi_register register);
       automatic logic [31:0] data;
 
-      this.bus.RegRead32(register.parent.get_address() + register.get_address(), data);
-      register.set(data);
+      this.bus.RegRead32(register.get_address(), data);
+      register.set_value(data);
     endtask: axi_read
 
     task axi_read_return(
-      input  register_base        register,
+      input  adi_register        register,
       output logic         [31:0] data);
 
-      this.bus.RegRead32(register.parent.get_address() + register.get_address(), data);
-      register.set(data);
+      this.bus.RegRead32(register.get_address(), data);
+      register.set_value(data);
     endtask: axi_read_return
 
     task axi_read_direct(
@@ -86,8 +87,8 @@ package adi_api_pkg;
       this.bus.RegRead32(this.address + addr, data);
     endtask: axi_read_direct
 
-    task axi_write(input register_base register);
-      this.bus.RegWrite32(register.parent.get_address() + register.get_address(), register.get());
+    task axi_write(input adi_register register);
+      this.bus.RegWrite32(register.get_address(), register.get_value());
     endtask: axi_write
 
     task axi_write_direct(
@@ -97,8 +98,8 @@ package adi_api_pkg;
       this.bus.RegWrite32(this.address + addr, data);
     endtask: axi_write_direct
 
-    task axi_verify(input register_base register);
-      this.bus.RegReadVerify32(register.parent.get_address() + register.get_address(), register.get());
+    task axi_verify(input adi_register register);
+      this.bus.RegReadVerify32(register.get_address(), register.get_value());
     endtask: axi_verify
 
     task axi_verify_direct(
@@ -115,29 +116,68 @@ package adi_api_pkg;
 
     local int address;
 
+    protected adi_register registers [];
+
     function new(
       input string name,
       input int address,
-      input adi_api parent = null);
+      input adi_component parent = null);
 
       super.new(name, parent);
 
       this.address = address;
+      this.registers = new [0];
     endfunction: new
 
+    function adi_register add_register(
+      input string name,
+      input int address);
+
+      this.registers = new [this.registers.size() + 1] (this.registers);
+      this.registers[this.registers.size() - 1] = new(name, address, this);
+
+      return this.registers[this.registers.size() - 1];
+    endfunction: add_register
+
+    function adi_register get_register(input string name);
+      for (int i=0; i<this.registers.size(); i++) begin
+        if (this.registers[i].name == name) begin
+          return this.registers[i];
+        end
+      end
+
+      return null;
+    endfunction: get_register
+
     function int get_address();
-      return this.address;
+      adi_regmap cast_object;
+
+      if (this.parent == null) begin
+        return this.address;
+      end else if ($cast(cast_object, this.parent) == 0) begin
+        return this.address;
+      end else begin
+        return this.address + cast_object.get_address();
+      end
     endfunction: get_address
+
+    function void init_done();
+      for (int i=0; i<this.registers.size(); i++) begin
+        this.registers[i].init_done();
+      end
+    endfunction: init_done
 
   endclass: adi_regmap
 
 
-  class register_base extends adi_component;
+  class adi_register extends adi_component;
 
     local logic [31:0] value;
     local logic [31:0] reset_value;
     local int address;
     local bit initialization_done;
+
+    protected adi_field fields [];
 
     function new(
       input string name,
@@ -151,22 +191,44 @@ package adi_api_pkg;
       this.reset_value = 'h0;
       this.address = address;
       this.initialization_done = 0;
+      this.fields = new [0];
     endfunction: new
 
-    function logic [31:0] get();
-      this.info($sformatf("Getting reg %s with value %h", this.name, this.value), ADI_VERBOSITY_HIGH);
+    function void add_field(
+      input string name,
+      input int msb,
+      input int lsb,
+      input acc_t access,
+      input int reset_value);
+
+      this.fields = new [this.fields.size() + 1] (this.fields);
+      this.fields[this.fields.size() - 1] = new(name, msb, lsb, access, reset_value, this);
+    endfunction: add_field
+
+    function adi_field get_field(input string name);
+      for (int i=0; i<this.fields.size(); i++) begin
+        if (this.fields[i].name == name) begin
+          return this.fields[i];
+        end
+      end
+
+      return null;
+    endfunction: get_field
+
+    function logic [31:0] get_value();
+      this.info($sformatf("Getting reg value %h", this.value), ADI_VERBOSITY_HIGH);
 
       return value;
-    endfunction: get
+    endfunction: get_value
 
-    function void set(input logic [31:0] value);
-      this.info($sformatf("Setting reg %s with value %h (%h)", this.name, value, this.value), ADI_VERBOSITY_HIGH);
+    function void set_value(input logic [31:0] value);
+      this.info($sformatf("Setting reg value %h (%h)", value, this.value), ADI_VERBOSITY_HIGH);
 
       this.value = value;
-    endfunction: set
+    endfunction: set_value
 
     function logic [31:0] get_reset_value();
-      this.info($sformatf("Getting reg %s with reset value %h", this.name, this.reset_value), ADI_VERBOSITY_HIGH);
+      this.info($sformatf("Getting reg reset value %h", this.reset_value), ADI_VERBOSITY_HIGH);
 
       return reset_value;
     endfunction: get_reset_value
@@ -176,30 +238,36 @@ package adi_api_pkg;
         this.fatal($sformatf("Changing the reset value after the registermap is created is not allowed!"));
       end
 
-      this.info($sformatf("Setting reg %s with reset value %h (%h)", this.name, reset_value, this.reset_value), ADI_VERBOSITY_HIGH);
-
       this.reset_value = this.reset_value | reset_value;
+
+      this.info($sformatf("Setting reg reset value %h (%h)", reset_value, this.reset_value), ADI_VERBOSITY_HIGH);
     endfunction: set_reset_value
 
     function int get_address();
-      return this.address;
+      adi_regmap cast_object;
+
+      if ($cast(cast_object, this.parent) == 0) begin
+        this.fatal($sformatf("Input object %s type is not compatible with current object type!", this.parent.name));
+      end
+
+      return this.address + cast_object.get_address();
     endfunction: get_address
 
-    function string get_name();
-      return this.name;
-    endfunction: get_name
+    function void init_done();
+      this.initialization_done = 1;
+    endfunction: init_done
 
-  endclass: register_base
+  endclass: adi_register
 
 
-  class field_base extends adi_component;
+  class adi_field extends adi_component;
 
     local int msb;
     local int lsb;
     local acc_t access;
     local logic [31:0] reset_value;
 
-    local register_base reg_handle;
+    local adi_register reg_handle;
 
     function new(
       input string name,
@@ -207,7 +275,7 @@ package adi_api_pkg;
       input int lsb,
       input acc_t access,
       input int reset_value,
-      input register_base parent);
+      input adi_register parent);
 
       automatic logic [31:0] update_value = 'h0;
 
@@ -228,9 +296,9 @@ package adi_api_pkg;
       this.reg_handle.set_reset_value(update_value);
     endfunction: new
 
-    function logic [31:0] get();
+    function logic [31:0] get_value();
       automatic logic [31:0] value = 'h0;
-      automatic logic [31:0] regvalue = this.reg_handle.get();
+      automatic logic [31:0] regvalue = this.reg_handle.get_value();
 
       case (this.access)
         NA: begin
@@ -247,12 +315,12 @@ package adi_api_pkg;
       end
       value = regvalue >> this.lsb;
 
-      this.info($sformatf("Getting reg %s[%0d:%0d] field %s with %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, value), ADI_VERBOSITY_HIGH);
+      this.info($sformatf("Getting field [%0d:%0d] value %h (%h)", this.msb, this.lsb, value, this.reg_handle.get_value()), ADI_VERBOSITY_HIGH);
 
       return value;
-    endfunction: get
+    endfunction: get_value
 
-    function void set(input logic [31:0] set_value);
+    function void set_value(input logic [31:0] set_value);
       automatic logic [31:0] update_value = 'h0;
       automatic logic [31:0] mask = 'hFFFF;
 
@@ -276,18 +344,18 @@ package adi_api_pkg;
         mask[i]=1'b0;
       end
 
-      this.reg_handle.set(this.reg_handle.get() & ~mask);
-      this.reg_handle.set(this.reg_handle.get() | update_value);
+      this.reg_handle.set_value(this.reg_handle.get_value() & ~mask);
+      this.reg_handle.set_value(this.reg_handle.get_value() | update_value);
 
-      this.info($sformatf("Setting reg %s[%0d:%0d] field %s with %h (%h)", this.reg_handle.get_name(), this.msb, this.lsb, this.name, set_value, this.reg_handle.get()), ADI_VERBOSITY_HIGH);
-    endfunction: set
+      this.info($sformatf("Setting field [%0d:%0d] value %h (%h)", this.msb, this.lsb, set_value, this.reg_handle.get_value()), ADI_VERBOSITY_HIGH);
+    endfunction: set_value
 
     function logic [31:0] get_reset_value();
-      this.info($sformatf("Getting reg %s[%0d:%0d] field %s with reset value %h", this.reg_handle.get_name(), this.msb, this.lsb, this.name, this.reset_value), ADI_VERBOSITY_HIGH);
+      this.info($sformatf("Getting field[%0d:%0d] reset value %h (%h)", this.msb, this.lsb, this.reset_value, this.reg_handle.get_reset_value()), ADI_VERBOSITY_HIGH);
 
       return this.reset_value;
     endfunction: get_reset_value
 
-  endclass: field_base
+  endclass: adi_field
 
 endpackage: adi_api_pkg

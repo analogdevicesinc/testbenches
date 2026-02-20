@@ -17,7 +17,7 @@ set project_name [file rootname $cfg_file]
 adi_sim_add_define "TEST_PROGRAM=test_program_si"
 
 # Create the project
-adi_sim_project_xilinx $project_name "xc7z020clg484-1"
+adi_sim_project_xilinx $project_name
 
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_spi_engine.tcl

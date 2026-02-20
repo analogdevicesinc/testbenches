@@ -29,3 +29,5 @@ set spi_s_vip_cfg [ list \
     DATA_DLENGTH    $ad_project_params(DATA_DLENGTH)    \
 ]
 set ad_project_params(spi_s_vip_cfg) $spi_s_vip_cfg
+
+set ad_project_params(FPGA_BOARD) "coraz7s"

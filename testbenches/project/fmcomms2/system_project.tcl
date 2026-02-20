@@ -14,7 +14,7 @@ source "cfgs/${cfg_file}"
 set project_name [file rootname $cfg_file]
 
 # Create the project
-adi_sim_project_xilinx $project_name "xczu9eg-ffvb1156-2-e"
+adi_sim_project_xilinx $project_name
 
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_converter.tcl

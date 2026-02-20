@@ -76,8 +76,11 @@ module system_tb();
     .d1a_n (db_n),
     .sync_n (sync_n),
     .frame_p (frame_clock_p),
-    .frame_n (frame_clock_n),
-    .tdd_ext_sync (tdd_ext_sync)
+    .frame_n (frame_clock_n)
+`ifdef TDD_EN
+    ,.trig_fmc_in (tdd_ext_sync)
+    ,.trig_fmc_out ()
+`endif
   );
 
   reg sync_n_d = 1'b0;
@@ -158,6 +161,8 @@ module system_tb();
   always @(*) db_n <= #3.5 ~db_p_int;
 
   reg [31:0] sample_count = 0;
+
+`ifdef TDD_EN
   reg [31:0] laser_fire_sample_idx = 0;
   wire tdd_ch0_rising;
   reg tdd_ch0_d = 0;
@@ -203,16 +208,20 @@ module system_tb();
     end
   end
 
+  reg dma_capture_active = 0;
+
   always @(posedge `TH.axi_ada4355_dma.fifo_wr_clk) begin
-    if (!tdd_ch1_active) begin
+    if (tdd_ch1_rising) begin
+      dma_capture_active <= 1;
       samples_captured_count <= 0;
-    end else if (`TH.axi_ada4355_dma.fifo_wr_en) begin
+    end else if (dma_capture_active && `TH.axi_ada4355_dma.fifo_wr_en) begin
       samples_captured_count <= samples_captured_count + 1;
       if (samples_captured_count < 3) begin
         $display("[TB] @%0t: SAMPLE CAPTURED #%0d: 0x%04h", $time, samples_captured_count, `TH.axi_ada4355_dma.fifo_wr_din);
       end
     end
   end
+`endif
 
   initial begin
     @(posedge sync_n_d);

@@ -62,6 +62,7 @@ program test_program;
   // ADA4355 specific register
   parameter REGMAP_ENABLE = BASE + 'h00C8;
 
+`ifdef TDD_EN
   // TDD base address and register offsets
   parameter TDD_BASE = `AXI_TDD_BA;
   parameter TDD_CONTROL = TDD_BASE + 'h40;
@@ -74,8 +75,7 @@ program test_program;
   parameter TDD_CH0_OFF = TDD_BASE + 'h84;  // Laser trigger OFF
   parameter TDD_CH1_ON = TDD_BASE + 'h88;   // DMA sync ON
   parameter TDD_CH1_OFF = TDD_BASE + 'h8C;  // DMA sync OFF
-  parameter TDD_CH2_ON = TDD_BASE + 'h90;   // [UNUSED]
-  parameter TDD_CH2_OFF = TDD_BASE + 'h94;  // [UNUSED]
+`endif
 
   // Module-level variables used in tasks
   int num_lanes = 2;
@@ -136,11 +136,14 @@ initial begin
   resync;
   #5000ns;
 
+`ifdef TDD_EN
   `INFO(("Performing system reset before tdd_lidar_test"), ADI_VERBOSITY_NONE);
   env.sys_reset();
   #1000ns;
   tdd_lidar_test;
   #1000ns;
+`endif
+
   `INFO(("All Tests Complete"), ADI_VERBOSITY_NONE);
   $finish;
 
@@ -287,6 +290,7 @@ begin
 
   #1us;
 
+`ifdef TDD_EN
   // Configure TDD for basic DMA test
   // Channel 1: DMA sync pulse - required because DMA has SYNC_TRANSFER_START=1
   // Note: adc_valid is now connected directly to DMA (no gate logic)
@@ -304,6 +308,7 @@ begin
   env.mng.master_sequencer.RegWrite32(TDD_CHANNEL_POLARITY, 32'h0);     // Active high
 
   `INFO(("TDD configured (not enabled yet - waiting for DMA setup)"), ADI_VERBOSITY_LOW);
+`endif
 
   // Configure RX DMA
   rx_dma_api.enable_dma();
@@ -324,13 +329,15 @@ begin
 
   `INFO(("Enable Pattern Done"), ADI_VERBOSITY_LOW);
 
+`ifdef TDD_EN
   // Now trigger TDD with external sync (DMA is armed and waiting for sync pulse)
   env.mng.master_sequencer.RegWrite32(TDD_CONTROL, 32'h9);  // ENABLE + SYNC_EXT
 
   #200ns;  // Wait for TDD FSM to reach ARMED state
 
   trigger_tdd_sync();  // Pulse external sync via testbench
-  `INFO(("TDD triggered with external sync - CH2 pulse will trigger DMA"), ADI_VERBOSITY_LOW);
+  `INFO(("TDD triggered with external sync - CH1 pulse will trigger DMA"), ADI_VERBOSITY_LOW);
+`endif
 
   // Wait for DMA transfer to complete
   rx_dma_api.wait_transfer_done(.transfer_id(transfer_id), .timeut_in_us(5000));
@@ -346,8 +353,10 @@ begin
     .length(TRANSFER_LENGTH/4)
   );
 
+`ifdef TDD_EN
   disable_tdd();
-  `INFO(("DMA test complete - TDD disabled"), ADI_VERBOSITY_LOW);
+`endif
+  `INFO(("DMA test complete"), ADI_VERBOSITY_LOW);
 
 end
 endtask
@@ -498,6 +507,7 @@ task dump_raw_data(bit [31:0] address, int length = 16);
   `INFO(("=== END RAW DATA DUMP ==="), ADI_VERBOSITY_NONE);
 endtask
 
+`ifdef TDD_EN
 // --------------------------
 // LiDAR-specific data verification
 // --------------------------
@@ -590,6 +600,9 @@ task check_lidar_captured_data(
 
 endtask
 
+`endif // TDD_EN (check_lidar_captured_data)
+
+`ifdef TDD_EN
 task disable_tdd();
 begin
   `INFO(("Disabling TDD"), ADI_VERBOSITY_LOW);
@@ -764,5 +777,6 @@ begin
 
 end
 endtask
+`endif // TDD_EN (disable_tdd, trigger_tdd_sync, tdd_lidar_test)
 
 endprogram

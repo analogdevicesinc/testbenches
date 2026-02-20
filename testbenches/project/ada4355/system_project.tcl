@@ -22,6 +22,7 @@ adi_sim_project_xilinx $project_name "xc7z020clg484-1" ;
 # Source the include files for package dependencies
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_converter.tcl
+source $ad_tb_dir/library/includes/sp_include_tdd.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \

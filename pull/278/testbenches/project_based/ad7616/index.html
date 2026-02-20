@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The purpose of this testbench is to validate the serial interface functionality of the projects/ad7616_sdz reference design." name="description" />
+
+    <title>AD7616 &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=a525f648" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script async="async" src="../../../_static/app.umd.js?v=fcf3088a"></script>
+    <link rel="icon" href="../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="AD9083" href="../ad9083/index.html" />
+    <link rel="prev" title="AD7606" href="../ad7606/index.html" />
+   
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">AD7616</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#block-design">Block design</a><ul>
+<li><a class="reference internal" href="#block-diagram">Block diagram</a><ul>
+<li><a class="reference internal" href="#ad7616-sdz-parallel-interface">AD7616_SDZ parallel interface</a></li>
+<li><a class="reference internal" href="#ad7616-sdz-serial-interface">AD7616_SDZ serial interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-parameters-and-modes">Configuration parameters and modes</a><ul>
+<li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cpu-memory-interconnect-addresses">CPU/Memory interconnect addresses</a></li>
+<li><a class="reference internal" href="#interrupts">Interrupts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
+<li><a class="reference internal" href="#parallel-test-program">Parallel test program</a><ul>
+<li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
+<li><a class="reference internal" href="#sanity-test">Sanity test</a></li>
+<li><a class="reference internal" href="#data-acquisition-test">Data acquisition test</a></li>
+<li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#serial-test-program">Serial test program</a><ul>
+<li><a class="reference internal" href="#id2">Environment bringup</a></li>
+<li><a class="reference internal" href="#id3">Sanity test</a></li>
+<li><a class="reference internal" href="#fifo-spi-test">FIFO SPI test</a></li>
+<li><a class="reference internal" href="#offload-spi-test">Offload SPI test</a></li>
+<li><a class="reference internal" href="#id4">Stop the environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
+<li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#hdl-related-dependencies-forming-the-dut">HDL related dependencies forming the DUT</a></li>
+<li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-information">More information</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../library/index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../library/regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/irq_handler/index.html">IRQ Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../library/vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/io_vip/index.html">IO VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axi_tdd/index.html">AXI TDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ada4355/index.html">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cn0577_adaq2387x/index.html">CN0577/ADAQ2387X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ltc2378/index.html">LTC2378</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">Project Based</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="ad7616">
+<span id="id1"></span><h1>AD7616<a class="headerlink" href="#ad7616" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The purpose of this testbench is to validate the serial interface functionality
+of the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/ad7616_sdz" target="_blank">projects/ad7616_sdz</a> reference design.</p>
+<p>The entire HDL documentation can be found here
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/ad7616_sdz/index.html#ad7616-sdz" target="_blank" title="(in HDL)"><span class="xref std std-ref">AD7616-SDZ HDL project</span></a>.</p>
+</section>
+<section id="block-design">
+<h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
+<p>The testbench block design includes part of the AD7616-SDZ HDL reference design,
+along with VIPs used for clocking, reset, PS and DDR simulations.</p>
+<section id="block-diagram">
+<h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
+<p>The data path and clock domains are depicted in the below diagrams:</p>
+<section id="ad7616-sdz-parallel-interface">
+<h4>AD7616_SDZ parallel interface<a class="headerlink" href="#ad7616-sdz-parallel-interface" title="Link to this heading"></a></h4>
+<a class="reference internal image-reference" href="../../../_images/ad7616_pi_tb.svg"><img alt="AD7616 Parallel Interface/Testbench block diagram" class="align-center" src="../../../_images/ad7616_pi_tb.svg" width="800" />
+</a>
+</section>
+<section id="ad7616-sdz-serial-interface">
+<h4>AD7616_SDZ serial interface<a class="headerlink" href="#ad7616-sdz-serial-interface" title="Link to this heading"></a></h4>
+<a class="reference internal image-reference" href="../../../_images/ad7616_si_tb.svg"><img alt="AD7616 Serial Interface/Testbench block diagram" class="align-center" src="../../../_images/ad7616_si_tb.svg" width="800" />
+</a>
+</section>
+</section>
+<section id="configuration-parameters-and-modes">
+<h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
+<p>The following parameter of this project that can be configured:</p>
+<ul class="simple">
+<li><p>INTF: defines the device’s interface:
+Options: 0 - Parallel, 1 - Serial</p></li>
+</ul>
+<section id="configuration-files">
+<h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
+<p>The following configuration files are available:</p>
+<blockquote>
+<div><div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
+<th class="head"><p>Parameters</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>INTF</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>cfg_pi</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_si</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div></blockquote>
+</section>
+<section id="tests">
+<h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
+<p>The following test program files are available:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test program</p></th>
+<th class="head"><p>Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>test_program_pi</p></td>
+<td><p>Tests the parallel interface capabilities.</p></td>
+</tr>
+<tr class="row-odd"><td><p>test_program_si</p></td>
+<td><p>Tests the serial interface capabilities.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="available-configurations-tests-combinations">
+<h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Configuration</p></th>
+<th class="head"><p>Test</p></th>
+<th class="head"><p>Build command</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cfg_pi</p></td>
+<td><p>test_program_pi</p></td>
+<td><p>make CFG=cfg_pi TST=test_program_pi</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_si</p></td>
+<td><p>test_program_si</p></td>
+<td><p>make CFG=cfg_si TST=test_program_si</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>Mixing a wrong pair of CFG and TST will result in a simulation errror.
+Please check out the proposed combinations before running a custom test.</p>
+</div>
+</section>
+</section>
+<section id="cpu-memory-interconnect-addresses">
+<h3>CPU/Memory interconnect addresses<a class="headerlink" href="#cpu-memory-interconnect-addresses" title="Link to this heading"></a></h3>
+<p>Below are the CPU/Memory interconnect addresses used in this project:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance</p></th>
+<th class="head"><p>Address</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>spi_ad7616_axi_regmap **</p></td>
+<td><p>0x44A0_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_ad7616 *</p></td>
+<td><p>0x44A8_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>axi_ad7616_dma</p></td>
+<td><p>0x44A3_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_intc</p></td>
+<td><p>0x4120_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ad7616_clkgen</p></td>
+<td><p>0x44A7_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>ad7616_pwm_gen</p></td>
+<td><p>0x44B0_0000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only for parallel interface</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">**</span></code> instantiated only for serial interface</p></li>
+</ul>
+</div>
+</section>
+<section id="interrupts">
+<h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
+<p>Below are the Programmable Logic interrupts used in this project:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance name</p></th>
+<th class="head"><p>HDL</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>axi_ad7616_dma</p></td>
+<td><p>13</p></td>
+</tr>
+<tr class="row-odd"><td><p>spi_ad7616</p></td>
+<td><p>12</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="test-stimulus">
+<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
+<section id="parallel-test-program">
+<h3>Parallel test program<a class="headerlink" href="#parallel-test-program" title="Link to this heading"></a></h3>
+<p>The test program is structured into several tests as follows:</p>
+<section id="environment-bringup">
+<h4>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h4>
+<p>The steps of the environment bringup are:</p>
+<ul class="simple">
+<li><p>Create the environment</p></li>
+<li><p>Start the environment</p></li>
+<li><p>Start the clocks</p></li>
+<li><p>Assert the resets</p></li>
+</ul>
+</section>
+<section id="sanity-test">
+<h4>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h4>
+<p>This test is used to check the communication with the AXI module of the AD7616
+interface, by writing and reading the SCRATCH register.</p>
+</section>
+<section id="data-acquisition-test">
+<h4>Data acquisition test<a class="headerlink" href="#data-acquisition-test" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Start the SPI clock generator (axi_clkgen)</p></li>
+<li><p>Configure the PWM generator (axi_pwmgen)</p></li>
+<li><p>Configure the DMA</p></li>
+<li><p>Configure the axi_ad7616 IP</p></li>
+<li><p>Submit a DMA transfer</p></li>
+<li><p>Stop the PWM generator</p></li>
+<li><p>Capture and compare the data</p></li>
+</ul>
+</section>
+<section id="stop-the-environment">
+<h4>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Stop the clocks</p></li>
+</ul>
+</section>
+</section>
+<section id="serial-test-program">
+<h3>Serial test program<a class="headerlink" href="#serial-test-program" title="Link to this heading"></a></h3>
+<p>The test program is structured into several tests as follows:</p>
+<section id="id2">
+<h4>Environment bringup<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<p>The steps of the environment bringup are:</p>
+<ul class="simple">
+<li><p>Create the environment</p></li>
+<li><p>Start the environment</p></li>
+<li><p>Start the clocks</p></li>
+<li><p>Assert the resets</p></li>
+</ul>
+</section>
+<section id="id3">
+<h4>Sanity test<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<p>This test is used to check the communication with the AXI REGMAP module of the
+AD7616 SPI Engine interface, by reading the core VERSION register, along with
+writing and reading the SCRATCH register.</p>
+</section>
+<section id="fifo-spi-test">
+<h4>FIFO SPI test<a class="headerlink" href="#fifo-spi-test" title="Link to this heading"></a></h4>
+<p>The FIFO SPI test verifies the simple serial transfers, made through the
+Execution module.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Start the SPI clock generator (axi_clkgen)</p></li>
+<li><p>Enable SPI Engine &amp; configure the Execution module</p></li>
+<li><p>Set up the interrupts</p></li>
+<li><p>Generate a FIFO transaction</p></li>
+<li><p>Capture and compare the results, using the PEEK register of the AXI SPI Engine</p></li>
+</ul>
+</section>
+<section id="offload-spi-test">
+<h4>Offload SPI test<a class="headerlink" href="#offload-spi-test" title="Link to this heading"></a></h4>
+<p>The Offload SPI test verifies the Offload module functionality.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Configure the conversion signal generator (axi_pwmgen)</p></li>
+<li><p>Configure the DMA</p></li>
+<li><p>Configure the Offload module</p></li>
+<li><p>Start the Offload module</p></li>
+<li><p>Capture and compare the Offload SDI data</p></li>
+</ul>
+</section>
+<section id="id4">
+<h4>Stop the environment<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Stop the clocks</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="building-the-testbench">
+<h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
+<p>The testbench is built upon ADI’s generic HDL reference design framework.
+ADI does not distribute compiled files of these projects so they must be built
+from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">here</a>,
+with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
+To get the source you must
+<a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank">clone</a>
+the HDL repository, and then build the project as follows:.</p>
+<p><strong>Linux/Cygwin/WSL</strong></p>
+<p><em>Example 1</em></p>
+<p>Build all the possible combinations of tests and configurations, using only the
+command line.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad7616
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad7616$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 2</em></p>
+<p>Build all the possible combinations of tests and configurations, using the
+Vivado GUI. This command will launch Vivado, will run the simulation and display
+the waveforms.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad7616
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad7616$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 3</em></p>
+<p>Build a particular combination of test and configuration, using the Vivado GUI.
+This command will launch Vivado, will run the simulation and display the
+waveforms.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad7616
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad7616$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_si<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_si
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+specific build has it’s own folder named after the configuration file’s name.
+Example: if the following command was run for a single configuration in the
+clean folder (no runs folder available):</p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_si</span></code></p>
+<p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg_si</span></code></p>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
+<section id="hdl-related-dependencies-forming-the-dut">
+<h3>HDL related dependencies forming the DUT<a class="headerlink" href="#hdl-related-dependencies-forming-the-dut" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IP name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AD_EDGE_DETECT</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/common/ad_edge_detect.v" target="_blank">library/common/ad_edge_detect.v</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_AD7616</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ad7616" target="_blank">library/axi_ad7616</a> *</p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_ad7616/index.html#axi-ad7616" target="_blank" title="(in HDL)"><span>AXI AD7616</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_DMAC</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_CLKGEN</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_clkgen" target="_blank">library/axi_clkgen</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_clkgen/index.html#axi-clkgen" target="_blank" title="(in HDL)"><span>AXI CLK Generator</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_HDMI_TX</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_hdmi_tx" target="_blank">library/axi_hdmi_tx</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_hdmi_tx/index.html#axi-hdmi-tx" target="_blank" title="(in HDL)"><span>AXI HDMI TX</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_I2S_ADI</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_i2s_adi" target="_blank">library/axi_i2s_adi</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_PWM_GEN</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_pwm_gen" target="_blank">library/axi_pwm_gen</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_pwm_gen/index.html#axi-pwm-gen" target="_blank" title="(in HDL)"><span>AXI PWM Generator</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_SPDIF_TX</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_spdif_tx" target="_blank">library/axi_spdif_tx</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>AXI_SPI_ENGINE</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/axi_spi_engine" target="_blank">library/spi_engine/axi_spi_engine</a>  **</p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/axi_spi_engine.html#spi-engine-axi" target="_blank" title="(in HDL)"><span>AXI SPI Engine Module</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_SYSID</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_sysid" target="_blank">library/axi_sysid</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" target="_blank" title="(in HDL)"><span>AXI System ID</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>SPI_ENGINE_EXECUTION</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_execution" target="_blank">library/spi_engine/spi_engine_execution</a> **</p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_execution.html#spi-engine-execution" target="_blank" title="(in HDL)"><span>SPI Engine Execution Module</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI_ENGINE_INTERCONNECT</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_interconnect" target="_blank">library/spi_engine/spi_engine_interconnect</a> **</p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_interconnect.html#spi-engine-interconnect" target="_blank" title="(in HDL)"><span>SPI Engine Interconnect Module</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>SPI_ENGINE_OFFLOAD</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/spi_engine/spi_engine_offload" target="_blank">library/spi_engine/spi_engine_offload</a> **</p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/spi_engine/spi_engine_offload.html#spi-engine-offload" target="_blank" title="(in HDL)"><span>SPI Engine Offload Module</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>SYNC_BITS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_cdc/sync_bits.v" target="_blank">library/util_cdc/sync_bits.v</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>SYSID_ROM</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/sysid_rom" target="_blank">library/sysid_rom</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_sysid/index.html#axi-sysid" target="_blank" title="(in HDL)"><span>AXI System ID</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>UTIL_CPACK2</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_pack/util_cpack2" target="_blank">library/util_pack/util_cpack2</a> *</p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/util_pack/util_cpack2.html#util-cpack2" target="_blank" title="(in HDL)"><span>Channel CPACK Utility</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only for parallel interface</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">**</span></code> instantiated only for serial interface</p></li>
+</ul>
+</div>
+</section>
+<section id="testbenches-related-dependencies">
+<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
+<p>Common with most testbenches:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>IRQ_HANDLER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/irq_handler_pkg.sv" target="_blank">library/utilities/irq_handler_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>LOGGER_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/logger_pkg.sv" target="_blank">library/utilities/logger_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>M_AXI_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axi_sequencer.sv" target="_blank">library/vip/amd/m_axi_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>REG_ACCESSOR</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/reg_accessor.sv" target="_blank">library/regmaps/reg_accessor.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>S_AXI_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axi_sequencer.sv" target="_blank">library/vip/amd/s_axi_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>TEST_HARNESS_ENV</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/test_harness_env.sv" target="_blank">library/utilities/test_harness_env.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/utilities/test_harness/index.html#test-harness"><span class="std std-ref">Test Harness</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>UTILS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/utils.svh" target="_blank">library/utilities/utils.svh</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>WATCHDOG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/common/watchdog.sv" target="_blank">library/drivers/common/watchdog.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/drivers/common/watchdog/index.html#watchdog"><span class="std std-ref">Watchdog</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Testbench specific dependencies:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ADI_REGMAP_ADC_PKG *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_adc_pkg.sv" target="_blank">library/regmaps/adi_regmap_adc_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_CLKGEN_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_clkgen_pkg.sv" target="_blank">library/regmaps/adi_regmap_clkgen_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_COMMON_PKG *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_common_pkg.sv" target="_blank">library/regmaps/adi_regmap_common_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg." target="_blank">library/regmaps/adi_regmap_dmac_pkg.</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv" target="_blank">library/regmaps/adi_regmap_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_PWM_GEN_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pwm_gen_pkg.sv" target="_blank">library/regmaps/adi_regmap_pwm_gen_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_SPI_ENGINE_PKG **</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_spi_engine_pkg.sv" target="_blank">library/regmaps/adi_regmap_spi_engine_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_VIP_PKG</p></td>
+<td><p>—</p></td>
+<td><p><a class="icon link reference external" href="https://www.xilinx.com/products/intellectual-property/axi-vip.html" target="_blank">AXI Verification IP (VIP)</a></p></td>
+</tr>
+<tr class="row-even"><td><p>AXI4STREAM_VIP_PKG</p></td>
+<td><p>—</p></td>
+<td><p><a class="icon link reference external" href="https://www.xilinx.com/products/intellectual-property/axi-stream-vip.html" target="_blank">AXI Stream Verification IP (VIP)</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>DMA_TRANS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv" target="_blank">library/drivers/dmac/dma_trans.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>DMAC_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>LOGGER_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/logger_pkg.sv" target="_blank">library/utilities/logger_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>M_AXIS_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axis_sequencer.sv" target="_blank">library/vip/amd/m_axis_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>S_AXIS_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axis_sequencer.sv" target="_blank">library/vip/amd/s_axis_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>TEST_HARNESS_ENV_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/test_harness_eng_pkg.sv" target="_blank">library/utilities/test_harness_eng_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> used only for parallel interface</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">**</span></code> used only for serial interface</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="more-information">
+<h2>More information<a class="headerlink" href="#more-information" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">ADI Testbenches User guide</span></a></p></li>
+</ul>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../ad7606/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD7606</a>
+    <a href="../ad9083/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">AD9083</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

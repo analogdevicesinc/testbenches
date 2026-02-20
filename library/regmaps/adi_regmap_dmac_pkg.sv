@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -44,7 +44,7 @@ package adi_regmap_dmac_pkg;
   const reg_t DMAC_VERSION = '{ 'h0000, "VERSION" , '{
     "VERSION_MAJOR": '{ 31, 16, RO, 'h04 },
     "VERSION_MINOR": '{ 15, 8, RO, 'h05 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h64 }}};
+    "VERSION_PATCH": '{ 7, 0, RO, 'h65 }}};
   `define SET_DMAC_VERSION_VERSION_MAJOR(x) SetField(DMAC_VERSION,"VERSION_MAJOR",x)
   `define GET_DMAC_VERSION_VERSION_MAJOR(x) GetField(DMAC_VERSION,"VERSION_MAJOR",x)
   `define DEFAULT_DMAC_VERSION_VERSION_MAJOR GetResetValue(DMAC_VERSION,"VERSION_MAJOR")

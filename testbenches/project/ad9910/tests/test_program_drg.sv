@@ -825,6 +825,61 @@ program test_program_drg (
     end
 
     // ----------------------------------------
+    // Test 9: Sawtooth DOWN mode (NO_DWELL_LOW)
+    // Verify that with NO_DWELL_LOW set, the ramp always goes down
+    // and snaps back to the upper limit when the lower limit is reached.
+    // Run a continuous burst of blades with no delay between them.
+    // ----------------------------------------
+    `INFO(("Test 9: Sawtooth DOWN mode (NO_DWELL_LOW)"), ADI_VERBOSITY_NONE);
+
+    begin
+      int unsigned blade_start_count;
+      int unsigned n_blades = 5;
+
+      // Enable sawtooth DOWN mode via NO_DWELL_LOW, auto-hold after full burst
+      set_drg_burst_limit(n_blades);
+
+      // Set ramp control: no_dwell_low=1, drctl_toggle_en=1, drctl_init=1
+      axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
+      read_ramp_ctrl();
+      #3us;
+
+      // Reset DRG model to UPPER limit (sawtooth down starts from top)
+      reset_drg_counter(DRG_UPPER_LIMIT);
+      blade_start_count = drover_pulse_count;
+
+      `INFO(("  Starting %0d sawtooth DOWN blades (no inter-blade delay)...", n_blades), ADI_VERBOSITY_NONE);
+
+      // Wait for all blades to complete continuously
+      wait_drover_pulses(n_blades, 100);
+
+      `INFO(("  Burst complete: drover_pulses=%0d, burst_hold=%b",
+             drover_pulse_count, drg_burst_hold), ADI_VERBOSITY_LOW);
+
+      // Verify model auto-held after all blades
+      if (drg_burst_hold) begin
+        `INFO(("  Model auto-held after %0d blades - PASSED", n_blades), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Model did not auto-hold after %0d blades", n_blades));
+        test_passed = 0;
+      end
+
+      // Verify total blades completed
+      if ((drover_pulse_count - blade_start_count) == n_blades) begin
+        `INFO(("  %0d sawtooth DOWN blades completed - PASSED", n_blades), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Expected %0d blades, got %0d",
+                n_blades, drover_pulse_count - blade_start_count));
+        test_passed = 0;
+      end
+
+      // Clean up
+      set_drg_burst_limit(0);
+      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
+      read_ramp_ctrl();
+    end
+
+    // ----------------------------------------
     // Final report
     // ----------------------------------------
     #1us;

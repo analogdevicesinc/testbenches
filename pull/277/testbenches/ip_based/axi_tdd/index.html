@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="The purpose of this testbench is to validate the ADC data path of the projects/ad9083_evb reference design." name="description" />
+<meta content="The purpose of this testbench is to validate the functionality of the library/axi_tdd IP core." name="description" />
 
-    <title>AD9083 &#8212; Testbenches  documentation</title>
+    <title>AXI TDD &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=a525f648" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
@@ -14,8 +14,8 @@
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="ADA4355" href="../ada4355/index.html" />
-    <link rel="prev" title="AD7616" href="../ad7616/index.html" />
+    <link rel="next" title="AXIS Sequencers" href="../axis_sequencers/index.html" />
+    <link rel="prev" title="IP Based" href="../index.html" />
    
   
   
@@ -95,7 +95,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">AD9083</a><ul>
+<li><a class="reference internal" href="#">AXI TDD</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
 <li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
@@ -105,21 +105,18 @@
 <li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cpu-memory-interconnect-addresses">CPU/Memory interconnect addresses</a></li>
-<li><a class="reference internal" href="#interrupts">Interrupts</a></li>
+<li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
-<li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
-<li><a class="reference internal" href="#test-dds-path">Test DDS path</a></li>
-<li><a class="reference internal" href="#test-dac-fifo-path-and-rx-dma-capture">Test DAC FIFO path and RX DMA capture</a></li>
+<li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
+<li><a class="reference internal" href="#tdd-testing">TDD testing</a></li>
 <li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
 <li><a class="reference internal" href="#resources">Resources</a><ul>
 <li><a class="reference internal" href="#hdl-related-dependencies-forming-the-dut">HDL related dependencies forming the DUT</a></li>
-<li><a class="reference internal" href="#auxiliary-hdl-dependencies-used-as-helper-ips">Auxiliary HDL dependencies used as helper IPs</a></li>
 <li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
 </ul>
 </li>
@@ -216,37 +213,37 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axi_tdd/index.html">AXI TDD</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/base/index.html">Base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_flock/index.html">DMA Framelock</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_loopback/index.html">DMA Loopback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/i3c_controller/index.html">I3C Controller</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/irq_handler/index.html">IRQ handler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_pack/index.html">Util Pack</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AXI TDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_pack/index.html">Util Pack</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad57xx/index.html">AD57XX</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad7606/index.html">AD7606</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad7616/index.html">AD7616</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">AD9083</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ada4355/index.html">ADA4355</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../cn0363/index.html">CN0363</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../cn0577_adaq2387x/index.html">CN0577/ADAQ2387X</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ltc2378/index.html">LTC2378</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ada4355/index.html">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/cn0363/index.html">CN0363</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/cn0577_adaq2387x/index.html">CN0577/ADAQ2387X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ltc2378/index.html">LTC2378</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
 </ul>
 </li>
 </ul>
@@ -263,141 +260,89 @@ Content on this topic
       <div class="documentwrapper">
         <div class="bodywrapper" id="top-anchor">
           <div class="body-header">
-  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">Project Based</a></li></ol></nav>
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">IP Based</a></li></ol></nav>
 </div>
           <div class="body" role="main">
             
-  <section id="ad9083">
-<span id="id1"></span><h1>AD9083<a class="headerlink" href="#ad9083" title="Link to this heading"></a></h1>
+  <section id="axi-tdd">
+<span id="id1"></span><h1>AXI TDD<a class="headerlink" href="#axi-tdd" title="Link to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p>The purpose of this testbench is to validate the ADC data path of the
-<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/ad9083_evb" target="_blank">projects/ad9083_evb</a> reference design.</p>
-<p>The entire HDL documentation can be found here
-<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/projects/ad9083_evb/index.html#ad9083-evb" target="_blank" title="(in HDL)"><span class="xref std std-ref">AD9083_EVB HDL project</span></a>.</p>
+<p>The purpose of this testbench is to validate the functionality of the
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_tdd" target="_blank">library/axi_tdd</a> IP core.</p>
+<p>The entire HDL documentation can be found at <a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_tdd/index.html#axi-tdd" target="_blank" title="(in HDL)"><span>AXI TDD</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
-<p>The testbench block design includes part of the AD9083_EVB HDL reference design,
-along with auxiliary IPs that help out with testing (JESD204B TX instances) and
-VIPs used for clocking, reset, PS and DDR simulations.</p>
+<p>The block design is based on the test harness with the addition of the AXI_TDD
+IP.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
-<p>The data path and clock domains are depicted in the below diagram:</p>
-<a class="reference internal image-reference" href="../../../_images/ad9083_tb.svg"><img alt="ad9083/Testbench block diagram" class="align-center" src="../../../_images/ad9083_tb.svg" width="800" />
+<a class="reference internal image-reference" href="../../../_images/axi_tdd_tb.svg"><img alt="AXI_TDD/Testbench block diagram" class="align-center" src="../../../_images/axi_tdd_tb.svg" width="800" />
 </a>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
-<p>The following parameters of this testbench that can be configured:</p>
+<p>The following parameters of this project that can be configured:</p>
 <ul class="simple">
-<li><p>JESD_MODE: used link layer encoder mode</p>
-<ul>
-<li><p>64B66B - 64b66b link layer defined in JESD204C, uses AMD IP as Physical
-Layer</p></li>
-<li><p>8B10B - 8b10b link layer defined in JESD204B, uses ADI IP as Physical
-Layer</p></li>
+<li><p>ID: instance identification number;</p></li>
+<li><p>CHANNEL_COUNT: number of channels;
+Options: from 1 to 32.</p></li>
+<li><p>REGISTER_WIDTH: internal counter and register width;
+Options: from 8 to 32.</p></li>
+<li><p>BURST_COUNT_WIDTH: burst counter width;
+Options: from 8 to 32.</p></li>
+<li><p>SYNC_EXTERNAL: enable support for external sync signal;
+Options: 0 - No, 1 - Yes.</p></li>
+<li><p>SYNC_INTERNAL: enable support for internal sync signal;
+Options: 0 - No, 1 - Yes.</p></li>
+<li><p>SYNC_EXTERNAL_CDC: enable synchronization of external sync signal;
+Options: 0 - No, 1 - Yes.</p></li>
+<li><p>SYNC_COUNT_WIDTH: sync generator counter width;
+Options: from 0 to 64.</p></li>
 </ul>
-</li>
-<li><p>REF_CLK_RATE: the rate of the reference clock</p></li>
-<li><p>RX_RATE: lane rate of the Rx link (to FPGA)</p></li>
-<li><p>TX_RATE: lane rate of the Tx link (from FPGA)</p></li>
-<li><p>[RX/TX]_NUM_LINKS: number of links</p></li>
-<li><p>[RX/TX]_JESD_M: number of converters per link</p></li>
-<li><p>[RX/TX]_JESD_L: number of lanes per link</p></li>
-<li><p>[RX/TX]_JESD_S: number of samples per frame</p></li>
-<li><p>[RX/TX]_JESD_NP: number of bits per sample</p></li>
-</ul>
-<p>Other JESD204B output configuration modes can be found in the <a class="icon adi reference external" href="https://www.analog.com/AD9083" target="_blank">AD9083</a>
-data sheet, at Table 24.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For other TDD parameter configurations, take a look at the
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_tdd/index.html#axi-tdd" target="_blank" title="(in HDL)"><span>AXI TDD</span></a>.</p>
+</div>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
-<p>The following configuration file is available:</p>
-<div class="table-wrapper colwidths-given docutils container">
+<p>The following configuration files are available:</p>
+<div class="table-wrapper docutils container">
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 45.0%" />
-<col style="width: 25.0%" />
-</colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>Configuration file</p></th>
-<th class="head"><p>Parameter</p></th>
-<th class="head"><p>Value</p></th>
+<tr class="row-odd"><th class="head"><p>Configuration mode</p></th>
+<th class="head"><p>cfg1</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Parameters</p></th>
+<th class="head"><p>DUT_TDD</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>cfg1</p></td>
-<td><p>JESD_MODE</p></td>
-<td><p>8B10B</p></td>
+<tr class="row-odd"><td><p>ID</p></td>
+<td><p>0</p></td>
 </tr>
-<tr class="row-odd"><td></td>
-<td><p>REF_CLK_RATE</p></td>
-<td><p>500</p></td>
-</tr>
-<tr class="row-even"><td></td>
-<td><p>RX_RATE</p></td>
-<td><p>10</p></td>
-</tr>
-<tr class="row-odd"><td></td>
-<td><p>TX_RATE</p></td>
-<td><p>10</p></td>
-</tr>
-<tr class="row-even"><td></td>
-<td><p>RX_NUM_LINKS</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td></td>
-<td><p>RX_JESD_M</p></td>
-<td><p>16</p></td>
-</tr>
-<tr class="row-even"><td></td>
-<td><p>RX_JESD_L</p></td>
-<td><p>4</p></td>
-</tr>
-<tr class="row-odd"><td></td>
-<td><p>RX_JESD_S</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td></td>
-<td><p>RX_JESD_NP</p></td>
-<td><p>16</p></td>
-</tr>
-<tr class="row-odd"><td></td>
-<td><p>RX_JESD_F</p></td>
+<tr class="row-even"><td><p>CHANNEL_COUNT</p></td>
 <td><p>8</p></td>
 </tr>
-<tr class="row-even"><td></td>
-<td><p>RX_JESD_K</p></td>
+<tr class="row-odd"><td><p>REGISTER_WIDTH</p></td>
 <td><p>32</p></td>
 </tr>
-<tr class="row-odd"><td></td>
-<td><p>TX_NUM_LINKS</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td></td>
-<td><p>TX_JESD_M</p></td>
-<td><p>16</p></td>
-</tr>
-<tr class="row-odd"><td></td>
-<td><p>TX_JESD_L</p></td>
-<td><p>4</p></td>
-</tr>
-<tr class="row-even"><td></td>
-<td><p>TX_JESD_S</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td></td>
-<td><p>TX_JESD_NP</p></td>
-<td><p>16</p></td>
-</tr>
-<tr class="row-even"><td></td>
-<td><p>TX_JESD_F</p></td>
-<td><p>8</p></td>
-</tr>
-<tr class="row-odd"><td></td>
-<td><p>TX_JESD_K</p></td>
+<tr class="row-even"><td><p>BURST_COUNT_WIDTH</p></td>
 <td><p>32</p></td>
+</tr>
+<tr class="row-odd"><td><p>SYNC_EXTERNAL</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>SYNC_INTERNAL</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>SYNC_EXTERNAL_CDC</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>SYNC_COUNT_WIDTH</p></td>
+<td><p>64</p></td>
 </tr>
 </tbody>
 </table>
@@ -415,7 +360,7 @@ data sheet, at Table 24.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Tests the ad9083 project capabilities.</p></td>
+<td><p>Tests the AXI_TDD module.</p></td>
 </tr>
 </tbody>
 </table>
@@ -423,12 +368,11 @@ data sheet, at Table 24.</p>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
-<p>The test program is compatible with the above mentioned configuration.</p>
+<p>The test program is compatible with the above-mentioned configuration.</p>
 </section>
 </section>
-<section id="cpu-memory-interconnect-addresses">
-<h3>CPU/Memory interconnect addresses<a class="headerlink" href="#cpu-memory-interconnect-addresses" title="Link to this heading"></a></h3>
-<p>Below are the CPU/Memory interconnect addresses used in this project:</p>
+<section id="cpu-memory-interconnects-addresses">
+<h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading"></a></h3>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -440,50 +384,11 @@ data sheet, at Table 24.</p>
 <tr class="row-even"><td><p>axi_intc</p></td>
 <td><p>0x4120_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>rx_ad9083_tpl_core</p></td>
-<td><p>0x44A0_0000</p></td>
+<tr class="row-odd"><td><p>dut_tdd</p></td>
+<td><p>0x7C42_0000</p></td>
 </tr>
-<tr class="row-even"><td><p>axi_ad9083_rx_xcvr</p></td>
-<td><p>0x44A6_0000</p></td>
-</tr>
-<tr class="row-odd"><td><p>axi_ad9083_rx_jesd</p></td>
-<td><p>0x44AA_0000</p></td>
-</tr>
-<tr class="row-even"><td><p>dac_jesd204_transport</p></td>
-<td><p>0x44B1_0000</p></td>
-</tr>
-<tr class="row-odd"><td><p>dac_jesd204_xcvr</p></td>
-<td><p>0x44B6_0000</p></td>
-</tr>
-<tr class="row-even"><td><p>dac_jesd204_link</p></td>
-<td><p>0x44B9_0000</p></td>
-</tr>
-<tr class="row-odd"><td><p>axi_ad9083_rx_dma</p></td>
-<td><p>0x7C40_0000</p></td>
-</tr>
-<tr class="row-even"><td><p>axi_ad9083_tx_dma</p></td>
-<td><p>0x7C43_0000</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="interrupts">
-<h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
-<p>Below are the Programmable Logic interrupts used in this project:</p>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Instance name</p></th>
-<th class="head"><p>HDL</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>axi_ad9083_rx_jesd</p></td>
-<td><p>13</p></td>
-</tr>
-<tr class="row-odd"><td><p>axi_ad9083_rx_dma</p></td>
-<td><p>12</p></td>
+<tr class="row-even"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
 </tr>
 </tbody>
 </table>
@@ -494,105 +399,32 @@ data sheet, at Table 24.</p>
 <h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
 <p>The test program is structured into several tests as follows:</p>
 <section id="environment-bringup">
-<h3>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
+<h3>Environment Bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
 <p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
 <li><p>Start the environment</p></li>
-<li><p>Set required parameters and JESD clocks</p></li>
 <li><p>Start the clocks</p></li>
 <li><p>Assert the resets</p></li>
+<li><p>Probe TDD clock</p></li>
+<li><p>Read TDD interface description</p></li>
+<li><p>Enable all TDD channels, use direct polarity</p></li>
+<li><p>Set initial TDD operation values</p></li>
 </ul>
 </section>
-<section id="test-dds-path">
-<h3>Test DDS path<a class="headerlink" href="#test-dds-path" title="Link to this heading"></a></h3>
-<p>The DDS test verifies the DDS path.</p>
-<p>The steps of this test are:</p>
+<section id="tdd-testing">
+<h3>TDD testing<a class="headerlink" href="#tdd-testing" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><dl class="simple">
-<dt>Configure Transport Layer for DDS</dt><dd><ul>
-<li><p>Enable RX channel</p></li>
-<li><p>Select DDS as source</p></li>
-<li><p>Configure tone amplitude and frequency</p></li>
-<li><p>Pull TPL cores out of reset</p></li>
-<li><p>Sync DDS cores</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Configure TX Link Layer</dt><dd><ul>
-<li><p>Link disable</p></li>
-<li><p>Enable <code class="docutils literal notranslate"><span class="pre">SYSREF</span></code> handling</p></li>
-<li><p>Configure the <code class="docutils literal notranslate"><span class="pre">octets-per-frame</span></code> and <code class="docutils literal notranslate"><span class="pre">frames-per-multi-frame</span></code> settings
-of the link</p></li>
-<li><p>Enable <code class="docutils literal notranslate"><span class="pre">scrambler</span></code></p></li>
-<li><p>Link enable</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Configure RX Link Layer</dt><dd><ul>
-<li><p>Link disable</p></li>
-<li><p>Enable <code class="docutils literal notranslate"><span class="pre">SYSREF</span></code> handling</p></li>
-<li><p>Configure the <code class="docutils literal notranslate"><span class="pre">octets-per-frame</span></code> and <code class="docutils literal notranslate"><span class="pre">frames-per-multi-frame</span></code> settings
-of the link</p></li>
-<li><p>Enable <code class="docutils literal notranslate"><span class="pre">scrambler</span></code></p></li>
-<li><p>Link enable</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>XCVR initialization</dt><dd><ul>
-<li><p>Configure XCVR control (RXOUTCLK uses DIV2, TXOUTCLK uses DIV2)</p></li>
-<li><p>Give time for the PLLs to lock</p></li>
-<li><dl class="simple">
-<dt>Read status back</dt><dd><ul>
-<li><p>Check <code class="docutils literal notranslate"><span class="pre">SYSREF_STATUS</span></code></p></li>
-<li><p>Check if the link is in <code class="docutils literal notranslate"><span class="pre">DATA</span></code> state and <code class="docutils literal notranslate"><span class="pre">SYNC</span></code> is 1</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>Link disable</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</section>
-<section id="test-dac-fifo-path-and-rx-dma-capture">
-<h3>Test DAC FIFO path and RX DMA capture<a class="headerlink" href="#test-dac-fifo-path-and-rx-dma-capture" title="Link to this heading"></a></h3>
-<p>The DAC FIFO path and RX DMA capture verifies the data path for DAC FIFO and
-RX DMA.</p>
-<p>The steps of this test are:</p>
-<ul class="simple">
-<li><p>Reset TPL cores</p></li>
-<li><p>Pull TPL cores out of reset</p></li>
-<li><p>Configure Transport Layer for DMA</p></li>
-<li><p>Configure TX DMA &amp; RX DMA</p></li>
-<li><p>Link enable</p></li>
-<li><dl class="simple">
-<dt>Read status back</dt><dd><ul>
-<li><p>Check <code class="docutils literal notranslate"><span class="pre">SYSREF_STATUS</span></code></p></li>
-<li><p>Check if the link is in <code class="docutils literal notranslate"><span class="pre">DATA</span></code> state and <code class="docutils literal notranslate"><span class="pre">SYNC</span></code> is 1</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>Link disable</p></li>
-<li><p>Configure TX DMA &amp; RX DMA</p></li>
-<li><p>Link enable</p></li>
-<li><p>Check captured data</p></li>
-<li><p>Check captured data against incremental pattern based on first sample</p></li>
+<li><p>Test incremental channel triggering values</p></li>
+<li><p>Test high duty triggering values</p></li>
+<li><p>Test special features</p></li>
 </ul>
 </section>
 <section id="stop-the-environment">
 <h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Stop the clocks</p></li>
+<li><p>Finish the simulation</p></li>
 </ul>
 </section>
 </section>
@@ -604,34 +436,32 @@ from the sources available <a class="icon git reference external" href="https://
 with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
 To get the source you must
 <a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank">clone</a>
-the HDL repository, and then build the project as follows:.</p>
+the HDL repository, and then build the project as follows:</p>
 <p><strong>Linux/Cygwin/WSL</strong></p>
 <p><em>Example 1</em></p>
-<p>Build all the possible combinations of tests and configurations, using only the
-command line.</p>
+<p>Building and simulating the testbench using only the command line.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad9083
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axi_tdd
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad9083$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axi_tdd$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p><em>Example 2</em></p>
-<p>Build all the possible combinations of tests and configurations, using the
-Vivado GUI. This command will launch Vivado, will run the simulation and display
-the waveforms.</p>
+<p>Building and simulating the testbench using the Vivado GUI. This command will
+launch Vivado, will run the simulation and display the waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad9083
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axi_tdd
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad9083$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axi_tdd$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
@@ -644,17 +474,17 @@ waveforms.</p>
 <div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad9083
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axi_tdd
 </pre></div>
 </div>
-<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad9083$
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axi_tdd$
 </pre></div>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
-<div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
-specific build has it’s own folder named after the configuration file’s name.
+<div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+specific build has its own folder named after the configuration file’s name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):</p>
 <p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg1</span></code></p>
@@ -679,65 +509,9 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AXI_DMAC</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>UTIL_CPACK2</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_pack/util_cpack2" target="_blank">library/util_pack/util_cpack2</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/util_pack/util_cpack2.html#util-cpack2" target="_blank" title="(in HDL)"><span>Channel CPACK Utility</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>UTIL_ADXCVR</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/xilinx/util_adxcvr" target="_blank">library/xilinx/util_adxcvr</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/xilinx/util_adxcvr/index.html#util-adxcvr" target="_blank" title="(in HDL)"><span>UTIL_ADXCVR core for AMD Xilinx devices</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>AXI_ADXCVR</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/xilinx/axi_adxcvr" target="_blank">library/xilinx/axi_adxcvr</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_adxcvr/index.html#axi-adxcvr-amd" target="_blank" title="(in HDL)"><span>AMD Xilinx Devices</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>AXI_JESD204_RX</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/axi_jesd204_rx" target="_blank">library/jesd204/axi_jesd204_rx</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/axi_jesd204_rx/index.html#axi-jesd204-rx" target="_blank" title="(in HDL)"><span>JESD204B/C Link Receive Peripheral</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>JESD204_TPL_ADC</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/ad_ip_jesd204_tpl_adc" target="_blank">library/jesd204/ad_ip_jesd204_tpl_adc</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/ad_ip_jesd204_tpl_adc/index.html#ad-ip-jesd204-tpl-adc" target="_blank" title="(in HDL)"><span>ADC JESD204B/C Transport Peripheral</span></a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="auxiliary-hdl-dependencies-used-as-helper-ips">
-<h3>Auxiliary HDL dependencies used as helper IPs<a class="headerlink" href="#auxiliary-hdl-dependencies-used-as-helper-ips" title="Link to this heading"></a></h3>
-<div class="table-wrapper colwidths-given docutils container">
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 30.0%" />
-<col style="width: 45.0%" />
-<col style="width: 25.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>IP name</p></th>
-<th class="head"><p>Source code link</p></th>
-<th class="head"><p>Documentation link</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>AXI_JESD204_TX</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/axi_jesd204_tx" target="_blank">library/jesd204/axi_jesd204_tx</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/axi_jesd204_tx/index.html#axi-jesd204-tx" target="_blank" title="(in HDL)"><span>JESD204B/C Link Transmit Peripheral</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>JESD204_TPL_DAC</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/ad_ip_jesd204_tpl_dac" target="_blank">library/jesd204/ad_ip_jesd204_tpl_dac</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/ad_ip_jesd204_tpl_dac/index.html#ad-ip-jesd204-tpl-dac" target="_blank" title="(in HDL)"><span>DAC JESD204B/C Transport Peripheral</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>UTIL_ADCFIFO</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_adcfifo" target="_blank">library/util_adcfifo</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>UTIL_DACFIFO</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/util_dacfifo" target="_blank">library/util_dacfifo</a></p></td>
-<td><p>—</p></td>
+<tr class="row-even"><td><p>AXI_TDD</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_tdd" target="_blank">library/axi_tdd</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_tdd/index.html#axi-tdd" target="_blank" title="(in HDL)"><span>AXI TDD</span></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -810,52 +584,12 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv" target="_blank">library/regmaps/adi_regmap_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_ADC_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_adc_pkg.sv" target="_blank">library/regmaps/adi_regmap_adc_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_common_pkg.sv" target="_blank">library/regmaps/adi_regmap_common_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>ADI_REGMAP_DAC_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dac_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_JESD_RX_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_rx_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_rx_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>ADI_REGMAP_JESD_TX_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_tx_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_tx_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_XCVR_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_xcvr_pkg.sv" target="_blank">library/regmaps/adi_regmap_xcvr_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>ADI_JESD204_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/jesd/adi_jesd204_pkg.sv" target="_blank">library/drivers/jesd/adi_jesd204_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_XCVR_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/xcvr/adi_xcvr_pkg.sv" target="_blank">library/drivers/xcvr/adi_xcvr_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>DMA_TRANS</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv" target="_blank">library/drivers/dmac/dma_trans.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>DMAC_API</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_TDD_GEN_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_tdd_gen_pkg." target="_blank">library/regmaps/adi_regmap_tdd_gen_pkg.</a></p></td>
 <td><p>—</p></td>
 </tr>
 </tbody>
@@ -883,8 +617,8 @@ are, the lower the chances to receive support from <a class="icon link reference
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../ad7616/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD7616</a>
-    <a href="../ada4355/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADA4355</a>
+    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">IP Based</a>
+    <a href="../axis_sequencers/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">AXIS Sequencers</a>
               </div>
           
         </div>

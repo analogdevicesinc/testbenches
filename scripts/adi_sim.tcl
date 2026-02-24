@@ -69,9 +69,6 @@ proc adi_part_decode {board_name} {
     "vmk180" {
       set part_name "xcvm1802-vsva2197-2MP-e-S"
     }
-    "vmk180_es1" {
-      set part_name "xcvm1802-vsva2197-2MP-e-S-es1"
-    }
     "vck190" {
       set part_name "xcvc1902-vsva2197-2MP-e-S"
     }
@@ -136,9 +133,6 @@ proc adi_board_decode {part_name} {
     "xcvm1802-vsva2197-2MP-e-S" {
       set board_name "vmk180"
     }
-    "xcvm1802-vsva2197-2MP-e-S-es1" {
-      set board_name "vmk180_es1"
-    }
     "xcvc1902-vsva2197-2MP-e-S" {
       set board_name "vck190"
     }
@@ -192,34 +186,29 @@ proc adi_resolve_fpga_target {} {
     set ad_project_params(FPGA_PART) $part_name
 
   } else {
-    # Set a random board
-    set board_no [expr {int(rand()*20)}]
-
-    switch $board_no {
-        0  { set board_name "zed" }
-        1  { set board_name "zc702" }
-        2  { set board_name "microzed" }
-        3  { set board_name "zc706" }
-        4  { set board_name "mitx045" }
-        5  { set board_name "coraz7s" }
-        6  { set board_name "zcu102" }
-        7  { set board_name "kv260" }
-        8  { set board_name "k26" }
-        9  { set board_name "ac701" }
-        10 { set board_name "kc705" }
-        11 { set board_name "kcu105" }
-        12 { set board_name "vc707" }
-        13 { set board_name "vc709" }
-        14 { set board_name "vcu118" }
-        15 { set board_name "vcu128" }
-        16 { set board_name "vmk180" }
-        17 { set board_name "vmk180_es1" }
-        18 { set board_name "vck190" }
-        19 { set board_name "vpk180" }
-        default {
-            error "ERROR: board_no invalid '$board_no'"
-        }
+    # Set a list with board names
+    set board_list {
+      "zed"
+      "zc702"
+      "microzed"
+      "zc706"
+      "mitx045"
+      "coraz7s"
+      "zcu102"
+      "kv260"
+      "k26"
+      "ac701"
+      "kc705"
+      "kcu105"
+      "vc707"
+      "vc709"
+      "vcu118"
+      "vcu128"
+      "vmk180"
+      "vck190"
+      "vpk180"
     }
+    set board_name [lindex $board_list [expr {int(rand() * [llength $board_list])}]]
 
     # Neither is present
     puts "WARNING: Neither FPGA_PART nor FPGA_BOARD is defined in ad_project_params. Board name was randomized '$board_name'"
@@ -253,7 +242,7 @@ proc adi_xcvr_sim_init {} {
   ] $board_name]
 
   puts "INFO: XCVR config - LANE_RATE: $lane_rate, REF_CLK: $ref_clk, PLL_TYPE: $pll_type"
-
+  puts "xcvr_config_paths: $xcvr_config_paths"
   return $xcvr_config_paths
 }
 

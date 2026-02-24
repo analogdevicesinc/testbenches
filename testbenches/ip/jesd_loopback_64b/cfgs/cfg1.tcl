@@ -1,3 +1,23 @@
+set xilinx_boards {
+    "zed"
+    "zc702"
+    "microzed"
+    "zc706"
+    "mitx045"
+    "coraz7s"
+    "zcu102"
+    "kv260"
+    "k26"
+    "kcu105"
+    "vc707"
+    "vc709"
+    "vcu118"
+    "vcu128"
+    "vmk180"
+}
+set chosen_board [lindex $xilinx_boards [expr {int(rand() * [llength $xilinx_boards])}]]
+set ad_project_params(FPGA_BOARD) $chosen_board
+
 set ad_project_params(JESD_L) 4
 set ad_project_params(JESD_M) 4
 set ad_project_params(JESD_F) 3

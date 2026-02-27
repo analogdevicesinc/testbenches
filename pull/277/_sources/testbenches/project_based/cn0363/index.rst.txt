@@ -34,7 +34,7 @@ Configuration parameters and modes
 The following parameters of this project can be configured:
 
 -  DATA_WIDTH: defines the SPI data width in bits
--  DATA_DLENGTH: defines the actual data length being transferred
+-  DATA_DLENGTH: defines the actual data length in bits being transferred
 -  NUM_OF_CS: defines the number of chip select lines
 -  THREE_WIRE: enables three-wire SPI mode:
    Options: 0 - Four-wire mode, 1 - Three-wire mode
@@ -52,13 +52,13 @@ Configuration files
 
 The following configuration file is available:
 
-   +-----------------+--------------+-------------+------+------+----------+
-   | Configuration   | Parameters                                          |
-   | mode            +--------------+-------------+------+------+----------+
-   |                 | DATA_WIDTH   | DATA_DLENGTH| CPOL | CPHA | NUM_OF_CS|
-   +=================+==============+=============+======+======+==========+
-   | cfg1            | 8            | 8           | 0    | 1    | 2        |
-   +-----------------+--------------+-------------+------+------+----------+
+   +-----------------+--------------+-------------+----------+------------+------+------+----------------+--------------+----------------+
+   | Configuration   | Parameters                                                                                                        |
+   | mode            +--------------+-------------+----------+------------+------+------+----------------+--------------+----------------+
+   |                 | DATA_WIDTH   | DATA_DLENGTH| NUM_OF_CS| THREE_WIRE | CPOL | CPHA | CLOCK_DIVIDER  | NUM_OF_WORDS | SDO_IDLE_STATE |
+   +=================+==============+=============+==========+============+======+======+================+==============+================+
+   | cfg1            | 8            | 8           | 2        | 0          | 0    | 1    | 0              | 1            | 0              |
+   +-----------------+--------------+-------------+----------+------------+------+------+----------------+--------------+----------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -164,8 +164,9 @@ data_ready signal.
 
 The CN0363 design uses the util_sigma_delta_spi module to detect ADC
 conversion completion and generate a trigger for the SPI Engine Offload.
-The testbench simulates periodic data_ready pulses to drive the offload
-transfers.
+The testbench simulates the AD7175-2 DOUT/RDY behavior by driving SDI LOW
+when the SPI bus is idle, allowing util_sigma_delta_spi to naturally detect
+data_ready and trigger offload transfers.
 
 The steps of this test are:
 
@@ -185,11 +186,11 @@ The steps of this test are:
   * Assert chip select
   * Read command (INST_RD)
   * De-assert chip select
+  * Re-assert chip select (re-arms the 63-clock data_ready counter)
   * SYNC command with ID=2 to generate interrupt
 
+* Assert CS LOW via FIFO command to bootstrap the first natural trigger
 * Start the offload module to begin autonomous operation
-* Simulate periodic ADC data_ready triggers via hierarchical reference to
-  util_sigma_delta_spi
 * Count completed transfers using offload SYNC IRQ events
 * Wait for all transfers (NUM_OF_TRANSFERS) to complete
 * Stop the offload module
@@ -284,9 +285,6 @@ HDL related dependencies forming the DUT
    * - IP name
      - Source code link
      - Documentation link
-   * - AXI_CLKGEN
-     - :git-hdl:`library/axi_clkgen`
-     - :external+hdl:ref:`axi_clkgen`
    * - AXI_DMAC
      - :git-hdl:`library/axi_dmac`
      - :external+hdl:ref:`axi_dmac`
@@ -332,17 +330,11 @@ Testbench specific dependencies:
    * - SV dependency name
      - Source code link
      - Documentation link
-   * - ADI_REGMAP_CLKGEN_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_clkgen_pkg.sv`
-     - ---
    * - ADI_REGMAP_DMAC_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
      - ---
    * - ADI_REGMAP_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_pkg.sv`
-     - ---
-   * - ADI_REGMAP_PWM_GEN_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_pwm_gen_pkg.sv`
      - ---
    * - ADI_REGMAP_SPI_ENGINE_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_spi_engine_pkg.sv`

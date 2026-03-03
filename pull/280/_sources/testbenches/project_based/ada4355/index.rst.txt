@@ -150,9 +150,8 @@ The steps of the environment bringup are:
 Sanity test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test is used to check the communication with the AXI ADC module of the
-ADA4355 interface, by reading the core VERSION register. The sanity test is
-also performed for the DMA.
+This test is used to check the communication with the DMA module by running
+the DMA API sanity test.
 
 DMA test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -214,13 +213,19 @@ The steps of this test are:
 TDD LiDAR test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The TDD LiDAR test verifies the full time-gated acquisition cycle.
+The TDD LiDAR test verifies the full time-gated acquisition cycle with
+realistic LiDAR timing parameters.
 
 The steps of this test are:
 
-* Disable and reconfigure the TDD controller
-* Trigger a new TDD cycle via external sync
-* Verify the captured data from the gated acquisition window
+* Configure the ADC interface and start data capture
+* Reset the TDD controller FSM
+* Configure TDD timing: CH0 for laser trigger pulse, CH1 for DMA sync
+* Configure and arm the DMA with sync transfer start
+* Enable frame pattern for data alignment
+* Trigger the TDD via external sync pulse
+* Wait for DMA transfer completion
+* Verify that captured data matches the expected sine wave pattern
 
 Building the testbench
 -------------------------------------------------------------------------------
@@ -333,27 +338,20 @@ Testbench specific dependencies:
    * - SV dependency name
      - Source code link
      - Documentation link
-   * - ADI_REGMAP_ADC_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_adc_pkg.sv`
-     - ---
-   * - ADI_REGMAP_COMMON_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_common_pkg.sv`
-     - ---
-   * - ADI_REGMAP_DMAC_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
-     - ---
-   * - ADI_REGMAP_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_pkg.sv`
-     - ---
-   * - ADI_REGMAP_TDD_GEN_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_tdd_gen_pkg.sv`
-     - ---
    * - ADC_API
      - :git-testbenches:`library/drivers/adc/adc_api.sv`
      - ---
    * - DMAC_API
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
+   * - TDD_API *
+     - :git-testbenches:`library/drivers/tdd/tdd_api.sv`
+     - ---
+
+.. admonition:: Legend
+   :class: note
+
+   - ``*`` used only by test_program_tdd
 
 .. include:: ../../../common/more_information.rst
 

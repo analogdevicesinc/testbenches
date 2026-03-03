@@ -480,9 +480,8 @@ Please check out the proposed combinations before running a custom test.</p>
 </section>
 <section id="sanity-test">
 <h4>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h4>
-<p>This test is used to check the communication with the AXI ADC module of the
-ADA4355 interface, by reading the core VERSION register. The sanity test is
-also performed for the DMA.</p>
+<p>This test is used to check the communication with the DMA module by running
+the DMA API sanity test.</p>
 </section>
 <section id="dma-test">
 <h4>DMA test<a class="headerlink" href="#dma-test" title="Link to this heading"></a></h4>
@@ -537,12 +536,18 @@ It is structured into several tests as follows:</p>
 </section>
 <section id="tdd-lidar-test">
 <h4>TDD LiDAR test<a class="headerlink" href="#tdd-lidar-test" title="Link to this heading"></a></h4>
-<p>The TDD LiDAR test verifies the full time-gated acquisition cycle.</p>
+<p>The TDD LiDAR test verifies the full time-gated acquisition cycle with
+realistic LiDAR timing parameters.</p>
 <p>The steps of this test are:</p>
 <ul class="simple">
-<li><p>Disable and reconfigure the TDD controller</p></li>
-<li><p>Trigger a new TDD cycle via external sync</p></li>
-<li><p>Verify the captured data from the gated acquisition window</p></li>
+<li><p>Configure the ADC interface and start data capture</p></li>
+<li><p>Reset the TDD controller FSM</p></li>
+<li><p>Configure TDD timing: CH0 for laser trigger pulse, CH1 for DMA sync</p></li>
+<li><p>Configure and arm the DMA with sync transfer start</p></li>
+<li><p>Enable frame pattern for data alignment</p></li>
+<li><p>Trigger the TDD via external sync pulse</p></li>
+<li><p>Wait for DMA transfer completion</p></li>
+<li><p>Verify that captured data matches the expected sine wave pattern</p></li>
 </ul>
 </section>
 </section>
@@ -733,36 +738,26 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>ADI_REGMAP_ADC_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_adc_pkg.sv" target="_blank">library/regmaps/adi_regmap_adc_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_common_pkg.sv" target="_blank">library/regmaps/adi_regmap_common_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv" target="_blank">library/regmaps/adi_regmap_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>ADI_REGMAP_TDD_GEN_PKG</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_tdd_gen_pkg.sv" target="_blank">library/regmaps/adi_regmap_tdd_gen_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADC_API</p></td>
+<tr class="row-even"><td><p>ADC_API</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/adc/adc_api.sv" target="_blank">library/drivers/adc/adc_api.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>DMAC_API</p></td>
+<tr class="row-odd"><td><p>DMAC_API</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>TDD_API *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/tdd/tdd_api.sv" target="_blank">library/drivers/tdd/tdd_api.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> used only by test_program_tdd</p></li>
+</ul>
 </div>
 </section>
 </section>

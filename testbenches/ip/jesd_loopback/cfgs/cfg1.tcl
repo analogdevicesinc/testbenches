@@ -5,7 +5,6 @@ set xilinx_boards {
     "zcu102"
     "kv260"
     "k26"
-    "kcu105"
     "vc707"
     "vc709"
     "vcu118"

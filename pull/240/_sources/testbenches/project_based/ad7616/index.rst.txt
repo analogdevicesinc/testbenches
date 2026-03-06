@@ -71,7 +71,7 @@ The following test program files are available:
 Test program    Usage
 =============== ==========================================
 test_program_pi Tests the parallel interface capabilities.
-test_program_pi Tests the serial interface capabilities.
+test_program_si Tests the serial interface capabilities.
 =============== ==========================================
 
 Available configurations & tests combinations

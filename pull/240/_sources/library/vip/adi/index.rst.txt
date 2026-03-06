@@ -8,6 +8,7 @@ Contents
 
 .. toctree::
    :maxdepth: 1
+   :glob:
 
-   SPI VIP <spi_vip/index>
+   */index
 

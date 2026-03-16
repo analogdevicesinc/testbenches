@@ -170,6 +170,11 @@ package adc_api_pkg;
         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_3_ADC_DATA_SEL(data_sel));
     endtask
 
+    task get_crc_err_channel_status(input bit [7:0] channel, output logic crc_err);
+      this.axi_read(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS), val);
+      crc_err = `GET_ADC_CHANNEL_REG_CHAN_STATUS_CRC_ERR(val);
+    endtask
+
     task clear_channel_status(input bit [7:0] channel);
       this.axi_write(channel * 'h40 + GetAddrs(ADC_CHANNEL_REG_CHAN_STATUS),
         `SET_ADC_CHANNEL_REG_CHAN_STATUS_CRC_ERR(1'b1) |

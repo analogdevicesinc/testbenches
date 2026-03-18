@@ -58,29 +58,29 @@ Configuration files
 
 The following configuration files are available:
 
-   +-----------------------+----------------------------------------------+
-   | Configuration mode    | Parameters                                   |
-   |                       +------------+--------+------------------------+
-   |                       | BUFMRCE_EN | TDD_EN | FRAME_SHIFT_CNT        |
-   +=======================+============+========+========================+
-   | cfg1                  | 1          | 0      | 0                      |
-   +-----------------------+------------+--------+------------------------+
-   | cfg2                  | 0          | 0      | 0                      |
-   +-----------------------+------------+--------+------------------------+
-   | cfg_tdd               | 0          | 1      | 4                      |
-   +-----------------------+------------+--------+------------------------+
++-----------------------+----------------------------------------------+
+| Configuration mode    | Parameters                                   |
+|                       +------------+--------+------------------------+
+|                       | BUFMRCE_EN | TDD_EN | FRAME_SHIFT_CNT        |
++=======================+============+========+========================+
+| cfg1                  | 1          | 0      | 0                      |
++-----------------------+------------+--------+------------------------+
+| cfg2                  | 0          | 0      | 0                      |
++-----------------------+------------+--------+------------------------+
+| cfg_tdd               | 0          | 1      | 4                      |
++-----------------------+------------+--------+------------------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following test program files are available:
 
-================ ==========================================================
+================ =============================================================
 Test program     Usage
-================ ==========================================================
+================ =============================================================
 test_program     Tests the LVDS interface and DMA transfer capabilities.
 test_program_tdd Tests TDD-gated LiDAR acquisition with external sync trigger.
-================ ==========================================================
+================ =============================================================
 
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -275,16 +275,6 @@ waveforms.
    $cd testbenches/project/ada4355
    $make MODE=gui CFG=cfg1 TST=test_program
 
-*Example 4*
-
-Build the TDD configuration with its corresponding test program.
-
-.. shell::
-   :showuser:
-
-   $cd testbenches/project/ada4355
-   $make MODE=gui CFG=cfg_tdd TST=test_program_tdd
-
 The built projects can be found in the ``runs`` folder, where each configuration
 specific build has it's own folder named after the configuration file's name.
 Example: if the following command was run for a single configuration in the
@@ -340,6 +330,18 @@ Testbench specific dependencies:
      - Documentation link
    * - ADC_API
      - :git-testbenches:`library/drivers/adc/adc_api.sv`
+     - ---
+   * - ADI_REGMAP_ADC_PKG
+     - :git-testbenches:`library/regmaps/adi_regmap_adc_pkg.sv`
+     - ---
+   * - ADI_REGMAP_COMMON_PKG
+     - :git-testbenches:`library/regmaps/adi_regmap_common_pkg.sv`
+     - ---
+   * - ADI_REGMAP_DMAC_PKG
+     - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
+     - ---
+   * - ADI_REGMAP_PKG
+     - :git-testbenches:`library/regmaps/adi_regmap_pkg.sv`
      - ---
    * - DMAC_API
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`

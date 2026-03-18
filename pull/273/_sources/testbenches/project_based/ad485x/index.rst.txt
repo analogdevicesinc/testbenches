@@ -115,6 +115,10 @@ The following configuration files are available:
 +---------------+----------+----------------+
 | cfg8_lvds     | AD4858   | 1 (LVDS)       |
 +---------------+----------+----------------+
+| cfg_cmos_rand | Random   | 0 (CMOS)       |
++---------------+----------+----------------+
+| cfg_lvds_rand | Random   | 1 (LVDS)       |
++---------------+----------+----------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -124,8 +128,8 @@ The following test program files are available:
 ================== =============================================
 Test program       Usage
 ================== =============================================
-test_program_cmos  Tests the CMOS parallel interface.
-test_program_lvds  Tests the LVDS serial interface.
+test_program_cmos  Tests the CMOS interface.
+test_program_lvds  Tests the LVDS interface.
 ================== =============================================
 
 Available configurations & tests combinations
@@ -153,10 +157,12 @@ Below are the CPU/Memory interconnect addresses used in this project:
 =========================  ===========
 Instance                   Address
 =========================  ===========
+axi_intc                   0x4120_0000
 axi_ad485x                 0x43C0_0000
 axi_pwm_gen                0x43D0_0000
 ad485x_dma                 0x43E0_0000
 adc_clkgen                 0x4400_0000
+ddr_axi_vip                0x8000_0000
 =========================  ===========
 
 Interrupts
@@ -176,11 +182,10 @@ Test stimulus
 Test parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following runtime parameters can be configured at the beginning of each
-test program:
+The following test parameters are available:
 
 -  packet_format: Defines the packet format mode.
-   Options: 0, 1, 2, 3 (default: 1)
+   Options: 0, 1, 2, 3
 
    +---------------+-------------------+-------------------+
    | packet_format | AD4851/3/5/7      | AD4852/4/6/8      |
@@ -194,10 +199,24 @@ test program:
    +---------------+-------------------+-------------------+
 
 -  crc_en: Enables CRC checking.
-   Options: 0 - Disabled, 1 - Enabled (default: 0)
+   Options: 0 - Disabled, 1 - Enabled
 
 -  oversampling_en: Enables oversampling mode.
-   Options: 0 - Disabled, 1 - Enabled (default: 0)
+   Options: 0 - Disabled, 1 - Enabled
+
+These parameters are randomized at build time in the configuration files
+(cfg1-cfg8). The valid range for ``packet_format`` depends on the device
+resolution: 0-1 for 16-bit devices (AD4851/3/5/7) and 0-3 for 20-bit devices
+(AD4852/4/6/8). The ``crc_en`` and ``oversampling_en`` parameters are
+randomized as 0 or 1 for all devices.
+
+When using these configurations, the test program runs a single test case with
+the randomized values.
+
+For the random configurations (``cfg_cmos_rand``, ``cfg_lvds_rand``), these
+parameters are not set at build time. Instead, the test program internally
+generates a random vector of test cases covering multiple combinations of
+``packet_format``, ``crc_en``, and ``oversampling_en``.
 
 .. warning::
 
@@ -410,6 +429,12 @@ Testbench specific dependencies:
      - ---
    * - PWM_GEN_API
      - :git-testbenches:`library/drivers/pwm_gen_api_pkg.sv`
+     - ---
+   * - ADC_API
+     - :git-testbenches:`library/drivers/adc_api_pkg.sv`
+     - ---
+   * - COMMON_API
+     - :git-testbenches:`library/drivers/common_api_pkg.sv`
      - ---
 
 .. include:: ../../../common/more_information.rst

@@ -33,4 +33,4 @@ set ad_project_params(RX_OS_JESD_K) 32
 
 set xilinx_boards {"zcu102" "kcu105"}
 set chosen_board [lindex $xilinx_boards [expr {int(rand() * [llength $xilinx_boards])}]]
-set ad_project_params(FPGA_BOARD) zc706 ; #$chosen_board
+set ad_project_params(FPGA_BOARD) $chosen_board

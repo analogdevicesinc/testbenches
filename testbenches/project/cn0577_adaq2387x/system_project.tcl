@@ -20,7 +20,7 @@ global ad_project_params
 set use_smartconnect 1
 
 # Create the project
-adi_sim_project_xilinx $project_name "xc7z007sclg400-1"
+adi_sim_project_xilinx $project_name
 
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_pwm_gen.tcl

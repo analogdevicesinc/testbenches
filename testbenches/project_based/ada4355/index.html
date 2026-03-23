@@ -8,9 +8,9 @@
 
     <title>ADA4355 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=a525f648" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5c8d5ce8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
-    <script async="async" src="../../../_static/app.umd.js?v=fcf3088a"></script>
+    <script async="async" src="../../../_static/app.umd.js?v=f78f54ff"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -69,7 +69,7 @@
         <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
         
         <a id="logo" href="../../../index.html">
           <div>HDL Testbenches</div>
@@ -98,7 +98,11 @@
 <li><a class="reference internal" href="#">ADA4355</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#block-design">Block design</a><ul>
-<li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
+<li><a class="reference internal" href="#block-diagram">Block diagram</a><ul>
+<li><a class="reference internal" href="#ada4355-base-configuration">ADA4355 base configuration</a></li>
+<li><a class="reference internal" href="#ada4356-tdd-configuration">ADA4356 TDD configuration</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#configuration-parameters-and-modes">Configuration parameters and modes</a><ul>
 <li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
 <li><a class="reference internal" href="#tests">Tests</a></li>
@@ -110,10 +114,20 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
+<li><a class="reference internal" href="#test-program">test_program</a><ul>
 <li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
 <li><a class="reference internal" href="#sanity-test">Sanity test</a></li>
 <li><a class="reference internal" href="#dma-test">DMA test</a></li>
 <li><a class="reference internal" href="#resync-test">Resync test</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-program-tdd">test_program_tdd</a><ul>
+<li><a class="reference internal" href="#id2">Environment bringup</a></li>
+<li><a class="reference internal" href="#id3">Sanity test</a></li>
+<li><a class="reference internal" href="#dma-test-with-tdd">DMA test with TDD</a></li>
+<li><a class="reference internal" href="#tdd-lidar-test">TDD LiDAR test</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
@@ -279,9 +293,17 @@ of the <a class="icon git reference external" href="https://github.com/analogdev
 along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
-<p>The data path and clock domains are depicted in the below diagram:</p>
+<p>The data path and clock domains are depicted in the below diagrams:</p>
+<section id="ada4355-base-configuration">
+<h4>ADA4355 base configuration<a class="headerlink" href="#ada4355-base-configuration" title="Link to this heading"></a></h4>
 <a class="reference internal image-reference" href="../../../_images/ada4355_testbench_diagram.svg"><img alt="ADA4355/Testbench block diagram" class="align-center" src="../../../_images/ada4355_testbench_diagram.svg" width="800" />
 </a>
+</section>
+<section id="ada4356-tdd-configuration">
+<h4>ADA4356 TDD configuration<a class="headerlink" href="#ada4356-tdd-configuration" title="Link to this heading"></a></h4>
+<a class="reference internal image-reference" href="../../../_images/ada4355_testbench_tdd_diagram.svg"><img alt="ADA4355 TDD/Testbench block diagram" class="align-center" src="../../../_images/ada4355_testbench_tdd_diagram.svg" width="800" />
+</a>
+</section>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
@@ -290,6 +312,8 @@ along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <li><p>BUFMRCE_EN: used to differentiate between the ADA4355 and ADA4356 boards.
 Defines if the BUFMRCE primitive is used for clock gating:
 Options: 0 - Disabled (ADA4356), 1 - Enabled (ADA4355)</p></li>
+<li><p>TDD_EN: enables the AXI TDD controller for LiDAR time-gated acquisition:
+Options: 0 - Disabled, 1 - Enabled</p></li>
 <li><p>FRAME_SHIFT_CNT: defines the frame alignment shift count for testing
 different phase offsets between data and frame clock:
 Options: 0-7</p></li>
@@ -297,14 +321,14 @@ Options: 0-7</p></li>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
 <p>The following configuration files are available:</p>
-<blockquote>
-<div><div class="table-wrapper docutils container">
+<div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
-<th class="head" colspan="2"><p>Parameters</p></th>
+<th class="head" colspan="3"><p>Parameters</p></th>
 </tr>
 <tr class="row-even"><th class="head"><p>BUFMRCE_EN</p></th>
+<th class="head"><p>TDD_EN</p></th>
 <th class="head"><p>FRAME_SHIFT_CNT</p></th>
 </tr>
 </thead>
@@ -312,23 +336,25 @@ Options: 0-7</p></li>
 <tr class="row-odd"><td><p>cfg1</p></td>
 <td><p>1</p></td>
 <td><p>0</p></td>
+<td><p>0</p></td>
 </tr>
 <tr class="row-even"><td><p>cfg2</p></td>
 <td><p>0</p></td>
 <td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_shift</p></td>
 <td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_tdd</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
 <td><p>4</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-</div></blockquote>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
-<p>The following test program file is available:</p>
+<p>The following test program files are available:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
@@ -340,13 +366,44 @@ Options: 0-7</p></li>
 <tr class="row-even"><td><p>test_program</p></td>
 <td><p>Tests the LVDS interface and DMA transfer capabilities.</p></td>
 </tr>
+<tr class="row-odd"><td><p>test_program_tdd</p></td>
+<td><p>Tests TDD-gated LiDAR acquisition with external sync trigger.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 </section>
 <section id="available-configurations-tests-combinations">
 <h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
-<p>The test program is compatible with all of the above mentioned configurations.</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Configuration</p></th>
+<th class="head"><p>Test</p></th>
+<th class="head"><p>Build command</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cfg1</p></td>
+<td><p>test_program</p></td>
+<td><p>make CFG=cfg1 TST=test_program</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg2</p></td>
+<td><p>test_program</p></td>
+<td><p>make CFG=cfg2 TST=test_program</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_tdd</p></td>
+<td><p>test_program_tdd</p></td>
+<td><p>make CFG=cfg_tdd TST=test_program_tdd</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>Mixing a wrong pair of CFG and TST will result in a simulation error.
+Please check out the proposed combinations before running a custom test.</p>
+</div>
 </section>
 </section>
 <section id="cpu-memory-interconnect-addresses">
@@ -369,11 +426,20 @@ Options: 0-7</p></li>
 <tr class="row-even"><td><p>axi_ada4355_dma</p></td>
 <td><p>0x44A3_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
+<tr class="row-odd"><td><p>axi_tdd_0 *</p></td>
+<td><p>0x44A4_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ddr_axi_vip</p></td>
 <td><p>0x8000_0000</p></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only when TDD_EN=1</p></li>
+</ul>
 </div>
 </section>
 <section id="interrupts">
@@ -397,9 +463,11 @@ Options: 0-7</p></li>
 </section>
 <section id="test-stimulus">
 <h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
+<section id="test-program">
+<h3>test_program<a class="headerlink" href="#test-program" title="Link to this heading"></a></h3>
 <p>The test program is structured into several tests as follows:</p>
 <section id="environment-bringup">
-<h3>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
+<h4>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h4>
 <p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
@@ -409,13 +477,12 @@ Options: 0-7</p></li>
 </ul>
 </section>
 <section id="sanity-test">
-<h3>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h3>
-<p>This test is used to check the communication with the AXI ADC module of the
-ADA4355 interface, by reading the core VERSION register. The sanity test is
-also performed for the DMA.</p>
+<h4>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h4>
+<p>This test is used to check the communication with the DMA module by running
+the DMA API sanity test.</p>
 </section>
 <section id="dma-test">
-<h3>DMA test<a class="headerlink" href="#dma-test" title="Link to this heading"></a></h3>
+<h4>DMA test<a class="headerlink" href="#dma-test" title="Link to this heading"></a></h4>
 <p>The DMA test verifies the data capture path from the LVDS interface through
 the AXI DMAC.</p>
 <p>The steps of this test are:</p>
@@ -430,7 +497,7 @@ the AXI DMAC.</p>
 </ul>
 </section>
 <section id="resync-test">
-<h3>Resync test<a class="headerlink" href="#resync-test" title="Link to this heading"></a></h3>
+<h4>Resync test<a class="headerlink" href="#resync-test" title="Link to this heading"></a></h4>
 <p>The resync test verifies that the FSM can re-align after a sync pulse.</p>
 <p>The steps of this test are:</p>
 <ul class="simple">
@@ -438,6 +505,49 @@ the AXI DMAC.</p>
 <li><p>Wait for FSM to complete alignment search</p></li>
 <li><p>Verify that the FSM has re-aligned correctly</p></li>
 </ul>
+</section>
+</section>
+<section id="test-program-tdd">
+<h3>test_program_tdd<a class="headerlink" href="#test-program-tdd" title="Link to this heading"></a></h3>
+<p>The TDD test program extends the base test with LiDAR time-gated acquisition.
+It is structured into several tests as follows:</p>
+<section id="id2">
+<h4>Environment bringup<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<p>Same as the base test program.</p>
+</section>
+<section id="id3">
+<h4>Sanity test<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<p>Same as the base test program.</p>
+</section>
+<section id="dma-test-with-tdd">
+<h4>DMA test with TDD<a class="headerlink" href="#dma-test-with-tdd" title="Link to this heading"></a></h4>
+<p>The DMA test configures the AXI TDD controller for time-gated acquisition.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Configure the ADC interface and start data capture</p></li>
+<li><p>Configure the AXI TDD controller (frame length, channels, sync settings)</p></li>
+<li><p>Configure the DMA with sync transfer start enabled</p></li>
+<li><p>Trigger the TDD via external sync pulse</p></li>
+<li><p>Wait for DMA transfer completion</p></li>
+<li><p>Verify that captured data matches the expected sine wave pattern</p></li>
+</ul>
+</section>
+<section id="tdd-lidar-test">
+<h4>TDD LiDAR test<a class="headerlink" href="#tdd-lidar-test" title="Link to this heading"></a></h4>
+<p>The TDD LiDAR test verifies the full time-gated acquisition cycle with
+realistic LiDAR timing parameters.</p>
+<p>The steps of this test are:</p>
+<ul class="simple">
+<li><p>Configure the ADC interface and start data capture</p></li>
+<li><p>Reset the TDD controller FSM</p></li>
+<li><p>Configure TDD timing: CH0 for laser trigger pulse, CH1 for DMA sync</p></li>
+<li><p>Configure and arm the DMA with sync transfer start</p></li>
+<li><p>Enable frame pattern for data alignment</p></li>
+<li><p>Trigger the TDD via external sync pulse</p></li>
+<li><p>Wait for DMA transfer completion</p></li>
+<li><p>Verify that captured data matches the expected sine wave pattern</p></li>
+</ul>
+</section>
 </section>
 </section>
 <section id="building-the-testbench">
@@ -531,8 +641,18 @@ clean folder (no runs folder available):</p>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
 <td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
 </tr>
+<tr class="row-even"><td><p>AXI_TDD *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_tdd" target="_blank">library/axi_tdd</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_tdd/index.html#axi-tdd" target="_blank" title="(in HDL)"><span>AXI TDD</span></a></p></td>
+</tr>
 </tbody>
 </table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only when TDD_EN=1</p></li>
+</ul>
 </div>
 </section>
 <section id="testbenches-related-dependencies">
@@ -602,32 +722,42 @@ clean folder (no runs folder available):</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>ADI_REGMAP_ADC_PKG</p></td>
+<tr class="row-even"><td><p>ADC_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/adc/adc_api.sv" target="_blank">library/drivers/adc/adc_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_ADC_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_adc_pkg.sv" target="_blank">library/regmaps/adi_regmap_adc_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_common_pkg.sv" target="_blank">library/regmaps/adi_regmap_common_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv" target="_blank">library/regmaps/adi_regmap_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>ADC_API</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/adc/adc_api.sv" target="_blank">library/drivers/adc/adc_api.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
 <tr class="row-odd"><td><p>DMAC_API</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
+<tr class="row-even"><td><p>TDD_API *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/tdd/tdd_api.sv" target="_blank">library/drivers/tdd/tdd_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
 </tbody>
 </table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> used only by test_program_tdd</p></li>
+</ul>
 </div>
 </section>
 </section>

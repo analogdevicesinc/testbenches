@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -71,7 +71,7 @@ program test_program (
   input [1:0] cn0363_spi_cs);
 
 timeunit 1ns;
-timeprecision 1ps;
+timeprecision 100ps;
 
 test_harness_env base_env;
 
@@ -86,6 +86,8 @@ dmac_api dma_api;
 // Main procedure
 // --------------------------
 initial begin
+
+  setLoggerVerbosity(.value(ADI_VERBOSITY_NONE));
 
   //creating environment
   base_env = new(
@@ -111,8 +113,6 @@ initial begin
   dma_api = new(.name("CN0363 DMA API"),
                 .bus(base_env.mng.master_sequencer),
                 .base_address(`CN0363_DMA_BA));
-
-  setLoggerVerbosity(.value(ADI_VERBOSITY_NONE));
 
   base_env.start();
   base_env.sys_reset();
@@ -480,8 +480,12 @@ endtask
 //---------------------------------------------------------------------------
 
 bit   [31:0]  sdi_fifo_data = 0;
+int unsigned  sdo_data [];
 
 task fifo_spi_test();
+
+  // Allocate array for SDO data
+  sdo_data = new[1];
 
   // Enable SPI Engine
   spi_api.enable_spi_engine();
@@ -502,7 +506,8 @@ task fifo_spi_test();
   #100ns;
   // Generate a FIFO transaction, write SDO first
   repeat (`NUM_OF_WORDS) begin
-    spi_api.sdo_fifo_write(.data((16'hDEAD << (`DATA_WIDTH - `DATA_DLENGTH))));
+    sdo_data[0] = (16'hDEAD << (`DATA_WIDTH - `DATA_DLENGTH));
+    spi_api.sdo_fifo_write(.data(sdo_data));
   end
 
   generate_transfer_cmd(.sync_id(1));

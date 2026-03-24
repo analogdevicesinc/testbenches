@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,7 +35,7 @@
 
 `include "utils.svh"
 
-package ad57xx_environment_pkg;
+package spi_environment_pkg;
 
   import logger_pkg::*;
   import adi_environment_pkg::*;
@@ -43,7 +43,7 @@ package ad57xx_environment_pkg;
   import adi_spi_vip_pkg::*;
   import adi_spi_vip_if_base_pkg::*;
 
-  class ad57xx_environment extends adi_environment;
+  class spi_environment extends adi_environment;
 
     // Agents
     adi_spi_agent spi_agent;
@@ -53,7 +53,6 @@ package ad57xx_environment_pkg;
     //============================================================================
     function new(
       input string name,
-
       adi_spi_vip_if_base spi_s_vip_if);
 
       super.new(name);
@@ -62,6 +61,14 @@ package ad57xx_environment_pkg;
       this.spi_agent = new("SPI VIP Agent", spi_s_vip_if, this);
 
     endfunction
+
+    //============================================================================
+    // Configure environment
+    //   - Configure the sequencers with an initial configuration before starting
+    //============================================================================
+    task configure();
+      // No additional configuration needed for this simple environment
+    endtask
 
     //============================================================================
     // Start environment

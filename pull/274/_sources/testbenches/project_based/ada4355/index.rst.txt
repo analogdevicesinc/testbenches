@@ -21,12 +21,23 @@ along with VIPs used for clocking, reset, PS and DDR simulations.
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The data path and clock domains are depicted in the below diagram:
+The data path and clock domains are depicted in the below diagrams:
+
+ADA4355 base configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ./ada4355_testbench_diagram.svg
    :width: 800
    :align: center
    :alt: ADA4355/Testbench block diagram
+
+ADA4356 TDD configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: ./ada4355_testbench_tdd_diagram.svg
+   :width: 800
+   :align: center
+   :alt: ADA4355 TDD/Testbench block diagram
 
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,6 +47,8 @@ The following parameters of this project that can be configured:
 -  BUFMRCE_EN: used to differentiate between the ADA4355 and ADA4356 boards.
    Defines if the BUFMRCE primitive is used for clock gating:
    Options: 0 - Disabled (ADA4356), 1 - Enabled (ADA4355)
+-  TDD_EN: enables the AXI TDD controller for LiDAR time-gated acquisition:
+   Options: 0 - Disabled, 1 - Enabled
 -  FRAME_SHIFT_CNT: defines the frame alignment shift count for testing
    different phase offsets between data and frame clock:
    Options: 0-7
@@ -45,33 +58,45 @@ Configuration files
 
 The following configuration files are available:
 
-   +-----------------------+--------------------------------+
-   | Configuration mode    | Parameters                     |
-   |                       +------------+-------------------+
-   |                       | BUFMRCE_EN | FRAME_SHIFT_CNT   |
-   +=======================+============+===================+
-   | cfg1                  | 1          | 0                 |
-   +-----------------------+------------+-------------------+
-   | cfg2                  | 0          | 0                 |
-   +-----------------------+------------+-------------------+
-   | cfg_shift             | 0          | 4                 |
-   +-----------------------+------------+-------------------+
++-----------------------+----------------------------------------------+
+| Configuration mode    | Parameters                                   |
+|                       +------------+--------+------------------------+
+|                       | BUFMRCE_EN | TDD_EN | FRAME_SHIFT_CNT        |
++=======================+============+========+========================+
+| cfg1                  | 1          | 0      | 0                      |
++-----------------------+------------+--------+------------------------+
+| cfg2                  | 0          | 0      | 0                      |
++-----------------------+------------+--------+------------------------+
+| cfg_tdd               | 0          | 1      | 4                      |
++-----------------------+------------+--------+------------------------+
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The following test program file is available:
+The following test program files are available:
 
-============ =====================================================
-Test program Usage
-============ =====================================================
-test_program Tests the LVDS interface and DMA transfer capabilities.
-============ =====================================================
+================ =============================================================
+Test program     Usage
+================ =============================================================
+test_program     Tests the LVDS interface and DMA transfer capabilities.
+test_program_tdd Tests TDD-gated LiDAR acquisition with external sync trigger.
+================ =============================================================
 
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The test program is compatible with all of the above mentioned configurations.
+============= ================ ==========================================
+Configuration Test             Build command
+============= ================ ==========================================
+cfg1          test_program     make CFG=cfg1 TST=test_program
+cfg2          test_program     make CFG=cfg2 TST=test_program
+cfg_tdd       test_program_tdd make CFG=cfg_tdd TST=test_program_tdd
+============= ================ ==========================================
+
+.. error::
+
+    Mixing a wrong pair of CFG and TST will result in a simulation error.
+    Please check out the proposed combinations before running a custom test.
 
 CPU/Memory interconnect addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,8 +109,14 @@ Instance              Address
 axi_intc              0x4120_0000
 axi_ada4355_adc       0x44A0_0000
 axi_ada4355_dma       0x44A3_0000
+axi_tdd_0 *           0x44A4_0000
 ddr_axi_vip           0x8000_0000
 ====================  ===========
+
+.. admonition:: Legend
+   :class: note
+
+   - ``*`` instantiated only when TDD_EN=1
 
 Interrupts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,10 +132,13 @@ axi_ada4355_dma  13
 Test stimulus
 -------------------------------------------------------------------------------
 
+test_program
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The test program is structured into several tests as follows:
 
 Environment bringup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The steps of the environment bringup are:
 
@@ -114,14 +148,13 @@ The steps of the environment bringup are:
 * Assert the resets
 
 Sanity test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This test is used to check the communication with the AXI ADC module of the
-ADA4355 interface, by reading the core VERSION register. The sanity test is
-also performed for the DMA.
+This test is used to check the communication with the DMA module by running
+the DMA API sanity test.
 
 DMA test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The DMA test verifies the data capture path from the LVDS interface through
 the AXI DMAC.
@@ -137,7 +170,7 @@ The steps of this test are:
 * Verify that captured data matches the expected sine wave pattern
 
 Resync test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The resync test verifies that the FSM can re-align after a sync pulse.
 
@@ -146,6 +179,53 @@ The steps of this test are:
 * Pulse sync_n low to trigger FSM reset
 * Wait for FSM to complete alignment search
 * Verify that the FSM has re-aligned correctly
+
+test_program_tdd
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The TDD test program extends the base test with LiDAR time-gated acquisition.
+It is structured into several tests as follows:
+
+Environment bringup
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Same as the base test program.
+
+Sanity test
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Same as the base test program.
+
+DMA test with TDD
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The DMA test configures the AXI TDD controller for time-gated acquisition.
+
+The steps of this test are:
+
+* Configure the ADC interface and start data capture
+* Configure the AXI TDD controller (frame length, channels, sync settings)
+* Configure the DMA with sync transfer start enabled
+* Trigger the TDD via external sync pulse
+* Wait for DMA transfer completion
+* Verify that captured data matches the expected sine wave pattern
+
+TDD LiDAR test
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The TDD LiDAR test verifies the full time-gated acquisition cycle with
+realistic LiDAR timing parameters.
+
+The steps of this test are:
+
+* Configure the ADC interface and start data capture
+* Reset the TDD controller FSM
+* Configure TDD timing: CH0 for laser trigger pulse, CH1 for DMA sync
+* Configure and arm the DMA with sync transfer start
+* Enable frame pattern for data alignment
+* Trigger the TDD via external sync pulse
+* Wait for DMA transfer completion
+* Verify that captured data matches the expected sine wave pattern
 
 Building the testbench
 -------------------------------------------------------------------------------
@@ -225,6 +305,14 @@ HDL related dependencies forming the DUT
    * - AXI_DMAC
      - :git-hdl:`library/axi_dmac`
      - :external+hdl:ref:`axi_dmac`
+   * - AXI_TDD *
+     - :git-hdl:`library/axi_tdd`
+     - :external+hdl:ref:`axi_tdd`
+
+.. admonition:: Legend
+   :class: note
+
+   - ``*`` instantiated only when TDD_EN=1
 
 Testbenches related dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -240,6 +328,9 @@ Testbench specific dependencies:
    * - SV dependency name
      - Source code link
      - Documentation link
+   * - ADC_API
+     - :git-testbenches:`library/drivers/adc/adc_api.sv`
+     - ---
    * - ADI_REGMAP_ADC_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_adc_pkg.sv`
      - ---
@@ -252,12 +343,17 @@ Testbench specific dependencies:
    * - ADI_REGMAP_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_pkg.sv`
      - ---
-   * - ADC_API
-     - :git-testbenches:`library/drivers/adc/adc_api.sv`
-     - ---
    * - DMAC_API
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
+   * - TDD_API *
+     - :git-testbenches:`library/drivers/tdd/tdd_api.sv`
+     - ---
+
+.. admonition:: Legend
+   :class: note
+
+   - ``*`` used only by test_program_tdd
 
 .. include:: ../../../common/more_information.rst
 

@@ -1,7 +1,6 @@
 source [file dirname [file normalize [info script]]]/common.tcl
 
 set xilinx_boards {
-    "zc706"
     "zcu102"
     "kv260"
     "k26"

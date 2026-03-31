@@ -627,6 +627,9 @@ Execution module. This task already generates two SPI transactions when
 interleaved mode is enabled.</p>
 <p>The steps of this test are:</p>
 <ul class="simple">
+<li><p>A watchdog is initialized, which ensures that the simulation doesn’t run off
+into infinity. It also prints all successfull transfers and which one
+started hanging</p></li>
 <li><p>Generate a FIFO transaction</p></li>
 <li><p>Capture and compare the results, reading the register of the AXI SPI Engine</p></li>
 </ul>

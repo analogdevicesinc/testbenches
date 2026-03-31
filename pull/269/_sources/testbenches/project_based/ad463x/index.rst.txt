@@ -309,6 +309,9 @@ interleaved mode is enabled.
 
 The steps of this test are:
 
+* A watchdog is initialized, which ensures that the simulation doesn’t run off
+  into infinity. It also prints all successfull transfers and which one
+  started hanging
 * Generate a FIFO transaction
 * Capture and compare the results, reading the register of the AXI SPI Engine
 

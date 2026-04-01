@@ -41,8 +41,8 @@ digital interface:
 
 The NUM_OF_CHANNEL configuration parameter defines the number of ADC channels:
 
-- 1 - AD403x devices;
-- 2 - AD463x/adaq42xx devices (default).
+- 1 - AD403X devices;
+- 2 - AD463X/ADAQ42XX devices (default).
 
 The LANES_PER_CHANNEL configuration parameter defines the number of MISO lanes
 per channel of the SPI interface:
@@ -66,11 +66,11 @@ and master clock mode the SDI lines can have Single or Double Data Rates:
 
 The INTERLEAVE_MODE configuration parameter defines whether the interleaved
 mode is enabled or disabled. Interleaved mode can be only used for
-NUM_OF_CHANNEL = 2 and LANES_PER_CHANNEL = 1 (ad463x). Enabling INTERLEAVE_MODE
+NUM_OF_CHANNEL = 2 and LANES_PER_CHANNEL = 1 (AD463X). Enabling INTERLEAVE_MODE
 for any other configuration is invalid.
 
 - 0 - interleave mode disabled, each channel has their own MISO lanes. (default);
-- 1 - interleave mode enabled, the ad463x ADC share the same MISO lanes.
+- 1 - interleave mode enabled, the AD463X ADC share the same MISO lanes.
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -284,11 +284,8 @@ Environment bringup
 
 The steps of the environment bringup are:
 
-* Set logger verbosity
 * Create the environment
 * Start the environment
-* Configure and start the sequencers
-* Configure and start the watchdog
 * Start the clocks
 * Assert the resets
 

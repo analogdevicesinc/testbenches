@@ -8,7 +8,7 @@
 
     <title>AD463x &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5c8d5ce8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=833c9372" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script async="async" src="../../../_static/app.umd.js?v=f78f54ff"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
@@ -288,107 +288,208 @@ along with VIPs used for clocking, reset, PS and DDR simulations.</p>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
 <p>The following parameters of this project that can be configured:</p>
+<p>The CLK_MODE configuration parameter defines clocking mode of the device’s
+digital interface:</p>
 <ul class="simple">
-<li><p>CLK_MODE: defines clocking mode of the device’s digital interface:
-Options: 0 - SPI mode, 1 - Echo-clock or Master clock mode</p></li>
-<li><p>NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
-Options: 1 - Interleaved mode, 2 - 1 lane per channel,
-4 - 2 lanes per channel, 8 - 4 lanes per channel</p></li>
-<li><p>CAPTURE_ZONE: defines the capture zone of the next sample.
-There are two capture zones: 1 - from negative edge of the BUSY line
-until the next CNV positive edge -20ns, 2 - from the next consecutive CNV
-positive edge +20ns until the second next consecutive CNV positive edge -20ns</p></li>
-<li><p>DDR_EN: defines the type of data transfer. In echo and master clock mode
-the SDI lines can have Single or Double Data Rates.
-Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
+<li><p>0 - SPI mode;</p></li>
+<li><p>1 - Echo-clock or Master clock mode.</p></li>
+</ul>
+<p>The NUM_OF_CHANNEL configuration parameter defines the number of ADC channels:</p>
+<ul class="simple">
+<li><p>1 - AD403X devices;</p></li>
+<li><p>2 - AD463X/ADAQ42XX devices (default).</p></li>
+</ul>
+<p>The LANES_PER_CHANNEL configuration parameter defines the number of MISO lanes
+per channel of the SPI interface:</p>
+<ul class="simple">
+<li><p>1 - 1 lane per channel: Interleaved mode or single lane per channel;</p></li>
+<li><p>2 - 2 lanes per channel;</p></li>
+<li><p>4 - 4 lanes per channel (default).</p></li>
+</ul>
+<p>The CAPTURE_ZONE configuration parameter defines the capture zone of the next
+sample. There are two capture zones:</p>
+<ul class="simple">
+<li><p>1 - from negative edge of the BUSY line until the next CNV positive edge -20ns</p></li>
+<li><p>2 - from the next consecutive CNV positive edge +20ns until the second next
+consecutive CNV positive edge -20ns</p></li>
+</ul>
+<p>The DDR_EN configuration parameter defines the type of data transfer. In echo
+and master clock mode the SDI lines can have Single or Double Data Rates:</p>
+<ul class="simple">
+<li><p>0 - MISO runs on SDR</p></li>
+<li><p>1 - MISO runs on DDR.</p></li>
+</ul>
+<p>The INTERLEAVE_MODE configuration parameter defines whether the interleaved
+mode is enabled or disabled. Interleaved mode can be only used for
+NUM_OF_CHANNEL = 2 and LANES_PER_CHANNEL = 1 (AD463X). Enabling INTERLEAVE_MODE
+for any other configuration is invalid.</p>
+<ul class="simple">
+<li><p>0 - interleave mode disabled, each channel has their own MISO lanes. (default);</p></li>
+<li><p>1 - interleave mode enabled, the AD463X ADC share the same MISO lanes.</p></li>
 </ul>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
 <p>The following configuration files are available:</p>
-<blockquote>
-<div><div class="table-wrapper docutils container">
+<div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
-<th class="head" colspan="4"><p>Parameters</p></th>
-</tr>
-<tr class="row-even"><th class="head"><p>CLK_MODE</p></th>
-<th class="head"><p>NUM_OF_SDI</p></th>
+<tr class="row-odd"><th class="head"><p>Configuration mode</p></th>
+<th class="head"><p>NUM_OF_CHANNEL</p></th>
+<th class="head"><p>CLK_MODE</p></th>
 <th class="head"><p>CAPTURE_ZONE</p></th>
+<th class="head"><p>LANES_PER_CHANNEL</p></th>
 <th class="head"><p>DDR_EN</p></th>
+<th class="head"><p>NO_REORDER</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-odd"><td><p>cfg_cm0_sdi2_cz1_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>2</p></td>
+<tr class="row-even"><td><p>cfg_ch1_cm0_cz1_sdi1_ddr0_nr1</p></td>
 <td><p>1</p></td>
 <td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm0_sdi2_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm0_sdi4_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>4</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm0_sdi8_cz2_ddr0</p></td>
-<td><p>0</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi1_cz2_ddr0</p></td>
 <td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch1_cm0_cz1_sdi2_ddr0_nr0</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
 <td><p>1</p></td>
 <td><p>2</p></td>
 <td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi2_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi2_cz2_ddr1</p></td>
+<tr class="row-even"><td><p>cfg_ch1_cm0_cz1_sdi4_ddr0_nr0</p></td>
 <td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi4_cz2_ddr0</p></td>
+<td><p>0</p></td>
 <td><p>1</p></td>
 <td><p>4</p></td>
-<td><p>2</p></td>
+<td><p>0</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi4_cz2_ddr1</p></td>
+<tr class="row-odd"><td><p>cfg_ch1_cm1_cz2_sdi1_ddr0_nr1</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_ch1_cm1_cz2_sdi2_ddr0_nr0</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch1_cm1_cz2_sdi2_ddr1_nr0</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_ch1_cm1_cz2_sdi4_ddr0_nr0</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch1_cm1_cz2_sdi4_ddr1_nr0</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_ch2_cm0_cz1_sdi1_ddr0_nr0</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch2_cm0_cz1_sdi1_ddr0_nr1</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_ch2_cm0_cz1_sdi2_ddr0_nr0</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch2_cm0_cz1_sdi4_ddr0_nr0</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
 <td><p>1</p></td>
 <td><p>4</p></td>
-<td><p>2</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg_cm1_sdi8_cz2_ddr0</p></td>
-<td><p>1</p></td>
-<td><p>8</p></td>
-<td><p>2</p></td>
+<td><p>0</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-odd"><td><p>cfg_cm1_sdi8_cz2_ddr1</p></td>
-<td><p>1</p></td>
-<td><p>8</p></td>
+<tr class="row-even"><td><p>cfg_ch2_cm1_cz2_sdi1_ddr0_nr0</p></td>
 <td><p>2</p></td>
 <td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch2_cm1_cz2_sdi1_ddr0_nr1</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_ch2_cm1_cz2_sdi2_ddr0_nr0</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch2_cm1_cz2_sdi2_ddr1_nr0</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg_ch2_cm1_cz2_sdi4_ddr0_nr0</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_ch2_cm1_cz2_sdi4_ddr1_nr0</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-</div></blockquote>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
@@ -463,11 +564,15 @@ Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
 <tr class="row-odd"><td><p>cnv_generator</p></td>
 <td><p>0x44B0_0000</p></td>
 </tr>
-<tr class="row-even"><td><p>sync_generator</p></td>
+<tr class="row-even"><td><p>sync_generator*</p></td>
 <td><p>0x44C0_0000</p></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated, but only used for ADAQ4224 with isolated power supply</p>
 </div>
 </section>
 <section id="interrupts">
@@ -509,20 +614,21 @@ Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.</p></li>
 <h3>Sanity test<a class="headerlink" href="#sanity-test" title="Link to this heading"></a></h3>
 <p>This test is used to check the communication with the AXI REGMAP module of the
 AD463X SPI Engine interface, by reading the core VERSION register, along with
-writing and reading the SCRATCH register.</p>
+writing and reading the SCRATCH register. This is also done for the PWM and
+DMA.</p>
 </section>
 <section id="fifo-spi-test">
 <h3>FIFO SPI test<a class="headerlink" href="#fifo-spi-test" title="Link to this heading"></a></h3>
 <p>The FIFO SPI test verifies the simple serial transfers, made through the
-Execution module.</p>
+Execution module. This task already generates two SPI transactions when
+interleaved mode is enabled.</p>
 <p>The steps of this test are:</p>
 <ul class="simple">
-<li><p>Start the SPI clock generator (axi_clkgen)</p></li>
-<li><p>Configure the conversion signal generator (axi_pwmgen)</p></li>
-<li><p>Enable SPI Engine &amp; configure the Execution module</p></li>
-<li><p>Set up the interrupts</p></li>
+<li><p>A watchdog is initialized, which ensures that the simulation doesn’t run off
+into infinity. It also prints all successfull transfers and which one
+started hanging</p></li>
 <li><p>Generate a FIFO transaction</p></li>
-<li><p>Capture and compare the results, using the PEEK register of the AXI SPI Engine</p></li>
+<li><p>Capture and compare the results, reading the register of the AXI SPI Engine</p></li>
 </ul>
 </section>
 <section id="offload-spi-test">
@@ -539,7 +645,9 @@ Execution module.</p>
 <section id="stop-the-environment">
 <h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
 <ul class="simple">
+<li><p>Stop the sequencers</p></li>
 <li><p>Stop the clocks</p></li>
+<li><p>Stop the watchdog</p></li>
 </ul>
 </section>
 </section>
@@ -597,16 +705,16 @@ waveforms.</p>
 <div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad463x$
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_cm0_sdi2_cz1_ddr0<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_ch1_cm0_cz1_sdi1_ddr0_nr1<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
 </pre></div>
 </div>
 <div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
 specific build has it’s own folder named after the configuration file’s name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):</p>
-<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_cm0_sdi2_cz1_ddr0</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_ch2_cm0_cz2_sdi4_ddr0_nr1</span></code></p>
 <p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
-<p><code class="docutils literal notranslate"><span class="pre">cfg_cm0_sdi2_cz1_ddr0</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg_ch2_cm0_cz2_sdi4_ddr0_nr1</span></code></p>
 </section>
 <section id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>

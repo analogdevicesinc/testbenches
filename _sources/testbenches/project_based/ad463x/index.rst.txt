@@ -33,51 +33,186 @@ Configuration parameters and modes
 
 The following parameters of this project that can be configured:
 
--  CLK_MODE: defines clocking mode of the device's digital interface:
-   Options: 0 - SPI mode, 1 - Echo-clock or Master clock mode
--  NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
-   Options: 1 - Interleaved mode, 2 - 1 lane per channel,
-   4 - 2 lanes per channel, 8 - 4 lanes per channel
--  CAPTURE_ZONE: defines the capture zone of the next sample.
-   There are two capture zones: 1 - from negative edge of the BUSY line
-   until the next CNV positive edge -20ns, 2 - from the next consecutive CNV
-   positive edge +20ns until the second next consecutive CNV positive edge -20ns
--  DDR_EN: defines the type of data transfer. In echo and master clock mode
-   the SDI lines can have Single or Double Data Rates.
-   Options: 0 - MISO runs on SDR, 1 - MISO runs on DDR.
+The CLK_MODE configuration parameter defines clocking mode of the device's
+digital interface:
+
+- 0 - SPI mode;
+- 1 - Echo-clock or Master clock mode.
+
+The NUM_OF_CHANNEL configuration parameter defines the number of ADC channels:
+
+- 1 - AD403X devices;
+- 2 - AD463X/ADAQ42XX devices (default).
+
+The LANES_PER_CHANNEL configuration parameter defines the number of MISO lanes
+per channel of the SPI interface:
+
+- 1 - 1 lane per channel: Interleaved mode or single lane per channel;
+- 2 - 2 lanes per channel;
+- 4 - 4 lanes per channel (default).
+
+The CAPTURE_ZONE configuration parameter defines the capture zone of the next
+sample. There are two capture zones:
+
+- 1 - from negative edge of the BUSY line until the next CNV positive edge -20ns
+- 2 - from the next consecutive CNV positive edge +20ns until the second next
+  consecutive CNV positive edge -20ns
+
+The DDR_EN configuration parameter defines the type of data transfer. In echo
+and master clock mode the SDI lines can have Single or Double Data Rates:
+
+- 0 - MISO runs on SDR
+- 1 - MISO runs on DDR.
+
+The INTERLEAVE_MODE configuration parameter defines whether the interleaved
+mode is enabled or disabled. Interleaved mode can be only used for
+NUM_OF_CHANNEL = 2 and LANES_PER_CHANNEL = 1 (AD463X). Enabling INTERLEAVE_MODE
+for any other configuration is invalid.
+
+- 0 - interleave mode disabled, each channel has their own MISO lanes. (default);
+- 1 - interleave mode enabled, the AD463X ADC share the same MISO lanes.
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following configuration files are available:
 
-   +-----------------------+-----------------------------------------------+
-   | Configuration mode    | Parameters                                    |
-   |                       +----------+------------+--------------+--------+
-   |                       | CLK_MODE | NUM_OF_SDI | CAPTURE_ZONE | DDR_EN |
-   +=======================+==========+============+==============+========+
-   | cfg_cm0_sdi2_cz1_ddr0 | 0        | 2          | 1            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm0_sdi2_cz2_ddr0 | 0        | 2          | 2            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm0_sdi4_cz2_ddr0 | 0        | 4          | 2            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm0_sdi8_cz2_ddr0 | 0        | 8          | 2            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm1_sdi1_cz2_ddr0 | 1        | 1          | 2            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm1_sdi2_cz2_ddr0 | 1        | 2          | 2            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm1_sdi2_cz2_ddr1 | 1        | 2          | 2            | 1      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm1_sdi4_cz2_ddr0 | 1        | 4          | 2            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm1_sdi4_cz2_ddr1 | 1        | 4          | 2            | 1      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm1_sdi8_cz2_ddr0 | 1        | 8          | 2            | 0      |
-   +-----------------------+----------+------------+--------------+--------+
-   | cfg_cm1_sdi8_cz2_ddr1 | 1        | 8          | 2            | 1      |
-   +-----------------------+----------+------------+--------------+--------+
+.. list-table::
+   :header-rows: 1
+
+   * - Configuration mode
+     - NUM_OF_CHANNEL
+     - CLK_MODE
+     - CAPTURE_ZONE
+     - LANES_PER_CHANNEL
+     - DDR_EN
+     - NO_REORDER
+   * - cfg_ch1_cm0_cz1_sdi1_ddr0_nr1
+     - 1
+     - 0
+     - 1
+     - 1
+     - 0
+     - 1
+   * - cfg_ch1_cm0_cz1_sdi2_ddr0_nr0
+     - 1
+     - 0
+     - 1
+     - 2
+     - 0
+     - 0
+   * - cfg_ch1_cm0_cz1_sdi4_ddr0_nr0
+     - 1
+     - 0
+     - 1
+     - 4
+     - 0
+     - 0
+   * - cfg_ch1_cm1_cz2_sdi1_ddr0_nr1
+     - 1
+     - 1
+     - 2
+     - 1
+     - 0
+     - 1
+   * - cfg_ch1_cm1_cz2_sdi2_ddr0_nr0
+     - 1
+     - 1
+     - 2
+     - 2
+     - 0
+     - 0
+   * - cfg_ch1_cm1_cz2_sdi2_ddr1_nr0
+     - 1
+     - 1
+     - 2
+     - 2
+     - 1
+     - 0
+   * - cfg_ch1_cm1_cz2_sdi4_ddr0_nr0
+     - 1
+     - 1
+     - 2
+     - 4
+     - 0
+     - 0
+   * - cfg_ch1_cm1_cz2_sdi4_ddr1_nr0
+     - 1
+     - 1
+     - 2
+     - 4
+     - 1
+     - 0
+   * - cfg_ch2_cm0_cz1_sdi1_ddr0_nr0
+     - 2
+     - 0
+     - 1
+     - 1
+     - 0
+     - 0
+   * - cfg_ch2_cm0_cz1_sdi1_ddr0_nr1
+     - 2
+     - 0
+     - 1
+     - 1
+     - 0
+     - 1
+   * - cfg_ch2_cm0_cz1_sdi2_ddr0_nr0
+     - 2
+     - 0
+     - 1
+     - 2
+     - 0
+     - 0
+   * - cfg_ch2_cm0_cz1_sdi4_ddr0_nr0
+     - 2
+     - 0
+     - 1
+     - 4
+     - 0
+     - 0
+   * - cfg_ch2_cm1_cz2_sdi1_ddr0_nr0
+     - 2
+     - 1
+     - 2
+     - 1
+     - 0
+     - 0
+   * - cfg_ch2_cm1_cz2_sdi1_ddr0_nr1
+     - 2
+     - 1
+     - 2
+     - 1
+     - 0
+     - 1
+   * - cfg_ch2_cm1_cz2_sdi2_ddr0_nr0
+     - 2
+     - 1
+     - 2
+     - 2
+     - 0
+     - 0
+   * - cfg_ch2_cm1_cz2_sdi2_ddr1_nr0
+     - 2
+     - 1
+     - 2
+     - 2
+     - 1
+     - 0
+   * - cfg_ch2_cm1_cz2_sdi4_ddr0_nr0
+     - 2
+     - 1
+     - 2
+     - 4
+     - 0
+     - 0
+   * - cfg_ch2_cm1_cz2_sdi4_ddr1_nr0
+     - 2
+     - 1
+     - 2
+     - 4
+     - 1
+     - 0
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -119,8 +254,13 @@ spi_ad463x_axi_regmap  0x44A0_0000
 axi_ad463x_dma         0x44A3_0000
 spi_clkgen             0x44A7_0000
 cnv_generator          0x44B0_0000
-sync_generator         0x44C0_0000
+sync_generator*        0x44C0_0000
 =====================  ===========
+
+.. admonition:: Legend
+   :class: note
+
+   ``*`` instantiated, but only used for ADAQ4224 with isolated power supply
 
 Interrupts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,22 +294,23 @@ Sanity test
 
 This test is used to check the communication with the AXI REGMAP module of the
 AD463X SPI Engine interface, by reading the core VERSION register, along with
-writing and reading the SCRATCH register.
+writing and reading the SCRATCH register. This is also done for the PWM and
+DMA.
 
 FIFO SPI test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The FIFO SPI test verifies the simple serial transfers, made through the
-Execution module.
+Execution module. This task already generates two SPI transactions when
+interleaved mode is enabled.
 
 The steps of this test are:
 
-* Start the SPI clock generator (axi_clkgen)
-* Configure the conversion signal generator (axi_pwmgen)
-* Enable SPI Engine & configure the Execution module
-* Set up the interrupts
+* A watchdog is initialized, which ensures that the simulation doesn’t run off
+  into infinity. It also prints all successfull transfers and which one
+  started hanging
 * Generate a FIFO transaction
-* Capture and compare the results, using the PEEK register of the AXI SPI Engine
+* Capture and compare the results, reading the register of the AXI SPI Engine
 
 Offload SPI test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,7 +327,9 @@ The steps of this test are:
 Stop the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* Stop the sequencers
 * Stop the clocks
+* Stop the watchdog
 
 Building the testbench
 -------------------------------------------------------------------------------
@@ -234,18 +377,18 @@ waveforms.
    :showuser:
 
    $cd testbenches/project/ad463x
-   $make MODE=gui CFG=cfg_cm0_sdi2_cz1_ddr0 TST=test_program
+   $make MODE=gui CFG=cfg_ch1_cm0_cz1_sdi1_ddr0_nr1 TST=test_program
 
 The built projects can be found in the ``runs`` folder, where each configuration
 specific build has it's own folder named after the configuration file's name.
 Example: if the following command was run for a single configuration in the
 clean folder (no runs folder available):
 
-``make CFG=cfg_cm0_sdi2_cz1_ddr0``
+``make CFG=cfg_ch2_cm0_cz2_sdi4_ddr0_nr1``
 
 Then the subfolder under ``runs`` name will be:
 
-``cfg_cm0_sdi2_cz1_ddr0``
+``cfg_ch2_cm0_cz2_sdi4_ddr0_nr1``
 
 Resources
 -------------------------------------------------------------------------------

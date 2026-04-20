@@ -34,3 +34,5 @@ set ad_project_params(SDO_IDLE_STATE)   0
 set ad_project_params(CLOCK_DIVIDER)    0
 set ad_project_params(CS_ACTIVE_HIGH)   0
 set ad_project_params(ECHO_SCLK)        1
+
+set ad_project_params(FPGA_BOARD) "zed"

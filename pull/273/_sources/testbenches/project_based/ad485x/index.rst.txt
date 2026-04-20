@@ -1,7 +1,7 @@
 .. _ad485x:
 
 AD485X
-================================================================================
+===============================================================================
 
 Overview
 -------------------------------------------------------------------------------
@@ -68,10 +68,13 @@ The following parameters of this project can be configured:
 -  LVDS_CMOS_N: Defines the physical interface type.
    Options: 0 - CMOS, 1 - LVDS
 
-The device parameter also determines:
+.. note::
 
--  Number of channels: 4 channels for AD4851-AD4854, 8 channels for AD4855-AD4858
--  Resolution: 16-bit for AD4851/AD4853/AD4855/AD4857, 20-bit for AD4852/AD4854/AD4856/AD4858
+   The following properties are automatically determined by the selected
+   DEVICE and are not configuration parameters:
+
+   -  Number of channels: 4 channels for AD4851-AD4854, 8 channels for AD4855-AD4858
+   -  Resolution: 16-bit for AD4851/AD4853/AD4855/AD4857, 20-bit for AD4852/AD4854/AD4856/AD4858
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -201,22 +204,22 @@ The following test parameters are available:
 -  crc_en: Enables CRC checking.
    Options: 0 - Disabled, 1 - Enabled
 
--  oversampling_en: Enables oversampling mode.
+-  os_en: Enables oversampling mode.
    Options: 0 - Disabled, 1 - Enabled
 
-These parameters are randomized at build time in the configuration files
-(cfg1-cfg8). The valid range for ``packet_format`` depends on the device
-resolution: 0-1 for 16-bit devices (AD4851/3/5/7) and 0-3 for 20-bit devices
-(AD4852/4/6/8). The ``crc_en`` and ``oversampling_en`` parameters are
-randomized as 0 or 1 for all devices.
+These parameters are randomized at build time in the numbered configuration
+files (cfg1-cfg8), not in the random configurations. The valid range for
+``packet_format`` depends on the device resolution: 0-1 for 16-bit devices
+(AD4851/3/5/7) and 0-3 for 20-bit devices (AD4852/4/6/8). The ``crc_en``
+and ``os_en`` parameters are randomized as 0 or 1 for all devices.
 
 When using these configurations, the test program runs a single test case with
 the randomized values.
 
 For the random configurations (``cfg_cmos_rand``, ``cfg_lvds_rand``), these
 parameters are not set at build time. Instead, the test program internally
-generates a random vector of test cases covering multiple combinations of
-``packet_format``, ``crc_en``, and ``oversampling_en``.
+generates all valid combinations of ``packet_format``, ``crc_en``, and
+``os_en``, then randomly selects 5 to 10 test cases to run.
 
 .. warning::
 
@@ -260,7 +263,6 @@ This test is used to check the communication with the AXI interfaces by:
 
 * Testing the DMA sanity (read/write SCRATCH register)
 * Testing the PWM generator sanity
-* Testing the ADC core sanity (read/write SCRATCH register)
 
 Data acquisition test
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -270,6 +272,7 @@ Data acquisition test
 * Enable CRC checking
 * Configure the number of active lanes
 * Enable ADC channels
+* Prepare expected test data
 * Configure the clock generator (axi_clkgen)
 * Configure the DMA for data reception
 * Configure and start the PWM generator for conversion triggering
@@ -412,12 +415,6 @@ Testbench specific dependencies:
    * - ADI_REGMAP_PWM_GEN_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_pwm_gen_pkg.sv`
      - ---
-   * - AXI_VIP_PKG
-     - ---
-     - :xilinx:`AXI Verification IP (VIP) <products/intellectual-property/axi-vip.html>`
-   * - AXI4STREAM_VIP_PKG
-     - ---
-     - :xilinx:`AXI Stream Verification IP (VIP) <products/intellectual-property/axi-stream-vip.html>`
    * - CLK_GEN_API
      - :git-testbenches:`library/drivers/clk_gen_api_pkg.sv`
      - ---

@@ -94,6 +94,12 @@ package adi_spi_vip_if_base_pkg;
 
     pure virtual task set_miso_oen(bit val);
 
+    pure virtual function logic get_resetn();
+
+    pure virtual task wait_until_reset_asserted();
+
+    pure virtual task wait_until_reset_deasserted();
+
   endclass
 
 endpackage

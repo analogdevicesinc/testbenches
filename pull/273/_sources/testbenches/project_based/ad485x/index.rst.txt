@@ -415,8 +415,14 @@ Testbench specific dependencies:
    * - ADI_REGMAP_PWM_GEN_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_pwm_gen_pkg.sv`
      - ---
+   * - ADC_API
+     - :git-testbenches:`library/drivers/adc_api_pkg.sv`
+     - ---
    * - CLK_GEN_API
      - :git-testbenches:`library/drivers/clk_gen_api_pkg.sv`
+     - ---
+   * - COMMON_API
+     - :git-testbenches:`library/drivers/common_api_pkg.sv`
      - ---
    * - DMA_TRANS
      - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
@@ -426,12 +432,6 @@ Testbench specific dependencies:
      - ---
    * - PWM_GEN_API
      - :git-testbenches:`library/drivers/pwm_gen_api_pkg.sv`
-     - ---
-   * - ADC_API
-     - :git-testbenches:`library/drivers/adc_api_pkg.sv`
-     - ---
-   * - COMMON_API
-     - :git-testbenches:`library/drivers/common_api_pkg.sv`
      - ---
 
 .. include:: ../../../common/more_information.rst

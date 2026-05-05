@@ -333,8 +333,10 @@ Options: 0 - CMOS, 1 - LVDS</p></li>
 <p>The following properties are automatically determined by the selected
 DEVICE and are not configuration parameters:</p>
 <ul class="simple">
-<li><p>Number of channels: 4 channels for AD4851-AD4854, 8 channels for AD4855-AD4858</p></li>
-<li><p>Resolution: 16-bit for AD4851/AD4853/AD4855/AD4857, 20-bit for AD4852/AD4854/AD4856/AD4858</p></li>
+<li><p>Number of channels: 4 channels for AD4851-AD4854, 8 channels for
+AD4855-AD4858</p></li>
+<li><p>Resolution: 16-bit for AD4851/AD4853/AD4855/AD4857, 20-bit for
+AD4852/AD4854/AD4856/AD4858</p></li>
 </ul>
 </div>
 <section id="configuration-files">
@@ -584,10 +586,10 @@ generates all valid combinations of <code class="docutils literal notranslate"><
 <code class="docutils literal notranslate"><span class="pre">os_en</span></code>, then randomly selects 5 to 10 test cases to run.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong>CMOS interface limitation:</strong> The CRC check might break the captured data when
-using max sample rate with scki = 100MHz and packet format &gt;= 20 bit.
-The data transaction doesn’t meet the minimum timing requirement between
-the last SCKI edge and the CNV signal according to the datasheet.</p>
+<p><strong>CMOS interface limitation:</strong> The CRC check might break the captured data
+when using max sample rate with scki = 100MHz and packet format &gt;= 20 bit.
+The data transaction doesn’t meet the minimum timing requirement between the
+last SCKI edge and the CNV signal according to the datasheet.</p>
 <p>Solutions:</p>
 <ul class="simple">
 <li><p>Use lower sampling rates</p></li>

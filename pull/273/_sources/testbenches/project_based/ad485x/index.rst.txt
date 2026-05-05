@@ -73,8 +73,10 @@ The following parameters of this project can be configured:
    The following properties are automatically determined by the selected
    DEVICE and are not configuration parameters:
 
-   -  Number of channels: 4 channels for AD4851-AD4854, 8 channels for AD4855-AD4858
-   -  Resolution: 16-bit for AD4851/AD4853/AD4855/AD4857, 20-bit for AD4852/AD4854/AD4856/AD4858
+   -  Number of channels: 4 channels for AD4851-AD4854, 8 channels for
+      AD4855-AD4858
+   -  Resolution: 16-bit for AD4851/AD4853/AD4855/AD4857, 20-bit for
+      AD4852/AD4854/AD4856/AD4858
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -223,10 +225,10 @@ generates all valid combinations of ``packet_format``, ``crc_en``, and
 
 .. warning::
 
-   **CMOS interface limitation:** The CRC check might break the captured data when
-   using max sample rate with scki = 100MHz and packet format >= 20 bit.
-   The data transaction doesn't meet the minimum timing requirement between
-   the last SCKI edge and the CNV signal according to the datasheet.
+   **CMOS interface limitation:** The CRC check might break the captured data
+   when using max sample rate with scki = 100MHz and packet format >= 20 bit.
+   The data transaction doesn't meet the minimum timing requirement between the
+   last SCKI edge and the CNV signal according to the datasheet.
 
    Solutions:
 

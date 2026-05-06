@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2022-2026 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,7 +38,7 @@ global ad_project_params
 # system level parameters
 set INTF  $ad_project_params(INTF)
 set ADC_N_BITS $ad_project_params(ADC_N_BITS)
-set NUM_OF_SDI $ad_project_params(NUM_OF_SDI)
+set NUM_OF_SDI $ad_project_params(NUM_OF_SDIO)
 
 adi_project_files [list \
 	"$ad_hdl_dir/library/common/ad_edge_detect.v" \
@@ -64,6 +64,18 @@ if {$INTF == 0} {
 
   create_bd_port -dir O ad7606_irq
   ad_connect ad7606_irq spi_ad7606/irq
+
+  # Add SPI VIP
+  ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
+  adi_sim_add_define "SPI_S=spi_s_vip"
+
+  # Create a monitor interface for waveform viewing
+  create_bd_intf_port -mode Monitor -vlnv analog.com:interface:spi_engine_rtl:1.0 ad7606_spi_vip
+
+  # Disconnect original SPI interface and connect VIP
+  ad_disconnect ad7606_spi spi_ad7606/m_spi
+  ad_connect spi_s_vip/s_spi spi_ad7606/m_spi
+  ad_connect ad7606_spi_vip spi_ad7606/m_spi
 
   set BA_SPI_REGMAP 0x44A00000
   set_property offset $BA_SPI_REGMAP [get_bd_addr_segs {mng_axi_vip/Master_AXI/spi_ad7606_axi_regmap}]

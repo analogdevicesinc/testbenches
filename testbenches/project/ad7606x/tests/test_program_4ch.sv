@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2023 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2023-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -38,25 +38,19 @@
 `include "utils.svh"
 
 import axi_vip_pkg::*;
-import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_adc_pkg::*;
 import adi_regmap_common_pkg::*;
-import adi_regmap_dmac_pkg::*;
-import adi_regmap_pwm_gen_pkg::*;
+import adc_api_pkg::*;
+import pwm_gen_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 parameter SIMPLE_STATUS_CRC = 0;
-
-localparam CH0 = 8'h00 * 4;
-localparam CH1 = 8'h10 * 4;
-localparam CH2 = 8'h20 * 4;
-localparam CH3 = 8'h30 * 4;
 
 program test_program_4ch (
   input         rx_cnvst_n,
@@ -81,32 +75,8 @@ program test_program_4ch (
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
-  // --------------------------
-  // Wrapper function for AXI read verif
-  // --------------------------
-  task axi_read_v(
-    input   [31:0]  raddr,
-    input   [31:0]  vdata);
-
-    base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
-  endtask
-
-  task axi_read(
-    input   [31:0]  raddr,
-    output  [31:0]  data);
-
-    base_env.mng.master_sequencer.RegRead32(raddr,data);
-  endtask
-
-  // --------------------------
-  // Wrapper function for AXI write
-  // --------------------------
-  task axi_write(
-    input [31:0]  waddr,
-    input [31:0]  wdata);
-
-    base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
-  endtask
+  adc_api adc_api;
+  pwm_gen_api pwm_api;
 
   // --------------------------
   // Main procedure
@@ -128,6 +98,14 @@ program test_program_4ch (
 
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
+
+    adc_api = new("ADC API",
+                  base_env.mng.master_sequencer,
+                  `AXI_AD7606X_BA);
+
+    pwm_api = new("PWM API",
+                  base_env.mng.master_sequencer,
+                  `AXI_PWMGEN_BA);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
@@ -190,8 +168,8 @@ program test_program_4ch (
 
   task sanity_test();
     // check ADC VERSION
-    axi_read_v (`AXI_AD7606X_BA + GetAddrs(COMMON_REG_VERSION),
-                    `SET_COMMON_REG_VERSION_VERSION('h000a0300));
+    adc_api.axi_verify(GetAddrs(COMMON_REG_VERSION),
+                       `SET_COMMON_REG_VERSION_VERSION('h000a0300));
     `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
   endtask
 
@@ -389,139 +367,131 @@ program test_program_4ch (
   bit        ctrl_status_STATUS_CRC = 'h0; // ctrl_status bit from ADC common core
 
   task adc_config_SIMPLE_test();
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // set static data setup in device's reg 0x21
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_SIMPLE); // read last config result
+    adc_api.reset(.ce_n(1'b0), .mmcm_rstn(1'b1), .rstn(1'b1));
+    adc_api.set_adc_config_wr(32'h00002181);
+    adc_api.get_adc_config_wr(config_SIMPLE);
     `INFO(("Config_SIMPLE is set up, ADC_CONFIG_WR contains 0x%h",config_SIMPLE), ADI_VERBOSITY_LOW);
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_SIMPLE); // read last config result
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.get_adc_config_control(config_wr_SIMPLE);
     `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
 
-    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW); // read written data
+    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_SIMPLE); // read last config result
+    adc_api.set_adc_config_control(32'h00000000);
+    adc_api.get_adc_config_control(config_wr_SIMPLE);
     `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_SIMPLE), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000000)); // set exit from register mode sequence
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+    adc_api.set_adc_config_wr(32'h00000000);
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.set_adc_config_control(32'h00000000);
 
-    //set HDL config mode
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h100); // set default
+    adc_api.set_common_control_3(.crc_en(1'b0), .custom_control(8'h00));
 
     adc_config_mode = 3'h0;
   endtask
 
   task adc_config_CRC_test();
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002185)); // set CRC and static data setup in device's reg 0x21
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_CRC); // read last config result
+    adc_api.reset(.ce_n(1'b0), .mmcm_rstn(1'b1), .rstn(1'b1));
+    adc_api.set_adc_config_wr(32'h00002185);
+    adc_api.get_adc_config_wr(config_CRC);
     `INFO(("Config_CRC is set up, ADC_CONFIG_WR contains 0x%h",config_CRC), ADI_VERBOSITY_LOW);
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_CRC); // read last config result
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.get_adc_config_control(config_wr_CRC);
     `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_CRC), ADI_VERBOSITY_LOW);
 
-    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW); // read written data
+    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_CRC); // read last config result
+    adc_api.set_adc_config_control(32'h00000000);
+    adc_api.get_adc_config_control(config_wr_CRC);
     `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_CRC), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000000)); // set exit from register mode sequence
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+    adc_api.set_adc_config_wr(32'h00000000);
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.set_adc_config_control(32'h00000000);
 
-    //set HDL config mode
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h101); // set default
+    adc_api.set_common_control_3(.crc_en(1'b1), .custom_control(8'h00));
 
     adc_config_mode = 3'h1;
   endtask
 
   task adc_config_STATUS_test();
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002181)); // static data setup in device's reg 0x21
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
+    adc_api.reset(.ce_n(1'b0), .mmcm_rstn(1'b1), .rstn(1'b1));
+    adc_api.set_adc_config_wr(32'h00002181);
+    adc_api.get_adc_config_wr(config_STATUS);
     `INFO(("Config_SIMPLE is set up, ADC_CONFIG_WR contains 0x%h",config_STATUS), ADI_VERBOSITY_LOW);
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_STATUS); // read last config result
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.get_adc_config_control(config_wr_STATUS);
     `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_STATUS), ADI_VERBOSITY_LOW);
 
-    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW); // read written data
+    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_CRC); // read last config result
+    adc_api.set_adc_config_control(32'h00000000);
+    adc_api.get_adc_config_control(config_wr_CRC);
     `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_CRC), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000248)); // set STATUS header in device's reg 0x02
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
+    adc_api.set_adc_config_wr(32'h00000248);
+    adc_api.get_adc_config_wr(config_STATUS);
     `INFO(("Config_STATUS is set up, ADC_CONFIG_WR contains 0x%h",config_STATUS), ADI_VERBOSITY_LOW);
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_STATUS); // read last config result
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.get_adc_config_control(config_wr_STATUS);
     `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_STATUS), ADI_VERBOSITY_LOW);
 
-    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW); // read written data
+    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_CRC); // read last config result
+    adc_api.set_adc_config_control(32'h00000000);
+    adc_api.get_adc_config_control(config_wr_CRC);
     `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_CRC), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000000)); // set exit from register mode sequence
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+    adc_api.set_adc_config_wr(32'h00000000);
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.set_adc_config_control(32'h00000000);
 
-    //set HDL config mode
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h102); // set default
+    adc_api.set_common_control_3(.crc_en(1'b0), .custom_control(8'h02));
 
     adc_config_mode = 3'h2;
   endtask
 
   task adc_config_STATUS_CRC_test();
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_RSTN), `SET_ADC_COMMON_REG_RSTN_RSTN(1'b1)); //ADC common core out of reset
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00002185)); // static data and CRC setup in device's reg 0x21
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
+    adc_api.reset(.ce_n(1'b0), .mmcm_rstn(1'b1), .rstn(1'b1));
+    adc_api.set_adc_config_wr(32'h00002185);
+    adc_api.get_adc_config_wr(config_STATUS);
     `INFO(("Config_SIMPLE is set up, ADC_CONFIG_WR contains 0x%h",config_STATUS), ADI_VERBOSITY_LOW);
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_STATUS); // read last config result
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.get_adc_config_control(config_wr_STATUS);
     `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_STATUS), ADI_VERBOSITY_LOW);
 
-    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW); // read written data
+    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_CRC); // read last config result
+    adc_api.set_adc_config_control(32'h00000000);
+    adc_api.get_adc_config_control(config_wr_CRC);
     `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_CRC), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000248)); // set STATUS header in device's reg 0x02
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), config_STATUS); // read last config result
+    adc_api.set_adc_config_wr(32'h00000248);
+    adc_api.get_adc_config_wr(config_STATUS);
     `INFO(("Config_STATUS is set up, ADC_CONFIG_WR contains 0x%h",config_STATUS), ADI_VERBOSITY_LOW);
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_STATUS); // read last config result
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.get_adc_config_control(config_wr_STATUS);
     `INFO(("Write request sent, ADC_CONFIG_CTRL contains 0x%h",config_wr_STATUS), ADI_VERBOSITY_LOW);
 
-    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW); // read written data
+    `INFO(("Data on DB_O port: 0x%h",rx_db_o), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
-    axi_read(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), config_wr_CRC); // read last config result
+    adc_api.set_adc_config_control(32'h00000000);
+    adc_api.get_adc_config_control(config_wr_CRC);
     `INFO(("ADC_CONFIG_CTRL contains 0x%h",config_wr_CRC), ADI_VERBOSITY_LOW);
 
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_WR), `SET_ADC_COMMON_REG_ADC_CONFIG_WR_ADC_CONFIG_WR(32'h00000000)); // set exit from register mode sequence
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000001)); // send WR request
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_ADC_CONFIG_CTRL), `SET_ADC_COMMON_REG_ADC_CONFIG_CTRL_ADC_CONFIG_CTRL(32'h00000000)); // set default control value (no rd/wr request)
+    adc_api.set_adc_config_wr(32'h00000000);
+    adc_api.set_adc_config_control(32'h00000001);
+    adc_api.set_adc_config_control(32'h00000000);
 
-   //set HDL config mode
-    axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h103); // set default
+    adc_api.set_common_control_3(.crc_en(1'b1), .custom_control(8'h03));
 
     adc_config_mode = 3'h3;
   endtask
 
   task adc_config_number_of_channels();
-    axi_write (`AXI_AD7606X_BA + CH0 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
-    axi_write (`AXI_AD7606X_BA + CH1 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
-    axi_write (`AXI_AD7606X_BA + CH2 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
-    axi_write (`AXI_AD7606X_BA + CH3 + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),`SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
-
-    //set HDL config mode
-    // axi_write(`AXI_AD7606X_BA + GetAddrs(ADC_COMMON_REG_CNTRL_3), 'h103); // set default
+    for (int i = 0; i < 4; i++) begin
+      adc_api.enable_channel(i);
+    end
 
     adc_config_mode = 3'h4;
   endtask
@@ -534,18 +504,18 @@ program test_program_4ch (
     transfer_status = 1;
 
     // Generate cnvst_n pulse using AXI_PWM_GEN
-    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(0)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD('h64)); // set PWM period
-    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH), `SET_AXI_PWM_GEN_REG_PULSE_X_WIDTH_PULSE_X_WIDTH('h63)); // set PWM pulse width
-    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
-    `INFO(("Axi_pwm_gen started"), ADI_VERBOSITY_LOW);
+    pwm_api.reset();
+    pwm_api.start();
+    pwm_api.pulse_period_config(0, 'h64);
+    pwm_api.pulse_width_config(0, 'h63);
+    pwm_api.load_config();
+    `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
 
     wait(rx_ch_count == num_of_transfers);
 
     // Stop pwm gen
-    axi_write (`AXI_PWMGEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
-    `INFO(("Axi_pwm_gen stopped"), ADI_VERBOSITY_LOW);
+    pwm_api.reset();
+    `INFO(("axi_pwm_gen stopped."), ADI_VERBOSITY_LOW);
   endtask
 
 endprogram

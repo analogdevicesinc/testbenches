@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2023 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2023-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -108,34 +108,31 @@ module system_tb();
   end
   else //serial interface
   begin
-    wire                   ad7606_spi_sclk;
-    wire                   ad7606_spi_sdo;
-    wire [`NUM_OF_SDI-1:0] ad7606_spi_sdi;
-    wire                   ad7606_spi_cs;
-    wire                   spi_clk;
-    wire                   adc_busy;
-    wire                   adc_cnvst_n;
-    wire                   ad7606_irq;
+    wire                    ad7606_spi_sclk;
+    wire                    ad7606_spi_sdo;
+    wire [`NUM_OF_MISO-1:0] ad7606_spi_sdi;
+    wire                    ad7606_spi_cs;
+    wire                    spi_clk;
+    wire                    adc_busy;
+    wire                    adc_cnvst_n;
+    wire                    ad7606_irq;
 
     `TEST_PROGRAM test(
       .spi_clk (spi_clk),
-      .ad7606_irq (ad7606_irq),
-      .ad7606_spi_sdi(ad7606_spi_sdi),
-      .ad7606_spi_cs (ad7606_spi_cs),
-      .ad7606_spi_sclk (ad7606_spi_sclk));
+      .ad7606_irq (ad7606_irq));
 
     test_harness `TH (
       .spi_clk (spi_clk),
       .ad7606_irq (ad7606_irq),
       .rx_busy (adc_busy),
       .rx_cnvst_n (adc_cnvst_n),
-      .ad7606_spi_sdo (ad7606_spi_sdo),
-      .ad7606_spi_sdi (ad7606_spi_sdi),
-      .ad7606_spi_cs (ad7606_spi_cs),
-      .ad7606_spi_sclk (ad7606_spi_sclk));
+      .ad7606_spi_vip_sclk (ad7606_spi_sclk),
+      .ad7606_spi_vip_cs (ad7606_spi_cs),
+      .ad7606_spi_vip_sdo (ad7606_spi_sdo),
+      .ad7606_spi_vip_sdi (ad7606_spi_sdi));
 
-      assign adc_busy = adc_cnvst_n;
-    end
+    assign adc_busy = adc_cnvst_n;
+  end
   endgenerate
 
 endmodule

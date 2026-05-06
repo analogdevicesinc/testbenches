@@ -59,7 +59,8 @@ program test_program (
   input ad463x_spi_sclk,
   input ad463x_spi_cs,
   input ad463x_spi_clk,
-  output [(`NUM_OF_SDI - 1):0] ad463x_spi_sdi);
+  input ad463x_spi_sdo,
+  output [(`NUM_OF_MISO - 1):0] ad463x_spi_sdi);
 
   timeunit 1ns;
   timeprecision 100ps;
@@ -75,6 +76,23 @@ program test_program (
   pwm_gen_api pwm_api;
   clk_gen_api clkgen_api;
   watchdog fifo_data_rd;
+
+  // Lane mask variables
+  bit [7:0] sdi_lane_mask = `MISO_LANE_MASK;
+  int num_of_active_sdi_lanes = $countones(`MISO_LANE_MASK);
+
+  // SDO capture variables (FIFO mode - per-transfer capture)
+  bit [31:0] sdo_shiftreg = 32'd0;
+  bit [31:0] sdo_captured_data = 32'd0;
+  bit [31:0] sdo_expected_data = 32'd0;
+  bit [5:0]  sdo_capture_cnt = 6'b0;
+
+  // SDO capture variables (Offload mode - continuous capture)
+  // Buffer holds all SDO bits during entire offload period
+  // Max: 2*NUM_OF_TRANSFERS * 32 bits = up to 640 bits for NUM_OF_TRANSFERS=10
+  localparam SDO_OFFLOAD_BUFFER_BITS = 2 * `NUM_OF_TRANSFERS * 32;
+  bit [SDO_OFFLOAD_BUFFER_BITS-1:0] sdo_offload_buffer = '0;
+  int sdo_offload_bit_cnt = 0;
 
   // --------------------------
   // Main procedure
@@ -141,11 +159,15 @@ program test_program (
   //---------------------------------------------------------------------------
 
   task generate_transfer_cmd(
-      input [7:0] sync_id);
+      input [7:0] sync_id,
+      input [7:0] lane_mask = `MISO_LANE_MASK);
+    // Set lane masks (SDO is always 1 lane for AD463x)
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(lane_mask));
+    spi_api.fifo_command(`SET_SDO_LANE_MASK(`MOSI_LANE_MASK));
     // assert CSN
     spi_api.fifo_command(`SET_CS(8'hFE));
-    // transfer data
-    spi_api.fifo_command(`INST_RD);
+    // transfer data (read + write)
+    spi_api.fifo_command(`INST_WRD);
     // de-assert CSN
     spi_api.fifo_command(`SET_CS(8'hFF));
     // SYNC command to generate interrupt
@@ -212,6 +234,34 @@ program test_program (
   assign ad463x_busy = (`CAPTURE_ZONE == 2) ? ad463x_echo_sclk : ad463x_cnv;
 
   //---------------------------------------------------------------------------
+  // SDO capture - captures data sent by SPI Engine on SDO pin
+  //---------------------------------------------------------------------------
+  // SDO capture uses spi_sclk (the clock from the SPI Engine master).
+  // The SPI Engine shifts SDO on spi_sclk, so we sample on spi_sclk posedge.
+  //
+  // Two capture modes:
+  // 1. FIFO mode (!offload_status): per-transfer capture into sdo_shiftreg
+  // 2. Offload mode (offload_status): continuous capture into sdo_offload_buffer
+  //
+  // Note: Uses m_spi_csn_negedge_s for CSN edge detection (defined below in SDI section)
+  initial forever @(posedge ad463x_spi_sclk or posedge m_spi_csn_negedge_s) begin
+    if (m_spi_csn_negedge_s) begin
+      // CSN negedge - reset per-transfer shiftreg
+      sdo_shiftreg <= 32'd0;
+      sdo_capture_cnt <= 6'b0;
+    end else if (!ad463x_spi_cs) begin
+      // FIFO mode: per-transfer capture
+      sdo_shiftreg <= {sdo_shiftreg[30:0], ad463x_spi_sdo};
+      sdo_capture_cnt <= sdo_capture_cnt + 1;
+      // Offload mode: continuous capture into large buffer
+      if (offload_status && sdo_offload_bit_cnt < SDO_OFFLOAD_BUFFER_BITS) begin
+        sdo_offload_buffer[sdo_offload_bit_cnt] <= ad463x_spi_sdo;
+        sdo_offload_bit_cnt <= sdo_offload_bit_cnt + 1;
+      end
+    end
+  end
+
+  //---------------------------------------------------------------------------
   // SDI data generator
   //---------------------------------------------------------------------------
   //
@@ -226,14 +276,15 @@ program test_program (
   //---------------------------------------------------------------------------
 
   wire          m_spi_csn_negedge_s;
+  wire          m_spi_csn_posedge_s;
   logic         ad463x_spi_cs_d = 1'b0;
-  bit   [31:0]  sdi_shiftreg [`NUM_OF_SDI-1:0];       // Per-lane shift registers
+  bit   [31:0]  sdi_shiftreg [`NUM_OF_MISO-1:0];       // Per-lane shift registers
   bit   [ 7:0]  spi_sclk_edge_counter = 8'b0;
-  bit   [31:0]  random_word [`NUM_OF_SDI-1:0];        // Per-lane random data
+  bit   [31:0]  random_word [`NUM_OF_MISO-1:0];        // Per-lane random data
 
   // Initialize per-lane random data
   initial begin
-    for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+    for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
       random_word[lane] = $urandom();
       sdi_shiftreg[lane] = 32'd0;
     end
@@ -248,10 +299,11 @@ program test_program (
   end
 
   assign m_spi_csn_negedge_s = ~ad463x_spi_cs & ad463x_spi_cs_d;
+  assign m_spi_csn_posedge_s = ad463x_spi_cs & ~ad463x_spi_cs_d;
 
   // Each SDI lane outputs its own data (MSB of per-lane shift register)
   genvar i;
-  for (i = 0; i < `NUM_OF_SDI; i++) begin
+  for (i = 0; i < `NUM_OF_MISO; i++) begin
     assign ad463x_spi_sdi[i] = sdi_shiftreg[i][31];
   end
 
@@ -270,7 +322,7 @@ program test_program (
         spi_sclk_edge_counter <= (spi_sclk_edge_counter == CLOCKS_PER_WORD) ? 0 : spi_sclk_edge_counter + 1;
         if (spi_sclk_edge_counter == CLOCKS_PER_WORD - 1) begin
           // Generate new random data for each lane
-          for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+          for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
             random_word[lane] <= $urandom();
           end
         end
@@ -282,11 +334,11 @@ program test_program (
   // Load random_word at CSN negedge or end of word, otherwise shift left
   task sdi_shiftreg_update();
     if (m_spi_csn_negedge_s || spi_sclk_edge_counter == CLOCKS_PER_WORD) begin
-      for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+      for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
         sdi_shiftreg[lane] <= random_word[lane];
       end
     end else begin
-      for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+      for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
         sdi_shiftreg[lane] <= {sdi_shiftreg[lane][30:0], 1'b0};
       end
     end
@@ -351,9 +403,9 @@ program test_program (
   localparam CAPTURE_CLOCKS = `DATA_DLENGTH;
 
   // Hardware capture simulation - tracks what each lane captures
-  bit [31:0]  hw_captured_data [`NUM_OF_SDI-1:0];  // per-lane capture
-  bit [31:0]  hw_captured_data_p [`NUM_OF_SDI-1:0]; // posedge capture for DDR
-  bit [31:0]  hw_captured_data_n [`NUM_OF_SDI-1:0]; // negedge capture for DDR
+  bit [31:0]  hw_captured_data [`NUM_OF_MISO-1:0];  // per-lane capture
+  bit [31:0]  hw_captured_data_p [`NUM_OF_MISO-1:0]; // posedge capture for DDR
+  bit [31:0]  hw_captured_data_n [`NUM_OF_MISO-1:0]; // negedge capture for DDR
   bit [5:0]   hw_capture_cnt = 6'b0;
   bit         hw_capture_done = 1'b0;
   bit         hw_capture_done_d = 1'b0;
@@ -375,13 +427,13 @@ program test_program (
         if (m_spi_csn_negedge_s) begin
           hw_capture_cnt <= 6'b0;
           hw_capture_done <= 1'b0;
-          for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+          for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
             hw_captured_data[lane] <= 32'd0;
           end
         end else if (!ad463x_spi_cs) begin
           if (hw_capture_cnt < CAPTURE_CLOCKS) begin
             // Capture current SDI value (what's on the wire right now)
-            for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+            for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
               hw_captured_data[lane] <= {hw_captured_data[lane][30:0], ad463x_spi_sdi[lane]};
             end
           end
@@ -400,12 +452,12 @@ program test_program (
           if (m_spi_csn_negedge_s) begin
             hw_capture_cnt <= 6'b0;
             hw_capture_done <= 1'b0;
-            for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+            for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
               hw_captured_data[lane] <= 32'd0;
             end
           end else if (!ad463x_spi_cs) begin
             if (hw_capture_cnt < CAPTURE_CLOCKS) begin
-              for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+              for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
                 hw_captured_data[lane] <= {hw_captured_data[lane][30:0], ad463x_spi_sdi[lane]};
               end
             end
@@ -416,11 +468,11 @@ program test_program (
         // Posedge capture (for FIFO expected data - SPI Engine samples on posedge)
         initial forever @(posedge ad463x_echo_sclk or posedge m_spi_csn_negedge_s) begin
           if (m_spi_csn_negedge_s) begin
-            for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+            for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
               hw_captured_data_p[lane] <= 32'd0;
             end
           end else if (!ad463x_spi_cs && hw_capture_cnt < CAPTURE_CLOCKS) begin
-            for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+            for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
               hw_captured_data_p[lane] <= {hw_captured_data_p[lane][30:0], ad463x_spi_sdi[lane]};
             end
           end
@@ -436,12 +488,12 @@ program test_program (
           if (m_spi_csn_negedge_s) begin
             hw_capture_cnt <= 6'b0;
             hw_capture_done <= 1'b0;
-            for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+            for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
               hw_captured_data_n[lane] <= 32'd0;
             end
           end else if (!ad463x_spi_cs) begin
             if (hw_capture_cnt < CAPTURE_CLOCKS) begin
-              for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+              for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
                 hw_captured_data_n[lane] <= {hw_captured_data_n[lane][30:0], ad463x_spi_sdi[lane]};
               end
             end
@@ -453,11 +505,11 @@ program test_program (
         // Posedge capture (for FIFO expected data)
         initial forever @(posedge ad463x_echo_sclk or posedge m_spi_csn_negedge_s) begin
           if (m_spi_csn_negedge_s) begin
-            for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+            for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
               hw_captured_data_p[lane] <= 32'd0;
             end
           end else if (!ad463x_spi_cs && hw_capture_cnt < CAPTURE_CLOCKS) begin
-            for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+            for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
               hw_captured_data_p[lane] <= {hw_captured_data_p[lane][30:0], ad463x_spi_sdi[lane]};
             end
           end
@@ -473,7 +525,7 @@ program test_program (
 
     // Rising edge of hw_capture_done
     if (hw_capture_done && !hw_capture_done_d) begin
-      if (`NUM_OF_SDI == 1 && `NO_REORDER == 0 && offload_status) begin
+      if (`NUM_OF_MISO == 1 && `NO_REORDER == 0 && offload_status) begin
         // 1-lane interleaved mode (OFFLOAD ONLY): collect 2 words before storing
         // FIFO path doesn't use spi_axis_reorder, so no interleaving needed
         if (interleave_word_idx == 0) begin
@@ -526,7 +578,7 @@ program test_program (
     pack_captured_data(packed_data_ch0, packed_data_ch1);
 
     // Store based on number of lanes and reorder mode
-    if (`NUM_OF_SDI == 1 && `NO_REORDER == 1) begin
+    if (`NUM_OF_MISO == 1 && `NO_REORDER == 1) begin
       // 1-lane NO_REORDER: single word per transfer
       offload_sdi_data_store_arr[offload_store_idx] = packed_data_ch0;
       offload_store_idx = offload_store_idx + 1;
@@ -551,7 +603,7 @@ program test_program (
       // DDR: interleave posedge and negedge captures
       // Hardware formula: m_axis_data[j*2 +: 2] = {data_shift_p[j], data_shift_n[j]}
       // Use only lower 16 bits of captured data (matching hardware)
-      for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+      for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
         lane_data[lane] = 32'd0;
         for (int j = 0; j < 16; j++) begin
           lane_data[lane][j*2]   = hw_captured_data_n[lane][j];
@@ -560,13 +612,13 @@ program test_program (
       end
     end else begin
       // SDR: use captured data directly
-      for (int lane = 0; lane < `NUM_OF_SDI; lane++) begin
+      for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
         lane_data[lane] = hw_captured_data[lane];
       end
     end
 
     // Step 2: Prepare word0/word1 for 1-lane interleaved mode
-    if (`NUM_OF_SDI == 1 && `NO_REORDER == 0) begin
+    if (`NUM_OF_MISO == 1 && `NO_REORDER == 0) begin
       if (`DDR_EN == 1) begin
         // DDR: apply interleaving to captured words
         for (int j = 0; j < 16; j++) begin
@@ -586,7 +638,7 @@ program test_program (
     ch0 = 32'd0;
     ch1 = 32'd0;
 
-    if (`NUM_OF_SDI == 1) begin
+    if (`NUM_OF_MISO == 1) begin
       if (`NO_REORDER == 0) begin
         // 1-lane interleaved: odd/even split across 2 words
         // ch0 gets odd bits, ch1 gets even bits
@@ -601,11 +653,11 @@ program test_program (
         ch0 = lane_data[0];
         ch1 = 32'd0;
       end
-    end else if (`NUM_OF_SDI == 2) begin
+    end else if (`NUM_OF_MISO == 2) begin
       // 2 lanes: pass-through
       ch0 = lane_data[0];
       ch1 = lane_data[1];
-    end else if (`NUM_OF_SDI == 4) begin
+    end else if (`NUM_OF_MISO == 4) begin
       // 4 lanes: reorder interleaves lane pairs
       for (int i = 0; i < 16; i++) begin
         ch0[2*i]   = lane_data[1][i];  // lane 1
@@ -613,7 +665,7 @@ program test_program (
         ch1[2*i]   = lane_data[3][i];  // lane 3
         ch1[2*i+1] = lane_data[2][i];  // lane 2
       end
-    end else if (`NUM_OF_SDI == 8) begin
+    end else if (`NUM_OF_MISO == 8) begin
       // 8 lanes: reorder interleaves 4 lanes per channel
       for (int i = 0; i < 8; i++) begin
         ch0[4*i]   = lane_data[3][i];  // lane 3
@@ -642,7 +694,7 @@ program test_program (
   // For 1-lane interleaved: count after pair is complete
   // For all other modes: count after each hw_capture_done
   initial forever @(posedge ad463x_spi_clk) begin
-    if (`NUM_OF_SDI == 1 && `NO_REORDER == 0) begin
+    if (`NUM_OF_MISO == 1 && `NO_REORDER == 0) begin
       // 1-lane interleaved: count when pair is done
       if (interleave_pair_done && offload_status) begin
         offload_transfer_cnt <= offload_transfer_cnt + 1;
@@ -669,10 +721,33 @@ program test_program (
   // Offload SPI Test
   //---------------------------------------------------------------------------
 
-  bit [31:0] offload_captured_word_arr [(2 * `NUM_OF_TRANSFERS) -1 :0];
+  // Fixed-size arrays - sized for max case (2*NUM_OF_TRANSFERS for interleaved mode)
+  // XSIM doesn't support non-blocking assignment to dynamic arrays
+  bit [31:0] offload_sdi_captured_arr [2 * `NUM_OF_TRANSFERS];
+  bit [31:0] offload_sdo_captured_arr [2 * `NUM_OF_TRANSFERS];
+  bit [31:0] offload_sdo_data [2 * `NUM_OF_TRANSFERS];
   bit offload_test_passed = 1'b1;
 
   task offload_spi_test();
+    int num_hw_transfers;
+    bit [31:0] extracted_word;
+    logic [31:0] sdo_offload_write_data [];
+
+    // For single-lane (NUM_OF_SDIO==1), hardware does 2*NUM_OF_TRANSFERS SPI transactions
+    // to fill the DMA buffer (32 bits per transfer vs 64 bits for multi-lane).
+    // For multi-lane, hardware does NUM_OF_TRANSFERS transactions.
+    num_hw_transfers = (`NUM_OF_MISO == 1) ? 2*`NUM_OF_TRANSFERS : `NUM_OF_TRANSFERS;
+
+    // Generate SDO write data
+    // SDO offload memory has limited depth - only write NUM_OF_WORDS entries
+    // These entries repeat for all transfers (hardware cycles through them)
+    sdo_offload_write_data = new[`NUM_OF_WORDS];
+    for (int i = 0; i < `NUM_OF_WORDS; i++) begin
+      offload_sdo_data[i] = $urandom();
+      sdo_offload_write_data[i] = offload_sdo_data[i];
+    end
+    spi_api.sdo_offload_fifo_write(sdo_offload_write_data);
+
     //Configure DMA
     dma_api.enable_dma();
     dma_api.set_flags(
@@ -684,11 +759,12 @@ program test_program (
     dma_api.transfer_start();
 
     // Configure the Offload module
+    // Note: Lane masks are set in init() via fifo_command, not in offload sequence
     spi_api.fifo_offload_command(`INST_CFG);
     spi_api.fifo_offload_command(`INST_PRESCALE);
     spi_api.fifo_offload_command(`INST_DLENGTH);
     spi_api.fifo_offload_command(`SET_CS(8'hFE));
-    spi_api.fifo_offload_command(`INST_RD);
+    spi_api.fifo_offload_command(`INST_WRD);
     spi_api.fifo_offload_command(`SET_CS(8'hFF));
     spi_api.fifo_offload_command(`INST_SYNC | 2);
 
@@ -697,25 +773,45 @@ program test_program (
     offload_transfer_cnt = 32'd0;
     interleave_word_idx = 1'b0;
     interleave_word_idx_d = 1'b0;
+    // Reset SDO offload buffer
+    sdo_offload_buffer = '0;
+    sdo_offload_bit_cnt = 0;
     offload_status = 1'b1;
 
     spi_api.start_offload();
     `INFO(("Offload started."), ADI_VERBOSITY_LOW);
 
-    if (`NUM_OF_SDI == 1) begin
-      wait(offload_transfer_cnt == 2*`NUM_OF_TRANSFERS);
-    end else begin
+    // Wait for all transfers to complete
+    // Counter behavior:
+    // - Interleaved (NUM_OF_SDIO==1 && NO_REORDER==0): counts pairs → reaches NUM_OF_TRANSFERS
+    // - All other modes: counts each hw_capture_done → reaches num_hw_transfers
+    if (`NUM_OF_MISO == 1 && `NO_REORDER == 0) begin
       wait(offload_transfer_cnt == `NUM_OF_TRANSFERS);
+    end else begin
+      wait(offload_transfer_cnt == num_hw_transfers);
     end
 
     spi_api.stop_offload();
     offload_status = 1'b0;
-    `INFO(("Offload stopped."), ADI_VERBOSITY_LOW);
+    `INFO(("Offload stopped. Captured %0d SDO bits.", sdo_offload_bit_cnt), ADI_VERBOSITY_LOW);
+
+    // Extract captured SDO data from continuous buffer
+    // Data was captured LSB-first (bit 0 is first captured bit)
+    // Need to reverse to MSB-first format (matching how SDO was shifted out)
+    for (int i = 0; i < num_hw_transfers; i++) begin
+      extracted_word = 32'd0;
+      for (int b = 0; b < 32; b++) begin
+        // Bit (i*32 + b) in buffer corresponds to bit (31-b) in word
+        // because SPI shifts MSB first, but we capture in order received
+        extracted_word[31-b] = sdo_offload_buffer[i*32 + b];
+      end
+      offload_sdo_captured_arr[i] = extracted_word;
+    end
 
     dma_api.wait_transfer_done(0);
 
     for (int i = 0; i < (2 * `NUM_OF_TRANSFERS); i++) begin
-      offload_captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA) + 4*i);
+      offload_sdi_captured_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA) + 4*i);
     end
 
     if (irq_pending == 'h0) begin
@@ -724,17 +820,33 @@ program test_program (
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
+    // Verify SDI read data
     for (int i = 0; i < (2 * `NUM_OF_TRANSFERS); i++) begin
-      if (offload_captured_word_arr[i] != offload_sdi_data_store_arr[i]) begin
-        `INFO(("offload_captured_word_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
-          i, offload_captured_word_arr[i],
+      if (offload_sdi_captured_arr[i] != offload_sdi_data_store_arr[i]) begin
+        `INFO(("offload_sdi_captured_arr[%d]: %x; offload_sdi_data_store_arr[%d]: %x",
+          i, offload_sdi_captured_arr[i],
           i, offload_sdi_data_store_arr[i]), ADI_VERBOSITY_LOW);
           offload_test_passed = 1'b0;
-        `ERROR(("Offload Test FAILED"));
+        `ERROR(("Offload Read Test FAILED"));
       end
     end
     if (offload_test_passed) begin
-      `INFO(("Offload Test PASSED"), ADI_VERBOSITY_LOW);
+      `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);
+    end
+
+    // Verify SDO write data
+    // SDO data repeats every NUM_OF_WORDS entries
+    for (int i = 0; i < num_hw_transfers; i++) begin
+      if (offload_sdo_captured_arr[i] != offload_sdo_data[i % `NUM_OF_WORDS]) begin
+        `INFO(("offload_sdo_captured_arr[%d]: %x; offload_sdo_data[%d]: %x",
+          i, offload_sdo_captured_arr[i],
+          i % `NUM_OF_WORDS, offload_sdo_data[i % `NUM_OF_WORDS]), ADI_VERBOSITY_LOW);
+        offload_test_passed = 1'b0;
+        `ERROR(("Offload Write Test FAILED"));
+      end
+    end
+    if (offload_test_passed) begin
+      `INFO(("Offload Write Test PASSED"), ADI_VERBOSITY_LOW);
     end
   endtask
 
@@ -742,7 +854,8 @@ program test_program (
   // FIFO SPI Test
   //---------------------------------------------------------------------------
 
-  bit   [31:0]  sdi_fifo_data = 32'd0;
+  logic [31:0]  sdi_fifo_data [];
+  logic [31:0]  sdo_write_data [];
 
   task fifo_spi_test();
     int fifo_transfer_cnt;
@@ -751,32 +864,55 @@ program test_program (
     hw_capture_done = 1'b0;
     sdi_fifo_data_store = 32'd0;
 
-    // For 1-lane interleaved mode (NUM_OF_SDI==1, NO_REORDER==0), we must send
+    // For 1-lane interleaved mode (NUM_OF_SDIO==1, NO_REORDER==0), we must send
     // an even number of transfers to fill the reorder buffer and produce valid
     // output, so we run 2 transfers instead of 1
-    fifo_transfer_cnt = (`NUM_OF_SDI == 1 && `NO_REORDER == 0) ? 2 : 1;
-    fifo_data_rd = new("Fifo Read Watchdog", 2000 * fifo_transfer_cnt, "FIFO read is hanging!");
+    fifo_transfer_cnt = (`NUM_OF_MISO == 1 && `NO_REORDER == 0) ? 2 : 1;
+    fifo_data_rd = new("Fifo Read Watchdog", 3000 * fifo_transfer_cnt, "FIFO read is hanging!");
     fifo_data_rd.start();
+
+    // Allocate FIFO data arrays
+    sdi_fifo_data = new[1];
+    sdo_write_data = new[1];
 
     for (int t = 0; t < fifo_transfer_cnt; t++) begin
 
-      generate_transfer_cmd(1);
+      // Generate and write SDO data
+      sdo_write_data[0] = $urandom();
+      sdo_expected_data = sdo_write_data[0];
+      spi_api.sdo_fifo_write(sdo_write_data);
+
+      // Reset SDO capture
+      sdo_shiftreg = 32'd0;
+      sdo_capture_cnt = 6'b0;
+
+      generate_transfer_cmd(1, sdi_lane_mask);
 
       wait(irq_pending[3] == 1'b1);
 
       spi_api.sdi_fifo_read(sdi_fifo_data);
 
       `INFO(("sdi_fifo_data[%0d]: %x; sdi_fifo_data_store: %x",
-              t, sdi_fifo_data, sdi_fifo_data_store), ADI_VERBOSITY_LOW);
-      if (sdi_fifo_data != sdi_fifo_data_store) begin
-        `FATAL(("Fifo Read Test FAILED"));
+              t, sdi_fifo_data[0], sdi_fifo_data_store), ADI_VERBOSITY_LOW);
+      if (sdi_fifo_data[0] != sdi_fifo_data_store) begin
+        `FATAL(("Fifo SDI Read Test FAILED"));
       end
+
+      // Verify SDO data
+      sdo_captured_data = sdo_shiftreg;
+      `INFO(("sdo_captured[%0d]: %x; sdo_expected: %x",
+              t, sdo_captured_data, sdo_expected_data), ADI_VERBOSITY_LOW);
+      if (sdo_captured_data != sdo_expected_data) begin
+        `FATAL(("Fifo SDO Write Test FAILED"));
+      end
+
       irq_pending[3] = 1'b0;
       sdi_fifo_data_store = 32'd0;
     end
     fifo_data_rd.stop();
 
     `INFO(("Fifo Read Test PASSED"), ADI_VERBOSITY_LOW);
+    `INFO(("Fifo Write Test PASSED"), ADI_VERBOSITY_LOW);
   endtask
 
   //---------------------------------------------------------------------------
@@ -802,6 +938,8 @@ program test_program (
     spi_api.fifo_command(`INST_CFG);
     spi_api.fifo_command(`INST_PRESCALE);
     spi_api.fifo_command(`INST_DLENGTH);
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
+    spi_api.fifo_command(`SET_SDO_LANE_MASK(`MOSI_LANE_MASK));
 
     // Set up the interrupts
     spi_api.set_interrup_mask(.sync_event(1'b1), .offload_sync_id_pending(1'b1));

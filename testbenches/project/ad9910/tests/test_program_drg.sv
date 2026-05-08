@@ -37,6 +37,7 @@
 
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_common_pkg::*;
@@ -111,7 +112,9 @@ program test_program_drg (
   localparam RAMP_OSK           = 0;
 
   // Test environment
-  test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+  test_harness_env base_env;
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
   // Test variables
   bit [31:0] read_data;
@@ -142,14 +145,21 @@ program test_program_drg (
   int unsigned          drg_burst_blade_limit = 0;  // 0 = unlimited, N = auto-hold after N blades
   int unsigned          drg_burst_blade_count = 0;  // Blades completed in current burst
   bit                   drg_burst_hold = 0;         // Auto-hold active (burst limit reached)
+  bit                   drctl_d = 0;                // Previous drctl_tp for edge detection
+  bit                   drctl_posedge_det;
+  bit                   drctl_negedge_det;
+  bit                   no_dwell_high;
+  bit                   no_dwell_low;
+  bit                   both_no_dwell;
 
   // DRG counter process - runs concurrently with tests
   initial begin : drg_model
     // Initialize
     drg_counter        = DRG_LOWER_LIMIT;
-    drover_tp          = 1'b1;  // Start at lower limit
+    drover_tp          = 1'b1;
     drover_pulse_count = 0;
     drg_state          = DRG_DWELL_LOWER;
+    drctl_d            = 0;
 
     // Wait for model to be enabled
     wait(drg_model_enabled);
@@ -158,6 +168,11 @@ program test_program_drg (
 
     forever begin
       @(posedge sync_clk_tp);
+
+      // Edge detection (computed before drctl_d update)
+      drctl_posedge_det = drctl_tp & !drctl_d;
+      drctl_negedge_det = !drctl_tp & drctl_d;
+      drctl_d = drctl_tp;
 
       // Check for reset
       if (main_reset_tp) begin
@@ -173,25 +188,36 @@ program test_program_drg (
         continue;
       end
 
+      // Mode flags derived from cached ramp_ctrl_val
+      no_dwell_high  = ramp_ctrl_val[RAMP_NO_DWELL_HIGH];
+      no_dwell_low   = ramp_ctrl_val[RAMP_NO_DWELL_LOW];
+      both_no_dwell  = no_dwell_high & no_dwell_low;
+
       case (drg_state)
 
         DRG_DWELL_LOWER: begin
           drover_tp = 1'b1;
-          if (drctl_tp)
-            drg_state = DRG_RAMP_UP;
+          if (both_no_dwell) begin
+            if (drctl_posedge_det)
+              drg_state = DRG_RAMP_UP;
+          end else if (no_dwell_high) begin
+            if (drctl_posedge_det)
+              drg_state = DRG_RAMP_UP;
+          end else begin
+            if (drctl_tp)
+              drg_state = DRG_RAMP_UP;
+          end
         end
 
         DRG_RAMP_UP: begin
           drover_tp = 1'b0;
-          if (!drctl_tp) begin
+          if (both_no_dwell && drctl_negedge_det) begin
             drg_state = DRG_RAMP_DOWN;
           end else if (drg_counter < DRG_UPPER_LIMIT - DRG_STEP_SIZE) begin
             drg_counter = drg_counter + DRG_STEP_SIZE;
           end else begin
-            // Upper limit reached
             drover_pulse_count++;
-            if (ramp_ctrl_val[RAMP_NO_DWELL_HIGH]) begin
-              // Sawtooth up: snap back to lower and keep ramping
+            if (no_dwell_high) begin
               drg_burst_blade_count++;
               `INFO(("DRG Model: Upper limit reached (blade=%0d) - snapping to lower",
                      drover_pulse_count), ADI_VERBOSITY_LOW);
@@ -202,9 +228,13 @@ program test_program_drg (
                 `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
                        drg_burst_blade_limit), ADI_VERBOSITY_LOW);
               end
-              // Stay in DRG_RAMP_UP; hold (if now set) will freeze on next cycle
+              if (both_no_dwell) begin
+                // Both no-dwell: auto-continue (stay in DRG_RAMP_UP)
+              end else begin
+                // No-dwell high only: wait at lower for next posedge
+                drg_state = DRG_DWELL_LOWER;
+              end
             end else begin
-              // Triangle mode: dwell at upper limit
               drg_counter = DRG_UPPER_LIMIT;
               drg_state   = DRG_DWELL_UPPER;
               drover_tp   = 1'b1;
@@ -216,21 +246,27 @@ program test_program_drg (
 
         DRG_DWELL_UPPER: begin
           drover_tp = 1'b1;
-          if (!drctl_tp)
-            drg_state = DRG_RAMP_DOWN;
+          if (both_no_dwell) begin
+            if (drctl_negedge_det)
+              drg_state = DRG_RAMP_DOWN;
+          end else if (no_dwell_low) begin
+            if (drctl_negedge_det)
+              drg_state = DRG_RAMP_DOWN;
+          end else begin
+            if (!drctl_tp)
+              drg_state = DRG_RAMP_DOWN;
+          end
         end
 
         DRG_RAMP_DOWN: begin
           drover_tp = 1'b0;
-          if (drctl_tp) begin
+          if (both_no_dwell && drctl_posedge_det) begin
             drg_state = DRG_RAMP_UP;
           end else if (drg_counter > DRG_LOWER_LIMIT + DRG_STEP_SIZE) begin
             drg_counter = drg_counter - DRG_STEP_SIZE;
           end else begin
-            // Lower limit reached
             drover_pulse_count++;
-            if (ramp_ctrl_val[RAMP_NO_DWELL_LOW]) begin
-              // Sawtooth down: snap back to upper and keep ramping
+            if (no_dwell_low) begin
               drg_burst_blade_count++;
               `INFO(("DRG Model: Lower limit reached (blade=%0d) - snapping to upper",
                      drover_pulse_count), ADI_VERBOSITY_LOW);
@@ -241,9 +277,13 @@ program test_program_drg (
                 `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
                        drg_burst_blade_limit), ADI_VERBOSITY_LOW);
               end
-              // Stay in DRG_RAMP_DOWN; hold (if now set) will freeze on next cycle
+              if (both_no_dwell) begin
+                // Both no-dwell: auto-continue (stay in DRG_RAMP_DOWN)
+              end else begin
+                // No-dwell low only: wait at upper for next negedge
+                drg_state = DRG_DWELL_UPPER;
+              end
             end else begin
-              // Triangle mode: dwell at lower limit
               drg_counter = DRG_LOWER_LIMIT;
               drg_state   = DRG_DWELL_LOWER;
               drover_tp   = 1'b1;
@@ -286,6 +326,7 @@ program test_program_drg (
   task start_new_burst();
     drg_burst_blade_count = 0;
     drg_burst_hold = 0;
+    drctl_d = 0;
     `INFO(("DRG Model: New burst started (limit=%0d)", drg_burst_blade_limit), ADI_VERBOSITY_LOW);
   endtask
 
@@ -297,6 +338,7 @@ program test_program_drg (
     drover_pulse_count = 0;
     drg_burst_blade_count = 0;
     drg_burst_hold = 0;
+    drctl_d = 0;
     `INFO(("DRG Model: Counter reset to %0d (drover=%b)", value, drover_tp), ADI_VERBOSITY_LOW);
   endtask
 
@@ -337,13 +379,13 @@ program test_program_drg (
   task axi_read_v(
     input   [31:0]  raddr,
     input   [31:0]  vdata);
-    base_env.mng.sequencer.RegReadVerify32(raddr, vdata);
+    base_env.mng.master_sequencer.RegReadVerify32(raddr, vdata);
   endtask
 
   task axi_read(
     input   [31:0]  raddr,
     output  [31:0]  data);
-    base_env.mng.sequencer.RegRead32(raddr, data);
+    base_env.mng.master_sequencer.RegRead32(raddr, data);
   endtask
 
   // --------------------------
@@ -352,7 +394,7 @@ program test_program_drg (
   task axi_write(
     input [31:0]  waddr,
     input [31:0]  wdata);
-    base_env.mng.sequencer.RegWrite32(waddr, wdata);
+    base_env.mng.master_sequencer.RegWrite32(waddr, wdata);
   endtask
 
   // --------------------------
@@ -376,13 +418,24 @@ program test_program_drg (
     ram_swp_ovr_tp = 1'b0;
 
     // Create environment
-    base_env = new("Base Environment",
-              `TH.`SYS_CLK.inst.IF,
-              `TH.`DMA_CLK.inst.IF,
-              `TH.`DDR_CLK.inst.IF,
-              `TH.`SYS_RST.inst.IF,
-              `TH.`MNG_AXI.inst.IF,
-              `TH.`DDR_AXI.inst.IF);
+    base_env = new(
+      .name("Base Environment"),
+      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+      .irq_base_address(`IRQ_C_BA),
+      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+
+    mng = new(
+      .name(""),
+      .master_vip_if(`TH.`MNG_AXI.inst.IF));
+    ddr = new(
+      .name(""),
+      .slave_vip_if(`TH.`DDR_AXI.inst.IF));
+
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
     base_env.start();
     base_env.sys_reset();

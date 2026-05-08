@@ -126,12 +126,16 @@ program test_program_drg (
   localparam logic [DRG_WIDTH-1:0] DRG_UPPER_LIMIT = 18'd5000;
   localparam logic [DRG_WIDTH-1:0] DRG_STEP_SIZE   = 18'd15;
 
-  // DRG state
+  // DRG state machine
+  typedef enum logic [1:0] {
+    DRG_DWELL_LOWER = 2'd0,
+    DRG_RAMP_UP     = 2'd1,
+    DRG_DWELL_UPPER = 2'd2,
+    DRG_RAMP_DOWN   = 2'd3
+  } drg_state_e;
+
+  drg_state_e           drg_state;
   logic [DRG_WIDTH-1:0] drg_counter;
-  logic                 drg_at_upper;
-  logic                 drg_at_lower;
-  logic                 drctl_prev;
-  logic                 ramp_up;
   int unsigned          drover_pulse_count;
   bit                   drg_model_enabled = 0;
   bit [31:0]            ramp_ctrl_val = 0;      // Cached REG_RAMP_CTRL value, updated via read_ramp_ctrl()
@@ -142,12 +146,10 @@ program test_program_drg (
   // DRG counter process - runs concurrently with tests
   initial begin : drg_model
     // Initialize
-    drg_counter = DRG_LOWER_LIMIT;
-    drover_tp = 1'b1;  // Start at lower limit, so drover is high
-    drctl_prev = 1'b0;
+    drg_counter        = DRG_LOWER_LIMIT;
+    drover_tp          = 1'b1;  // Start at lower limit
     drover_pulse_count = 0;
-    drg_at_upper = 1'b0;
-    drg_at_lower = 1'b1;
+    drg_state          = DRG_DWELL_LOWER;
 
     // Wait for model to be enabled
     wait(drg_model_enabled);
@@ -160,101 +162,98 @@ program test_program_drg (
       // Check for reset
       if (main_reset_tp) begin
         drg_counter = DRG_LOWER_LIMIT;
-        drg_at_upper = 1'b0;
-        drg_at_lower = 1'b1;
-        drover_tp = 1'b1;  // At lower limit after reset
+        drg_state   = DRG_DWELL_LOWER;
+        drover_tp   = 1'b1;
         continue;
       end
 
-      // Skip counter update if model disabled, hold is active, or burst limit reached
+      // Freeze state if model is disabled or a hold is active
       if (!drg_model_enabled || drhold_tp || drg_burst_hold) begin
-        // But still update drover based on current position
-        drover_tp = (drg_at_upper || drg_at_lower);
+        drover_tp = (drg_state == DRG_DWELL_LOWER || drg_state == DRG_DWELL_UPPER);
         continue;
       end
 
-      // Save previous drctl for edge detection
-      drctl_prev = drctl_tp;
+      case (drg_state)
 
-      // Determine effective ramp direction
-      // NO_DWELL_HIGH only: always ramp up (sawtooth up)
-      // NO_DWELL_LOW only:  always ramp down (sawtooth down)
-      // Neither or both:    follow drctl_tp (triangle)
-      ramp_up = (ramp_ctrl_val[RAMP_NO_DWELL_HIGH] & !ramp_ctrl_val[RAMP_NO_DWELL_LOW]) |
-                (~ramp_ctrl_val[RAMP_NO_DWELL_HIGH] & ~ramp_ctrl_val[RAMP_NO_DWELL_LOW] & drctl_tp) |
-                (ramp_ctrl_val[RAMP_NO_DWELL_HIGH] & ramp_ctrl_val[RAMP_NO_DWELL_LOW] & drctl_tp);
+        DRG_DWELL_LOWER: begin
+          drover_tp = 1'b1;
+          if (drctl_tp)
+            drg_state = DRG_RAMP_UP;
+        end
 
-      // Ramp logic
-      if (ramp_up) begin
-        // Ramp UP
-        if (drg_counter < DRG_UPPER_LIMIT - DRG_STEP_SIZE) begin
-          drg_counter = drg_counter + DRG_STEP_SIZE;
-          drg_at_upper = 1'b0;
-          drg_at_lower = 1'b0;
-        end else if (!drg_at_upper) begin
-          // Reached upper limit
-          drover_pulse_count++;
-          if (ramp_ctrl_val[RAMP_NO_DWELL_HIGH]) begin
-            // Sawtooth up: snap back to lower limit, keep ramping up
-            drg_burst_blade_count++;
-            `INFO(("DRG Model: Upper limit reached (blade=%0d) - snapping to lower",
-                   drover_pulse_count), ADI_VERBOSITY_LOW);
-            drg_counter = DRG_LOWER_LIMIT;
-            drg_at_upper = 1'b0;
-            drg_at_lower = 1'b1;
-
-            // Check burst blade limit - auto-hold if reached
-            if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
-              drg_burst_hold = 1;
-              `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
-                     drg_burst_blade_limit), ADI_VERBOSITY_LOW);
-            end
+        DRG_RAMP_UP: begin
+          drover_tp = 1'b0;
+          if (!drctl_tp) begin
+            drg_state = DRG_RAMP_DOWN;
+          end else if (drg_counter < DRG_UPPER_LIMIT - DRG_STEP_SIZE) begin
+            drg_counter = drg_counter + DRG_STEP_SIZE;
           end else begin
-            // Triangle mode: dwell at upper limit
-            drg_counter = DRG_UPPER_LIMIT;
-            drg_at_upper = 1'b1;
-            drg_at_lower = 1'b0;
-            `INFO(("DRG Model: Upper limit reached (count=%0d, transitions=%0d)",
-                   drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
+            // Upper limit reached
+            drover_pulse_count++;
+            if (ramp_ctrl_val[RAMP_NO_DWELL_HIGH]) begin
+              // Sawtooth up: snap back to lower and keep ramping
+              drg_burst_blade_count++;
+              `INFO(("DRG Model: Upper limit reached (blade=%0d) - snapping to lower",
+                     drover_pulse_count), ADI_VERBOSITY_LOW);
+              drg_counter = DRG_LOWER_LIMIT;
+              drover_tp   = 1'b1;
+              if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
+                drg_burst_hold = 1;
+                `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
+                       drg_burst_blade_limit), ADI_VERBOSITY_LOW);
+              end
+              // Stay in DRG_RAMP_UP; hold (if now set) will freeze on next cycle
+            end else begin
+              // Triangle mode: dwell at upper limit
+              drg_counter = DRG_UPPER_LIMIT;
+              drg_state   = DRG_DWELL_UPPER;
+              drover_tp   = 1'b1;
+              `INFO(("DRG Model: Upper limit reached (count=%0d, transitions=%0d)",
+                     drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
+            end
           end
         end
-      end else begin
-        // Ramp DOWN
-        if (drg_counter > DRG_LOWER_LIMIT + DRG_STEP_SIZE) begin
-          drg_counter = drg_counter - DRG_STEP_SIZE;
-          drg_at_upper = 1'b0;
-          drg_at_lower = 1'b0;
-        end else if (!drg_at_lower) begin
-          // Reached lower limit
-          drover_pulse_count++;
-          if (ramp_ctrl_val[RAMP_NO_DWELL_LOW]) begin
-            // Sawtooth down: snap back to upper limit, keep ramping down
-            drg_burst_blade_count++;
-            `INFO(("DRG Model: Lower limit reached (blade=%0d) - snapping to upper",
-                   drover_pulse_count), ADI_VERBOSITY_LOW);
-            drg_counter = DRG_UPPER_LIMIT;
-            drg_at_upper = 1'b1;
-            drg_at_lower = 1'b0;
 
-            // Check burst blade limit - auto-hold if reached
-            if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
-              drg_burst_hold = 1;
-              `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
-                     drg_burst_blade_limit), ADI_VERBOSITY_LOW);
-            end
+        DRG_DWELL_UPPER: begin
+          drover_tp = 1'b1;
+          if (!drctl_tp)
+            drg_state = DRG_RAMP_DOWN;
+        end
+
+        DRG_RAMP_DOWN: begin
+          drover_tp = 1'b0;
+          if (drctl_tp) begin
+            drg_state = DRG_RAMP_UP;
+          end else if (drg_counter > DRG_LOWER_LIMIT + DRG_STEP_SIZE) begin
+            drg_counter = drg_counter - DRG_STEP_SIZE;
           end else begin
-            // Triangle mode: dwell at lower limit
-            drg_counter = DRG_LOWER_LIMIT;
-            drg_at_lower = 1'b1;
-            drg_at_upper = 1'b0;
-            `INFO(("DRG Model: Lower limit reached (count=%0d, transitions=%0d)",
-                   drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
+            // Lower limit reached
+            drover_pulse_count++;
+            if (ramp_ctrl_val[RAMP_NO_DWELL_LOW]) begin
+              // Sawtooth down: snap back to upper and keep ramping
+              drg_burst_blade_count++;
+              `INFO(("DRG Model: Lower limit reached (blade=%0d) - snapping to upper",
+                     drover_pulse_count), ADI_VERBOSITY_LOW);
+              drg_counter = DRG_UPPER_LIMIT;
+              drover_tp   = 1'b1;
+              if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
+                drg_burst_hold = 1;
+                `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
+                       drg_burst_blade_limit), ADI_VERBOSITY_LOW);
+              end
+              // Stay in DRG_RAMP_DOWN; hold (if now set) will freeze on next cycle
+            end else begin
+              // Triangle mode: dwell at lower limit
+              drg_counter = DRG_LOWER_LIMIT;
+              drg_state   = DRG_DWELL_LOWER;
+              drover_tp   = 1'b1;
+              `INFO(("DRG Model: Lower limit reached (count=%0d, transitions=%0d)",
+                     drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
+            end
           end
         end
-      end
 
-      // drover is HIGH when at either limit, LOW when ramping between limits
-      drover_tp = (drg_at_upper || drg_at_lower);
+      endcase
     end
   end
 
@@ -293,10 +292,8 @@ program test_program_drg (
   // Task to reset DRG counter to a specific value
   task reset_drg_counter(input logic [DRG_WIDTH-1:0] value = DRG_LOWER_LIMIT);
     drg_counter = value;
-    drg_at_upper = (value >= DRG_UPPER_LIMIT);
-    drg_at_lower = (value <= DRG_LOWER_LIMIT);
-    // drover is high when at either limit
-    drover_tp = (drg_at_upper || drg_at_lower);
+    drg_state   = (value >= DRG_UPPER_LIMIT) ? DRG_DWELL_UPPER : DRG_DWELL_LOWER;
+    drover_tp   = 1'b1;
     drover_pulse_count = 0;
     drg_burst_blade_count = 0;
     drg_burst_hold = 0;

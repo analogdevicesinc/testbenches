@@ -39,20 +39,41 @@ global ad_project_params
 #  Block design under test
 #
 
+# ---------------------------------------------------------------
+# Parallel interface mode: DDR infrastructure is kept for the
+# DMA read path. dma_clk_vip stays at default 200 MHz; the DUT's
+# async FIFO handles CDC between DMA and pd_clk domains.
+# ---------------------------------------------------------------
+
 # Create axi_ad9910 instance
 ad_ip_instance axi_ad9910 axi_ad9910 [list \
   IODELAY_ENABLE 0 \
 ]
 
-# Create external port for sync_clk (from AD9910 device - simulated in testbench)
+# Pass-through clock VIPs for pd_clk and sync_clk
+# Allows test program to monitor or override clocks at runtime
+ad_ip_instance clk_vip pd_clk_vip [list \
+  INTERFACE_MODE {PASS_THROUGH} \
+  FREQ_HZ 250000000 \
+]
+adi_sim_add_define "PD_CLK_VIP=pd_clk_vip"
+
+ad_ip_instance clk_vip sync_clk_vip [list \
+  INTERFACE_MODE {PASS_THROUGH} \
+  FREQ_HZ 250000000 \
+]
+adi_sim_add_define "SYNC_CLK_VIP=sync_clk_vip"
+
+# Route external clock ports through the VIPs to the DUT
 create_bd_port -dir I sync_clk_in
-ad_connect sync_clk_in axi_ad9910/sync_clk
+ad_connect sync_clk_in sync_clk_vip/clk_in
+ad_connect sync_clk_vip/clk_out axi_ad9910/sync_clk
 
 ad_connect sys_cpu_clk axi_ad9910/delay_clk
 
-# Create external port for parallel data clock (directly from testbench)
 create_bd_port -dir I pd_clk_in
-ad_connect pd_clk_in axi_ad9910/pd_clk_in
+ad_connect pd_clk_in pd_clk_vip/clk_in
+ad_connect pd_clk_vip/clk_out axi_ad9910/pd_clk_in
 
 # Connect AXI interface
 ad_cpu_interconnect 0x44A00000 axi_ad9910
@@ -101,17 +122,56 @@ ad_connect axi_ad9910/io_update io_update
 ad_connect axi_ad9910/db_o db_o
 ad_connect axi_ad9910/tx_enable tx_enable
 
-# AXI-Stream interface - tie off for DRG mode (no DMA needed)
-ad_connect sys_cpu_clk axi_ad9910/s_axis_aclk
-ad_connect sys_cpu_resetn axi_ad9910/s_axis_aresetn
+# AXI-Stream interface configuration (MODE-dependent)
+if {$ad_project_params(MODE) == "PAR_IF"} {
 
-create_bd_port -dir O s_axis_tready
-ad_connect axi_ad9910/s_axis_tready s_axis_tready
+  # AXIS domain runs on the DMA clock (pd_clk via dma_clk_vip)
+  ad_connect sys_dma_clk axi_ad9910/s_axis_aclk
+  ad_connect sys_dma_resetn axi_ad9910/s_axis_aresetn
 
-# Tie AXI-Stream inputs to ground for DRG mode
-ad_connect axi_ad9910/s_axis_tvalid GND
-ad_connect axi_ad9910/s_axis_tlast GND
-ad_connect axi_ad9910/s_axis_tdata GND
+  # Instantiate TX DMA (reads DDR via AXI MM, outputs AXI-Stream to DUT)
+  ad_ip_instance axi_dmac tx_dma $ad_project_params(tx_dma_cfg)
+  adi_sim_add_define "TX_DMA=tx_dma"
+
+  # DMA clocks and resets
+  ad_connect sys_dma_clk tx_dma/m_axis_aclk
+  ad_connect sys_dma_resetn tx_dma/m_src_axi_aresetn
+
+  # DMA AXI-Stream output → DUT AXI-Stream input
+  ad_connect tx_dma/m_axis axi_ad9910/s_axis
+
+  # TLAST is not part of the DUT bus interface; tie to GND
+  ad_connect axi_ad9910/s_axis_tlast GND
+
+  # DMA DDR read port → memory interconnect
+  ad_mem_hp0_interconnect $sys_dma_clk tx_dma/m_src_axi
+
+  # DMA register access via CPU interconnect
+  ad_cpu_interconnect 0x44A30000 tx_dma
+
+  # DMA interrupt
+  ad_cpu_interrupt ps-13 mb-12 tx_dma/irq
+
+  # Set DMA base address define
+  set BA_TX_DMA 0x44A30000
+  set_property offset $BA_TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_tx_dma}]
+  adi_sim_add_define "TX_DMA_BA=[format "%d" ${BA_TX_DMA}]"
+
+} else {
+
+  # DRG mode — AXIS on CPU clock, no DMA needed
+  ad_connect sys_cpu_clk axi_ad9910/s_axis_aclk
+  ad_connect sys_cpu_resetn axi_ad9910/s_axis_aresetn
+
+  # Tie AXI-Stream inputs to ground
+  create_bd_port -dir O s_axis_tready
+  ad_connect axi_ad9910/s_axis_tready s_axis_tready
+
+  ad_connect axi_ad9910/s_axis_tvalid GND
+  ad_connect axi_ad9910/s_axis_tlast GND
+  ad_connect axi_ad9910/s_axis_tdata GND
+
+}
 
 # Set base address define
 set BA_AD9910 0x44A00000

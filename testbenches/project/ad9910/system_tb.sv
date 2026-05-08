@@ -69,8 +69,11 @@ module system_tb();
   wire [17:0] db_o_tb;
   wire        tx_enable_tb;
 
-  // AXI-Stream (unused in DRG mode)
+  // AXI-Stream tready (exposed externally only in DRG mode;
+  // in PAR_IF mode the DMA handles flow control internally)
+`ifndef TX_DMA
   wire        s_axis_tready_tb;
+`endif
 
   // Test program instantiation
   `TEST_PROGRAM test (
@@ -113,8 +116,10 @@ module system_tb();
     .profile(profile_tb),
     .io_update(io_update_tb),
     .db_o(db_o_tb),
-    .tx_enable(tx_enable_tb),
-    .s_axis_tready(s_axis_tready_tb)
+    .tx_enable(tx_enable_tb)
+`ifndef TX_DMA
+    ,.s_axis_tready(s_axis_tready_tb)
+`endif
   );
 
 endmodule

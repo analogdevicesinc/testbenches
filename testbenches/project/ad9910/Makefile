@@ -20,6 +20,7 @@ CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 # List of tests and configuration combinations that has to be run
 # Format is:  <configuration>:<test name>
 TESTS += cfg1_drg:test_program_drg
+TESTS += cfg2_par_if:test_program_par_if
 
 include $(ADI_TB_DIR)/scripts/project-sim.mk
 
@@ -27,9 +28,11 @@ include $(ADI_TB_DIR)/scripts/project-sim.mk
 #
 # run specific test on a specific configuration in gui mode
 # 	make CFG=cfg1_drg TST=test_program_drg MODE=gui
+# 	make CFG=cfg2_par_if TST=test_program_par_if MODE=gui
 #
 # run all test from a configuration
 # 	make cfg1_drg
+# 	make cfg2_par_if
 
 ####################################################################################
 ####################################################################################

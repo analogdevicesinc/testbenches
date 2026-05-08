@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="system_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_common_pkg" />
+            <top_module name="adi_environment_pkg" />
+            <top_module name="adi_vip_pkg" />
+            <top_module name="attributes" />
+            <top_module name="axi_vip_pkg" />
+            <top_module name="glbl" />
+            <top_module name="ipif_pkg" />
+            <top_module name="logger_pkg" />
+            <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="math_real" />
+            <top_module name="numeric_std" />
+            <top_module name="pub_sub_pkg" />
+            <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="standard" />
+            <top_module name="std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_misc" />
+            <top_module name="std_logic_unsigned" />
+            <top_module name="system_tb" />
+            <top_module name="test_harness_env_pkg" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+            <top_module name="vital_primitives" />
+            <top_module name="vital_timing" />
+            <top_module name="vpkg" />
+            <top_module name="watchdog_pkg" />
+            <top_module name="xil_common_vip_pkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="6.650001 us"></ZoomEndTime>
+      <Cursor1Time time="0.000000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="157"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="24" />
+   <wvobject type="logic" fp_name="/system_tb/pd_clk_tb">
+      <obj_property name="ElementShortName">pd_clk_tb</obj_property>
+      <obj_property name="ObjectShortName">pd_clk_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/sync_clk_tb">
+      <obj_property name="ElementShortName">sync_clk_tb</obj_property>
+      <obj_property name="ObjectShortName">sync_clk_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ad9910_main_reset_tb">
+      <obj_property name="ElementShortName">ad9910_main_reset_tb</obj_property>
+      <obj_property name="ObjectShortName">ad9910_main_reset_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ad9910_io_reset_tb">
+      <obj_property name="ElementShortName">ad9910_io_reset_tb</obj_property>
+      <obj_property name="ObjectShortName">ad9910_io_reset_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/pw_down_tb">
+      <obj_property name="ElementShortName">pw_down_tb</obj_property>
+      <obj_property name="ObjectShortName">pw_down_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ext_sync_tb">
+      <obj_property name="ElementShortName">ext_sync_tb</obj_property>
+      <obj_property name="ObjectShortName">ext_sync_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ad9910_irq_tb">
+      <obj_property name="ElementShortName">ad9910_irq_tb</obj_property>
+      <obj_property name="ObjectShortName">ad9910_irq_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/trig_out_tb">
+      <obj_property name="ElementShortName">trig_out_tb</obj_property>
+      <obj_property name="ObjectShortName">trig_out_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/osk_tb">
+      <obj_property name="ElementShortName">osk_tb</obj_property>
+      <obj_property name="ObjectShortName">osk_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/drctl_tb">
+      <obj_property name="ElementShortName">drctl_tb</obj_property>
+      <obj_property name="ObjectShortName">drctl_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/drhold_tb">
+      <obj_property name="ElementShortName">drhold_tb</obj_property>
+      <obj_property name="ObjectShortName">drhold_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/drover_tb">
+      <obj_property name="ElementShortName">drover_tb</obj_property>
+      <obj_property name="ObjectShortName">drover_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/sync_smp_err_tb">
+      <obj_property name="ElementShortName">sync_smp_err_tb</obj_property>
+      <obj_property name="ObjectShortName">sync_smp_err_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/ram_swp_ovr_tb">
+      <obj_property name="ElementShortName">ram_swp_ovr_tb</obj_property>
+      <obj_property name="ObjectShortName">ram_swp_ovr_tb</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/profile_tb">
+      <obj_property name="ElementShortName">profile_tb[2:0]</obj_property>
+      <obj_property name="ObjectShortName">profile_tb[2:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/io_update_tb">
+      <obj_property name="ElementShortName">io_update_tb</obj_property>
+      <obj_property name="ObjectShortName">io_update_tb</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/db_o_tb">
+      <obj_property name="ElementShortName">db_o_tb[17:0]</obj_property>
+      <obj_property name="ObjectShortName">db_o_tb[17:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/tx_enable_tb">
+      <obj_property name="ElementShortName">tx_enable_tb</obj_property>
+      <obj_property name="ObjectShortName">tx_enable_tb</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/s_axis_tready_tb">
+      <obj_property name="ElementShortName">s_axis_tready_tb</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tready_tb</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/drg_counter">
+      <obj_property name="ElementShortName">drg_counter[17:0]</obj_property>
+      <obj_property name="ObjectShortName">drg_counter[17:0]</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_AUTO</obj_property>
+      <obj_property name="AnalogYRangeMin">0.000000</obj_property>
+      <obj_property name="AnalogYRRangeMax">0.000000</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/drg_at_upper">
+      <obj_property name="ElementShortName">drg_at_upper</obj_property>
+      <obj_property name="ObjectShortName">drg_at_upper</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/drg_at_lower">
+      <obj_property name="ElementShortName">drg_at_lower</obj_property>
+      <obj_property name="ObjectShortName">drg_at_lower</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test/drg_model_enabled">
+      <obj_property name="ElementShortName">drg_model_enabled</obj_property>
+      <obj_property name="ObjectShortName">drg_model_enabled</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test/ramp_ctrl_val">
+      <obj_property name="ElementShortName">ramp_ctrl_val[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ramp_ctrl_val[31:0]</obj_property>
+   </wvobject>
+</wave_config>

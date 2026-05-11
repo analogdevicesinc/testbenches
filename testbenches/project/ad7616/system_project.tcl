@@ -36,15 +36,16 @@ if {[expr {![info exists use_smartconnect]}]} {
 # Create the project
 adi_sim_project_xilinx $project_name
 
+source $ad_tb_dir/library/includes/sp_include_axis.tcl
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_spi_engine.tcl
+source $ad_tb_dir/library/includes/sp_include_pwm_gen.tcl
+source $ad_tb_dir/library/includes/sp_include_clk_gen.tcl
+source $ad_tb_dir/library/includes/sp_include_converter.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
-  "$ad_tb_dir/library/regmaps/adi_regmap_adc_pkg.sv" \
-  "$ad_tb_dir/library/regmaps/adi_regmap_common_pkg.sv" \
-  "$ad_tb_dir/library/regmaps/adi_regmap_clkgen_pkg.sv" \
-  "$ad_tb_dir/library/regmaps/adi_regmap_pwm_gen_pkg.sv" \
+  "spi_environment.sv" \
   "tests/test_program_si.sv" \
   "tests/test_program_pi.sv" \
 ]

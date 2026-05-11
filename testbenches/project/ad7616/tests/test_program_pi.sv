@@ -206,12 +206,10 @@ end
 // Data Acquisition Test
 //---------------------------------------------------------------------------
 
-reg [31:0] rdata_reg;
-bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
-bit [31:0] config_wr_SIMPLE = 'h0; // write request sent result
-bit [31:0] config_SIMPLE = 'h0; // channel static data setup
-
 task data_acquisition_test();
+  bit [31:0] captured_word_arr [(NUM_OF_TRANSFERS) -1 :0];
+  bit [31:0] config_wr_SIMPLE;
+  bit [31:0] config_SIMPLE;
 
     // Enable all ADC channels
     for (int i = 0; i < 16; i=i+1) begin

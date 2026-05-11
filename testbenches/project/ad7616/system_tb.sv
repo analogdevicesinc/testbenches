@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2022-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -40,7 +40,7 @@ module system_tb();
     if (`INTF == 1) begin //serial interface
       wire                       ad7616_spi_sclk;
       wire                       ad7616_spi_sdo;
-      wire [(`NUM_OF_SDI - 1):0] ad7616_spi_sdi;
+      wire [(`NUM_OF_MISO - 1):0] ad7616_spi_sdi;
       wire                       ad7616_spi_cs;
       wire                       adc_busy;
       wire                       adc_cnvst;
@@ -49,20 +49,17 @@ module system_tb();
 
     `TEST_PROGRAM test(
       .spi_clk (spi_clk),
-      .ad7616_irq (ad7616_irq),
-      .ad7616_spi_sdi(ad7616_spi_sdi),
-      .ad7616_spi_cs (ad7616_spi_cs),
-      .ad7616_spi_sclk (ad7616_spi_sclk));
+      .ad7616_irq (ad7616_irq));
 
     test_harness `TH (
       .spi_clk (spi_clk),
       .ad7616_irq (ad7616_irq),
       .rx_busy (adc_busy),
       .rx_cnvst (adc_cnvst),
-      .ad7616_spi_sdo (ad7616_spi_sdo),
-      .ad7616_spi_sdi (ad7616_spi_sdi),
-      .ad7616_spi_cs (ad7616_spi_cs),
-      .ad7616_spi_sclk (ad7616_spi_sclk));
+      .ad7616_spi_vip_sclk (ad7616_spi_sclk),
+      .ad7616_spi_vip_cs (ad7616_spi_cs),
+      .ad7616_spi_vip_sdo (ad7616_spi_sdo),
+      .ad7616_spi_vip_sdi (ad7616_spi_sdi));
 
       assign adc_busy = adc_cnvst;
     end

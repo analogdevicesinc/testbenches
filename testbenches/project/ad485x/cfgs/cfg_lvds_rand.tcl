@@ -5,3 +5,5 @@ set chosen_device [lindex $devices [expr {int(rand() * [llength $devices])}]]
 
 set ad_project_params(DEVICE) $chosen_device
 set ad_project_params(LVDS_CMOS_N) 1
+
+set ad_project_params(FPGA_BOARD) "zed"

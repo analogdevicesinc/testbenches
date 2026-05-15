@@ -9,3 +9,5 @@ set ad_project_params(LVDS_CMOS_N) 0
 set ad_project_params(PACKET_FORMAT) $packet_format
 set ad_project_params(CRC_EN) $crc_enable
 set ad_project_params(OS_EN) $os_enable
+
+set ad_project_params(FPGA_BOARD) "zed"

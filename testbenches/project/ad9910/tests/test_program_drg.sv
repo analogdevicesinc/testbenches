@@ -119,6 +119,7 @@ program test_program_drg (
   // Test variables
   bit [31:0] read_data;
   bit        test_passed = 1;
+  int        current_test = 0;
 
   // --------------------------
   // DRG Counter Model - Simulates AD9910 Digital Ramp Generator
@@ -146,8 +147,10 @@ program test_program_drg (
   int unsigned          drg_burst_blade_count = 0;  // Blades completed in current burst
   bit                   drg_burst_hold = 0;         // Auto-hold active (burst limit reached)
   bit                   drctl_d = 0;                // Previous drctl_tp for edge detection
-  bit                   drctl_posedge_det;
-  bit                   drctl_negedge_det;
+  logic                 drctl_posedge_det;
+  logic                 drctl_negedge_det;
+  assign                drctl_posedge_det = drctl_tp & !drctl_d;
+  assign                drctl_negedge_det = !drctl_tp & drctl_d;
   bit                   no_dwell_high;
   bit                   no_dwell_low;
   bit                   both_no_dwell;
@@ -169,131 +172,117 @@ program test_program_drg (
     forever begin
       @(posedge sync_clk_tp);
 
-      // Edge detection (computed before drctl_d update)
-      drctl_posedge_det = drctl_tp & !drctl_d;
-      drctl_negedge_det = !drctl_tp & drctl_d;
-      drctl_d = drctl_tp;
-
-      // Check for reset
       if (main_reset_tp) begin
         drg_counter = DRG_LOWER_LIMIT;
         drg_state   = DRG_DWELL_LOWER;
         drover_tp   = 1'b1;
-        continue;
-      end
-
-      // Freeze state if model is disabled or a hold is active
-      if (!drg_model_enabled || drhold_tp || drg_burst_hold) begin
+      end else if (!drg_model_enabled || drhold_tp || drg_burst_hold) begin
         drover_tp = (drg_state == DRG_DWELL_LOWER || drg_state == DRG_DWELL_UPPER);
-        continue;
+      end else begin
+        no_dwell_high  = ramp_ctrl_val[RAMP_NO_DWELL_HIGH];
+        no_dwell_low   = ramp_ctrl_val[RAMP_NO_DWELL_LOW];
+        both_no_dwell  = no_dwell_high & no_dwell_low;
+
+        case (drg_state)
+
+          DRG_DWELL_LOWER: begin
+            drover_tp = 1'b1;
+            if (both_no_dwell) begin
+              if (drctl_posedge_det)
+                drg_state = DRG_RAMP_UP;
+            end else if (no_dwell_high) begin
+              if (drctl_posedge_det)
+                drg_state = DRG_RAMP_UP;
+            end else begin
+              if (drctl_tp)
+                drg_state = DRG_RAMP_UP;
+            end
+          end
+
+          DRG_RAMP_UP: begin
+            drover_tp = 1'b0;
+            if (both_no_dwell && drctl_negedge_det) begin
+              drg_state = DRG_RAMP_DOWN;
+            end else if (drg_counter < DRG_UPPER_LIMIT - DRG_STEP_SIZE) begin
+              drg_counter = drg_counter + DRG_STEP_SIZE;
+            end else begin
+              drover_pulse_count++;
+              if (no_dwell_high) begin
+                drg_burst_blade_count++;
+                `INFO(("DRG Model: Upper limit reached (blade=%0d) - snapping to lower",
+                       drover_pulse_count), ADI_VERBOSITY_LOW);
+                drg_counter = DRG_LOWER_LIMIT;
+                drover_tp   = 1'b1;
+                if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
+                  drg_burst_hold = 1;
+                  `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
+                         drg_burst_blade_limit), ADI_VERBOSITY_LOW);
+                end
+                if (both_no_dwell) begin
+                end else begin
+                  drg_state = DRG_DWELL_LOWER;
+                end
+              end else begin
+                drg_counter = DRG_UPPER_LIMIT;
+                drg_state   = DRG_DWELL_UPPER;
+                drover_tp   = 1'b1;
+                `INFO(("DRG Model: Upper limit reached (count=%0d, transitions=%0d)",
+                       drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
+              end
+            end
+          end
+
+          DRG_DWELL_UPPER: begin
+            drover_tp = 1'b1;
+            if (both_no_dwell) begin
+              if (drctl_negedge_det)
+                drg_state = DRG_RAMP_DOWN;
+            end else if (no_dwell_low) begin
+              if (drctl_negedge_det)
+                drg_state = DRG_RAMP_DOWN;
+            end else begin
+              if (!drctl_tp)
+                drg_state = DRG_RAMP_DOWN;
+            end
+          end
+
+          DRG_RAMP_DOWN: begin
+            drover_tp = 1'b0;
+            if (both_no_dwell && drctl_posedge_det) begin
+              drg_state = DRG_RAMP_UP;
+            end else if (drg_counter > DRG_LOWER_LIMIT + DRG_STEP_SIZE) begin
+              drg_counter = drg_counter - DRG_STEP_SIZE;
+            end else begin
+              drover_pulse_count++;
+              if (no_dwell_low) begin
+                drg_burst_blade_count++;
+                `INFO(("DRG Model: Lower limit reached (blade=%0d) - snapping to upper",
+                       drover_pulse_count), ADI_VERBOSITY_LOW);
+                drg_counter = DRG_UPPER_LIMIT;
+                drover_tp   = 1'b1;
+                if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
+                  drg_burst_hold = 1;
+                  `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
+                         drg_burst_blade_limit), ADI_VERBOSITY_LOW);
+                end
+                if (both_no_dwell) begin
+                end else begin
+                  drg_state = DRG_DWELL_UPPER;
+                end
+              end else begin
+                drg_counter = DRG_LOWER_LIMIT;
+                drg_state   = DRG_DWELL_LOWER;
+                drover_tp   = 1'b1;
+                `INFO(("DRG Model: Lower limit reached (count=%0d, transitions=%0d)",
+                       drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
+              end
+            end
+          end
+
+        endcase
       end
 
-      // Mode flags derived from cached ramp_ctrl_val
-      no_dwell_high  = ramp_ctrl_val[RAMP_NO_DWELL_HIGH];
-      no_dwell_low   = ramp_ctrl_val[RAMP_NO_DWELL_LOW];
-      both_no_dwell  = no_dwell_high & no_dwell_low;
-
-      case (drg_state)
-
-        DRG_DWELL_LOWER: begin
-          drover_tp = 1'b1;
-          if (both_no_dwell) begin
-            if (drctl_posedge_det)
-              drg_state = DRG_RAMP_UP;
-          end else if (no_dwell_high) begin
-            if (drctl_posedge_det)
-              drg_state = DRG_RAMP_UP;
-          end else begin
-            if (drctl_tp)
-              drg_state = DRG_RAMP_UP;
-          end
-        end
-
-        DRG_RAMP_UP: begin
-          drover_tp = 1'b0;
-          if (both_no_dwell && drctl_negedge_det) begin
-            drg_state = DRG_RAMP_DOWN;
-          end else if (drg_counter < DRG_UPPER_LIMIT - DRG_STEP_SIZE) begin
-            drg_counter = drg_counter + DRG_STEP_SIZE;
-          end else begin
-            drover_pulse_count++;
-            if (no_dwell_high) begin
-              drg_burst_blade_count++;
-              `INFO(("DRG Model: Upper limit reached (blade=%0d) - snapping to lower",
-                     drover_pulse_count), ADI_VERBOSITY_LOW);
-              drg_counter = DRG_LOWER_LIMIT;
-              drover_tp   = 1'b1;
-              if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
-                drg_burst_hold = 1;
-                `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
-                       drg_burst_blade_limit), ADI_VERBOSITY_LOW);
-              end
-              if (both_no_dwell) begin
-                // Both no-dwell: auto-continue (stay in DRG_RAMP_UP)
-              end else begin
-                // No-dwell high only: wait at lower for next posedge
-                drg_state = DRG_DWELL_LOWER;
-              end
-            end else begin
-              drg_counter = DRG_UPPER_LIMIT;
-              drg_state   = DRG_DWELL_UPPER;
-              drover_tp   = 1'b1;
-              `INFO(("DRG Model: Upper limit reached (count=%0d, transitions=%0d)",
-                     drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
-            end
-          end
-        end
-
-        DRG_DWELL_UPPER: begin
-          drover_tp = 1'b1;
-          if (both_no_dwell) begin
-            if (drctl_negedge_det)
-              drg_state = DRG_RAMP_DOWN;
-          end else if (no_dwell_low) begin
-            if (drctl_negedge_det)
-              drg_state = DRG_RAMP_DOWN;
-          end else begin
-            if (!drctl_tp)
-              drg_state = DRG_RAMP_DOWN;
-          end
-        end
-
-        DRG_RAMP_DOWN: begin
-          drover_tp = 1'b0;
-          if (both_no_dwell && drctl_posedge_det) begin
-            drg_state = DRG_RAMP_UP;
-          end else if (drg_counter > DRG_LOWER_LIMIT + DRG_STEP_SIZE) begin
-            drg_counter = drg_counter - DRG_STEP_SIZE;
-          end else begin
-            drover_pulse_count++;
-            if (no_dwell_low) begin
-              drg_burst_blade_count++;
-              `INFO(("DRG Model: Lower limit reached (blade=%0d) - snapping to upper",
-                     drover_pulse_count), ADI_VERBOSITY_LOW);
-              drg_counter = DRG_UPPER_LIMIT;
-              drover_tp   = 1'b1;
-              if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
-                drg_burst_hold = 1;
-                `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
-                       drg_burst_blade_limit), ADI_VERBOSITY_LOW);
-              end
-              if (both_no_dwell) begin
-                // Both no-dwell: auto-continue (stay in DRG_RAMP_DOWN)
-              end else begin
-                // No-dwell low only: wait at upper for next negedge
-                drg_state = DRG_DWELL_UPPER;
-              end
-            end else begin
-              drg_counter = DRG_LOWER_LIMIT;
-              drg_state   = DRG_DWELL_LOWER;
-              drover_tp   = 1'b1;
-              `INFO(("DRG Model: Lower limit reached (count=%0d, transitions=%0d)",
-                     drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
-            end
-          end
-        end
-
-      endcase
+      drctl_d = drctl_tp;
     end
   end
 
@@ -424,8 +413,8 @@ program test_program_drg (
       .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
       .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
       .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
-      .irq_base_address(`IRQ_C_BA),
-      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+      .irq_base_address(0),
+      .irq_vip_if(null));
 
     mng = new(
       .name(""),
@@ -445,6 +434,7 @@ program test_program_drg (
     // ----------------------------------------
     // Test 1: Sanity test - read version/ID
     // ----------------------------------------
+    current_test = 1;
     `INFO(("Test 1: Sanity test - register access"), ADI_VERBOSITY_NONE);
 
     axi_read(reg_addr(REG_VERSION), read_data);
@@ -461,6 +451,7 @@ program test_program_drg (
     // ----------------------------------------
     // Test 2: Take device out of reset
     // ----------------------------------------
+    current_test = 2;
     `INFO(("Test 2: Device reset sequence"), ADI_VERBOSITY_NONE);
 
     // Release reset (clear reset bits, keep device in known state)
@@ -489,6 +480,7 @@ program test_program_drg (
     // ----------------------------------------
     // Test 3: Configure DRG mode
     // ----------------------------------------
+    current_test = 3;
     `INFO(("Test 3: Configure DRG mode"), ADI_VERBOSITY_NONE);
 
     // Configure ramp delays
@@ -526,6 +518,7 @@ program test_program_drg (
     // ----------------------------------------
     // Test 4: Trigger ramp and verify drctl
     // ----------------------------------------
+    current_test = 4;
     `INFO(("Test 4: Ramp operation"), ADI_VERBOSITY_NONE);
 
     // Wait for drctl to assert (ramp starts automatically after config + BST_DELAY)
@@ -564,6 +557,7 @@ program test_program_drg (
     // ----------------------------------------
     // Test 5: Verify profile output
     // ----------------------------------------
+    current_test = 5;
     `INFO(("Test 5: Profile selection"), ADI_VERBOSITY_NONE);
 
     axi_write(reg_addr(REG_PROFILE), 32'h00000002);
@@ -581,6 +575,7 @@ program test_program_drg (
     // ----------------------------------------
     // Test 6: Test drhold - verify counter freezes
     // ----------------------------------------
+    current_test = 6;
     `INFO(("Test 6: DRHOLD control"), ADI_VERBOSITY_NONE);
 
     // First, reset counter and let it ramp a bit
@@ -659,6 +654,7 @@ program test_program_drg (
     // Verify that after each blade reaches the upper limit, the DRG
     // pauses for ALR_DELAY sync_clk cycles before starting the next blade.
     // ----------------------------------------
+    current_test = 7;
     `INFO(("Test 7: Sawtooth mode with inter-blade delay"), ADI_VERBOSITY_NONE);
 
     begin
@@ -754,6 +750,7 @@ program test_program_drg (
     // Test 8: Burst mode - sawtooth blades with burst limits and delay
     // driven by REG_RAMP_BURSTS and REG_BURST_DELAY register values
     // ----------------------------------------
+    current_test = 8;
     `INFO(("Test 8: Burst mode - sawtooth pattern with burst limits"), ADI_VERBOSITY_NONE);
 
     begin
@@ -880,6 +877,7 @@ program test_program_drg (
     // and snaps back to the upper limit when the lower limit is reached.
     // Run a continuous burst of blades with no delay between them.
     // ----------------------------------------
+    current_test = 9;
     `INFO(("Test 9: Sawtooth DOWN mode (NO_DWELL_LOW)"), ADI_VERBOSITY_NONE);
 
     begin
@@ -922,6 +920,210 @@ program test_program_drg (
                 n_blades, drover_pulse_count - blade_start_count));
         test_passed = 0;
       end
+
+      // Clean up
+      set_drg_burst_limit(0);
+      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
+      read_ramp_ctrl();
+    end
+
+    // ----------------------------------------
+    // Test 10: No-dwell mode cycling (NO_DWELL_HIGH <-> NO_DWELL_LOW)
+    // Direct mode switches between no-dwell modes. Each switch triggers
+    // auto_ramp_mode_en which resets the FSM. With the RTL fix, the CDC
+    // and timing infrastructure survive the reset, and the FSM self-advances
+    // via no_dwell_advance — no drover feedback needed.
+    // ----------------------------------------
+    current_test = 10;
+    `INFO(("Test 10: No-dwell mode cycling (NO_DWELL_HIGH <-> NO_DWELL_LOW)"), ADI_VERBOSITY_NONE);
+
+    begin
+      int unsigned phase_start_count;
+      int unsigned blades_per_mode = 2;
+      int unsigned n_iterations = 3;
+
+      // Initial setup via device reset for clean CDC state
+      enable_drg_model(0);
+      axi_write(reg_addr(REG_CONTROL), 32'h02);
+      axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
+      axi_write(reg_addr(REG_BST_DELAY), 32'd250);
+      axi_write(reg_addr(REG_ALR_DELAY), 32'd75);
+      axi_write(reg_addr(REG_CONTROL), 32'h00);
+      read_ramp_ctrl();
+      #1500ns;
+      enable_drg_model(1);
+
+      set_drg_burst_limit(blades_per_mode);
+
+      for (int i = 0; i < n_iterations; i++) begin
+        `INFO(("  === Iteration %0d/%0d ===", i + 1, n_iterations), ADI_VERBOSITY_NONE);
+
+        // --- NO_DWELL_HIGH ---
+        if (i > 0) begin
+          axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
+          read_ramp_ctrl();
+        end
+        reset_drg_counter(DRG_LOWER_LIMIT);
+        start_new_burst();
+        phase_start_count = drover_pulse_count;
+
+        wait_drover_pulses(blades_per_mode, 10);
+
+        `INFO(("  NO_DWELL_HIGH: %0d blades, drctl=%b",
+               drover_pulse_count - phase_start_count, drctl_tp), ADI_VERBOSITY_LOW);
+
+        if (!drg_burst_hold) begin
+          `ERROR(("  Iteration %0d: NO_DWELL_HIGH did not auto-hold", i + 1));
+          test_passed = 0;
+        end
+
+        // --- Switch to NO_DWELL_LOW ---
+        axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
+        read_ramp_ctrl();
+
+        reset_drg_counter(DRG_UPPER_LIMIT);
+        start_new_burst();
+        phase_start_count = drover_pulse_count;
+
+        wait_drover_pulses(blades_per_mode, 10);
+
+        `INFO(("  NO_DWELL_LOW: %0d blades, drctl=%b",
+               drover_pulse_count - phase_start_count, drctl_tp), ADI_VERBOSITY_LOW);
+
+        if (!drg_burst_hold) begin
+          `ERROR(("  Iteration %0d: NO_DWELL_LOW did not auto-hold", i + 1));
+          test_passed = 0;
+        end
+
+        `INFO(("  Iteration %0d complete", i + 1), ADI_VERBOSITY_LOW);
+      end
+
+      `INFO(("  %0d iterations, %0d mode switches completed",
+             n_iterations, n_iterations * 2), ADI_VERBOSITY_NONE);
+
+      // Clean up
+      set_drg_burst_limit(0);
+      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
+      read_ramp_ctrl();
+      #1500ns;
+      reset_drg_counter();
+    end
+
+    // ----------------------------------------
+    // Test 11: Toggle/no-dwell interleaved mode cycling
+    // Cycles: TOGGLE -> NO_DWELL_HIGH -> TOGGLE -> NO_DWELL_LOW
+    // Each toggle->no-dwell transition triggers auto_ramp_mode_en,
+    // which resets the FSM and CDC. The no-dwell->toggle transitions
+    // do NOT trigger it (falling edge, not rising).
+    // ----------------------------------------
+    current_test = 11;
+    `INFO(("Test 11: Toggle/no-dwell interleaved mode cycling"), ADI_VERBOSITY_NONE);
+
+    begin
+      int unsigned phase_start_count;
+      int unsigned total_phases_passed = 0;
+      int unsigned total_phases = 0;
+      int unsigned blades_per_nodwell = 2;
+      int unsigned pulses_per_toggle = 2;  // 1 full triangle cycle = up + down
+      int unsigned n_iterations = 3;
+
+      for (int i = 0; i < n_iterations; i++) begin
+        `INFO(("  === Iteration %0d/%0d ===", i + 1, n_iterations), ADI_VERBOSITY_NONE);
+
+        // --- Phase A: Triangle toggle mode ---
+        `INFO(("  Phase A: TOGGLE mode (0x0C)"), ADI_VERBOSITY_LOW);
+        set_drg_burst_limit(0);
+        axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
+        read_ramp_ctrl();
+        #3us;
+
+        reset_drg_counter(DRG_LOWER_LIMIT);
+        phase_start_count = drover_pulse_count;
+
+        wait_drover_pulses(pulses_per_toggle, 100);
+        total_phases++;
+
+        if ((drover_pulse_count - phase_start_count) == pulses_per_toggle) begin
+          total_phases_passed++;
+          `INFO(("  TOGGLE: %0d pulses - PASSED", pulses_per_toggle), ADI_VERBOSITY_LOW);
+        end else begin
+          `ERROR(("  TOGGLE: expected %0d pulses, got %0d",
+                  pulses_per_toggle, drover_pulse_count - phase_start_count));
+          test_passed = 0;
+        end
+
+        // --- Phase B: NO_DWELL_HIGH (triggers auto_ramp_mode_en) ---
+        `INFO(("  Phase B: Switching to NO_DWELL_HIGH (0x2C)"), ADI_VERBOSITY_LOW);
+        set_drg_burst_limit(blades_per_nodwell);
+        axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
+        read_ramp_ctrl();
+        #3us;
+
+        reset_drg_counter(DRG_LOWER_LIMIT);
+        start_new_burst();
+        phase_start_count = drover_pulse_count;
+
+        wait_drover_pulses(blades_per_nodwell, 50);
+        total_phases++;
+
+        if (drg_burst_hold && (drover_pulse_count - phase_start_count) == blades_per_nodwell) begin
+          total_phases_passed++;
+          `INFO(("  NO_DWELL_HIGH: %0d blades - PASSED", blades_per_nodwell), ADI_VERBOSITY_LOW);
+        end else begin
+          `ERROR(("  Iteration %0d: NO_DWELL_HIGH failed (blades=%0d, burst_hold=%b)",
+                  i + 1, drover_pulse_count - phase_start_count, drg_burst_hold));
+          test_passed = 0;
+        end
+
+        // --- Phase C: Back to triangle toggle mode (no auto_ramp_mode_en) ---
+        `INFO(("  Phase C: Back to TOGGLE mode (0x0C)"), ADI_VERBOSITY_LOW);
+        set_drg_burst_limit(0);
+        axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
+        read_ramp_ctrl();
+        #3us;
+
+        reset_drg_counter(DRG_LOWER_LIMIT);
+        phase_start_count = drover_pulse_count;
+
+        wait_drover_pulses(pulses_per_toggle, 100);
+        total_phases++;
+
+        if ((drover_pulse_count - phase_start_count) == pulses_per_toggle) begin
+          total_phases_passed++;
+          `INFO(("  TOGGLE: %0d pulses - PASSED", pulses_per_toggle), ADI_VERBOSITY_LOW);
+        end else begin
+          `ERROR(("  TOGGLE: expected %0d pulses, got %0d",
+                  pulses_per_toggle, drover_pulse_count - phase_start_count));
+          test_passed = 0;
+        end
+
+        // --- Phase D: NO_DWELL_LOW (triggers auto_ramp_mode_en) ---
+        `INFO(("  Phase D: Switching to NO_DWELL_LOW (0x1C)"), ADI_VERBOSITY_LOW);
+        set_drg_burst_limit(blades_per_nodwell);
+        axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
+        read_ramp_ctrl();
+        #3us;
+
+        reset_drg_counter(DRG_UPPER_LIMIT);
+        start_new_burst();
+        phase_start_count = drover_pulse_count;
+
+        wait_drover_pulses(blades_per_nodwell, 50);
+        total_phases++;
+
+        if (drg_burst_hold && (drover_pulse_count - phase_start_count) == blades_per_nodwell) begin
+          total_phases_passed++;
+          `INFO(("  NO_DWELL_LOW: %0d blades - PASSED", blades_per_nodwell), ADI_VERBOSITY_LOW);
+        end else begin
+          `ERROR(("  Iteration %0d: NO_DWELL_LOW failed (blades=%0d, burst_hold=%b)",
+                  i + 1, drover_pulse_count - phase_start_count, drg_burst_hold));
+          test_passed = 0;
+        end
+
+        `INFO(("  Iteration %0d complete", i + 1), ADI_VERBOSITY_LOW);
+      end
+
+      `INFO(("  %0d/%0d phases passed", total_phases_passed, total_phases), ADI_VERBOSITY_NONE);
 
       // Clean up
       set_drg_burst_limit(0);

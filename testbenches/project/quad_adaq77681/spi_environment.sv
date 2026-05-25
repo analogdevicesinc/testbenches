@@ -57,7 +57,7 @@ package spi_environment_pkg;
     `ifdef DEF_SDO_STREAMING
       adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(test_harness_sdo_src_0)) sdo_src_agent;
     `endif
-    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(30.5)) mclk_clk_vip_if;
+    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(`MCLK_CLK_PERIOD)) mclk_clk_vip_if;
 
     //============================================================================
     // Constructor
@@ -69,7 +69,7 @@ package spi_environment_pkg;
         virtual interface axi4stream_vip_if #(`AXIS_VIP_IF_PARAMS(test_harness_sdo_src_0)) sdo_src_axis_vip_if,
       `endif
       adi_spi_vip_if_base spi_s_vip_if,
-      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(30.5)) mclk_clk_vip_if);
+      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(`MCLK_CLK_PERIOD)) mclk_clk_vip_if);
 
       super.new(name);
 

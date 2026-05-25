@@ -3,6 +3,7 @@ global ad_project_params
 # SPI Engine DUT parameters
 set ad_project_params(DATA_WIDTH)           32
 set ad_project_params(ASYNC_SPI_CLK)        1
+set ad_project_params(EN_SINGLE_CS)         0
 set ad_project_params(NUM_OF_CS)            4
 set ad_project_params(NUM_OF_SDIO)          4
 set ad_project_params(NUM_OF_SDO)           4
@@ -64,3 +65,5 @@ set axis_sdo_src_vip_cfg [ list \
     TID_WIDTH 0 \
 ]
 set ad_project_params(axis_sdo_src_vip_cfg) $axis_sdo_src_vip_cfg
+
+set ad_project_params(FPGA_BOARD) "zed"

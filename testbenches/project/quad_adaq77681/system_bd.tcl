@@ -92,16 +92,19 @@ if ($ad_project_params(SDO_STREAMING)) {
     ad_connect sdo_src/m_axis $hier_spi_engine/s_axis_sample
 }
 
+set mclk_freq_hz 16384000
 ad_ip_instance clk_vip mclk_clkgen_vip [ list \
   INTERFACE_MODE {MASTER} \
-  FREQ_HZ 32768000 \
+  FREQ_HZ $mclk_freq_hz \
 ]
+set mclk_period [expr {1.0e9 / $mclk_freq_hz}]
 adi_sim_add_define "MCLK_CLK=mclk_clkgen_vip"
+adi_sim_add_define "MCLK_CLK_PERIOD=$mclk_period"
 
 delete_bd_objs [get_bd_nets quad_adaq77681_mclk_refclk_1]
 connect_bd_net [get_bd_pins mclk_clkgen_vip/clk_out] [get_bd_pins mclk_clkgen/clk]
 
-ad_connect quad_adaq77681_spi_vip_clk spi_clkgen/clk_0
+ad_connect quad_adaq77681_spi_vip_clk mclk_clkgen/clk_0
 ad_connect quad_adaq77681_irq quad_adaq77681/irq
 
 set BA_SPI_REGMAP 0x44A00000
@@ -111,10 +114,6 @@ adi_sim_add_define "QUAD_ADAQ77681_SPI_REGMAP_BA=[format "%d" ${BA_SPI_REGMAP}]"
 set BA_DMA 0x44A30000
 set_property offset $BA_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_qadc_dma}]
 adi_sim_add_define "QUAD_ADAQ77681_DMA_BA=[format "%d" ${BA_DMA}]"
-
-set BA_SPI_CLKGEN 0x44A70000
-set_property offset $BA_SPI_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_spi_clkgen}]
-adi_sim_add_define "QUAD_ADAQ77681_AXI_SPI_CLKGEN_BA=[format "%d" ${BA_SPI_CLKGEN}]"
 
 set BA_MCLK_CLKGEN 0x44B00000
 set_property offset $BA_MCLK_CLKGEN [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mclk_clkgen}]

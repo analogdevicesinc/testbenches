@@ -80,7 +80,6 @@ program test_program (
   spi_engine_api spi_api;
   dmac_api dma_api;
   pwm_gen_api pwm_api;
-  clk_gen_api clkgen_api;
   clk_gen_api clkgen_mclk;
 
   // --------------------------
@@ -156,10 +155,6 @@ program test_program (
     dma_api     = new("RX DMA API",
                       base_env.mng.master_sequencer,
                       `QUAD_ADAQ77681_DMA_BA);
-
-    clkgen_api  = new("CLKGEN API",
-                      base_env.mng.master_sequencer,
-                      `QUAD_ADAQ77681_AXI_SPI_CLKGEN_BA);
 
     clkgen_mclk = new("CLKGEN MCLK",
                       base_env.mng.master_sequencer,
@@ -536,7 +531,6 @@ program test_program (
   //---------------------------------------------------------------------------
   task init();
     // Start spi clk generator
-    clkgen_api.enable_clkgen();
     clkgen_mclk.enable_clkgen();
 
     // Config pwm

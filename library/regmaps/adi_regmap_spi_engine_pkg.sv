@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsibilities that he or she has by using this source/core.
+// freedoms and responsabilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -33,7 +33,7 @@
 // ***************************************************************************
 // ***************************************************************************
 /* Auto generated Register Map */
-/* Thu May 21 09:29:28 2026 */
+/* Tue Jun  2 14:23:37 2026 */
 
 package adi_regmap_spi_engine_pkg;
   import adi_regmap_pkg::*;
@@ -42,9 +42,9 @@ package adi_regmap_spi_engine_pkg;
 /* SPI Engine (axi_spi_engine) */
 
   const reg_t AXI_SPI_ENGINE_VERSION = '{ 'h0000, "VERSION" , '{
-    "VERSION_MAJOR": '{ 31, 16, RO, 'h00000002 },
+    "VERSION_MAJOR": '{ 31, 16, RO, 'h0002 },
     "VERSION_MINOR": '{ 15, 8, RO, 'h00000000 },
-    "VERSION_PATCH": '{ 7, 0, RO, 'h00000000 }}};
+    "VERSION_PATCH": '{ 7, 0, RO, 'h00000001 }}};
   `define SET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) SetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
   `define GET_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR(x) GetField(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR",x)
   `define DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR GetResetValue(AXI_SPI_ENGINE_VERSION,"VERSION_MAJOR")
@@ -73,12 +73,12 @@ package adi_regmap_spi_engine_pkg;
   `define UPDATE_AXI_SPI_ENGINE_SCRATCH_SCRATCH(x,y) UpdateField(AXI_SPI_ENGINE_SCRATCH,"SCRATCH",x,y)
 
   const reg_t AXI_SPI_ENGINE_DATA_WIDTH = '{ 'h000c, "DATA_WIDTH" , '{
-    "NUM_OF_SDIO": '{ 7, 4, RO, 0 },
-    "DATA_WIDTH": '{ 3, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x) SetField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDIO",x)
-  `define GET_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x) GetField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDIO",x)
-  `define DEFAULT_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI GetResetValue(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDIO")
-  `define UPDATE_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x,y) UpdateField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDIO",x,y)
+    "NUM_OF_SDI": '{ 23, 16, RO, 0 },
+    "DATA_WIDTH": '{ 15, 0, RO, 0 }}};
+  `define SET_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x) SetField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI",x)
+  `define GET_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x) GetField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI",x)
+  `define DEFAULT_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI GetResetValue(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI")
+  `define UPDATE_AXI_SPI_ENGINE_DATA_WIDTH_NUM_OF_SDI(x,y) UpdateField(AXI_SPI_ENGINE_DATA_WIDTH,"NUM_OF_SDI",x,y)
   `define SET_AXI_SPI_ENGINE_DATA_WIDTH_DATA_WIDTH(x) SetField(AXI_SPI_ENGINE_DATA_WIDTH,"DATA_WIDTH",x)
   `define GET_AXI_SPI_ENGINE_DATA_WIDTH_DATA_WIDTH(x) GetField(AXI_SPI_ENGINE_DATA_WIDTH,"DATA_WIDTH",x)
   `define DEFAULT_AXI_SPI_ENGINE_DATA_WIDTH_DATA_WIDTH GetResetValue(AXI_SPI_ENGINE_DATA_WIDTH,"DATA_WIDTH")
@@ -221,13 +221,6 @@ package adi_regmap_spi_engine_pkg;
   `define GET_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(x) GetField(AXI_SPI_ENGINE_SDI_FIFO,"SDI_FIFO",x)
   `define DEFAULT_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO GetResetValue(AXI_SPI_ENGINE_SDI_FIFO,"SDI_FIFO")
   `define UPDATE_AXI_SPI_ENGINE_SDI_FIFO_SDI_FIFO(x,y) UpdateField(AXI_SPI_ENGINE_SDI_FIFO,"SDI_FIFO",x,y)
-
-  const reg_t AXI_SPI_ENGINE_SDI_FIFO_MSB = '{ 'h00ec, "SDI_FIFO_MSB" , '{
-    "SDI_FIFO_MSB": '{ 31, 0, RO, 0 }}};
-  `define SET_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB(x) SetField(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB",x)
-  `define GET_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB(x) GetField(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB",x)
-  `define DEFAULT_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB GetResetValue(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB")
-  `define UPDATE_AXI_SPI_ENGINE_SDI_FIFO_MSB_SDI_FIFO_MSB(x,y) UpdateField(AXI_SPI_ENGINE_SDI_FIFO_MSB,"SDI_FIFO_MSB",x,y)
 
   const reg_t AXI_SPI_ENGINE_SDI_FIFO_PEEK = '{ 'h00f0, "SDI_FIFO_PEEK" , '{
     "SDI_FIFO_PEEK": '{ 31, 0, RO, 'h00 }}};

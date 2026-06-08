@@ -65,7 +65,7 @@ program test_program (
   inout quad_adaq77681_spi_clk,
   inout quad_adaq77681_spi_sclk,
   inout [(`NUM_OF_CS-1) :0] quad_adaq77681_spi_cs,
-  inout [(`NUM_OF_SDI-1):0] quad_adaq77681_spi_sdi,
+  inout [(`NUM_OF_MISO-1):0] quad_adaq77681_spi_sdi,
   inout quad_adaq77681_irq);
 
   timeunit 1ns;
@@ -116,15 +116,15 @@ program test_program (
   logic [  `DATA_WIDTH-1:0]  rx_data_cast [];
   int unsigned               tx_data_cast [];
   int unsigned               receive_data [];
-  int num_of_active_sdi_lanes = $countones(`SDI_LANE_MASK);
-  int num_of_active_sdo_lanes = $countones(`SDO_LANE_MASK);
+  int num_of_active_sdi_lanes = $countones(`MISO_LANE_MASK);
+  int num_of_active_sdo_lanes = $countones(`MOSI_LANE_MASK);
 
   // --------------------------
   // Main procedure
   // --------------------------
   initial begin
 
-    setLoggerVerbosity(ADI_VERBOSITY_HIGH);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     //creating environment
     base_env = new(
@@ -185,7 +185,7 @@ program test_program (
     #100ns;
 
     fifo_spi_test();
-    sdi_lane_mask = {`NUM_OF_SDI{1'b1}};
+    sdi_lane_mask = {`NUM_OF_MISO{1'b1}};
     sdo_lane_mask = 8'h01;
     num_of_active_sdi_lanes = $countones(sdi_lane_mask);
     num_of_active_sdo_lanes = $countones(sdo_lane_mask);
@@ -231,15 +231,15 @@ program test_program (
   //---------------------------------------------------------------------------
   task sdo_stream_gen(
       input [`DATA_DLENGTH-1:0] tx_data[]);
-    xil_axi4stream_data_byte data[((`DATA_WIDTH/8) * (`NUM_OF_SDO))-1:0];
+    xil_axi4stream_data_byte data[((`DATA_WIDTH/8) * (`NUM_OF_MOSI))-1:0];
     `ifdef DEF_SDO_STREAMING
-      for (int i = 0; i < `NUM_OF_SDO; i++) begin
+      for (int i = 0; i < `NUM_OF_MOSI; i++) begin
         for (int j = 0; j < (`DATA_WIDTH/8); j++) begin
           data[i * (`DATA_WIDTH/8) + j] = (tx_data[i] & (8'hFF << 8*j)) >> 8*j;
           spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i * (`DATA_WIDTH/8) + j]);
         end
       end
-      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8) * (`NUM_OF_SDO),0,0);
+      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8) * (`NUM_OF_MOSI),0,0);
     `endif
   endtask
 
@@ -313,15 +313,15 @@ program test_program (
 
     tx_data_cast         = new [num_of_active_sdo_lanes];
     tx_data              = new [num_of_active_sdo_lanes];
-    sdo_write_data       = new [`NUM_OF_SDO];
-    rx_data              = new [`NUM_OF_SDI];
+    sdo_write_data       = new [`NUM_OF_MOSI];
+    rx_data              = new [`NUM_OF_MISO];
     sdi_read_data        = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)* num_of_active_sdi_lanes];
     sdi_read_data_store  = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)* num_of_active_sdi_lanes];
 
     `ifdef DEF_SDO_STREAMING
-      sdo_write_data_store = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
+      sdo_write_data_store = new [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_MOSI)];
     `else
-      sdo_write_data_store = new [(`NUM_OF_WORDS)*(`NUM_OF_SDO)];
+      sdo_write_data_store = new [(`NUM_OF_WORDS)*(`NUM_OF_MOSI)];
     `endif
 
     //Configure DMA
@@ -331,7 +331,7 @@ program test_program (
       .tlast(1'b1),
       .partial_reporting_en(1'b1)
     );
-    dma_api.set_lengths(((`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_SDI) * (`DATA_WIDTH/8))-1,0);
+    dma_api.set_lengths(((`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_MISO) * (`DATA_WIDTH/8))-1,0);
     dma_api.set_dest_addr(`DDR_BA);
     dma_api.transfer_start();
 
@@ -350,7 +350,7 @@ program test_program (
 
     // Enqueue transfers to DUT
     for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
-      for (int j = 0, k = 0; j < (`NUM_OF_SDI); j++) begin
+      for (int j = 0, k = 0; j < (`NUM_OF_MISO); j++) begin
         rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
         if (sdi_lane_mask[j]) begin
           sdi_read_data_store[i * num_of_active_sdi_lanes + k]  = rx_data[j];
@@ -367,22 +367,22 @@ program test_program (
 
       `ifdef DEF_SDO_STREAMING
         sdo_stream_gen(tx_data);
-        for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+        for (int j = 0, k = 0; j < `NUM_OF_MOSI; j++) begin
           if (sdo_lane_mask[j]) begin
-            sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[k]; // all of valid random words will be used
+            sdo_write_data_store[i * (`NUM_OF_MOSI) + j] = tx_data[k]; // all of valid random words will be used
             k++;
           end else begin
-            sdo_write_data_store[i * (`NUM_OF_SDO) + j] = `SDO_IDLE_STATE;
+            sdo_write_data_store[i * (`NUM_OF_MOSI) + j] = `SDO_IDLE_STATE;
           end
         end
       `else
         if (i < (`NUM_OF_WORDS)) begin
-          for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+          for (int j = 0, k = 0; j < `NUM_OF_MOSI; j++) begin
             if (sdo_lane_mask[j]) begin
-              sdo_write_data_store[i * (`NUM_OF_SDO) + j] = tx_data[k]; //only the first NUM_OF_WORDS random words will be used for all transfers
+              sdo_write_data_store[i * (`NUM_OF_MOSI) + j] = tx_data[k]; //only the first NUM_OF_WORDS random words will be used for all transfers
               k++;
             end else begin
-              sdo_write_data_store[i * (`NUM_OF_SDO) + j] = `SDO_IDLE_STATE;
+              sdo_write_data_store[i * (`NUM_OF_MOSI) + j] = `SDO_IDLE_STATE;
             end
           end
           spi_api.sdo_offload_fifo_write(tx_data_cast);
@@ -405,8 +405,8 @@ program test_program (
       `INFO(("IRQ Test PASSED"), ADI_VERBOSITY_LOW);
     end
 
-    for (int i = 0, k = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_SDI)); i++) begin
-      if (sdi_lane_mask[i%(`NUM_OF_SDI)]) begin
+    for (int i = 0, k = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_MISO)); i++) begin
+      if (sdi_lane_mask[i%(`NUM_OF_MISO)]) begin
         sdi_read_data[k] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
         if (sdi_read_data[k] != sdi_read_data_store[k]) begin //one word at a time comparison
           `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x",
@@ -421,21 +421,21 @@ program test_program (
 
     for (int i = 0; i < (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i++) begin
       spi_receive(sdo_write_data);
-      for (int j = 0; j < `NUM_OF_SDO; j++) begin
+      for (int j = 0; j < `NUM_OF_MOSI; j++) begin
         `ifdef DEF_SDO_STREAMING
-          if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_SDO + j)]) begin
+          if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_MOSI + j)]) begin
             `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x",
                         j, sdo_write_data[j],
-                        (i * `NUM_OF_SDO + j),
-                        sdo_write_data_store[(i * `NUM_OF_SDO + j)]), ADI_VERBOSITY_LOW);
+                        (i * `NUM_OF_MOSI + j),
+                        sdo_write_data_store[(i * `NUM_OF_MOSI + j)]), ADI_VERBOSITY_LOW);
             `FATAL(("Offload Write Test FAILED"));
           end
         `else
-          if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_SDO + j) % (`NUM_OF_WORDS * `NUM_OF_SDO)]) begin
+          if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_MOSI + j) % (`NUM_OF_WORDS * `NUM_OF_MOSI)]) begin
             `INFO(("sdo_write_data[%d]: %x; sdo_write_data_store[%d]: %x",
                         j, sdo_write_data[j],
-                        ((i * `NUM_OF_SDO + j) % (`NUM_OF_WORDS * `NUM_OF_SDO)),
-                        sdo_write_data_store[(i * `NUM_OF_SDO + j) % (`NUM_OF_WORDS * `NUM_OF_SDO)]), ADI_VERBOSITY_LOW);
+                        ((i * `NUM_OF_MOSI + j) % (`NUM_OF_WORDS * `NUM_OF_MOSI)),
+                        sdo_write_data_store[(i * `NUM_OF_MOSI + j) % (`NUM_OF_WORDS * `NUM_OF_MOSI)]), ADI_VERBOSITY_LOW);
             `FATAL(("Offload Write Test FAILED"));
           end
         `endif
@@ -449,24 +449,24 @@ program test_program (
   //---------------------------------------------------------------------------
   task fifo_spi_test();
 
-    sdi_lane_mask       = (2**`NUM_OF_SDI)-1; //new mask defining the active lanes
+    sdi_lane_mask       = (2**`NUM_OF_MISO)-1; //new mask defining the active lanes
     sdo_lane_mask       = 8'h01; //new mask defining the active lanes
     num_of_active_sdi_lanes = $countones(sdi_lane_mask);
     num_of_active_sdo_lanes = $countones(sdo_lane_mask);
 
     rx_data_cast        = new [num_of_active_sdi_lanes];
-    rx_data             = new [(`NUM_OF_SDI)];
+    rx_data             = new [(`NUM_OF_MISO)];
     sdi_fifo_data       = new [num_of_active_sdi_lanes * `NUM_OF_WORDS];
     sdi_fifo_data_store = new [num_of_active_sdi_lanes * `NUM_OF_WORDS];
     tx_data             = new [num_of_active_sdo_lanes];
     tx_data_cast        = new [num_of_active_sdo_lanes];
-    receive_data        = new [`NUM_OF_SDO];
-    sdo_fifo_data       = new [`NUM_OF_SDO * `NUM_OF_WORDS];
-    sdo_fifo_data_store = new [`NUM_OF_SDO * `NUM_OF_WORDS];
+    receive_data        = new [`NUM_OF_MOSI];
+    sdo_fifo_data       = new [`NUM_OF_MOSI * `NUM_OF_WORDS];
+    sdo_fifo_data_store = new [`NUM_OF_MOSI * `NUM_OF_WORDS];
 
     // Generate a FIFO transaction, write SDO first
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
-      for (int j = 0, k = 0; j < (`NUM_OF_SDI); j++) begin
+      for (int j = 0, k = 0; j < (`NUM_OF_MISO); j++) begin
         rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
         if (sdi_lane_mask[j]) begin
           sdi_fifo_data_store[i * num_of_active_sdi_lanes + k] = rx_data[j];
@@ -479,12 +479,12 @@ program test_program (
         tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
       end
 
-      for (int j = 0, k = 0; j < `NUM_OF_SDO; j++) begin
+      for (int j = 0, k = 0; j < `NUM_OF_MOSI; j++) begin
         if (sdo_lane_mask[j]) begin
-          sdo_fifo_data_store[i * `NUM_OF_SDO + j] = tx_data[k];
+          sdo_fifo_data_store[i * `NUM_OF_MOSI + j] = tx_data[k];
           k++;
         end else begin
-          sdo_fifo_data_store[i * `NUM_OF_SDO + j] = `SDO_IDLE_STATE;
+          sdo_fifo_data_store[i * `NUM_OF_MOSI + j] = `SDO_IDLE_STATE;
         end
       end
 
@@ -504,8 +504,8 @@ program test_program (
       for (int j = 0; j < num_of_active_sdi_lanes; j++) begin
         sdi_fifo_data[i * num_of_active_sdi_lanes + j] = rx_data_cast[j];
       end
-      for (int j = 0; j < (`NUM_OF_SDO); j++) begin
-        sdo_fifo_data[i * (`NUM_OF_SDO) + j] = receive_data[j];
+      for (int j = 0; j < (`NUM_OF_MOSI); j++) begin
+        sdo_fifo_data[i * (`NUM_OF_MOSI) + j] = receive_data[j];
       end
     end
 

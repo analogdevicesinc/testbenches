@@ -311,15 +311,23 @@ program test_program_drg (
     `INFO(("DRG Model: Burst blade limit set to %0d (0=unlimited)", limit), ADI_VERBOSITY_LOW);
   endtask
 
-  // Task to start a new burst (resets blade count, releases burst hold)
+  // Task to start a new burst (resets blade count, releases burst hold).
+  // Sets drctl_d to the opposite of current drctl_tp so the model registers
+  // the appropriate edge on its next iteration: in NO_DWELL_LOW the FSM
+  // drives drctl low after auto-hold and the model needs a negedge to leave
+  // DWELL_UPPER; in NO_DWELL_HIGH the FSM holds drctl high and the model
+  // needs a posedge to leave DWELL_LOWER. Forcing drctl_d=!drctl_tp covers
+  // both directions without inspecting mode bits.
   task start_new_burst();
     drg_burst_blade_count = 0;
     drg_burst_hold = 0;
-    drctl_d = 0;
+    drctl_d = !drctl_tp;
     `INFO(("DRG Model: New burst started (limit=%0d)", drg_burst_blade_limit), ADI_VERBOSITY_LOW);
   endtask
 
-  // Task to reset DRG counter to a specific value
+  // Task to reset DRG counter to a specific value. Same drctl_d=!drctl_tp
+  // trick as start_new_burst so the model picks up the next FSM-driven edge
+  // regardless of drctl's current level.
   task reset_drg_counter(input logic [DRG_WIDTH-1:0] value = DRG_LOWER_LIMIT);
     drg_counter = value;
     drg_state   = (value >= DRG_UPPER_LIMIT) ? DRG_DWELL_UPPER : DRG_DWELL_LOWER;
@@ -327,7 +335,7 @@ program test_program_drg (
     drover_pulse_count = 0;
     drg_burst_blade_count = 0;
     drg_burst_hold = 0;
-    drctl_d = 0;
+    drctl_d = !drctl_tp;
     `INFO(("DRG Model: Counter reset to %0d (drover=%b)", value, drover_tp), ADI_VERBOSITY_LOW);
   endtask
 
@@ -485,7 +493,7 @@ program test_program_drg (
 
     // Configure ramp delays
     axi_write(reg_addr(REG_BST_DELAY), 32'd250);    // Before start delay
-    axi_write(reg_addr(REG_ALR_DELAY), 32'd75);     // After level reached delay
+    axi_write(reg_addr(REG_ALR_DELAY), 32'd0);      // After level reached delay
     axi_write(reg_addr(REG_BURST_DELAY), 32'd200);  // Burst delay
     axi_write(reg_addr(REG_RAMP_BURSTS), 32'd5);    // Number of bursts
 
@@ -929,10 +937,12 @@ program test_program_drg (
 
     // ----------------------------------------
     // Test 10: No-dwell mode cycling (NO_DWELL_HIGH <-> NO_DWELL_LOW)
-    // Direct mode switches between no-dwell modes. Each switch triggers
-    // auto_ramp_mode_en which resets the FSM. With the RTL fix, the CDC
-    // and timing infrastructure survive the reset, and the FSM self-advances
-    // via no_dwell_advance — no drover feedback needed.
+    // Direct mode switches between no-dwell modes. Each switch is detected
+    // on sync_clk (auto_ramp_mode_update) and pulses reset_overwrite for
+    // 16 cycles, clearing the FSM/timing counters while the CDC config
+    // registers (no_dwell_*, drctl_toggle_en, etc.) survive. IDLE states
+    // wait for drover_d2=1 before transitioning, eliminating the
+    // stale-edge race that caused the original deadlock.
     // ----------------------------------------
     current_test = 10;
     `INFO(("Test 10: No-dwell mode cycling (NO_DWELL_HIGH <-> NO_DWELL_LOW)"), ADI_VERBOSITY_NONE);
@@ -947,7 +957,7 @@ program test_program_drg (
       axi_write(reg_addr(REG_CONTROL), 32'h02);
       axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
       axi_write(reg_addr(REG_BST_DELAY), 32'd250);
-      axi_write(reg_addr(REG_ALR_DELAY), 32'd75);
+      axi_write(reg_addr(REG_ALR_DELAY), 32'd0);
       axi_write(reg_addr(REG_CONTROL), 32'h00);
       read_ramp_ctrl();
       #1500ns;
@@ -962,6 +972,7 @@ program test_program_drg (
         if (i > 0) begin
           axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
           read_ramp_ctrl();
+          #1500ns;
         end
         reset_drg_counter(DRG_LOWER_LIMIT);
         start_new_burst();
@@ -980,6 +991,7 @@ program test_program_drg (
         // --- Switch to NO_DWELL_LOW ---
         axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
         read_ramp_ctrl();
+        #1500ns;
 
         reset_drg_counter(DRG_UPPER_LIMIT);
         start_new_burst();
@@ -1012,9 +1024,10 @@ program test_program_drg (
     // ----------------------------------------
     // Test 11: Toggle/no-dwell interleaved mode cycling
     // Cycles: TOGGLE -> NO_DWELL_HIGH -> TOGGLE -> NO_DWELL_LOW
-    // Each toggle->no-dwell transition triggers auto_ramp_mode_en,
-    // which resets the FSM and CDC. The no-dwell->toggle transitions
-    // do NOT trigger it (falling edge, not rising).
+    // Every change in {no_dwell_high, no_dwell_low, drctl_toggle_en} is
+    // detected by auto_ramp_mode_update (XOR-based, both edges) and
+    // pulses reset_overwrite. CDC config registers reset only on
+    // reset_sync_cd, so they survive each switch.
     // ----------------------------------------
     current_test = 11;
     `INFO(("Test 11: Toggle/no-dwell interleaved mode cycling"), ADI_VERBOSITY_NONE);
@@ -1035,9 +1048,9 @@ program test_program_drg (
         set_drg_burst_limit(0);
         axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
         read_ramp_ctrl();
+        reset_drg_counter(DRG_LOWER_LIMIT);
         #3us;
 
-        reset_drg_counter(DRG_LOWER_LIMIT);
         phase_start_count = drover_pulse_count;
 
         wait_drover_pulses(pulses_per_toggle, 100);
@@ -1052,14 +1065,14 @@ program test_program_drg (
           test_passed = 0;
         end
 
-        // --- Phase B: NO_DWELL_HIGH (triggers auto_ramp_mode_en) ---
+        // --- Phase B: NO_DWELL_HIGH (triggers reset_overwrite) ---
         `INFO(("  Phase B: Switching to NO_DWELL_HIGH (0x2C)"), ADI_VERBOSITY_LOW);
         set_drg_burst_limit(blades_per_nodwell);
         axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
         read_ramp_ctrl();
+        reset_drg_counter(DRG_LOWER_LIMIT);
         #3us;
 
-        reset_drg_counter(DRG_LOWER_LIMIT);
         start_new_burst();
         phase_start_count = drover_pulse_count;
 
@@ -1075,14 +1088,14 @@ program test_program_drg (
           test_passed = 0;
         end
 
-        // --- Phase C: Back to triangle toggle mode (no auto_ramp_mode_en) ---
+        // --- Phase C: Back to triangle toggle mode (also triggers reset_overwrite) ---
         `INFO(("  Phase C: Back to TOGGLE mode (0x0C)"), ADI_VERBOSITY_LOW);
         set_drg_burst_limit(0);
         axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
         read_ramp_ctrl();
+        reset_drg_counter(DRG_LOWER_LIMIT);
         #3us;
 
-        reset_drg_counter(DRG_LOWER_LIMIT);
         phase_start_count = drover_pulse_count;
 
         wait_drover_pulses(pulses_per_toggle, 100);
@@ -1097,14 +1110,14 @@ program test_program_drg (
           test_passed = 0;
         end
 
-        // --- Phase D: NO_DWELL_LOW (triggers auto_ramp_mode_en) ---
+        // --- Phase D: NO_DWELL_LOW (triggers reset_overwrite) ---
         `INFO(("  Phase D: Switching to NO_DWELL_LOW (0x1C)"), ADI_VERBOSITY_LOW);
         set_drg_burst_limit(blades_per_nodwell);
         axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
         read_ramp_ctrl();
+        reset_drg_counter(DRG_UPPER_LIMIT);
         #3us;
 
-        reset_drg_counter(DRG_UPPER_LIMIT);
         start_new_burst();
         phase_start_count = drover_pulse_count;
 

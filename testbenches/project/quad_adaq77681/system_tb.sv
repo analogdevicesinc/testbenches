@@ -45,8 +45,8 @@ module system_tb();
   wire                     quad_adaq77681_spi_clk;
   wire                     quad_adaq77681_spi_sclk;
   wire [(`NUM_OF_CS-1) :0] quad_adaq77681_spi_cs;
-  wire [(`NUM_OF_SDI-1):0] quad_adaq77681_spi_sdi;
-  wire [(`NUM_OF_SDO-1):0] quad_adaq77681_spi_sdo;
+  wire [(`NUM_OF_MISO-1):0] quad_adaq77681_spi_sdi;
+  wire [(`NUM_OF_MOSI-1):0] quad_adaq77681_spi_sdo;
   wire                     quad_adaq77681_irq;
   
   `TEST_PROGRAM test(

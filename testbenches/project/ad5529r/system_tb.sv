@@ -55,11 +55,6 @@ module system_tb();
   assign spi_mosi = `TH.`SPI_S.inst.IF.s_mosi;
   assign spi_miso = `TH.`SPI_S.inst.IF.s_miso;
 
-  // SPI VIP reset signal - directly driven by test_program for precise timing control
-  // Must be asserted BEFORE system reset so VIP knows to expect CS glitches
-  wire spi_resetn;
-  assign `TH.`SPI_S.inst.IF.resetn = spi_resetn;
-
   `TEST_PROGRAM test(
     .ad5529r_spi_irq(ad5529r_spi_irq),
     .ad5529r_spi_clk(ad5529r_spi_clk),
@@ -70,8 +65,7 @@ module system_tb();
     .spi_sclk(spi_sclk),
     .spi_cs(spi_cs),
     .spi_mosi(spi_mosi),
-    .spi_miso(spi_miso),
-    .spi_resetn(spi_resetn));
+    .spi_miso(spi_miso));
 
   test_harness `TH (
     .ad5529r_spi_irq(ad5529r_spi_irq),

@@ -79,9 +79,7 @@ program test_program (
   input spi_sclk,
   input spi_cs,
   input spi_mosi,
-  input spi_miso,
-  // SPI VIP reset - directly controlled for precise timing during system reset
-  output reg spi_resetn);
+  input spi_miso);
 
   timeunit 1ns;
   timeprecision 1ps;
@@ -838,19 +836,15 @@ end
 // System Reset Testing: Reset execution handler
 // --------------------------
 // When system_reset_triggered is set, executes the actual reset sequence.
-// CRITICAL: Assert SPI VIP reset BEFORE system reset so the VIP knows to
-// expect CS glitches. The VIP checks resetn when CS goes inactive mid-transaction.
+// Uses SPI VIP methods to tolerate CS glitches during DUT reset.
 initial begin
-  // Initialize SPI VIP resetn to deasserted (normal operation)
-  spi_resetn = 1'b1;
-
   forever begin
     @(posedge system_reset_triggered);
 
-    // Step 1: Assert SPI VIP reset FIRST (so VIP tolerates CS glitches)
-    `INFO(("[RESET_TEST] Asserting SPI VIP reset..."), ADI_VERBOSITY_LOW);
-    spi_resetn = 1'b0;
-    #10ns;  // Small delay to ensure VIP sees reset before DUT drops CS
+    // Step 1: Tell SPI VIP to tolerate CS glitches during DUT reset
+    `INFO(("[RESET_TEST] Allowing CS inactive mid-transfer..."), ADI_VERBOSITY_LOW);
+    spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(1);
+    #10ns;
 
     // Step 2: Assert system reset (DUT will drop CS here)
     `INFO(("[RESET_TEST] Asserting system reset..."), ADI_VERBOSITY_LOW);
@@ -862,14 +856,16 @@ initial begin
     base_env.sys_rst_vip_if.deassert_reset();
     #100ns;
 
-    // Step 4: Signal reset complete (but keep SPI VIP in reset)
-    // The SPI VIP reset will be deasserted by the recovery path AFTER config_spi()
-    // completes, to avoid spurious CS glitches during DUT reconfiguration.
+    // Step 4: Reset SPI VIP state (clears mailboxes, counters)
+    // CS tolerance stays enabled — config_spi() also causes CS glitches.
+    // The test recovery path re-disables it after config_spi() completes.
+    `INFO(("[RESET_TEST] Resetting SPI VIP..."), ADI_VERBOSITY_LOW);
+    spi_env.spi_agent.sequencer.reset();
+
     #700ns;
 
     system_reset_complete = 1;
     `INFO(("[RESET_TEST] System reset sequence complete (triggered at bit %0d)", reset_bit_count), ADI_VERBOSITY_LOW);
-    `INFO(("[RESET_TEST] Note: SPI VIP still in reset - will be released after DUT reconfiguration"), ADI_VERBOSITY_LOW);
   end
 end
 
@@ -1156,14 +1152,10 @@ task streaming_test(
     // (Re)configure system - required after reset or on first run
     config_spi();
 
-    // On retry, deassert SPI VIP reset now that DUT is reconfigured and stable
-    // This must happen AFTER config_spi() to avoid spurious CS glitches during clock/PWM startup
+    // On retry after reset, re-disable CS tolerance and clear spurious MOSI data
     if (reset_tested) begin
-      `INFO(("[RESET_TEST] Deasserting SPI VIP reset after DUT reconfiguration..."), ADI_VERBOSITY_LOW);
-      spi_resetn = 1'b1;
-      #100ns;  // Allow VIP to stabilize
-      // Clear any spurious MOSI data captured during config_spi() while VIP was in reset
-      // (The rx_mosi task runs even during reset and may capture garbage)
+      spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(0);
+      #100ns;
       spi_clear_receive();
     end
 
@@ -1510,14 +1502,10 @@ task single_instruction_test(
     // (Re)configure system - required after reset or on first run
     config_spi();
 
-    // On retry, deassert SPI VIP reset now that DUT is reconfigured and stable
-    // This must happen AFTER config_spi() to avoid spurious CS glitches during clock/PWM startup
+    // On retry after reset, re-disable CS tolerance and clear spurious MOSI data
     if (reset_tested) begin
-      `INFO(("[RESET_TEST] Deasserting SPI VIP reset after DUT reconfiguration..."), ADI_VERBOSITY_LOW);
-      spi_resetn = 1'b1;
-      #100ns;  // Allow VIP to stabilize
-      // Clear any spurious MOSI data captured during config_spi() while VIP was in reset
-      // (The rx_mosi task runs even during reset and may capture garbage)
+      spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(0);
+      #100ns;
       spi_clear_receive();
     end
 

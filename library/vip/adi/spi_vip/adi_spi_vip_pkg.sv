@@ -56,6 +56,7 @@ package adi_spi_vip_pkg;
     protected event tx_mbx_updated;
     protected int unsigned rx_transaction_count;
     protected int unsigned tx_transaction_count;
+    protected bit cs_inactive_mid_transfer_allowed = 0;
 
     adi_spi_vip_if_base vif;
 
@@ -208,8 +209,8 @@ package adi_spi_vip_pkg;
               if (!vif.get_cs_active()) begin
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
-                  if (vif.get_resetn() == 1'b0) begin
-                    this.info($sformatf("[SPI VIP] MISO Tx: CS inactive mid-transaction during reset (expected)"), ADI_VERBOSITY_HIGH);
+                  if (cs_inactive_mid_transfer_allowed) begin
+                    this.warning($sformatf("[SPI VIP] MISO Tx: CS inactive mid-transaction (allowed by allow_cs_inactive_mid_transfer)"));
                   end else begin
                     this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
                   end
@@ -271,28 +272,6 @@ package adi_spi_vip_pkg;
       end
     endtask : cs_tristate
 
-    protected task reset_handler();
-      int dummy;
-      int miso_cleared, mosi_cleared;
-      forever begin
-        vif.wait_until_reset_asserted();
-        miso_cleared = 0;
-        mosi_cleared = 0;
-        foreach (miso_mbx[i]) begin
-          while (miso_mbx[i].try_get(dummy)) miso_cleared++;
-        end
-        foreach (mosi_mbx[i]) begin
-          while (mosi_mbx[i].try_get(dummy)) mosi_cleared++;
-        end
-        rx_transaction_count = 0;
-        tx_transaction_count = 0;
-        this.info($sformatf("[SPI VIP] Reset asserted - cleared %0d MISO, %0d MOSI items, reset transaction counters", miso_cleared, mosi_cleared), ADI_VERBOSITY_HIGH);
-
-        vif.wait_until_reset_deasserted();
-        this.info($sformatf("[SPI VIP] Reset deasserted"), ADI_VERBOSITY_HIGH);
-      end
-    endtask : reset_handler
-
     protected task run();
       fork
           begin
@@ -304,9 +283,6 @@ package adi_spi_vip_pkg;
           begin
             cs_tristate();
           end
-          begin
-            reset_handler();
-          end
       join
     endtask : run
 
@@ -315,6 +291,26 @@ package adi_spi_vip_pkg;
     );
       this.default_miso_data = default_data;
     endfunction : set_default_miso_data
+
+    task reset();
+      int dummy;
+      int miso_cleared = 0;
+      int mosi_cleared = 0;
+      foreach (miso_mbx[i]) begin
+        while (miso_mbx[i].try_get(dummy)) miso_cleared++;
+      end
+      foreach (mosi_mbx[i]) begin
+        while (mosi_mbx[i].try_get(dummy)) mosi_cleared++;
+      end
+      rx_transaction_count = 0;
+      tx_transaction_count = 0;
+      this.info($sformatf("[SPI VIP] Reset - cleared %0d MISO, %0d MOSI items, reset transaction counters",
+        miso_cleared, mosi_cleared), ADI_VERBOSITY_HIGH);
+    endtask : reset
+
+    function void allow_cs_inactive_mid_transfer(bit allow);
+      cs_inactive_mid_transfer_allowed = allow;
+    endfunction : allow_cs_inactive_mid_transfer
 
     task put_tx_data(
       input int unsigned data[]);
@@ -490,6 +486,15 @@ package adi_spi_vip_pkg;
     virtual function void set_default_miso_data(input int unsigned data);
       this.driver.set_default_miso_data(data);
     endfunction : set_default_miso_data
+
+    virtual task reset();
+      this.verify_count = 0;
+      this.driver.reset();
+    endtask : reset
+
+    virtual function void allow_cs_inactive_mid_transfer(bit allow);
+      this.driver.allow_cs_inactive_mid_transfer(allow);
+    endfunction : allow_cs_inactive_mid_transfer
 
   endclass
 

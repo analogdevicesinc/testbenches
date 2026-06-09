@@ -55,7 +55,6 @@ interface spi_vip_if #(
   wire  [NUM_OF_MISO-1:0] s_miso; // need net types here in case tb wants to tristate this
   logic [NUM_OF_MOSI-1:0] s_mosi;
   logic s_cs;
-  logic resetn = 1'b1;  // Active-low reset, default deasserted
 
   logic m_sclk;
   wire  [NUM_OF_MISO-1:0] m_miso; // need net types here in case tb wants to tristate this
@@ -223,20 +222,6 @@ interface spi_vip_if #(
     virtual task set_miso_oen(bit val);
       miso_oen <= #(CS_TO_MISO*1ns) val;
     endtask
-
-    virtual function logic get_resetn();
-      return resetn;
-    endfunction : get_resetn
-
-    virtual task wait_until_reset_asserted();
-      if (resetn == 1'b1)
-        @(negedge resetn);
-    endtask : wait_until_reset_asserted
-
-    virtual task wait_until_reset_deasserted();
-      if (resetn == 1'b0)
-        @(posedge resetn);
-    endtask : wait_until_reset_deasserted
 
   endclass: adi_spi_vip_if
 

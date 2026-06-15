@@ -5,10 +5,8 @@ set ad_project_params(DATA_WIDTH)           32
 set ad_project_params(ASYNC_SPI_CLK)        1
 set ad_project_params(EN_SINGLE_CS)         0
 set ad_project_params(NUM_OF_CS)            4
-set ad_project_params(NUM_OF_MISO)          1
+set ad_project_params(NUM_OF_MISO)          4
 set ad_project_params(NUM_OF_MOSI)          1
-# NUM_OF_SDIO for HDL block design compatibility
-set ad_project_params(NUM_OF_SDIO)          $ad_project_params(NUM_OF_MISO)
 set ad_project_params(SDI_DELAY)            1
 set ad_project_params(ECHO_SCLK)            0
 set ad_project_params(CMD_MEM_ADDR_WIDTH)   4

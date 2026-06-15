@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -36,15 +36,6 @@
 `include "utils.svh"
 
 module system_tb();
-
-  localparam RX_SAMPLES_PER_CHANNEL = (`RX_JESD_L*`LL_OUT_BYTES*8) / `RX_JESD_M / `RX_JESD_NP;
-  localparam RX_DMA_NP = `RX_JESD_NP == 12 ? 16 : `RX_JESD_NP;
-
-  localparam RX_OS_SAMPLES_PER_CHANNEL = (`RX_OS_JESD_L*`LL_OUT_BYTES1*8) / `RX_OS_JESD_M / `RX_OS_JESD_NP;
-  localparam RX_OS_DMA_NP = `RX_OS_JESD_NP == 12 ? 16 : `RX_OS_JESD_NP;
-
-  reg [`RX_JESD_M*RX_SAMPLES_PER_CHANNEL*RX_DMA_NP-1:0] tx_ex_dac_data = 'h0;
-  reg [`RX_OS_JESD_M*RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP-1:0] tx_os_ex_dac_data = 'h0;
 
   wire rx_sync;
   wire tx_sync;
@@ -126,53 +117,9 @@ module system_tb();
     .tx_data_3_n(dut2ex_serial_lane_n[1]),
     .tx_data_3_p(dut2ex_serial_lane_p[1]),
 
-    .dac_data_0(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*0 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
-    .dac_data_1(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*1 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
-    .dac_data_2(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*2 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
-    .dac_data_3(tx_ex_dac_data[RX_SAMPLES_PER_CHANNEL*RX_DMA_NP*3 +: RX_SAMPLES_PER_CHANNEL*RX_DMA_NP]),
-
-    .dac_os_data_0(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*0 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
-    .dac_os_data_1(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*1 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
-    .dac_os_data_2(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*2 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
-    .dac_os_data_3(tx_os_ex_dac_data[RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP*3 +: RX_OS_SAMPLES_PER_CHANNEL*RX_OS_DMA_NP]),
-
     .dac_fir_filter_active (1'b0),
     .adc_fir_filter_active (1'b0)
   );
-
-  reg [RX_DMA_NP-1:0] sample = 'h0;
-  integer sample_counter = 0;
-  always @(posedge `TH.i_tx_jesd_exerciser.device_clk) begin
-    for (int i = 0; i < `RX_JESD_M; i++) begin
-      for (int j = 0; j < RX_SAMPLES_PER_CHANNEL; j++) begin
-        // Test incrementing data on consecutive samples
-        if (`TH.i_tx_jesd_exerciser.tx_tpl_core.dac_enable_0) begin
-          sample = sample_counter+`RX_JESD_M*j+i;
-        end else begin
-          sample = 'h0;
-        end
-        tx_ex_dac_data[RX_DMA_NP*(RX_SAMPLES_PER_CHANNEL*i+j) +:RX_DMA_NP] = sample;
-      end
-    end
-    sample_counter = sample_counter + `RX_JESD_M*RX_SAMPLES_PER_CHANNEL;
-  end
-
-  reg [RX_OS_DMA_NP-1:0] sample1 = 'h0;
-  integer sample_counter1 = 0;
-  always @(posedge `TH.i_tx_os_jesd_exerciser.device_clk) begin
-    for (int i = 0; i < `RX_OS_JESD_M; i++) begin
-      for (int j = 0; j < RX_OS_SAMPLES_PER_CHANNEL; j++) begin
-        // Test incrementing data on consecutive samples
-        if (`TH.i_tx_os_jesd_exerciser.tx_tpl_core.dac_enable_0) begin
-          sample1 = sample_counter1+`RX_OS_JESD_M*j+i;
-        end else begin
-          sample1 = 'h0;
-        end
-        tx_os_ex_dac_data[RX_OS_DMA_NP*(RX_OS_SAMPLES_PER_CHANNEL*i+j) +:RX_OS_DMA_NP] = sample1;
-      end
-    end
-    sample_counter1 = sample_counter1 + `RX_OS_JESD_M*RX_OS_SAMPLES_PER_CHANNEL;
-  end
 
 endmodule
 

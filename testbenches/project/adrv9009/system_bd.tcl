@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2018-2025 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2018-2026 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -89,8 +89,16 @@ if {$RX_OS_JESD_F % 3 == 0} {
   set LL_OUT_BYTES1 [expr max($RX_OS_JESD_F,$DATAPATH_WIDTH)]
 }
 
+# For F=3,6,12 use dual clock
+if {$TX_JESD_F % 3 == 0} {
+  set LL_OUT_BYTES2 [expr max($TX_JESD_F,$NP12_DATAPATH_WIDTH)]
+} else {
+  set LL_OUT_BYTES2 [expr max($TX_JESD_F,$DATAPATH_WIDTH)]
+}
+
 adi_sim_add_define LL_OUT_BYTES=$LL_OUT_BYTES
 adi_sim_add_define LL_OUT_BYTES1=$LL_OUT_BYTES1
+adi_sim_add_define LL_OUT_BYTES2=$LL_OUT_BYTES2
 
 set RX_DMA_SAMPLE_WIDTH $ad_project_params(RX_JESD_NP)
 if {$RX_DMA_SAMPLE_WIDTH == 12} {
@@ -102,11 +110,9 @@ if {$RX_OS_DMA_SAMPLE_WIDTH == 12} {
   set RX_OS_DMA_SAMPLE_WIDTH 16
 }
 
-set TX_EX_DAC_DATA_WIDTH [expr $RX_NUM_OF_LANES * $LL_OUT_BYTES * 8]
-set TX_EX_SAMPLES_PER_CHANNEL [expr $TX_EX_DAC_DATA_WIDTH / $RX_NUM_OF_CONVERTERS / $RX_SAMPLE_WIDTH]
-
-set TX_OS_EX_DAC_DATA_WIDTH [expr $RX_OS_NUM_OF_LANES * $LL_OUT_BYTES1 * 8]
-set TX_OS_EX_SAMPLES_PER_CHANNEL [expr $TX_OS_EX_DAC_DATA_WIDTH / $RX_OS_NUM_OF_CONVERTERS / $RX_OS_SAMPLE_WIDTH]
+set TX_EX_DMA_DATA_WIDTH [expr $RX_NUM_OF_LANES * $LL_OUT_BYTES * 8]
+set TX_OS_EX_DMA_DATA_WIDTH [expr $RX_OS_NUM_OF_LANES * $LL_OUT_BYTES1 * 8]
+set RX_EX_DMA_DATA_WIDTH [expr $TX_NUM_OF_LANES * $LL_OUT_BYTES2 * 8]
 
 set TX_MAX_LANES 4
 set RX_MAX_LANES 2
@@ -193,32 +199,74 @@ create_bd_port -dir O tx_os_data1_${i}_n
 create_bd_port -dir O tx_os_data1_${i}_p
 }
 
-# Rx reset generator
-ad_ip_instance proc_sys_reset rx_device_clk_rstgen
-ad_connect  rx_device_clk rx_device_clk_rstgen/slowest_sync_clk
-ad_connect  $sys_cpu_resetn rx_device_clk_rstgen/ext_reset_in
-
-# Tx reset generator
-ad_ip_instance proc_sys_reset tx_device_clk_rstgen
-ad_connect  tx_device_clk tx_device_clk_rstgen/slowest_sync_clk
-ad_connect  $sys_cpu_resetn tx_device_clk_rstgen/ext_reset_in
-
-# Tx Observation reset generator
-ad_ip_instance proc_sys_reset tx_os_device_clk_rstgen
-ad_connect  tx_os_device_clk tx_os_device_clk_rstgen/slowest_sync_clk
-ad_connect  $sys_cpu_resetn tx_os_device_clk_rstgen/ext_reset_in
-
 source $ad_hdl_dir/projects/adrv9009/common/adrv9009_bd.tcl
-
 source $ad_tb_dir/library/drivers/jesd/jesd_exerciser.tcl
 
-create_jesd_exerciser rx_jesd_exerciser 0 $ENCODER_SEL $LANE_RATE $TX_NUM_OF_CONVERTERS $TX_NUM_OF_LANES $TX_SAMPLES_PER_FRAME $TX_SAMPLE_WIDTH
+ad_ip_parameter axi_adrv9009_tx_dma    CONFIG.DMA_DATA_WIDTH_SRC 128
+ad_ip_parameter axi_adrv9009_rx_dma    CONFIG.DMA_DATA_WIDTH_DEST 128
+ad_ip_parameter axi_adrv9009_rx_os_dma CONFIG.DMA_DATA_WIDTH_DEST 128
+ad_ip_parameter axi_adrv9009_rx_dma    CONFIG.FIFO_SIZE 32
+ad_ip_parameter axi_adrv9009_rx_os_dma CONFIG.FIFO_SIZE 32
+ad_ip_parameter axi_adrv9009_tx_dma    CONFIG.FIFO_SIZE 32
+
+# Exerciser peripheral addresses
+set EX_RX_JESD_ADDR  0x44A10000
+set EX_RX_TPL_ADDR   0x44A30000
+set EX_RX_XCVR_ADDR  0x44A20000
+
+set EX_TX_JESD_ADDR  0x44A40000
+set EX_TX_TPL_ADDR   0x44AC0000
+set EX_TX_XCVR_ADDR  0x44A70000
+
+set EX_TX_OS_JESD_ADDR  0x44AD0000
+set EX_TX_OS_TPL_ADDR   0x44AF0000
+set EX_TX_OS_XCVR_ADDR  0x44AE0000
+
+adi_sim_add_define "EX_AXI_JESD_RX_BA=[format "%d" ${EX_RX_JESD_ADDR}]"
+adi_sim_add_define "EX_ADC_TPL_BA=[format "%d" ${EX_RX_TPL_ADDR}]"
+adi_sim_add_define "EX_AXI_XCVR_RX_BA=[format "%d" ${EX_RX_XCVR_ADDR}]"
+
+adi_sim_add_define "EX_AXI_JESD_TX_BA=[format "%d" ${EX_TX_JESD_ADDR}]"
+adi_sim_add_define "EX_DAC_TPL_BA=[format "%d" ${EX_TX_TPL_ADDR}]"
+adi_sim_add_define "EX_AXI_XCVR_TX_BA=[format "%d" ${EX_TX_XCVR_ADDR}]"
+
+adi_sim_add_define "EX_AXI_JESD_TX_OS_BA=[format "%d" ${EX_TX_OS_JESD_ADDR}]"
+adi_sim_add_define "EX_DAC_OS_TPL_BA=[format "%d" ${EX_TX_OS_TPL_ADDR}]"
+adi_sim_add_define "EX_AXI_XCVR_TX_OS_BA=[format "%d" ${EX_TX_OS_XCVR_ADDR}]"
+
+create_jesd_exerciser rx_jesd_exerciser 0 \
+                      $ENCODER_SEL \
+                      $LANE_RATE \
+                      $TX_NUM_OF_CONVERTERS \
+                      $TX_NUM_OF_LANES \
+                      $TX_SAMPLES_PER_FRAME \
+                      $TX_SAMPLE_WIDTH \
+                      $EX_RX_JESD_ADDR \
+                      $EX_RX_TPL_ADDR \
+                      $EX_RX_XCVR_ADDR
 create_bd_cell -type container -reference rx_jesd_exerciser i_rx_jesd_exerciser
 
-create_jesd_exerciser tx_jesd_exerciser 1 $ENCODER_SEL $LANE_RATE $RX_NUM_OF_CONVERTERS $RX_NUM_OF_LANES $RX_SAMPLES_PER_FRAME $RX_SAMPLE_WIDTH
+create_jesd_exerciser tx_jesd_exerciser 1 \
+                      $ENCODER_SEL \
+                      $LANE_RATE \
+                      $RX_NUM_OF_CONVERTERS \
+                      $RX_NUM_OF_LANES \
+                      $RX_SAMPLES_PER_FRAME \
+                      $RX_SAMPLE_WIDTH \
+                      $EX_TX_JESD_ADDR \
+                      $EX_TX_TPL_ADDR \
+                      $EX_TX_XCVR_ADDR
 create_bd_cell -type container -reference tx_jesd_exerciser i_tx_jesd_exerciser
 
-create_jesd_exerciser tx_os_jesd_exerciser 1 $ENCODER_SEL $LANE_RATE $RX_OS_NUM_OF_CONVERTERS $RX_OS_NUM_OF_LANES $RX_OS_SAMPLES_PER_FRAME $RX_OS_SAMPLE_WIDTH
+create_jesd_exerciser tx_os_jesd_exerciser 1 \
+                      $ENCODER_SEL $LANE_RATE \
+                      $RX_OS_NUM_OF_CONVERTERS \
+                      $RX_OS_NUM_OF_LANES \
+                      $RX_OS_SAMPLES_PER_FRAME \
+                      $RX_OS_SAMPLE_WIDTH \
+                      $EX_TX_OS_JESD_ADDR \
+                      $EX_TX_OS_TPL_ADDR \
+                      $EX_TX_OS_XCVR_ADDR
 create_bd_cell -type container -reference tx_os_jesd_exerciser i_tx_os_jesd_exerciser
 
 # Rx exerciser
@@ -244,6 +292,18 @@ ad_connect sys_cpu_resetn axi_axi_interconnect/M18_ARESETN
 create_bd_port -dir O ex_rx_sync
 ad_connect ex_rx_sync i_rx_jesd_exerciser/rx_sync_0
 
+ad_ip_instance axi_dmac ex_rx_axi_dma
+ad_ip_parameter ex_rx_axi_dma CONFIG.DMA_TYPE_SRC 1
+ad_ip_parameter ex_rx_axi_dma CONFIG.DMA_TYPE_DEST 0
+ad_ip_parameter ex_rx_axi_dma CONFIG.CYCLIC 0
+ad_ip_parameter ex_rx_axi_dma CONFIG.DMA_DATA_WIDTH_SRC $RX_EX_DMA_DATA_WIDTH
+ad_ip_parameter ex_rx_axi_dma CONFIG.DMA_DATA_WIDTH_DEST 128
+ad_ip_parameter ex_rx_axi_dma CONFIG.MAX_BYTES_PER_BURST 256
+
+ad_connect $sys_dma_resetn ex_rx_axi_dma/m_dest_axi_aresetn
+ad_connect rx_device_clk ex_rx_axi_dma/s_axis_aclk
+ad_connect i_rx_jesd_exerciser/m_axis_0 ex_rx_axi_dma/s_axis
+
 # Tx exerciser
 for {set i 0} {$i < $RX_NUM_OF_LANES} {incr i} {
   ad_connect tx_data1_${i}_n i_tx_jesd_exerciser/tx_data_${i}_n
@@ -266,14 +326,17 @@ ad_connect sys_cpu_resetn axi_axi_interconnect/M19_ARESETN
 create_bd_port -dir I ex_tx_sync
 ad_connect ex_tx_sync i_tx_jesd_exerciser/tx_sync_0
 
-for {set i 0} {$i < $MAX_NUM_OF_CONVERTERS} {incr i} {
-  create_bd_port -dir I -from [expr $TX_EX_SAMPLES_PER_CHANNEL*$RX_DMA_SAMPLE_WIDTH-1] -to 0 dac_data_$i
-  create_bd_port -dir I -from [expr $TX_OS_EX_SAMPLES_PER_CHANNEL*$RX_OS_DMA_SAMPLE_WIDTH-1] -to 0 dac_os_data_$i
-}
+ad_ip_instance axi_dmac ex_tx_axi_dma
+ad_ip_parameter ex_tx_axi_dma CONFIG.DMA_TYPE_SRC 0
+ad_ip_parameter ex_tx_axi_dma CONFIG.DMA_TYPE_DEST 1
+ad_ip_parameter ex_tx_axi_dma CONFIG.CYCLIC 1
+ad_ip_parameter ex_tx_axi_dma CONFIG.DMA_DATA_WIDTH_DEST $TX_EX_DMA_DATA_WIDTH
+ad_ip_parameter ex_tx_axi_dma CONFIG.DMA_DATA_WIDTH_SRC 128
+ad_ip_parameter ex_tx_axi_dma CONFIG.MAX_BYTES_PER_BURST 256
 
-for {set i 0} {$i < $RX_NUM_OF_CONVERTERS} {incr i} {
-  ad_connect dac_data_$i i_tx_jesd_exerciser/dac_data_${i}_0
-}
+ad_connect $sys_dma_resetn ex_tx_axi_dma/m_src_axi_aresetn
+ad_connect tx_device_clk ex_tx_axi_dma/m_axis_aclk
+ad_connect i_tx_jesd_exerciser/s_axis_0 ex_tx_axi_dma/m_axis
 
 # Tx Observation exerciser
 for {set i 0} {$i < $RX_OS_NUM_OF_LANES} {incr i} {
@@ -297,11 +360,40 @@ ad_connect sys_cpu_resetn axi_axi_interconnect/M20_ARESETN
 create_bd_port -dir I ex_tx_os_sync
 ad_connect ex_tx_os_sync i_tx_os_jesd_exerciser/tx_sync_0
 
-for {set i 0} {$i < $RX_OS_NUM_OF_CONVERTERS} {incr i} {
-  ad_connect dac_os_data_$i i_tx_os_jesd_exerciser/dac_data_${i}_0
-}
+ad_ip_instance axi_dmac ex_tx_os_axi_dma
+ad_ip_parameter ex_tx_os_axi_dma CONFIG.DMA_TYPE_SRC 0
+ad_ip_parameter ex_tx_os_axi_dma CONFIG.DMA_TYPE_DEST 1
+ad_ip_parameter ex_tx_os_axi_dma CONFIG.CYCLIC 1
+ad_ip_parameter ex_tx_os_axi_dma CONFIG.DMA_DATA_WIDTH_DEST $TX_OS_EX_DMA_DATA_WIDTH
+ad_ip_parameter ex_tx_os_axi_dma CONFIG.DMA_DATA_WIDTH_SRC 128
+ad_ip_parameter ex_tx_os_axi_dma CONFIG.MAX_BYTES_PER_BURST 256
+
+ad_connect $sys_dma_resetn ex_tx_os_axi_dma/m_src_axi_aresetn
+ad_connect tx_os_device_clk ex_tx_os_axi_dma/m_axis_aclk
+ad_connect i_tx_os_jesd_exerciser/s_axis_0 ex_tx_os_axi_dma/m_axis
+
+ad_cpu_interconnect 0x7c450000 ex_rx_axi_dma
+ad_cpu_interconnect 0x7c460000 ex_tx_axi_dma
+ad_cpu_interconnect 0x7c470000 ex_tx_os_axi_dma
+
+# Connect exerciser DMAs to DDR memory
+ad_mem_hp0_interconnect $sys_dma_clk ex_rx_axi_dma/m_dest_axi
+ad_mem_hp0_interconnect $sys_dma_clk ex_tx_axi_dma/m_src_axi
+ad_mem_hp0_interconnect $sys_dma_clk ex_tx_os_axi_dma/m_src_axi
 
 assign_bd_address
+
+set ADC_TPL 0x44A00000
+set_property offset $ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_adrv9009_tpl_core}]
+adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
+
+set ADC_OS_TPL 0x44A08000
+set_property offset $ADC_OS_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_os_adrv9009_tpl_core}]
+adi_sim_add_define "ADC_OS_TPL_BA=[format "%d" ${ADC_OS_TPL}]"
+
+set DAC_TPL 0x44A04000
+set_property offset $DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_tx_adrv9009_tpl_core}]
+adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"
 
 set AXI_JESD_RX_OS 0x44AB0000
 set_property offset $AXI_JESD_RX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_jesd}]
@@ -315,6 +407,17 @@ set AXI_JESD_TX 0x44A90000
 set_property offset $AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_jesd}]
 adi_sim_add_define "AXI_JESD_TX_BA=[format "%d" ${AXI_JESD_TX}]"
 
+set DUT_AXI_XCVR_RX_OS 0x44A50000
+set_property offset $DUT_AXI_XCVR_RX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_xcvr}]
+adi_sim_add_define "DUT_AXI_XCVR_RX_OS_BA=[format "%d" ${DUT_AXI_XCVR_RX_OS}]"
+
+set DUT_AXI_XCVR_RX 0x44A60000
+set_property offset $DUT_AXI_XCVR_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_xcvr}]
+adi_sim_add_define "DUT_AXI_XCVR_RX_BA=[format "%d" ${DUT_AXI_XCVR_RX}]"
+
+set DUT_AXI_XCVR_TX 0x44A80000
+set_property offset $DUT_AXI_XCVR_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_xcvr}]
+adi_sim_add_define "DUT_AXI_XCVR_TX_BA=[format "%d" ${DUT_AXI_XCVR_TX}]"
 
 set TX_DMA 0x7C420000
 set_property offset $TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_dma}]
@@ -332,73 +435,6 @@ set RX_OS_DMA 0x7C440000
 set_property offset $RX_OS_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_dma}]
 adi_sim_add_define "RX_OS_DMA_BA=[format "%d" ${RX_OS_DMA}]"
 
-
-set ADC_TPL 0x44A00000
-set_property offset $ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_adrv9009_tpl_core}]
-adi_sim_add_define "ADC_TPL_BA=[format "%d" ${ADC_TPL}]"
-
-set ADC_OS_TPL 0x44A08000
-set_property offset $ADC_OS_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_rx_os_adrv9009_tpl_core}]
-adi_sim_add_define "ADC_OS_TPL_BA=[format "%d" ${ADC_OS_TPL}]"
-
-set DAC_TPL 0x44A04000
-set_property offset $DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_tx_adrv9009_tpl_core}]
-adi_sim_add_define "DAC_TPL_BA=[format "%d" ${DAC_TPL}]"
-
-
-set EX_ADC_TPL 0x44A30000
-set_property offset $EX_ADC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_adc_tpl_core_axi_lite}]
-adi_sim_add_define "EX_ADC_TPL_BA=[format "%d" ${EX_ADC_TPL}]"
-
-set EX_DAC_TPL 0x44AC0000
-set_property offset $EX_DAC_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_dac_tpl_core_axi_lite}]
-adi_sim_add_define "EX_DAC_TPL_BA=[format "%d" ${EX_DAC_TPL}]"
-
-set EX_DAC_OS_TPL 0x44AF0000
-set_property offset $EX_DAC_OS_TPL [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_dac_tpl_core_axi_lite_1}]
-adi_sim_add_define "EX_DAC_OS_TPL_BA=[format "%d" ${EX_DAC_OS_TPL}]"
-
-
-set DUT_AXI_XCVR_RX_OS 0x44A50000
-set_property offset $DUT_AXI_XCVR_RX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_xcvr}]
-adi_sim_add_define "DUT_AXI_XCVR_RX_OS_BA=[format "%d" ${DUT_AXI_XCVR_RX_OS}]"
-
-set DUT_AXI_XCVR_RX 0x44A60000
-set_property offset $DUT_AXI_XCVR_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_xcvr}]
-adi_sim_add_define "DUT_AXI_XCVR_RX_BA=[format "%d" ${DUT_AXI_XCVR_RX}]"
-
-set DUT_AXI_XCVR_TX 0x44A80000
-set_property offset $DUT_AXI_XCVR_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_xcvr}]
-adi_sim_add_define "DUT_AXI_XCVR_TX_BA=[format "%d" ${DUT_AXI_XCVR_TX}]"
-
-
-set EX_AXI_XCVR_RX 0x44A20000
-set_property offset $EX_AXI_XCVR_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_axi_xcvr_axi_lite}]
-adi_sim_add_define "EX_AXI_XCVR_RX_BA=[format "%d" ${EX_AXI_XCVR_RX}]"
-
-set EX_AXI_JESD_RX 0x44A10000
-set_property offset $EX_AXI_JESD_RX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_rx_axi_axi_lite}]
-adi_sim_add_define "EX_AXI_JESD_RX_BA=[format "%d" ${EX_AXI_JESD_RX}]"
-
-
-set EX_AXI_XCVR_TX 0x44A70000
-set_property offset $EX_AXI_XCVR_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_axi_xcvr_axi_lite_1}]
-adi_sim_add_define "EX_AXI_XCVR_TX_BA=[format "%d" ${EX_AXI_XCVR_TX}]"
-
-set EX_AXI_JESD_TX 0x44A40000
-set_property offset $EX_AXI_JESD_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_tx_axi_axi_lite}]
-adi_sim_add_define "EX_AXI_JESD_TX_BA=[format "%d" ${EX_AXI_JESD_TX}]"
-
-
-set EX_AXI_XCVR_TX_OS 0x44AE0000
-set_property offset $EX_AXI_XCVR_TX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_axi_xcvr_axi_lite_2}]
-adi_sim_add_define "EX_AXI_XCVR_TX_OS_BA=[format "%d" ${EX_AXI_XCVR_TX_OS}]"
-
-set EX_AXI_JESD_TX_OS 0x44AD0000
-set_property offset $EX_AXI_JESD_TX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_tx_axi_axi_lite_1}]
-adi_sim_add_define "EX_AXI_JESD_TX_OS_BA=[format "%d" ${EX_AXI_JESD_TX_OS}]"
-
-
 set AXI_CLKGEN_TX 0x43C00000
 set_property offset $AXI_CLKGEN_TX [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_tx_clkgen}]
 adi_sim_add_define "AXI_CLKGEN_TX_BA=[format "%d" ${AXI_CLKGEN_TX}]"
@@ -410,3 +446,15 @@ adi_sim_add_define "AXI_CLKGEN_RX_BA=[format "%d" ${AXI_CLKGEN_RX}]"
 set AXI_CLKGEN_RX_OS 0x43C20000
 set_property offset $AXI_CLKGEN_RX_OS [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_adrv9009_rx_os_clkgen}]
 adi_sim_add_define "AXI_CLKGEN_RX_OS_BA=[format "%d" ${AXI_CLKGEN_RX_OS}]"
+
+set EX_RX_DMA 0x7C450000
+set_property offset $EX_RX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ex_rx_axi_dma}]
+adi_sim_add_define "EX_RX_DMA_BA=[format "%d" ${EX_RX_DMA}]"
+
+set EX_TX_DMA 0x7C460000
+set_property offset $EX_TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ex_tx_axi_dma}]
+adi_sim_add_define "EX_TX_DMA_BA=[format "%d" ${EX_TX_DMA}]"
+
+set EX_TX_OS_DMA 0x7C470000
+set_property offset $EX_TX_OS_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_ex_tx_os_axi_dma}]
+adi_sim_add_define "EX_TX_OS_DMA_BA=[format "%d" ${EX_TX_OS_DMA}]"

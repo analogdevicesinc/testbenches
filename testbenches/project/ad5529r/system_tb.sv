@@ -43,29 +43,13 @@ module system_tb();
   wire ad5529r_tg2;
   wire ad5529r_tg3;
 
-  // SPI signals exposed for timing measurement
-  // These are directly assigned from the SPI VIP interface
-  wire spi_sclk;
-  wire spi_cs;
-  wire spi_mosi;
-  wire spi_miso;
-
-  assign spi_sclk = `TH.`SPI_S.inst.IF.s_sclk;
-  assign spi_cs   = `TH.`SPI_S.inst.IF.s_cs;
-  assign spi_mosi = `TH.`SPI_S.inst.IF.s_mosi;
-  assign spi_miso = `TH.`SPI_S.inst.IF.s_miso;
-
   `TEST_PROGRAM test(
     .ad5529r_spi_irq(ad5529r_spi_irq),
     .ad5529r_spi_clk(ad5529r_spi_clk),
     .ad5529r_tg0(ad5529r_tg0),
     .ad5529r_tg1(ad5529r_tg1),
     .ad5529r_tg2(ad5529r_tg2),
-    .ad5529r_tg3(ad5529r_tg3),
-    .spi_sclk(spi_sclk),
-    .spi_cs(spi_cs),
-    .spi_mosi(spi_mosi),
-    .spi_miso(spi_miso));
+    .ad5529r_tg3(ad5529r_tg3));
 
   test_harness `TH (
     .ad5529r_spi_irq(ad5529r_spi_irq),

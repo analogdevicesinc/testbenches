@@ -74,15 +74,15 @@ program test_program (
   inout ad5529r_tg0,
   inout ad5529r_tg1,
   inout ad5529r_tg2,
-  inout ad5529r_tg3,
-  // SPI signals for timing measurement
-  input spi_sclk,
-  input spi_cs,
-  input spi_mosi,
-  input spi_miso);
+  inout ad5529r_tg3);
 
   timeunit 1ns;
   timeprecision 1ps;
+
+wire spi_sclk = `TH.`SPI_S.inst.IF.s_sclk;
+wire spi_cs   = `TH.`SPI_S.inst.IF.s_cs;
+wire spi_mosi = `TH.`SPI_S.inst.IF.s_mosi;
+wire spi_miso = `TH.`SPI_S.inst.IF.s_miso;
 
 typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
 

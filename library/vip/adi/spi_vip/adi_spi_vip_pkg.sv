@@ -117,7 +117,7 @@ package adi_spi_vip_pkg;
 
               for (int j = 0; j < vif.get_param_NUM_OF_MOSI(); j++) begin
                 if ($isunknown(mosi_logic[j]))
-                  this.error($sformatf("[SPI VIP] MOSI Rx: unknown mosi bit at sample edge!"));
+                  this.error($sformatf("MOSI Rx: unknown mosi bit at sample edge!"));
                 mosi_bit = bit'(mosi_logic[j]);
                 bitqueue_push_lsb(mosi_bit_queue[j], mosi_bit);
               end
@@ -125,7 +125,7 @@ package adi_spi_vip_pkg;
 
             foreach(mosi_bit_queue[i]) begin
               mosi_mbx[i].put(bitqueue_to_int(mosi_bit_queue[i]));
-              this.info($sformatf("[SPI VIP] MOSI Rx #%0d lane %0d: received 0x%04x", rx_transaction_count + 1, i, bitqueue_to_int(mosi_bit_queue[i])), ADI_VERBOSITY_HIGH);
+              this.info($sformatf("MOSI Rx #%0d lane %0d: received 0x%04x", rx_transaction_count + 1, i, bitqueue_to_int(mosi_bit_queue[i])), ADI_VERBOSITY_HIGH);
               mosi_bit_queue[i].delete();
             end
             rx_transaction_count++;
@@ -145,7 +145,7 @@ package adi_spi_vip_pkg;
         if (vif.get_mode() == SPI_MODE_SLAVE) begin
           cs_assertion_edge = 1'b1;
           vif.wait_cs_active();
-          this.info($sformatf("[SPI VIP] CS active - starting transaction (lane 0 queue depth: %0d)", miso_mbx[0].num()), ADI_VERBOSITY_HIGH);
+          this.info($sformatf("CS active - starting transaction (lane 0 queue depth: %0d)", miso_mbx[0].num()), ADI_VERBOSITY_HIGH);
           while (vif.get_cs_active()) begin
             // try to get an item from the mailbox, without popping it
             using_default = 1'b0;
@@ -156,9 +156,9 @@ package adi_spi_vip_pkg;
               end
             end
             if (using_default) begin
-              this.info($sformatf("[SPI VIP] MISO Tx: using DEFAULT data 0x%04x (a lane queue is empty)", default_miso_data), ADI_VERBOSITY_HIGH);
+              this.info($sformatf("MISO Tx: using DEFAULT data 0x%04x (a lane queue is empty)", default_miso_data), ADI_VERBOSITY_HIGH);
             end else begin
-              this.info($sformatf("[SPI VIP] MISO Tx: using QUEUED data"), ADI_VERBOSITY_HIGH);
+              this.info($sformatf("MISO Tx: using QUEUED data"), ADI_VERBOSITY_HIGH);
             end
 
             //if one lane does not have valid data, all of the lanes use default_data
@@ -210,9 +210,9 @@ package adi_spi_vip_pkg;
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
                   if (cs_inactive_mid_transfer_allowed) begin
-                    this.warning($sformatf("[SPI VIP] MISO Tx: CS inactive mid-transaction (allowed by allow_cs_inactive_mid_transfer)"));
+                    this.warning($sformatf("MISO Tx: CS inactive mid-transaction (allowed by allow_cs_inactive_mid_transfer)"));
                   end else begin
-                    this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
+                    this.fatal($sformatf("MISO Tx: early exit due to unexpected CS inactive!"));
                   end
                 end
                 foreach (miso_bits[j]) begin
@@ -242,13 +242,13 @@ package adi_spi_vip_pkg;
 
                 if (i == vif.get_param_DATA_DLENGTH()-1) begin
                   tx_transaction_count++;
-                  this.info($sformatf("[SPI VIP] MISO Tx #%0d: end of transfer%s",
+                  this.info($sformatf("MISO Tx #%0d: end of transfer%s",
                     tx_transaction_count, using_default ? " (DEFAULT)" : ""), ADI_VERBOSITY_HIGH);
                   if (!using_default) begin
                     // finally pop an item from each lane mailbox after a complete transfer
                     foreach (miso_mbx[j]) begin
                       miso_mbx[j].get(miso_data[j]);
-                      this.info($sformatf("[SPI VIP] MISO queue lane %0d: popped 0x%04x (queue depth now: %0d)", j, miso_data[j], miso_mbx[j].num()), ADI_VERBOSITY_HIGH);
+                      this.info($sformatf("MISO queue lane %0d: popped 0x%04x (queue depth now: %0d)", j, miso_data[j], miso_mbx[j].num()), ADI_VERBOSITY_HIGH);
                     end
                   end
                 end
@@ -293,18 +293,15 @@ package adi_spi_vip_pkg;
     endfunction : set_default_miso_data
 
     task reset();
-      int dummy;
       int miso_cleared = 0;
       int mosi_cleared = 0;
-      foreach (miso_mbx[i]) begin
-        while (miso_mbx[i].try_get(dummy)) miso_cleared++;
-      end
-      foreach (mosi_mbx[i]) begin
-        while (mosi_mbx[i].try_get(dummy)) mosi_cleared++;
-      end
+      foreach (miso_mbx[i]) miso_cleared += miso_mbx[i].num();
+      foreach (mosi_mbx[i]) mosi_cleared += mosi_mbx[i].num();
+      clear_tx();
+      clear_rx();
       rx_transaction_count = 0;
       tx_transaction_count = 0;
-      this.info($sformatf("[SPI VIP] Reset - cleared %0d MISO, %0d MOSI items, reset transaction counters",
+      this.info($sformatf("Reset - cleared %0d MISO, %0d MOSI items, reset transaction counters",
         miso_cleared, mosi_cleared), ADI_VERBOSITY_HIGH);
     endtask : reset
 
@@ -316,7 +313,7 @@ package adi_spi_vip_pkg;
       input int unsigned data[]);
       foreach (data[i]) begin
         miso_mbx[i].put(data[i]);
-        this.info($sformatf("[SPI VIP] MISO queue lane %0d: added 0x%04x (queue depth now: %0d)", i, data[i], miso_mbx[i].num()), ADI_VERBOSITY_HIGH);
+        this.info($sformatf("MISO queue lane %0d: added 0x%04x (queue depth now: %0d)", i, data[i], miso_mbx[i].num()), ADI_VERBOSITY_HIGH);
       end
       ->tx_mbx_updated;
     endtask
@@ -329,7 +326,7 @@ package adi_spi_vip_pkg;
     endtask
 
     task flush_tx();
-      this.info($sformatf("[SPI VIP] flush_tx: waiting for all lane queues to empty"), ADI_VERBOSITY_HIGH);
+      this.info($sformatf("flush_tx: waiting for all lane queues to empty"), ADI_VERBOSITY_HIGH);
       fork
         begin: isolation_process
           foreach (miso_mbx[i]) begin
@@ -343,7 +340,7 @@ package adi_spi_vip_pkg;
           wait fork;
         end : isolation_process
       join
-      this.info($sformatf("[SPI VIP] flush_tx: all lane queues are now empty"), ADI_VERBOSITY_HIGH);
+      this.info($sformatf("flush_tx: all lane queues are now empty"), ADI_VERBOSITY_HIGH);
     endtask
 
     // Clear receive buffer - discards any pending received data
@@ -361,7 +358,7 @@ package adi_spi_vip_pkg;
       foreach (miso_mbx[i]) begin
         while (miso_mbx[i].try_get(dummy)) cleared++;
       end
-      this.info($sformatf("[SPI VIP] clear_tx: cleared %0d items from MISO queues", cleared), ADI_VERBOSITY_HIGH);
+      this.info($sformatf("clear_tx: cleared %0d items from MISO queues", cleared), ADI_VERBOSITY_HIGH);
     endtask
 
     task start();
@@ -372,7 +369,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                this.info($sformatf("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_HIGH);
+                this.info($sformatf("Stop event triggered."), ADI_VERBOSITY_HIGH);
                 this.stop_flag = 0;
               end
               begin
@@ -456,12 +453,12 @@ package adi_spi_vip_pkg;
       verify_count++;
       foreach (received[i]) begin
         if (received[i] !== expected[i]) begin
-          this.error($sformatf({"[SPI VIP] MOSI verify #%0d lane %0d:\n",
+          this.error($sformatf({"MOSI verify #%0d lane %0d:\n",
                                 "        Expected: 0x%04x\n",
                                 "        Actual:   0x%04x\n",
                                 "        Status:   FAIL"}, verify_count, i, expected[i], received[i]));
         end else begin
-          this.info($sformatf({"[SPI VIP] MOSI verify #%0d lane %0d:\n",
+          this.info($sformatf({"MOSI verify #%0d lane %0d:\n",
                                "        Expected: 0x%04x\n",
                                "        Actual:   0x%04x\n",
                                "        Status:   PASS"}, verify_count, i, expected[i], received[i]), ADI_VERBOSITY_HIGH);

@@ -215,47 +215,9 @@ task axi_write(
   base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
 endtask
 
-// --------------------------
-// Wrapper function for SPI receive (from DUT)
-// --------------------------
-task spi_receive(
-    output [`DATA_DLENGTH:0]  data);
-  spi_env.spi_agent.sequencer.receive_data(data);
-endtask
-
-// --------------------------
-// Wrapper function for SPI send (to DUT)
-// --------------------------
-task spi_send(
-    input [`DATA_DLENGTH:0]  data);
-  spi_env.spi_agent.sequencer.send_data(data);
-endtask
-
-// --------------------------
-// Wrapper function for waiting for all SPI
-// --------------------------
-task spi_wait_send();
-  spi_env.spi_agent.sequencer.flush_send();
-endtask
-
-// --------------------------
-// Wrapper function for clearing SPI receive buffer
-// --------------------------
-task spi_clear_receive();
-  spi_env.spi_agent.sequencer.clear_receive();
-endtask
-
-// --------------------------
-// Wrapper function for clearing SPI send buffer
-// --------------------------
-task spi_clear_send();
-  spi_env.spi_agent.sequencer.clear_send();
-endtask
-
-// --------------------------
-// Random delay utility (deterministic with same seed)
-// --------------------------
-task wait_random(input int min_ns, input int max_ns);
+task wait_random(
+  input int min_ns,
+  input int max_ns);
   int delay_ns;
   delay_ns = $urandom_range(max_ns, min_ns);
   #(delay_ns * 1ns);
@@ -271,7 +233,9 @@ task reset_dut_state();
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
 
   // Wait for any pending SPI transactions to complete
-  wait_random(400, 600);
+  wait_random(
+    .min_ns(400),
+    .max_ns(600));
 
   // Reset offload command memory (critical for re-programming offload)
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
@@ -290,7 +254,9 @@ task reset_dut_state();
   sclk_rise_time = 0;
   sclk_prev_rise = 0;
 
-  wait_random(50, 150);
+  wait_random(
+    .min_ns(50),
+    .max_ns(150));
   `INFO(("[RESET] DUT state reset complete"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -327,8 +293,7 @@ task wait_for_reset_complete();
     `INFO(("[RESET_TEST] Waiting for system reset to complete..."), ADI_VERBOSITY_LOW);
     @(posedge system_reset_complete);
   end
-  // Additional settling time after reset
-  #100ns;
+  #1000ns;
   `INFO(("[RESET_TEST] Reset complete, settling time elapsed"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -371,23 +336,23 @@ task verify_sclk_frequency(
   actual_freq_mhz = 1000.0 / avg_period_ns;  // ns to MHz conversion
   deviation_pct = ((actual_freq_mhz - expected_freq_mhz) / expected_freq_mhz) * 100.0;
 
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("=== SCLK Frequency Verification ==="), ADI_VERBOSITY_NONE);
-  `INFO(("  SCLK edges measured: %0d", sclk_period_count), ADI_VERBOSITY_NONE);
-  `INFO(("  Average period:      %.2f ns", avg_period_ns), ADI_VERBOSITY_NONE);
-  `INFO(("  Actual frequency:    %.2f MHz", actual_freq_mhz), ADI_VERBOSITY_NONE);
-  `INFO(("  Expected frequency:  %.2f MHz", expected_freq_mhz), ADI_VERBOSITY_NONE);
-  `INFO(("  Deviation:           %.2f%%", deviation_pct), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("=== SCLK Frequency Verification ==="), ADI_VERBOSITY_LOW);
+  `INFO(("  SCLK edges measured: %0d", sclk_period_count), ADI_VERBOSITY_LOW);
+  `INFO(("  Average period:      %.2f ns", avg_period_ns), ADI_VERBOSITY_LOW);
+  `INFO(("  Actual frequency:    %.2f MHz", actual_freq_mhz), ADI_VERBOSITY_LOW);
+  `INFO(("  Expected frequency:  %.2f MHz", expected_freq_mhz), ADI_VERBOSITY_LOW);
+  `INFO(("  Deviation:           %.2f%%", deviation_pct), ADI_VERBOSITY_LOW);
 
   if (deviation_pct < 0) deviation_pct = -deviation_pct;  // abs
 
   if (deviation_pct > tolerance_pct) begin
-    // In simulation, axi_clkgen may not produce exact hardware frequencies
-    // Report as warning, not error
-    `WARNING(("[SCLK] Frequency deviation %.2f%% exceeds tolerance %.2f%% (simulation clock may differ from hardware)", deviation_pct, tolerance_pct));
-    `INFO(("  [CHECK] SCLK frequency: Status=WARN (simulation)"), ADI_VERBOSITY_NONE);
-  end else begin
-    `INFO(("  [CHECK] SCLK frequency: Status=PASS"), ADI_VERBOSITY_NONE);
+    if (deviation_pct > tolerance_pct * 5) begin
+      `ERROR(("[SCLK] Frequency deviation %.2f%% far exceeds tolerance %.2f%% - possible clock misconfiguration", deviation_pct, tolerance_pct));
+      total_error_count++;
+    end else begin
+      `WARNING(("[SCLK] Frequency deviation %.2f%% exceeds tolerance %.2f%% (simulation clock may differ from hardware)", deviation_pct, tolerance_pct));
+    end
   end
 endtask
 
@@ -415,40 +380,33 @@ task verify_cs_timing(
 );
   cs_measurement_enabled = 0;
 
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("=== CS Timing Verification ==="), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("=== CS Timing Verification ==="), ADI_VERBOSITY_LOW);
 
   if (cs_timing_samples == 0) begin
     `WARNING(("[CS] No complete CS transactions captured for timing analysis"));
-    `INFO(("  [CHECK] CS timing: Status=SKIP (no complete transactions)"), ADI_VERBOSITY_NONE);
     return;
   end
 
-  `INFO(("  Transactions measured: %0d", cs_timing_samples), ADI_VERBOSITY_NONE);
+  `INFO(("  Transactions measured: %0d", cs_timing_samples), ADI_VERBOSITY_LOW);
   `INFO(("  CS setup (t5):  min=%.2f ns, max=%.2f ns (required: >= %.2f ns)",
-         cs_setup_min, cs_setup_max, min_cs_setup_ns), ADI_VERBOSITY_NONE);
+         cs_setup_min, cs_setup_max, min_cs_setup_ns), ADI_VERBOSITY_LOW);
 
   if (cs_setup_min < min_cs_setup_ns) begin
     `ERROR(("[CS] Setup time violation: %.2f ns < %.2f ns minimum", cs_setup_min, min_cs_setup_ns));
     total_error_count++;
-    `INFO(("  [CHECK] CS setup: Status=FAIL"), ADI_VERBOSITY_NONE);
-  end else begin
-    `INFO(("  [CHECK] CS setup: Status=PASS"), ADI_VERBOSITY_NONE);
   end
 
-  if (cs_hold_min < 1e9) begin  // Check if any hold measurements were captured
+  if (cs_hold_min < 1e9) begin
     `INFO(("  CS hold (t6):   min=%.2f ns, max=%.2f ns (required: >= %.2f ns)",
-           cs_hold_min, cs_hold_max, min_cs_hold_ns), ADI_VERBOSITY_NONE);
+           cs_hold_min, cs_hold_max, min_cs_hold_ns), ADI_VERBOSITY_LOW);
 
     if (cs_hold_min < min_cs_hold_ns) begin
       `ERROR(("[CS] Hold time violation: %.2f ns < %.2f ns minimum", cs_hold_min, min_cs_hold_ns));
       total_error_count++;
-      `INFO(("  [CHECK] CS hold: Status=FAIL"), ADI_VERBOSITY_NONE);
-    end else begin
-      `INFO(("  [CHECK] CS hold: Status=PASS"), ADI_VERBOSITY_NONE);
     end
   end else begin
-    `INFO(("  CS hold (t6):   Not measured"), ADI_VERBOSITY_NONE);
+    `INFO(("  CS hold (t6):   Not measured"), ADI_VERBOSITY_LOW);
   end
 endtask
 
@@ -463,25 +421,21 @@ task verify_spi_mode();
   localparam int EXPECTED_CPOL = 0;
   localparam int EXPECTED_CPHA = 1;
 
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("=== SPI Mode Verification (Expected: CPOL=%0d, CPHA=%0d) ===", EXPECTED_CPOL, EXPECTED_CPHA), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("=== SPI Mode Verification (Expected: CPOL=%0d, CPHA=%0d) ===", EXPECTED_CPOL, EXPECTED_CPHA), ADI_VERBOSITY_LOW);
 
-  // CPOL=0: SCLK should idle LOW when CS is high (inactive)
-  // Check current state when CS is inactive
-  if (spi_cs) begin  // CS inactive (high for active-low)
+  if (spi_cs) begin
     if (spi_sclk == 0) begin
-      `INFO(("  [CHECK] CPOL=0 (SCLK idle low): SCLK is LOW when CS inactive - PASS"), ADI_VERBOSITY_NONE);
+      `INFO(("  CPOL=0 (SCLK idle low): SCLK is LOW when CS inactive - PASS"), ADI_VERBOSITY_LOW);
     end else begin
       `ERROR(("[SPI_MODE] CPOL=0 violation: SCLK should be LOW when CS inactive, but SCLK=1"));
       total_error_count++;
-      `INFO(("  [CHECK] CPOL=0 (SCLK idle low): Status=FAIL"), ADI_VERBOSITY_NONE);
     end
   end else begin
-    `INFO(("  [CHECK] CPOL: CS currently active, skipping idle state check"), ADI_VERBOSITY_NONE);
+    `INFO(("  CPOL: CS currently active, skipping idle state check"), ADI_VERBOSITY_LOW);
   end
 
-  // Log CPHA setting (verification requires monitoring data transitions)
-  `INFO(("  [CHECK] CPHA=1 (data sampled on rising edge): Configuration verified"), ADI_VERBOSITY_NONE);
+  `INFO(("  CPHA=1 (data sampled on rising edge): Configuration verified"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -554,7 +508,7 @@ task verify_pwm_timing(
   duty_deviation = avg_duty_pct - expected_duty_pct;
 
   `INFO(("  TG%0d: Freq=%.2f MHz (exp: %.2f), Duty=%.1f%% (exp: %.1f%%)",
-         channel, actual_freq_mhz, expected_freq_mhz, avg_duty_pct, expected_duty_pct), ADI_VERBOSITY_NONE);
+         channel, actual_freq_mhz, expected_freq_mhz, avg_duty_pct, expected_duty_pct), ADI_VERBOSITY_LOW);
 
   // Check frequency
   if (freq_deviation < 0) freq_deviation = -freq_deviation;
@@ -595,11 +549,11 @@ task print_throughput_summary();
 
   throughput_monitor_enabled = 0;
 
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("=== Throughput Summary ==="), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("=== Throughput Summary ==="), ADI_VERBOSITY_LOW);
 
   if (tput_total_transactions == 0) begin
-    `INFO(("  No transactions recorded"), ADI_VERBOSITY_NONE);
+    `INFO(("  No transactions recorded"), ADI_VERBOSITY_LOW);
     return;
   end
 
@@ -608,23 +562,27 @@ task print_throughput_summary();
   max_ksps = tput_ksps[0]; max_idx = 0;
 
   foreach (tput_ksps[i]) begin
-    if (tput_ksps[i] < min_ksps) begin min_ksps = tput_ksps[i]; min_idx = i; end
-    if (tput_ksps[i] > max_ksps) begin max_ksps = tput_ksps[i]; max_idx = i; end
+    if (tput_ksps[i] < min_ksps) begin
+      min_ksps = tput_ksps[i];
+      min_idx = i;
+    end
+    if (tput_ksps[i] > max_ksps) begin
+      max_ksps = tput_ksps[i];
+      max_idx = i;
+    end
   end
 
-  // Theoretical max: SCLK_freq / bits_per_sample
-  // At 35 MHz, 16-bit samples: 35e6 / 16 = 2187.5 kSPS
   theoretical_max_ksps = 35000.0 / 16.0;
   efficiency = (avg_ksps / theoretical_max_ksps) * 100.0;
 
-  `INFO(("  Transactions:    %0d", tput_total_transactions), ADI_VERBOSITY_NONE);
-  `INFO(("  Total samples:   %0d", tput_total_samples), ADI_VERBOSITY_NONE);
-  `INFO(("  Total time:      %.2f us", tput_total_time_ns / 1000.0), ADI_VERBOSITY_NONE);
-  `INFO(("  Avg throughput:  %.0f kSPS", avg_ksps), ADI_VERBOSITY_NONE);
-  `INFO(("  Min throughput:  %.0f kSPS (transaction #%0d)", min_ksps, min_idx+1), ADI_VERBOSITY_NONE);
-  `INFO(("  Max throughput:  %.0f kSPS (transaction #%0d)", max_ksps, max_idx+1), ADI_VERBOSITY_NONE);
-  `INFO(("  Theoretical max: %.0f kSPS (at 35 MHz SCLK, 16-bit)", theoretical_max_ksps), ADI_VERBOSITY_NONE);
-  `INFO(("  Efficiency:      %.1f%%", efficiency), ADI_VERBOSITY_NONE);
+  `INFO(("  Transactions:    %0d", tput_total_transactions), ADI_VERBOSITY_LOW);
+  `INFO(("  Total samples:   %0d", tput_total_samples), ADI_VERBOSITY_LOW);
+  `INFO(("  Total time:      %.2f us", tput_total_time_ns / 1000.0), ADI_VERBOSITY_LOW);
+  `INFO(("  Avg throughput:  %.0f kSPS", avg_ksps), ADI_VERBOSITY_LOW);
+  `INFO(("  Min throughput:  %.0f kSPS (transaction #%0d)", min_ksps, min_idx+1), ADI_VERBOSITY_LOW);
+  `INFO(("  Max throughput:  %.0f kSPS (transaction #%0d)", max_ksps, max_idx+1), ADI_VERBOSITY_LOW);
+  `INFO(("  Theoretical max: %.0f kSPS (at 35 MHz SCLK, 16-bit)", theoretical_max_ksps), ADI_VERBOSITY_LOW);
+  `INFO(("  Efficiency:      %.1f%%", efficiency), ADI_VERBOSITY_LOW);
 endtask
 
 // --------------------------
@@ -758,10 +716,11 @@ initial begin
       real txn_ksps;
 
       // Calculate effective samples based on mode
-      if (`NUM_OF_WORDS > 1)
-        effective_samples = `NUM_OF_WORDS - 1;  // Streaming: subtract instruction word
-      else
-        effective_samples = 1;  // Single-instruction
+      if (`NUM_OF_WORDS > 1) begin
+        effective_samples = `NUM_OF_WORDS - 1;
+      end else begin
+        effective_samples = 1;
+      end
 
       txn_ksps = (real'(effective_samples) / duration) * 1e6;  // samples/ns -> kSPS
 
@@ -784,8 +743,12 @@ initial begin
       stress_transfers_until_print--;
 
       if (stress_transfers_until_print <= 0) begin
-        print_throughput_status(stress_start_time, stress_current_transfers,
-                                stress_total_transfers, stress_samples_per_transfer, 0);
+        print_throughput_status(
+          .start_time(stress_start_time),
+          .current_transfers(stress_current_transfers),
+          .total_transfers(stress_total_transfers),
+          .samples_per_transfer(stress_samples_per_transfer),
+          .is_final(0));
         stress_transfers_until_print = stress_print_interval;  // Reload counter
       end
     end
@@ -902,14 +865,15 @@ function void print_throughput_status(
     per_channel_ksps = 0;
   end
 
-  if (is_final)
+  if (is_final) begin
     status_prefix = "[FINAL]";
-  else
+  end else begin
     status_prefix = $sformatf("[%5.1f%%]", progress_pct);
+  end
 
   `INFO(("    %s | Duration: %8.3f ms | Xfers: %5d | Samples: %6d | Tput: %8.3f kSPS | Per-ch: %7.3f kSPS",
          status_prefix, duration_ms, current_transfers, current_samples,
-         throughput_ksps, per_channel_ksps), ADI_VERBOSITY_NONE);
+         throughput_ksps, per_channel_ksps), ADI_VERBOSITY_LOW);
 endfunction
 
 // --------------------------
@@ -919,11 +883,12 @@ initial begin
   process current_process;
   string current_process_random_state;
 
+  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
   current_process = process::self();
   current_process_random_state = current_process.get_randstate();
   `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
-  //creating environment
   base_env = new(
     .name("Base Environment"),
     .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
@@ -941,8 +906,6 @@ initial begin
 
   spi_env = new("SPI Environment", `TH.`SPI_S.inst.IF.vif);
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
-
   base_env.start();
   spi_env.start();
 
@@ -950,16 +913,20 @@ initial begin
 
   base_env.sys_reset();
 
-  `INFO(("=== AD5529R Testbench Started ==="), ADI_VERBOSITY_NONE);
-  `INFO(("  Configuration: NUM_OF_WORDS=%0d, NUM_OF_TRANSFERS=%0d", `NUM_OF_WORDS, `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
+  `INFO(("=== AD5529R Testbench Started ==="), ADI_VERBOSITY_LOW);
+  `INFO(("  Configuration: NUM_OF_WORDS=%0d, NUM_OF_TRANSFERS=%0d", `NUM_OF_WORDS, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
 
   sanity_test();
 
-  wait_random(50, 150);
+  wait_random(
+    .min_ns(50),
+    .max_ns(150));
 
   config_spi();
 
-  wait_random(50, 150);
+  wait_random(
+    .min_ns(50),
+    .max_ns(150));
 
   // Enable timing monitors
   reset_sclk_measurement();
@@ -967,10 +934,9 @@ initial begin
   reset_throughput_monitor();
 
   // Run tests based on configuration
-  `INFO((""), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
   if (`NUM_OF_TRANSFERS >= 100) begin
-    // Stress test mode: high transfer count indicates stress config
-    `INFO(("=== Running Stress Test Mode ==="), ADI_VERBOSITY_NONE);
+    `INFO(("=== Running Stress Test Mode ==="), ADI_VERBOSITY_LOW);
     stress_test();
 
   end else begin
@@ -980,20 +946,23 @@ initial begin
     string test_type = (`NUM_OF_WORDS == 1) ? "single_instruction" : "streaming";
 
     `INFO(("=== Running %s Mode Tests ===",
-           (`NUM_OF_WORDS == 1) ? "Single-Instruction" : "Streaming"), ADI_VERBOSITY_NONE);
+           (`NUM_OF_WORDS == 1) ? "Single-Instruction" : "Streaming"), ADI_VERBOSITY_LOW);
 
     foreach (test_modes[i]) begin
-      `INFO((""), ADI_VERBOSITY_NONE);
-      `INFO((">>> Test Case: %s_test_%s <<<", test_type, mode_names[i]), ADI_VERBOSITY_NONE);
+      `INFO((""), ADI_VERBOSITY_LOW);
+      `INFO((">>> Test Case: %s_test_%s <<<", test_type, mode_names[i]), ADI_VERBOSITY_LOW);
 
-      if (`NUM_OF_WORDS == 1)
+      if (`NUM_OF_WORDS == 1) begin
         single_instruction_test(test_modes[i]);
-      else
+      end else begin
         streaming_test(test_modes[i]);
+      end
 
       if (i < test_modes.size() - 1) begin
         reset_dut_state();
-        wait_random(50, 150);
+        wait_random(
+    .min_ns(50),
+    .max_ns(150));
       end
     end
   end
@@ -1001,31 +970,32 @@ initial begin
   print_throughput_summary();
 
   // Expected: 35 MHz with 5% tolerance
-  verify_sclk_frequency(35.0, 5.0);
+  verify_sclk_frequency(
+    .expected_freq_mhz(35.0),
+    .tolerance_pct(5.0));
 
   // AD5529R requires: t5 (setup) >= 8ns, t6 (hold) >= 8ns
-  verify_cs_timing(8.0, 8.0);
+  verify_cs_timing(
+    .min_cs_setup_ns(8.0),
+    .min_cs_hold_ns(8.0));
 
   verify_spi_mode();
 
-  wait_random(50, 150);
+  wait_random(
+    .min_ns(50),
+    .max_ns(150));
 
   toggle_pin_test();
 
   spi_env.stop();
   base_env.stop();
 
-  // Final test summary
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("=== AD5529R TEST SUMMARY ==="), ADI_VERBOSITY_NONE);
-  `INFO(("  Total errors: %0d", total_error_count), ADI_VERBOSITY_NONE);
-
-  if (total_error_count == 0) begin
-    `INFO(("=== AD5529R Test PASSED ==="), ADI_VERBOSITY_NONE);
-  end else begin
-    `ERROR(("=== AD5529R Test FAILED ==="));
+  if (total_error_count > 0) begin
+    `ERROR(("AD5529R Test FAILED with %0d errors", total_error_count));
     `FATAL(("Test terminated with %0d errors", total_error_count));
   end
+
+  `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
   $finish();
 
 end
@@ -1042,7 +1012,7 @@ task sanity_test();
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
   axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  `INFO(("Sanity Test PASSED"), ADI_VERBOSITY_NONE);
+  `INFO(("Sanity Test PASSED"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -1138,12 +1108,12 @@ task streaming_test(
   bit test_done = 0;
   bit reset_tested = 0;
 
-  `INFO(("Streaming Test: Testing %0d transfers of %0d words each", `NUM_OF_TRANSFERS, `NUM_OF_WORDS), ADI_VERBOSITY_NONE);
-  `INFO(("  Configuration:"), ADI_VERBOSITY_NONE);
-  `INFO(("    DATA_DLENGTH: %0d bits", `DATA_DLENGTH), ADI_VERBOSITY_NONE);
-  `INFO(("    Data mode: %s", data_mode.name()), ADI_VERBOSITY_NONE);
-  `INFO(("    DDR base address: 0x%08x", `DDR_BA), ADI_VERBOSITY_NONE);
-  `INFO(("    Total bytes to transfer: %0d", total_bytes), ADI_VERBOSITY_NONE);
+  `INFO(("Streaming Test: Testing %0d transfers of %0d words each", `NUM_OF_TRANSFERS, `NUM_OF_WORDS), ADI_VERBOSITY_LOW);
+  `INFO(("  Configuration:"), ADI_VERBOSITY_LOW);
+  `INFO(("    DATA_DLENGTH: %0d bits", `DATA_DLENGTH), ADI_VERBOSITY_LOW);
+  `INFO(("    Data mode: %s", data_mode.name()), ADI_VERBOSITY_LOW);
+  `INFO(("    DDR base address: 0x%08x", `DDR_BA), ADI_VERBOSITY_LOW);
+  `INFO(("    Total bytes to transfer: %0d", total_bytes), ADI_VERBOSITY_LOW);
 
   // Main test loop with reset recovery
   while (!test_done) begin
@@ -1156,7 +1126,7 @@ task streaming_test(
     if (reset_tested) begin
       spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(0);
       #100ns;
-      spi_clear_receive();
+      spi_env.spi_agent.sequencer.clear_receive();
     end
 
     // Setup system reset trigger (only on first attempt)
@@ -1174,7 +1144,7 @@ task streaming_test(
         default: dac_word = {`DATA_DLENGTH{1'b1}};
       endcase
       sdo_write_data_store[i] = dac_word;
-      spi_send('0);
+      spi_env.spi_agent.sequencer.send_data('0);
     end
 
     `INFO(("  Phase 1b: Writing data to DDR..."), ADI_VERBOSITY_LOW);
@@ -1221,33 +1191,38 @@ task streaming_test(
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-        if (`CS_ACTIVE_HIGH)
+        if (`CS_ACTIVE_HIGH) begin
           axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+        end
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
-        `INFO(("  Phase 4: Starting offload transfer..."), ADI_VERBOSITY_NONE);
-        `INFO(("    NUM_OF_TRANSFERS=%0d, PWM_PERIOD=%0d cycles", `NUM_OF_TRANSFERS, `PWM_PERIOD), ADI_VERBOSITY_NONE);
-        wait_random(50, 150);
+        `INFO(("  Phase 4: Starting offload transfer..."), ADI_VERBOSITY_LOW);
+        `INFO(("    NUM_OF_TRANSFERS=%0d, PWM_PERIOD=%0d cycles", `NUM_OF_TRANSFERS, `PWM_PERIOD), ADI_VERBOSITY_LOW);
+        wait_random(
+    .min_ns(50),
+    .max_ns(150));
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-        `INFO(("    Offload enabled, waiting for SPI transactions..."), ADI_VERBOSITY_NONE);
+        `INFO(("    Offload enabled, waiting for SPI transactions..."), ADI_VERBOSITY_LOW);
 
         begin
           int wait_cycles = `PWM_PERIOD * `NUM_OF_TRANSFERS * 2;
           int wait_ns = wait_cycles * 10;
-          `INFO(("    Waiting %0d ns for %0d transfers...", wait_ns, `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
+          `INFO(("    Waiting %0d ns for %0d transfers...", wait_ns, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
           #(wait_ns * 1ns);
         end
 
-        spi_wait_send();
+        spi_env.spi_agent.sequencer.flush_send();
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-        `INFO(("    Offload disabled"), ADI_VERBOSITY_NONE);
-        wait_random(4000, 6000);
+        `INFO(("    Offload disabled"), ADI_VERBOSITY_LOW);
+        wait_random(
+    .min_ns(4000),
+    .max_ns(6000));
 
         // Verification phases
-        `INFO(("  Phase 5: Verifying IRQ and data..."), ADI_VERBOSITY_NONE);
+        `INFO(("  Phase 5: Verifying IRQ and data..."), ADI_VERBOSITY_LOW);
         if (irq_pending == 'h0) begin
           `FATAL(("Streaming Test FAILED: No IRQ received - offload may not have executed"));
         end else begin
@@ -1256,21 +1231,22 @@ task streaming_test(
 
         `INFO(("  Phase 6: Comparing transmitted SPI data against expected..."), ADI_VERBOSITY_LOW);
         for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-          spi_receive(sdo_write_data[i]);
+          spi_env.spi_agent.sequencer.receive_data(sdo_write_data[i]);
           if (sdo_write_data[i] != sdo_write_data_store[i]) begin
             streaming_error_count++;
             total_error_count++;
             `ERROR(("Streaming Test: Data mismatch at word %0d", i));
             `INFO(("  [CHECK] Word %0d: Expected=0x%04x, Actual=0x%04x, Status=FAIL",
-                   i, sdo_write_data_store[i], sdo_write_data[i]), ADI_VERBOSITY_NONE);
+                   i, sdo_write_data_store[i], sdo_write_data[i]), ADI_VERBOSITY_LOW);
           end else begin
             `INFO(("  [CHECK] Word %0d: Expected=0x%04x, Actual=0x%04x, Status=PASS",
                    i, sdo_write_data_store[i], sdo_write_data[i]), ADI_VERBOSITY_MEDIUM);
           end
         end
 
-        if (streaming_error_count == 0)
-          `INFO(("Streaming Test PASSED: All %0d words verified", (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)), ADI_VERBOSITY_NONE);
+        if (streaming_error_count == 0) begin
+          `INFO(("Streaming Test PASSED: All %0d words verified", (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)), ADI_VERBOSITY_LOW);
+        end
         else
           `ERROR(("Streaming Test FAILED: %0d/%0d words mismatched", streaming_error_count, (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)));
 
@@ -1282,7 +1258,7 @@ task streaming_test(
       //-----------------------------------------------------------------------
       begin : reset_watcher
         wait (system_reset_triggered);
-        `INFO(("[RESET_TEST] System reset triggered - aborting streaming_test"), ADI_VERBOSITY_NONE);
+        `INFO(("[RESET_TEST] System reset triggered - aborting streaming_test"), ADI_VERBOSITY_LOW);
         disable test_body;
       end
 
@@ -1298,8 +1274,8 @@ task streaming_test(
 
       // Clear SPI VIP queues - both send and receive
       // Must clear AFTER system reset completes to remove any stale data captured during reset
-      spi_clear_send();
-      spi_clear_receive();
+      spi_env.spi_agent.sequencer.clear_send();
+      spi_env.spi_agent.sequencer.clear_receive();
 
       // Ensure DUT is in clean state before reconfiguring (system reset should have done this,
       // but be explicit to prevent stray triggers when config_spi() starts the trigger PWM)
@@ -1310,7 +1286,7 @@ task streaming_test(
       offload_transfer_cnt = 0;
       irq_pending = 0;
 
-      `INFO(("[RESET_TEST] Restarting streaming_test after system reset..."), ADI_VERBOSITY_NONE);
+      `INFO(("[RESET_TEST] Restarting streaming_test after system reset..."), ADI_VERBOSITY_LOW);
       `INFO(("[RESET_TEST] Reconfiguring DUT (clocks, PWM, SPI engine)..."), ADI_VERBOSITY_LOW);
       // Loop continues → config_spi() will reconfigure everything
     end else begin
@@ -1319,7 +1295,7 @@ task streaming_test(
 
   end  // while (!test_done)
 
-  `INFO(("[streaming_test] Test complete (reset_tested=%0b)", reset_tested), ADI_VERBOSITY_NONE);
+  `INFO(("[streaming_test] Test complete (reset_tested=%0b)", reset_tested), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -1337,23 +1313,22 @@ task stress_test();
   time test_start_time, test_end_time;
   real total_duration_us, measured_ksps;
 
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("=== STRESS TEST: Sustained Throughput Validation ==="), ADI_VERBOSITY_NONE);
-  `INFO(("  Target: ~123 kSPS per channel sustained"), ADI_VERBOSITY_NONE);
-  `INFO(("  Frames: %0d", `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
-  `INFO(("  Samples: %0d (16 per frame)", total_samples), ADI_VERBOSITY_NONE);
-  `INFO(("  DDR buffer: %0d bytes", total_bytes), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("=== STRESS TEST: Sustained Throughput Validation ==="), ADI_VERBOSITY_LOW);
+  `INFO(("  Target: ~123 kSPS per channel sustained"), ADI_VERBOSITY_LOW);
+  `INFO(("  Frames: %0d", `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
+  `INFO(("  Samples: %0d (16 per frame)", total_samples), ADI_VERBOSITY_LOW);
+  `INFO(("  DDR buffer: %0d bytes", total_bytes), ADI_VERBOSITY_LOW);
 
-  // Generate random data and queue SPI VIP responses
-  `INFO(("  Phase 1: Generating %0d random words...", total_words), ADI_VERBOSITY_NONE);
+  `INFO(("  Phase 1: Generating %0d random words...", total_words), ADI_VERBOSITY_LOW);
   for (int i = 0; i < total_words; i++) begin
     dac_word = $urandom;
     sdo_write_data_store[i] = dac_word;
-    spi_send('0);
+    spi_env.spi_agent.sequencer.send_data('0);
   end
 
   // Write to DDR (16-bit packing)
-  `INFO(("  Phase 2: Writing to DDR..."), ADI_VERBOSITY_NONE);
+  `INFO(("  Phase 2: Writing to DDR..."), ADI_VERBOSITY_LOW);
   for (int i = 0; i < total_words; i = i + 2) begin
     bit [31:0] write_data;
     if (i + 1 < total_words)
@@ -1365,7 +1340,7 @@ task stress_test();
   end
 
   // Configure DMA
-  `INFO(("  Phase 3: Configuring DMA for %0d byte transfer...", total_bytes), ADI_VERBOSITY_NONE);
+  `INFO(("  Phase 3: Configuring DMA for %0d byte transfer...", total_bytes), ADI_VERBOSITY_LOW);
   base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL),
     `SET_DMAC_CONTROL_ENABLE(1));
   base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
@@ -1378,19 +1353,19 @@ task stress_test();
     `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   // Configure offload
-  `INFO(("  Phase 4: Configuring SPI offload..."), ADI_VERBOSITY_NONE);
+  `INFO(("  Phase 4: Configuring SPI offload..."), ADI_VERBOSITY_LOW);
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-  if (`CS_ACTIVE_HIGH)
+  if (`CS_ACTIVE_HIGH) begin
     axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+  end
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
-  // Start offload and measure
-  `INFO(("  Phase 5: Starting stress transfer..."), ADI_VERBOSITY_NONE);
+  `INFO(("  Phase 5: Starting stress transfer..."), ADI_VERBOSITY_LOW);
 
   // Extend watchdog timer for stress test (default is 1ms, we need ~20ms+)
   // Calculate: 17 words * 16 bits * 1000 frames / 35 MHz ≈ 7.77ms + overhead
@@ -1410,19 +1385,21 @@ task stress_test();
   stress_samples_per_transfer = 16;  // 16 DAC values per frame
 
   `INFO(("    Waiting for %0d transfers (progress every %0d transfers = 2%%)...",
-         `NUM_OF_TRANSFERS, stress_print_interval), ADI_VERBOSITY_NONE);
-  `INFO(("    Legend: @<sim_time> | Duration: <elapsed> | Xfers: <count> | Samples | Throughput | Per-channel"), ADI_VERBOSITY_NONE);
+         `NUM_OF_TRANSFERS, stress_print_interval), ADI_VERBOSITY_LOW);
+  `INFO(("    Legend: @<sim_time> | Duration: <elapsed> | Xfers: <count> | Samples | Throughput | Per-channel"), ADI_VERBOSITY_LOW);
 
   test_start_time = $time;
   stress_start_time = test_start_time;
   stress_progress_enabled = 1;  // Enable progress reporting in CS monitor
 
-  wait_random(50, 150);
+  wait_random(
+    .min_ns(50),
+    .max_ns(150));
   axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
     `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
 
   // Wait for all transfers to complete
-  spi_wait_send();
+  spi_env.spi_agent.sequencer.flush_send();
   test_end_time = $time;
 
   stress_progress_enabled = 0;  // Disable progress reporting
@@ -1436,15 +1413,19 @@ task stress_test();
   measured_ksps = real'(total_samples) * 1000.0 / total_duration_us;
 
   // Print final status using the same function
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("  === STRESS TEST RESULTS ==="), ADI_VERBOSITY_NONE);
-  print_throughput_status(test_start_time, `NUM_OF_TRANSFERS, `NUM_OF_TRANSFERS, 16, 1);
-  `INFO(("    Target:       123 kSPS per channel"), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("  === STRESS TEST RESULTS ==="), ADI_VERBOSITY_LOW);
+  print_throughput_status(
+    .start_time(test_start_time),
+    .current_transfers(`NUM_OF_TRANSFERS),
+    .total_transfers(`NUM_OF_TRANSFERS),
+    .samples_per_transfer(16),
+    .is_final(1));
+  `INFO(("    Target:       123 kSPS per channel"), ADI_VERBOSITY_LOW);
 
-  // Verify data integrity
-  `INFO(("  Phase 6: Verifying data integrity..."), ADI_VERBOSITY_NONE);
+  `INFO(("  Phase 6: Verifying data integrity..."), ADI_VERBOSITY_LOW);
   for (int i = 0; i < total_words; i++) begin
-    spi_receive(sdo_write_data[i]);
+    spi_env.spi_agent.sequencer.receive_data(sdo_write_data[i]);
     if (sdo_write_data[i] != sdo_write_data_store[i]) begin
       stress_error_count++;
       if (stress_error_count <= 10)  // Limit error spam
@@ -1453,14 +1434,15 @@ task stress_test();
     end
   end
 
-  if (stress_error_count > 10)
+  if (stress_error_count > 10) begin
     `ERROR(("[STRESS] ... and %0d more errors", stress_error_count - 10));
+  end
 
   // Final verdict
-  `INFO((""), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
   if (stress_error_count == 0 && measured_ksps / 16.0 >= 100.0) begin
     `INFO(("  [STRESS TEST] PASSED - %0d samples verified, %.1f kSPS/channel achieved",
-           total_samples, measured_ksps / 16.0), ADI_VERBOSITY_NONE);
+           total_samples, measured_ksps / 16.0), ADI_VERBOSITY_LOW);
   end else if (stress_error_count > 0) begin
     total_error_count += stress_error_count;
     `ERROR(("[STRESS TEST] FAILED - %0d/%0d words corrupted", stress_error_count, total_words));
@@ -1488,12 +1470,12 @@ task single_instruction_test(
   bit test_done = 0;
   bit reset_tested = 0;
 
-  `INFO(("Single-Instruction Test: Testing %0d separate 16-bit transfers", `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
-  `INFO(("  Configuration:"), ADI_VERBOSITY_NONE);
-  `INFO(("    DATA_DLENGTH: %0d bits", `DATA_DLENGTH), ADI_VERBOSITY_NONE);
-  `INFO(("    NUM_OF_WORDS: %0d (single-instruction mode)", `NUM_OF_WORDS), ADI_VERBOSITY_NONE);
-  `INFO(("    NUM_OF_TRANSFERS: %0d", `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
-  `INFO(("    Data mode: %s", data_mode.name()), ADI_VERBOSITY_NONE);
+  `INFO(("Single-Instruction Test: Testing %0d separate 16-bit transfers", `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
+  `INFO(("  Configuration:"), ADI_VERBOSITY_LOW);
+  `INFO(("    DATA_DLENGTH: %0d bits", `DATA_DLENGTH), ADI_VERBOSITY_LOW);
+  `INFO(("    NUM_OF_WORDS: %0d (single-instruction mode)", `NUM_OF_WORDS), ADI_VERBOSITY_LOW);
+  `INFO(("    NUM_OF_TRANSFERS: %0d", `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
+  `INFO(("    Data mode: %s", data_mode.name()), ADI_VERBOSITY_LOW);
 
   // Main test loop with reset recovery
   while (!test_done) begin
@@ -1506,7 +1488,7 @@ task single_instruction_test(
     if (reset_tested) begin
       spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(0);
       #100ns;
-      spi_clear_receive();
+      spi_env.spi_agent.sequencer.clear_receive();
     end
 
     // Setup system reset trigger (only on first attempt)
@@ -1526,7 +1508,7 @@ task single_instruction_test(
         default: dac_word = {`DATA_DLENGTH{1'b1}};
       endcase
       sdo_write_data_store[i] = dac_word;
-      spi_send('0);
+      spi_env.spi_agent.sequencer.send_data('0);
     end
 
     `INFO(("  Phase 1b: Writing data to DDR..."), ADI_VERBOSITY_LOW);
@@ -1560,45 +1542,47 @@ task single_instruction_test(
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-        if (`CS_ACTIVE_HIGH)
+        if (`CS_ACTIVE_HIGH) begin
           axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+        end
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
-        `INFO(("  Phase 4: Starting offload..."), ADI_VERBOSITY_NONE);
-        wait_random(50, 150);
+        `INFO(("  Phase 4: Starting offload..."), ADI_VERBOSITY_LOW);
+        wait_random(
+    .min_ns(50),
+    .max_ns(150));
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
 
         begin
           int wait_cycles = `PWM_PERIOD * `NUM_OF_TRANSFERS * 2;
           int wait_ns = wait_cycles * 10;
-          `INFO(("    Waiting %0d ns for %0d transfers...", wait_ns, `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
+          `INFO(("    Waiting %0d ns for %0d transfers...", wait_ns, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
           #(wait_ns * 1ns);
         end
 
-        spi_wait_send();
+        spi_env.spi_agent.sequencer.flush_send();
         axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-        wait_random(4000, 6000);
+        wait_random(
+    .min_ns(4000),
+    .max_ns(6000));
 
         // Verification phases
-        `INFO(("  Phase 5: Verifying CS toggle behavior..."), ADI_VERBOSITY_NONE);
+        `INFO(("  Phase 5: Verifying CS toggle behavior..."), ADI_VERBOSITY_LOW);
         begin
           int actual_cs_transactions = cs_transaction_count - initial_cs_count;
-          `INFO(("    CS transactions detected: %0d (expected: %0d)", actual_cs_transactions, `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
+          `INFO(("    CS transactions detected: %0d (expected: %0d)", actual_cs_transactions, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
           if (actual_cs_transactions != `NUM_OF_TRANSFERS) begin
             `ERROR(("[SINGLE] Expected %0d CS transactions, got %0d", `NUM_OF_TRANSFERS, actual_cs_transactions));
             total_error_count++;
-            `INFO(("  [CHECK] CS toggle count: Status=FAIL"), ADI_VERBOSITY_NONE);
-          end else begin
-            `INFO(("  [CHECK] CS toggle count: Status=PASS"), ADI_VERBOSITY_NONE);
           end
         end
 
         `INFO(("  Phase 6: Verifying transmitted data..."), ADI_VERBOSITY_LOW);
         for (int i = 0; i < `NUM_OF_TRANSFERS; i++) begin
-          spi_receive(sdo_write_data[i]);
+          spi_env.spi_agent.sequencer.receive_data(sdo_write_data[i]);
           if (sdo_write_data[i] != sdo_write_data_store[i]) begin
             single_instr_error_count++;
             total_error_count++;
@@ -1607,10 +1591,11 @@ task single_instruction_test(
           end
         end
 
-        if (single_instr_error_count == 0)
-          `INFO(("Single-Instruction Test PASSED: All %0d words verified", `NUM_OF_TRANSFERS), ADI_VERBOSITY_NONE);
-        else
+        if (single_instr_error_count == 0) begin
+          `INFO(("Single-Instruction Test PASSED: All %0d words verified", `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
+        end else begin
           `ERROR(("Single-Instruction Test FAILED: %0d/%0d words mismatched", single_instr_error_count, `NUM_OF_TRANSFERS));
+        end
 
         test_done = 1;  // Signal successful completion
       end
@@ -1620,7 +1605,7 @@ task single_instruction_test(
       //-----------------------------------------------------------------------
       begin : reset_watcher
         wait (system_reset_triggered);
-        `INFO(("[RESET_TEST] System reset triggered - aborting single_instruction_test"), ADI_VERBOSITY_NONE);
+        `INFO(("[RESET_TEST] System reset triggered - aborting single_instruction_test"), ADI_VERBOSITY_LOW);
         disable test_body;
       end
 
@@ -1636,8 +1621,8 @@ task single_instruction_test(
 
       // Clear SPI VIP queues - both send and receive
       // Must clear AFTER system reset completes to remove any stale data captured during reset
-      spi_clear_send();
-      spi_clear_receive();
+      spi_env.spi_agent.sequencer.clear_send();
+      spi_env.spi_agent.sequencer.clear_receive();
 
       // Ensure DUT is in clean state before reconfiguring (system reset should have done this,
       // but be explicit to prevent stray triggers when config_spi() starts the trigger PWM)
@@ -1648,7 +1633,7 @@ task single_instruction_test(
       offload_transfer_cnt = 0;
       irq_pending = 0;
 
-      `INFO(("[RESET_TEST] Restarting single_instruction_test after system reset..."), ADI_VERBOSITY_NONE);
+      `INFO(("[RESET_TEST] Restarting single_instruction_test after system reset..."), ADI_VERBOSITY_LOW);
       `INFO(("[RESET_TEST] Reconfiguring DUT (clocks, PWM, SPI engine)..."), ADI_VERBOSITY_LOW);
       // Loop continues → config_spi() will reconfigure everything
     end else begin
@@ -1657,7 +1642,7 @@ task single_instruction_test(
 
   end  // while (!test_done)
 
-  `INFO(("[single_instruction_test] Test complete (reset_tested=%0b)", reset_tested), ADI_VERBOSITY_NONE);
+  `INFO(("[single_instruction_test] Test complete (reset_tested=%0b)", reset_tested), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -1670,8 +1655,8 @@ task toggle_pin_test();
   int toggle_error_count = 0;
   int edges_tg0, edges_tg1, edges_tg2, edges_tg3;
 
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("=== Toggle Pin Test: Verifying PWM outputs on TG0-TG3 ==="), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("=== Toggle Pin Test: Verifying PWM outputs on TG0-TG3 ==="), ADI_VERBOSITY_LOW);
 
   // Record initial edge counts
   initial_tg0 = tg0_edges;
@@ -1703,7 +1688,7 @@ task toggle_pin_test();
   // Load configuration
   axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
 
-  `INFO(("  PWM generator configured: Period=28 cycles, Width=14 cycles (50%% duty)"), ADI_VERBOSITY_NONE);
+  `INFO(("  PWM generator configured: Period=28 cycles, Width=14 cycles (50%% duty)"), ADI_VERBOSITY_LOW);
   `INFO(("  Expected: 5 MHz @ 140 MHz clock"), ADI_VERBOSITY_LOW);
 
   // FIXED TIMING: PWM measurement window - test expects minimum edge count based on this duration
@@ -1726,57 +1711,76 @@ task toggle_pin_test();
   edges_tg3 = final_tg3 - initial_tg3;
 
   // Basic edge count verification
-  `INFO(("  Edge count verification:"), ADI_VERBOSITY_NONE);
+  `INFO(("  Edge count verification:"), ADI_VERBOSITY_LOW);
 
   if (edges_tg0 < 10) begin
     toggle_error_count++;
     total_error_count++;
     `ERROR(("Toggle Pin Test: TG0 edge count too low"));
-    `INFO(("    [CHECK] TG0: Edges=%0d, Expected>=10, Status=FAIL", edges_tg0), ADI_VERBOSITY_NONE);
+    `INFO(("    TG0: Edges=%0d, Expected>=10, Status=FAIL", edges_tg0), ADI_VERBOSITY_LOW);
   end else begin
-    `INFO(("    [CHECK] TG0: Edges=%0d, Expected>=10, Status=PASS", edges_tg0), ADI_VERBOSITY_NONE);
+    `INFO(("    TG0: Edges=%0d, Expected>=10, Status=PASS", edges_tg0), ADI_VERBOSITY_LOW);
   end
 
   if (edges_tg1 < 10) begin
     toggle_error_count++;
     total_error_count++;
     `ERROR(("Toggle Pin Test: TG1 edge count too low"));
-    `INFO(("    [CHECK] TG1: Edges=%0d, Expected>=10, Status=FAIL", edges_tg1), ADI_VERBOSITY_NONE);
+    `INFO(("    TG1: Edges=%0d, Expected>=10, Status=FAIL", edges_tg1), ADI_VERBOSITY_LOW);
   end else begin
-    `INFO(("    [CHECK] TG1: Edges=%0d, Expected>=10, Status=PASS", edges_tg1), ADI_VERBOSITY_NONE);
+    `INFO(("    TG1: Edges=%0d, Expected>=10, Status=PASS", edges_tg1), ADI_VERBOSITY_LOW);
   end
 
   if (edges_tg2 < 10) begin
     toggle_error_count++;
     total_error_count++;
     `ERROR(("Toggle Pin Test: TG2 edge count too low"));
-    `INFO(("    [CHECK] TG2: Edges=%0d, Expected>=10, Status=FAIL", edges_tg2), ADI_VERBOSITY_NONE);
+    `INFO(("    TG2: Edges=%0d, Expected>=10, Status=FAIL", edges_tg2), ADI_VERBOSITY_LOW);
   end else begin
-    `INFO(("    [CHECK] TG2: Edges=%0d, Expected>=10, Status=PASS", edges_tg2), ADI_VERBOSITY_NONE);
+    `INFO(("    TG2: Edges=%0d, Expected>=10, Status=PASS", edges_tg2), ADI_VERBOSITY_LOW);
   end
 
   if (edges_tg3 < 10) begin
     toggle_error_count++;
     total_error_count++;
     `ERROR(("Toggle Pin Test: TG3 edge count too low"));
-    `INFO(("    [CHECK] TG3: Edges=%0d, Expected>=10, Status=FAIL", edges_tg3), ADI_VERBOSITY_NONE);
+    `INFO(("    TG3: Edges=%0d, Expected>=10, Status=FAIL", edges_tg3), ADI_VERBOSITY_LOW);
   end else begin
-    `INFO(("    [CHECK] TG3: Edges=%0d, Expected>=10, Status=PASS", edges_tg3), ADI_VERBOSITY_NONE);
+    `INFO(("    TG3: Edges=%0d, Expected>=10, Status=PASS", edges_tg3), ADI_VERBOSITY_LOW);
   end
 
-  // PWM timing verification (frequency and duty cycle)
-  `INFO((""), ADI_VERBOSITY_NONE);
-  `INFO(("  PWM Timing Verification:"), ADI_VERBOSITY_NONE);
+  `INFO((""), ADI_VERBOSITY_LOW);
+  `INFO(("  PWM Timing Verification:"), ADI_VERBOSITY_LOW);
 
   // 140 MHz / 28 = 5 MHz, tolerance 1%
   // 50% duty cycle, tolerance 2%
-  verify_pwm_timing(0, 5.0, 1.0, 50.0, 2.0);  // TG0
-  verify_pwm_timing(1, 5.0, 1.0, 50.0, 2.0);  // TG1
-  verify_pwm_timing(2, 5.0, 1.0, 50.0, 2.0);  // TG2
-  verify_pwm_timing(3, 5.0, 1.0, 50.0, 2.0);  // TG3
+  verify_pwm_timing(
+    .channel(0),
+    .expected_freq_mhz(5.0),
+    .freq_tolerance_pct(1.0),
+    .expected_duty_pct(50.0),
+    .duty_tolerance_pct(2.0));
+  verify_pwm_timing(
+    .channel(1),
+    .expected_freq_mhz(5.0),
+    .freq_tolerance_pct(1.0),
+    .expected_duty_pct(50.0),
+    .duty_tolerance_pct(2.0));
+  verify_pwm_timing(
+    .channel(2),
+    .expected_freq_mhz(5.0),
+    .freq_tolerance_pct(1.0),
+    .expected_duty_pct(50.0),
+    .duty_tolerance_pct(2.0));
+  verify_pwm_timing(
+    .channel(3),
+    .expected_freq_mhz(5.0),
+    .freq_tolerance_pct(1.0),
+    .expected_duty_pct(50.0),
+    .duty_tolerance_pct(2.0));
 
   if (toggle_error_count == 0) begin
-    `INFO(("Toggle Pin Test PASSED: All 4 pins verified"), ADI_VERBOSITY_NONE);
+    `INFO(("Toggle Pin Test PASSED: All 4 pins verified"), ADI_VERBOSITY_LOW);
   end else begin
     `ERROR(("Toggle Pin Test FAILED: %0d/4 pins failed", toggle_error_count));
   end
@@ -1789,7 +1793,7 @@ endtask
 
 task config_spi();
 
-  `INFO(("Config SPI: Starting clock generator and configuring SPI engine"), ADI_VERBOSITY_NONE);
+  `INFO(("Config SPI: Starting clock generator and configuring SPI engine"), ADI_VERBOSITY_LOW);
 
   // Start spi clk generator
   axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
@@ -1820,7 +1824,7 @@ task config_spi();
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );
 
-  `INFO(("Config SPI PASSED"), ADI_VERBOSITY_NONE);
+  `INFO(("Config SPI PASSED"), ADI_VERBOSITY_LOW);
 
 endtask
 

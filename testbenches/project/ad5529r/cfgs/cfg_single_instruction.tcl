@@ -24,7 +24,6 @@ set ad_project_params(NUM_OF_WORDS)         1
 set ad_project_params(NUM_OF_TRANSFERS)     16
 set ad_project_params(CS_ACTIVE_HIGH)       0
 set ad_project_params(PWM_PERIOD)           98
-set ad_project_params(TEST_DATA_MODE)       DATA_MODE_RAMP
 
 # SPI VIP configuration
 set spi_s_vip_cfg [ list \

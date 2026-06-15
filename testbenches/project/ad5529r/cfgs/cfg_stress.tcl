@@ -3,14 +3,10 @@
 #
 # Tests sustained streaming at maximum rate with random data.
 # Validates:
-#   - Back-to-back transfers (default 100, configurable via NUM_OF_TRANSFERS env var)
+#   - Back-to-back transfers (100 frames)
 #   - Random data patterns (hardest to accidentally pass)
 #   - Sustained throughput over extended duration
 #   - No dropped samples under load
-#
-# Usage:
-#   make cfg_stress:test_program                    # Uses default 100 transfers
-#   NUM_OF_TRANSFERS=500 make cfg_stress:test_program  # Override to 500 transfers
 #
 # Throughput math:
 #   - 35 MHz SCLK, streaming mode: 17 words x 16 bits = 272 bits
@@ -34,19 +30,10 @@ set ad_project_params(CS_TO_MISO)           0
 set ad_project_params(CLOCK_DIVIDER)        1
 # Streaming mode: 17 words per frame (1 instruction + 16 DAC values)
 set ad_project_params(NUM_OF_WORDS)         17
-# Stress test: number of frames (default 100, configurable via environment variable)
-# Usage: NUM_OF_TRANSFERS=500 make cfg_stress:test_program
-if {[info exists ::env(NUM_OF_TRANSFERS)]} {
-    set ad_project_params(NUM_OF_TRANSFERS) $::env(NUM_OF_TRANSFERS)
-    puts "INFO: NUM_OF_TRANSFERS set from environment: $ad_project_params(NUM_OF_TRANSFERS)"
-} else {
-    set ad_project_params(NUM_OF_TRANSFERS) 100
-    puts "INFO: NUM_OF_TRANSFERS using default: 100"
-}
+set ad_project_params(NUM_OF_TRANSFERS)     100
 set ad_project_params(CS_ACTIVE_HIGH)       0
 # Aggressive trigger rate - offload queues them
 set ad_project_params(PWM_PERIOD)           50
-set ad_project_params(TEST_DATA_MODE)       DATA_MODE_RANDOM
 
 # SPI VIP configuration
 set spi_s_vip_cfg [ list \

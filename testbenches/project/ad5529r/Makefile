@@ -8,11 +8,10 @@
 include ../../../scripts/make_tb_path.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_spi_engine.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_clk_gen.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_pwm_gen.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_clkgen_pkg.sv
-SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_pwm_gen_pkg.sv
-
 SV_DEPS += ad5529r_environment.sv
 
 LIB_DEPS += axi_clkgen
@@ -23,8 +22,6 @@ LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
-
-SIM_LIB_DEPS += spi_vip
 
 # list of test programs
 TP := $(notdir $(basename $(wildcard tests/*.sv)))

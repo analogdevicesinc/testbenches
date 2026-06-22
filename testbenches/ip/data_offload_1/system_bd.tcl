@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2022 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2022-2026 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -39,16 +39,11 @@ source "$ad_hdl_dir/projects/common/xilinx/data_offload_bd.tcl"
 
 ## DUT configuration
 
-set adc_data_path_width $ad_project_params(ADC_DATA_PATH_WIDTH)
-set dac_data_path_width $ad_project_params(DAC_DATA_PATH_WIDTH)
-
-set adc_path_type $ad_project_params(ADC_PATH_TYPE)
 set adc_offload_mem_type $ad_project_params(ADC_OFFLOAD_MEM_TYPE)
 set adc_offload_size $ad_project_params(ADC_OFFLOAD_SIZE)
 set adc_offload_src_dwidth $ad_project_params(ADC_OFFLOAD_SRC_DWIDTH)
 set adc_offload_dst_dwidth $ad_project_params(ADC_OFFLOAD_DST_DWIDTH)
 
-set dac_path_type $ad_project_params(DAC_PATH_TYPE)
 set dac_offload_mem_type $ad_project_params(DAC_OFFLOAD_MEM_TYPE)
 set dac_offload_size $ad_project_params(DAC_OFFLOAD_SIZE)
 set dac_offload_src_dwidth $ad_project_params(DAC_OFFLOAD_SRC_DWIDTH)
@@ -61,7 +56,7 @@ ad_ip_instance xlconstant GND [list \
 ]
 ad_connect gnd GND/dout
 
-ad_ip_instance axi_dmac i_rx_dmac [list \
+ad_ip_instance axi_dmac rx_dmac [list \
   DMA_TYPE_SRC 1 \
   DMA_TYPE_DEST 0 \
   ID 0 \
@@ -76,7 +71,7 @@ ad_ip_instance axi_dmac i_rx_dmac [list \
   DMA_DATA_WIDTH_DEST 64 \
 ]
 
-ad_ip_instance axi_dmac i_tx_dmac [list \
+ad_ip_instance axi_dmac tx_dmac [list \
   DMA_TYPE_SRC 0 \
   DMA_TYPE_DEST 1 \
   ID 0 \
@@ -108,11 +103,11 @@ ad_data_offload_create TX_DUT \
                         $plddr_offload_data_width
 
 set RX_DMAC_BA 0x50040000
-ad_cpu_interconnect $RX_DMAC_BA i_rx_dmac
+ad_cpu_interconnect $RX_DMAC_BA rx_dmac
 adi_sim_add_define "RX_DMA_BA=[format "%d" ${RX_DMAC_BA}]"
 
 set TX_DMAC_BA 0x50050000
-ad_cpu_interconnect $TX_DMAC_BA i_tx_dmac
+ad_cpu_interconnect $TX_DMAC_BA tx_dmac
 adi_sim_add_define "TX_DMA_BA=[format "%d" ${TX_DMAC_BA}]"
 
 set RX_DO_BA 0x50060000
@@ -127,7 +122,7 @@ ad_ip_instance axi4stream_vip adc_src_axis [list \
   INTERFACE_MODE {MASTER} \
   HAS_TREADY {1} \
   HAS_TLAST {0} \
-  TDATA_NUM_BYTES $adc_data_path_width \
+  TDATA_NUM_BYTES [expr $adc_offload_src_dwidth/8] \
 ]
 adi_sim_add_define "ADC_SRC_AXIS=adc_src_axis"
 
@@ -135,7 +130,7 @@ ad_ip_instance axi_vip adc_dst_axi
 adi_sim_add_define "ADC_DST_AXI=adc_dst_axi"
 
 ad_connect adc_src_axis/m_axis RX_DUT/s_axis
-ad_connect RX_DUT/m_axis i_rx_dmac/s_axis
+ad_connect RX_DUT/m_axis rx_dmac/s_axis
 
 ad_connect sys_dma_clk adc_src_axis/aclk
 ad_connect sys_dma_resetn adc_src_axis/aresetn
@@ -145,22 +140,22 @@ ad_connect sys_dma_resetn RX_DUT/s_axis_aresetn
 ad_connect sys_cpu_clk RX_DUT/m_axis_aclk
 ad_connect sys_cpu_resetn RX_DUT/m_axis_aresetn
 
-ad_connect sys_cpu_clk i_rx_dmac/s_axis_aclk
-ad_connect sys_mem_clk i_rx_dmac/m_dest_axi_aclk
-ad_connect sys_mem_resetn i_rx_dmac/m_dest_axi_aresetn
+ad_connect sys_cpu_clk rx_dmac/s_axis_aclk
+ad_connect sys_mem_clk rx_dmac/m_dest_axi_aclk
+ad_connect sys_mem_resetn rx_dmac/m_dest_axi_aresetn
 
-ad_connect i_rx_dmac/s_axis_xfer_req RX_DUT/init_req
+ad_connect rx_dmac/s_axis_xfer_req RX_DUT/init_req
 ad_connect gnd RX_DUT/sync_ext
 
 ad_connect sys_mem_clk adc_dst_axi/aclk
 ad_connect sys_mem_resetn adc_dst_axi/aresetn
-ad_connect adc_dst_axi/S_AXI i_rx_dmac/m_dest_axi
+ad_connect adc_dst_axi/S_AXI rx_dmac/m_dest_axi
 
 ad_mem_hp0_interconnect sys_mem_clk adc_dst_axi/M_AXI
 
 ad_ip_instance axi4stream_vip dac_dst_axis [list \
   INTERFACE_MODE {SLAVE} \
-  TDATA_NUM_BYTES $dac_data_path_width \
+  TDATA_NUM_BYTES [expr $dac_offload_dst_dwidth/8] \
   HAS_TLAST {1} \
   HAS_TKEEP {0} \
 ]
@@ -177,19 +172,19 @@ ad_connect sys_dma_resetn TX_DUT/m_axis_aresetn
 ad_connect sys_cpu_clk TX_DUT/s_axis_aclk
 ad_connect sys_cpu_resetn TX_DUT/s_axis_aresetn
 
-ad_connect sys_cpu_clk i_tx_dmac/m_axis_aclk
-ad_connect sys_mem_clk i_tx_dmac/m_src_axi_aclk
-ad_connect sys_mem_resetn i_tx_dmac/m_src_axi_aresetn
+ad_connect sys_cpu_clk tx_dmac/m_axis_aclk
+ad_connect sys_mem_clk tx_dmac/m_src_axi_aclk
+ad_connect sys_mem_resetn tx_dmac/m_src_axi_aresetn
 
 ad_connect TX_DUT/m_axis dac_dst_axis/s_axis
-ad_connect TX_DUT/s_axis i_tx_dmac/m_axis
+ad_connect TX_DUT/s_axis tx_dmac/m_axis
 
-ad_connect i_tx_dmac/m_axis_xfer_req TX_DUT/init_req
+ad_connect tx_dmac/m_axis_xfer_req TX_DUT/init_req
 ad_connect gnd TX_DUT/sync_ext
 
 ad_connect sys_mem_clk dac_src_axi/aclk
 ad_connect sys_mem_resetn dac_src_axi/aresetn
-ad_connect dac_src_axi/S_AXI i_tx_dmac/m_src_axi
+ad_connect dac_src_axi/S_AXI tx_dmac/m_src_axi
 
 ad_mem_hp0_interconnect sys_mem_clk dac_src_axi/M_AXI
 

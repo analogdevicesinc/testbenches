@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2021-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -35,122 +35,184 @@
 
 `include "utils.svh"
 
+import logger_pkg::*;
+import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
-import m_axis_sequencer_pkg::*;
-import logger_pkg::*;
-
 import environment_pkg::*;
-import data_offload_pkg::*;
+import data_offload_api_pkg::*;
 
-//=============================================================================
-// Register Maps
-//=============================================================================
+import `PKGIFY(test_harness, mng_axi_vip)::*;
+import `PKGIFY(test_harness, ddr_axi_vip)::*;
+import `PKGIFY(test_harness, src_axis)::*;
+import `PKGIFY(test_harness, dst_axis)::*;
 
-module test_program_sync (
-  output  reg       init_req = 1'b0,
-  output  reg       sync_ext = 1'b0,
-  output  reg       mem_rst_n = 1'b0
-);
+`ifdef HBM_AXI
+import `PKGIFY(test_harness, HBM_VIP)::*;
+`endif
 
-  //declaring environment instance
-  environment                       env;
-  xil_axi4stream_ready_gen_policy_t dac_mode;
+program test_program_sync;
 
-  data_offload                      dut;
+  timeunit 1ns;
+  timeprecision 1ps;
+
+  // Declare the class instances
+  test_harness_env base_env;
+  environment #(`AXIS_VIP_PARAMS(test_harness, src_axis), `AXIS_VIP_PARAMS(test_harness, dst_axis)) test_env;
+  adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+
+  `ifdef HBM_AXI
+  adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, HBM_VIP)) hbm_axi_agent;
+  `endif
+
+  data_offload_api dut;
+
+  // Number of hardware sync pulses issued below (must match the pulse sequence)
+  localparam int NUM_SYNC_PULSES = 5;
+
+  // Number of HBM segment masters
+  localparam int NUM_M = (`PATH_TYPE == 1 ? `OFFLOAD_DST_DWIDTH : `OFFLOAD_SRC_DWIDTH)
+                         / `PLDDR_OFFLOAD_DATA_WIDTH;
+
+  // Effective offload transfer length (falls back to the full buffer when unset)
+  `ifdef OFFLOAD_TRANSFER_LENGTH
+  localparam int EFF_OFFLOAD_LEN = `OFFLOAD_TRANSFER_LENGTH;
+  `else
+  localparam int EFF_OFFLOAD_LEN = `OFFLOAD_SIZE;
+  `endif
+
+  int                                src_transfers_length;
+  int                                src_transfers_delay;
+  int                                sync_delay_ns;
+  int                                dst_ready_high = 1;
+  int                                dst_ready_low  = 3;
+  int                                time_to_wait;
+  xil_axi4stream_ready_gen_policy_t  dst_ready_mode;
+
+  int                                len_choices[]   = '{512, 1024};
+  int                                delay_choices[] = '{10000, 20000};
+  xil_axi4stream_ready_gen_policy_t  mode_choices[]  = '{XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE,
+                                                         XIL_AXI4STREAM_READY_GEN_OSC};
 
   initial begin
-    //creating environment
-    env = new(`TH.`MNG_AXI.inst.IF,
-              `TH.`SRC_AXIS.inst.IF,
-              `TH.`DST_AXIS.inst.IF
-             );
 
-    dut = new(env.mng, `DOFF_BA);
+    // Create environment
+    base_env = new(
+      .name("Base Environment"),
+      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+      .irq_base_address(`IRQ_C_BA),
+      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
 
-    //=========================================================================
-    // Setup generator/monitor stubs
-    //=========================================================================
+    mng = new(.name(""), .master_vip_if(`TH.`MNG_AXI.inst.IF));
+    ddr = new(.name(""), .slave_vip_if(`TH.`DDR_AXI.inst.IF));
 
-    env.src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-    env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
+    `LINK(mng, base_env, mng)
+    `LINK(ddr, base_env, ddr)
 
-    env.dst_axis_seq.set_mode(`DST_READY_MODE);
-    env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
-    env.dst_axis_seq.set_low_time(`DST_READY_LOW);
+    `ifdef HBM_AXI
+    hbm_axi_agent = new(
+      .name("AXI HBM stub agent"),
+      .slave_vip_if(`TH.`HBM_AXI.inst.IF));
+    `endif
 
-    //=========================================================================
+    test_env = new(
+      .name("Test Environment"),
+      .src_axis_vip_if(`TH.`SRC_AXIS.inst.IF),
+      .dst_axis_vip_if(`TH.`DST_AXIS.inst.IF),
+      .init_req_vip_if(`TH.`INIT_REQ.inst.inst.IF.vif),
+      .sync_ext_vip_if(`TH.`SYNC_EXT.inst.inst.IF.vif));
+
+    dut = new(
+      .name("Data Offload"),
+      .bus(base_env.mng.master_sequencer),
+      .base_address(`DOFF_BA));
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-    env.scoreboard.set_oneshot(1);
+    base_env.start();
+    test_env.start();
+
+    `ifdef HBM_AXI
+    hbm_axi_agent.start_slave();
+    `endif
 
     start_clocks();
-    sys_reset();
+    base_env.sys_reset();
 
-    env.start();
+    // Randomize the simulation stimulus
+    src_transfers_length = len_choices[$urandom_range(len_choices.size()-1)];
+    // One transfer is released per sync pulse, so each transfer must fit the
+    // per-pulse offload window. Compute to the largest power-of-two length that fits.
+    if (src_transfers_length > EFF_OFFLOAD_LEN) begin
+      src_transfers_length = 2 ** $clog2(EFF_OFFLOAD_LEN);
+      if (src_transfers_length > EFF_OFFLOAD_LEN) begin
+        src_transfers_length /= 2;
+      end
+    end
+
+    src_transfers_delay = delay_choices[$urandom_range(delay_choices.size()-1)];
+    sync_delay_ns       = (`MEM_TYPE == 2) ? (NUM_M * src_transfers_length) : 1000;
+    time_to_wait        = (`MEM_TYPE == 2) ? 10000 : 2500;
+    dst_ready_mode      = mode_choices [$urandom_range(mode_choices.size() -1)];
+
+    `INFO(("Randomized stimulus: length=%0d delay=%0d sync_delay=%0d time_to_wait=%0d dst_ready_mode=%s",
+      src_transfers_length, src_transfers_delay, sync_delay_ns, time_to_wait, dst_ready_mode.name()), ADI_VERBOSITY_LOW);
+
+    // Configure environment sequencers
+    test_env.configure(
+      .transfer_length(src_transfers_length),
+      .transfer_count(NUM_SYNC_PULSES),
+      .path_type(`PATH_TYPE),
+      .dst_ready_mode(dst_ready_mode),
+      .dst_ready_high(dst_ready_high),
+      .dst_ready_low(dst_ready_low),
+      .oneshot(1));
+
+    test_env.init_req_vip_if.set_io(1'b0);
+    test_env.sync_ext_vip_if.set_io(1'b0);
 
     `INFO(("Bring up IP from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
 
-    env.src_axis_seq.start();
-
     // Start the ADC/DAC stubs
     `INFO(("Call the run() ..."), ADI_VERBOSITY_LOW);
-    env.run();
+    test_env.run();
 
-    init_req <= 1'b1;
+    test_env.src_axis_agent.master_sequencer.start();
 
-    // @env.src_axis_seq.queue_empty;
-    // init_req <= 1'b0;
-    #100ns;
+    test_env.init_req_vip_if.set_io(1'b1);
 
+    repeat (10) test_env.init_req_vip_if.wait_posedge_clk();
 
-    sync_ext <= 1'b1;
-    @(posedge `TH.`DST_CLK.clk_out);
-    @(posedge `TH.`DST_CLK.clk_out);
-    sync_ext <= 1'b0;
-    #1000ns;
+    trigger_ext_sync();
+    #(sync_delay_ns * 1ns);
 
-    sync_ext <= 1'b1;
-    @(posedge `TH.`DST_CLK.clk_out);
-    @(posedge `TH.`DST_CLK.clk_out);
-    sync_ext <= 1'b0;
-    #1000ns;
+    trigger_ext_sync();
+    #(sync_delay_ns * 1ns);
 
-    sync_ext <= 1'b1;
-    @(posedge `TH.`DST_CLK.clk_out);
-    @(posedge `TH.`DST_CLK.clk_out);
-    sync_ext <= 1'b0;
-    #1000ns;
+    trigger_ext_sync();
+    #(sync_delay_ns * 1ns);
 
-    // init_req <= 1'b1;
+    trigger_ext_sync();
+    #(sync_delay_ns * 1ns);
 
-    sync_ext <= 1'b1;
-    @(posedge `TH.`DST_CLK.clk_out);
-    @(posedge `TH.`DST_CLK.clk_out);
+    #((src_transfers_delay)*1ns);
 
-    sync_ext <= 1'b0;
-    #1000ns;
+    trigger_ext_sync();
 
-    #((`SRC_TRANSFERS_DELAY)*1ns);
+    #((time_to_wait)*1ns);
 
+    `ifdef HBM_AXI
+    hbm_axi_agent.stop_slave();
+    `endif
 
-    //init_req <= 1'b1;
-    #100ns;
-    // env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
-
-    // @env.src_axis_seq.queue_empty;
-    // init_req <= 1'b0;
-
-    #300ns;
-    sync_ext <= 1'b1;
-    @(posedge `TH.`DST_CLK.clk_out);
-    sync_ext <= 1'b0;
-
-    #((`TIME_TO_WAIT)*1ns);
-
-    env.stop();
+    test_env.stop();
+    base_env.stop();
 
     stop_clocks();
 
@@ -162,36 +224,40 @@ module test_program_sync (
   task start_clocks();
     `TH.`SRC_CLK.inst.IF.start_clock();
     `TH.`DST_CLK.inst.IF.start_clock();
-    `TH.`SYS_CLK.inst.IF.start_clock();
+    `ifdef HBM_AXI
+    `TH.`MEM_CLK.inst.IF.start_clock();
+    `endif
   endtask
 
   task stop_clocks();
     `TH.`SRC_CLK.inst.IF.stop_clock();
     `TH.`DST_CLK.inst.IF.stop_clock();
-    `TH.`SYS_CLK.inst.IF.stop_clock();
-  endtask
-
-  task sys_reset();
-    `TH.`SRC_RST.inst.IF.assert_reset();
-    `TH.`DST_RST.inst.IF.assert_reset();
-    `TH.`SYS_RST.inst.IF.assert_reset();
-
-    #500ns;
-    `TH.`SRC_RST.inst.IF.deassert_reset();
-    `TH.`DST_RST.inst.IF.deassert_reset();
-    `TH.`SYS_RST.inst.IF.deassert_reset();
+    `ifdef HBM_AXI
+    `TH.`MEM_CLK.inst.IF.stop_clock();
+    `endif
   endtask
 
   task systemBringUp();
-    // bring up the Data Offload instances from reset
-    `INFO(("Bring up TX Data Offload"), ADI_VERBOSITY_LOW);
+    // Bring up the Data Offload instances from reset
+    `INFO(("Bring up Data Offload"), ADI_VERBOSITY_LOW);
 
-    dut.set_oneshot(0);
-    dut.set_sync_config(1); // Hardware Sync
+    dut.disable_oneshot_mode();
+    dut.set_sync_config(2'h1); // Hardware Sync
 
-    // dut.set_transfer_length(`TRANSFER_LENGTH);
+    `ifdef OFFLOAD_TRANSFER_LENGTH
+    dut.set_transfer_length(`OFFLOAD_TRANSFER_LENGTH/64);
+    `else
+    dut.set_transfer_length(`OFFLOAD_SIZE/64);
+    `endif
 
-    dut.set_resetn(1'b1);
+    dut.deassert_reset();
   endtask
 
-endmodule
+  task trigger_ext_sync();
+    test_env.sync_ext_vip_if.set_io(1'b1);
+    test_env.sync_ext_vip_if.wait_posedge_clk();
+    test_env.sync_ext_vip_if.wait_posedge_clk();
+    test_env.sync_ext_vip_if.set_io(1'b0);
+  endtask
+
+endprogram

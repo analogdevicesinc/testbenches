@@ -50,6 +50,7 @@ import logger_pkg::*;
 import watchdog_pkg::*;
 import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
+import m_axi_sequencer_pkg::*;
 import ad5529r_environment_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
@@ -91,6 +92,9 @@ test_harness_env base_env;
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 ad5529r_environment spi_env;
+
+// Shorthand handle for the AXI manager sequencer (set in the main initial block)
+m_axi_sequencer_base mseq;
 
 // Toggle pin edge counters
 int tg0_edges = 0;
@@ -191,33 +195,10 @@ bit reset_monitor_active = 0;   // Enable flag for the monitor
 bit system_reset_triggered = 0; // Set when system reset is triggered
 bit system_reset_complete = 0;  // Set when reset sequence finishes
 
-// --------------------------
-// Wrapper function for AXI read verify
-// --------------------------
-task axi_read_v(
-    input   [31:0]  raddr,
-    input   [31:0]  vdata);
-  base_env.mng.master_sequencer.RegReadVerify32(raddr,vdata);
-endtask
-
-task axi_read(
-    input   [31:0]  raddr,
-    output  [31:0]  data);
-  base_env.mng.master_sequencer.RegRead32(raddr,data);
-endtask
-
-// --------------------------
-// Wrapper function for AXI write
-// --------------------------
-task axi_write(
-    input [31:0]  waddr,
-    input [31:0]  wdata);
-  base_env.mng.master_sequencer.RegWrite32(waddr,wdata);
-endtask
-
 task wait_random(
   input int min_ns,
-  input int max_ns);
+  input int max_ns
+);
   int delay_ns;
   delay_ns = $urandom_range(max_ns, min_ns);
   #(delay_ns * 1ns);
@@ -230,7 +211,7 @@ task reset_dut_state();
   `INFO(("[RESET] Resetting DUT state..."), ADI_VERBOSITY_LOW);
 
   // Disable offload first
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
 
   // Wait for any pending SPI transactions to complete
   wait_random(
@@ -238,13 +219,13 @@ task reset_dut_state();
     .max_ns(600));
 
   // Reset offload command memory (critical for re-programming offload)
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
 
   // Clear all pending IRQs
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
 
   // Reset DMA - just disable, tests will re-enable and configure
-  axi_write(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
+  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
 
   // Reset local state
   offload_transfer_cnt = 0;
@@ -904,6 +885,10 @@ initial begin
   `LINK(mng, base_env, mng)
   `LINK(ddr, base_env, ddr)
 
+  // Grab a shorthand handle to the AXI manager sequencer (same object,
+  // upcast to its base type which exposes RegRead32/RegWrite32/RegReadVerify32)
+  mseq = base_env.mng.master_sequencer;
+
   spi_env = new("SPI Environment", `TH.`SPI_S.inst.IF.vif);
 
   base_env.start();
@@ -1009,9 +994,9 @@ task sanity_test();
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
   `INFO(("Sanity Test: Checking SPI Engine version and scratch register"), ADI_VERBOSITY_LOW);
-  axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
-  axi_write  (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  axi_read_v (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  mseq.RegReadVerify32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  mseq.RegReadVerify32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test PASSED"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -1036,13 +1021,13 @@ task generate_transfer_cmd(
     end
   endcase
   // assert CSN
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFE));
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFE));
   // transfer data
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), transfer_instr);
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), transfer_instr);
   // de-assert CSN
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));
   // SYNC command to generate interrupt
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
   `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
 endtask
 
@@ -1058,16 +1043,16 @@ initial begin
   forever begin
     @(posedge ad5529r_spi_irq);
     // read pending IRQs
-    axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    mseq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
-      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      mseq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       offload_transfer_cnt++;
       `INFO(("Offload SYNC %d IRQ. Transfer count: %d", sync_id, offload_transfer_cnt), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
-      axi_read (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      mseq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SDI FIFO
@@ -1083,7 +1068,7 @@ initial begin
       `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
     // Clear all pending IRQs
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
   end
 end
 
@@ -1179,32 +1164,32 @@ task streaming_test(
       //-----------------------------------------------------------------------
       begin : test_body
         `INFO(("  Phase 2: Configuring TX DMA..."), ADI_VERBOSITY_LOW);
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
           `SET_DMAC_FLAGS_TLAST(1) | `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
         `INFO(("    DMA configured: SRC_ADDR=0x%08x, X_LENGTH=%0d bytes", `DDR_BA, total_bytes), ADI_VERBOSITY_LOW);
 
         `INFO(("  Phase 3: Configuring SPI Engine Offload..."), ADI_VERBOSITY_LOW);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
         if (`CS_ACTIVE_HIGH) begin
-          axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+          mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
         end
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
         `INFO(("  Phase 4: Starting offload transfer..."), ADI_VERBOSITY_LOW);
         `INFO(("    NUM_OF_TRANSFERS=%0d, PWM_PERIOD=%0d cycles", `NUM_OF_TRANSFERS, `PWM_PERIOD), ADI_VERBOSITY_LOW);
         wait_random(
     .min_ns(50),
     .max_ns(150));
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
         `INFO(("    Offload enabled, waiting for SPI transactions..."), ADI_VERBOSITY_LOW);
 
         begin
@@ -1215,7 +1200,7 @@ task streaming_test(
         end
 
         spi_env.spi_agent.sequencer.flush_send();
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
         `INFO(("    Offload disabled"), ADI_VERBOSITY_LOW);
         wait_random(
     .min_ns(4000),
@@ -1279,10 +1264,10 @@ task streaming_test(
 
       // Ensure DUT is in clean state before reconfiguring (system reset should have done this,
       // but be explicit to prevent stray triggers when config_spi() starts the trigger PWM)
-      axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
-      axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
-      axi_write(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
-      axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
+      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
+      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
+      mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
+      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
       offload_transfer_cnt = 0;
       irq_pending = 0;
 
@@ -1341,29 +1326,29 @@ task stress_test();
 
   // Configure DMA
   `INFO(("  Phase 3: Configuring DMA for %0d byte transfer...", total_bytes), ADI_VERBOSITY_LOW);
-  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL),
+  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL),
     `SET_DMAC_CONTROL_ENABLE(1));
-  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
+  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
     `SET_DMAC_FLAGS_TLAST(1) | `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1));
-  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH),
+  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH),
     `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
-  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS),
+  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS),
     `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-  base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
+  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
     `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
   // Configure offload
   `INFO(("  Phase 4: Configuring SPI offload..."), ADI_VERBOSITY_LOW);
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
   if (`CS_ACTIVE_HIGH) begin
-    axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+    mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
   end
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
   `INFO(("  Phase 5: Starting stress transfer..."), ADI_VERBOSITY_LOW);
 
@@ -1395,7 +1380,7 @@ task stress_test();
   wait_random(
     .min_ns(50),
     .max_ns(150));
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
     `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
 
   // Wait for all transfers to complete
@@ -1404,7 +1389,7 @@ task stress_test();
 
   stress_progress_enabled = 0;  // Disable progress reporting
 
-  axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
+  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
     `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
   // Calculate measured throughput
@@ -1531,30 +1516,30 @@ task single_instruction_test(
       //-----------------------------------------------------------------------
       begin : test_body
         `INFO(("  Phase 2: Configuring TX DMA..."), ADI_VERBOSITY_LOW);
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
           `SET_DMAC_FLAGS_TLAST(1) | `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-        base_env.mng.master_sequencer.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
+        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
 
         `INFO(("  Phase 3: Configuring SPI Engine Offload (single-instruction mode)..."), ADI_VERBOSITY_LOW);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
         if (`CS_ACTIVE_HIGH) begin
-          axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+          mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
         end
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 
         `INFO(("  Phase 4: Starting offload..."), ADI_VERBOSITY_LOW);
         wait_random(
     .min_ns(50),
     .max_ns(150));
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
 
         begin
           int wait_cycles = `PWM_PERIOD * `NUM_OF_TRANSFERS * 2;
@@ -1564,7 +1549,7 @@ task single_instruction_test(
         end
 
         spi_env.spi_agent.sequencer.flush_send();
-        axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
+        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
         wait_random(
     .min_ns(4000),
     .max_ns(6000));
@@ -1626,10 +1611,10 @@ task single_instruction_test(
 
       // Ensure DUT is in clean state before reconfiguring (system reset should have done this,
       // but be explicit to prevent stray triggers when config_spi() starts the trigger PWM)
-      axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
-      axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
-      axi_write(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
-      axi_write(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
+      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
+      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
+      mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
+      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
       offload_transfer_cnt = 0;
       irq_pending = 0;
 
@@ -1669,24 +1654,24 @@ task toggle_pin_test();
 
   // Configure toggle_gen PWM
   // Reset PWM generator
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
 
   // Set period for all 4 channels (140 MHz / 28 = 5 MHz)
   // REG_PULSE_X_PERIOD base is 0x40, channels are +4 bytes apart
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 0*4, 28);  // Channel 0 period
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 1*4, 28);  // Channel 1 period
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 2*4, 28);  // Channel 2 period
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 3*4, 28);  // Channel 3 period
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 0*4, 28);  // Channel 0 period
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 1*4, 28);  // Channel 1 period
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 2*4, 28);  // Channel 2 period
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 3*4, 28);  // Channel 3 period
 
   // Set pulse width for all 4 channels (50% duty cycle)
   // REG_PULSE_X_WIDTH base is 0x80, channels are +4 bytes apart
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 0*4, 14);  // Channel 0 width
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 1*4, 14);  // Channel 1 width
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 2*4, 14);  // Channel 2 width
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 3*4, 14);  // Channel 3 width
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 0*4, 14);  // Channel 0 width
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 1*4, 14);  // Channel 1 width
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 2*4, 14);  // Channel 2 width
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 3*4, 14);  // Channel 3 width
 
   // Load configuration
-  axi_write (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
+  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
 
   `INFO(("  PWM generator configured: Period=28 cycles, Width=14 cycles (50%% duty)"), ADI_VERBOSITY_LOW);
   `INFO(("  Expected: 5 MHz @ 140 MHz clock"), ADI_VERBOSITY_LOW);
@@ -1796,30 +1781,30 @@ task config_spi();
   `INFO(("Config SPI: Starting clock generator and configuring SPI engine"), ADI_VERBOSITY_LOW);
 
   // Start spi clk generator
-  axi_write (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+  mseq.RegWrite32 (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
     `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
     );
 
   // Config trigger PWM
-  axi_write (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  axi_write (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
-  axi_write (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  mseq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  mseq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
+  mseq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   `INFO(("Trigger PWM generator started."), ADI_VERBOSITY_LOW);
 
   // Enable SPI Engine
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
   // Configure the execution module
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
   if (`CS_ACTIVE_HIGH) begin
-    axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
+    mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
   end
 
   // Set up the interrupts
-  axi_write (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
     `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );

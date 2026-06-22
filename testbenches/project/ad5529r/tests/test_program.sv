@@ -97,8 +97,9 @@ test_harness_env base_env;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 ad5529r_environment spi_env;
 
-// Shorthand handle for the AXI manager sequencer (set in the main initial block)
-m_axi_sequencer_base mseq;
+// Shorthand handle for the sequencers (set in the main initial block)
+m_axi_sequencer_base mSeq;
+adi_spi_sequencer spiSeq;
 
 // Toggle pin edge counters (one per channel, free-running)
 int tg_edges[NUM_TG] = '{default:0};
@@ -209,21 +210,22 @@ task reset_dut_state();
   `INFO(("[RESET] Resetting DUT state..."), ADI_VERBOSITY_LOW);
 
   // Disable offload first
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
 
   // Wait for any pending SPI transactions to complete
   wait_random(
     .min_ns(400),
-    .max_ns(600));
+    .max_ns(600)
+  );
 
   // Reset offload command memory (critical for re-programming offload)
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
 
   // Clear all pending IRQs
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
 
   // Reset DMA - just disable, tests will re-enable and configure
-  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
+  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
 
   // Reset local state
   offload_transfer_cnt = 0;
@@ -235,7 +237,8 @@ task reset_dut_state();
 
   wait_random(
     .min_ns(50),
-    .max_ns(150));
+    .max_ns(150)
+  );
   `INFO(("[RESET] DUT state reset complete"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -390,13 +393,11 @@ task verify_cs_timing(
 endtask
 
 //---------------------------------------------------------------------------
-// SPI Mode Verification (CPOL=0, CPHA=1)
+// SPI Mode Verification
 // Note: CPOL and CPHA are configured via TCL parameters in cfg_*.tcl files
 // AD5529R uses CPOL=0, CPHA=1 (SPI Mode 1)
 //---------------------------------------------------------------------------
 task verify_spi_mode();
-  // AD5529R configuration: CPOL=0, CPHA=1
-  // These values are set in cfg_streaming.tcl and cfg_single_instruction.tcl
   localparam int EXPECTED_CPOL = 0;
   localparam int EXPECTED_CPHA = 1;
 
@@ -561,7 +562,7 @@ endtask
 // --------------------------
 // Single thread: wake on any change of tg_bus, then diff against the previous
 // state to detect which channel(s) toggled and the direction (level after the
-// change => rise/fall). Replaces the former 8 per-signal/per-edge monitors.
+// change => rise/fall).
 initial begin
   logic [NUM_TG-1:0] tg_prev = '0;
   forever begin
@@ -733,7 +734,7 @@ initial begin
 
     // Step 1: Tell SPI VIP to tolerate CS glitches during DUT reset
     `INFO(("[RESET_TEST] Allowing CS inactive mid-transfer..."), ADI_VERBOSITY_LOW);
-    spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(1);
+    spiSeq.allow_cs_inactive_mid_transfer(1);
     #10ns;
 
     // Step 2: Assert system reset (DUT will drop CS here)
@@ -750,7 +751,7 @@ initial begin
     // CS tolerance stays enabled — config_spi() also causes CS glitches.
     // The test recovery path re-disables it after config_spi() completes.
     `INFO(("[RESET_TEST] Resetting SPI VIP..."), ADI_VERBOSITY_LOW);
-    spi_env.spi_agent.sequencer.reset();
+    spiSeq.reset();
 
     #700ns;
 
@@ -831,16 +832,16 @@ initial begin
   `LINK(mng, base_env, mng)
   `LINK(ddr, base_env, ddr)
 
-  // Grab a shorthand handle to the AXI manager sequencer (same object,
-  // upcast to its base type which exposes RegRead32/RegWrite32/RegReadVerify32)
-  mseq = base_env.mng.master_sequencer;
-
   spi_env = new("SPI Environment", `TH.`SPI_S.inst.IF.vif);
+
+  // Grab a shorthand handle to the sequencers
+  mSeq = base_env.mng.master_sequencer;
+  spiSeq = spi_env.spi_agent.sequencer;
 
   base_env.start();
   spi_env.start();
 
-  spi_env.spi_agent.sequencer.set_default_miso_data('h0);
+  spiSeq.set_default_miso_data('h0);
 
   base_env.sys_reset();
 
@@ -851,13 +852,15 @@ initial begin
 
   wait_random(
     .min_ns(50),
-    .max_ns(150));
+    .max_ns(150)
+  );
 
   config_spi();
 
   wait_random(
     .min_ns(50),
-    .max_ns(150));
+    .max_ns(150)
+  );
 
   // Enable timing monitors
   reset_sclk_measurement();
@@ -892,8 +895,9 @@ initial begin
       if (i < test_modes.size() - 1) begin
         reset_dut_state();
         wait_random(
-    .min_ns(50),
-    .max_ns(150));
+          .min_ns(50),
+          .max_ns(150)
+        );
       end
     end
   end
@@ -914,7 +918,8 @@ initial begin
 
   wait_random(
     .min_ns(50),
-    .max_ns(150));
+    .max_ns(150)
+  );
 
   toggle_pin_test();
 
@@ -940,9 +945,9 @@ task sanity_test();
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MINOR)<<8
                             | (`DEFAULT_AXI_SPI_ENGINE_VERSION_VERSION_MAJOR)<<16;
   `INFO(("Sanity Test: Checking SPI Engine version and scratch register"), ADI_VERBOSITY_LOW);
-  mseq.RegReadVerify32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
-  mseq.RegReadVerify32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  mSeq.RegReadVerify32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_VERSION), pcore_version);
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
+  mSeq.RegReadVerify32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SCRATCH), 32'hDEADBEEF);
   `INFO(("Sanity Test PASSED"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -967,13 +972,13 @@ task generate_transfer_cmd(
     end
   endcase
   // assert CSN
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFE));
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFE));
   // transfer data
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), transfer_instr);
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), transfer_instr);
   // de-assert CSN
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS(8'hFF));
   // SYNC command to generate interrupt
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), (`INST_SYNC | sync_id));
   `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
 endtask
 
@@ -989,16 +994,16 @@ initial begin
   forever begin
     @(posedge ad5529r_spi_irq);
     // read pending IRQs
-    mseq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    mSeq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
     // IRQ launched by Offload SYNC command
     if (irq_pending & 5'b10000) begin
-      mseq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      mSeq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       offload_transfer_cnt++;
       `INFO(("Offload SYNC %d IRQ. Transfer count: %d", sync_id, offload_transfer_cnt), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SYNC command
     if (irq_pending & 5'b01000) begin
-      mseq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
+      mSeq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
     end
     // IRQ launched by SDI FIFO
@@ -1014,7 +1019,7 @@ initial begin
       `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
     // Clear all pending IRQs
-    mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
+    mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), irq_pending);
   end
 end
 
@@ -1027,13 +1032,164 @@ bit [`DATA_DLENGTH-1:0] sdo_write_data_store [(`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS
 bit [`DATA_DLENGTH-1:0] dac_word;
 bit [`DATA_DLENGTH-1:0] temp_data;
 
+//---------------------------------------------------------------------------
+// Offload test phase helpers
+//
+// The streaming, single-instruction and stress tests all walk through the same
+// sequence of phases. Each phase is factored out here so the test tasks read as
+// a short list of calls; the "Phase N" labels live only in the callers' logs.
+// Helpers are `automatic` so they can take ref args and so their stack frames
+// unwind cleanly if a caller's forked branch is `disable`d mid-call.
+//---------------------------------------------------------------------------
+
+// Phase 1: fill the expected-data store and prime the SPI VIP send queue.
+// The DAC value per word depends on the requested data mode (the stress test
+// always asks for random data).
+task automatic gen_offload_test_data(
+  input offload_test_t data_mode,
+  input int num_words
+);
+  for (int i = 0; i < num_words; i++) begin
+    case (data_mode)
+      DATA_MODE_RANDOM:  dac_word = $urandom;
+      DATA_MODE_RAMP:    dac_word = i;
+      DATA_MODE_PATTERN: dac_word = {`DATA_DLENGTH{1'b1}} & 'hA5A5A5A5;
+      default:           dac_word = {`DATA_DLENGTH{1'b1}};
+    endcase
+    sdo_write_data_store[i] = dac_word;
+    spiSeq.send_data('0);
+  end
+endtask
+
+// Phase 1b: copy the expected data into DDR for the DMA to fetch. 16-bit words
+// are packed two-per-32-bit-beat (the DAC's native width); other widths get one
+// word per beat.
+task automatic write_data_to_ddr(
+  input int num_words
+);
+  bit [31:0] write_data;
+  if (`DATA_DLENGTH == 16) begin
+    for (int i = 0; i < num_words; i = i + 2) begin
+      if (i + 1 < num_words)
+        write_data = {sdo_write_data_store[i+1][15:0], sdo_write_data_store[i][15:0]};
+      else
+        write_data = {16'h0000, sdo_write_data_store[i][15:0]};
+      base_env.ddr.slave_sequencer.BackdoorWrite32(.addr(xil_axi_uint'(`DDR_BA + 2*i)),
+                                                    .data(write_data), .strb('1));
+    end
+  end else begin
+    for (int i = 0; i < num_words; i = i + 1) begin
+      write_data = sdo_write_data_store[i];
+      base_env.ddr.slave_sequencer.BackdoorWrite32(.addr(xil_axi_uint'(`DDR_BA + 4*i)),
+                                                    .data(write_data), .strb('1));
+    end
+  end
+endtask
+
+// Phase 2: point the TX DMA at the DDR buffer and submit the transfer.
+task automatic config_tx_dma(
+  input int total_bytes
+);
+  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
+  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
+    `SET_DMAC_FLAGS_TLAST(1) | `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1));
+  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
+  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
+  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  `INFO(("    DMA configured: SRC_ADDR=0x%08x, X_LENGTH=%0d bytes", `DDR_BA, total_bytes), ADI_VERBOSITY_LOW);
+endtask
+
+// Phase 3: load the offload command memory with the per-transfer SPI program
+// (config, prescale, data length, optional CS polarity invert, then a single
+// CS-framed write followed by a SYNC so the engine raises an IRQ).
+task automatic config_offload_command_fifo();
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
+  if (`CS_ACTIVE_HIGH) begin
+    mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
+  end
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+endtask
+
+// Phase 4 (streaming / single-instruction): kick off the offload, wait long
+// enough for the trigger PWM to clock out every transfer, then flush and stop.
+// The wait is sized off the PWM period so it scales with the transfer count.
+// (The stress test runs its own variant that measures throughput instead.)
+task automatic run_start_wait_stop(
+  input int num_transfers
+);
+  int wait_ns = `PWM_PERIOD * num_transfers * 2 * 10;
+  wait_random(
+    .min_ns(50),
+    .max_ns(150)
+  );
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+  `INFO(("    Offload enabled, waiting %0d ns for %0d transfers...", wait_ns, num_transfers), ADI_VERBOSITY_LOW);
+  #(wait_ns * 1ns);
+  spiSeq.flush_send();
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
+  `INFO(("    Offload disabled"), ADI_VERBOSITY_LOW);
+  wait_random(
+    .min_ns(4000),
+    .max_ns(6000)
+  );
+endtask
+
+// Phase 6: pull each transmitted word out of the SPI VIP and compare it against
+// what we asked the DAC to receive. Mismatches bump the caller's error counter
+// (total_error_count is reconciled by the caller, since each test folds it in at
+// a different point).
+task automatic compare_received_data(
+  input int num_words,
+  ref int error_count
+);
+  for (int i = 0; i < num_words; i++) begin
+    spiSeq.receive_data(sdo_write_data[i]);
+    if (sdo_write_data[i] != sdo_write_data_store[i]) begin
+      error_count++;
+      `ERROR(("Data mismatch at word %0d: Expected=0x%04x, Actual=0x%04x",
+              i, sdo_write_data_store[i], sdo_write_data[i]));
+    end
+  end
+endtask
+
+// Reset-recovery: after a mid-transfer system reset, wait for it to settle and
+// put the DUT back into a clean state (clear stale offload/DMA/IRQ state and
+// VIP queues) so the outer loop can restart.
+task automatic recover_after_reset();
+  wait_for_reset_complete();
+  cleanup_system_reset_test();
+
+  // Clear SPI VIP queues - both send and receive
+  // Must clear AFTER system reset completes to remove any stale data captured during reset
+  spiSeq.clear_send();
+  spiSeq.clear_receive();
+
+  // Ensure DUT is in clean state before reconfiguring
+  // (system reset should have done this, but be explicit to prevent
+  // stray triggers when config_spi() starts the trigger PWM)
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
+  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
+  offload_transfer_cnt = 0;
+  irq_pending = 0;
+
+  `INFO(("[RESET_TEST] Reconfiguring DUT (clocks, PWM, SPI engine) and retrying..."), ADI_VERBOSITY_LOW);
+endtask
+
 task streaming_test(
   input offload_test_t data_mode
 );
 
   int streaming_error_count = 0;
-  int total_bytes = ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) * `DATA_DLENGTH) / 8;
-  int total_bits = `NUM_OF_TRANSFERS * `NUM_OF_WORDS * `DATA_DLENGTH;
+  int num_words = (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS);
+  int total_bytes = (num_words * `DATA_DLENGTH) / 8;
+  int total_bits = num_words * `DATA_DLENGTH;
 
   // Fork-join control variables
   bit test_done = 0;
@@ -1055,9 +1211,9 @@ task streaming_test(
 
     // On retry after reset, re-disable CS tolerance and clear spurious MOSI data
     if (reset_tested) begin
-      spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(0);
+      spiSeq.allow_cs_inactive_mid_transfer(0);
       #100ns;
-      spi_env.spi_agent.sequencer.clear_receive();
+      spiSeq.clear_receive();
     end
 
     // Setup system reset trigger (only on first attempt)
@@ -1067,39 +1223,10 @@ task streaming_test(
 
     // Generate test data and write to DDR (before fork - not interruptible)
     `INFO(("  Phase 1: Generating test data..."), ADI_VERBOSITY_LOW);
-    for (int i = 0; i<((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)) ; i=i+1) begin
-      case (data_mode)
-        DATA_MODE_RANDOM: dac_word = $urandom;
-        DATA_MODE_RAMP: dac_word = i;
-        DATA_MODE_PATTERN: dac_word = {`DATA_DLENGTH{1'b1}} & 'hA5A5A5A5;
-        default: dac_word = {`DATA_DLENGTH{1'b1}};
-      endcase
-      sdo_write_data_store[i] = dac_word;
-      spi_env.spi_agent.sequencer.send_data('0);
-    end
+    gen_offload_test_data(data_mode, num_words);
 
     `INFO(("  Phase 1b: Writing data to DDR..."), ADI_VERBOSITY_LOW);
-    begin
-      int num_words = (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS);
-      bit [31:0] write_data;
-
-      if (`DATA_DLENGTH == 16) begin
-        for (int i = 0; i < num_words; i = i + 2) begin
-          if (i + 1 < num_words)
-            write_data = {sdo_write_data_store[i+1][15:0], sdo_write_data_store[i][15:0]};
-          else
-            write_data = {16'h0000, sdo_write_data_store[i][15:0]};
-          base_env.ddr.slave_sequencer.BackdoorWrite32(.addr(xil_axi_uint'(`DDR_BA + 2*i)),
-                                                        .data(write_data), .strb('1));
-        end
-      end else begin
-        for (int i = 0; i < num_words; i = i + 1) begin
-          write_data = sdo_write_data_store[i];
-          base_env.ddr.slave_sequencer.BackdoorWrite32(.addr(xil_axi_uint'(`DDR_BA + 4*i)),
-                                                        .data(write_data), .strb('1));
-        end
-      end
-    end
+    write_data_to_ddr(num_words);
 
     //=========================================================================
     // Fork-join block: Race between test execution and reset trigger
@@ -1110,49 +1237,15 @@ task streaming_test(
       //-----------------------------------------------------------------------
       begin : test_body
         `INFO(("  Phase 2: Configuring TX DMA..."), ADI_VERBOSITY_LOW);
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
-          `SET_DMAC_FLAGS_TLAST(1) | `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-        `INFO(("    DMA configured: SRC_ADDR=0x%08x, X_LENGTH=%0d bytes", `DDR_BA, total_bytes), ADI_VERBOSITY_LOW);
+        config_tx_dma(total_bytes);
 
         `INFO(("  Phase 3: Configuring SPI Engine Offload..."), ADI_VERBOSITY_LOW);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-        if (`CS_ACTIVE_HIGH) begin
-          mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
-        end
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+        config_offload_command_fifo();
 
         `INFO(("  Phase 4: Starting offload transfer..."), ADI_VERBOSITY_LOW);
-        `INFO(("    NUM_OF_TRANSFERS=%0d, PWM_PERIOD=%0d cycles", `NUM_OF_TRANSFERS, `PWM_PERIOD), ADI_VERBOSITY_LOW);
-        wait_random(
-    .min_ns(50),
-    .max_ns(150));
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-        `INFO(("    Offload enabled, waiting for SPI transactions..."), ADI_VERBOSITY_LOW);
+        run_start_wait_stop(`NUM_OF_TRANSFERS);
 
-        begin
-          int wait_cycles = `PWM_PERIOD * `NUM_OF_TRANSFERS * 2;
-          int wait_ns = wait_cycles * 10;
-          `INFO(("    Waiting %0d ns for %0d transfers...", wait_ns, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
-          #(wait_ns * 1ns);
-        end
-
-        spi_env.spi_agent.sequencer.flush_send();
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-        `INFO(("    Offload disabled"), ADI_VERBOSITY_LOW);
-        wait_random(
-    .min_ns(4000),
-    .max_ns(6000));
-
-        // Verification phases
+        // Phase 5: a non-zero IRQ pending means the offload actually ran.
         `INFO(("  Phase 5: Verifying IRQ and data..."), ADI_VERBOSITY_LOW);
         if (irq_pending == 'h0) begin
           `FATAL(("Streaming Test FAILED: No IRQ received - offload may not have executed"));
@@ -1161,25 +1254,14 @@ task streaming_test(
         end
 
         `INFO(("  Phase 6: Comparing transmitted SPI data against expected..."), ADI_VERBOSITY_LOW);
-        for (int i=0; i<=((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS) -1); i=i+1) begin
-          spi_env.spi_agent.sequencer.receive_data(sdo_write_data[i]);
-          if (sdo_write_data[i] != sdo_write_data_store[i]) begin
-            streaming_error_count++;
-            total_error_count++;
-            `ERROR(("Streaming Test: Data mismatch at word %0d", i));
-            `INFO(("  [CHECK] Word %0d: Expected=0x%04x, Actual=0x%04x, Status=FAIL",
-                   i, sdo_write_data_store[i], sdo_write_data[i]), ADI_VERBOSITY_LOW);
-          end else begin
-            `INFO(("  [CHECK] Word %0d: Expected=0x%04x, Actual=0x%04x, Status=PASS",
-                   i, sdo_write_data_store[i], sdo_write_data[i]), ADI_VERBOSITY_MEDIUM);
-          end
-        end
+        compare_received_data(num_words, streaming_error_count);
+        total_error_count += streaming_error_count;
 
         if (streaming_error_count == 0) begin
-          `INFO(("Streaming Test PASSED: All %0d words verified", (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)), ADI_VERBOSITY_LOW);
+          `INFO(("Streaming Test PASSED: All %0d words verified", num_words), ADI_VERBOSITY_LOW);
         end
         else
-          `ERROR(("Streaming Test FAILED: %0d/%0d words mismatched", streaming_error_count, (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)));
+          `ERROR(("Streaming Test FAILED: %0d/%0d words mismatched", streaming_error_count, num_words));
 
         test_done = 1;  // Signal successful completion
       end
@@ -1200,26 +1282,7 @@ task streaming_test(
     // Handle reset recovery
     if (!test_done) begin
       reset_tested = 1;
-      wait_for_reset_complete();
-      cleanup_system_reset_test();
-
-      // Clear SPI VIP queues - both send and receive
-      // Must clear AFTER system reset completes to remove any stale data captured during reset
-      spi_env.spi_agent.sequencer.clear_send();
-      spi_env.spi_agent.sequencer.clear_receive();
-
-      // Ensure DUT is in clean state before reconfiguring (system reset should have done this,
-      // but be explicit to prevent stray triggers when config_spi() starts the trigger PWM)
-      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
-      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
-      mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
-      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
-      offload_transfer_cnt = 0;
-      irq_pending = 0;
-
-      `INFO(("[RESET_TEST] Restarting streaming_test after system reset..."), ADI_VERBOSITY_LOW);
-      `INFO(("[RESET_TEST] Reconfiguring DUT (clocks, PWM, SPI engine)..."), ADI_VERBOSITY_LOW);
-      // Loop continues → config_spi() will reconfigure everything
+      recover_after_reset();  // loop continues → config_spi() reprograms everything
     end else begin
       cleanup_system_reset_test();
     end
@@ -1252,50 +1315,20 @@ task stress_test();
   `INFO(("  DDR buffer: %0d bytes", total_bytes), ADI_VERBOSITY_LOW);
 
   `INFO(("  Phase 1: Generating %0d random words...", total_words), ADI_VERBOSITY_LOW);
-  for (int i = 0; i < total_words; i++) begin
-    dac_word = $urandom;
-    sdo_write_data_store[i] = dac_word;
-    spi_env.spi_agent.sequencer.send_data('0);
-  end
+  gen_offload_test_data(DATA_MODE_RANDOM, total_words);
 
-  // Write to DDR (16-bit packing)
   `INFO(("  Phase 2: Writing to DDR..."), ADI_VERBOSITY_LOW);
-  for (int i = 0; i < total_words; i = i + 2) begin
-    bit [31:0] write_data;
-    if (i + 1 < total_words)
-      write_data = {sdo_write_data_store[i+1][15:0], sdo_write_data_store[i][15:0]};
-    else
-      write_data = {16'h0000, sdo_write_data_store[i][15:0]};
-    base_env.ddr.slave_sequencer.BackdoorWrite32(
-      .addr(xil_axi_uint'(`DDR_BA + 2*i)), .data(write_data), .strb('1));
-  end
+  write_data_to_ddr(total_words);
 
-  // Configure DMA
   `INFO(("  Phase 3: Configuring DMA for %0d byte transfer...", total_bytes), ADI_VERBOSITY_LOW);
-  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL),
-    `SET_DMAC_CONTROL_ENABLE(1));
-  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
-    `SET_DMAC_FLAGS_TLAST(1) | `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1));
-  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH),
-    `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
-  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS),
-    `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-  mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT),
-    `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+  config_tx_dma(total_bytes);
 
-  // Configure offload
   `INFO(("  Phase 4: Configuring SPI offload..."), ADI_VERBOSITY_LOW);
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-  if (`CS_ACTIVE_HIGH) begin
-    mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
-  end
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+  config_offload_command_fifo();
 
+  // Phase 5 is bespoke for the stress test: it extends the watchdog, enables
+  // sample-based progress reporting, and times the run to measure throughput,
+  // so it stays inline rather than using run_start_wait_stop().
   `INFO(("  Phase 5: Starting stress transfer..."), ADI_VERBOSITY_LOW);
 
   // Extend watchdog timer for stress test (default is 1ms, we need ~20ms+)
@@ -1325,17 +1358,18 @@ task stress_test();
 
   wait_random(
     .min_ns(50),
-    .max_ns(150));
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
+    .max_ns(150)
+  );
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
     `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
 
   // Wait for all transfers to complete
-  spi_env.spi_agent.sequencer.flush_send();
+  spiSeq.flush_send();
   test_end_time = $time;
 
   stress_progress_enabled = 0;  // Disable progress reporting
 
-  mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN),
     `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
 
   // Calculate measured throughput
@@ -1355,19 +1389,7 @@ task stress_test();
   `INFO(("    Target:       123 kSPS per channel"), ADI_VERBOSITY_LOW);
 
   `INFO(("  Phase 6: Verifying data integrity..."), ADI_VERBOSITY_LOW);
-  for (int i = 0; i < total_words; i++) begin
-    spi_env.spi_agent.sequencer.receive_data(sdo_write_data[i]);
-    if (sdo_write_data[i] != sdo_write_data_store[i]) begin
-      stress_error_count++;
-      if (stress_error_count <= 10)  // Limit error spam
-        `ERROR(("[STRESS] Mismatch at word %0d: Expected=0x%04x, Actual=0x%04x",
-                i, sdo_write_data_store[i], sdo_write_data[i]));
-    end
-  end
-
-  if (stress_error_count > 10) begin
-    `ERROR(("[STRESS] ... and %0d more errors", stress_error_count - 10));
-  end
+  compare_received_data(total_words, stress_error_count);
 
   // Final verdict
   `INFO((""), ADI_VERBOSITY_LOW);
@@ -1417,9 +1439,9 @@ task single_instruction_test(
 
     // On retry after reset, re-disable CS tolerance and clear spurious MOSI data
     if (reset_tested) begin
-      spi_env.spi_agent.sequencer.allow_cs_inactive_mid_transfer(0);
+      spiSeq.allow_cs_inactive_mid_transfer(0);
       #100ns;
-      spi_env.spi_agent.sequencer.clear_receive();
+      spiSeq.clear_receive();
     end
 
     // Setup system reset trigger (only on first attempt)
@@ -1429,29 +1451,13 @@ task single_instruction_test(
 
     initial_cs_count = cs_transaction_count;
 
-    // Generate test data and write to DDR (before fork - not interruptible)
+    // Generate test data and write to DDR (before fork - not interruptible).
+    // Single-instruction mode: one word per transfer, so num_words == NUM_OF_TRANSFERS.
     `INFO(("  Phase 1: Generating test data..."), ADI_VERBOSITY_LOW);
-    for (int i = 0; i < `NUM_OF_TRANSFERS; i++) begin
-      case (data_mode)
-        DATA_MODE_RANDOM: dac_word = $urandom;
-        DATA_MODE_RAMP: dac_word = i;
-        DATA_MODE_PATTERN: dac_word = {`DATA_DLENGTH{1'b1}} & 'hA5A5A5A5;
-        default: dac_word = {`DATA_DLENGTH{1'b1}};
-      endcase
-      sdo_write_data_store[i] = dac_word;
-      spi_env.spi_agent.sequencer.send_data('0);
-    end
+    gen_offload_test_data(data_mode, `NUM_OF_TRANSFERS);
 
     `INFO(("  Phase 1b: Writing data to DDR..."), ADI_VERBOSITY_LOW);
-    for (int i = 0; i < `NUM_OF_TRANSFERS; i = i + 2) begin
-      bit [31:0] write_data;
-      if (i + 1 < `NUM_OF_TRANSFERS)
-        write_data = {sdo_write_data_store[i+1][15:0], sdo_write_data_store[i][15:0]};
-      else
-        write_data = {16'h0000, sdo_write_data_store[i][15:0]};
-      base_env.ddr.slave_sequencer.BackdoorWrite32(.addr(xil_axi_uint'(`DDR_BA + 2*i)),
-                                                    .data(write_data), .strb('1));
-    end
+    write_data_to_ddr(`NUM_OF_TRANSFERS);
 
     //=========================================================================
     // Fork-join block: Race between test execution and reset trigger
@@ -1462,45 +1468,16 @@ task single_instruction_test(
       //-----------------------------------------------------------------------
       begin : test_body
         `INFO(("  Phase 2: Configuring TX DMA..."), ADI_VERBOSITY_LOW);
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), `SET_DMAC_CONTROL_ENABLE(1));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_FLAGS),
-          `SET_DMAC_FLAGS_TLAST(1) | `SET_DMAC_FLAGS_PARTIAL_REPORTING_EN(1));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_X_LENGTH), `SET_DMAC_X_LENGTH_X_LENGTH(total_bytes - 1));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_SRC_ADDRESS), `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA));
-        mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_TRANSFER_SUBMIT), `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+        config_tx_dma(total_bytes);
 
         `INFO(("  Phase 3: Configuring SPI Engine Offload (single-instruction mode)..."), ADI_VERBOSITY_LOW);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_CFG);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_PRESCALE);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_DLENGTH);
-        if (`CS_ACTIVE_HIGH) begin
-          mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS_INV_MASK(8'hFF));
-        end
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFE));
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_WR);
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `SET_CS(8'hFF));
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
+        config_offload_command_fifo();
 
         `INFO(("  Phase 4: Starting offload..."), ADI_VERBOSITY_LOW);
-        wait_random(
-    .min_ns(50),
-    .max_ns(150));
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
+        run_start_wait_stop(`NUM_OF_TRANSFERS);
 
-        begin
-          int wait_cycles = `PWM_PERIOD * `NUM_OF_TRANSFERS * 2;
-          int wait_ns = wait_cycles * 10;
-          `INFO(("    Waiting %0d ns for %0d transfers...", wait_ns, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
-          #(wait_ns * 1ns);
-        end
-
-        spi_env.spi_agent.sequencer.flush_send();
-        mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-        wait_random(
-    .min_ns(4000),
-    .max_ns(6000));
-
-        // Verification phases
+        // Phase 5: in single-instruction mode each word is its own CS-framed
+        // transaction, so the CS edge count must equal the transfer count.
         `INFO(("  Phase 5: Verifying CS toggle behavior..."), ADI_VERBOSITY_LOW);
         begin
           int actual_cs_transactions = cs_transaction_count - initial_cs_count;
@@ -1512,15 +1489,8 @@ task single_instruction_test(
         end
 
         `INFO(("  Phase 6: Verifying transmitted data..."), ADI_VERBOSITY_LOW);
-        for (int i = 0; i < `NUM_OF_TRANSFERS; i++) begin
-          spi_env.spi_agent.sequencer.receive_data(sdo_write_data[i]);
-          if (sdo_write_data[i] != sdo_write_data_store[i]) begin
-            single_instr_error_count++;
-            total_error_count++;
-            `ERROR(("[SINGLE] Data mismatch at word %0d: Expected=0x%04x, Actual=0x%04x",
-                    i, sdo_write_data_store[i], sdo_write_data[i]));
-          end
-        end
+        compare_received_data(`NUM_OF_TRANSFERS, single_instr_error_count);
+        total_error_count += single_instr_error_count;
 
         if (single_instr_error_count == 0) begin
           `INFO(("Single-Instruction Test PASSED: All %0d words verified", `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
@@ -1547,26 +1517,7 @@ task single_instruction_test(
     // Handle reset recovery
     if (!test_done) begin
       reset_tested = 1;
-      wait_for_reset_complete();
-      cleanup_system_reset_test();
-
-      // Clear SPI VIP queues - both send and receive
-      // Must clear AFTER system reset completes to remove any stale data captured during reset
-      spi_env.spi_agent.sequencer.clear_send();
-      spi_env.spi_agent.sequencer.clear_receive();
-
-      // Ensure DUT is in clean state before reconfiguring (system reset should have done this,
-      // but be explicit to prevent stray triggers when config_spi() starts the trigger PWM)
-      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
-      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
-      mseq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
-      mseq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
-      offload_transfer_cnt = 0;
-      irq_pending = 0;
-
-      `INFO(("[RESET_TEST] Restarting single_instruction_test after system reset..."), ADI_VERBOSITY_LOW);
-      `INFO(("[RESET_TEST] Reconfiguring DUT (clocks, PWM, SPI engine)..."), ADI_VERBOSITY_LOW);
-      // Loop continues → config_spi() will reconfigure everything
+      recover_after_reset();  // loop continues → config_spi() reprograms everything
     end else begin
       cleanup_system_reset_test();
     end
@@ -1641,17 +1592,17 @@ task toggle_pin_test();
 
   // Configure toggle_gen PWM
   // Reset PWM generator
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
+  mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
 
   // Set period and pulse width per channel. REG_PULSE_X_PERIOD/WIDTH have one
   // register per channel, +4 bytes apart.
   for (int ch = 0; ch < NUM_TG; ch++) begin
-    mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + ch*4, PWM_PERIOD_C);
-    mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH)  + ch*4, PWM_WIDTH_C);
+    mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + ch*4, PWM_PERIOD_C);
+    mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH)  + ch*4, PWM_WIDTH_C);
   end
 
   // Load configuration
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
+  mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
 
   `INFO(("  PWM generator configured: Period=%0d cycles, Width=%0d cycles (50%% duty)", PWM_PERIOD_C, PWM_WIDTH_C), ADI_VERBOSITY_LOW);
   `INFO(("  Expected: 5 MHz @ 140 MHz clock"), ADI_VERBOSITY_LOW);
@@ -1693,30 +1644,30 @@ task config_spi();
   `INFO(("Config SPI: Starting clock generator and configuring SPI engine"), ADI_VERBOSITY_LOW);
 
   // Start spi clk generator
-  mseq.RegWrite32 (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
+  mSeq.RegWrite32 (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
     `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
     );
 
   // Config trigger PWM
-  mseq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
-  mseq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
-  mseq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
+  mSeq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
+  mSeq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(`PWM_PERIOD)); // set PWM period
+  mSeq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   `INFO(("Trigger PWM generator started."), ADI_VERBOSITY_LOW);
 
   // Enable SPI Engine
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(0));
 
   // Configure the execution module
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_CFG);
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_PRESCALE);
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `INST_DLENGTH);
   if (`CS_ACTIVE_HIGH) begin
-    mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
+    mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_CMD_FIFO), `SET_CS_INV_MASK(8'hFF));
   end
 
   // Set up the interrupts
-  mseq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
+  mSeq.RegWrite32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_MASK),
     `SET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(1) |
     `SET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(1)
     );

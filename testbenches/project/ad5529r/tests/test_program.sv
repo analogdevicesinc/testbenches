@@ -85,6 +85,10 @@ wire spi_cs   = `TH.`SPI_S.inst.IF.s_cs;
 wire spi_mosi = `TH.`SPI_S.inst.IF.s_mosi;
 wire spi_miso = `TH.`SPI_S.inst.IF.s_miso;
 
+// Toggle pins (TG0-TG3) bundled into an indexable vector for the edge monitor
+localparam int NUM_TG = 4;   // number of TG/PWM channels
+wire [NUM_TG-1:0] tg_bus = {ad5529r_tg3, ad5529r_tg2, ad5529r_tg1, ad5529r_tg0};
+
 typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP, DATA_MODE_PATTERN} offload_test_t;
 
 test_harness_env base_env;
@@ -96,14 +100,14 @@ ad5529r_environment spi_env;
 // Shorthand handle for the AXI manager sequencer (set in the main initial block)
 m_axi_sequencer_base mseq;
 
-// Toggle pin edge counters
-int tg0_edges = 0;
-int tg1_edges = 0;
-int tg2_edges = 0;
-int tg3_edges = 0;
+// Toggle pin edge counters (one per channel, free-running)
+int tg_edges[NUM_TG] = '{default:0};
 
 // Global error tracking for test pass/fail
 int total_error_count = 0;
+
+// Toggle pin test error count (module-scope so verify_tg_channel can update it)
+int toggle_error_count = 0;
 
 //---------------------------------------------------------------------------
 // SCLK Timing Measurement Infrastructure
@@ -158,14 +162,8 @@ int stress_samples_per_transfer = 16;    // Samples per transfer (16 DAC values)
 //---------------------------------------------------------------------------
 // PWM Timing Measurement Infrastructure
 //---------------------------------------------------------------------------
-time tg0_rise_times[$];
-time tg0_fall_times[$];
-time tg1_rise_times[$];
-time tg1_fall_times[$];
-time tg2_rise_times[$];
-time tg2_fall_times[$];
-time tg3_rise_times[$];
-time tg3_fall_times[$];
+time tg_rise_times[NUM_TG][$];
+time tg_fall_times[NUM_TG][$];
 bit pwm_measurement_enabled = 0;
 
 //---------------------------------------------------------------------------
@@ -423,14 +421,10 @@ endtask
 // PWM Frequency and Duty Cycle Verification
 //---------------------------------------------------------------------------
 task reset_pwm_measurement();
-  tg0_rise_times.delete();
-  tg0_fall_times.delete();
-  tg1_rise_times.delete();
-  tg1_fall_times.delete();
-  tg2_rise_times.delete();
-  tg2_fall_times.delete();
-  tg3_rise_times.delete();
-  tg3_fall_times.delete();
+  foreach (tg_rise_times[ch]) begin
+    tg_rise_times[ch].delete();
+    tg_fall_times[ch].delete();
+  end
   pwm_measurement_enabled = 1;
 endtask
 
@@ -450,12 +444,8 @@ task verify_pwm_timing(
   real freq_deviation, duty_deviation;
 
   // Select channel data
-  case (channel)
-    0: begin rise_times = tg0_rise_times; fall_times = tg0_fall_times; end
-    1: begin rise_times = tg1_rise_times; fall_times = tg1_fall_times; end
-    2: begin rise_times = tg2_rise_times; fall_times = tg2_fall_times; end
-    3: begin rise_times = tg3_rise_times; fall_times = tg3_fall_times; end
-  endcase
+  rise_times = tg_rise_times[channel];
+  fall_times = tg_fall_times[channel];
 
   if (rise_times.size() < 2) begin
     `ERROR(("[PWM] TG%0d: Insufficient rise edges (%0d) for timing measurement", channel, rise_times.size()));
@@ -567,69 +557,25 @@ task print_throughput_summary();
 endtask
 
 // --------------------------
-// Toggle pin edge counters with PWM timing
+// Toggle pin (TG) edge monitor with PWM timing capture
 // --------------------------
+// Single thread: wake on any change of tg_bus, then diff against the previous
+// state to detect which channel(s) toggled and the direction (level after the
+// change => rise/fall). Replaces the former 8 per-signal/per-edge monitors.
 initial begin
+  logic [NUM_TG-1:0] tg_prev = '0;
   forever begin
-    @(posedge ad5529r_tg0);
-    tg0_edges++;
-    if (pwm_measurement_enabled) tg0_rise_times.push_back($time);
-  end
-end
-
-initial begin
-  forever begin
-    @(negedge ad5529r_tg0);
-    tg0_edges++;
-    if (pwm_measurement_enabled) tg0_fall_times.push_back($time);
-  end
-end
-
-initial begin
-  forever begin
-    @(posedge ad5529r_tg1);
-    tg1_edges++;
-    if (pwm_measurement_enabled) tg1_rise_times.push_back($time);
-  end
-end
-
-initial begin
-  forever begin
-    @(negedge ad5529r_tg1);
-    tg1_edges++;
-    if (pwm_measurement_enabled) tg1_fall_times.push_back($time);
-  end
-end
-
-initial begin
-  forever begin
-    @(posedge ad5529r_tg2);
-    tg2_edges++;
-    if (pwm_measurement_enabled) tg2_rise_times.push_back($time);
-  end
-end
-
-initial begin
-  forever begin
-    @(negedge ad5529r_tg2);
-    tg2_edges++;
-    if (pwm_measurement_enabled) tg2_fall_times.push_back($time);
-  end
-end
-
-initial begin
-  forever begin
-    @(posedge ad5529r_tg3);
-    tg3_edges++;
-    if (pwm_measurement_enabled) tg3_rise_times.push_back($time);
-  end
-end
-
-initial begin
-  forever begin
-    @(negedge ad5529r_tg3);
-    tg3_edges++;
-    if (pwm_measurement_enabled) tg3_fall_times.push_back($time);
+    @(tg_bus);
+    for (int ch = 0; ch < NUM_TG; ch++) begin
+      if (tg_bus[ch] !== tg_prev[ch]) begin
+        tg_edges[ch]++;
+        if (pwm_measurement_enabled) begin
+          if (tg_bus[ch]) tg_rise_times[ch].push_back($time);
+          else            tg_fall_times[ch].push_back($time);
+        end
+      end
+    end
+    tg_prev = tg_bus;
   end
 end
 
@@ -1631,23 +1577,64 @@ task single_instruction_test(
 endtask
 
 //---------------------------------------------------------------------------
+// Per-channel TG verification: edge count + PWM frequency/duty.
+// Called once per channel after the shared measurement window closes.
+//---------------------------------------------------------------------------
+task verify_tg_channel(
+  input int channel,
+  input int edges,
+  input int min_edges
+);
+  // Edge count: did the pin actually toggle during the window?
+  if (edges < min_edges) begin
+    toggle_error_count++;
+    total_error_count++;
+    `ERROR(("Toggle Pin Test: TG%0d edge count too low", channel));
+    `INFO(("    TG%0d: Edges=%0d, Expected>=%0d, Status=FAIL", channel, edges, min_edges), ADI_VERBOSITY_LOW);
+  end else begin
+    `INFO(("    TG%0d: Edges=%0d, Expected>=%0d, Status=PASS", channel, edges, min_edges), ADI_VERBOSITY_LOW);
+  end
+
+  // Frequency/duty: 140 MHz / 28 = 5 MHz, tolerance 1%; 50% duty, tolerance 2%
+  verify_pwm_timing(
+    .channel(channel),
+    .expected_freq_mhz(5.0),
+    .freq_tolerance_pct(1.0),
+    .expected_duty_pct(50.0),
+    .duty_tolerance_pct(2.0));
+endtask
+
+//---------------------------------------------------------------------------
 // Toggle Pin Test (TG0-TG3 PWM outputs)
+//
+// The toggle_gen AXI PWM generator drives the four TG pins, which are used to
+// time the DAC's LDAC/toggle behavior. This test programs all four channels
+// identically (5 MHz, 50% duty), runs them concurrently for a single fixed
+// window, then checks per channel that each pin toggled and met its
+// frequency/duty targets. It validates both that the PWM core is wired to every
+// TG output and that the generated waveform matches the configured period/width.
+//
+// Note: toggle_gen is a SEPARATE PWM core from the SPI trigger PWM. Its period
+// (PWM_PERIOD_C below) is a test-local constant and is independent of the
+// `PWM_PERIOD cfg parameter, which only configures the trigger PWM (TRIG_GEN).
 //---------------------------------------------------------------------------
 
 task toggle_pin_test();
-  int initial_tg0, initial_tg1, initial_tg2, initial_tg3;
-  int final_tg0, final_tg1, final_tg2, final_tg3;
-  int toggle_error_count = 0;
-  int edges_tg0, edges_tg1, edges_tg2, edges_tg3;
+  // NUM_TG is declared at module scope (shared with the TG edge monitor)
+  localparam int PWM_PERIOD_C = 28;    // toggle_gen period: 140 MHz / 28 = 5 MHz (not `PWM_PERIOD)
+  localparam int PWM_WIDTH_C  = 14;    // 50% duty cycle
+  localparam int MIN_EDGES    = 10;    // edge-count pass threshold over the window
+
+  int initial_tg[NUM_TG];
+  int edges_tg[NUM_TG];
+
+  toggle_error_count = 0;
 
   `INFO((""), ADI_VERBOSITY_LOW);
   `INFO(("=== Toggle Pin Test: Verifying PWM outputs on TG0-TG3 ==="), ADI_VERBOSITY_LOW);
 
-  // Record initial edge counts
-  initial_tg0 = tg0_edges;
-  initial_tg1 = tg1_edges;
-  initial_tg2 = tg2_edges;
-  initial_tg3 = tg3_edges;
+  // Record initial edge counts (snapshot of the free-running per-channel counters)
+  initial_tg = tg_edges;
 
   // Reset PWM measurement and enable timing capture
   reset_pwm_measurement();
@@ -1656,24 +1643,17 @@ task toggle_pin_test();
   // Reset PWM generator
   mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
 
-  // Set period for all 4 channels (140 MHz / 28 = 5 MHz)
-  // REG_PULSE_X_PERIOD base is 0x40, channels are +4 bytes apart
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 0*4, 28);  // Channel 0 period
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 1*4, 28);  // Channel 1 period
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 2*4, 28);  // Channel 2 period
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + 3*4, 28);  // Channel 3 period
-
-  // Set pulse width for all 4 channels (50% duty cycle)
-  // REG_PULSE_X_WIDTH base is 0x80, channels are +4 bytes apart
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 0*4, 14);  // Channel 0 width
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 1*4, 14);  // Channel 1 width
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 2*4, 14);  // Channel 2 width
-  mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH) + 3*4, 14);  // Channel 3 width
+  // Set period and pulse width per channel. REG_PULSE_X_PERIOD/WIDTH have one
+  // register per channel, +4 bytes apart.
+  for (int ch = 0; ch < NUM_TG; ch++) begin
+    mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + ch*4, PWM_PERIOD_C);
+    mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH)  + ch*4, PWM_WIDTH_C);
+  end
 
   // Load configuration
   mseq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
 
-  `INFO(("  PWM generator configured: Period=28 cycles, Width=14 cycles (50%% duty)"), ADI_VERBOSITY_LOW);
+  `INFO(("  PWM generator configured: Period=%0d cycles, Width=%0d cycles (50%% duty)", PWM_PERIOD_C, PWM_WIDTH_C), ADI_VERBOSITY_LOW);
   `INFO(("  Expected: 5 MHz @ 140 MHz clock"), ADI_VERBOSITY_LOW);
 
   // FIXED TIMING: PWM measurement window - test expects minimum edge count based on this duration
@@ -1683,91 +1663,23 @@ task toggle_pin_test();
   // Disable PWM measurement
   pwm_measurement_enabled = 0;
 
-  // Record final edge counts
-  final_tg0 = tg0_edges;
-  final_tg1 = tg1_edges;
-  final_tg2 = tg2_edges;
-  final_tg3 = tg3_edges;
+  // Compute edges detected per channel over the window
+  edges_tg = tg_edges;
+  foreach (edges_tg[ch]) edges_tg[ch] -= initial_tg[ch];
 
-  // Calculate edges detected
-  edges_tg0 = final_tg0 - initial_tg0;
-  edges_tg1 = final_tg1 - initial_tg1;
-  edges_tg2 = final_tg2 - initial_tg2;
-  edges_tg3 = final_tg3 - initial_tg3;
-
-  // Basic edge count verification
-  `INFO(("  Edge count verification:"), ADI_VERBOSITY_LOW);
-
-  if (edges_tg0 < 10) begin
-    toggle_error_count++;
-    total_error_count++;
-    `ERROR(("Toggle Pin Test: TG0 edge count too low"));
-    `INFO(("    TG0: Edges=%0d, Expected>=10, Status=FAIL", edges_tg0), ADI_VERBOSITY_LOW);
-  end else begin
-    `INFO(("    TG0: Edges=%0d, Expected>=10, Status=PASS", edges_tg0), ADI_VERBOSITY_LOW);
+  // Per-channel verification: edge count + frequency/duty
+  `INFO(("  Channel verification (edge count + PWM timing):"), ADI_VERBOSITY_LOW);
+  foreach (edges_tg[ch]) begin
+    verify_tg_channel(
+      .channel(ch),
+      .edges(edges_tg[ch]),
+      .min_edges(MIN_EDGES));
   end
-
-  if (edges_tg1 < 10) begin
-    toggle_error_count++;
-    total_error_count++;
-    `ERROR(("Toggle Pin Test: TG1 edge count too low"));
-    `INFO(("    TG1: Edges=%0d, Expected>=10, Status=FAIL", edges_tg1), ADI_VERBOSITY_LOW);
-  end else begin
-    `INFO(("    TG1: Edges=%0d, Expected>=10, Status=PASS", edges_tg1), ADI_VERBOSITY_LOW);
-  end
-
-  if (edges_tg2 < 10) begin
-    toggle_error_count++;
-    total_error_count++;
-    `ERROR(("Toggle Pin Test: TG2 edge count too low"));
-    `INFO(("    TG2: Edges=%0d, Expected>=10, Status=FAIL", edges_tg2), ADI_VERBOSITY_LOW);
-  end else begin
-    `INFO(("    TG2: Edges=%0d, Expected>=10, Status=PASS", edges_tg2), ADI_VERBOSITY_LOW);
-  end
-
-  if (edges_tg3 < 10) begin
-    toggle_error_count++;
-    total_error_count++;
-    `ERROR(("Toggle Pin Test: TG3 edge count too low"));
-    `INFO(("    TG3: Edges=%0d, Expected>=10, Status=FAIL", edges_tg3), ADI_VERBOSITY_LOW);
-  end else begin
-    `INFO(("    TG3: Edges=%0d, Expected>=10, Status=PASS", edges_tg3), ADI_VERBOSITY_LOW);
-  end
-
-  `INFO((""), ADI_VERBOSITY_LOW);
-  `INFO(("  PWM Timing Verification:"), ADI_VERBOSITY_LOW);
-
-  // 140 MHz / 28 = 5 MHz, tolerance 1%
-  // 50% duty cycle, tolerance 2%
-  verify_pwm_timing(
-    .channel(0),
-    .expected_freq_mhz(5.0),
-    .freq_tolerance_pct(1.0),
-    .expected_duty_pct(50.0),
-    .duty_tolerance_pct(2.0));
-  verify_pwm_timing(
-    .channel(1),
-    .expected_freq_mhz(5.0),
-    .freq_tolerance_pct(1.0),
-    .expected_duty_pct(50.0),
-    .duty_tolerance_pct(2.0));
-  verify_pwm_timing(
-    .channel(2),
-    .expected_freq_mhz(5.0),
-    .freq_tolerance_pct(1.0),
-    .expected_duty_pct(50.0),
-    .duty_tolerance_pct(2.0));
-  verify_pwm_timing(
-    .channel(3),
-    .expected_freq_mhz(5.0),
-    .freq_tolerance_pct(1.0),
-    .expected_duty_pct(50.0),
-    .duty_tolerance_pct(2.0));
 
   if (toggle_error_count == 0) begin
-    `INFO(("Toggle Pin Test PASSED: All 4 pins verified"), ADI_VERBOSITY_LOW);
+    `INFO(("Toggle Pin Test PASSED: All %0d pins verified", NUM_TG), ADI_VERBOSITY_LOW);
   end else begin
-    `ERROR(("Toggle Pin Test FAILED: %0d/4 pins failed", toggle_error_count));
+    `ERROR(("Toggle Pin Test FAILED: %0d/%0d pins failed", toggle_error_count, NUM_TG));
   end
 
 endtask

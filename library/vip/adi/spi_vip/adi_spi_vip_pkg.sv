@@ -325,6 +325,12 @@ package adi_spi_vip_pkg;
       end
     endtask
 
+    function int get_num_rx_data();
+      // Per-lane word count; every lane receives one entry per word, so lane 0
+      // is representative.
+      return mosi_mbx[0].num();
+    endfunction
+
     task flush_tx();
       this.info($sformatf("flush_tx: waiting for all lane queues to empty"), ADI_VERBOSITY_HIGH);
       fork
@@ -446,6 +452,10 @@ package adi_spi_vip_pkg;
     virtual task automatic receive_data(ref int unsigned data[]);
       this.driver.get_rx_data(data);
     endtask : receive_data
+
+    virtual function int get_num_rx_data();
+      return this.driver.get_num_rx_data();
+    endfunction : get_num_rx_data
 
     virtual task automatic receive_data_verify(input int unsigned expected[]);
       int unsigned received[] = new[expected.size()];

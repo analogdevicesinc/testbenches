@@ -1,0 +1,300 @@
+.. _data_offload_1:
+
+Data Offload 1
+================================================================================
+
+Overview
+-------------------------------------------------------------------------------
+
+The purpose of these two testbenches is to validate the functionality of the
+:git-hdl:`library/data_offload <library/data_offload>` IP core.
+
+The entire HDL documentation can be found
+:external+hdl:ref:`here <data_offload>`.
+
+Block design
+-------------------------------------------------------------------------------
+
+The block design is based on the test harness with two instances (TX and RX) of
+the Data Offload IP as DUT and other auxiliary modules.
+For the TX ``data_offload`` IP testing, the auxiliary modules are a TX
+``axi_dmac`` IP instance and a subordinate AXI4 Stream VIP.  The TX DMA is used
+to generate data for the DUT IP. The data_offload IP stores the data and then
+sends it to the subordinate AXIS VIP for verification.
+For the RX ``data_offload`` IP testing, the auxiliary modules are a manager
+AXI4 Stream VIP and an RX ``axi_dmac`` IP instance.  The AXIS VIP is used to
+generate data for the DUT IP. The data_offload IP stores the data and then
+sends it to the RX DMA for verification.
+
+Block diagram
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: ./data_offload_tb_1.svg
+   :width: 800
+   :align: center
+   :alt: DATA_OFFLOAD/Testbench 1 block diagram
+
+Configuration parameters and modes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following parameters of this project that can be configured:
+
+-  ADC_DATA_PATH_WIDTH: RX AXIS VIP TDATA width in bytes
+-  DAC_DATA_PATH_WIDTH: TX AXIS VIP TDATA width in bytes
+-  ADC_OFFLOAD_MEM_TYPE: used storage type:
+   Options: 0 for internal or 1 for external
+-  ADC_OFFLOAD_SIZE: size of the storage element in bytes
+-  ADC_OFFLOAD_SRC_DWIDTH: data width of the source interface
+-  ADC_OFFLOAD_DST_DWIDTH: data width of the destination interface
+-  DAC_OFFLOAD_MEM_TYPE: used storage type:
+   Options: 0 for internal or 1 for external
+-  DAC_OFFLOAD_SIZE: size of the storage element in bytes
+-  DAC_OFFLOAD_SRC_DWIDTH: data width of the source interface
+-  DAC_OFFLOAD_DST_DWIDTH: data width of the destination interface
+-  PLDDR_OFFLOAD_DATA_WIDTH: data width of the external memory interface
+
+Configuration files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following configuration files are available:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Parameter
+     - cfg1
+     - cfg2
+     - cfg3
+     - cfg4
+   * - ADC\_DATA\_PATH\_WIDTH
+     - 16
+     - 16
+     - 8
+     - 16
+   * - DAC\_DATA\_PATH\_WIDTH
+     - 16
+     - 16
+     - 16
+     - 16
+   * - ADC\_OFFLOAD\_MEM\_TYPE
+     - 0
+     - 1
+     - 0
+     - 0
+   * - ADC\_OFFLOAD\_SIZE
+     - 2048
+     - 256*1024*1024
+     - 2048
+     - 2048
+   * - ADC\_OFFLOAD\_SRC\_DWIDTH
+     - 128
+     - 128
+     - 64
+     - 128
+   * - ADC\_OFFLOAD\_DST\_DWIDTH
+     - 128
+     - 64
+     - 64
+     - 128
+   * - DAC\_OFFLOAD\_MEM\_TYPE
+     - 0
+     - 0
+     - 1
+     - 0
+   * - DAC\_OFFLOAD\_SIZE
+     - 2048
+     - 2048
+     - 256*1024*1024
+     - 1024*1024
+   * - DAC\_OFFLOAD\_SRC\_DWIDTH
+     - 128
+     - 128
+     - 64
+     - 128
+   * - DAC\_OFFLOAD\_DST\_DWIDTH
+     - 128
+     - 128
+     - 128
+     - 128
+   * - PLDDR\_OFFLOAD\_DATA\_WIDTH
+     - 512
+     - 512
+     - 512
+     - 512
+
+Tests
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following test program file is available:
+
+============ =============================
+Test program Usage
+============ =============================
+test_program Tests the TX/RX Data Offload.
+============ =============================
+
+Available configurations & tests combinations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The test program is compatible with all the above-mentioned configurations.
+
+CPU/Memory interconnects addresses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+===========  ===========
+Instance     Address
+===========  ===========
+axi_intc     0x4120_0000
+ddr_axi_vip  0x8000_0000
+rx_dmac      0x5004_0000
+tx_dmac      0x5005_0000
+RX_DUT       0x5006_0000
+TX_DUT       0x5007_0000
+===========  ===========
+
+Test stimulus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The test program is responsible for verifying the Data Offload in different
+configurations.
+
+Environment Bringup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The steps of the environment bringup are:
+
+* Create the environment
+* Configure the sequencers
+* Start the environment
+* Start the clocks
+* Assert the resets
+
+Data Offload testing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Configure TX and RX Data Offload
+* Enable TX and RX DMA
+* Start the sequencers and scoreboard
+* Configure and start the DMAs
+* Wait for scoreboard to complete checking
+
+Stop the environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Stop the scoreboard
+* Stop the environment
+* Stop the clocks
+
+Building the testbench
+-------------------------------------------------------------------------------
+
+The testbench is built upon ADI's generic HDL reference design framework.
+ADI does not distribute compiled files of these projects so they must be built
+from the sources available :git-hdl:`here </>` and :git-testbenches:`here </>`,
+with the specified hierarchy described :ref:`build_tb set_up_tb_repo`.
+To get the source you must
+`clone <https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository>`__
+the HDL repository, and then build the project as follows:
+
+**Linux/Cygwin/WSL**
+
+*Example 1*
+
+Building and simulating the testbench using only the command line.
+
+.. shell::
+   :showuser:
+
+   $cd testbenches/ip/data_offload_1
+   $make
+
+*Example 2*
+
+Building and simulating the testbench using the Vivado GUI. This command will
+launch Vivado, will run the simulation and display the waveforms.
+
+.. shell::
+   :showuser:
+
+   $cd testbenches/ip/data_offload_1
+   $make MODE=gui
+
+*Example 3*
+
+Build a particular combination of test and configuration, using the Vivado GUI.
+This command will launch Vivado, will run the simulation and display the
+waveforms.
+
+.. shell::
+   :showuser:
+
+   $cd testbenches/ip/data_offload_1
+   $make MODE=gui CFG=cfg1 TST=test_program
+
+The built project can be found in the ``runs`` folder, where each configuration
+specific build has its own folder named after the configuration file's name.
+Example: if the following command was run for a single configuration in the
+clean folder (no runs folder available):
+
+``make CFG=cfg1``
+
+Then the subfolder under ``runs`` name will be:
+
+``cfg1``
+
+Resources
+-------------------------------------------------------------------------------
+
+HDL related dependencies forming the DUT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 30 45 25
+   :header-rows: 1
+
+   * - IP name
+     - Source code link
+     - Documentation link
+   * - AXI_DMAC
+     - :git-hdl:`library/axi_dmac`
+     - :external+hdl:ref:`here <axi_dmac>`
+   * - DATA_OFFLOAD
+     - :git-hdl:`library/data_offload <library/data_offload>`
+     - :external+hdl:ref:`here <data_offload>`
+
+Testbenches related dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: ../../common/dependency_common.rst
+
+Testbench specific dependencies:
+
+.. list-table::
+   :widths: 30 45 25
+   :header-rows: 1
+
+   * - SV dependency name
+     - Source code link
+     - Documentation link
+   * - DATA_OFFLOAD_API
+     - :git-testbenches:`library/drivers/data_offload/data_offload_api.sv`
+     - ---
+   * - DMA_TRANS
+     - :git-testbenches:`library/drivers/dmac/dma_trans.sv`
+     - ---
+   * - DMAC_API
+     - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
+     - ---
+   * - M_AXIS_SEQUENCER
+     - :git-testbenches:`library/vip/amd/axis/m_axis_sequencer.sv`
+     - ---
+   * - S_AXIS_SEQUENCER
+     - :git-testbenches:`library/vip/amd/axis/s_axis_sequencer.sv`
+     - ---
+   * - SCOREBOARD
+     - :git-testbenches:`library/drivers/common/scoreboard.sv`
+     - ---
+
+.. include:: ../../../common/more_information.rst
+
+.. include:: ../../../common/support.rst

@@ -1,8 +1,10 @@
 ####################################################################################
-# cfg1.tcl - AD5529R Streaming Mode Configuration
+# cfg_ad5529r.tcl - AD5529R common HDL / SPI-VIP configuration
 #
-# Tests 16-channel streaming mode with 17-word frames
-# (1 instruction word + 16 DAC data words)
+# Holds only the real compile-time / SPI-VIP settings shared by every test.
+# The TB-only parameters NUM_OF_WORDS / NUM_OF_TRANSFERS / PWM_PERIOD are NOT set
+# here — each test program (tests/test_*.sv) `defines them and includes the
+# shared flow (tests/ad5529r_test_flow.svh).
 ####################################################################################
 
 global ad_project_params
@@ -18,11 +20,7 @@ set ad_project_params(SLAVE_TIN)            0
 set ad_project_params(SLAVE_TOUT)           0
 set ad_project_params(CS_TO_MISO)           0
 set ad_project_params(CLOCK_DIVIDER)        1
-# Streaming mode: 17 words per frame (1 instruction + 16 DAC values)
-set ad_project_params(NUM_OF_WORDS)         17
-set ad_project_params(NUM_OF_TRANSFERS)     1
 set ad_project_params(CS_ACTIVE_HIGH)       0
-set ad_project_params(PWM_PERIOD)           98
 
 # SPI VIP configuration
 set spi_s_vip_cfg [ list \

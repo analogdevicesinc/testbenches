@@ -24,13 +24,12 @@ source $ad_tb_dir/library/includes/sp_include_spi_engine.tcl
 source $ad_tb_dir/library/includes/sp_include_clk_gen.tcl
 source $ad_tb_dir/library/includes/sp_include_pwm_gen.tcl
 
-# Add test files to the project
-adi_sim_project_files [list \
-  "ad5529r_environment.sv" \
-  "tests/test_program.sv" \
-]
+# Add test files to the project.
+# Every tests/*.sv is a thin program wrapper that `includes the shared flow
+# (tests/ad5529r_test_flow.svh, pulled in via `include, not compiled directly).
+adi_sim_project_files [glob "tests/*.sv"]
 
-#set a default test program
-adi_sim_add_define "TEST_PROGRAM=test_program"
+#set a default test program (run_sim.tcl overrides TEST_PROGRAM per run)
+adi_sim_add_define "TEST_PROGRAM=test_streaming"
 
 adi_sim_generate $project_name

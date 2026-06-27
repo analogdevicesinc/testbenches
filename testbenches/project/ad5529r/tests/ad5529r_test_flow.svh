@@ -87,49 +87,50 @@ wire [NUM_TG-1:0] tg_bus = {ad5529r_tg3, ad5529r_tg2, ad5529r_tg1, ad5529r_tg0};
 // Pass/fail gate; only verify_* tasks increment it.
 int total_error_count = 0;
 
-// IRQ state (declared here so reset_dut_state/recover_after_reset, defined above
-// the IRQ callback block, can reference them). Driven by the IRQ callback below.
+// IRQ state (declared here so reset_dut_state, defined above the IRQ callback
+// block, can reference them). Driven by the IRQ callback below.
 reg [4:0] irq_pending = 0;
 reg [7:0] sync_id = 0;
 int offload_transfer_cnt = 0;
 
 // SCLK timing measurement
-time sclk_rise_time = 0;
-time sclk_prev_rise = 0;
-int sclk_period_count = 0;
-real sclk_period_sum = 0;
-bit sclk_measurement_enabled = 0;
+time sclk_rise_time;
+time sclk_prev_rise;
+int sclk_period_count;
+real sclk_period_sum;
+bit sclk_measurement_enabled;
 
 // CS timing measurement
-time cs_fall_time = 0;
-time first_sclk_rise_after_cs = 0;
-time last_sclk_fall_before_cs_rise = 0;
-bit cs_measurement_enabled = 0;
+time cs_fall_time;
+time first_sclk_rise_after_cs;
+time last_sclk_fall_before_cs_rise;
+bit cs_measurement_enabled;
 
 // Min/max timing across all transactions
-real cs_setup_min = 1e9;
-real cs_setup_max = 0;
-real cs_hold_min = 1e9;
-real cs_hold_max = 0;
-int cs_timing_samples = 0;
+real cs_setup_min;
+real cs_setup_max;
+real cs_hold_min;
+real cs_hold_max;
+int cs_timing_samples;
 
 // Throughput Measurement
 localparam int PROGRESS_REPORTER_PERCENT = 2;  // report progress every 2% of transfers
 
 // Gate + cadence counters for tput_monitor (program scope: the monitor touches
-// them before the meter handle exists).
-bit tput_enabled          = 0;  // count transfers only while a run is active
-int tput_print_interval   = 1;  // print a partial line every N transfers (= 2%)
-int tput_until_print      = 1;  // countdown to next partial print
+// them before the meter handle exists)
+bit tput_enabled;          // count transfers only while a run is active
+int tput_print_interval;   // print a partial line every N transfers (= 2%)
+int tput_until_print;      // countdown to next partial print
 
 // Throughput accounting. One transfer = one CS cycle updating
 // channels_per_transfer channels; per-channel kSPS = aggregate / channels_per_transfer.
 class throughput_meter;
   int  channels_per_transfer;
-  int  total_transfers;          // transfers completed this run
+  int  total_transfers;          // transfers seen by the monitor this run
   int  total_transfers_target;   // expected transfers (for the progress %)
   int  total_updates;            // = total_transfers * channels_per_transfer
-  time run_start_time;
+  time run_start_time;           // start_measure() timestamp
+  time run_end_time;             // end_measure() timestamp
   // open checkpoint window baseline + last closed window's rate
   int  ckpt_base_updates;
   time ckpt_base_time;
@@ -149,11 +150,25 @@ class throughput_meter;
     total_transfers            = 0;
     total_updates              = 0;
     run_start_time             = $time;
+    run_end_time               = 0;
     ckpt_base_updates          = 0;
     ckpt_base_time             = $time;
     ckpt_window_ksps           = 0;
     measured_ksps_all_channels = 0;
     measured_ksps_per_channel  = 0;
+  endfunction
+
+  // rate = samples_seen / (end - start). The window includes software/AXI
+  // overhead (offload-enable latency, flush/settle) on purpose: it dilutes over
+  // many transfers, giving an honest end-to-end rate. The count is whatever the
+  // CS-rise monitor saw; completeness is checked separately against the VIP RX
+  // mailbox in run_verification_suite.
+  function void start_measure();
+    clear();
+  endfunction
+
+  function void end_measure();
+    run_end_time = $time;
   endfunction
 
   function void record_transfer();
@@ -181,8 +196,12 @@ class throughput_meter;
   endfunction
 
   // Update measured_* fields and print one row: global + last-checkpoint window.
+  // For the FINAL line, measure across the explicitly bracketed window
+  // [run_start_time, run_end_time]; for partial lines (window still open) measure
+  // up to now.
   function void print_status(bit is_final);
-    real total_dur_us = real'($time - run_start_time) / 1000.0;
+    time   end_t        = (is_final && run_end_time != 0) ? run_end_time : $time;
+    real   total_dur_us = real'(end_t - run_start_time) / 1000.0;
     real progress_pct = (total_transfers_target > 0)
                       ? real'(total_transfers) * 100.0 / real'(total_transfers_target) : 0;
     string prefix = is_final ? "[FINAL]" : $sformatf("[%5.1f%%]", progress_pct);
@@ -206,15 +225,6 @@ time tg_rise_times[NUM_TG][$];
 time tg_fall_times[NUM_TG][$];
 bit pwm_measurement_enabled = 0;
 
-// System-reset test: assert a system reset mid-transfer to check DUT recovery.
-// A SCLK+CS monitor counts bits to a random target, fires the reset, and the
-// fork-join below aborts the test body; the outer loop reconfigures and retries.
-int reset_bit_count = 0;        // bits counted so far (SCLK+CS monitor)
-int reset_target_bit = -1;      // reset fires at this bit (-1 = disabled)
-bit reset_monitor_active = 0;   // monitor enable
-bit system_reset_triggered = 0;
-bit system_reset_complete = 0;
-
 // Main procedure
 initial begin
   setLoggerVerbosity(ADI_VERBOSITY_LOW);
@@ -229,20 +239,8 @@ initial begin
     .max_ns(150)
   );
 
-  // Enable timing monitors
-  reset_sclk_measurement();
-  reset_cs_measurement();
-
-  // Construct the throughput meter and arm the tput_monitor cadence.
-  // Streaming-mode: NUM_OF_WORDS = 1 stream instr + channels,
-  //                 so channels_per_transfer = NUM_OF_WORDS - 1
-  // Single-instruction: channels_per_transfer = 1.
-  tput_meter = new(
-    .channels_per_transfer((`NUM_OF_WORDS > 1) ? `NUM_OF_WORDS - 1 : 1),
-    .total_transfers_target(`NUM_OF_TRANSFERS)
-  );
-  tput_print_interval = (`NUM_OF_TRANSFERS * PROGRESS_REPORTER_PERCENT) / 100;
-  if (tput_print_interval < 1) tput_print_interval = 1;  // floor at 1 transfer
+  // Initialize all measurement state and enable the timing monitors.
+  reset_measurements();
 
   foreach (test_modes[idx]) begin
     run_offload_test(test_modes[idx]);
@@ -271,9 +269,16 @@ initial begin
 end
 
 task automatic run_verification_suite();
-  if (system_reset_triggered == 0 && tput_meter.total_transfers != `NUM_OF_TRANSFERS) begin
-    `ERROR(("total_transfers (%0d) != NUM_OF_TRANSFERS(%0d) - were transfers lost?", tput_meter.total_transfers, `NUM_OF_TRANSFERS));
-    total_error_count++;
+  // Completeness check against ground truth (ungated VIP RX mailbox), not the
+  // gated throughput meter. One mailbox entry per word; a complete run =
+  // NUM_OF_TRANSFERS * NUM_OF_WORDS words.
+  begin
+    int expected_words = `NUM_OF_TRANSFERS * `NUM_OF_WORDS;
+    int actual_words   = spiSeq.get_num_rx_data();
+    if (actual_words != expected_words) begin
+      `ERROR(("rx words (%0d) != expected (%0d) - were transfers lost?", actual_words, expected_words));
+      total_error_count++;
+    end
   end
   // Expected: 35 MHz with 5% tolerance
   verify_sclk_frequency(
@@ -288,7 +293,8 @@ task automatic run_verification_suite();
   `INFO(("Verifying IRQ..."), ADI_VERBOSITY_LOW);
   verify_irq_was_raised();
   `INFO(("Comparing transmitted SPI data against expected..."), ADI_VERBOSITY_LOW);
-  verify_received_data(.xfer_cnt(tput_meter.total_transfers), .error_cnt(total_error_count));
+  // Verify every expected word, independent of the gated meter count.
+  verify_received_data(.word_cnt(`NUM_OF_TRANSFERS * `NUM_OF_WORDS), .error_cnt(total_error_count));
 endtask
 
 task wait_random(
@@ -317,6 +323,10 @@ task reset_dut_state();
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
   // Disable DMA; tests re-enable and configure it
   mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
+  // Empty the SPI VIP queues so a leftover RX entry can't shift the next test's
+  // data by one (verify_received_data drains only as many words as were counted).
+  spiSeq.clear_send();
+  spiSeq.clear_receive();
   offload_transfer_cnt = 0;
   irq_pending = 0;
   // Reset SCLK running state, keep cumulative counters
@@ -329,50 +339,39 @@ task reset_dut_state();
   `INFO(("reset_dut_state: DUT state reset complete"), ADI_VERBOSITY_LOW);
 endtask
 
-// Schedule a system reset at a random bit during the SPI transfer.
-task setup_system_reset_test(input int total_bits);
-  // 1%-per-bit roll biases the reset toward later bit indices.
-  reset_target_bit = -1;
-  for (int b = 0; b < total_bits && reset_target_bit < 0; b++) begin
-    if ($urandom_range(0, 99) == 0) begin  // 1% chance
-      reset_target_bit = b;
-    end
-  end
-  // No hit => reset on the last bit
-  if (reset_target_bit < 0) reset_target_bit = total_bits - 1;
-  reset_bit_count = 0;
-  system_reset_triggered = 0;
-  system_reset_complete = 0;
-  reset_monitor_active = 1;
-  `INFO(("setup_system_reset_test: reset scheduled at bit %0d of %0d", reset_target_bit, total_bits), ADI_VERBOSITY_LOW);
-endtask
-
-// Wait for the system reset to deassert, then settle.
-task wait_for_reset_complete();
-  if (!system_reset_complete) begin
-    `INFO(("RESET_TEST: Waiting for system reset to complete..."), ADI_VERBOSITY_LOW);
-    @(posedge system_reset_complete);
-  end
-  // TODO WAIT: size this settle delay properly.
-  #1000ns;
-  `INFO(("RESET_TEST: Reset complete, settling time elapsed"), ADI_VERBOSITY_LOW);
-endtask
-
-// Clear reset-test state after recovery.
-task cleanup_system_reset_test();
-  reset_monitor_active = 0;
-  reset_target_bit = -1;
-  system_reset_triggered = 0;
-  system_reset_complete = 0;
-endtask
-
-// SCLK Frequency Verification
-task reset_sclk_measurement();
+// Initialize all measurement state once at start of run: assign defaults,
+// construct the throughput meter, arm the tput_monitor cadence, enable monitors.
+task reset_measurements();
+  // SCLK timing
   sclk_rise_time = 0;
   sclk_prev_rise = 0;
   sclk_period_count = 0;
   sclk_period_sum = 0;
   sclk_measurement_enabled = 1;
+
+  // CS timing
+  cs_fall_time = 0;
+  first_sclk_rise_after_cs = 0;
+  last_sclk_fall_before_cs_rise = 0;
+  cs_setup_min = 1e9;
+  cs_setup_max = 0;
+  cs_hold_min = 1e9;
+  cs_hold_max = 0;
+  cs_timing_samples = 0;
+  cs_measurement_enabled = 1;
+
+  // Throughput: construct the meter and arm the tput_monitor cadence.
+  // Streaming-mode: NUM_OF_WORDS = 1 stream instr + channels,
+  //                 so channels_per_transfer = NUM_OF_WORDS - 1
+  // Single-instruction: channels_per_transfer = 1.
+  tput_enabled = 0;
+  tput_meter = new(
+    .channels_per_transfer((`NUM_OF_WORDS > 1) ? `NUM_OF_WORDS - 1 : 1),
+    .total_transfers_target(`NUM_OF_TRANSFERS)
+  );
+  tput_print_interval = (`NUM_OF_TRANSFERS * PROGRESS_REPORTER_PERCENT) / 100;
+  if (tput_print_interval < 1) tput_print_interval = 1;  // floor at 1 transfer
+  tput_until_print = tput_print_interval;
 endtask
 
 task verify_sclk_frequency(
@@ -416,19 +415,6 @@ task verify_sclk_frequency(
 endtask
 
 // CS Timing Verification
-task reset_cs_measurement();
-  cs_fall_time = 0;
-  first_sclk_rise_after_cs = 0;
-  last_sclk_fall_before_cs_rise = 0;
-  // Reset min/max tracking
-  cs_setup_min = 1e9;
-  cs_setup_max = 0;
-  cs_hold_min = 1e9;
-  cs_hold_max = 0;
-  cs_timing_samples = 0;
-  cs_measurement_enabled = 1;
-endtask
-
 task verify_cs_timing(
   input real min_cs_setup_ns,  // t5: CS fall to first SCLK rise
   input real min_cs_hold_ns    // t6: last SCLK fall to CS rise
@@ -657,56 +643,6 @@ initial begin
   end
 end
 
-// Reset-test bit counter: count SCLK edges while CS is active; fire the system
-// reset once the target bit is reached.
-initial begin
-  forever begin
-    @(posedge spi_sclk);  // Sample edge (CPHA=1)
-    if (reset_monitor_active && !spi_cs) begin  // CS active (active-low)
-      reset_bit_count++;
-      if (reset_target_bit >= 0 && reset_bit_count >= reset_target_bit) begin
-        system_reset_triggered = 1;
-        reset_monitor_active = 0;
-        `INFO(("RESET_TEST: Triggering system reset at bit %0d", reset_bit_count), ADI_VERBOSITY_LOW);
-      end
-    end
-  end
-end
-
-// Reset execution handler: run the actual reset sequence when triggered.
-// Tolerates CS glitches via the SPI VIP across the reset.
-initial begin
-  forever begin
-    @(posedge system_reset_triggered);
-
-    `INFO(("RESET_TEST: Allowing CS inactive mid-transfer..."), ADI_VERBOSITY_LOW);
-    spiSeq.allow_cs_inactive_mid_transfer(1);
-    #10ns;
-
-    // Assert (DUT drops CS here)
-    `INFO(("RESET_TEST: Asserting system reset..."), ADI_VERBOSITY_LOW);
-    base_env.sys_rst_vip_if.assert_reset();
-    // TODO WAIT: size this delay to actual reset-propagation cycles.
-    #200ns;
-
-    `INFO(("RESET_TEST: Deasserting system reset..."), ADI_VERBOSITY_LOW);
-    base_env.sys_rst_vip_if.deassert_reset();
-    // TODO WAIT: size this delay to actual reset-propagation cycles.
-    #100ns;
-
-    // Reset SPI VIP (mailboxes, counters). CS tolerance stays on (config_spi
-    // also glitches CS); recovery re-disables it after config_spi().
-    `INFO(("RESET_TEST: Resetting SPI VIP..."), ADI_VERBOSITY_LOW);
-    spiSeq.reset();
-
-    // TODO WAIT: size this delay to actual reset-propagation cycles.
-    #700ns;
-
-    system_reset_complete = 1;
-    `INFO(("RESET_TEST: System reset sequence complete (triggered at bit %0d)", reset_bit_count), ADI_VERBOSITY_LOW);
-  end
-end
-
 // Build/start the environments, grab sequencer handles, reset, arm the watchdog.
 task automatic init_environment();
   int transfer_timeout_ns = 100_000_000;
@@ -734,8 +670,7 @@ task automatic init_environment();
   spiSeq.set_default_miso_data('h0);
   base_env.sys_reset();
 
-  // TODO: derive timeout from transfer size: N*M*X / 35 MHz, +130% margin
-  // (double for the mid-transfer reset retry, plus 30%).
+  // TODO: derive timeout from transfer size: N*M*X / 35 MHz, +130% margin.
   base_env.simulation_watchdog.update_timer(transfer_timeout_ns);
   base_env.simulation_watchdog.reset();
   `INFO(("    Watchdog set to %0d ms", transfer_timeout_ns / 1000000), ADI_VERBOSITY_LOW);
@@ -861,37 +796,44 @@ endtask
 // Start the offload, wait for the trigger PWM to clock out every transfer,
 // then flush and stop.
 task automatic start_offload_wait_for_pwm_then_stop();
-  // Start the throughput window, restart the 2% print cadence, arm the CS monitor.
-  tput_meter.clear();
+  // Open the measurement window and arm the CS monitor before enabling offload,
+  // so offload-enable latency falls inside the window (intended; see start_measure).
+  tput_meter.start_measure();
   tput_until_print = tput_print_interval;
   tput_meter.print_header();
   tput_enabled = 1;  // start counting transfers in the CS monitor
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-  // Wait for all transfers to complete
+  // Wait for all transfer data to be consumed by the engine.
   spiSeq.flush_send();
-  // Disable offload
+  // Wait for every transfer to physically complete (ungated VIP RX mailbox = one
+  // entry per word) before closing the window. Bounded poll so a real shortfall
+  // surfaces as the lost-transfer check instead of hanging; the TX DMA is drained
+  // so no extra transfers start.
+  begin
+    int expected_words = `NUM_OF_TRANSFERS * `NUM_OF_WORDS;
+    int settle_tries   = 20;  // 20 * ~500ns = ~10us ceiling
+    while (spiSeq.get_num_rx_data() < expected_words && settle_tries > 0) begin
+      wait_random(.min_ns(400), .max_ns(600));
+      settle_tries--;
+    end
+  end
+  // Close the throughput window, then disable offload and stop counting.
+  tput_meter.end_measure();
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-  // flush_send() can unblock just before the final CS rise that tput_monitor
-  // counts, so keep counting across this settle window (offload is already
-  // flushed+disabled, so no new transfers occur).
-  // TODO WAIT: size this settle delay properly.
-  wait_random(
-    .min_ns(4000),
-    .max_ns(6000)
-  );
   tput_enabled = 0;  // stop counting transfers in the CS monitor
 endtask
 
-// Compare transmitted words from the SPI VIP with what the DAC received.
-task automatic verify_received_data(input int xfer_cnt, ref int error_cnt);
+// Compare transmitted words from the SPI VIP with what the DAC received. One
+// mailbox entry == one word; word_cnt is NUM_OF_TRANSFERS * NUM_OF_WORDS.
+task automatic verify_received_data(input int word_cnt, ref int error_cnt);
   int len_rx = spiSeq.get_num_rx_data();
-  if (len_rx < xfer_cnt) begin
-    // All transfers should be done by now; if the mailbox is short, the
-    // receive_data() loop below will stall on mailbox.get() in the VIP.
-    `ERROR(("len_rx(%0d) < xfer_cnt(%0d), verification might stall", len_rx, xfer_cnt));
+  if (len_rx < word_cnt) begin
+    // All words should be in by now; if the mailbox is short, the receive_data()
+    // loop below will stall on mailbox.get() in the VIP.
+    `ERROR(("len_rx(%0d) < word_cnt(%0d), verification might stall", len_rx, word_cnt));
     error_cnt++;
   end
-  for (int idx = 0; idx < xfer_cnt; idx++) begin
+  for (int idx = 0; idx < word_cnt; idx++) begin
     spiSeq.receive_data(sdo_write_data[idx]); // might stall if mailbox is empty
     if (sdo_write_data[idx] != sdo_write_data_store[idx]) begin
       error_cnt++;
@@ -899,7 +841,7 @@ task automatic verify_received_data(input int xfer_cnt, ref int error_cnt);
               idx, sdo_write_data_store[idx], sdo_write_data[idx]));
     end
   end
-  `INFO(("  Verified %0d words - %0d errors.", xfer_cnt, error_cnt), ADI_VERBOSITY_LOW);
+  `INFO(("  Verified %0d words - %0d errors.", word_cnt, error_cnt), ADI_VERBOSITY_LOW);
 endtask
 
 task automatic verify_irq_was_raised();
@@ -909,30 +851,6 @@ task automatic verify_irq_was_raised();
   end else begin
     `INFO(("  IRQ received (pending=0x%02x) - transfer(s) completed", irq_pending), ADI_VERBOSITY_LOW);
   end
-endtask
-
-// After a mid-transfer system reset: wait for settle, then clear stale
-// offload/DMA/IRQ state and VIP queues so the outer loop can restart.
-task automatic recover_after_reset();
-  wait_for_reset_complete();
-  cleanup_system_reset_test();
-  // Clear VIP queues after reset completes (drops data captured during reset)
-  spiSeq.clear_send();
-  spiSeq.clear_receive();
-  // Force a clean DUT state before reconfig (avoids stray triggers when
-  // config_spi() starts the trigger PWM)
-  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), 0);
-  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
-  mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
-  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
-  offload_transfer_cnt = 0;
-  irq_pending = 0;
-  // Drop pre-reset SCLK baselines: the clkgen is held off across the reset, so
-  // the first post-recovery rise would otherwise log one huge period and skew
-  // the average. Zeroing both makes the `sclk_prev_rise != 0` guard skip it.
-  sclk_rise_time = 0;
-  sclk_prev_rise = 0;
-  `INFO(("RESET_TEST: Reconfiguring DUT (clocks, PWM, SPI engine) and retrying..."), ADI_VERBOSITY_LOW);
 endtask
 
 task automatic print_test_header(
@@ -972,90 +890,33 @@ endtask
 //   1. config_spi
 //   2. generate data (generate_sdo_data + write_data_to_ddr)
 //   3. SPI transfers (config_tx_dma + config_offload_command_fifo + run/verify)
-//   4-5. reset mid-transfer, then retry step 3 (while/fork + recover_after_reset)
-//   6. verify
-// Static (not automatic) so the `disable <named-block>` reset idiom works.
-task run_offload_test(
+//   4. verify
+task automatic run_offload_test(
   input offload_test_t data_mode
 );
-  // Static task (see above): locals declared without initializers and assigned
-  // below so they re-init on every call rather than once at time zero.
-  static int num_words   = 0;
-  static int total_bits  = 0;
-  static int total_bytes = 0;
-
-  // Fork-join control variables
-  static bit test_done    = 0;
-  static bit reset_tested = 0;
-
-  num_words    = (`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS);
-  total_bits   = num_words * `DATA_DLENGTH;
-  total_bytes  = total_bits / 8;
-  test_done    = 0;
-  reset_tested = 0;
+  int num_words   = (`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS);
+  int total_bytes = (num_words * `DATA_DLENGTH) / 8;
 
   print_test_header(data_mode, total_bytes);
 
-  // Main test loop with reset recovery
-  while (!test_done) begin
+  config_spi();
 
-    // (Re)configure system - required after reset or on first run
-    config_spi();
+  // Generate test data and write to DDR
+  `INFO(("Generating test data..."), ADI_VERBOSITY_LOW);
+  generate_sdo_data(data_mode, num_words);
 
-    // On retry after reset, re-disable CS tolerance and clear spurious MOSI data
-    if (reset_tested) begin
-      spiSeq.allow_cs_inactive_mid_transfer(0);
-      #100ns;
-      spiSeq.clear_receive();
-    end
+  `INFO(("Writing data to DDR..."), ADI_VERBOSITY_LOW);
+  write_data_to_ddr(num_words);
 
-    // Setup system reset trigger (only on first attempt)
-    if (!reset_tested) begin
-      setup_system_reset_test(total_bits);
-    end
+  `INFO(("Configuring TX DMA..."), ADI_VERBOSITY_LOW);
+  config_tx_dma(total_bytes);
+  `INFO(("Configuring SPI Engine Offload..."), ADI_VERBOSITY_LOW);
+  config_offload_command_fifo();
+  `INFO(("Running SPI Engine Offload..."), ADI_VERBOSITY_LOW);
+  run_spi_engine_offload();
+  run_verification_suite();
 
-    // Generate test data and write to DDR (before fork - not interruptible)
-    `INFO(("Generating test data..."), ADI_VERBOSITY_LOW);
-    generate_sdo_data(data_mode, num_words);
-
-    `INFO(("Writing data to DDR..."), ADI_VERBOSITY_LOW);
-    write_data_to_ddr(num_words);
-
-    // Fork-join block: Race between test execution and reset trigger
-    fork : offload_test_and_reset_race
-      // Branch 1: Test execution body
-      begin : test_body
-        `INFO(("Configuring TX DMA..."), ADI_VERBOSITY_LOW);
-        config_tx_dma(total_bytes);
-        `INFO(("Configuring SPI Engine Offload..."), ADI_VERBOSITY_LOW);
-        config_offload_command_fifo();
-        `INFO(("Running SPI Engine Offload..."), ADI_VERBOSITY_LOW);
-        run_spi_engine_offload();
-        run_verification_suite();
-        test_done = 1;  // Signal successful completion
-      end
-
-      // Branch 2: System reset watcher
-      begin : reset_watcher
-        wait (system_reset_triggered);
-        `INFO(("RESET_TEST: System reset triggered - aborting offload test"), ADI_VERBOSITY_LOW);
-        disable test_body;
-        // TODO: fold err into total_error_count before the reset to keep
-        // pre-reset errors?
-      end
-
-    join_any
-    disable offload_test_and_reset_race;  // Clean up the other branch
-
-    // Handle reset recovery
-    if (!test_done) begin
-      reset_tested = 1;
-      recover_after_reset();  // loop continues --> config_spi() reprograms everything
-    end
-
-  end  // while (!test_done)
-
-  `INFO(("[run_offload_test] test complete (reset_tested=%0b)", reset_tested), ADI_VERBOSITY_LOW);
+  `INFO(("[run_offload_test] test complete"), ADI_VERBOSITY_LOW);
 endtask
 
 // Toggle Pin Test (TG0-TG3 PWM outputs)

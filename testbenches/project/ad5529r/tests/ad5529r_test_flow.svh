@@ -62,6 +62,15 @@ wire spi_cs   = `TH.`SPI_S.inst.IF.s_cs;
 wire spi_mosi = `TH.`SPI_S.inst.IF.s_mosi;
 wire spi_miso = `TH.`SPI_S.inst.IF.s_miso;
 
+// CS asserted level, independent of polarity. Active-low (CS_ACTIVE_HIGH=0):
+// asserted when spi_cs==0, so spi_cs_active = ~spi_cs. CS-edge monitors key off
+// this wire so a polarity flip needs no edits (C8).
+wire spi_cs_active = `CS_ACTIVE_HIGH ? spi_cs : ~spi_cs;
+
+// AD5529R DAC channel count. Single-instruction mode writes one sample to ONE
+// channel per transfer, so per-channel rate = aggregate / NUM_DAC_CHANNELS.
+localparam int NUM_DAC_CHANNELS = 16;
+
 // Toggle/trigger pins TG0-TG3
 localparam int NUM_TG = 4;
 
@@ -93,17 +102,19 @@ reg [4:0] irq_pending = 0;
 reg [7:0] sync_id = 0;
 int offload_transfer_cnt = 0;
 
-// SCLK timing measurement
-time sclk_rise_time;
-time sclk_prev_rise;
+// SCLK timing measurement ($realtime: 1ns quantization of $time would add noise
+// to ns-scale measurements - C6)
+realtime sclk_rise_time;
+realtime sclk_prev_rise;
 int sclk_period_count;
 real sclk_period_sum;
 bit sclk_measurement_enabled;
 
-// CS timing measurement
-time cs_fall_time;
-time first_sclk_rise_after_cs;
-time last_sclk_fall_before_cs_rise;
+// CS timing measurement. "assert"/"deassert" track the logical CS level
+// (spi_cs_active), not a fixed physical edge, so polarity is handled centrally.
+realtime cs_assert_time;
+realtime first_sclk_rise_after_cs;
+realtime last_sclk_fall_before_cs_deassert;
 bit cs_measurement_enabled;
 
 // Min/max timing across all transactions
@@ -116,105 +127,200 @@ int cs_timing_samples;
 // Throughput Measurement
 localparam int PROGRESS_REPORTER_PERCENT = 2;  // report progress every 2% of transfers
 
-// Gate + cadence counters for tput_monitor (program scope: the monitor touches
-// them before the meter handle exists)
-bit tput_enabled;          // count transfers only while a run is active
-int tput_print_interval;   // print a partial line every N transfers (= 2%)
-int tput_until_print;      // countdown to next partial print
-
-// Throughput accounting. One transfer = one CS cycle updating
-// channels_per_transfer channels; per-channel kSPS = aggregate / channels_per_transfer.
+// Self-windowing throughput meter.
+//
+// The CS monitor drives this entirely off SPI edges: arm() before a run, then
+// CS assert/deassert callbacks define the timing window AND count transfers, so
+// numerator and denominator always cover the same interval (no separate
+// start/stop vs enable knobs to drift apart).
+//
+//   window = [first CS assert -> last CS deassert]
+//
+// Offload-enable latency (before the first assert) and the settle-poll tail
+// (after the last deassert) fall outside automatically.
+//
+// One transfer = one CS cycle carrying channels_per_transfer channel updates
+// (streaming: NUM_OF_WORDS-1; single-instruction: 1). Per-channel rate always
+// divides the aggregate by NUM_DAC_CHANNELS: streaming spreads the 16 updates
+// over the 16 channels within a frame, single-instruction spreads its transfers
+// over the 16 channels across frames (C1).
 class throughput_meter;
-  int  channels_per_transfer;
-  int  total_transfers;          // transfers seen by the monitor this run
-  int  total_transfers_target;   // expected transfers (for the progress %)
-  int  total_updates;            // = total_transfers * channels_per_transfer
-  time run_start_time;           // start_measure() timestamp
-  time run_end_time;             // end_measure() timestamp
-  // open checkpoint window baseline + last closed window's rate
-  int  ckpt_base_updates;
-  time ckpt_base_time;
-  real ckpt_window_ksps;
-  // measured throughput, read after the run
-  real measured_ksps_all_channels;
-  real measured_ksps_per_channel;
+  int      channels_per_transfer;
+  int      total_transfers;        // transfers counted this run
+  int      total_transfers_target; // expected transfers (progress % + reliability gate)
+  int      total_updates;          // = total_transfers * channels_per_transfer
+  bit      armed;                  // count only between arm()/disarm()
+  bit      final_done;            // FINAL row already rendered (count-hit vs backstop)
+  // Self-defined window: stamped from real CS edges. win_start < 0 == not yet started.
+  realtime win_start;
+  realtime win_last;
+  // Cadence for partial lines (in-class; was program-scope globals - A1/A4)
+  int      print_interval;         // print every N transfers (= PROGRESS_REPORTER_PERCENT)
+  int      until_print;            // countdown to next partial line
+  // Rolling checkpoint window baseline + last closed window's rate
+  int      ckpt_base_updates;
+  realtime ckpt_base_time;
+  real     ckpt_window_ksps;
+  // Measured throughput (set by compute(), read by render()/verify_throughput())
+  real     measured_dur_us;
+  real     measured_ksps_all_channels;
+  real     measured_ksps_per_channel;
 
   function new(int channels_per_transfer, int total_transfers_target);
     this.channels_per_transfer  = channels_per_transfer;
     this.total_transfers_target = total_transfers_target;
+    print_interval = (total_transfers_target * PROGRESS_REPORTER_PERCENT) / 100;
+    if (print_interval < 1) print_interval = 1;  // floor at 1 transfer
     clear();
   endfunction
 
-  // Zero accumulators and re-stamp baselines to now (offload start or TB reset).
+  // Zero accumulators and disarm. win_start < 0 so the next run re-arms its
+  // window on the first CS assert (offload start or TB reset between modes).
   function void clear();
     total_transfers            = 0;
     total_updates              = 0;
-    run_start_time             = $time;
-    run_end_time               = 0;
+    armed                      = 0;
+    final_done                 = 0;
+    win_start                  = -1;
+    win_last                   = 0;
+    until_print                = print_interval;
     ckpt_base_updates          = 0;
-    ckpt_base_time             = $time;
+    ckpt_base_time             = 0;
     ckpt_window_ksps           = 0;
+    measured_dur_us            = 0;
     measured_ksps_all_channels = 0;
     measured_ksps_per_channel  = 0;
   endfunction
 
-  // rate = samples_seen / (end - start). The window includes software/AXI
-  // overhead (offload-enable latency, flush/settle) on purpose: it dilutes over
-  // many transfers, giving an honest end-to-end rate. The count is whatever the
-  // CS-rise monitor saw; completeness is checked separately against the VIP RX
-  // mailbox in run_verification_suite.
-  function void start_measure();
+  // Begin a run: reset and start counting. The window opens lazily on the first
+  // CS assert, so offload-enable latency is excluded.
+  function void arm();
     clear();
+    armed = 1;
   endfunction
 
-  function void end_measure();
-    run_end_time = $time;
+  // End a run: stop counting. Closes the gate atomically with the last counted
+  // transfer (no separate end-timestamp to drift) - C7.
+  function void disarm();
+    armed = 0;
   endfunction
 
-  function void record_transfer();
+  // CS asserted: open the window on the first real transfer of this run.
+  function void on_cs_assert();
+    if (!armed) return;
+    if (win_start < 0) begin
+      win_start      = $realtime;
+      ckpt_base_time = $realtime;
+    end
+  endfunction
+
+  // CS deasserted: one transfer completed. Count it, extend the window, emit a
+  // partial line at cadence, and render FINAL once the target is reached.
+  function void on_cs_deassert();
+    if (!armed) return;
+    win_last = $realtime;
     total_transfers++;
     total_updates += channels_per_transfer;
+    if (total_transfers == total_transfers_target) begin
+      // Target reached: render FINAL only (skip a coinciding partial line).
+      checkpoint();
+      compute(.is_final(1));
+      render(.is_final(1));
+    end else if (--until_print <= 0) begin
+      checkpoint();
+      compute(.is_final(0));
+      render(.is_final(0));
+      until_print = print_interval;
+    end
   endfunction
 
-  // Close the current window (compute its rate) and open a fresh one at now.
-  // Call right before a partial print_status().
+  // Close the rolling checkpoint window (compute its rate) and open a fresh one.
   function void checkpoint();
-    real dur_us = real'($time - ckpt_base_time) / 1000.0;
+    real dur_us = real'($realtime - ckpt_base_time) / 1000.0;
     ckpt_window_ksps  = (dur_us > 0) ? real'(total_updates - ckpt_base_updates) * 1000.0 / dur_us : 0;
     ckpt_base_updates = total_updates;
-    ckpt_base_time    = $time;
+    ckpt_base_time    = $realtime;
   endfunction
 
-  // Aggregate kSPS -> per-channel kSPS (== transfer rate).
+  // Aggregate kSPS -> per-channel kSPS. Always /NUM_DAC_CHANNELS (C1).
   function real per_channel(real all_channel_ksps);
-    return (channels_per_transfer > 0) ? all_channel_ksps / real'(channels_per_transfer) : 0;
+    return all_channel_ksps / real'(NUM_DAC_CHANNELS);
+  endfunction
+
+  // Pure measurement, no printing (C5). FINAL measures across the closed window
+  // [win_start, win_last]; partial measures up to now (window still open).
+  function void compute(bit is_final);
+    realtime end_t = is_final ? win_last : $realtime;
+    if (win_start < 0) begin  // never started: nothing to measure
+      measured_dur_us            = 0;
+      measured_ksps_all_channels = 0;
+      measured_ksps_per_channel  = 0;
+      return;
+    end
+    measured_dur_us            = real'(end_t - win_start) / 1000.0;
+    // updates/µs * 1000 = kSPS (kilosamples per second)
+    measured_ksps_all_channels = (measured_dur_us > 0) ? real'(total_updates) * 1000.0 / measured_dur_us : 0;
+    measured_ksps_per_channel  = per_channel(measured_ksps_all_channels);
   endfunction
 
   function void print_header();
     `INFO((""), ADI_VERBOSITY_LOW);
-    `INFO(("    Throughput: [pct|FINAL] | Dur(ms) | Transfers | Updates | Global kSPS (per-ch) | Window kSPS (per-ch)"), ADI_VERBOSITY_LOW);
+    `INFO(("Sample percnt |     Dur(ms) | Transfers | Updates |        Global kSPS (per-ch) | Window kSPS (per-ch)"), ADI_VERBOSITY_LOW);
   endfunction
 
-  // Update measured_* fields and print one row: global + last-checkpoint window.
-  // For the FINAL line, measure across the explicitly bracketed window
-  // [run_start_time, run_end_time]; for partial lines (window still open) measure
-  // up to now.
-  function void print_status(bit is_final);
-    time   end_t        = (is_final && run_end_time != 0) ? run_end_time : $time;
-    real   total_dur_us = real'(end_t - run_start_time) / 1000.0;
-    real progress_pct = (total_transfers_target > 0)
-                      ? real'(total_transfers) * 100.0 / real'(total_transfers_target) : 0;
-    string prefix = is_final ? "[FINAL]" : $sformatf("[%5.1f%%]", progress_pct);
-
-    // updates/µs * 1000 = kSPS (kilosamples per second)
-    measured_ksps_all_channels = (total_dur_us > 0) ? real'(total_updates) * 1000.0 / total_dur_us : 0;
-    measured_ksps_per_channel  = per_channel(measured_ksps_all_channels);
-
+  // Pure printing, no measurement (C5). Reads fields set by compute(). The FINAL
+  // row prints once: whichever of the count-hit path or the run-flow backstop
+  // gets there first (lost-transfer safety).
+  function void render(bit is_final);
+    real   progress_pct = (total_transfers_target > 0)
+      ? real'(total_transfers) * 100.0 / real'(total_transfers_target) : 0;
+    string prefix = is_final ? " FINAL " : $sformatf(" %6.1f%% ", progress_pct);
+    if (is_final) begin
+      if (final_done) return;
+      final_done = 1;
+    end
     `INFO(("    %s | %8.3f ms | %9d | %7d | %8.3f kSPS (%7.3f /ch) | %8.3f kSPS (%7.3f /ch)",
-           prefix, total_dur_us / 1000.0, total_transfers, total_updates,
+           prefix, measured_dur_us / 1000.0, total_transfers, total_updates,
            measured_ksps_all_channels, measured_ksps_per_channel,
            ckpt_window_ksps, per_channel(ckpt_window_ksps)),
           ADI_VERBOSITY_LOW);
+  endfunction
+
+  // Throughput acceptance check. Only runs when the target transfer count is
+  // large enough for a reliable window (C4); short runs (C3) are reported but not
+  // asserted. expected_per_ch_ksps <= 0 means "smoke only" (rate must be > 0),
+  // used for modes without a documented sustained target.
+  function void verify_throughput(real expected_per_ch_ksps, real tol_pct, ref int error_cnt);
+    real dev_pct;
+    `INFO((""), ADI_VERBOSITY_LOW);
+    `INFO(("=== Throughput Verification ==="), ADI_VERBOSITY_LOW);
+    if (total_transfers_target <= 10) begin
+      `INFO(("  Skipped: short run (target=%0d transfers <= 10) - window unreliable",
+             total_transfers_target), ADI_VERBOSITY_LOW);
+      return;
+    end
+    compute(.is_final(1));
+    `INFO(("  Measured: %.3f kSPS/ch (%.3f kSPS aggregate over %.3f ms, %0d transfers)",
+           measured_ksps_per_channel, measured_ksps_all_channels,
+           measured_dur_us / 1000.0, total_transfers), ADI_VERBOSITY_LOW);
+    if (measured_ksps_per_channel <= 0) begin
+      `ERROR(("[TPUT] No throughput measured (rate=0) - did transfers run?"));
+      error_cnt++;
+      return;
+    end
+    if (expected_per_ch_ksps <= 0) begin
+      `INFO(("  No sustained target for this mode; smoke check only (rate > 0): PASS"), ADI_VERBOSITY_LOW);
+      return;
+    end
+    dev_pct = ((measured_ksps_per_channel - expected_per_ch_ksps) / expected_per_ch_ksps) * 100.0;
+    `INFO(("  Expected: %.3f kSPS/ch +/- %.1f%% (deviation %.2f%%)",
+           expected_per_ch_ksps, tol_pct, dev_pct), ADI_VERBOSITY_LOW);
+    if (dev_pct < 0) dev_pct = -dev_pct;  // abs
+    if (dev_pct > tol_pct) begin
+      `ERROR(("[TPUT] Throughput %.3f kSPS/ch deviates %.2f%% from %.3f (tol %.1f%%)",
+              measured_ksps_per_channel, dev_pct, expected_per_ch_ksps, tol_pct));
+      error_cnt++;
+    end
   endfunction
 endclass
 
@@ -239,14 +345,11 @@ initial begin
     .max_ns(150)
   );
 
-  // Initialize all measurement state and enable the timing monitors.
-  reset_measurements();
+  reset_measurements(); // init measurement states and enable the timing monitors
 
   foreach (test_modes[idx]) begin
+    reset_dut_state();
     run_offload_test(test_modes[idx]);
-    if (idx < test_modes.size() - 1) begin
-      reset_dut_state();
-    end
   end
 
   wait_random(
@@ -265,7 +368,6 @@ initial begin
 
   `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
   $finish();
-
 end
 
 task automatic run_verification_suite();
@@ -276,7 +378,7 @@ task automatic run_verification_suite();
     int expected_words = `NUM_OF_TRANSFERS * `NUM_OF_WORDS;
     int actual_words   = spiSeq.get_num_rx_data();
     if (actual_words != expected_words) begin
-      `ERROR(("rx words (%0d) != expected (%0d) - were transfers lost?", actual_words, expected_words));
+      `ERROR(("rx words (%0d) != expected (%0d) - transfers lost?", actual_words, expected_words));
       total_error_count++;
     end
   end
@@ -292,6 +394,13 @@ task automatic run_verification_suite();
   );
   `INFO(("Verifying IRQ..."), ADI_VERBOSITY_LOW);
   verify_irq_was_raised();
+  // Throughput acceptance (skipped for short runs - C3/C4). Streaming has a
+  // documented ~123 kSPS/ch sustained target; single-instruction has none, so it
+  // is smoke-checked (rate > 0) only.
+  if (`NUM_OF_WORDS > 1)
+    tput_meter.verify_throughput(.expected_per_ch_ksps(123.0), .tol_pct(10.0), .error_cnt(total_error_count));
+  else
+    tput_meter.verify_throughput(.expected_per_ch_ksps(0.0), .tol_pct(0.0), .error_cnt(total_error_count));
   `INFO(("Comparing transmitted SPI data against expected..."), ADI_VERBOSITY_LOW);
   // Verify every expected word, independent of the gated meter count.
   verify_received_data(.word_cnt(`NUM_OF_TRANSFERS * `NUM_OF_WORDS), .error_cnt(total_error_count));
@@ -350,9 +459,9 @@ task reset_measurements();
   sclk_measurement_enabled = 1;
 
   // CS timing
-  cs_fall_time = 0;
+  cs_assert_time = 0;
   first_sclk_rise_after_cs = 0;
-  last_sclk_fall_before_cs_rise = 0;
+  last_sclk_fall_before_cs_deassert = 0;
   cs_setup_min = 1e9;
   cs_setup_max = 0;
   cs_hold_min = 1e9;
@@ -360,18 +469,14 @@ task reset_measurements();
   cs_timing_samples = 0;
   cs_measurement_enabled = 1;
 
-  // Throughput: construct the meter and arm the tput_monitor cadence.
+  // Throughput: construct the meter (cadence + state live inside it - A1/A4).
   // Streaming-mode: NUM_OF_WORDS = 1 stream instr + channels,
   //                 so channels_per_transfer = NUM_OF_WORDS - 1
-  // Single-instruction: channels_per_transfer = 1.
-  tput_enabled = 0;
+  // Single-instruction: channels_per_transfer = 1 (one channel per transfer).
   tput_meter = new(
     .channels_per_transfer((`NUM_OF_WORDS > 1) ? `NUM_OF_WORDS - 1 : 1),
     .total_transfers_target(`NUM_OF_TRANSFERS)
   );
-  tput_print_interval = (`NUM_OF_TRANSFERS * PROGRESS_REPORTER_PERCENT) / 100;
-  if (tput_print_interval < 1) tput_print_interval = 1;  // floor at 1 transfer
-  tput_until_print = tput_print_interval;
 endtask
 
 task verify_sclk_frequency(
@@ -555,7 +660,7 @@ initial begin
     @(posedge spi_sclk);
     if (sclk_measurement_enabled) begin
       sclk_prev_rise = sclk_rise_time;
-      sclk_rise_time = $time;
+      sclk_rise_time = $realtime;
       if (sclk_prev_rise != 0) begin
         sclk_period_sum += real'(sclk_rise_time - sclk_prev_rise);
         sclk_period_count++;
@@ -564,20 +669,20 @@ initial begin
   end
 end
 
-// CS timing measurement
+// CS timing measurement: CS asserted (active edge, polarity from CS_ACTIVE_HIGH)
 initial begin
   forever begin
-    @(negedge spi_cs);  // CS falls (active low)
-    cs_fall_time = $time;
+    @(posedge spi_cs_active);  // CS asserted
+    cs_assert_time = $realtime;
     first_sclk_rise_after_cs = 0;
-    last_sclk_fall_before_cs_rise = 0;
+    last_sclk_fall_before_cs_deassert = 0;
   end
 end
 
 initial begin : sclk_measurement_rst
   forever begin
-    @(posedge spi_cs);  // CS rises (inactive)
-    // Zero both so the CS-high gap is not counted as a period (sclk_rise_time
+    @(negedge spi_cs_active);  // CS deasserted
+    // Zero both so the CS-idle gap is not counted as a period (sclk_rise_time
     // becomes sclk_prev_rise on the next edge).
     sclk_rise_time = 0;
     sclk_prev_rise = 0;
@@ -587,16 +692,15 @@ end
 // CS setup/hold timing min/max capture
 initial begin : cs_setup_hold_timing
   forever begin
-    @(posedge spi_cs);
-    // Capture CS timing min/max on each complete transaction
-    if (cs_measurement_enabled && first_sclk_rise_after_cs != 0 && cs_fall_time != 0) begin
-      automatic real t_setup = real'(first_sclk_rise_after_cs - cs_fall_time);
-      automatic real t_hold = real'($time - last_sclk_fall_before_cs_rise);
+    @(negedge spi_cs_active);  // CS deasserted -> one complete transaction
+    if (cs_measurement_enabled && first_sclk_rise_after_cs != 0 && cs_assert_time != 0) begin
+      automatic real t_setup = real'(first_sclk_rise_after_cs - cs_assert_time);
+      automatic real t_hold = real'($realtime - last_sclk_fall_before_cs_deassert);
       // Update min/max setup time
       if (t_setup < cs_setup_min) cs_setup_min = t_setup;
       if (t_setup > cs_setup_max) cs_setup_max = t_setup;
       // Update min/max hold time (only if valid)
-      if (last_sclk_fall_before_cs_rise != 0) begin
+      if (last_sclk_fall_before_cs_deassert != 0) begin
         if (t_hold < cs_hold_min) cs_hold_min = t_hold;
         if (t_hold > cs_hold_max) cs_hold_max = t_hold;
       end
@@ -606,39 +710,34 @@ initial begin : cs_setup_hold_timing
   end
 end
 
-// Throughput monitor: one CS rise == one completed transfer. Record it and,
-// every PROGRESS_REPORTER_PERCENT of the target, print a partial line.
-// (run_spi_engine_offload prints the final line via the same meter.)
+// Throughput monitor: CS assert opens the window (first one of a run), CS
+// deassert == one completed transfer. The meter counts, emits partial lines at
+// cadence, and renders FINAL on reaching the target (all in on_cs_deassert).
 initial begin : tput_monitor
   forever begin
-    @(posedge spi_cs);  // CS rises (inactive) -> one transfer completed
-    if (tput_enabled && tput_meter != null) begin
-      tput_meter.record_transfer();
-      if (--tput_until_print <= 0) begin
-        tput_meter.checkpoint();
-        tput_meter.print_status(.is_final(0));
-        tput_until_print = tput_print_interval;  // reload countdown
-      end
-    end
+    @(posedge spi_cs_active);  // CS asserted
+    if (tput_meter != null) tput_meter.on_cs_assert();
+    @(negedge spi_cs_active);  // CS deasserted -> one transfer completed
+    if (tput_meter != null) tput_meter.on_cs_deassert();
   end
 end
 
-// Track first SCLK rise after CS falls for setup time measurement
+// Track first SCLK rise after CS asserts for setup time measurement
 initial begin
   forever begin
     @(posedge spi_sclk);
-    if (cs_measurement_enabled && !spi_cs && first_sclk_rise_after_cs == 0) begin
-      first_sclk_rise_after_cs = $time;
+    if (cs_measurement_enabled && spi_cs_active && first_sclk_rise_after_cs == 0) begin
+      first_sclk_rise_after_cs = $realtime;
     end
   end
 end
 
-// Track last SCLK fall before CS rises for hold time measurement
+// Track last SCLK fall before CS deasserts for hold time measurement
 initial begin
   forever begin
     @(negedge spi_sclk);
-    if (cs_measurement_enabled && !spi_cs) begin
-      last_sclk_fall_before_cs_rise = $time;
+    if (cs_measurement_enabled && spi_cs_active) begin
+      last_sclk_fall_before_cs_deassert = $realtime;
     end
   end
 end
@@ -698,7 +797,8 @@ initial begin
     if (irq_pending & 5'b10000) begin
       mSeq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       offload_transfer_cnt++;
-      `INFO(("Offload SYNC %d IRQ. Transfer count: %d", sync_id, offload_transfer_cnt), ADI_VERBOSITY_LOW);
+      // Verbosity raised as to not ruin the tput table
+      `INFO(("Offload SYNC %d IRQ. Transfer count: %d", sync_id, offload_transfer_cnt), ADI_VERBOSITY_MEDIUM);
     end
     // SYNC command
     if (irq_pending & 5'b01000) begin
@@ -796,19 +896,18 @@ endtask
 // Start the offload, wait for the trigger PWM to clock out every transfer,
 // then flush and stop.
 task automatic start_offload_wait_for_pwm_then_stop();
-  // Open the measurement window and arm the CS monitor before enabling offload,
-  // so offload-enable latency falls inside the window (intended; see start_measure).
-  tput_meter.start_measure();
-  tput_until_print = tput_print_interval;
+  // Arm the meter before enabling offload. The window opens lazily on the first
+  // CS assert, so offload-enable latency is excluded automatically (C2).
+  tput_meter.arm();
   tput_meter.print_header();
-  tput_enabled = 1;  // start counting transfers in the CS monitor
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
   // Wait for all transfer data to be consumed by the engine.
   spiSeq.flush_send();
   // Wait for every transfer to physically complete (ungated VIP RX mailbox = one
-  // entry per word) before closing the window. Bounded poll so a real shortfall
-  // surfaces as the lost-transfer check instead of hanging; the TX DMA is drained
-  // so no extra transfers start.
+  // entry per word). Bounded poll so a real shortfall surfaces as the
+  // lost-transfer check instead of hanging; the TX DMA is drained so no extra
+  // transfers start. On the happy path the meter already rendered FINAL when the
+  // count hit the target; this poll is the lost-transfer backstop.
   begin
     int expected_words = `NUM_OF_TRANSFERS * `NUM_OF_WORDS;
     int settle_tries   = 20;  // 20 * ~500ns = ~10us ceiling
@@ -817,10 +916,10 @@ task automatic start_offload_wait_for_pwm_then_stop();
       settle_tries--;
     end
   end
-  // Close the throughput window, then disable offload and stop counting.
-  tput_meter.end_measure();
+  // Stop counting (atomic with the last counted transfer - C7), then disable
+  // offload.
+  tput_meter.disarm();
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
-  tput_enabled = 0;  // stop counting transfers in the CS monitor
 endtask
 
 // Compare transmitted words from the SPI VIP with what the DAC received. One
@@ -869,9 +968,9 @@ endtask
 
 // Start the offload and run the per-test acceptance check.
 task automatic run_spi_engine_offload();
-  // The CS monitor prints partial lines every PROGRESS_REPORTER_PERCENT; the
-  // final line below uses the same meter.
-  `INFO(("    Waiting for %0d transfers (progress every %0d transfers = %0d %%)...", `NUM_OF_TRANSFERS, tput_print_interval, PROGRESS_REPORTER_PERCENT), ADI_VERBOSITY_LOW);
+  // The CS monitor prints partial lines every PROGRESS_REPORTER_PERCENT and the
+  // FINAL line when the transfer count hits the target.
+  `INFO(("    Waiting for %0d transfers (progress every %0d transfers = %0d %%)...", `NUM_OF_TRANSFERS, tput_meter.print_interval, PROGRESS_REPORTER_PERCENT), ADI_VERBOSITY_LOW);
 
   wait_random(
     .min_ns(50),
@@ -879,10 +978,11 @@ task automatic run_spi_engine_offload();
   );
   start_offload_wait_for_pwm_then_stop();
 
-  // Final throughput line; measured_ksps_* is read by the end-of-test check.
-  `INFO((""), ADI_VERBOSITY_LOW);
-  `INFO(("  === TEST THROUGHPUT RESULTS ==="), ADI_VERBOSITY_LOW);
-  tput_meter.print_status(.is_final(1));
+  // Backstop: if a transfer was lost the count never hit the target, so the
+  // monitor never rendered FINAL. Force it here (render() dedups, so the happy
+  // path is unaffected).
+  tput_meter.compute(.is_final(1));
+  tput_meter.render(.is_final(1));
 
 endtask
 

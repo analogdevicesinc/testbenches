@@ -53,30 +53,29 @@ import adi_spi_vip_pkg::*;
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-// Shared test flow body. Not compiled standalone: `included by a `program`
-// wrapper (tests/test_*.sv) that supplies the ports and `NUM_OF_WORDS /
-// `NUM_OF_TRANSFERS.
+// Shared test flow body. Not standalone: `included by a `program wrapper
+// (tests/test_*.sv) that supplies the ports + `NUM_OF_WORDS / `NUM_OF_TRANSFERS.
 
 wire spi_sclk = `TH.`SPI_S.inst.IF.s_sclk;
 wire spi_cs   = `TH.`SPI_S.inst.IF.s_cs;
 wire spi_mosi = `TH.`SPI_S.inst.IF.s_mosi;
 wire spi_miso = `TH.`SPI_S.inst.IF.s_miso;
 
-// CS asserted level, independent of polarity. Active-low (CS_ACTIVE_HIGH=0):
-// asserted when spi_cs==0, so spi_cs_active = ~spi_cs. CS-edge monitors key off
-// this wire so a polarity flip needs no edits (C8).
+// CS asserted level, polarity-independent. Active-low (CS_ACTIVE_HIGH=0):
+// spi_cs_active = ~spi_cs. CS-edge monitors key off this wire so a polarity flip
+// needs no edits.
 wire spi_cs_active = `CS_ACTIVE_HIGH ? spi_cs : ~spi_cs;
 
-// AD5529R DAC channel count. Single-instruction mode writes one sample to ONE
-// channel per transfer, so per-channel rate = aggregate / NUM_DAC_CHANNELS.
+// DAC channel count. Single-instruction mode writes one channel per transfer, so
+// per-channel rate = aggregate / NUM_DAC_CHANNELS.
 localparam int NUM_DAC_CHANNELS = 16;
 
 // Toggle/trigger pins TG0-TG3
 localparam int NUM_TG = 4;
 
-// `DDR_BA is injected as the bare decimal 2147483648 (0x8000_0000), which
-// overflows a 32-bit signed int (VRFC 10-9277). Hold the DDR base in a wide
-// unsigned param so address arithmetic stays warning-free and correct.
+// `DDR_BA is injected as bare decimal 2147483648 (0x8000_0000), which overflows
+// a 32-bit signed int (VRFC 10-9277). Hold in a wide unsigned param so address
+// arithmetic stays warning-free.
 localparam longint unsigned DDR_BASE_ADDR = 64'd`DDR_BA;
 
 test_harness_env base_env;
@@ -96,22 +95,21 @@ wire [NUM_TG-1:0] tg_bus = {ad5529r_tg3, ad5529r_tg2, ad5529r_tg1, ad5529r_tg0};
 // Pass/fail gate; only verify_* tasks increment it.
 int total_error_count = 0;
 
-// IRQ state (declared here so reset_dut_state, defined above the IRQ callback
-// block, can reference them). Driven by the IRQ callback below.
+// IRQ state. Declared here so reset_dut_state (above the IRQ callback block) can
+// reference them. Driven by the IRQ callback below.
 reg [4:0] irq_pending = 0;
 reg [7:0] sync_id = 0;
 int offload_transfer_cnt = 0;
 
-// SCLK timing measurement ($realtime: 1ns quantization of $time would add noise
-// to ns-scale measurements - C6)
+// SCLK timing. $realtime, not $time: 1ns quantization adds noise at ns scale.
 realtime sclk_rise_time;
 realtime sclk_prev_rise;
 int sclk_period_count;
 real sclk_period_sum;
 bit sclk_measurement_enabled;
 
-// CS timing measurement. "assert"/"deassert" track the logical CS level
-// (spi_cs_active), not a fixed physical edge, so polarity is handled centrally.
+// CS timing. assert/deassert track logical CS level (spi_cs_active), not a fixed
+// physical edge, so polarity is handled centrally.
 realtime cs_assert_time;
 realtime first_sclk_rise_after_cs;
 realtime last_sclk_fall_before_cs_deassert;
@@ -127,182 +125,131 @@ int cs_timing_samples;
 // Throughput Measurement
 localparam int PROGRESS_REPORTER_PERCENT = 2;  // report progress every 2% of transfers
 
-// Self-windowing throughput meter.
+// Throughput meter.
 //
-// The CS monitor drives this entirely off SPI edges: arm() before a run, then
-// CS assert/deassert callbacks define the timing window AND count transfers, so
-// numerator and denominator always cover the same interval (no separate
-// start/stop vs enable knobs to drift apart).
+// Counts what the DAC actually clocks in, straight off the SPI bus: every SCLK
+// rising edge inside an active CS frame is one shifted bit; bits_per_word edges =
+// one word, words_per_transfer words = one transfer. on_sclk_edge() is called
+// from the SCLK monitor below. No mailbox, no polling, no gating.
 //
-//   window = [first CS assert -> last CS deassert]
+// Why SCLK, not the CS deassert edge: the trigger PWM free-runs and fires one
+// extra trigger past the last transfer, opening a data-starved CS frame that
+// stalls asserted until the next run's config flushes it. That stalled frame
+// clocks zero SCLK, so counting bits ignores it automatically; counting CS
+// deasserts would defer the last edge across the run boundary and lose a count.
 //
-// Offload-enable latency (before the first assert) and the settle-poll tail
-// (after the last deassert) fall outside automatically.
-//
-// One transfer = one CS cycle carrying channels_per_transfer channel updates
-// (streaming: NUM_OF_WORDS-1; single-instruction: 1). Per-channel rate always
-// divides the aggregate by NUM_DAC_CHANNELS: streaming spreads the 16 updates
-// over the 16 channels within a frame, single-instruction spreads its transfers
-// over the 16 channels across frames (C1).
+// One transfer = words_per_transfer words carrying channels_per_transfer sample
+// updates (streaming: NUM_OF_WORDS-1; single-instruction: 1). Per-channel rate
+// divides the aggregate by NUM_DAC_CHANNELS: streaming spreads 16 updates over 16
+// channels within a frame, single-instruction spreads transfers over 16 channels
+// across frames.
 class throughput_meter;
+  int      words_per_transfer;     // = NUM_OF_WORDS
   int      channels_per_transfer;
-  int      total_transfers;        // transfers counted this run
-  int      total_transfers_target; // expected transfers (progress % + reliability gate)
-  int      total_updates;          // = total_transfers * channels_per_transfer
-  bit      armed;                  // count only between arm()/disarm()
-  bit      final_done;            // FINAL row already rendered (count-hit vs backstop)
-  // Self-defined window: stamped from real CS edges. win_start < 0 == not yet started.
-  realtime win_start;
-  realtime win_last;
-  // Cadence for partial lines (in-class; was program-scope globals - A1/A4)
-  int      print_interval;         // print every N transfers (= PROGRESS_REPORTER_PERCENT)
-  int      until_print;            // countdown to next partial line
-  // Rolling checkpoint window baseline + last closed window's rate
-  int      ckpt_base_updates;
-  realtime ckpt_base_time;
-  real     ckpt_window_ksps;
-  // Measured throughput (set by compute(), read by render()/verify_throughput())
+  int      total_transfers_target;
+  int      bits_per_word;          // = DATA_DLENGTH (SCLK edges per word)
+  int      print_interval;         // print a progress line every N transfers
+  int      next_print_transfers;   // next transfer count to print at
+  // Window: [first SCLK edge -> last completed word]. Set by on_sclk_edge().
+  bit      started;
+  int      bits_in_word;           // SCLK edges accumulated in the current word
+  int      words_seen;             // complete words clocked this run
+  int      total_transfers;        // = words_seen / words_per_transfer
+  realtime t_first;
+  realtime t_last;
+  // Measured throughput. Set by compute(), read by render()/verify_throughput().
   real     measured_dur_us;
   real     measured_ksps_all_channels;
   real     measured_ksps_per_channel;
 
-  function new(int channels_per_transfer, int total_transfers_target);
+  function new(int words_per_transfer, int channels_per_transfer, int total_transfers_target, int bits_per_word);
+    this.words_per_transfer     = words_per_transfer;
     this.channels_per_transfer  = channels_per_transfer;
     this.total_transfers_target = total_transfers_target;
+    this.bits_per_word          = bits_per_word;
     print_interval = (total_transfers_target * PROGRESS_REPORTER_PERCENT) / 100;
     if (print_interval < 1) print_interval = 1;  // floor at 1 transfer
-    clear();
+    reset();
   endfunction
 
-  // Zero accumulators and disarm. win_start < 0 so the next run re-arms its
-  // window on the first CS assert (offload start or TB reset between modes).
-  function void clear();
+  function void reset();
+    started                    = 0;
+    bits_in_word               = 0;
+    words_seen                 = 0;
     total_transfers            = 0;
-    total_updates              = 0;
-    armed                      = 0;
-    final_done                 = 0;
-    win_start                  = -1;
-    win_last                   = 0;
-    until_print                = print_interval;
-    ckpt_base_updates          = 0;
-    ckpt_base_time             = 0;
-    ckpt_window_ksps           = 0;
+    t_first                    = 0;
+    t_last                     = 0;
+    next_print_transfers       = print_interval;
     measured_dur_us            = 0;
     measured_ksps_all_channels = 0;
     measured_ksps_per_channel  = 0;
   endfunction
 
-  // Begin a run: reset and start counting. The window opens lazily on the first
-  // CS assert, so offload-enable latency is excluded.
-  function void arm();
-    clear();
-    armed = 1;
+  function int transfers_seen();
+    return total_transfers;
   endfunction
 
-  // End a run: stop counting. Closes the gate atomically with the last counted
-  // transfer (no separate end-timestamp to drift) - C7.
-  function void disarm();
-    armed = 0;
-  endfunction
-
-  // CS asserted: open the window on the first real transfer of this run.
-  function void on_cs_assert();
-    if (!armed) return;
-    if (win_start < 0) begin
-      win_start      = $realtime;
-      ckpt_base_time = $realtime;
-    end
-  endfunction
-
-  // CS deasserted: one transfer completed. Count it, extend the window, emit a
-  // partial line at cadence, and render FINAL once the target is reached.
-  function void on_cs_deassert();
-    if (!armed) return;
-    win_last = $realtime;
+  // One SCLK rising edge inside an active CS frame = one shifted bit. Opens the
+  // window on the first bit, completes a word every bits_per_word edges, and a
+  // transfer every words_per_transfer words.
+  function void on_sclk_edge(realtime t);
+    if (!started) begin started = 1; t_first = t; end
+    bits_in_word++;
+    if (bits_in_word < bits_per_word) return;   // word still shifting
+    bits_in_word = 0;
+    words_seen++;
+    t_last = t;
+    if ((words_seen % words_per_transfer) != 0) return;  // transfer still shifting
     total_transfers++;
-    total_updates += channels_per_transfer;
-    if (total_transfers == total_transfers_target) begin
-      // Target reached: render FINAL only (skip a coinciding partial line).
-      checkpoint();
-      compute(.is_final(1));
-      render(.is_final(1));
-    end else if (--until_print <= 0) begin
-      checkpoint();
-      compute(.is_final(0));
+    if (total_transfers >= next_print_transfers && total_transfers < total_transfers_target) begin
+      compute();
       render(.is_final(0));
-      until_print = print_interval;
+      while (next_print_transfers <= total_transfers) next_print_transfers += print_interval;
     end
   endfunction
 
-  // Close the rolling checkpoint window (compute its rate) and open a fresh one.
-  function void checkpoint();
-    real dur_us = real'($realtime - ckpt_base_time) / 1000.0;
-    ckpt_window_ksps  = (dur_us > 0) ? real'(total_updates - ckpt_base_updates) * 1000.0 / dur_us : 0;
-    ckpt_base_updates = total_updates;
-    ckpt_base_time    = $realtime;
-  endfunction
-
-  // Aggregate kSPS -> per-channel kSPS. Always /NUM_DAC_CHANNELS (C1).
-  function real per_channel(real all_channel_ksps);
-    return all_channel_ksps / real'(NUM_DAC_CHANNELS);
-  endfunction
-
-  // Pure measurement, no printing (C5). FINAL measures across the closed window
-  // [win_start, win_last]; partial measures up to now (window still open).
-  function void compute(bit is_final);
-    realtime end_t = is_final ? win_last : $realtime;
-    if (win_start < 0) begin  // never started: nothing to measure
-      measured_dur_us            = 0;
-      measured_ksps_all_channels = 0;
-      measured_ksps_per_channel  = 0;
-      return;
-    end
-    measured_dur_us            = real'(end_t - win_start) / 1000.0;
-    // updates/µs * 1000 = kSPS (kilosamples per second)
-    measured_ksps_all_channels = (measured_dur_us > 0) ? real'(total_updates) * 1000.0 / measured_dur_us : 0;
-    measured_ksps_per_channel  = per_channel(measured_ksps_all_channels);
+  // Rate over [t_first, t_last]. updates = transfers * channels_per_transfer.
+  function void compute();
+    int updates = total_transfers * channels_per_transfer;
+    measured_dur_us            = started ? real'(t_last - t_first) / 1000.0 : 0;
+    measured_ksps_all_channels = (measured_dur_us > 0) ? real'(updates) * 1000.0 / measured_dur_us : 0;
+    measured_ksps_per_channel  = measured_ksps_all_channels / real'(NUM_DAC_CHANNELS);
   endfunction
 
   function void print_header();
     `INFO((""), ADI_VERBOSITY_LOW);
-    `INFO(("Sample percnt |     Dur(ms) | Transfers | Updates |        Global kSPS (per-ch) | Window kSPS (per-ch)"), ADI_VERBOSITY_LOW);
+    `INFO(("  Progress |   Dur(ms) | Transfers | Updates | Aggregate kSPS | Per-ch kSPS"), ADI_VERBOSITY_LOW);
   endfunction
 
-  // Pure printing, no measurement (C5). Reads fields set by compute(). The FINAL
-  // row prints once: whichever of the count-hit path or the run-flow backstop
-  // gets there first (lost-transfer safety).
+  // Pure printing; reads fields set by compute().
   function void render(bit is_final);
     real   progress_pct = (total_transfers_target > 0)
-      ? real'(total_transfers) * 100.0 / real'(total_transfers_target) : 0;
-    string prefix = is_final ? " FINAL " : $sformatf(" %6.1f%% ", progress_pct);
-    if (is_final) begin
-      if (final_done) return;
-      final_done = 1;
-    end
-    `INFO(("    %s | %8.3f ms | %9d | %7d | %8.3f kSPS (%7.3f /ch) | %8.3f kSPS (%7.3f /ch)",
-           prefix, measured_dur_us / 1000.0, total_transfers, total_updates,
-           measured_ksps_all_channels, measured_ksps_per_channel,
-           ckpt_window_ksps, per_channel(ckpt_window_ksps)),
+      ? real'(transfers_seen()) * 100.0 / real'(total_transfers_target) : 0;
+    string prefix = is_final ? " FINAL " : $sformatf(" %6.1f%%", progress_pct);
+    `INFO(("  %7s | %9.3f | %9d | %7d | %14.3f | %11.3f",
+           prefix, measured_dur_us / 1000.0, transfers_seen(),
+           transfers_seen() * channels_per_transfer,
+           measured_ksps_all_channels, measured_ksps_per_channel),
           ADI_VERBOSITY_LOW);
   endfunction
 
-  // Throughput acceptance check. Only runs when the target transfer count is
-  // large enough for a reliable window (C4); short runs (C3) are reported but not
-  // asserted. expected_per_ch_ksps <= 0 means "smoke only" (rate must be > 0),
-  // used for modes without a documented sustained target.
+  // Throughput acceptance check. Runs only when target is large enough for a
+  // reliable window; short runs reported, not asserted.
+  // expected_per_ch_ksps <= 0 == smoke only (rate must be > 0), for modes with no
+  // documented sustained target.
   function void verify_throughput(real expected_per_ch_ksps, real tol_pct, ref int error_cnt);
     real dev_pct;
     `INFO((""), ADI_VERBOSITY_LOW);
     `INFO(("=== Throughput Verification ==="), ADI_VERBOSITY_LOW);
+    compute();
     if (total_transfers_target <= 10) begin
       `INFO(("  Skipped: short run (target=%0d transfers <= 10) - window unreliable",
              total_transfers_target), ADI_VERBOSITY_LOW);
       return;
     end
-    compute(.is_final(1));
     `INFO(("  Measured: %.3f kSPS/ch (%.3f kSPS aggregate over %.3f ms, %0d transfers)",
            measured_ksps_per_channel, measured_ksps_all_channels,
-           measured_dur_us / 1000.0, total_transfers), ADI_VERBOSITY_LOW);
+           measured_dur_us / 1000.0, transfers_seen()), ADI_VERBOSITY_LOW);
     if (measured_ksps_per_channel <= 0) begin
       `ERROR(("[TPUT] No throughput measured (rate=0) - did transfers run?"));
       error_cnt++;
@@ -371,9 +318,8 @@ initial begin
 end
 
 task automatic run_verification_suite();
-  // Completeness check against ground truth (ungated VIP RX mailbox), not the
-  // gated throughput meter. One mailbox entry per word; a complete run =
-  // NUM_OF_TRANSFERS * NUM_OF_WORDS words.
+  // Completeness vs ground truth (ungated VIP RX mailbox), not the gated meter.
+  // One mailbox entry per word; complete run = NUM_OF_TRANSFERS * NUM_OF_WORDS.
   begin
     int expected_words = `NUM_OF_TRANSFERS * `NUM_OF_WORDS;
     int actual_words   = spiSeq.get_num_rx_data();
@@ -394,9 +340,8 @@ task automatic run_verification_suite();
   );
   `INFO(("Verifying IRQ..."), ADI_VERBOSITY_LOW);
   verify_irq_was_raised();
-  // Throughput acceptance (skipped for short runs - C3/C4). Streaming has a
-  // documented ~123 kSPS/ch sustained target; single-instruction has none, so it
-  // is smoke-checked (rate > 0) only.
+  // Throughput acceptance (skipped for short runs). Streaming has a documented
+  // ~123 kSPS/ch target; single-instruction has none -> smoke check.
   if (`NUM_OF_WORDS > 1)
     tput_meter.verify_throughput(.expected_per_ch_ksps(123.0), .tol_pct(10.0), .error_cnt(total_error_count));
   else
@@ -428,12 +373,24 @@ task reset_dut_state();
   );
   // Reset offload command memory (required before re-programming offload)
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 1);
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_MEM_RESET), 0);
+// Replace with these tasks defined in testbenches/library/drivers/spi_engine/spi_engine_api_pkg.sv
+//  task offload_mem_assert_reset();
+//    this.axi_write(GetAddrs(AXI_SP
+//  endtask
+//  task offload_mem_deassert_reset();
+//    this.axi_write(GetAddrs(AXI_SPI_
+//  endtask
   // Clear all pending IRQs
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), 'hFF);
+// Replace with these tasks defined in testbenches/library/drivers/spi_engine/spi_engine_api_pkg.sv
+//  task clear_irq_pending(input bit [31:0] irq_pending);
+//    this.axi_write(GetAddrs(AXI_SPI_ENGINE_IRQ_PENDING), `SET_AXI_SPI_ENGINE_IRQ_PENDING_IRQ_PENDING(irq_pending));
+//  endtask
   // Disable DMA; tests re-enable and configure it
   mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
-  // Empty the SPI VIP queues so a leftover RX entry can't shift the next test's
-  // data by one (verify_received_data drains only as many words as were counted).
+  // Empty SPI VIP queues so a leftover RX entry can't shift the next test's data
+  // by one (verify_received_data drains only as many words as counted).
   spiSeq.clear_send();
   spiSeq.clear_receive();
   offload_transfer_cnt = 0;
@@ -448,8 +405,8 @@ task reset_dut_state();
   `INFO(("reset_dut_state: DUT state reset complete"), ADI_VERBOSITY_LOW);
 endtask
 
-// Initialize all measurement state once at start of run: assign defaults,
-// construct the throughput meter, arm the tput_monitor cadence, enable monitors.
+// Init measurement state at start of run: defaults, construct the throughput
+// meter, enable monitors.
 task reset_measurements();
   // SCLK timing
   sclk_rise_time = 0;
@@ -469,13 +426,14 @@ task reset_measurements();
   cs_timing_samples = 0;
   cs_measurement_enabled = 1;
 
-  // Throughput: construct the meter (cadence + state live inside it - A1/A4).
-  // Streaming-mode: NUM_OF_WORDS = 1 stream instr + channels,
-  //                 so channels_per_transfer = NUM_OF_WORDS - 1
-  // Single-instruction: channels_per_transfer = 1 (one channel per transfer).
+  // Throughput: construct the meter.
+  //   Streaming:          channels_per_transfer = NUM_OF_WORDS - 1 (drop stream instr)
+  //   Single-instruction: channels_per_transfer = 1 (one channel per transfer)
   tput_meter = new(
+    .words_per_transfer(`NUM_OF_WORDS),
     .channels_per_transfer((`NUM_OF_WORDS > 1) ? `NUM_OF_WORDS - 1 : 1),
-    .total_transfers_target(`NUM_OF_TRANSFERS)
+    .total_transfers_target(`NUM_OF_TRANSFERS),
+    .bits_per_word(`DATA_DLENGTH)
   );
 endtask
 
@@ -636,7 +594,7 @@ task automatic verify_pwm_timing(
 endtask
 
 // TG edge monitor: wake on any tg_bus change, diff vs previous to find which
-// channel(s) toggled and the direction; capture timestamps when measuring.
+// channel(s) toggled and direction; capture timestamps when measuring.
 initial begin
   static logic [NUM_TG-1:0] tg_prev = '0;
   forever begin
@@ -654,10 +612,12 @@ initial begin
   end
 end
 
-// SCLK period measurement
+// SCLK period measurement + throughput bit counting. Each rising edge inside an
+// active CS frame is one shifted bit fed to the meter (bus ground truth).
 initial begin
   forever begin
     @(posedge spi_sclk);
+    if (spi_cs_active && tput_meter != null) tput_meter.on_sclk_edge($realtime);
     if (sclk_measurement_enabled) begin
       sclk_prev_rise = sclk_rise_time;
       sclk_rise_time = $realtime;
@@ -669,13 +629,14 @@ initial begin
   end
 end
 
-// CS timing measurement: CS asserted (active edge, polarity from CS_ACTIVE_HIGH)
+// CS timing measurement: CS asserted (active edge, polarity from CS_ACTIVE_HIGH).
 initial begin
   forever begin
     @(posedge spi_cs_active);  // CS asserted
     cs_assert_time = $realtime;
     first_sclk_rise_after_cs = 0;
     last_sclk_fall_before_cs_deassert = 0;
+    `INFO(("SPI_CS_ACTIVE --> ASSERT  (t=%.3f ns)", $realtime), ADI_VERBOSITY_MEDIUM);
   end
 end
 
@@ -686,6 +647,10 @@ initial begin : sclk_measurement_rst
     // becomes sclk_prev_rise on the next edge).
     sclk_rise_time = 0;
     sclk_prev_rise = 0;
+    `INFO(("SPI_CS_ACTIVE --> DEASSERT (t=%.3f ns)  words=%0d transfers=%0d/%0d",
+           $realtime, (tput_meter != null) ? tput_meter.words_seen : 0,
+           (tput_meter != null) ? tput_meter.total_transfers : 0,
+           `NUM_OF_TRANSFERS), ADI_VERBOSITY_MEDIUM);
   end
 end
 
@@ -707,18 +672,6 @@ initial begin : cs_setup_hold_timing
 
       cs_timing_samples++;
     end
-  end
-end
-
-// Throughput monitor: CS assert opens the window (first one of a run), CS
-// deassert == one completed transfer. The meter counts, emits partial lines at
-// cadence, and renders FINAL on reaching the target (all in on_cs_deassert).
-initial begin : tput_monitor
-  forever begin
-    @(posedge spi_cs_active);  // CS asserted
-    if (tput_meter != null) tput_meter.on_cs_assert();
-    @(negedge spi_cs_active);  // CS deasserted -> one transfer completed
-    if (tput_meter != null) tput_meter.on_cs_deassert();
   end
 end
 
@@ -787,7 +740,7 @@ task automatic sanity_test();
   `INFO(("Sanity Test PASSED"), ADI_VERBOSITY_LOW);
 endtask
 
-// IRQ callback (irq_pending/sync_id/offload_transfer_cnt declared near the top)
+// IRQ callback (irq_pending/sync_id/offload_transfer_cnt declared near top)
 initial begin
   forever begin
     @(posedge ad5529r_spi_irq);
@@ -797,7 +750,7 @@ initial begin
     if (irq_pending & 5'b10000) begin
       mSeq.RegRead32 (`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_SYNC_ID), sync_id);
       offload_transfer_cnt++;
-      // Verbosity raised as to not ruin the tput table
+      // Verbosity raised so it doesn't ruin the tput table
       `INFO(("Offload SYNC %d IRQ. Transfer count: %d", sync_id, offload_transfer_cnt), ADI_VERBOSITY_MEDIUM);
     end
     // SYNC command
@@ -833,12 +786,12 @@ task automatic generate_sdo_data(
       default: dac_word = {`DATA_DLENGTH{1'b1}};
     endcase
     sdo_write_data_store[i] = dac_word;
-    spiSeq.send_data('0);
+    spiSeq.send_data('0); // TODO: what does this command do?
   end
 endtask
 
-// Copy expected data into DDR for the DMA. 16-bit words pack two per 32-bit
-// beat; other widths use one word per beat.
+// Copy expected data into DDR for the DMA. 16-bit words pack two per 32-bit beat;
+// other widths use one word per beat.
 task automatic write_data_to_ddr(
   input int num_words
 );
@@ -893,33 +846,43 @@ task automatic config_offload_command_fifo();
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_CDM_FIFO), `INST_SYNC | 2);
 endtask
 
-// Start the offload, wait for the trigger PWM to clock out every transfer,
-// then flush and stop.
+// Start the offload, wait for the SPI bus to clock out every transfer (counted
+// by CS frames), then stop.
 task automatic start_offload_wait_for_pwm_then_stop();
-  // Arm the meter before enabling offload. The window opens lazily on the first
-  // CS assert, so offload-enable latency is excluded automatically (C2).
-  tput_meter.arm();
+  // Watchdog: ~10us/word ceiling. Bus counting can't hang the TB, but a lost
+  // transfer would never reach the target, so cap the wait and flag a shortfall.
+  realtime timeout_ns = `NUM_OF_TRANSFERS * `NUM_OF_WORDS * 10000 + 100000;
+  bit timed_out = 0;
+  tput_meter.reset();
   tput_meter.print_header();
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(1));
-  // Wait for all transfer data to be consumed by the engine.
-  spiSeq.flush_send();
-  // Wait for every transfer to physically complete (ungated VIP RX mailbox = one
-  // entry per word). Bounded poll so a real shortfall surfaces as the
-  // lost-transfer check instead of hanging; the TX DMA is drained so no extra
-  // transfers start. On the happy path the meter already rendered FINAL when the
-  // count hit the target; this poll is the lost-transfer backstop.
-  begin
-    int expected_words = `NUM_OF_TRANSFERS * `NUM_OF_WORDS;
-    int settle_tries   = 20;  // 20 * ~500ns = ~10us ceiling
-    while (spiSeq.get_num_rx_data() < expected_words && settle_tries > 0) begin
-      wait_random(.min_ns(400), .max_ns(600));
-      settle_tries--;
+  // Wait on the bus word count reaching the known target. The SCLK monitor feeds
+  // tput_meter.on_sclk_edge(), which bumps total_transfers every full transfer.
+  fork
+    begin : wait_count
+      wait (tput_meter.total_transfers >= `NUM_OF_TRANSFERS);
     end
+    begin : watchdog
+      #(timeout_ns * 1ns);
+      timed_out = 1;
+    end
+  join_any
+  disable fork;
+  if (timed_out || tput_meter.total_transfers < `NUM_OF_TRANSFERS) begin
+    `ERROR(("offload timed out: %0d/%0d transfers on SPI bus",
+            tput_meter.total_transfers, `NUM_OF_TRANSFERS));
+    total_error_count++;
   end
-  // Stop counting (atomic with the last counted transfer - C7), then disable
-  // offload.
-  tput_meter.disarm();
+  // Teardown order matters. The trigger PWM free-runs and has already fired one
+  // trigger past the last transfer; the engine commits to it and opens a
+  // data-starved CS frame that blocks on INST_WR. Stop the PWM (no more
+  // triggers), disable the offload, then pulse the engine sync-reset (ENABLE=1)
+  // to ABORT that in-flight frame. OFFLOAD0_EN=0 and MEM_RESET only touch command
+  // memory; without the engine reset the stalled frame survives teardown and
+  // steals the next run's first word (lost-transfer bug).
+  mSeq.RegWrite32(`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
   mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
+  mSeq.RegWrite32(`SPI_ENGINE_SPI_REGMAP_BA + GetAddrs(AXI_SPI_ENGINE_ENABLE), `SET_AXI_SPI_ENGINE_ENABLE_ENABLE(1));  // assert engine reset -> abort stalled frame
 endtask
 
 // Compare transmitted words from the SPI VIP with what the DAC received. One
@@ -927,17 +890,18 @@ endtask
 task automatic verify_received_data(input int word_cnt, ref int error_cnt);
   int len_rx = spiSeq.get_num_rx_data();
   if (len_rx < word_cnt) begin
-    // All words should be in by now; if the mailbox is short, the receive_data()
-    // loop below will stall on mailbox.get() in the VIP.
-    `ERROR(("len_rx(%0d) < word_cnt(%0d), verification might stall", len_rx, word_cnt));
-    error_cnt++;
+    // All words should be in by now; if mailbox is short, the receive_data() loop
+    // below stalls on mailbox.get() in the VIP.
+    `FATAL(("len_rx(%0d) < word_cnt(%0d), verification will stall", len_rx, word_cnt));
   end
   for (int idx = 0; idx < word_cnt; idx++) begin
-    spiSeq.receive_data(sdo_write_data[idx]); // might stall if mailbox is empty
+    spiSeq.receive_data(sdo_write_data[idx]); // stalls if mailbox empty
     if (sdo_write_data[idx] != sdo_write_data_store[idx]) begin
       error_cnt++;
-      `ERROR(("Data mismatch at word %0d: Expected=0x%04x, Actual=0x%04x",
+      `ERROR(("word %4d MISMATCH: Expected=0x%04x, Actual=0x%04x",
               idx, sdo_write_data_store[idx], sdo_write_data[idx]));
+    end else begin
+      `INFO(("word %4d MATCH: got=0x%04x", idx, sdo_write_data[idx]), ADI_VERBOSITY_LOW);
     end
   end
   `INFO(("  Verified %0d words - %0d errors.", word_cnt, error_cnt), ADI_VERBOSITY_LOW);
@@ -968,8 +932,6 @@ endtask
 
 // Start the offload and run the per-test acceptance check.
 task automatic run_spi_engine_offload();
-  // The CS monitor prints partial lines every PROGRESS_REPORTER_PERCENT and the
-  // FINAL line when the transfer count hits the target.
   `INFO(("    Waiting for %0d transfers (progress every %0d transfers = %0d %%)...", `NUM_OF_TRANSFERS, tput_meter.print_interval, PROGRESS_REPORTER_PERCENT), ADI_VERBOSITY_LOW);
 
   wait_random(
@@ -978,12 +940,8 @@ task automatic run_spi_engine_offload();
   );
   start_offload_wait_for_pwm_then_stop();
 
-  // Backstop: if a transfer was lost the count never hit the target, so the
-  // monitor never rendered FINAL. Force it here (render() dedups, so the happy
-  // path is unaffected).
-  tput_meter.compute(.is_final(1));
+  tput_meter.compute();
   tput_meter.render(.is_final(1));
-
 endtask
 
 // Shared engine for all tests:
@@ -1021,9 +979,9 @@ endtask
 
 // Toggle Pin Test (TG0-TG3 PWM outputs)
 //
-// The toggle_gen PWM core drives the four TG pins (DAC LDAC/toggle timing). All
-// channels are programmed identically (5 MHz, 50% duty) and run for one fixed
-// window; each pin is then checked for toggling + frequency/duty.
+// toggle_gen PWM core drives the four TG pins (DAC LDAC/toggle timing). All
+// channels programmed identically (5 MHz, 50% duty), run for one fixed window;
+// each pin then checked for toggling + frequency/duty.
 //
 // toggle_gen is a SEPARATE core from the SPI trigger PWM, so PWM_PERIOD_C below
 // is independent of config_spi's PWM_PERIOD (TRIG_GEN).
@@ -1094,10 +1052,9 @@ endtask
 task config_spi();
 
   // Period between SPI-offload triggers, in PWM-gen clock cycles (one transfer
-  // per trigger). If it is longer than the time to shift out a frame, transfers
-  // wait between triggers and it caps throughput; once shorter, transfers run
-  // back-to-back and the SPI shift time becomes the limit. 50 sits in the
-  // back-to-back region and yields appropriate throughput for every test.
+  // per trigger). Longer than frame shift time -> transfers wait between triggers,
+  // caps throughput. Shorter -> back-to-back, SPI shift time is the limit. 50 sits
+  // in the back-to-back region for every test.
   localparam int PWM_PERIOD = 50;
 
   `INFO(("Config SPI: Starting clock generator and configuring SPI engine"), ADI_VERBOSITY_LOW);

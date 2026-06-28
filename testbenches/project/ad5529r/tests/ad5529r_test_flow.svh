@@ -55,7 +55,7 @@ import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
 // Shared test flow body. Not standalone: `included by a `program wrapper
-// (tests/test_*.sv) that supplies the ports + `NUM_OF_WORDS / `NUM_OF_TRANSFERS.
+// (tests/test_*.sv) supplying the ports + `NUM_OF_WORDS / `NUM_OF_TRANSFERS.
 
 wire spi_sclk = `TH.`SPI_S.inst.IF.s_sclk;
 wire spi_cs   = `TH.`SPI_S.inst.IF.s_cs;
@@ -63,7 +63,7 @@ wire spi_mosi = `TH.`SPI_S.inst.IF.s_mosi;
 wire spi_miso = `TH.`SPI_S.inst.IF.s_miso;
 
 // CS asserted level, polarity-independent. Active-low (CS_ACTIVE_HIGH=0):
-// spi_cs_active = ~spi_cs. CS-edge monitors key off this wire so a polarity flip
+// spi_cs_active = ~spi_cs. CS-edge monitors key off this wire so polarity flip
 // needs no edits.
 wire spi_cs_active = `CS_ACTIVE_HIGH ? spi_cs : ~spi_cs;
 
@@ -74,9 +74,9 @@ localparam int NUM_DAC_CHANNELS = 16;
 // Toggle/trigger pins TG0-TG3
 localparam int NUM_TG = 4;
 
-// `DDR_BA is injected as bare decimal 2147483648 (0x8000_0000), which overflows
-// a 32-bit signed int (VRFC 10-9277). Hold in a wide unsigned param so address
-// arithmetic stays warning-free.
+// `DDR_BA injected as bare decimal 2147483648 (0x8000_0000), overflows a 32-bit
+// signed int (VRFC 10-9277). Hold in a wide unsigned param so address arithmetic
+// stays warning-free.
 localparam longint unsigned DDR_BASE_ADDR = 64'd`DDR_BA;
 
 test_harness_env base_env;
@@ -90,7 +90,7 @@ m_axi_sequencer_base mSeq;
 adi_spi_sequencer spiSeq;
 
 // Typed SPI Engine register API (base = SPI_ENGINE_SPI_REGMAP_BA). Wraps mSeq;
-// task addresses are GetAddrs() relative to that base.
+// task addresses GetAddrs() relative to that base.
 spi_engine_api spiEngine;
 
 // Toggle pin edge counters (one per channel, free-running)
@@ -101,7 +101,7 @@ wire [NUM_TG-1:0] tg_bus = {ad5529r_tg3, ad5529r_tg2, ad5529r_tg1, ad5529r_tg0};
 int total_error_count = 0;
 
 // IRQ state. Declared here so reset_dut_state (above the IRQ callback block) can
-// reference them. Driven by the IRQ callback below.
+// reference them. Driven by IRQ callback below.
 reg [4:0] irq_pending = 0;
 reg [7:0] sync_id = 0;
 int offload_transfer_cnt = 0;
@@ -114,7 +114,7 @@ real sclk_period_sum;
 bit sclk_measurement_enabled;
 
 // CS timing. assert/deassert track logical CS level (spi_cs_active), not a fixed
-// physical edge, so polarity is handled centrally.
+// physical edge, so polarity handled centrally.
 realtime cs_assert_time;
 realtime first_sclk_rise_after_cs;
 realtime last_sclk_fall_before_cs_deassert;
@@ -130,24 +130,16 @@ int cs_timing_samples;
 // Throughput Measurement
 localparam int PROGRESS_REPORTER_PERCENT = 2;  // report progress every 2% of transfers
 
-// Throughput meter.
+// Throughput meter. Counts bits off the SPI bus (ground truth), not a mailbox.
 //
-// Counts what the DAC actually clocks in, straight off the SPI bus: every SCLK
-// rising edge inside an active CS frame is one shifted bit; bits_per_word edges =
-// one word, words_per_transfer words = one transfer. on_sclk_edge() is called
-// from the SCLK monitor below. No mailbox, no polling, no gating.
+// Why SCLK edges, not CS deasserts: trigger PWM free-runs and fires one trigger
+// past the last transfer, opening a data-starved CS frame that stalls until the
+// next run flushes it. That frame clocks zero SCLK, so counting bits ignores it;
+// counting CS deasserts would defer the last edge past the run boundary and lose
+// a count.
 //
-// Why SCLK, not the CS deassert edge: the trigger PWM free-runs and fires one
-// extra trigger past the last transfer, opening a data-starved CS frame that
-// stalls asserted until the next run's config flushes it. That stalled frame
-// clocks zero SCLK, so counting bits ignores it automatically; counting CS
-// deasserts would defer the last edge across the run boundary and lose a count.
-//
-// One transfer = words_per_transfer words carrying channels_per_transfer sample
-// updates (streaming: NUM_OF_WORDS-1; single-instruction: 1). Per-channel rate
-// divides the aggregate by NUM_DAC_CHANNELS: streaming spreads 16 updates over 16
-// channels within a frame, single-instruction spreads transfers over 16 channels
-// across frames.
+// Per-channel rate = aggregate / NUM_DAC_CHANNELS. channels_per_transfer =
+// updates per frame (streaming: NUM_OF_WORDS-1; single-instruction: 1).
 class throughput_meter;
   int      words_per_transfer;     // = NUM_OF_WORDS
   int      channels_per_transfer;
@@ -194,9 +186,9 @@ class throughput_meter;
     return total_transfers;
   endfunction
 
-  // One SCLK rising edge inside an active CS frame = one shifted bit. Opens the
-  // window on the first bit, completes a word every bits_per_word edges, and a
-  // transfer every words_per_transfer words.
+  // One SCLK rising edge inside active CS frame = one shifted bit. Opens window
+  // on first bit, completes a word every bits_per_word edges, a transfer every
+  // words_per_transfer words.
   function void on_sclk_edge(realtime t);
     if (!started) begin started = 1; t_first = t; end
     bits_in_word++;
@@ -238,7 +230,7 @@ class throughput_meter;
           ADI_VERBOSITY_LOW);
   endfunction
 
-  // Throughput acceptance check. Runs only when target is large enough for a
+  // Throughput acceptance check. Runs only when target large enough for a
   // reliable window; short runs reported, not asserted.
   // expected_per_ch_ksps <= 0 == smoke only (rate must be > 0), for modes with no
   // documented sustained target.
@@ -345,7 +337,7 @@ task automatic run_offload_test(
 endtask
 
 task automatic run_verification_suite();
-  // Completeness vs ground truth (ungated VIP RX mailbox), not the gated meter.
+  // Completeness vs ground truth (ungated VIP RX mailbox), not gated meter.
   // One mailbox entry per word; complete run = NUM_OF_TRANSFERS * NUM_OF_WORDS.
   begin
     int expected_words = `NUM_OF_TRANSFERS * `NUM_OF_WORDS;
@@ -367,7 +359,7 @@ task automatic run_verification_suite();
   );
   `INFO(("Verifying IRQ..."), ADI_VERBOSITY_LOW);
   verify_irq_was_raised();
-  // Throughput acceptance (skipped for short runs). Streaming has a documented
+  // Throughput acceptance (skipped for short runs). Streaming has documented
   // ~123 kSPS/ch target; single-instruction has none -> smoke check.
   if (`NUM_OF_WORDS > 1)
     tput_meter.verify_throughput(.expected_per_ch_ksps(123.0), .tol_pct(10.0), .error_cnt(total_error_count));
@@ -390,8 +382,8 @@ task reset_dut_state();
   spiEngine.clear_irq_pending('hFF);
   // Disable DMA; tests re-enable and configure it
   mSeq.RegWrite32(`SPI_ENGINE_TX_DMA_BA + GetAddrs(DMAC_CONTROL), 0);
-  // Empty SPI VIP queues so a leftover RX entry can't shift the next test's data
-  // by one (verify_received_data drains only as many words as counted).
+  // Empty SPI VIP queues so a leftover RX entry can't shift next test's data by
+  // one (verify_received_data drains only as many words as counted).
   spiSeq.clear_send();
   spiSeq.clear_receive();
   offload_transfer_cnt = 0;
@@ -402,8 +394,8 @@ task reset_dut_state();
   `INFO(("reset_dut_state: DUT state reset complete"), ADI_VERBOSITY_LOW);
 endtask
 
-// Init measurement state at start of run: defaults, construct the throughput
-// meter, enable monitors.
+// Init measurement state at start of run: defaults, construct throughput meter,
+// enable monitors.
 task reset_measurements();
   // SCLK timing
   sclk_rise_time = 0;
@@ -423,7 +415,7 @@ task reset_measurements();
   cs_timing_samples = 0;
   cs_measurement_enabled = 1;
 
-  // Throughput: construct the meter.
+  // Throughput: construct meter.
   //   Streaming:          channels_per_transfer = NUM_OF_WORDS - 1 (drop stream instr)
   //   Single-instruction: channels_per_transfer = 1 (one channel per transfer)
   tput_meter = new(
@@ -591,7 +583,7 @@ task automatic verify_pwm_timing(
 endtask
 
 // TG edge monitor: wake on any tg_bus change, diff vs previous to find which
-// channel(s) toggled and direction; capture timestamps when measuring.
+// channel(s) toggled + direction; capture timestamps when measuring.
 initial begin : tg_edge_monitor
   static logic [NUM_TG-1:0] tg_prev = '0;
   forever begin : tg_edge_loop
@@ -610,7 +602,7 @@ initial begin : tg_edge_monitor
 end
 
 // SCLK period measurement + throughput bit counting. Each rising edge inside an
-// active CS frame is one shifted bit fed to the meter (bus ground truth).
+// active CS frame = one shifted bit fed to meter (bus ground truth).
 initial begin : sclk_period_monitor
   forever begin : sclk_period_loop
     @(posedge spi_sclk);
@@ -640,8 +632,8 @@ end
 initial begin : sclk_measurement_rst
   forever begin : sclk_measurement_rst_loop
     @(negedge spi_cs_active);  // CS deasserted
-    // Zero both so the CS-idle gap is not counted as a period (sclk_rise_time
-    // becomes sclk_prev_rise on the next edge).
+    // Zero both so CS-idle gap is not counted as a period (sclk_rise_time
+    // becomes sclk_prev_rise on next edge).
     sclk_rise_time = 0;
     sclk_prev_rise = 0;
     `INFO(("SPI_CS_ACTIVE --> DEASSERT (t=%.3f ns)  words=%0d transfers=%0d/%0d",
@@ -692,7 +684,7 @@ initial begin : cs_hold_sclk_tracker
   end
 end
 
-// Build/start the environments, grab sequencer handles, reset, arm the watchdog.
+// Build/start environments, grab sequencer handles, reset, arm watchdog.
 task automatic init_environment();
   // Total-sim watchdog budget: 1us per word, across every transfer of every mode
   // (one mode runs NUM_OF_TRANSFERS transfers of NUM_OF_WORDS words each), x2 for
@@ -778,7 +770,7 @@ task automatic generate_sdo_data(
 endtask
 
 // Copy expected data into DDR for the DMA. 16-bit words pack two per 32-bit beat;
-// other widths use one word per beat.
+// other widths one word per beat.
 task automatic write_data_to_ddr(
   input int num_words
 );
@@ -805,7 +797,7 @@ task automatic write_data_to_ddr(
   end
 endtask
 
-// Point the TX DMA at the DDR buffer and submit the transfer.
+// Point TX DMA at DDR buffer and submit transfer.
 task automatic config_tx_dma(
   input int total_bytes
 );
@@ -818,8 +810,8 @@ task automatic config_tx_dma(
   `INFO(("    DMA configured: SRC_ADDR=0x%08x, X_LENGTH=%0d bytes", DDR_BASE_ADDR, total_bytes), ADI_VERBOSITY_LOW);
 endtask
 
-// Load the per-transfer SPI program into offload command memory: config,
-// prescale, dlength, optional CS invert, a CS-framed write, then SYNC (-> IRQ).
+// Load per-transfer SPI program into offload command memory: config, prescale,
+// dlength, optional CS invert, a CS-framed write, then SYNC (-> IRQ).
 task automatic config_offload_command_fifo();
   spiEngine.fifo_offload_command(`INST_CFG);
   spiEngine.fifo_offload_command(`INST_PRESCALE);
@@ -833,17 +825,17 @@ task automatic config_offload_command_fifo();
   spiEngine.fifo_offload_command(`INST_SYNC | 2);
 endtask
 
-// Start the offload, wait for the SPI bus to clock out every transfer (counted
-// by CS frames), then stop.
+// Start offload, wait for SPI bus to clock out every transfer (counted by CS
+// frames), then stop.
 task automatic start_offload_wait_for_pwm_then_stop();
   // Watchdog: ~10us/word ceiling. Bus counting can't hang the TB, but a lost
-  // transfer would never reach the target, so cap the wait and flag a shortfall.
+  // transfer would never reach target, so cap the wait and flag a shortfall.
   realtime timeout_ns = `NUM_OF_TRANSFERS * `NUM_OF_WORDS * 10000 + 100000;
   bit timed_out = 0;
   tput_meter.reset();
   tput_meter.print_header();
   spiEngine.start_offload();
-  // Wait on the bus word count reaching the known target. The SCLK monitor feeds
+  // Wait on bus word count reaching known target. SCLK monitor feeds
   // tput_meter.on_sclk_edge(), which bumps total_transfers every full transfer.
   fork : wait_or_timeout
     begin : wait_count
@@ -860,25 +852,25 @@ task automatic start_offload_wait_for_pwm_then_stop();
             tput_meter.total_transfers, `NUM_OF_TRANSFERS));
     total_error_count++;
   end
-  // Teardown order matters. The trigger PWM free-runs and has already fired one
-  // trigger past the last transfer; the engine commits to it and opens a
-  // data-starved CS frame that blocks on INST_WR. Stop the PWM (no more
-  // triggers), disable the offload, then pulse the engine sync-reset (ENABLE=1)
-  // to ABORT that in-flight frame. OFFLOAD0_EN=0 and MEM_RESET only touch command
-  // memory; without the engine reset the stalled frame survives teardown and
-  // steals the next run's first word (lost-transfer bug).
+  // Teardown order matters. Trigger PWM free-runs and has already fired one
+  // trigger past the last transfer; engine commits to it and opens a
+  // data-starved CS frame that blocks on INST_WR. Stop PWM (no more triggers),
+  // disable offload, then pulse engine sync-reset (ENABLE=1) to ABORT that
+  // in-flight frame. OFFLOAD0_EN=0 and MEM_RESET only touch command memory;
+  // without engine reset the stalled frame survives teardown and steals next
+  // run's first word (lost-transfer bug).
   mSeq.RegWrite32(`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
   spiEngine.stop_offload();
   spiEngine.disable_spi_engine();  // assert engine reset -> abort stalled frame
 endtask
 
-// Compare transmitted words from the SPI VIP with what the DAC received. One
-// mailbox entry == one word; word_cnt is NUM_OF_TRANSFERS * NUM_OF_WORDS.
+// Compare transmitted words from SPI VIP with what DAC received. One mailbox
+// entry == one word; word_cnt is NUM_OF_TRANSFERS * NUM_OF_WORDS.
 task automatic verify_received_data(input int word_cnt, ref int error_cnt);
   int len_rx = spiSeq.get_num_rx_data();
   if (len_rx < word_cnt) begin
-    // All words should be in by now; if mailbox is short, the receive_data() loop
-    // below stalls on mailbox.get() in the VIP.
+    // All words should be in by now; if mailbox short, receive_data() loop below
+    // stalls on mailbox.get() in the VIP.
     `FATAL(("len_rx(%0d) < word_cnt(%0d), verification will stall", len_rx, word_cnt));
   end
   for (int idx = 0; idx < word_cnt; idx++) begin
@@ -917,7 +909,7 @@ task automatic print_test_header(
   `INFO(("  Target: ~123 kSPS per channel when sustained (high transfer count)"), ADI_VERBOSITY_LOW);
 endtask
 
-// Start the offload and run the per-test acceptance check.
+// Start offload and run per-test acceptance check.
 task automatic run_spi_engine_offload();
   `INFO(("    Waiting for %0d transfers (progress every %0d transfers = %0d %%)...", `NUM_OF_TRANSFERS, tput_meter.print_interval, PROGRESS_REPORTER_PERCENT), ADI_VERBOSITY_LOW);
   start_offload_wait_for_pwm_then_stop();
@@ -931,16 +923,16 @@ endtask
 // channels programmed identically (5 MHz, 50% duty), run for one fixed window;
 // each pin then checked for toggling + frequency/duty.
 //
-// toggle_gen is a SEPARATE core from the SPI trigger PWM, so PWM_PERIOD_C below
-// is independent of config_spi's PWM_PERIOD (TRIG_GEN).
+// toggle_gen is a SEPARATE core from SPI trigger PWM, so PWM_PERIOD_C below is
+// independent of config_spi's PWM_PERIOD (TRIG_GEN).
 
 task test_toggle_pins();
   localparam int  PWM_CLK_MHZ   = 140;   // toggle_gen source clock
   localparam int  PWM_PERIOD_C  = 28;    // 140 MHz / 28 = 5 MHz
   localparam int  PWM_WIDTH_C   = 14;    // 50% duty
   localparam int  MIN_EDGES     = 10;    // min edges over the window to pass
-  // Window self-sizes off the target edge count: aim 10x MIN_EDGES per pin, with
-  // 2 edges per PWM period, each period PWM_PERIOD_C / PWM_CLK_MHZ long.
+  // Window self-sizes off target edge count: aim 10x MIN_EDGES per pin, with 2
+  // edges per PWM period, each period PWM_PERIOD_C / PWM_CLK_MHZ long.
   localparam int  TARGET_EDGES  = 10 * MIN_EDGES;
   localparam int  TARGET_PERIODS = (TARGET_EDGES + 1) / 2;
   localparam real PWM_PERIOD_NS = real'(PWM_PERIOD_C) * 1000.0 / real'(PWM_CLK_MHZ);
@@ -965,7 +957,7 @@ task test_toggle_pins();
   mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
   `INFO(("  PWM generator configured: Period=%0d cycles, Width=%0d cycles (50%% duty)", PWM_PERIOD_C, PWM_WIDTH_C), ADI_VERBOSITY_LOW);
   `INFO(("  Expected: 5 MHz @ 140 MHz clock"), ADI_VERBOSITY_LOW);
-  // Measurement window sized for TARGET_EDGES per pin (see localparams above).
+  // Window sized for TARGET_EDGES per pin (see localparams above).
   `INFO(("  Measurement window: %.0f ns (~%0d edges/pin, threshold %0d)", WINDOW_NS, TARGET_EDGES, MIN_EDGES), ADI_VERBOSITY_LOW);
   #(WINDOW_NS * 1ns);
   pwm_measurement_enabled = 0;
@@ -999,7 +991,7 @@ task config_spi();
   // Period between SPI-offload triggers, in PWM-gen clock cycles (one transfer
   // per trigger). Longer than frame shift time -> transfers wait between triggers,
   // caps throughput. Shorter -> back-to-back, SPI shift time is the limit. 50 sits
-  // in the back-to-back region for every test.
+  // in back-to-back region for every test.
   localparam int PWM_PERIOD = 50;
   `INFO(("Config SPI: Starting clock generator and configuring SPI engine"), ADI_VERBOSITY_LOW);
   // Start spi clk generator

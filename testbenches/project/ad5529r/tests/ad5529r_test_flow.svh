@@ -192,16 +192,22 @@ class throughput_meter;
   function void on_sclk_edge(realtime t);
     if (!started) begin started = 1; t_first = t; end
     bits_in_word++;
-    if (bits_in_word < bits_per_word) return;   // word still shifting
+    if (bits_in_word < bits_per_word) begin   // word still shifting
+      return;
+    end
     bits_in_word = 0;
     words_seen++;
     t_last = t;
-    if ((words_seen % words_per_transfer) != 0) return;  // transfer still shifting
+    if ((words_seen % words_per_transfer) != 0) begin  // transfer still shifting
+      return;
+    end
     total_transfers++;
     if (total_transfers >= next_print_transfers && total_transfers < total_transfers_target) begin
       compute();
       render(.is_final(0));
-      while (next_print_transfers <= total_transfers) next_print_transfers += print_interval;
+      while (next_print_transfers <= total_transfers) begin
+        next_print_transfers += print_interval;
+      end
     end
   endfunction
 
@@ -248,20 +254,21 @@ class throughput_meter;
            measured_ksps_per_channel, measured_ksps_all_channels,
            measured_dur_us / 1000.0, transfers_seen()), ADI_VERBOSITY_LOW);
     if (measured_ksps_per_channel <= 0) begin
-      `ERROR(("[TPUT] No throughput measured (rate=0) - did transfers run?"));
+      `ERROR(("No throughput measured (rate=0) - did transfers run?"));
       error_cnt++;
       return;
     end
     if (expected_per_ch_ksps <= 0) begin
-      `INFO(("  No sustained target for this mode; smoke check only (rate > 0): PASS"), ADI_VERBOSITY_LOW);
-      return;
+      return;  // smoke check only (rate > 0): no sustained target for this mode
     end
     dev_pct = ((measured_ksps_per_channel - expected_per_ch_ksps) / expected_per_ch_ksps) * 100.0;
     `INFO(("  Expected: %.3f kSPS/ch +/- %.1f%% (deviation %.2f%%)",
            expected_per_ch_ksps, tol_pct, dev_pct), ADI_VERBOSITY_LOW);
-    if (dev_pct < 0) dev_pct = -dev_pct;  // abs
+    if (dev_pct < 0) begin
+      dev_pct = -dev_pct;  // abs
+    end
     if (dev_pct > tol_pct) begin
-      `ERROR(("[TPUT] Throughput %.3f kSPS/ch deviates %.2f%% from %.3f (tol %.1f%%)",
+      `ERROR(("Throughput %.3f kSPS/ch deviates %.2f%% from %.3f (tol %.1f%%)",
               measured_ksps_per_channel, dev_pct, expected_per_ch_ksps, tol_pct));
       error_cnt++;
     end
@@ -333,7 +340,7 @@ task automatic run_offload_test(
   run_spi_engine_offload();
   run_verification_suite();
 
-  `INFO(("[run_offload_test] test complete"), ADI_VERBOSITY_LOW);
+  `INFO(("test complete"), ADI_VERBOSITY_LOW);
 endtask
 
 task automatic run_verification_suite();
@@ -437,7 +444,7 @@ task verify_sclk_frequency(
   sclk_measurement_enabled = 0;
 
   if (sclk_period_count == 0) begin
-    `ERROR(("[SCLK] No SCLK edges detected - cannot verify frequency"));
+    `ERROR(("No SCLK edges detected - cannot verify frequency"));
     total_error_count++;
     return;
   end
@@ -454,14 +461,16 @@ task verify_sclk_frequency(
   `INFO(("  Expected frequency:  %.2f MHz", expected_freq_mhz), ADI_VERBOSITY_LOW);
   `INFO(("  Deviation:           %.2f%%", deviation_pct), ADI_VERBOSITY_LOW);
 
-  if (deviation_pct < 0) deviation_pct = -deviation_pct;  // abs
+  if (deviation_pct < 0) begin
+    deviation_pct = -deviation_pct;  // abs
+  end
 
   if (deviation_pct > tolerance_pct) begin
     if (deviation_pct > tolerance_pct * 5) begin
-      `ERROR(("[SCLK] Frequency deviation %.2f%% far exceeds tolerance %.2f%% - possible clock misconfiguration", deviation_pct, tolerance_pct));
+      `ERROR(("Frequency deviation %.2f%% far exceeds tolerance %.2f%% - possible clock misconfiguration", deviation_pct, tolerance_pct));
       total_error_count++;
     end else begin
-      `WARNING(("[SCLK] Frequency deviation %.2f%% exceeds tolerance %.2f%% (simulation clock may differ from hardware)", deviation_pct, tolerance_pct));
+      `WARNING(("Frequency deviation %.2f%% exceeds tolerance %.2f%% (simulation clock may differ from hardware)", deviation_pct, tolerance_pct));
     end
   end
 endtask
@@ -477,7 +486,7 @@ task verify_cs_timing(
   `INFO(("=== CS Timing Verification ==="), ADI_VERBOSITY_LOW);
 
   if (cs_timing_samples == 0) begin
-    `WARNING(("[CS] No complete CS transactions captured for timing analysis"));
+    `WARNING(("No complete CS transactions captured for timing analysis"));
     return;
   end
 
@@ -486,7 +495,7 @@ task verify_cs_timing(
          cs_setup_min, cs_setup_max, min_cs_setup_ns), ADI_VERBOSITY_LOW);
 
   if (cs_setup_min < min_cs_setup_ns) begin
-    `ERROR(("[CS] Setup time violation: %.2f ns < %.2f ns minimum", cs_setup_min, min_cs_setup_ns));
+    `ERROR(("Setup time violation: %.2f ns < %.2f ns minimum", cs_setup_min, min_cs_setup_ns));
     total_error_count++;
   end
 
@@ -495,7 +504,7 @@ task verify_cs_timing(
            cs_hold_min, cs_hold_max, min_cs_hold_ns), ADI_VERBOSITY_LOW);
 
     if (cs_hold_min < min_cs_hold_ns) begin
-      `ERROR(("[CS] Hold time violation: %.2f ns < %.2f ns minimum", cs_hold_min, min_cs_hold_ns));
+      `ERROR(("Hold time violation: %.2f ns < %.2f ns minimum", cs_hold_min, min_cs_hold_ns));
       total_error_count++;
     end
   end else begin
@@ -532,7 +541,7 @@ task automatic verify_pwm_timing(
   fall_times = tg_fall_times[channel];
 
   if (rise_times.size() < 2) begin
-    `ERROR(("[PWM] TG%0d: Insufficient rise edges (%0d) for timing measurement", channel, rise_times.size()));
+    `ERROR(("TG%0d: Insufficient rise edges (%0d) for timing measurement", channel, rise_times.size()));
     total_error_count++;
     return;
   end
@@ -566,17 +575,21 @@ task automatic verify_pwm_timing(
          channel, actual_freq_mhz, expected_freq_mhz, avg_duty_pct, expected_duty_pct), ADI_VERBOSITY_LOW);
 
   // Check frequency
-  if (freq_deviation < 0) freq_deviation = -freq_deviation;
+  if (freq_deviation < 0) begin
+    freq_deviation = -freq_deviation;
+  end
   if (freq_deviation > freq_tolerance_pct) begin
-    `ERROR(("[PWM] TG%0d: Frequency deviation %.2f%% exceeds tolerance %.2f%%",
+    `ERROR(("TG%0d: Frequency deviation %.2f%% exceeds tolerance %.2f%%",
             channel, freq_deviation, freq_tolerance_pct));
     total_error_count++;
   end
 
   // Check duty cycle
-  if (duty_deviation < 0) duty_deviation = -duty_deviation;
+  if (duty_deviation < 0) begin
+    duty_deviation = -duty_deviation;
+  end
   if (duty_deviation > duty_tolerance_pct) begin
-    `ERROR(("[PWM] TG%0d: Duty cycle deviation %.1f%% exceeds tolerance %.1f%%",
+    `ERROR(("TG%0d: Duty cycle deviation %.1f%% exceeds tolerance %.1f%%",
             channel, duty_deviation, duty_tolerance_pct));
     total_error_count++;
   end
@@ -592,8 +605,11 @@ initial begin : tg_edge_monitor
       if (tg_bus[ch] !== tg_prev[ch]) begin
         tg_edges[ch]++;
         if (pwm_measurement_enabled) begin
-          if (tg_bus[ch]) tg_rise_times[ch].push_back($time);
-          else            tg_fall_times[ch].push_back($time);
+          if (tg_bus[ch]) begin
+            tg_rise_times[ch].push_back($time);
+          end else begin
+            tg_fall_times[ch].push_back($time);
+          end
         end
       end
     end
@@ -606,7 +622,9 @@ end
 initial begin : sclk_period_monitor
   forever begin : sclk_period_loop
     @(posedge spi_sclk);
-    if (spi_cs_active && tput_meter != null) tput_meter.on_sclk_edge($realtime);
+    if (spi_cs_active && tput_meter != null) begin
+      tput_meter.on_sclk_edge($realtime);
+    end
     if (sclk_measurement_enabled) begin
       sclk_prev_rise = sclk_rise_time;
       sclk_rise_time = $realtime;
@@ -651,12 +669,20 @@ initial begin : cs_setup_hold_timing
       automatic real t_setup = real'(first_sclk_rise_after_cs - cs_assert_time);
       automatic real t_hold = real'($realtime - last_sclk_fall_before_cs_deassert);
       // Update min/max setup time
-      if (t_setup < cs_setup_min) cs_setup_min = t_setup;
-      if (t_setup > cs_setup_max) cs_setup_max = t_setup;
+      if (t_setup < cs_setup_min) begin
+        cs_setup_min = t_setup;
+      end
+      if (t_setup > cs_setup_max) begin
+        cs_setup_max = t_setup;
+      end
       // Update min/max hold time (only if valid)
       if (last_sclk_fall_before_cs_deassert != 0) begin
-        if (t_hold < cs_hold_min) cs_hold_min = t_hold;
-        if (t_hold > cs_hold_max) cs_hold_max = t_hold;
+        if (t_hold < cs_hold_min) begin
+          cs_hold_min = t_hold;
+        end
+        if (t_hold > cs_hold_max) begin
+          cs_hold_max = t_hold;
+        end
       end
 
       cs_timing_samples++;
@@ -738,9 +764,15 @@ initial begin : irq_callback
       spiEngine.get_sync_id(sync_id);
       `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
     end
-    if (irq_pending & 5'b00100) `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
-    if (irq_pending & 5'b00010) `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
-    if (irq_pending & 5'b00001) `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
+    if (irq_pending & 5'b00100) begin
+      `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
+    end
+    if (irq_pending & 5'b00010) begin
+      `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
+    end
+    if (irq_pending & 5'b00001) begin
+      `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
+    end
     // Clear all pending IRQs
     spiEngine.clear_irq_pending(irq_pending);
   end
@@ -879,8 +911,6 @@ task automatic verify_received_data(input int word_cnt, ref int error_cnt);
       error_cnt++;
       `ERROR(("word %4d MISMATCH: Expected=0x%04x, Actual=0x%04x",
               idx, sdo_write_data_store[idx], sdo_write_data[idx]));
-    end else begin
-      `INFO(("word %4d MATCH: got=0x%04x", idx, sdo_write_data[idx]), ADI_VERBOSITY_LOW);
     end
   end
   `INFO(("  Verified %0d words - %0d errors.", word_cnt, error_cnt), ADI_VERBOSITY_LOW);
@@ -964,17 +994,16 @@ task test_toggle_pins();
 
   // Edges per channel over the window
   edges_tg = tg_edges;
-  foreach (edges_tg[ch]) edges_tg[ch] -= initial_tg[ch];
+  foreach (edges_tg[ch]) begin
+    edges_tg[ch] -= initial_tg[ch];
+  end
   // Per-channel: edge count + frequency/duty
   `INFO(("  Channel verification (edge count + PWM timing):"), ADI_VERBOSITY_LOW);
   foreach (edges_tg[ch]) begin
     // Did the pin toggle during the window?
     if (edges_tg[ch] < MIN_EDGES) begin
       total_error_count++;
-      `ERROR(("Toggle Pin Test: TG%0d edge count too low", ch));
-      `INFO(("    TG%0d: Edges=%0d, Expected>=%0d, Status=FAIL", ch, edges_tg[ch], MIN_EDGES), ADI_VERBOSITY_LOW);
-    end else begin
-      `INFO(("    TG%0d: Edges=%0d, Expected>=%0d, Status=PASS", ch, edges_tg[ch], MIN_EDGES), ADI_VERBOSITY_LOW);
+      `ERROR(("TG%0d edge count too low: %0d < %0d", ch, edges_tg[ch], MIN_EDGES));
     end
     // 5 MHz +/-1%, 50% duty +/-2%
     verify_pwm_timing(
@@ -1015,5 +1044,4 @@ task config_spi();
   end
   // Set up the interrupts
   spiEngine.set_interrup_mask(.sync_event(1), .offload_sync_id_pending(1));
-  `INFO(("Config SPI PASSED"), ADI_VERBOSITY_LOW);
 endtask

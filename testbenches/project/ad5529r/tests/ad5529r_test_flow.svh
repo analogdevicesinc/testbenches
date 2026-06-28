@@ -292,22 +292,12 @@ initial begin : main
   `INFO(("=== AD5529R Testbench Started ==="), ADI_VERBOSITY_LOW);
   `INFO(("  Configuration: NUM_OF_WORDS=%0d, NUM_OF_TRANSFERS=%0d", `NUM_OF_WORDS, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
   spiEngine.sanity_test();  // version verify + scratch write/verify
-  wait_random(
-    .min_ns(50),
-    .max_ns(150)
-  );
-
   reset_measurements(); // init measurement states and enable the timing monitors
 
   foreach (test_modes[idx]) begin
     reset_dut_state();
     run_offload_test(test_modes[idx]);
   end
-
-  wait_random(
-    .min_ns(50),
-    .max_ns(150)
-  );
 
   test_toggle_pins();
 
@@ -317,10 +307,42 @@ initial begin : main
   if (total_error_count > 0) begin
     `FATAL(("Test terminated with %0d errors", total_error_count));
   end
-
   `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
   $finish();
 end
+
+// Shared engine for all tests:
+//   1. config_spi
+//   2. generate data (generate_sdo_data + write_data_to_ddr)
+//   3. SPI transfers (config_tx_dma + config_offload_command_fifo + run/verify)
+//   4. verify
+task automatic run_offload_test(
+  input offload_test_t data_mode
+);
+  int num_words   = (`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS);
+  int total_bytes = (num_words * `DATA_DLENGTH) / 8;
+
+  print_test_header(data_mode, total_bytes);
+
+  config_spi();
+
+  // Generate test data and write to DDR
+  `INFO(("Generating test data..."), ADI_VERBOSITY_LOW);
+  generate_sdo_data(data_mode, num_words);
+
+  `INFO(("Writing data to DDR..."), ADI_VERBOSITY_LOW);
+  write_data_to_ddr(num_words);
+
+  `INFO(("Configuring TX DMA..."), ADI_VERBOSITY_LOW);
+  config_tx_dma(total_bytes);
+  `INFO(("Configuring SPI Engine Offload..."), ADI_VERBOSITY_LOW);
+  config_offload_command_fifo();
+  `INFO(("Running SPI Engine Offload..."), ADI_VERBOSITY_LOW);
+  run_spi_engine_offload();
+  run_verification_suite();
+
+  `INFO(("[run_offload_test] test complete"), ADI_VERBOSITY_LOW);
+endtask
 
 task automatic run_verification_suite();
   // Completeness vs ground truth (ungated VIP RX mailbox), not the gated meter.
@@ -356,26 +378,11 @@ task automatic run_verification_suite();
   verify_received_data(.word_cnt(`NUM_OF_TRANSFERS * `NUM_OF_WORDS), .error_cnt(total_error_count));
 endtask
 
-task wait_random(
-  input int min_ns,
-  input int max_ns
-);
-  int delay_ns;
-  delay_ns = $urandom_range(max_ns, min_ns);
-  #(delay_ns * 1ns);
-endtask
-
 // Reset DUT state between test cases.
 task reset_dut_state();
   `INFO(("reset_dut_state: Resetting DUT state..."), ADI_VERBOSITY_LOW);
   // Disable offload first
   spiEngine.stop_offload();
-  // Let pending SPI transactions drain
-  // TODO WAIT: size this delay properly.
-  wait_random(
-    .min_ns(400),
-    .max_ns(600)
-  );
   // Reset offload command memory (required before re-programming offload)
   spiEngine.offload_mem_assert_reset();
   spiEngine.offload_mem_deassert_reset();
@@ -392,10 +399,6 @@ task reset_dut_state();
   // Reset SCLK running state, keep cumulative counters
   sclk_rise_time = 0;
   sclk_prev_rise = 0;
-  wait_random(
-    .min_ns(50),
-    .max_ns(150)
-  );
   `INFO(("reset_dut_state: DUT state reset complete"), ADI_VERBOSITY_LOW);
 endtask
 
@@ -771,7 +774,6 @@ task automatic generate_sdo_data(
       default: dac_word = {`DATA_DLENGTH{1'b1}};
     endcase
     sdo_write_data_store[i] = dac_word;
-    spiSeq.send_data('0); // TODO: what does this command do?
   end
 endtask
 
@@ -918,48 +920,9 @@ endtask
 // Start the offload and run the per-test acceptance check.
 task automatic run_spi_engine_offload();
   `INFO(("    Waiting for %0d transfers (progress every %0d transfers = %0d %%)...", `NUM_OF_TRANSFERS, tput_meter.print_interval, PROGRESS_REPORTER_PERCENT), ADI_VERBOSITY_LOW);
-
-  wait_random(
-    .min_ns(50),
-    .max_ns(150)
-  );
   start_offload_wait_for_pwm_then_stop();
-
   tput_meter.compute();
   tput_meter.render(.is_final(1));
-endtask
-
-// Shared engine for all tests:
-//   1. config_spi
-//   2. generate data (generate_sdo_data + write_data_to_ddr)
-//   3. SPI transfers (config_tx_dma + config_offload_command_fifo + run/verify)
-//   4. verify
-task automatic run_offload_test(
-  input offload_test_t data_mode
-);
-  int num_words   = (`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS);
-  int total_bytes = (num_words * `DATA_DLENGTH) / 8;
-
-  print_test_header(data_mode, total_bytes);
-
-  config_spi();
-
-  // Generate test data and write to DDR
-  `INFO(("Generating test data..."), ADI_VERBOSITY_LOW);
-  generate_sdo_data(data_mode, num_words);
-
-  `INFO(("Writing data to DDR..."), ADI_VERBOSITY_LOW);
-  write_data_to_ddr(num_words);
-
-  `INFO(("Configuring TX DMA..."), ADI_VERBOSITY_LOW);
-  config_tx_dma(total_bytes);
-  `INFO(("Configuring SPI Engine Offload..."), ADI_VERBOSITY_LOW);
-  config_offload_command_fifo();
-  `INFO(("Running SPI Engine Offload..."), ADI_VERBOSITY_LOW);
-  run_spi_engine_offload();
-  run_verification_suite();
-
-  `INFO(("[run_offload_test] test complete"), ADI_VERBOSITY_LOW);
 endtask
 
 // Toggle Pin Test (TG0-TG3 PWM outputs)
@@ -972,46 +935,44 @@ endtask
 // is independent of config_spi's PWM_PERIOD (TRIG_GEN).
 
 task test_toggle_pins();
-  localparam int PWM_PERIOD_C = 28;    // 140 MHz / 28 = 5 MHz
-  localparam int PWM_WIDTH_C  = 14;    // 50% duty
-  localparam int MIN_EDGES    = 10;    // min edges over the window to pass
+  localparam int  PWM_CLK_MHZ   = 140;   // toggle_gen source clock
+  localparam int  PWM_PERIOD_C  = 28;    // 140 MHz / 28 = 5 MHz
+  localparam int  PWM_WIDTH_C   = 14;    // 50% duty
+  localparam int  MIN_EDGES     = 10;    // min edges over the window to pass
+  // Window self-sizes off the target edge count: aim 10x MIN_EDGES per pin, with
+  // 2 edges per PWM period, each period PWM_PERIOD_C / PWM_CLK_MHZ long.
+  localparam int  TARGET_EDGES  = 10 * MIN_EDGES;
+  localparam int  TARGET_PERIODS = (TARGET_EDGES + 1) / 2;
+  localparam real PWM_PERIOD_NS = real'(PWM_PERIOD_C) * 1000.0 / real'(PWM_CLK_MHZ);
+  localparam real WINDOW_NS     = real'(TARGET_PERIODS) * PWM_PERIOD_NS;
 
   int initial_tg[NUM_TG];
   int edges_tg[NUM_TG];
 
   `INFO((""), ADI_VERBOSITY_LOW);
   `INFO(("=== Toggle Pin Test: Verifying PWM outputs on TG0-TG3 ==="), ADI_VERBOSITY_LOW);
-
   // Snapshot the free-running edge counters
   initial_tg = tg_edges;
-
   reset_pwm_measurement();
-
   // Reset toggle_gen PWM
   mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1));
-
   // Per-channel period/width (one register each, +4 bytes apart)
   for (int ch = 0; ch < NUM_TG; ch++) begin
     mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD) + ch*4, PWM_PERIOD_C);
     mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_WIDTH)  + ch*4, PWM_WIDTH_C);
   end
-
   // Load configuration
   mSeq.RegWrite32 (`SPI_ENGINE_TOGGLE_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1));
-
   `INFO(("  PWM generator configured: Period=%0d cycles, Width=%0d cycles (50%% duty)", PWM_PERIOD_C, PWM_WIDTH_C), ADI_VERBOSITY_LOW);
   `INFO(("  Expected: 5 MHz @ 140 MHz clock"), ADI_VERBOSITY_LOW);
-
-  // Measurement window: ~50 edges/pin at 5 MHz (threshold 10)
-  // TODO WAIT: size this window properly.
-  #10000ns;
-
+  // Measurement window sized for TARGET_EDGES per pin (see localparams above).
+  `INFO(("  Measurement window: %.0f ns (~%0d edges/pin, threshold %0d)", WINDOW_NS, TARGET_EDGES, MIN_EDGES), ADI_VERBOSITY_LOW);
+  #(WINDOW_NS * 1ns);
   pwm_measurement_enabled = 0;
 
   // Edges per channel over the window
   edges_tg = tg_edges;
   foreach (edges_tg[ch]) edges_tg[ch] -= initial_tg[ch];
-
   // Per-channel: edge count + frequency/duty
   `INFO(("  Channel verification (edge count + PWM timing):"), ADI_VERBOSITY_LOW);
   foreach (edges_tg[ch]) begin
@@ -1035,30 +996,24 @@ endtask
 
 // Start the SPI clk generator and trigger PWM, then configure the SPI engine.
 task config_spi();
-
   // Period between SPI-offload triggers, in PWM-gen clock cycles (one transfer
   // per trigger). Longer than frame shift time -> transfers wait between triggers,
   // caps throughput. Shorter -> back-to-back, SPI shift time is the limit. 50 sits
   // in the back-to-back region for every test.
   localparam int PWM_PERIOD = 50;
-
   `INFO(("Config SPI: Starting clock generator and configuring SPI engine"), ADI_VERBOSITY_LOW);
-
   // Start spi clk generator
   mSeq.RegWrite32 (`SPI_ENGINE_AXI_CLKGEN_BA + GetAddrs(AXI_CLKGEN_REG_RSTN),
     `SET_AXI_CLKGEN_REG_RSTN_MMCM_RSTN(1) |
     `SET_AXI_CLKGEN_REG_RSTN_RSTN(1)
     );
-
   // Config trigger PWM
   mSeq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_RESET(1)); // PWM_GEN reset in regmap (ACTIVE HIGH)
   mSeq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_PULSE_X_PERIOD), `SET_AXI_PWM_GEN_REG_PULSE_X_PERIOD_PULSE_X_PERIOD(PWM_PERIOD)); // set PWM period
   mSeq.RegWrite32 (`SPI_ENGINE_TRIG_GEN_BA + GetAddrs(AXI_PWM_GEN_REG_RSTN), `SET_AXI_PWM_GEN_REG_RSTN_LOAD_CONFIG(1)); // load AXI_PWM_GEN configuration
   `INFO(("Trigger PWM generator started."), ADI_VERBOSITY_LOW);
-
   // Enable SPI Engine
   spiEngine.enable_spi_engine();
-
   // Configure the execution module
   spiEngine.fifo_command(`INST_CFG);
   spiEngine.fifo_command(`INST_PRESCALE);
@@ -1066,10 +1021,7 @@ task config_spi();
   if (`CS_ACTIVE_HIGH) begin
     spiEngine.fifo_command(`SET_CS_INV_MASK(8'hFF));
   end
-
   // Set up the interrupts
   spiEngine.set_interrup_mask(.sync_event(1), .offload_sync_id_pending(1));
-
   `INFO(("Config SPI PASSED"), ADI_VERBOSITY_LOW);
-
 endtask

@@ -899,14 +899,19 @@ endtask
 // Compare transmitted words from SPI VIP with what DAC received. One mailbox
 // entry == one word; word_cnt is NUM_OF_TRANSFERS * NUM_OF_WORDS.
 task automatic verify_received_data(input int word_cnt, ref int error_cnt);
+  int unsigned rx_word[];
   int len_rx = spiSeq.get_num_rx_data();
   if (len_rx < word_cnt) begin
     // All words should be in by now; if mailbox short, receive_data() loop below
     // stalls on mailbox.get() in the VIP.
     `FATAL(("len_rx(%0d) < word_cnt(%0d), verification will stall", len_rx, word_cnt));
   end
+  // VIP API is multi-lane: receive_data() returns one word per MOSI lane. This
+  // DAC is single-lane (NUM_OF_MOSI=1), so each call yields one word in rx_word[0].
+  rx_word = new[1];
   for (int idx = 0; idx < word_cnt; idx++) begin
-    spiSeq.receive_data(sdo_write_data[idx]); // stalls if mailbox empty
+    spiSeq.receive_data(rx_word); // stalls if mailbox empty
+    sdo_write_data[idx] = rx_word[0];
     if (sdo_write_data[idx] != sdo_write_data_store[idx]) begin
       error_cnt++;
       `ERROR(("word %4d MISMATCH: Expected=0x%04x, Actual=0x%04x",

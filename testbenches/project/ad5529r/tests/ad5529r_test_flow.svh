@@ -757,25 +757,27 @@ initial begin : irq_callback
     @(posedge ad5529r_spi_irq);
     // read pending IRQs
     spiEngine.get_irq_pending(irq_pending);
+    // Decode via named regmap fields (IRQ_PENDING shares the IRQ_MASK bit
+    // layout) so bit positions stay sourced from the regmap, not duplicated here.
     // Offload SYNC command
-    if (irq_pending & 5'b10000) begin
+    if (`GET_AXI_SPI_ENGINE_IRQ_MASK_OFFLOAD_SYNC_ID_PENDING(irq_pending)) begin
       spiEngine.get_sync_id(sync_id);
       offload_transfer_cnt++;
       // Verbosity raised so it doesn't ruin the tput table
       `INFO(("Offload SYNC %d IRQ. Transfer count: %d", sync_id, offload_transfer_cnt), ADI_VERBOSITY_MEDIUM);
     end
     // SYNC command
-    if (irq_pending & 5'b01000) begin
+    if (`GET_AXI_SPI_ENGINE_IRQ_MASK_SYNC_EVENT(irq_pending)) begin
       spiEngine.get_sync_id(sync_id);
       `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
     end
-    if (irq_pending & 5'b00100) begin
+    if (`GET_AXI_SPI_ENGINE_IRQ_MASK_SDI_ALMOST_FULL(irq_pending)) begin
       `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
-    if (irq_pending & 5'b00010) begin
+    if (`GET_AXI_SPI_ENGINE_IRQ_MASK_SDO_ALMOST_EMPTY(irq_pending)) begin
       `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
-    if (irq_pending & 5'b00001) begin
+    if (`GET_AXI_SPI_ENGINE_IRQ_MASK_CMD_ALMOST_EMPTY(irq_pending)) begin
       `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
     end
     // Clear all pending IRQs

@@ -937,6 +937,16 @@ task automatic verify_irq_was_raised();
   end else begin
     `INFO(("  IRQ received (pending=0x%02x) - transfer(s) completed", irq_pending), ADI_VERBOSITY_LOW);
   end
+  // The IRQ callback bumps offload_transfer_cnt on each offload-SYNC IRQ, so it
+  // must equal the number of transfers issued. This turns "some IRQ fired" into
+  // "every transfer signalled completion".
+  if (offload_transfer_cnt != `NUM_OF_TRANSFERS) begin
+    `ERROR(("  Offload SYNC IRQ count (%0d) != expected transfers (%0d)",
+            offload_transfer_cnt, `NUM_OF_TRANSFERS));
+    total_error_count++;
+  end else begin
+    `INFO(("  Offload SYNC IRQ count matches %0d transfers", `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
+  end
 endtask
 
 task automatic print_test_header(

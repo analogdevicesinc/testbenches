@@ -8,15 +8,16 @@
 
     <title>AD7606 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=ac863bf0" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=a8f9a170" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
-    <script async="async" src="../../../_static/app.umd.js?v=09b0c6bc"></script>
+    <script async="async" src="../../../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AD7616" href="../ad7616/index.html" />
     <link rel="prev" title="AD738x" href="../ad738x/index.html" />
    
+  
   
   
   <meta name="repository" content="testbenches">
@@ -234,6 +235,7 @@ Content on this topic
 </li>
 <li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad485x/index.html">AD485X</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ad57xx/index.html">AD57XX</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">AD7606</a></li>
@@ -296,7 +298,7 @@ Options: 0 - AD7606B, 1 - AD7606C-16, 2 - AD7606C-18</p></li>
 Options: 0 - without external clock, 1 - with external clock</p></li>
 <li><p>INTF: defines the interface type:
 Options: 0 - Parallel, 1 - Serial</p></li>
-<li><p>NUM_OF_SDI: defines the number of MOSI lines of the SPI interface:
+<li><p>NUM_OF_SDIO: defines the number of MOSI lines of the SPI interface:
 Options: 1 - Interleaved mode, 2 - 1 lane per channel,
 4 - 2 lanes per channel, 8 - 4 lanes per channel</p></li>
 </ul>
@@ -304,41 +306,7 @@ Options: 1 - Interleaved mode, 2 - 1 lane per channel,
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
 <p>The following configuration files are available:</p>
 <blockquote>
-<div><div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration mode</p></th>
-<th class="head" colspan="4"><p>Parameters</p></th>
-</tr>
-<tr class="row-even"><th class="head"><p>DEV_CONFIG</p></th>
-<th class="head"><p>EXT_CLK</p></th>
-<th class="head"><p>INTF</p></th>
-<th class="head"><p>NUM_OF_SDI</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-odd"><td><p>cfg1</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>cfg2</p></td>
-<td><p>1</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>cfg3</p></td>
-<td><p>2</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>1</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div></blockquote>
+<div></div></blockquote>
 </section>
 <section id="tests">
 <h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>

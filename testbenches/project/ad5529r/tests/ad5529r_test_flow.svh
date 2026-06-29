@@ -526,9 +526,6 @@ task verify_cs_timing(
       total_error_count++;
     end
   end else begin
-    // We have complete CS transactions but never captured a hold sample. That is
-    // a measurement-path gap (cs_hold_sclk_tracker should fire on every framed
-    // transfer), not an intentionally untested path - so fail rather than skip.
     `ERROR(("CS hold (t6) not measured despite %0d transactions - hold tracker gap", cs_timing_samples));
     total_error_count++;
   end
@@ -952,15 +949,18 @@ task automatic verify_irq_was_raised();
   end else begin
     `INFO(("  IRQ received (pending=0x%02x) - transfer(s) completed", irq_pending), ADI_VERBOSITY_LOW);
   end
-  // The IRQ callback bumps offload_transfer_cnt on each offload-SYNC IRQ, so it
-  // must equal the number of transfers issued. This turns "some IRQ fired" into
-  // "every transfer signalled completion".
-  if (offload_transfer_cnt != `NUM_OF_TRANSFERS) begin
-    `ERROR(("  Offload SYNC IRQ count (%0d) != expected transfers (%0d)",
-            offload_transfer_cnt, `NUM_OF_TRANSFERS));
+  // Confirm the offload-SYNC IRQ *source* specifically fired, not just any IRQ
+  // bit. offload_transfer_cnt counts IRQ-line posedges: back-to-back transfers
+  // keep the line asserted, so multiple SYNC events coalesce into one edge and
+  // the count is only a lower bound (< NUM_OF_TRANSFERS) - it can't be asserted
+  // exactly. Exact per-transfer completeness is checked against the RX mailbox
+  // word count in run_verification_suite; only verify the right IRQ ran.
+  if (offload_transfer_cnt == 0) begin
+    `ERROR(("  Offload SYNC IRQ never observed - offload did not signal completion"));
     total_error_count++;
   end else begin
-    `INFO(("  Offload SYNC IRQ count matches %0d transfers", `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
+    `INFO(("  Offload SYNC IRQ observed (%0d edge(s) for %0d transfers; edges coalesce)",
+           offload_transfer_cnt, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
   end
 endtask
 

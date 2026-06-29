@@ -293,12 +293,7 @@ initial begin : main
   spiEngine.sanity_test();  // version verify + scratch write/verify
 
   foreach (test_modes[idx]) begin
-    reset_dut_state();
-    // Re-arm the timing monitors and zero per-mode accumulators (also rebuilds
-    // the throughput meter) so every mode is measured fresh. Without this, the
-    // verify_* tasks disable the monitors after mode 1 and modes 2..N would
-    // re-report mode 1's stale SCLK/CS samples as a pass.
-    reset_measurements();
+    reset_dut_state();  // resets DUT + measurement state for this mode
     run_offload_test(test_modes[idx]);
   end
 
@@ -399,9 +394,11 @@ task reset_dut_state();
   spiSeq.clear_receive();
   offload_transfer_cnt = 0;
   irq_pending = 0;
-  // Reset SCLK running state, keep cumulative counters
-  sclk_rise_time = 0;
-  sclk_prev_rise = 0;
+  // Re-arm the timing monitors and zero per-mode accumulators (also rebuilds the
+  // throughput meter) so DUT and measurement state are reset together, once per
+  // mode. Keeping these two lifecycles in lockstep is what stops modes 2..N from
+  // re-reporting mode 1's stale SCLK/CS samples.
+  reset_measurements();
   `INFO(("reset_dut_state: DUT state reset complete"), ADI_VERBOSITY_LOW);
 endtask
 

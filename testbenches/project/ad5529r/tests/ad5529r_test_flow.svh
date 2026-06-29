@@ -865,10 +865,10 @@ task automatic config_offload_command_fifo();
   if (`CS_ACTIVE_HIGH) begin
     spiEngine.fifo_offload_command(`SET_CS_INV_MASK(8'hFF));
   end
-  spiEngine.fifo_offload_command(`SET_CS(8'hFE));
+  spiEngine.fifo_offload_command(`SET_CS(8'hFE));  // assert CS0 (bitmask: 0=selected)
   spiEngine.fifo_offload_command(`INST_WR);
-  spiEngine.fifo_offload_command(`SET_CS(8'hFF));
-  spiEngine.fifo_offload_command(`INST_SYNC | 2);
+  spiEngine.fifo_offload_command(`SET_CS(8'hFF));  // deassert all CS (frame end)
+  spiEngine.fifo_offload_command(`INST_SYNC | 2);  // SYNC, sync_id=2 (-> offload IRQ, reported by callback)
 endtask
 
 // Start offload, wait for SPI bus to clock out every transfer (counted by CS

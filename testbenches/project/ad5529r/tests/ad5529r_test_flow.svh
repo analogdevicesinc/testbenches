@@ -886,7 +886,9 @@ task automatic start_offload_wait_for_pwm_then_stop();
       timed_out = 1;
     end
   join_any
-  disable fork;
+  // Kill only this fork's leftover branch (the wait or the watchdog, whichever
+  // lost the race), not every descendant process of the calling task.
+  disable wait_or_timeout;
   if (timed_out || tput_meter.total_transfers < `NUM_OF_TRANSFERS) begin
     `ERROR(("offload timed out: %0d/%0d transfers on SPI bus",
             tput_meter.total_transfers, `NUM_OF_TRANSFERS));

@@ -509,7 +509,11 @@ task verify_cs_timing(
       total_error_count++;
     end
   end else begin
-    `INFO(("  CS hold (t6):   Not measured"), ADI_VERBOSITY_LOW);
+    // We have complete CS transactions but never captured a hold sample. That is
+    // a measurement-path gap (cs_hold_sclk_tracker should fire on every framed
+    // transfer), not an intentionally untested path - so fail rather than skip.
+    `ERROR(("CS hold (t6) not measured despite %0d transactions - hold tracker gap", cs_timing_samples));
+    total_error_count++;
   end
 endtask
 

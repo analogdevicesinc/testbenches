@@ -59,13 +59,6 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 // SPI Engine configuration parameters
 //---------------------------------------------------------------------------
 program test_program (
-  `ifdef DEF_ECHO_SCLK
-    inout quad_adaq77681_echo_sclk,
-  `endif
-  inout quad_adaq77681_spi_clk,
-  inout quad_adaq77681_spi_sclk,
-  inout [(`NUM_OF_CS-1) :0] quad_adaq77681_spi_cs,
-  inout [(`NUM_OF_MISO-1):0] quad_adaq77681_spi_sdi,
   inout quad_adaq77681_irq);
 
   timeunit 1ns;
@@ -127,42 +120,47 @@ program test_program (
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     //creating environment
-    base_env = new(
-      .name("Base Environment"),
-      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
-      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
-      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
-      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
-      .irq_base_address(`IRQ_C_BA),
-      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+    base_env    = new(
+                      .name("Base Environment"),
+                      .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
+                      .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
+                      .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
+                      .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
+                      .irq_base_address(`IRQ_C_BA),
+                      .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
 
     mng = new("", `TH.`MNG_AXI.inst.IF);
     ddr = new("", `TH.`DDR_AXI.inst.IF);
 
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
-    spi_env     = new("SPI Engine Environment",
+    spi_env     = new(
+                      .name("SPI Engine Environment"),
                       `ifdef DEF_SDO_STREAMING
-                        `TH.`SDO_SRC.inst.IF,
+                        .sdo_src_axis_vip_if(`TH.`SDO_SRC.inst.IF),
                       `endif
-                      `TH.`SPI_S.inst.IF.vif,
-                      `TH.`MCLK_CLK.inst.IF);
+                      .spi_s_vip_if(`TH.`SPI_S.inst.IF.vif),
+                      .mclk_clk_vip_if(`TH.`MCLK_CLK.inst.IF));
 
-    spi_api     = new("SPI Engine API",
-                      base_env.mng.master_sequencer,
-                      `QUAD_ADAQ77681_SPI_REGMAP_BA);
+    spi_api     = new(
+                      .name("SPI Engine API"),
+                      .bus(base_env.mng.master_sequencer),
+                      .base_address(`QUAD_ADAQ77681_SPI_REGMAP_BA));
 
-    dma_api     = new("RX DMA API",
-                      base_env.mng.master_sequencer,
-                      `QUAD_ADAQ77681_DMA_BA);
+    dma_api     = new(
+                      .name("RX DMA API"),
+                      .bus(base_env.mng.master_sequencer),
+                      .base_address(`QUAD_ADAQ77681_DMA_BA));
 
-    clkgen_mclk = new("CLKGEN MCLK",
-                      base_env.mng.master_sequencer,
-                      `QUAD_ADAQ77681_AXI_MCLK_CLKGEN_BA);
+    clkgen_mclk = new(
+                      .name("CLKGEN MCLK"),
+                      .bus(base_env.mng.master_sequencer),
+                      .base_address(`QUAD_ADAQ77681_AXI_MCLK_CLKGEN_BA));
 
-    pwm_api = new("PWM API",
-                  base_env.mng.master_sequencer,
-                  `QUAD_ADAQ77681_PWM_GEN_BA);
+    pwm_api     = new(
+                      .name("PWM API"),
+                      .bus(base_env.mng.master_sequencer),
+                      .base_address(`QUAD_ADAQ77681_PWM_GEN_BA));
 
     base_env.start();
     spi_env.start();
@@ -182,17 +180,7 @@ program test_program (
 
     init();
 
-    #100ns;
-
     fifo_spi_test();
-    sdi_lane_mask = {`NUM_OF_MISO{1'b1}};
-    sdo_lane_mask = 8'h01;
-    num_of_active_sdi_lanes = $countones(sdi_lane_mask);
-    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
-    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
-    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));//guarantee all SDO lanes must be active
-
-    #100ns;
 
     offload_spi_test();
 
@@ -282,17 +270,6 @@ program test_program (
   end
 
   //---------------------------------------------------------------------------
-  // Echo SCLK generation - we need this only if ECHO_SCLK is enabled
-  //---------------------------------------------------------------------------
-  `ifdef DEF_ECHO_SCLK
-    initial begin
-      forever @(quad_adaq77681_spi_sclk) begin
-        quad_adaq77681_echo_sclk <= #(`ECHO_SCLK_DELAY * 1ns) quad_adaq77681_spi_sclk;
-      end
-    end
-  `endif
-
-  //---------------------------------------------------------------------------
   // Sanity Tests
   //---------------------------------------------------------------------------
   task sanity_tests();
@@ -311,6 +288,11 @@ program test_program (
 
   task offload_spi_test();
 
+    sdi_lane_mask = {`NUM_OF_MISO{1'b1}};
+    sdo_lane_mask = 8'h01;
+    num_of_active_sdi_lanes = $countones(sdi_lane_mask);
+    num_of_active_sdo_lanes = $countones(sdo_lane_mask);
+
     tx_data_cast         = new [num_of_active_sdo_lanes];
     tx_data              = new [num_of_active_sdo_lanes];
     sdo_write_data       = new [`NUM_OF_MOSI];
@@ -323,6 +305,9 @@ program test_program (
     `else
       sdo_write_data_store = new [(`NUM_OF_WORDS)*(`NUM_OF_MOSI)];
     `endif
+
+    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
+    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));//guarantee only one SDO lane is active
 
     //Configure DMA
     dma_api.enable_dma();
@@ -351,7 +336,7 @@ program test_program (
     // Enqueue transfers to DUT
     for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
       for (int j = 0, k = 0; j < (`NUM_OF_MISO); j++) begin
-        rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
+        rx_data[j]      = sdi_lane_mask[j] ? $urandom() : `SDO_IDLE_STATE; //easier to debug
         if (sdi_lane_mask[j]) begin
           sdi_read_data_store[i * num_of_active_sdi_lanes + k]  = rx_data[j];
           k++;
@@ -361,7 +346,7 @@ program test_program (
       spi_send(rx_data);
 
       for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
-        tx_data[j] = $urandom;
+        tx_data[j] = $urandom();
         tx_data_cast[j] = tx_data[j];
       end
 
@@ -390,7 +375,6 @@ program test_program (
       `endif
     end
 
-    #100ns;
     spi_api.start_offload();
     `INFO(("Offload started."), ADI_VERBOSITY_LOW);
     spi_wait_send();
@@ -467,7 +451,7 @@ program test_program (
     // Generate a FIFO transaction, write SDO first
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
       for (int j = 0, k = 0; j < (`NUM_OF_MISO); j++) begin
-        rx_data[j]      = sdi_lane_mask[j] ? $urandom : `SDO_IDLE_STATE; //easier to debug
+        rx_data[j]      = sdi_lane_mask[j] ? $urandom() : `SDO_IDLE_STATE; //easier to debug
         if (sdi_lane_mask[j]) begin
           sdi_fifo_data_store[i * num_of_active_sdi_lanes + k] = rx_data[j];
           k++;
@@ -475,7 +459,7 @@ program test_program (
       end
 
       for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
-        tx_data[j]      = $urandom;
+        tx_data[j]      = $urandom();
         tx_data_cast[j] = tx_data[j]; //a cast is necessary for the SPI API
       end
 

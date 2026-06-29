@@ -39,30 +39,17 @@
 
 module system_tb();
 
-  `ifdef DEF_ECHO_SCLK
-  wire                     quad_adaq77681_echo_sclk;
-  `endif
   wire                     quad_adaq77681_spi_clk;
   wire                     quad_adaq77681_spi_sclk;
   wire [(`NUM_OF_CS-1) :0] quad_adaq77681_spi_cs;
   wire [(`NUM_OF_MISO-1):0] quad_adaq77681_spi_sdi;
   wire [(`NUM_OF_MOSI-1):0] quad_adaq77681_spi_sdo;
   wire                     quad_adaq77681_irq;
-  
+
   `TEST_PROGRAM test(
-    `ifdef DEF_ECHO_SCLK
-    .quad_adaq77681_echo_sclk(quad_adaq77681_echo_sclk),
-    `endif
-    .quad_adaq77681_spi_clk(quad_adaq77681_spi_clk),
-    .quad_adaq77681_spi_sclk(quad_adaq77681_spi_sclk),
-    .quad_adaq77681_spi_cs(quad_adaq77681_spi_cs),
-    .quad_adaq77681_spi_sdi(quad_adaq77681_spi_sdi),
     .quad_adaq77681_irq(quad_adaq77681_irq));
 
   test_harness `TH (
-    `ifdef DEF_ECHO_SCLK
-    .quad_adaq77681_echo_sclk(quad_adaq77681_echo_sclk),
-    `endif
     .quad_adaq77681_spi_vip_clk(quad_adaq77681_spi_clk),
     .quad_adaq77681_spi_vip_sclk(quad_adaq77681_spi_sclk),
     .quad_adaq77681_spi_vip_cs(quad_adaq77681_spi_cs),

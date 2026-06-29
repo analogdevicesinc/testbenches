@@ -15,24 +15,13 @@ include $(ADI_TB_DIR)/library/includes/Makeinclude_spi_engine.mk
 
 # Remaining test-bench dependencies except test programs
 SV_DEPS += spi_environment.sv
-# SV_DEPS += ../common/sv/m_axis_sequencer.sv
-# SV_DEPS += ../common/sv/s_axis_sequencer.sv
-# ENV_DEPS += system_project.tcl
-# ENV_DEPS += system_bd.tcl
-# ENV_DEPS +=../scripts/adi_sim.tcl
-# ENV_DEPS +=../scripts/run_sim.tcl
 
 LIB_DEPS += axi_clkgen
-LIB_DEPS += axi_pwm_gen
 LIB_DEPS += axi_dmac
-LIB_DEPS += axi_sysid
-LIB_DEPS += util_cdc
-LIB_DEPS += util_axis_fifo
 LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect
 LIB_DEPS += spi_engine/spi_engine_offload
-LIB_DEPS += sysid_rom
 
 # default test programs
 # Format is: <test name>

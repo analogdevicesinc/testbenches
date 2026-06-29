@@ -291,10 +291,14 @@ initial begin : main
   `INFO(("=== AD5529R Testbench Started ==="), ADI_VERBOSITY_LOW);
   `INFO(("  Configuration: NUM_OF_WORDS=%0d, NUM_OF_TRANSFERS=%0d", `NUM_OF_WORDS, `NUM_OF_TRANSFERS), ADI_VERBOSITY_LOW);
   spiEngine.sanity_test();  // version verify + scratch write/verify
-  reset_measurements(); // init measurement states and enable the timing monitors
 
   foreach (test_modes[idx]) begin
     reset_dut_state();
+    // Re-arm the timing monitors and zero per-mode accumulators (also rebuilds
+    // the throughput meter) so every mode is measured fresh. Without this, the
+    // verify_* tasks disable the monitors after mode 1 and modes 2..N would
+    // re-report mode 1's stale SCLK/CS samples as a pass.
+    reset_measurements();
     run_offload_test(test_modes[idx]);
   end
 
@@ -795,7 +799,6 @@ task automatic generate_sdo_data(
         ramp_step = (num_words <= 1) ? 0 : (dac_max / (num_words - 1));
         dac_word = (num_words <= 1) ? dac_max : (i * ramp_step);
       end
-      default: dac_word = {`DATA_DLENGTH{1'b1}};
     endcase
     sdo_write_data_store[i] = dac_word;
   end

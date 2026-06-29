@@ -113,7 +113,7 @@ package adi_spi_vip_pkg;
 
               for (int j = 0; j < vif.get_param_NUM_OF_MOSI(); j++) begin
                 if ($isunknown(mosi_logic[j]))
-                  this.error($sformatf("[SPI VIP] MOSI Rx: unknown mosi bit at sample edge!"));
+                  this.error($sformatf("MOSI Rx: unknown mosi bit at sample edge!"));
                 mosi_bit = bit'(mosi_logic[j]);
                 bitqueue_push_lsb(mosi_bit_queue[j], mosi_bit);
               end
@@ -198,9 +198,9 @@ package adi_spi_vip_pkg;
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
                   if (cs_inactive_mid_transfer_allowed) begin
-                    this.warning($sformatf("[SPI VIP] MISO Tx: CS inactive mid-transaction (allowed by allow_cs_inactive_mid_transfer)"));
+                    this.warning($sformatf("MISO Tx: CS inactive mid-transaction (allowed by allow_cs_inactive_mid_transfer)"));
                   end else begin
-                  this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
+                  this.fatal($sformatf("MISO Tx: early exit due to unexpected CS inactive!"));
                   end
                 end
                 foreach (miso_bits[j]) begin
@@ -230,7 +230,7 @@ package adi_spi_vip_pkg;
 
                 foreach (miso_mbx[j]) begin
                   if (i == vif.get_param_DATA_DLENGTH()-1) begin
-                    this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
+                    this.info($sformatf("MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
                     if (!using_default) begin
                       // finally pop an item from the mailbox after a complete transfer
                       miso_mbx[j].get(miso_data[j]);
@@ -354,7 +354,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                this.info($sformatf("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_HIGH);
+                this.info($sformatf("Stop event triggered."), ADI_VERBOSITY_HIGH);
                 this.stop_flag = 0;
               end
               begin

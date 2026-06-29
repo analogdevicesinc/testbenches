@@ -74,6 +74,11 @@ localparam int NUM_DAC_CHANNELS = 16;
 // Toggle/trigger pins TG0-TG3
 localparam int NUM_TG = 4;
 
+// Sustained per-channel throughput target (streaming mode, high transfer count).
+// Single source for the documented target and the asserted acceptance limit.
+localparam real TARGET_KSPS_PER_CH = 123.0;
+localparam real TARGET_KSPS_TOL_PCT = 10.0;
+
 // `DDR_BA injected as bare decimal 2147483648 (0x8000_0000), overflows a 32-bit
 // signed int (VRFC 10-9277). Hold in a wide unsigned param so address arithmetic
 // stays warning-free.
@@ -365,10 +370,11 @@ task automatic run_verification_suite();
   );
   `INFO(("Verifying IRQ..."), ADI_VERBOSITY_LOW);
   verify_irq_was_raised();
-  // Throughput acceptance (skipped for short runs). Streaming has documented
-  // ~123 kSPS/ch target; single-instruction has none -> smoke check.
+  // Throughput acceptance (skipped for short runs). Streaming has a documented
+  // sustained target (TARGET_KSPS_PER_CH); single-instruction has none -> smoke
+  // check.
   if (`NUM_OF_WORDS > 1)
-    tput_meter.verify_throughput(.expected_per_ch_ksps(123.0), .tol_pct(10.0), .error_cnt(total_error_count));
+    tput_meter.verify_throughput(.expected_per_ch_ksps(TARGET_KSPS_PER_CH), .tol_pct(TARGET_KSPS_TOL_PCT), .error_cnt(total_error_count));
   else
     tput_meter.verify_throughput(.expected_per_ch_ksps(0.0), .tol_pct(0.0), .error_cnt(total_error_count));
   `INFO(("Comparing transmitted SPI data against expected..."), ADI_VERBOSITY_LOW);
@@ -962,7 +968,7 @@ task automatic print_test_header(
          `NUM_OF_TRANSFERS * tput_meter.channels_per_transfer, tput_meter.channels_per_transfer, `DATA_DLENGTH), ADI_VERBOSITY_LOW);
   `INFO(("    DDR base address: 0x%08x", DDR_BASE_ADDR), ADI_VERBOSITY_LOW);
   `INFO(("    Total bytes to transfer / DDR buffer: %0d", total_bytes), ADI_VERBOSITY_LOW);
-  `INFO(("  Target: ~123 kSPS per channel when sustained (high transfer count)"), ADI_VERBOSITY_LOW);
+  `INFO(("  Target: ~%.0f kSPS per channel when sustained (high transfer count)", TARGET_KSPS_PER_CH), ADI_VERBOSITY_LOW);
 endtask
 
 // Start offload and run per-test acceptance check.

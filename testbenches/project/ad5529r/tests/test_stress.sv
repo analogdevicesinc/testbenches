@@ -25,7 +25,7 @@ program test_stress (
 
   typedef enum {DATA_MODE_RANDOM, DATA_MODE_RAMP} offload_test_t;
   // Test will loop for each mode below
-  offload_test_t test_modes[$] = '{DATA_MODE_RANDOM};
+  offload_test_t test_modes[$] = '{DATA_MODE_RANDOM, DATA_MODE_RANDOM};
 
   `include "ad5529r_test_flow.svh"
 

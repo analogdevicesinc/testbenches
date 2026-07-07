@@ -12,6 +12,9 @@ set ad_project_params(TLAST_EN) $tlast_en
 set tstrb_en [expr int(rand()*2)]
 set ad_project_params(TSTRB_EN) $tstrb_en
 
+set tlast_en [expr int(rand()*2)]
+set ad_project_params(TLAST_DEFAULT) $tlast_en
+
 set tid_width [expr int(int(rand()*2)*int(rand()*33.0))]
 set ad_project_params(TID_WIDTH) $tid_width
 

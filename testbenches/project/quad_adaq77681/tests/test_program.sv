@@ -80,7 +80,7 @@ program test_program (
   // --------------------------
   task automatic spi_receive(
       ref int unsigned  data[]);
-      spi_env.spi_agent.sequencer.receive_data(data);
+      spi_env.spi_agent.sequencer.receive_data(.data(data));
   endtask
 
   // --------------------------
@@ -88,7 +88,7 @@ program test_program (
   // --------------------------
   task spi_send(
       input [`DATA_DLENGTH-1:0] data[]);
-    spi_env.spi_agent.sequencer.send_data(data);
+    spi_env.spi_agent.sequencer.send_data(.data(data));
   endtask
 
   // --------------------------
@@ -129,8 +129,8 @@ program test_program (
                       .irq_base_address(`IRQ_C_BA),
                       .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
 
-    mng = new("", `TH.`MNG_AXI.inst.IF);
-    ddr = new("", `TH.`DDR_AXI.inst.IF);
+    mng = new(.name(""), .master_vip_if(`TH.`MNG_AXI.inst.IF));
+    ddr = new(.name(""), .slave_vip_if(`TH.`DDR_AXI.inst.IF));
 
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
@@ -169,7 +169,7 @@ program test_program (
 
     spi_env.configure();
 
-    spi_env.spi_agent.sequencer.set_default_miso_data('h2AA55);
+    spi_env.spi_agent.sequencer.set_default_miso_data(.data('h2AA55));
 
     // start sdo source (will wait for data enqueued)
     `ifdef DEF_SDO_STREAMING
@@ -201,16 +201,16 @@ program test_program (
       input [7:0] sdo_lane_mask);
 
     // define spi lane mask
-    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));
-    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));
+    spi_api.fifo_command(.cmd(`SET_SDI_LANE_MASK(sdi_lane_mask)));
+    spi_api.fifo_command(.cmd(`SET_SDO_LANE_MASK(sdo_lane_mask)));
     // assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFE));
+    spi_api.fifo_command(.cmd(`SET_CS(8'hFE)));
     // transfer data
-    spi_api.fifo_command(`INST_WRD);
+    spi_api.fifo_command(.cmd(`INST_WRD));
     // de-assert CSN
-    spi_api.fifo_command(`SET_CS(8'hFF));
+    spi_api.fifo_command(.cmd(`SET_CS(8'hFF)));
     // SYNC command to generate interrupt
-    spi_api.fifo_command(`INST_SYNC | sync_id);
+    spi_api.fifo_command(.cmd(`INST_SYNC | sync_id));
     `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
   endtask
 
@@ -224,10 +224,10 @@ program test_program (
       for (int i = 0; i < `NUM_OF_MOSI; i++) begin
         for (int j = 0; j < (`DATA_WIDTH/8); j++) begin
           data[i * (`DATA_WIDTH/8) + j] = (tx_data[i] & (8'hFF << 8*j)) >> 8*j;
-          spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i * (`DATA_WIDTH/8) + j]);
+          spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(.byte_stream(data[i * (`DATA_WIDTH/8) + j]));
         end
       end
-      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8) * (`NUM_OF_MOSI),0,0);
+      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count(.bytes_to_generate((`DATA_WIDTH/8) * (`NUM_OF_MOSI)), .gen_last(0), .gen_sync(0));
     `endif
   endtask
 
@@ -241,31 +241,31 @@ program test_program (
     forever begin
       @(posedge quad_adaq77681_irq);
       // read pending IRQs
-      spi_api.get_irq_pending(irq_pending);
+      spi_api.get_irq_pending(.irq_pending(irq_pending));
       // IRQ launched by Offload SYNC command
-      if (spi_api.check_irq_offload_sync_id_pending(irq_pending)) begin
-        spi_api.get_sync_id(sync_id);
+      if (spi_api.check_irq_offload_sync_id_pending(.irq_pending(irq_pending))) begin
+        spi_api.get_sync_id(.sync_id(sync_id));
         `INFO(("Offload SYNC %d IRQ. An offload transfer just finished.",  sync_id), ADI_VERBOSITY_LOW);
       end
       // IRQ launched by SYNC command
-      if (spi_api.check_irq_sync_event(irq_pending)) begin
-        spi_api.get_sync_id(sync_id);
+      if (spi_api.check_irq_sync_event(.irq_pending(irq_pending))) begin
+        spi_api.get_sync_id(.sync_id(sync_id));
         `INFO(("SYNC %d IRQ. FIFO transfer just finished.", sync_id), ADI_VERBOSITY_LOW);
       end
       // IRQ launched by SDI FIFO
-      if (spi_api.check_irq_sdi_almost_full(irq_pending)) begin
+      if (spi_api.check_irq_sdi_almost_full(.irq_pending(irq_pending))) begin
         `INFO(("SDI FIFO IRQ."), ADI_VERBOSITY_LOW);
       end
       // IRQ launched by SDO FIFO
-      if (spi_api.check_irq_sdo_almost_empty(irq_pending)) begin
+      if (spi_api.check_irq_sdo_almost_empty(.irq_pending(irq_pending))) begin
         `INFO(("SDO FIFO IRQ."), ADI_VERBOSITY_LOW);
       end
       // IRQ launched by CMD FIFO
-      if (spi_api.check_irq_cmd_almost_empty(irq_pending)) begin
+      if (spi_api.check_irq_cmd_almost_empty(.irq_pending(irq_pending))) begin
         `INFO(("CMD FIFO IRQ."), ADI_VERBOSITY_LOW);
       end
       // Clear all pending IRQs
-      spi_api.clear_irq_pending(irq_pending);
+      spi_api.clear_irq_pending(.irq_pending(irq_pending));
     end
   end
 
@@ -306,8 +306,8 @@ program test_program (
       sdo_write_data_store = new [(`NUM_OF_WORDS)*(`NUM_OF_MOSI)];
     `endif
 
-    spi_api.fifo_command(`SET_SDI_LANE_MASK(sdi_lane_mask));//guarantee all SDI lanes must be active
-    spi_api.fifo_command(`SET_SDO_LANE_MASK(sdo_lane_mask));//guarantee only one SDO lane is active
+    spi_api.fifo_command(.cmd(`SET_SDI_LANE_MASK(sdi_lane_mask)));//guarantee all SDI lanes must be active
+    spi_api.fifo_command(.cmd(`SET_SDO_LANE_MASK(sdo_lane_mask)));//guarantee only one SDO lane is active
 
     //Configure DMA
     dma_api.enable_dma();
@@ -316,22 +316,22 @@ program test_program (
       .tlast(1'b1),
       .partial_reporting_en(1'b1)
     );
-    dma_api.set_lengths(((`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_MISO) * (`DATA_WIDTH/8))-1,0);
-    dma_api.set_dest_addr(`DDR_BA);
+    dma_api.set_lengths(.xfer_length_x(((`NUM_OF_TRANSFERS) * (`NUM_OF_WORDS) * (`NUM_OF_MISO) * (`DATA_WIDTH/8))-1), .xfer_length_y(0));
+    dma_api.set_dest_addr(.xfer_addr(`DDR_BA));
     dma_api.transfer_start();
 
     // Configure the Offload module
-    spi_api.fifo_offload_command(`INST_CFG);
-    spi_api.fifo_offload_command(`INST_PRESCALE);
-    spi_api.fifo_offload_command(`INST_DLENGTH);
+    spi_api.fifo_offload_command(.cmd(`INST_CFG));
+    spi_api.fifo_offload_command(.cmd(`INST_PRESCALE));
+    spi_api.fifo_offload_command(.cmd(`INST_DLENGTH));
     if (`CS_ACTIVE_HIGH) begin
-      spi_api.fifo_offload_command(`SET_CS_INV_MASK(8'hFF));
+      spi_api.fifo_offload_command(.cmd(`SET_CS_INV_MASK(8'hFF)));
     end
-    spi_api.fifo_offload_command(`SET_CS(8'hFE));
-    spi_api.fifo_offload_command(`INST_WRD);
-    // spi_api.fifo_offload_command(`INST_RD);
-    spi_api.fifo_offload_command(`SET_CS(8'hFF));
-    spi_api.fifo_offload_command(`INST_SYNC | 2);
+    spi_api.fifo_offload_command(.cmd(`SET_CS(8'hFE)));
+    spi_api.fifo_offload_command(.cmd(`INST_WRD));
+    // spi_api.fifo_offload_command(.cmd(`INST_RD));
+    spi_api.fifo_offload_command(.cmd(`SET_CS(8'hFF)));
+    spi_api.fifo_offload_command(.cmd(`INST_SYNC | 2));
 
     // Enqueue transfers to DUT
     for (int i = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)); i++) begin
@@ -343,7 +343,7 @@ program test_program (
         end
       end
 
-      spi_send(rx_data);
+      spi_send(.data(rx_data));
 
       for (int j = 0; j < num_of_active_sdo_lanes; j++) begin
         tx_data[j] = $urandom();
@@ -351,7 +351,7 @@ program test_program (
       end
 
       `ifdef DEF_SDO_STREAMING
-        sdo_stream_gen(tx_data);
+        sdo_stream_gen(.tx_data(tx_data));
         for (int j = 0, k = 0; j < `NUM_OF_MOSI; j++) begin
           if (sdo_lane_mask[j]) begin
             sdo_write_data_store[i * (`NUM_OF_MOSI) + j] = tx_data[k]; // all of valid random words will be used
@@ -370,7 +370,7 @@ program test_program (
               sdo_write_data_store[i * (`NUM_OF_MOSI) + j] = `SDO_IDLE_STATE;
             end
           end
-          spi_api.sdo_offload_fifo_write(tx_data_cast);
+          spi_api.sdo_offload_fifo_write(.data(tx_data_cast));
         end
       `endif
     end
@@ -391,7 +391,7 @@ program test_program (
 
     for (int i = 0, k = 0; i < ((`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS)*(`NUM_OF_MISO)); i++) begin
       if (sdi_lane_mask[i%(`NUM_OF_MISO)]) begin
-        sdi_read_data[k] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
+        sdi_read_data[k] = base_env.ddr.slave_sequencer.BackdoorRead32(.addr(xil_axi_uint'(`DDR_BA + 4*i)));
         if (sdi_read_data[k] != sdi_read_data_store[k]) begin //one word at a time comparison
           `INFO(("sdi_read_data[%d]: %x; sdi_read_data_store[%d]: %x",
           k, sdi_read_data[k],
@@ -404,7 +404,7 @@ program test_program (
     `INFO(("Offload Read Test PASSED"), ADI_VERBOSITY_LOW);
 
     for (int i = 0; i < (`NUM_OF_TRANSFERS)*(`NUM_OF_WORDS); i++) begin
-      spi_receive(sdo_write_data);
+      spi_receive(.data(sdo_write_data));
       for (int j = 0; j < `NUM_OF_MOSI; j++) begin
         `ifdef DEF_SDO_STREAMING
           if (sdo_write_data[j] != sdo_write_data_store[(i * `NUM_OF_MOSI + j)]) begin
@@ -472,19 +472,19 @@ program test_program (
         end
       end
 
-      spi_api.sdo_fifo_write((tx_data_cast));// << API is expecting 32 bits, only active lanes are written
-      spi_send(rx_data);
+      spi_api.sdo_fifo_write(.data(tx_data_cast));// << API is expecting 32 bits, only active lanes are written
+      spi_send(.data(rx_data));
     end
 
-    generate_transfer_cmd(1, sdi_lane_mask, sdo_lane_mask); //generate transfer with specific spi lane mask
+    generate_transfer_cmd(.sync_id(1), .sdi_lane_mask(sdi_lane_mask), .sdo_lane_mask(sdo_lane_mask)); //generate transfer with specific spi lane mask
 
     `INFO(("Waiting for SPI VIP send..."), ADI_VERBOSITY_LOW);
     spi_wait_send();
     `INFO(("SPI sent"), ADI_VERBOSITY_LOW);
 
     for (int i = 0; i < (`NUM_OF_WORDS); i++) begin
-      spi_api.sdi_fifo_read(rx_data_cast); //API always returns 32 bits
-      spi_receive(receive_data);
+      spi_api.sdi_fifo_read(.data(rx_data_cast)); //API always returns 32 bits
+      spi_receive(.data(receive_data));
       for (int j = 0; j < num_of_active_sdi_lanes; j++) begin
         sdi_fifo_data[i * num_of_active_sdi_lanes + j] = rx_data_cast[j];
       end
@@ -519,7 +519,7 @@ program test_program (
 
     // Config pwm
     pwm_api.reset();
-    pwm_api.pulse_config(0,'d16, 'd1, 'd0); // config channel 0 period, width, and offset
+    pwm_api.pulse_config(.channel(0), .period('d16), .width('d1), .offset('d0)); // config channel 0 period, width, and offset
     pwm_api.load_config();
     pwm_api.start();
     `INFO(("axi_pwm_gen started."), ADI_VERBOSITY_LOW);
@@ -528,11 +528,11 @@ program test_program (
     spi_api.enable_spi_engine();
 
     // Configure the execution module
-    spi_api.fifo_command(`INST_CFG);
-    spi_api.fifo_command(`INST_PRESCALE);
-    spi_api.fifo_command(`INST_DLENGTH);
+    spi_api.fifo_command(.cmd(`INST_CFG));
+    spi_api.fifo_command(.cmd(`INST_PRESCALE));
+    spi_api.fifo_command(.cmd(`INST_DLENGTH));
     if (`CS_ACTIVE_HIGH) begin
-      spi_api.fifo_command(`SET_CS_INV_MASK(8'hFF));
+      spi_api.fifo_command(.cmd(`SET_CS_INV_MASK(8'hFF)));
     end
 
     // Set up the interrupts

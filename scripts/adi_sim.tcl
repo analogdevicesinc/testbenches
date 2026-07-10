@@ -235,13 +235,21 @@ proc adi_xcvr_sim_init {} {
   set pll_type  $ad_project_params(PLL_TYPE)
   set board_name $ad_project_params(FPGA_BOARD)
 
-  set xcvr_config_paths [adi_xcvr_project [list \
+  set xcvr_params [list \
     LANE_RATE $lane_rate \
     REF_CLK   $ref_clk \
     PLL_TYPE  $pll_type \
-  ] $board_name]
+  ]
 
-  puts "INFO: XCVR config - LANE_RATE: $lane_rate, REF_CLK: $ref_clk, PLL_TYPE: $pll_type"
+  foreach opt_param {JESD_MODE XCVR_RX_PLL_TYPE XCVR_RX_LANE_RATE XCVR_RX_REF_CLK} {
+    if {[info exists ad_project_params($opt_param)] && $ad_project_params($opt_param) ne ""} {
+      lappend xcvr_params $opt_param $ad_project_params($opt_param)
+    }
+  }
+
+  set xcvr_config_paths [adi_xcvr_project $xcvr_params $board_name]
+
+  puts "INFO: XCVR config - LANE_RATE: $lane_rate, REF_CLK: $ref_clk, PLL_TYPE: $pll_type, BOARD: $board_name"
   puts "xcvr_config_paths: $xcvr_config_paths"
   return $xcvr_config_paths
 }

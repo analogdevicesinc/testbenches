@@ -25,6 +25,9 @@ set ad_project_params(TX_JESD_K) 32
 
 set ad_project_params(TDD_SUPPORT) 0
 
+set ad_project_params(LANE_RATE) 10
+set ad_project_params(PLL_TYPE) QPLL0
+
 set xilinx_boards {"vcu118"}
 set chosen_board [lindex $xilinx_boards [expr {int(rand() * [llength $xilinx_boards])}]]
 set ad_project_params(FPGA_BOARD) $chosen_board

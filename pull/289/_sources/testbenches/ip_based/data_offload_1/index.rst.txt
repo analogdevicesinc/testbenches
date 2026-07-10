@@ -39,8 +39,6 @@ Configuration parameters and modes
 
 The following parameters of this project that can be configured:
 
--  ADC_DATA_PATH_WIDTH: RX AXIS VIP TDATA width in bytes
--  DAC_DATA_PATH_WIDTH: TX AXIS VIP TDATA width in bytes
 -  ADC_OFFLOAD_MEM_TYPE: used storage type:
    Options: 0 for internal or 1 for external
 -  ADC_OFFLOAD_SIZE: size of the storage element in bytes
@@ -66,16 +64,6 @@ The following configuration files are available:
      - cfg2
      - cfg3
      - cfg4
-   * - ADC\_DATA\_PATH\_WIDTH
-     - 16
-     - 16
-     - 8
-     - 16
-   * - DAC\_DATA\_PATH\_WIDTH
-     - 16
-     - 16
-     - 16
-     - 16
    * - ADC\_OFFLOAD\_MEM\_TYPE
      - 0
      - 1

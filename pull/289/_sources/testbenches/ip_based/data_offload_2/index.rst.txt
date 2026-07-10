@@ -163,7 +163,7 @@ The following configuration files are available:
      - 512
      - 512
      - 512
-     - 1024
+     - 512
      - 1024
      - 512
      - 512

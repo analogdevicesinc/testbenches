@@ -38,7 +38,6 @@
 package scoreboard_pack_pkg;
 
   import logger_pkg::*;
-  import adi_component_pkg::*;
   import scoreboard_pkg::*;
 
   typedef enum {
@@ -73,7 +72,7 @@ package scoreboard_pack_pkg;
     endfunction: new
 
     // compare the collected data
-    virtual function void compare_transaction();
+    virtual task compare_transaction();
 
       logic [7:0] source_byte;
       logic [7:0] sink_byte;
@@ -82,22 +81,24 @@ package scoreboard_pack_pkg;
       int outer_loop = (this.mode == CPACK) ? this.channels : this.samples;
       int inner_loop = (this.mode == CPACK) ? this.samples : this.channels;
 
-      this.byte_streams_empty_sig = 0;
+      this.data_fifos_empty_sig = 0;
 
-      if (this.enabled == 0)
+      if (this.enabled == 0) begin
         return;
+      end
 
-      while ((this.subscriber_source.get_size() > 0) &&
-            (this.subscriber_sink.get_size() >= this.channels*this.samples*this.width/8)) begin
+      while ((this.subscriber_source.data_fifo.size() > 0) &&
+            (this.subscriber_sink.data_fifo.size() >= this.channels*this.samples*this.width/8)) begin
         for (int i=0; i<this.channels*this.samples*this.width/8; i++) begin
-          sink_byte_stream_block[i] = this.subscriber_sink.get_data();
+          sink_byte_stream_block[i] = this.subscriber_sink.data_fifo.pop();
         end
         for (int i=0; i<outer_loop; i++) begin
           for (int j=0; j<inner_loop; j++) begin
             for (int k=0; k<this.width/8; k++) begin
-              source_byte = this.subscriber_source.get_data();
-              if (this.sink_type == CYCLIC)
-                this.subscriber_source.put_data(source_byte);
+              source_byte = this.subscriber_source.data_fifo.pop();
+              if (this.sink_type == CYCLIC) begin
+                void'(this.subscriber_source.data_fifo.push(source_byte));
+              end
               sink_byte = sink_byte_stream_block[(outer_loop*j+i)*this.width/8+k];
               this.info($sformatf("Scoreboard source-sink data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_MEDIUM);
               if (source_byte != sink_byte) begin
@@ -108,12 +109,12 @@ package scoreboard_pack_pkg;
         end
       end
 
-      if ((this.subscriber_source.get_size() == 0) &&
-          (this.subscriber_sink.get_size() == 0)) begin
-        this.byte_streams_empty_sig = 1;
-        ->this.byte_streams_empty;
+      if ((this.subscriber_source.data_fifo.size() == 0) &&
+          (this.subscriber_sink.data_fifo.size() == 0)) begin
+        this.data_fifos_empty_sig = 1;
+        ->this.data_fifos_empty;
       end
-    endfunction: compare_transaction
+    endtask: compare_transaction
 
   endclass
 

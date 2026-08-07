@@ -131,7 +131,7 @@ package test_harness_env_pkg;
     // System reset routine
     //============================================================================
     task sys_reset();
-      //asserts all the resets for 100 ns
+      //asserts all the resets for 1 us
       this.sys_rst_vip_if.assert_reset();
       #200ns;
       this.sys_rst_vip_if.deassert_reset();

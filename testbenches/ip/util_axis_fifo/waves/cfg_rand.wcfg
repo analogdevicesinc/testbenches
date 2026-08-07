@@ -5,28 +5,60 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
-            <top_module name="\$unit_xpm_cdc_sv_220102727 " />
+            <top_module name="adi_agent_pkg" />
+            <top_module name="adi_api_pkg" />
             <top_module name="adi_axi_agent_pkg" />
             <top_module name="adi_axi_monitor_pkg" />
             <top_module name="adi_axis_agent_pkg" />
+            <top_module name="adi_axis_byte_pkg" />
+            <top_module name="adi_axis_config_pkg" />
+            <top_module name="adi_axis_frame_pkg" />
             <top_module name="adi_axis_monitor_pkg" />
-            <top_module name="adi_common_pkg" />
+            <top_module name="adi_axis_packet_pkg" />
+            <top_module name="adi_axis_rand_config_pkg" />
+            <top_module name="adi_axis_rand_obj_pkg" />
+            <top_module name="adi_axis_transaction_pkg" />
+            <top_module name="adi_component_pkg" />
+            <top_module name="adi_environment_pkg" />
+            <top_module name="adi_fifo_class_pkg" />
+            <top_module name="adi_fifo_pkg" />
+            <top_module name="adi_fifo_primitive_pkg" />
+            <top_module name="adi_monitor_pkg" />
+            <top_module name="adi_object_pkg" />
+            <top_module name="adi_reporter_pkg" />
+            <top_module name="adi_sequencer_pkg" />
+            <top_module name="attributes" />
             <top_module name="axi4stream_vip_pkg" />
             <top_module name="axi_vip_pkg" />
             <top_module name="environment_pkg" />
             <top_module name="glbl" />
+            <top_module name="io_vip_if_base_pkg" />
             <top_module name="ipif_pkg" />
+            <top_module name="irq_handler_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
             <top_module name="m_axis_sequencer_pkg" />
+            <top_module name="math_real" />
+            <top_module name="numeric_std" />
             <top_module name="pub_sub_pkg" />
-
             <top_module name="s_axi_sequencer_pkg" />
             <top_module name="s_axis_sequencer_pkg" />
             <top_module name="scoreboard_pkg" />
+            <top_module name="standard" />
+            <top_module name="status_signals_pkg" />
             <top_module name="std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_misc" />
+            <top_module name="std_logic_unsigned" />
             <top_module name="system_tb" />
             <top_module name="test_harness_env_pkg" />
+            <top_module name="test_harness_input_axis_0_pkg" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+            <top_module name="vip_agent_typedef_pkg" />
+            <top_module name="vital_primitives" />
+            <top_module name="vital_timing" />
             <top_module name="vpkg" />
             <top_module name="watchdog_pkg" />
             <top_module name="xil_common_vip_pkg" />
@@ -34,15 +66,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="17.454 ns"></ZoomEndTime>
-      <Cursor1Time time="1,048.600 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="10.128001 us"></ZoomEndTime>
+      <Cursor1Time time="1.044001 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="170"></ValueColumnWidth>
+      <ValueColumnWidth column_width="154"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="2" />
+   <WVObjectSize size="26" />
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/s_axis">
       <obj_property name="children_use_element_short_name">true</obj_property>
       <obj_property name="WaveformStyle">STYLE_ENUM_TRANSACTION</obj_property>
@@ -62,5 +94,98 @@
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/m_axis">
       <obj_property name="ElementShortName">m_axis</obj_property>
       <obj_property name="ObjectShortName">m_axis</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider23" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/s_axis_aclk">
+      <obj_property name="ElementShortName">s_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">s_axis_aclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/s_axis_ready">
+      <obj_property name="ElementShortName">s_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">s_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/s_axis_valid">
+      <obj_property name="ElementShortName">s_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/s_axis_room">
+      <obj_property name="ElementShortName">s_axis_room[3:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_room[3:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/s_axis_empty">
+      <obj_property name="ElementShortName">s_axis_empty</obj_property>
+      <obj_property name="ObjectShortName">s_axis_empty</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/s_axis_almost_empty">
+      <obj_property name="ElementShortName">s_axis_almost_empty</obj_property>
+      <obj_property name="ObjectShortName">s_axis_almost_empty</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/s_axis_full">
+      <obj_property name="ElementShortName">s_axis_full</obj_property>
+      <obj_property name="ObjectShortName">s_axis_full</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/s_axis_almost_full">
+      <obj_property name="ElementShortName">s_axis_almost_full</obj_property>
+      <obj_property name="ObjectShortName">s_axis_almost_full</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider24" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/m_axis_aclk">
+      <obj_property name="ElementShortName">m_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">m_axis_aclk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/m_axis_ready">
+      <obj_property name="ElementShortName">m_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/m_axis_valid">
+      <obj_property name="ElementShortName">m_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/m_axis_level">
+      <obj_property name="ElementShortName">m_axis_level[3:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_level[3:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/m_axis_empty">
+      <obj_property name="ElementShortName">m_axis_empty</obj_property>
+      <obj_property name="ObjectShortName">m_axis_empty</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/m_axis_almost_empty">
+      <obj_property name="ElementShortName">m_axis_almost_empty</obj_property>
+      <obj_property name="ObjectShortName">m_axis_almost_empty</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/m_axis_full">
+      <obj_property name="ElementShortName">m_axis_full</obj_property>
+      <obj_property name="ObjectShortName">m_axis_full</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/m_axis_almost_full">
+      <obj_property name="ElementShortName">m_axis_almost_full</obj_property>
+      <obj_property name="ObjectShortName">m_axis_almost_full</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider25" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/ALMOST_EMPTY_THRESHOLD">
+      <obj_property name="ElementShortName">ALMOST_EMPTY_THRESHOLD[3:0]</obj_property>
+      <obj_property name="ObjectShortName">ALMOST_EMPTY_THRESHOLD[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/ALMOST_FULL_THRESHOLD">
+      <obj_property name="ElementShortName">ALMOST_FULL_THRESHOLD[3:0]</obj_property>
+      <obj_property name="ObjectShortName">ALMOST_FULL_THRESHOLD[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/ASYNC_CLK">
+      <obj_property name="ElementShortName">ASYNC_CLK[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ASYNC_CLK[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/\fifo.s_axis_waddr ">
+      <obj_property name="ElementShortName">\fifo.s_axis_waddr [3:0]</obj_property>
+      <obj_property name="ObjectShortName">\fifo.s_axis_waddr [3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_axis_fifo_DUT/inst/\fifo.m_axis_raddr ">
+      <obj_property name="ElementShortName">\fifo.m_axis_raddr [3:0]</obj_property>
+      <obj_property name="ObjectShortName">\fifo.m_axis_raddr [3:0]</obj_property>
    </wvobject>
 </wave_config>

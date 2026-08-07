@@ -61,7 +61,7 @@ ad_ip_instance xlconstant GND [list \
 ]
 ad_connect gnd GND/dout
 
-for {set i 0} {$i < 2} {incr i} {
+for {set i 0} {$i < 1} {incr i} {
   ad_ip_instance axi_dmac i_rx_dmac_${i} [list \
     DMA_TYPE_SRC 1 \
     DMA_TYPE_DEST 0 \

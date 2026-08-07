@@ -39,13 +39,17 @@ package adi_axis_monitor_pkg;
 
   import axi4stream_vip_pkg::*;
   import logger_pkg::*;
-  import adi_vip_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_monitor_pkg::*;
   import pub_sub_pkg::*;
-
+  import adi_object_pkg::*;
+  import adi_axis_transaction_pkg::*;
+  import adi_fifo_class_pkg::*;
+  import adi_axis_config_pkg::*;
 
   class adi_axis_monitor_base extends adi_monitor;
 
-    adi_publisher #(logic [7:0]) publisher;
+    adi_publisher #(adi_axis_transaction) publisher;
 
     protected bit enabled;
     protected event enable_ev;
@@ -114,24 +118,59 @@ package adi_axis_monitor_pkg;
     // collect data from the AXI4Strean interface of the stub, this task
     // handles both ONESHOT and CYCLIC scenarios
     virtual task get_transaction();
-      axi4stream_transaction transaction;
-      xil_axi4stream_data_beat data_beat;
-      xil_axi4stream_strb_beat keep_beat;
-      int num_bytes;
-      logic [7:0] axi_byte;
-      logic [7:0] data_queue [$];
+      axi4stream_transaction xil_transaction;
+      xil_axi4stream_data_byte tdata[];
+      xil_axi4stream_strb tkeep[];
+      xil_axi4stream_strb tstrb[];
+      bit tlast;
+      xil_axi4stream_uint tid;
+      xil_axi4stream_uint tdest;
+      xil_axi4stream_user_beat tuser;
+      adi_axis_config axis_cfg = new(`AXIS_TRANSACTION_SEQ_PARAM(AXIS));
+      adi_axis_transaction adi_transaction = new(.cfg(axis_cfg));
+      adi_fifo_class #(adi_axis_transaction) data_queue = new();
+
+      tdata = new[axis_cfg.BYTES_PER_TRANSACTION];
+      tkeep = new[axis_cfg.BYTES_PER_TRANSACTION];
+      tstrb = new[axis_cfg.BYTES_PER_TRANSACTION];
 
       forever begin
-        this.monitor.item_collected_port.get(transaction);
-        // all bytes from a beat are valid
-        num_bytes = transaction.get_data_width()/8;
-        data_beat = transaction.get_data_beat();
-        keep_beat = transaction.get_keep_beat();
-        for (int j=0; j<num_bytes; j++) begin
-          axi_byte = data_beat[j*8+:8];
-          if (keep_beat[j+:1] || !this.monitor.vif_proxy.C_XIL_AXI4STREAM_SIGNAL_SET[XIL_AXI4STREAM_SIGSET_POS_KEEP])
-            data_queue.push_back(axi_byte);
+        this.monitor.item_collected_port.get(xil_transaction);
+        // extract data from Xil AXIS transaction
+        xil_transaction.get_data(tdata);
+        xil_transaction.get_keep(tkeep);
+        xil_transaction.get_strb(tstrb);
+        tlast = xil_transaction.get_last();
+        tid = xil_transaction.get_id();
+        tdest = xil_transaction.get_dest();
+        tuser = xil_transaction.get_user_beat();
+
+        // create ADI AXIS transaction from extracted data
+        if (axis_cfg.EN_TLAST) begin
+          adi_transaction.update_tlast(tlast);
         end
+        adi_transaction.update_tid(tid);
+        adi_transaction.update_tdest(tdest);
+        if (!AXIS_VIP_USER_BITS_PER_BYTE && AXIS_VIP_USER_WIDTH > 0) begin
+          adi_transaction.update_tuser(tuser);
+        end
+        for (int i=0; i<AXIS_VIP_DATA_WIDTH/8; i++) begin
+          adi_transaction.bytes[i].update_tdata(tdata[i]);
+          if (axis_cfg.EN_TKEEP) begin
+            adi_transaction.bytes[i].update_tkeep(tkeep[i]);
+          end else begin
+            adi_transaction.bytes[i].update_tkeep(1'b1);
+          end
+          if (axis_cfg.EN_TSTRB) begin
+            adi_transaction.bytes[i].update_tstrb(tstrb[i]);
+          end else begin
+            adi_transaction.bytes[i].update_tstrb(adi_transaction.bytes[i].tkeep);
+          end
+          if (AXIS_VIP_USER_BITS_PER_BYTE && AXIS_VIP_USER_WIDTH > 0) begin
+            adi_transaction.bytes[i].update_tuser(tuser[i*AXIS_VIP_USER_WIDTH/(AXIS_VIP_DATA_WIDTH/8)+:AXIS_VIP_USER_WIDTH/(AXIS_VIP_DATA_WIDTH/8)]);
+          end
+        end
+        void'(data_queue.push(adi_transaction));
         this.info($sformatf("Caught an AXI4 stream transaction: %d", data_queue.size()), ADI_VERBOSITY_MEDIUM);
         this.publisher.notify(data_queue);
         data_queue.delete();

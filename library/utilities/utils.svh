@@ -74,4 +74,6 @@
 `define MAX(a,b) ((a > b) ? a : b)
 `define MIN(a,b) ((a > b) ? b : a)
 
+`define INT_MAX 32'sd2147483647
+
 `endif

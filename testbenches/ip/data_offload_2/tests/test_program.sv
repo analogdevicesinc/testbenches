@@ -82,7 +82,7 @@ module test_program(
 
     env.src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
     for (int i = 0; i < `SRC_TRANSFERS_INITIAL_COUNT; i++)
-      env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
+      env.src_axis_seq.add_xfer_transaction_byte_count(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0); // Only gen TLAST in TX path
 
     env.dst_axis_seq.set_mode(`DST_READY_MODE);
     env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
@@ -119,7 +119,7 @@ module test_program(
     init_req <= 1'b1;
 
     if (!`OFFLOAD_ONESHOT) begin
-      env.src_axis_seq.wait_empty_descriptor_queue();
+      env.src_axis_seq.wait_empty_transaction_queue();
       init_req <= 1'b0;
     end
 
@@ -130,10 +130,10 @@ module test_program(
     #100ns;
 
     for (int i = 0; i < `SRC_TRANSFERS_DELAYED_COUNT; i++)
-      env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
+      env.src_axis_seq.add_xfer_transaction_byte_count(`SRC_TRANSFERS_LENGTH, `PATH_TYPE, 0);
 
     if (!`OFFLOAD_ONESHOT) begin
-      env.src_axis_seq.wait_empty_descriptor_queue();
+      env.src_axis_seq.wait_empty_transaction_queue();
       init_req <= 1'b0;
     end
 

@@ -35,13 +35,28 @@
 
 global ad_project_params
 
+# Get VIP configuration parameters
+set DATA_WIDTH $ad_project_params(DATA_WIDTH)
+set TKEEP_EN $ad_project_params(TKEEP_EN)
+set TSTRB_EN $ad_project_params(TSTRB_EN)
+set TLAST_EN $ad_project_params(TLAST_EN)
+set TUSER_EN $ad_project_params(TUSER_EN)
+set TID_EN $ad_project_params(TID_EN)
+set TDEST_EN $ad_project_params(TDEST_EN)
+set TUSER_WIDTH $ad_project_params(TUSER_WIDTH)
+set TID_WIDTH $ad_project_params(TID_WIDTH)
+set TDEST_WIDTH $ad_project_params(TDEST_WIDTH)
+
 ad_ip_instance axi4stream_vip src_axis [list \
   INTERFACE_MODE {MASTER} \
+  TDATA_NUM_BYTES [expr {$DATA_WIDTH/8}] \
   HAS_TREADY 1 \
-  HAS_TLAST 1 \
-  TDATA_NUM_BYTES 4 \
-  TDEST_WIDTH 0 \
-  TID_WIDTH 0 \
+  HAS_TKEEP $TKEEP_EN \
+  HAS_TSTRB $TSTRB_EN \
+  HAS_TLAST $TLAST_EN \
+  TUSER_WIDTH [expr $TUSER_WIDTH * $TUSER_EN] \
+  TID_WIDTH [expr $TID_WIDTH * $TID_EN] \
+  TDEST_WIDTH [expr $TDEST_WIDTH * $TDEST_EN] \
 ]
 adi_sim_add_define "SRC_AXIS=src_axis"
 
@@ -50,6 +65,13 @@ ad_connect sys_dma_resetn src_axis/aresetn
 
 ad_ip_instance axi4stream_vip dst_axis [list \
   INTERFACE_MODE {SLAVE} \
+  TDATA_NUM_BYTES [expr {$DATA_WIDTH/8}] \
+  HAS_TKEEP $TKEEP_EN \
+  HAS_TSTRB $TSTRB_EN \
+  HAS_TLAST $TLAST_EN \
+  TUSER_WIDTH [expr $TUSER_WIDTH * $TUSER_EN] \
+  TID_WIDTH [expr $TID_WIDTH * $TID_EN] \
+  TDEST_WIDTH [expr $TDEST_WIDTH * $TDEST_EN] \
 ]
 adi_sim_add_define "DST_AXIS=dst_axis"
 

@@ -19,9 +19,9 @@ SV_DEPS += $(ADI_TB_DIR)/library/base_classes/adi_driver_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/base_classes/adi_monitor_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/base_classes/adi_sequencer_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/test_harness_env.sv
-SV_DEPS += $(ADI_TB_DIR)/library/drivers/common/watchdog.sv
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/irq_handler_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/vip/adi/io_vip/io_vip_if_base_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/utilities/watchdog.sv
 
 SV_DEPS += system_tb.sv
 

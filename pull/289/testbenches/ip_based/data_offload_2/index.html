@@ -8,7 +8,7 @@
 
     <title>Data Offload 2 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=d3f78147" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=cae2157c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
     <script async="async" src="../../../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
@@ -67,10 +67,10 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         
-        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
         
         <a id="logo" href="../../../index.html">
           <div>HDL Testbenches</div>
@@ -290,25 +290,17 @@ Offload IP.</p>
 <p>The following parameters of this project that can be configured:</p>
 <ul class="simple">
 <li><p>MEM_TYPE: used storage type:
-Options: 0 for internal or 1 for external</p></li>
+Options: 0 (BRAM), 1 (PL-DDR), 2 (HBM)</p></li>
 <li><p>PATH_TYPE: used data path type:
 Options: 0 for RX or 1 for TX</p></li>
 <li><p>OFFLOAD_SIZE: size of the storage element in bytes</p></li>
+<li><p>OFFLOAD_TRANSFER_LENGTH: effective offload transfer length in bytes</p></li>
 <li><p>OFFLOAD_SRC_DWIDTH: data width of the source interface</p></li>
 <li><p>OFFLOAD_DST_DWIDTH: data width of the destination interface</p></li>
 <li><p>OFFLOAD_ONESHOT: enable oneshot mode</p></li>
 <li><p>PLDDR_OFFLOAD_DATA_WIDTH: data width of the external memory interface</p></li>
 <li><p>SRC_CLOCK_FREQ: source clock frequency in Hz</p></li>
 <li><p>DST_CLOCK_FREQ: destination clock frequency in Hz</p></li>
-<li><p>SRC_TRANSFERS_INITIAL_COUNT: number of transfers initially queued up</p></li>
-<li><p>SRC_TRANSFERS_LENGTH: transfer length in bytes</p></li>
-<li><p>SRC_TRANSFERS_SYNC_COUNT: number of transfers for test_program_sync</p></li>
-<li><p>SRC_TRANSFERS_DELAY: delay in ns before the next batch is queued</p></li>
-<li><p>SRC_TRANSFERS_DELAYED_COUNT: number of transfers queued in second batch</p></li>
-<li><p>DST_READY_MODE: DST AXIS VIP backpressure policy for TREADY generation</p></li>
-<li><p>DST_READY_HIGH: number of clock cycles TREADY stays high (when oscillating)</p></li>
-<li><p>DST_READY_LOW: number of clock cycles TREADY stays low (when oscillating)</p></li>
-<li><p>TIME_TO_WAIT: delay in ns before exiting the simulation</p></li>
 </ul>
 <section id="configuration-files">
 <h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
@@ -317,19 +309,15 @@ Options: 0 for RX or 1 for TX</p></li>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>cfg0</p></th>
 <th class="head"><p>cfg1</p></th>
 <th class="head"><p>cfg2</p></th>
 <th class="head"><p>cfg3</p></th>
 <th class="head"><p>cfg4</p></th>
-<th class="head"><p>cfg5_hbm</p></th>
-<th class="head"><p>cfg5_hbm_cyclic</p></th>
+<th class="head"><p>cfg5</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>MEM_TYPE</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
 <td><p>0</p></td>
 <td><p>0</p></td>
 <td><p>0</p></td>
@@ -339,15 +327,11 @@ Options: 0 for RX or 1 for TX</p></li>
 <tr class="row-odd"><td><p>PATH_TYPE</p></td>
 <td><p>1</p></td>
 <td><p>1</p></td>
-<td><p>1</p></td>
 <td><p>0</p></td>
-<td><p>1</p></td>
 <td><p>1</p></td>
 <td><p>1</p></td>
 </tr>
 <tr class="row-even"><td><p>OFFLOAD_SIZE</p></td>
-<td><p>1024</p></td>
-<td><p>1024</p></td>
 <td><p>1024</p></td>
 <td><p>1024</p></td>
 <td><p>1024</p></td>
@@ -357,15 +341,11 @@ Options: 0 for RX or 1 for TX</p></li>
 <tr class="row-odd"><td><p>OFFLOAD_TRANSFER_LENGTH</p></td>
 <td><p>—</p></td>
 <td><p>—</p></td>
-<td><p>—</p></td>
 <td><p>512</p></td>
-<td><p>—</p></td>
 <td><p>4096</p></td>
 <td><p>4096</p></td>
 </tr>
 <tr class="row-even"><td><p>OFFLOAD_SRC_DWIDTH</p></td>
-<td><p>128</p></td>
-<td><p>128</p></td>
 <td><p>128</p></td>
 <td><p>128</p></td>
 <td><p>128</p></td>
@@ -376,23 +356,17 @@ Options: 0 for RX or 1 for TX</p></li>
 <td><p>128</p></td>
 <td><p>128</p></td>
 <td><p>128</p></td>
-<td><p>128</p></td>
-<td><p>128</p></td>
 <td><p>1024</p></td>
 <td><p>1024</p></td>
 </tr>
 <tr class="row-even"><td><p>OFFLOAD_ONESHOT</p></td>
 <td><p>1</p></td>
-<td><p>1</p></td>
 <td><p>0</p></td>
-<td><p>1</p></td>
 <td><p>1</p></td>
 <td><p>1</p></td>
 <td><p>0</p></td>
 </tr>
 <tr class="row-odd"><td><p>PLDDR_OFFLOAD_DATA_WIDTH</p></td>
-<td><p>512</p></td>
-<td><p>512</p></td>
 <td><p>512</p></td>
 <td><p>512</p></td>
 <td><p>512</p></td>
@@ -405,8 +379,6 @@ Options: 0 for RX or 1 for TX</p></li>
 <td><p>250000000</p></td>
 <td><p>250000000</p></td>
 <td><p>250000000</p></td>
-<td><p>250000000</p></td>
-<td><p>250000000</p></td>
 </tr>
 <tr class="row-odd"><td><p>DST_CLOCK_FREQ</p></td>
 <td><p>300000000</p></td>
@@ -414,89 +386,6 @@ Options: 0 for RX or 1 for TX</p></li>
 <td><p>300000000</p></td>
 <td><p>300000000</p></td>
 <td><p>300000000</p></td>
-<td><p>300000000</p></td>
-<td><p>300000000</p></td>
-</tr>
-<tr class="row-even"><td><p>SRC_TRANSFERS_INITIAL_COUNT</p></td>
-<td><p>20</p></td>
-<td><p>20</p></td>
-<td><p>1</p></td>
-<td><p>2</p></td>
-<td><p>20</p></td>
-<td><p>20</p></td>
-<td><p>20</p></td>
-</tr>
-<tr class="row-odd"><td><p>SRC_TRANSFERS_LENGTH</p></td>
-<td><p>512</p></td>
-<td><p>512</p></td>
-<td><p>512</p></td>
-<td><p>512</p></td>
-<td><p>1024</p></td>
-<td><p>512</p></td>
-<td><p>512</p></td>
-</tr>
-<tr class="row-even"><td><p>SRC_TRANSFERS_SYNC_COUNT</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>5</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>SRC_TRANSFERS_DELAY</p></td>
-<td><p>10000</p></td>
-<td><p>20000</p></td>
-<td><p>10000</p></td>
-<td><p>10000</p></td>
-<td><p>10000</p></td>
-<td><p>10000</p></td>
-<td><p>10000</p></td>
-</tr>
-<tr class="row-even"><td><p>SRC_TRANSFERS_DELAYED_COUNT</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>DST_READY_MODE</p></td>
-<td><p>GEN_NO_BACKPRESSURE</p></td>
-<td><p>GEN_OSC</p></td>
-<td><p>GEN_NO_BACKPRESSURE</p></td>
-<td><p>GEN_NO_BACKPRESSURE</p></td>
-<td><p>GEN_NO_BACKPRESSURE</p></td>
-<td><p>GEN_NO_BACKPRESSURE</p></td>
-<td><p>GEN_NO_BACKPRESSURE</p></td>
-</tr>
-<tr class="row-even"><td><p>DST_READY_HIGH</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>DST_READY_LOW</p></td>
-<td><p>3</p></td>
-<td><p>3</p></td>
-<td><p>3</p></td>
-<td><p>0</p></td>
-<td><p>0</p></td>
-<td><p>3</p></td>
-<td><p>3</p></td>
-</tr>
-<tr class="row-even"><td><p>TIME_TO_WAIT</p></td>
-<td><p>1500</p></td>
-<td><p>10000</p></td>
-<td><p>1500</p></td>
-<td><p>1500</p></td>
-<td><p>1500</p></td>
-<td><p>40000</p></td>
-<td><p>40000</p></td>
 </tr>
 </tbody>
 </table>

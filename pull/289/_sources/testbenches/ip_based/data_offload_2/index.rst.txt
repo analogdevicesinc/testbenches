@@ -35,25 +35,17 @@ Configuration parameters and modes
 The following parameters of this project that can be configured:
 
 -  MEM_TYPE: used storage type:
-   Options: 0 for internal or 1 for external
+   Options: 0 (BRAM), 1 (PL-DDR), 2 (HBM)
 -  PATH_TYPE: used data path type:
    Options: 0 for RX or 1 for TX
 -  OFFLOAD_SIZE: size of the storage element in bytes
+-  OFFLOAD_TRANSFER_LENGTH: effective offload transfer length in bytes
 -  OFFLOAD_SRC_DWIDTH: data width of the source interface
 -  OFFLOAD_DST_DWIDTH: data width of the destination interface
 -  OFFLOAD_ONESHOT: enable oneshot mode
 -  PLDDR_OFFLOAD_DATA_WIDTH: data width of the external memory interface
 -  SRC_CLOCK_FREQ: source clock frequency in Hz
 -  DST_CLOCK_FREQ: destination clock frequency in Hz
--  SRC_TRANSFERS_INITIAL_COUNT: number of transfers initially queued up
--  SRC_TRANSFERS_LENGTH: transfer length in bytes
--  SRC_TRANSFERS_SYNC_COUNT: number of transfers for test_program_sync
--  SRC_TRANSFERS_DELAY: delay in ns before the next batch is queued
--  SRC_TRANSFERS_DELAYED_COUNT: number of transfers queued in second batch
--  DST_READY_MODE: DST AXIS VIP backpressure policy for TREADY generation
--  DST_READY_HIGH: number of clock cycles TREADY stays high (when oscillating)
--  DST_READY_LOW: number of clock cycles TREADY stays low (when oscillating)
--  TIME_TO_WAIT: delay in ns before exiting the simulation
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -64,16 +56,12 @@ The following configuration files are available:
    :header-rows: 1
 
    * - Parameter
-     - cfg0
      - cfg1
      - cfg2
      - cfg3
      - cfg4
-     - cfg5\_hbm
-     - cfg5\_hbm\_cyclic
+     - cfg5
    * - MEM\_TYPE
-     - 0
-     - 0
      - 0
      - 0
      - 0
@@ -82,14 +70,10 @@ The following configuration files are available:
    * - PATH\_TYPE
      - 1
      - 1
-     - 1
      - 0
      - 1
      - 1
-     - 1
    * - OFFLOAD\_SIZE
-     - 1024
-     - 1024
      - 1024
      - 1024
      - 1024
@@ -98,14 +82,10 @@ The following configuration files are available:
    * - OFFLOAD\_TRANSFER\_LENGTH
      - ---
      - ---
-     - ---
      - 512
-     - ---
      - 4096
      - 4096
    * - OFFLOAD\_SRC\_DWIDTH
-     - 128
-     - 128
      - 128
      - 128
      - 128
@@ -115,21 +95,15 @@ The following configuration files are available:
      - 128
      - 128
      - 128
-     - 128
-     - 128
      - 1024
      - 1024
    * - OFFLOAD\_ONESHOT
      - 1
-     - 1
      - 0
-     - 1
      - 1
      - 1
      - 0
    * - PLDDR\_OFFLOAD\_DATA\_WIDTH
-     - 512
-     - 512
      - 512
      - 512
      - 512
@@ -141,88 +115,12 @@ The following configuration files are available:
      - 250000000
      - 250000000
      - 250000000
-     - 250000000
-     - 250000000
    * - DST\_CLOCK\_FREQ
      - 300000000
      - 300000000
      - 300000000
      - 300000000
      - 300000000
-     - 300000000
-     - 300000000
-   * - SRC\_TRANSFERS\_INITIAL\_COUNT
-     - 20
-     - 20
-     - 1
-     - 2
-     - 20
-     - 20
-     - 20
-   * - SRC\_TRANSFERS\_LENGTH
-     - 512
-     - 512
-     - 512
-     - 512
-     - 1024
-     - 512
-     - 512
-   * - SRC\_TRANSFERS\_SYNC\_COUNT
-     - 1
-     - 1
-     - 1
-     - 5
-     - 1
-     - 1
-     - 1
-   * - SRC\_TRANSFERS\_DELAY
-     - 10000
-     - 20000
-     - 10000
-     - 10000
-     - 10000
-     - 10000
-     - 10000
-   * - SRC\_TRANSFERS\_DELAYED\_COUNT
-     - 1
-     - 1
-     - 1
-     - 1
-     - 1
-     - 1
-     - 1
-   * - DST\_READY\_MODE
-     - GEN\_NO\_BACKPRESSURE
-     - GEN\_OSC
-     - GEN\_NO\_BACKPRESSURE
-     - GEN\_NO\_BACKPRESSURE
-     - GEN\_NO\_BACKPRESSURE
-     - GEN\_NO\_BACKPRESSURE
-     - GEN\_NO\_BACKPRESSURE
-   * - DST\_READY\_HIGH
-     - 1
-     - 1
-     - 1
-     - 1
-     - 1
-     - 1
-     - 1
-   * - DST\_READY\_LOW
-     - 3
-     - 3
-     - 3
-     - 0
-     - 0
-     - 3
-     - 3
-   * - TIME\_TO\_WAIT
-     - 1500
-     - 10000
-     - 1500
-     - 1500
-     - 1500
-     - 40000
-     - 40000
 
 Tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The purpose of this testbench is to validate the LVDS physical interface of the library/axi_ad9361 IP core, specifically the axi_ad9361_lvds_if submodule implemented in library/axi_ad9361/xilinx/axi_ad9361_lvds_if.v." name="description" />
+
+    <title>AXI AD9361 LVDS Interface &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script async="async" src="../../../_static/app.umd.js?v=26d0298f"></script>
+    <link rel="icon" href="../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="AXI TDD" href="../axi_tdd/index.html" />
+    <link rel="prev" title="IP Based" href="../index.html" />
+   
+  
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
+        
+        <a id="logo" href="../../../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">AXI AD9361 LVDS Interface</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#block-design">Block design</a><ul>
+<li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
+<li><a class="reference internal" href="#configuration-parameters-and-modes">Configuration parameters and modes</a><ul>
+<li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#clock-scheme">Clock scheme</a></li>
+<li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
+<li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
+<li><a class="reference internal" href="#test-program">test_program</a><ul>
+<li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
+<li><a class="reference internal" href="#test-1-valid-frame-patterns">Test 1 — Valid frame patterns</a></li>
+<li><a class="reference internal" href="#test-2-invalid-frame-patterns-glitch-detection">Test 2 — Invalid frame patterns (glitch detection)</a></li>
+<li><a class="reference internal" href="#test-3-2r2t-rx-data-delineation-cfg-2r2t-only">Test 3 — 2R2T RX data delineation (<code class="docutils literal notranslate"><span class="pre">cfg_2r2t</span></code> only)</a></li>
+<li><a class="reference internal" href="#test-4-1r1t-rx-data-delineation-cfg-1r1t-only">Test 4 — 1R1T RX data delineation (<code class="docutils literal notranslate"><span class="pre">cfg_1r1t</span></code> only)</a></li>
+<li><a class="reference internal" href="#test-5-tx-frame-signal-cfg-2r2t-only">Test 5 — TX frame signal (<code class="docutils literal notranslate"><span class="pre">cfg_2r2t</span></code> only)</a></li>
+<li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#frame-sweep">frame_sweep</a><ul>
+<li><a class="reference internal" href="#section-1-valid-steady-state-patterns">Section 1 — Valid steady-state patterns</a></li>
+<li><a class="reference internal" href="#section-2-complete-frame-bursts">Section 2 — Complete frame bursts</a></li>
+<li><a class="reference internal" href="#section-3-invalid-glitch-patterns">Section 3 — Invalid/glitch patterns</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#hdl-related-dependencies-forming-the-dut">HDL related dependencies forming the DUT</a></li>
+<li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-information">More information</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../library/index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../library/regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/irq_handler/index.html">IRQ Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../library/vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/io_vip/index.html">IO VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AXI AD9361 LVDS Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axi_tdd/index.html">AXI TDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../project_based/index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad485x/index.html">AD485X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ada4355/index.html">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/cn0363/index.html">CN0363</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/cn0577_adaq2387x/index.html">CN0577/ADAQ2387X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ltc2378/index.html">LTC2378</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">IP Based</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="axi-ad9361-lvds-interface">
+<span id="axi-ad9361-lvds"></span><h1>AXI AD9361 LVDS Interface<a class="headerlink" href="#axi-ad9361-lvds-interface" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The purpose of this testbench is to validate the LVDS physical interface of the
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ad9361" target="_blank">library/axi_ad9361</a> IP core, specifically the
+<code class="docutils literal notranslate"><span class="pre">axi_ad9361_lvds_if</span></code> submodule implemented in
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ad9361/xilinx/axi_ad9361_lvds_if.v" target="_blank">library/axi_ad9361/xilinx/axi_ad9361_lvds_if.v</a>.</p>
+<p>The primary focus is the <strong>frame error detection logic</strong>, which checks incoming
+DDR frame signal patterns against the four valid AD9361 frame transitions using
+an explicit whitelist with case-equality (<code class="docutils literal notranslate"><span class="pre">===</span></code>) operators. Beyond frame
+checking, the testbench validates the RX data delineation state machine in both
+2R2T and 1R1T modes, and the TX serialization path.</p>
+</section>
+<section id="block-design">
+<h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
+<p>The block design instantiates the <code class="docutils literal notranslate"><span class="pre">axi_ad9361</span></code> IP (which wraps
+<code class="docutils literal notranslate"><span class="pre">axi_ad9361_lvds_if</span></code> internally) connected to a set of <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> instances
+that act as signal drivers (master mode) and monitors (slave mode) for all LVDS
+pins.</p>
+<section id="block-diagram">
+<h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
+<p>The block design contains the following main components:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dut</span></code>: <code class="docutils literal notranslate"><span class="pre">axi_ad9361</span></code> IP, configured for LVDS operation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">l_clk_vip</span></code>: 250 MHz clock VIP driving the DUT <code class="docutils literal notranslate"><span class="pre">clk</span></code> port directly
+(<code class="docutils literal notranslate"><span class="pre">USE_SSI_CLK=0</span></code> bypasses the <code class="docutils literal notranslate"><span class="pre">IBUFGDS</span></code>/<code class="docutils literal notranslate"><span class="pre">BUFG</span></code> clock primitives)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rx_frame_vip</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_data_vip</span></code>: master <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> instances driving the
+RX LVDS frame and data pins</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rx_frame_inv</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_data_inv</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_clk_inv</span></code>: <code class="docutils literal notranslate"><span class="pre">util_vector_logic</span> <span class="pre">NOT</span></code>
+gates generating the differential N-side complement required by <code class="docutils literal notranslate"><span class="pre">IBUFDS</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tx_frame_vip</span></code> / <code class="docutils literal notranslate"><span class="pre">tx_data_vip</span></code>: slave <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> instances monitoring the
+TX LVDS outputs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adc_valid_i0_vip</span></code> / <code class="docutils literal notranslate"><span class="pre">adc_data_i0_vip</span></code> (and q0, i1, q1 variants): slave
+<code class="docutils literal notranslate"><span class="pre">io_vip</span></code> instances monitoring the ADC output ports at the DMA side</p></li>
+</ul>
+<p>All <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> clocks are connected to <code class="docutils literal notranslate"><span class="pre">l_clk_vip/clk_out</span></code> so that driving
+and sampling are synchronous to the DUT’s DDR data clock.</p>
+</section>
+<section id="configuration-parameters-and-modes">
+<h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
+<p>The following parameters of this project can be configured:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MODE_1R1T</span></code>: selects between 2R2T and 1R1T operation;
+Options: 0 - 2R2T (two receiver, two transmitter), 1 - 1R1T (single receiver,
+single transmitter)</p></li>
+</ul>
+<p>The following DUT parameters are fixed across all configurations:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Reason</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CMOS_OR_LVDS_N</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Select LVDS interface path</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">USE_SSI_CLK</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Bypass IBUFGDS/BUFG; clock driven by VIP</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MIMO_ENABLE</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Maps to <code class="docutils literal notranslate"><span class="pre">CLK_DESKEW=0</span></code> in <code class="docutils literal notranslate"><span class="pre">lvds_if</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IODELAY_CTRL</span></code></p></td>
+<td><p>0</p></td>
+<td><p>Disable IDELAYCTRL (not needed for simulation)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="configuration-files">
+<h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
+<p>The following configuration files are available:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Configuration mode</p></th>
+<th class="head"><p>MODE_1R1T</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cfg_2r2t</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg_1r1t</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="tests">
+<h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
+<p>The following test program files are available:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test program</p></th>
+<th class="head"><p>Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>test_program</p></td>
+<td><p>Functional pass/fail tests: frame error detection,
+RX delineation, TX frame signal.</p></td>
+</tr>
+<tr class="row-odd"><td><p>frame_sweep</p></td>
+<td><p>Exhaustive frame pattern sweep for waveform inspection.
+Drives all valid and invalid patterns; no assertions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="available-configurations-tests-combinations">
+<h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test \ Config</p></th>
+<th class="head"><p>cfg_2r2t</p></th>
+<th class="head"><p>cfg_1r1t</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>test_program</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>frame_sweep</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Active tests per configuration:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cfg_2r2t</span></code> + <code class="docutils literal notranslate"><span class="pre">test_program</span></code>: Test 1 (valid patterns), Test 2 (glitch
+patterns), Test 3 (2R2T delineation), Test 5 (TX frame signal)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cfg_1r1t</span></code> + <code class="docutils literal notranslate"><span class="pre">test_program</span></code>: Test 1 (valid patterns), Test 2 (glitch
+patterns), Test 4 (1R1T delineation)</p></li>
+<li><p>Both configs + <code class="docutils literal notranslate"><span class="pre">frame_sweep</span></code>: Section 1 (steady-state patterns), Section 2
+(mode-specific burst), Section 3 (glitch patterns)</p></li>
+</ul>
+</section>
+</section>
+<section id="clock-scheme">
+<h3>Clock scheme<a class="headerlink" href="#clock-scheme" title="Link to this heading"></a></h3>
+<p>A single 250 MHz clock VIP (<code class="docutils literal notranslate"><span class="pre">l_clk_vip</span></code>) drives all clocked elements:</p>
+<ul class="simple">
+<li><p>DUT <code class="docutils literal notranslate"><span class="pre">clk</span></code> port (the SSI/DDR data clock, normally sourced from the AD9361
+via <code class="docutils literal notranslate"><span class="pre">IBUFGDS+BUFG</span></code>; bypassed here by <code class="docutils literal notranslate"><span class="pre">USE_SSI_CLK=0</span></code>)</p></li>
+<li><p>All <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> instances (RX driver, TX monitor, ADC output monitors)</p></li>
+</ul>
+<p>The test harness provides <code class="docutils literal notranslate"><span class="pre">sys_cpu_clk</span></code> (100 MHz) for the AXI-Lite register
+interface, independently of the 250 MHz data clock.</p>
+</section>
+<section id="cpu-memory-interconnects-addresses">
+<h3>CPU/Memory interconnects addresses<a class="headerlink" href="#cpu-memory-interconnects-addresses" title="Link to this heading"></a></h3>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance</p></th>
+<th class="head"><p>Address</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>axi_intc</p></td>
+<td><p>0x4120_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>dut (axi_ad9361)</p></td>
+<td><p>0x44A0_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Key register offsets within the DUT (byte addresses relative to
+<code class="docutils literal notranslate"><span class="pre">0x44A0_0000</span></code>):</p>
+</section>
+</section>
+<section id="building-the-testbench">
+<h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
+<p>The testbench is built upon ADI’s generic HDL reference design framework.
+ADI does not distribute compiled files of these projects so they must be built
+from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">here</a>,
+with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
+To get the source you must
+<a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank">clone</a>
+the HDL repository, and then build the project as follows:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">axi_ad9361</span></code> IP must be built in the HDL library before running the
+testbench:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$ADI_HDL_DIR</span>/library/axi_ad9361
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/$ADI_HDL_DIR/library/axi_ad9361$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>xilinx
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></div>
+<p><strong>Linux/Cygwin/WSL</strong></p>
+<p><em>Example 1</em></p>
+<p>Building and simulating all configurations and test combinations.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axi_ad9361_lvds
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axi_ad9361_lvds$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">ADI_HDL_DIR</span><span class="o">=</span>/path/to/hdl<span class="w"> </span><span class="nv">ADI_TB_DIR</span><span class="o">=</span>/path/to/testbenches<span class="w"> </span>make
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 2</em></p>
+<p>Building and simulating the testbench using the Vivado GUI. This command will
+launch Vivado, run the simulation and display the waveforms.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axi_ad9361_lvds
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axi_ad9361_lvds$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_2r2t<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>frame_sweep
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 3</em></p>
+<p>Build a particular combination of test and configuration, using batch mode.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axi_ad9361_lvds
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axi_ad9361_lvds$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg_2r2t<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 4</em></p>
+<p>Run all tests for a single configuration.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/ip/axi_ad9361_lvds
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/ip/axi_ad9361_lvds$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cfg_1r1t
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>The built project can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+specific build has its own folder named after the configuration file’s name.
+Example: if the following command was run for a single configuration in the
+clean folder (no runs folder available):</p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg_2r2t</span></code></p>
+<p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg_2r2t</span></code></p>
+<p>After the Vivado project has been built once, re-running the simulation after
+only <code class="docutils literal notranslate"><span class="pre">.sv</span></code> test file changes does not require rebuilding the project:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>runs/cfg_2r2t/cfg_2r2t.sim/sim_1/behav/xsim
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/runs/cfg_2r2t/cfg_2r2t.sim/sim_1/behav/xsim$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>compile.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>elaborate.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>simulate.sh
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div></section>
+<section id="test-stimulus">
+<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
+<p>Both test programs share two helper tasks defined in their respective program
+blocks:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">drive_ddr_cycle</span></code> / <code class="docutils literal notranslate"><span class="pre">drive_cycle</span></code>: drives one complete DDR clock cycle on
+<code class="docutils literal notranslate"><span class="pre">rx_frame_in_p</span></code> and <code class="docutils literal notranslate"><span class="pre">rx_data_in_p</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poll_valid</span></code>: polls <code class="docutils literal notranslate"><span class="pre">adc_valid_i0</span></code> on every posedge for up to 20–30
+cycles and captures <code class="docutils literal notranslate"><span class="pre">adc_data_i0</span></code> at the cycle the 1-cycle pulse is seen</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">adc_valid_i0</span></code> signal is a single-cycle pulse that arrives exactly
+8 posedges after the delineation trigger in <code class="docutils literal notranslate"><span class="pre">lvds_if</span></code> (1 flop in
+<code class="docutils literal notranslate"><span class="pre">lvds_if</span></code> + 1 in <code class="docutils literal notranslate"><span class="pre">ad_datafmt</span></code> + 3 in <code class="docutils literal notranslate"><span class="pre">ad_dcfilter</span></code> + 2 in
+<code class="docutils literal notranslate"><span class="pre">ad_iqcor</span></code> + 1 in <code class="docutils literal notranslate"><span class="pre">axi_ad9361</span></code>). A one-shot read after a fixed delay
+will always miss it; <code class="docutils literal notranslate"><span class="pre">poll_valid</span></code> is required.</p>
+</div>
+<section id="test-program">
+<h3>test_program<a class="headerlink" href="#test-program" title="Link to this heading"></a></h3>
+<p>The test program is structured into the following tests:</p>
+<section id="environment-bringup">
+<h4>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Create and start the test harness environment</p></li>
+<li><p>Start the 250 MHz L_CLK</p></li>
+<li><p>Assert and release system reset</p></li>
+<li><p>Initialize all master <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> outputs to 0</p></li>
+<li><p>Write 1 to <code class="docutils literal notranslate"><span class="pre">up_resetn</span></code> (<code class="docutils literal notranslate"><span class="pre">0x44A00040</span></code>) to release the ADC from internal
+reset; without this, <code class="docutils literal notranslate"><span class="pre">up_xfer_status</span></code> is held in reset and <code class="docutils literal notranslate"><span class="pre">adc_status</span></code>
+never propagates to the AXI register</p></li>
+<li><p>Wait 200 <code class="docutils literal notranslate"><span class="pre">l_clk</span></code> posedges for control and status CDCs to settle</p></li>
+<li><p>Disable IQ correction, DC filter and data format on all four channels so
+<code class="docutils literal notranslate"><span class="pre">adc_data_i0</span></code>/<code class="docutils literal notranslate"><span class="pre">q0</span></code>/<code class="docutils literal notranslate"><span class="pre">i1</span></code>/<code class="docutils literal notranslate"><span class="pre">q1</span></code> reflect raw 12-bit samples</p></li>
+</ul>
+</section>
+<section id="test-1-valid-frame-patterns">
+<h4>Test 1 — Valid frame patterns<a class="headerlink" href="#test-1-valid-frame-patterns" title="Link to this heading"></a></h4>
+<p>Drives each of the four valid <code class="docutils literal notranslate"><span class="pre">{rx_frame_s,</span> <span class="pre">rx_frame}</span></code> patterns and reads
+<code class="docutils literal notranslate"><span class="pre">adc_status</span></code> via AXI after waiting 200 cycles for CDC settle.</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Pattern driven</p></th>
+<th class="head"><p>Meaning</p></th>
+<th class="head"><p>Expected <code class="docutils literal notranslate"><span class="pre">adc_status</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">4'b1111</span></code></p></td>
+<td><p>Frame stays high — MSB slot</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">4'b1100</span></code></p></td>
+<td><p>Frame just rose — start of MSB</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">4'b0000</span></code></p></td>
+<td><p>Frame stays low — LSB slot</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">4'b0011</span></code></p></td>
+<td><p>Frame just fell — start of LSB</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="test-2-invalid-frame-patterns-glitch-detection">
+<h4>Test 2 — Invalid frame patterns (glitch detection)<a class="headerlink" href="#test-2-invalid-frame-patterns-glitch-detection" title="Link to this heading"></a></h4>
+<p>Drives the two even-XOR-parity patterns that the previous XOR-reduction
+implementation would have silently passed. Verifies that <code class="docutils literal notranslate"><span class="pre">adc_status</span></code> is
+deasserted (frame error detected).</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Pattern driven</p></th>
+<th class="head"><p>Meaning</p></th>
+<th class="head"><p>Expected <code class="docutils literal notranslate"><span class="pre">adc_status</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">4'b0101</span></code></p></td>
+<td><p>Frame toggles at 2× rate — impossible</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">4'b1010</span></code></p></td>
+<td><p>Frame toggles at 2× rate (inverted)</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="test-3-2r2t-rx-data-delineation-cfg-2r2t-only">
+<h4>Test 3 — 2R2T RX data delineation (<code class="docutils literal notranslate"><span class="pre">cfg_2r2t</span></code> only)<a class="headerlink" href="#test-3-2r2t-rx-data-delineation-cfg-2r2t-only" title="Link to this heading"></a></h4>
+<p>Drives a valid 2R2T frame sequence and checks that the delineation FSM asserts
+<code class="docutils literal notranslate"><span class="pre">adc_valid_i0</span></code> and produces a non-zero <code class="docutils literal notranslate"><span class="pre">adc_data_i0</span></code>.</p>
+<ul class="simple">
+<li><p>8 idle cycles: <code class="docutils literal notranslate"><span class="pre">frame=0000</span></code></p></li>
+<li><p>Cycle A (<code class="docutils literal notranslate"><span class="pre">frame=1111</span></code>): <code class="docutils literal notranslate"><span class="pre">data_p=0x15</span></code>, <code class="docutils literal notranslate"><span class="pre">data_n=0x2A</span></code> — MSB slot, stored
+into <code class="docutils literal notranslate"><span class="pre">adc_data_p[23:0]</span></code></p></li>
+<li><p>Cycle B (<code class="docutils literal notranslate"><span class="pre">frame=0000</span></code>): <code class="docutils literal notranslate"><span class="pre">data_p=0x0F</span></code>, <code class="docutils literal notranslate"><span class="pre">data_n=0x3C</span></code> — LSB slot, stored
+into <code class="docutils literal notranslate"><span class="pre">adc_data_p[47:24]</span></code>; <code class="docutils literal notranslate"><span class="pre">adc_valid_p</span></code> asserted</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adc_valid_i0</span></code> polled for 20 cycles</p></li>
+</ul>
+</section>
+<section id="test-4-1r1t-rx-data-delineation-cfg-1r1t-only">
+<h4>Test 4 — 1R1T RX data delineation (<code class="docutils literal notranslate"><span class="pre">cfg_1r1t</span></code> only)<a class="headerlink" href="#test-4-1r1t-rx-data-delineation-cfg-1r1t-only" title="Link to this heading"></a></h4>
+<p>Drives the 1R1T delineation trigger (<code class="docutils literal notranslate"><span class="pre">{curr=00,</span> <span class="pre">prev=11}</span></code> = <code class="docutils literal notranslate"><span class="pre">4'b0011</span></code>) and
+checks that <code class="docutils literal notranslate"><span class="pre">adc_valid_i0</span></code> pulses.</p>
+<ul class="simple">
+<li><p>8 idle cycles: <code class="docutils literal notranslate"><span class="pre">frame=0000</span></code></p></li>
+<li><p>Prep cycle (<code class="docutils literal notranslate"><span class="pre">frame=1111</span></code>): sets <code class="docutils literal notranslate"><span class="pre">rx_frame=2'b11</span></code> (previous)</p></li>
+<li><p>Trigger cycle (<code class="docutils literal notranslate"><span class="pre">frame=0000</span></code>): produces <code class="docutils literal notranslate"><span class="pre">{curr=00,</span> <span class="pre">prev=11}</span></code> →
+<code class="docutils literal notranslate"><span class="pre">adc_valid_p</span></code> asserted</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adc_valid_i0</span></code> polled for 20 cycles</p></li>
+</ul>
+</section>
+<section id="test-5-tx-frame-signal-cfg-2r2t-only">
+<h4>Test 5 — TX frame signal (<code class="docutils literal notranslate"><span class="pre">cfg_2r2t</span></code> only)<a class="headerlink" href="#test-5-tx-frame-signal-cfg-2r2t-only" title="Link to this heading"></a></h4>
+<p>Samples <code class="docutils literal notranslate"><span class="pre">tx_frame_out_p</span></code> on two consecutive posedges and logs the observed
+values. Smoke test only — verifies the TX path is active.</p>
+</section>
+<section id="stop-the-environment">
+<h4>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Stop the L_CLK</p></li>
+<li><p>Stop the environment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$finish</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="frame-sweep">
+<h3>frame_sweep<a class="headerlink" href="#frame-sweep" title="Link to this heading"></a></h3>
+<p>Environment bringup is identical to <code class="docutils literal notranslate"><span class="pre">test_program</span></code>. The sweep is structured
+into three sections:</p>
+<section id="section-1-valid-steady-state-patterns">
+<h4>Section 1 — Valid steady-state patterns<a class="headerlink" href="#section-1-valid-steady-state-patterns" title="Link to this heading"></a></h4>
+<p>Each of the four valid patterns is driven for 12 consecutive DDR cycles (enough
+for <code class="docutils literal notranslate"><span class="pre">{rx_frame_s,</span> <span class="pre">rx_frame}</span></code> to fully settle). After each pattern,
+<code class="docutils literal notranslate"><span class="pre">adc_status</span></code> is read via AXI and <code class="docutils literal notranslate"><span class="pre">adc_valid_i0</span></code> is polled. Results are
+logged with <code class="docutils literal notranslate"><span class="pre">$sformatf</span></code>; no assertions are made. Intended for waveform
+inspection.</p>
+</section>
+<section id="section-2-complete-frame-bursts">
+<h4>Section 2 — Complete frame bursts<a class="headerlink" href="#section-2-complete-frame-bursts" title="Link to this heading"></a></h4>
+<p>Realistic repeating bursts as the AD9361 sends them (UG-570, Figure 79),
+repeated 10 times so 10 data transfers are visible in the waveform viewer.</p>
+<ul class="simple">
+<li><p><strong>2R2T</strong> (<code class="docutils literal notranslate"><span class="pre">cfg_2r2t</span></code>): alternating <code class="docutils literal notranslate"><span class="pre">drive_cycle(1,</span> <span class="pre">0x15)</span></code> +
+<code class="docutils literal notranslate"><span class="pre">drive_cycle(0,</span> <span class="pre">0x2A)</span></code>; <code class="docutils literal notranslate"><span class="pre">adc_valid_p</span></code> fires on every LSB cycle</p></li>
+<li><p><strong>1R1T</strong> (<code class="docutils literal notranslate"><span class="pre">cfg_1r1t</span></code>): primed with one MSB cycle, then alternating
+<code class="docutils literal notranslate"><span class="pre">drive_cycle(0,</span> <span class="pre">0x2A)</span></code> + <code class="docutils literal notranslate"><span class="pre">drive_cycle(1,</span> <span class="pre">0x15)</span></code>; <code class="docutils literal notranslate"><span class="pre">adc_valid_p</span></code> fires
+on every <code class="docutils literal notranslate"><span class="pre">4'b0011</span></code> falling-frame cycle</p></li>
+</ul>
+</section>
+<section id="section-3-invalid-glitch-patterns">
+<h4>Section 3 — Invalid/glitch patterns<a class="headerlink" href="#section-3-invalid-glitch-patterns" title="Link to this heading"></a></h4>
+<p>Drives both steady-state glitch patterns (<code class="docutils literal notranslate"><span class="pre">4'b0101</span></code> and <code class="docutils literal notranslate"><span class="pre">4'b1010</span></code>) and all
+8 remaining invalid patterns injected as a single bad DDR cycle sandwiched
+between valid frames. Intended to show <code class="docutils literal notranslate"><span class="pre">rx_error</span></code> pulsing high in the
+waveform viewer.</p>
+</section>
+</section>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
+<section id="hdl-related-dependencies-forming-the-dut">
+<h3>HDL related dependencies forming the DUT<a class="headerlink" href="#hdl-related-dependencies-forming-the-dut" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IP name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AXI_AD9361</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ad9361" target="_blank">library/axi_ad9361</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_ad9361/index.html#axi-ad9361" target="_blank" title="(in HDL)"><span>AXI AD9361</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="testbenches-related-dependencies">
+<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
+<p>Common with most testbenches:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>IRQ_HANDLER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/irq_handler_pkg.sv" target="_blank">library/utilities/irq_handler_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>LOGGER_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/logger_pkg.sv" target="_blank">library/utilities/logger_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>M_AXI_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axi_sequencer.sv" target="_blank">library/vip/amd/m_axi_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>REG_ACCESSOR</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/reg_accessor.sv" target="_blank">library/regmaps/reg_accessor.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>S_AXI_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axi_sequencer.sv" target="_blank">library/vip/amd/s_axi_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>TEST_HARNESS_ENV</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/test_harness_env.sv" target="_blank">library/utilities/test_harness_env.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/utilities/test_harness/index.html#test-harness"><span class="std std-ref">Test Harness</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>UTILS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/utils.svh" target="_blank">library/utilities/utils.svh</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>WATCHDOG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/common/watchdog.sv" target="_blank">library/drivers/common/watchdog.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/drivers/common/watchdog/index.html#watchdog"><span class="std std-ref">Watchdog</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="more-information">
+<h2>More information<a class="headerlink" href="#more-information" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">ADI Testbenches User guide</span></a></p></li>
+</ul>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">IP Based</a>
+    <a href="../axi_tdd/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">AXI TDD</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

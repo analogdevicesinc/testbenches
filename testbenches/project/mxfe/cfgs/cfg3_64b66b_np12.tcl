@@ -1,11 +1,15 @@
 global ad_project_params
 
 set ad_project_params(JESD_MODE) 64B66B
+
+set ad_project_params(REF_CLK_RATE) 250
+set ad_project_params(LANE_RATE) 16.5
+set ad_project_params(PLL_TYPE) QPLL1
+
 set ad_project_params(RX_LANE_RATE) 16.5
 set ad_project_params(RX_PLL_SEL) 2
 set ad_project_params(TX_LANE_RATE) 16.5
 set ad_project_params(TX_PLL_SEL) 2
-set ad_project_params(REF_CLK_RATE) 250
 
 set ad_project_params(RX_NUM_LINKS) 1
 set ad_project_params(RX_JESD_M) 4
@@ -24,9 +28,6 @@ set ad_project_params(TX_JESD_F) 3
 set ad_project_params(TX_JESD_K) 256
 
 set ad_project_params(TDD_SUPPORT) 0
-
-set ad_project_params(LANE_RATE) 16.5
-set ad_project_params(PLL_TYPE) QPLL1
 
 set xilinx_boards {"vcu118"}
 set chosen_board [lindex $xilinx_boards [expr {int(rand() * [llength $xilinx_boards])}]]

@@ -28,14 +28,19 @@ pins.
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. image:: ./axi_ad9361_lvds_tb.svg
+   :width: 800
+   :align: center
+   :alt: AXI_AD9361_LVDS/Testbench block diagram
+
 The block design contains the following main components:
 
 - ``dut``: ``axi_ad9361`` IP, configured for LVDS operation
 - ``l_clk_vip``: 250 MHz clock VIP driving the DUT ``clk`` port directly
   (``USE_SSI_CLK=0`` bypasses the ``IBUFGDS``/``BUFG`` clock primitives)
-- ``rx_frame_vip`` / ``rx_data_vip``: master ``io_vip`` instances driving the
-  RX LVDS frame and data pins
-- ``rx_frame_inv`` / ``rx_data_inv`` / ``rx_clk_inv``: ``util_vector_logic NOT``
+- ``rx_clk_vip`` / ``rx_frame_vip`` / ``rx_data_vip``: master ``io_vip``
+  instances driving the RX LVDS clock, frame and data pins
+- ``rx_clk_inv`` / ``rx_frame_inv`` / ``rx_data_inv``: ``util_vector_logic NOT``
   gates generating the differential N-side complement required by ``IBUFDS``
 - ``tx_frame_vip`` / ``tx_data_vip``: slave ``io_vip`` instances monitoring the
   TX LVDS outputs
@@ -44,6 +49,11 @@ The block design contains the following main components:
 
 All ``io_vip`` clocks are connected to ``l_clk_vip/clk_out`` so that driving
 and sampling are synchronous to the DUT's DDR data clock.
+
+The test programs access each ``io_vip`` interface through an ``io_vip_if_base``
+handle assigned at startup, and communicate with the DUT register interface
+through the ``adc_api`` class using the base address defined in the block design
+via ``adi_sim_add_define``.
 
 Configuration parameters and modes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

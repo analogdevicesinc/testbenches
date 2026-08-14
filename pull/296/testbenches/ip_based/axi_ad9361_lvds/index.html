@@ -301,14 +301,16 @@ that act as signal drivers (master mode) and monitors (slave mode) for all LVDS
 pins.</p>
 <section id="block-diagram">
 <h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
+<a class="reference internal image-reference" href="../../../_images/axi_ad9361_lvds_tb.svg"><img alt="AXI_AD9361_LVDS/Testbench block diagram" class="align-center" src="../../../_images/axi_ad9361_lvds_tb.svg" width="800" />
+</a>
 <p>The block design contains the following main components:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">dut</span></code>: <code class="docutils literal notranslate"><span class="pre">axi_ad9361</span></code> IP, configured for LVDS operation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">l_clk_vip</span></code>: 250 MHz clock VIP driving the DUT <code class="docutils literal notranslate"><span class="pre">clk</span></code> port directly
 (<code class="docutils literal notranslate"><span class="pre">USE_SSI_CLK=0</span></code> bypasses the <code class="docutils literal notranslate"><span class="pre">IBUFGDS</span></code>/<code class="docutils literal notranslate"><span class="pre">BUFG</span></code> clock primitives)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rx_frame_vip</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_data_vip</span></code>: master <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> instances driving the
-RX LVDS frame and data pins</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rx_frame_inv</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_data_inv</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_clk_inv</span></code>: <code class="docutils literal notranslate"><span class="pre">util_vector_logic</span> <span class="pre">NOT</span></code>
+<li><p><code class="docutils literal notranslate"><span class="pre">rx_clk_vip</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_frame_vip</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_data_vip</span></code>: master <code class="docutils literal notranslate"><span class="pre">io_vip</span></code>
+instances driving the RX LVDS clock, frame and data pins</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rx_clk_inv</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_frame_inv</span></code> / <code class="docutils literal notranslate"><span class="pre">rx_data_inv</span></code>: <code class="docutils literal notranslate"><span class="pre">util_vector_logic</span> <span class="pre">NOT</span></code>
 gates generating the differential N-side complement required by <code class="docutils literal notranslate"><span class="pre">IBUFDS</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">tx_frame_vip</span></code> / <code class="docutils literal notranslate"><span class="pre">tx_data_vip</span></code>: slave <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> instances monitoring the
 TX LVDS outputs</p></li>
@@ -317,6 +319,10 @@ TX LVDS outputs</p></li>
 </ul>
 <p>All <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> clocks are connected to <code class="docutils literal notranslate"><span class="pre">l_clk_vip/clk_out</span></code> so that driving
 and sampling are synchronous to the DUT’s DDR data clock.</p>
+<p>The test programs access each <code class="docutils literal notranslate"><span class="pre">io_vip</span></code> interface through an <code class="docutils literal notranslate"><span class="pre">io_vip_if_base</span></code>
+handle assigned at startup, and communicate with the DUT register interface
+through the <code class="docutils literal notranslate"><span class="pre">adc_api</span></code> class using the base address defined in the block design
+via <code class="docutils literal notranslate"><span class="pre">adi_sim_add_define</span></code>.</p>
 </section>
 <section id="configuration-parameters-and-modes">
 <h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>

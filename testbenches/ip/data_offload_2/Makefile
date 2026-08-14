@@ -1,25 +1,22 @@
 ####################################################################################
 ####################################################################################
-## Copyright (C) 2021 Analog Devices, Inc.
+## Copyright (C) 2021-2026 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_axis.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_scoreboard.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_data_offload.mk
 
 # Remaining test-bench dependencies except test programs
-SV_DEPS += do_scoreboard.sv
 SV_DEPS += environment.sv
-SV_DEPS += data_offload_pkg.sv
-
-ENV_DEPS += cfgs/common_cfg.tcl
 
 LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
-LIB_DEPS += util_do_ram
-LIB_DEPS += axi_dmac
 LIB_DEPS += data_offload
+LIB_DEPS += util_do_ram
 LIB_DEPS += util_hbm
 
 # list of test programs

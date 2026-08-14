@@ -21,8 +21,6 @@ ad_ip_instance axi_ad9361 dut [list \
   MIMO_ENABLE             {0} \
   MODE_1R1T               $ad_project_params(MODE_1R1T) \
   IODELAY_CTRL            {0} \
-  DELAY_REFCLK_FREQUENCY  {300} \
-  FPGA_TECHNOLOGY         {3} \
 ]
 adi_sim_add_define "DUT=dut"
 
@@ -45,13 +43,15 @@ ad_connect l_clk_vip/clk_out dut/clk
 # ---------------------------------------------------------------------------
 ad_cpu_interconnect 0x44A00000 dut
 
+set AXI_AD9361_BA 0x44A00000
+set_property offset $AXI_AD9361_BA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_dut}]
+adi_sim_add_define "AXI_AD9361_BA=[format "%d" ${AXI_AD9361_BA}]"
+
 # s_axi_aclk and s_axi_aresetn are wired automatically by ad_cpu_interconnect
 
 # ---------------------------------------------------------------------------
 # Physical LVDS RX pins
 # ---------------------------------------------------------------------------
-# io_vip master mode auto-creates a net on /o at instantiation.
-# Do NOT use ad_connect for /o → DUT connections; use connect_bd_net instead.
 # Each differential pair needs a NOT gate so IBUFDS sees a valid complement.
 
 # rx_clk_in — IBUFGDS port (not used for clocking; USE_SSI_CLK=0)
@@ -59,9 +59,8 @@ ad_ip_instance io_vip rx_clk_vip [list MODE {1} WIDTH {1}]
 adi_sim_add_define "RX_CLK=rx_clk_vip"
 ad_connect rx_clk_vip/clk l_clk_vip/clk_out
 ad_ip_instance util_vector_logic rx_clk_inv [list C_SIZE {1} C_OPERATION {not}]
-connect_bd_net [get_bd_pins rx_clk_vip/o] \
-               [get_bd_pins dut/rx_clk_in_p] \
-               [get_bd_pins rx_clk_inv/Op1]
+ad_connect rx_clk_vip/o dut/rx_clk_in_p
+ad_connect rx_clk_vip/o rx_clk_inv/Op1
 ad_connect rx_clk_inv/Res dut/rx_clk_in_n
 
 # rx_frame_in
@@ -69,9 +68,8 @@ ad_ip_instance io_vip rx_frame_vip [list MODE {1} WIDTH {1}]
 adi_sim_add_define "RX_FRAME=rx_frame_vip"
 ad_connect rx_frame_vip/clk l_clk_vip/clk_out
 ad_ip_instance util_vector_logic rx_frame_inv [list C_SIZE {1} C_OPERATION {not}]
-connect_bd_net [get_bd_pins rx_frame_vip/o] \
-               [get_bd_pins dut/rx_frame_in_p] \
-               [get_bd_pins rx_frame_inv/Op1]
+ad_connect rx_frame_vip/o dut/rx_frame_in_p
+ad_connect rx_frame_vip/o rx_frame_inv/Op1
 ad_connect rx_frame_inv/Res dut/rx_frame_in_n
 
 # rx_data_in[5:0]
@@ -79,9 +77,8 @@ ad_ip_instance io_vip rx_data_vip [list MODE {1} WIDTH {6}]
 adi_sim_add_define "RX_DATA=rx_data_vip"
 ad_connect rx_data_vip/clk l_clk_vip/clk_out
 ad_ip_instance util_vector_logic rx_data_inv [list C_SIZE {6} C_OPERATION {not}]
-connect_bd_net [get_bd_pins rx_data_vip/o] \
-               [get_bd_pins dut/rx_data_in_p] \
-               [get_bd_pins rx_data_inv/Op1]
+ad_connect rx_data_vip/o dut/rx_data_in_p
+ad_connect rx_data_vip/o rx_data_inv/Op1
 ad_connect rx_data_inv/Res dut/rx_data_in_n
 
 # ---------------------------------------------------------------------------
@@ -152,22 +149,22 @@ ad_connect dut/adc_data_q1 adc_data_q1_vip/i
 ad_ip_instance io_vip dac_data_i0_vip [list MODE {1} WIDTH {16}]
 adi_sim_add_define "DAC_DATA_I0=dac_data_i0_vip"
 ad_connect dac_data_i0_vip/clk l_clk_vip/clk_out
-connect_bd_net [get_bd_pins dac_data_i0_vip/o] [get_bd_pins dut/dac_data_i0]
+ad_connect dac_data_i0_vip/o dut/dac_data_i0
 
 ad_ip_instance io_vip dac_data_q0_vip [list MODE {1} WIDTH {16}]
 adi_sim_add_define "DAC_DATA_Q0=dac_data_q0_vip"
 ad_connect dac_data_q0_vip/clk l_clk_vip/clk_out
-connect_bd_net [get_bd_pins dac_data_q0_vip/o] [get_bd_pins dut/dac_data_q0]
+ad_connect dac_data_q0_vip/o dut/dac_data_q0
 
 ad_ip_instance io_vip dac_data_i1_vip [list MODE {1} WIDTH {16}]
 adi_sim_add_define "DAC_DATA_I1=dac_data_i1_vip"
 ad_connect dac_data_i1_vip/clk l_clk_vip/clk_out
-connect_bd_net [get_bd_pins dac_data_i1_vip/o] [get_bd_pins dut/dac_data_i1]
+ad_connect dac_data_i1_vip/o dut/dac_data_i1
 
 ad_ip_instance io_vip dac_data_q1_vip [list MODE {1} WIDTH {16}]
 adi_sim_add_define "DAC_DATA_Q1=dac_data_q1_vip"
 ad_connect dac_data_q1_vip/clk l_clk_vip/clk_out
-connect_bd_net [get_bd_pins dac_data_q1_vip/o] [get_bd_pins dut/dac_data_q1]
+ad_connect dac_data_q1_vip/o dut/dac_data_q1
 
 # Observe dac_valid outputs from DUT
 ad_ip_instance io_vip dac_valid_i0_vip [list MODE {0} WIDTH {1}]
@@ -185,14 +182,13 @@ ad_connect dut/dac_valid_q0 dac_valid_q0_vip/i
 # or dedicated xlconstant cells for wider ports.
 # ---------------------------------------------------------------------------
 
-connect_bd_net [get_bd_pins GND_1/dout] \
-  [get_bd_pins dut/dac_sync_in] \
-  [get_bd_pins dut/tdd_sync] \
-  [get_bd_pins dut/gps_pps] \
-  [get_bd_pins dut/adc_dovf] \
-  [get_bd_pins dut/dac_dunf] \
-  [get_bd_pins dut/up_enable] \
-  [get_bd_pins dut/up_txnrx]
+ad_connect GND_1/dout dut/dac_sync_in
+ad_connect GND_1/dout dut/tdd_sync
+ad_connect GND_1/dout dut/gps_pps
+ad_connect GND_1/dout dut/adc_dovf
+ad_connect GND_1/dout dut/dac_dunf
+ad_connect GND_1/dout dut/up_enable
+ad_connect GND_1/dout dut/up_txnrx
 
 # delay_clk must not be zero: ad_rst inside up_delay_cntrl is clocked by it;
 # with delay_clk=0 delay_rst_s stays X and propagates through up_rdata.
@@ -208,6 +204,5 @@ foreach {port width} {
     CONST_WIDTH $width \
     CONST_VAL   0 \
   ]
-  connect_bd_net [get_bd_pins ${cell_name}/dout] \
-                 [get_bd_pins dut/${port}]
+  ad_connect ${cell_name}/dout dut/${port}
 }

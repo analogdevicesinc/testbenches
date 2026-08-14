@@ -39,27 +39,13 @@
 import logger_pkg::*;
 import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
+import adc_api_pkg::*;
+import adi_regmap_adc_pkg::*;
+import io_vip_if_base_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-// ---------------------------------------------------------------------------
-// Shorthand macros to access io_vip interfaces through the test harness
-// ---------------------------------------------------------------------------
-`define RX_FRAME_VIF     `TH.`RX_FRAME.inst.inst.IF.vif
-`define RX_DATA_VIF      `TH.`RX_DATA.inst.inst.IF.vif
-`define ADC_VALID_I0_VIF `TH.`ADC_VALID_I0.inst.inst.IF.vif
-`define ADC_DATA_I0_VIF  `TH.`ADC_DATA_I0.inst.inst.IF.vif
-
-// ---------------------------------------------------------------------------
-// AXI base address and register offset
-// ---------------------------------------------------------------------------
-`define AXI_AD9361_BASE   32'h44A00000
-`define REG_ADC_STATUS    (`AXI_AD9361_BASE + 32'h005C)
-`define REG_CHAN_CTRL_I0  (`AXI_AD9361_BASE + 32'h0400)  // channel 0 (R1 I)
-`define REG_CHAN_CTRL_Q0  (`AXI_AD9361_BASE + 32'h0440)  // channel 1 (R1 Q)
-`define REG_CHAN_CTRL_I1  (`AXI_AD9361_BASE + 32'h0480)  // channel 2 (R2 I)
-`define REG_CHAN_CTRL_Q1  (`AXI_AD9361_BASE + 32'h04C0)  // channel 3 (R2 Q)
 
 // ---------------------------------------------------------------------------
 // Frame Sweep Test Program
@@ -100,6 +86,17 @@ program frame_sweep;
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
+  adc_api adc;
+
+  // io_vip interface handles — assigned once at startup, used throughout
+  io_vip_if_base rx_frame_vif;
+  io_vip_if_base rx_data_vif;
+  io_vip_if_base adc_valid_i0_vif;
+  io_vip_if_base adc_data_i0_vif;
+
+  process current_process;
+  string  current_process_random_state;
+
   // -------------------------------------------------------------------------
   // drive_cycle: drives one clock cycle using only the posedge clocking block.
   //
@@ -112,21 +109,19 @@ program frame_sweep;
     input logic frame,
     input logic [5:0] data
   );
-    `RX_FRAME_VIF.set_positive_edge();
-    `RX_FRAME_VIF.set_io({{1023{1'b0}}, frame});
-    `RX_DATA_VIF.set_positive_edge();
-    `RX_DATA_VIF.set_io({{1018{1'b0}}, data});
-    `RX_FRAME_VIF.wait_posedge_clk();
+    rx_frame_vif.set_positive_edge();
+    rx_frame_vif.set_io({{1023{1'b0}}, frame});
+    rx_data_vif.set_positive_edge();
+    rx_data_vif.set_io({{1018{1'b0}}, data});
+    rx_frame_vif.wait_posedge_clk();
   endtask
 
   // -------------------------------------------------------------------------
-  // read_status: read adc_status bit[0] via AXI after waiting for CDC settle.
+  // read_status: read adc_status via ADC API after waiting for CDC settle.
   // -------------------------------------------------------------------------
   task read_status(output logic status);
-    logic [31:0] rdata;
-    repeat (200) `RX_FRAME_VIF.wait_posedge_clk();
-    base_env.mng.master_sequencer.RegRead32(`REG_ADC_STATUS, rdata);
-    status = rdata[0];
+    repeat (200) rx_frame_vif.wait_posedge_clk();
+    adc.get_status(.status(status));
   endtask
 
   // -------------------------------------------------------------------------
@@ -136,14 +131,18 @@ program frame_sweep;
   // read after a long wait will always miss it.
   // -------------------------------------------------------------------------
   task poll_valid(output logic seen, output logic [15:0] data_out);
-    logic valid;
+    logic        valid;
+    logic [0:0]  valid_raw;
+    logic [15:0] data_raw;
     seen     = 1'b0;
     data_out = 16'h0;
     for (int c = 0; c < 30; c++) begin
-      `ADC_VALID_I0_VIF.wait_posedge_clk();
-      valid = `ADC_VALID_I0_VIF.get_io()[0];
+      adc_valid_i0_vif.wait_posedge_clk();
+      valid_raw = adc_valid_i0_vif.get_io();
+      valid = valid_raw[0];
       if (valid === 1'b1) begin
-        data_out = `ADC_DATA_I0_VIF.get_io()[15:0];
+        data_raw = adc_data_i0_vif.get_io();
+        data_out = data_raw;
         seen     = 1'b1;
       end
     end
@@ -168,29 +167,48 @@ program frame_sweep;
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 
+    adc = new(.name("adc"), .bus(base_env.mng.master_sequencer), .base_address(`AXI_AD9361_BA));
+
+    // Assign io_vip interface handles
+    rx_frame_vif     = `TH.`RX_FRAME.inst.inst.IF.vif;
+    rx_data_vif      = `TH.`RX_DATA.inst.inst.IF.vif;
+    adc_valid_i0_vif = `TH.`ADC_VALID_I0.inst.inst.IF.vif;
+    adc_data_i0_vif  = `TH.`ADC_DATA_I0.inst.inst.IF.vif;
+
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     base_env.start();
     `TH.`L_CLK.inst.IF.start_clock();
     base_env.sys_reset();
 
-    `RX_FRAME_VIF.set_positive_edge();
-    `RX_FRAME_VIF.set_io(1024'b0);
-    `RX_DATA_VIF.set_positive_edge();
-    `RX_DATA_VIF.set_io(1024'b0);
+    rx_frame_vif.set_positive_edge();
+    rx_frame_vif.set_io(1024'b0);
+    rx_data_vif.set_positive_edge();
+    rx_data_vif.set_io(1024'b0);
 
-    // Release ADC from reset (write 1 to up_resetn, reg offset 0x40 bit 0)
-    base_env.mng.master_sequencer.RegWrite32(`AXI_AD9361_BASE + 32'h0040, 32'h1);
-    repeat (200) `RX_FRAME_VIF.wait_posedge_clk();
+    // Release ADC from reset (up_resetn)
+    adc.reset(.ce_n(1'b0), .mmcm_rstn(1'b1), .rstn(1'b1));
+    repeat (200) rx_frame_vif.wait_posedge_clk();
 
-    // Disable IQ correction and DC filter on all 4 channels so that
-    // adc_data_i0/q0/i1/q1 reflects the raw 12-bit sample (zero-padded
-    // to 16 bits) without any DSP processing applied.
-    // Writing 0 clears: bit[9]=iqcor_enb, bit[8]=dcfilt_enb, bit[4]=dfmt_enable.
-    base_env.mng.master_sequencer.RegWrite32(`REG_CHAN_CTRL_I0, 32'h0);
-    base_env.mng.master_sequencer.RegWrite32(`REG_CHAN_CTRL_Q0, 32'h0);
-    base_env.mng.master_sequencer.RegWrite32(`REG_CHAN_CTRL_I1, 32'h0);
-    base_env.mng.master_sequencer.RegWrite32(`REG_CHAN_CTRL_Q1, 32'h0);
+    // Disable IQ correction, DC filter and data format on all 4 channels so
+    // adc_data_i0/q0/i1/q1 reflects the raw 12-bit sample without DSP applied.
+    for (int ch = 0; ch < 4; ch++) begin
+      adc.set_channel_control(
+        .channel(ch),
+        .adc_lb_owr(1'b0),
+        .adc_pn_sel_owr(1'b0),
+        .iqcor_enb(1'b0),
+        .dcfilt_enb(1'b0),
+        .format_signext(1'b0),
+        .format_type(1'b0),
+        .format_enable(1'b0),
+        .adc_pn_type_owr(1'b0),
+        .enable(1'b0));
+    end
 
     // ==================================================================
     // SECTION 1: Steady-state valid patterns
@@ -207,8 +225,8 @@ program frame_sweep;
     // Expected: adc_status=1 for all four patterns.
     // adc_valid_i0 pulses once per trigger cycle (polled over 20 cycles).
     // ==================================================================
-    `INFO((""), ADI_VERBOSITY_NONE);
-    `INFO(("=== SECTION 1: Valid steady-state frame patterns ==="), ADI_VERBOSITY_NONE);
+    `INFO((""), ADI_VERBOSITY_LOW);
+    `INFO(("=== SECTION 1: Valid steady-state frame patterns ==="), ADI_VERBOSITY_LOW);
 
     // ------------------------------------------------------------------
     // Pattern 4'b1111 — frame stays high (MSB slot, steady state)
@@ -218,12 +236,12 @@ program frame_sweep;
     // ------------------------------------------------------------------
     begin
       logic status; logic seen; logic [15:0] d;
-      `INFO(("--- 4'b1111: frame stays high (MSB slot) ---"), ADI_VERBOSITY_NONE);
-      repeat (12) drive_cycle(1'b1, 6'h1F);
-      read_status(status);
-      poll_valid(seen, d);
+      `INFO(("--- 4'b1111: frame stays high (MSB slot) ---"), ADI_VERBOSITY_LOW);
+      repeat (12) drive_cycle(.frame(1'b1), .data(6'h1F));
+      read_status(.status(status));
+      poll_valid(.seen(seen), .data_out(d));
       `INFO(($sformatf("[SWEEP] 4'b1111 stay-high | status=%0b valid_seen=%0b data=0x%04h",
-             status, seen, d)), ADI_VERBOSITY_NONE);
+             status, seen, d)), ADI_VERBOSITY_LOW);
     end
 
     // ------------------------------------------------------------------
@@ -235,13 +253,13 @@ program frame_sweep;
     // ------------------------------------------------------------------
     begin
       logic status; logic seen; logic [15:0] d;
-      `INFO(("--- 4'b1100: frame just rose (start of MSB slot) ---"), ADI_VERBOSITY_NONE);
-      repeat (6) drive_cycle(1'b0, 6'h3F); // prev = 00
-      repeat (6) drive_cycle(1'b1, 6'h1F); // curr = 11 → pattern = 1100
-      read_status(status);
-      poll_valid(seen, d);
+      `INFO(("--- 4'b1100: frame just rose (start of MSB slot) ---"), ADI_VERBOSITY_LOW);
+      repeat (6) drive_cycle(.frame(1'b0), .data(6'h3F)); // prev = 00
+      repeat (6) drive_cycle(.frame(1'b1), .data(6'h1F)); // curr = 11 → pattern = 1100
+      read_status(.status(status));
+      poll_valid(.seen(seen), .data_out(d));
       `INFO(($sformatf("[SWEEP] 4'b1100 frame-rose  | status=%0b valid_seen=%0b data=0x%04h",
-             status, seen, d)), ADI_VERBOSITY_NONE);
+             status, seen, d)), ADI_VERBOSITY_LOW);
     end
 
     // ------------------------------------------------------------------
@@ -252,12 +270,12 @@ program frame_sweep;
     // ------------------------------------------------------------------
     begin
       logic status; logic seen; logic [15:0] d;
-      `INFO(("--- 4'b0000: frame stays low (LSB slot, valid fires) ---"), ADI_VERBOSITY_NONE);
-      repeat (12) drive_cycle(1'b0, 6'h3F);
-      read_status(status);
-      poll_valid(seen, d);
+      `INFO(("--- 4'b0000: frame stays low (LSB slot, valid fires) ---"), ADI_VERBOSITY_LOW);
+      repeat (12) drive_cycle(.frame(1'b0), .data(6'h3F));
+      read_status(.status(status));
+      poll_valid(.seen(seen), .data_out(d));
       `INFO(($sformatf("[SWEEP] 4'b0000 stay-low   | status=%0b valid_seen=%0b data=0x%04h",
-             status, seen, d)), ADI_VERBOSITY_NONE);
+             status, seen, d)), ADI_VERBOSITY_LOW);
     end
 
     // ------------------------------------------------------------------
@@ -271,13 +289,13 @@ program frame_sweep;
     // ------------------------------------------------------------------
     begin
       logic status; logic seen; logic [15:0] d;
-      `INFO(("--- 4'b0011: frame just fell (start of LSB slot; 1R1T valid trigger) ---"), ADI_VERBOSITY_NONE);
-      repeat (6) drive_cycle(1'b1, 6'h1F); // prev = 11
-      repeat (6) drive_cycle(1'b0, 6'h3F); // curr = 00 → pattern = 0011
-      read_status(status);
-      poll_valid(seen, d);
+      `INFO(("--- 4'b0011: frame just fell (start of LSB slot; 1R1T valid trigger) ---"), ADI_VERBOSITY_LOW);
+      repeat (6) drive_cycle(.frame(1'b1), .data(6'h1F)); // prev = 11
+      repeat (6) drive_cycle(.frame(1'b0), .data(6'h3F)); // curr = 00 → pattern = 0011
+      read_status(.status(status));
+      poll_valid(.seen(seen), .data_out(d));
       `INFO(($sformatf("[SWEEP] 4'b0011 frame-fell  | status=%0b valid_seen=%0b data=0x%04h",
-             status, seen, d)), ADI_VERBOSITY_NONE);
+             status, seen, d)), ADI_VERBOSITY_LOW);
     end
 
     // ==================================================================
@@ -296,40 +314,40 @@ program frame_sweep;
     // Data value 0x15 for MSB cycles, 0x2A for LSB cycles — distinct,
     // non-zero values that are easy to identify in the waveform viewer.
     // ==================================================================
-    `INFO((""), ADI_VERBOSITY_NONE);
-    `INFO(("=== SECTION 2: Complete frame bursts ==="), ADI_VERBOSITY_NONE);
+    `INFO((""), ADI_VERBOSITY_LOW);
+    `INFO(("=== SECTION 2: Complete frame bursts ==="), ADI_VERBOSITY_LOW);
 
     if (`MODE_1R1T == 0) begin
       logic seen; logic [15:0] d;
       // 2R2T burst: 1 MSB cycle (frame high) + 1 LSB cycle (frame low)
       // (R2 data would come from the second LVDS pair; data_p/data_n here
       //  are R1 only — R2 is 0 since only one io_vip drives rx_data_in_p)
-      `INFO(("--- 2R2T burst x10: MSB(frame=1111) + LSB(frame=0000) ---"), ADI_VERBOSITY_NONE);
+      `INFO(("--- 2R2T burst x10: MSB(frame=1111) + LSB(frame=0000) ---"), ADI_VERBOSITY_LOW);
       // drive_cycle drives posedge only; IDDRE1 SAME_EDGE mode captures the same
       // stable value at both posedge (I) and negedge (Q) within the full period.
       repeat (10) begin
-        drive_cycle(1'b1, 6'h15); // MSB: data=0x15 → both I_MSB and Q_MSB = 0x15
-        drive_cycle(1'b0, 6'h2A); // LSB: data=0x2A → both I_LSB and Q_LSB = 0x2A; valid fires
+        drive_cycle(.frame(1'b1), .data(6'h15)); // MSB: data=0x15 → both I_MSB and Q_MSB = 0x15
+        drive_cycle(.frame(1'b0), .data(6'h2A)); // LSB: data=0x2A → both I_LSB and Q_LSB = 0x2A; valid fires
       end
-      poll_valid(seen, d);
+      poll_valid(.seen(seen), .data_out(d));
       `INFO(($sformatf("[SWEEP] 2R2T burst | valid_seen=%0b data_i0=0x%04h", seen, d)),
-            ADI_VERBOSITY_NONE);
+            ADI_VERBOSITY_LOW);
     end
 
     if (`MODE_1R1T == 1) begin
       logic seen; logic [15:0] d;
       // 1R1T burst: 1 MSB cycle (frame high) + 1 LSB cycle (frame low → 0011 trigger)
-      `INFO(("--- 1R1T burst x10: MSB(frame=1111) + LSB-trigger(frame=0000→0011) ---"), ADI_VERBOSITY_NONE);
+      `INFO(("--- 1R1T burst x10: MSB(frame=1111) + LSB-trigger(frame=0000→0011) ---"), ADI_VERBOSITY_LOW);
       // Prime with one MSB cycle first so the very first 0011 transition has
       // a valid previous state (prev=11).
-      drive_cycle(1'b1, 6'h15);
+      drive_cycle(.frame(1'b1), .data(6'h15));
       repeat (10) begin
-        drive_cycle(1'b0, 6'h2A); // falling: {curr=00,prev=11}=0011 → valid
-        drive_cycle(1'b1, 6'h15); // rising:  {curr=11,prev=00}=1100
+        drive_cycle(.frame(1'b0), .data(6'h2A)); // falling: {curr=00,prev=11}=0011 → valid
+        drive_cycle(.frame(1'b1), .data(6'h15)); // rising:  {curr=11,prev=00}=1100
       end
-      poll_valid(seen, d);
+      poll_valid(.seen(seen), .data_out(d));
       `INFO(($sformatf("[SWEEP] 1R1T burst | valid_seen=%0b data_i0=0x%04h", seen, d)),
-            ADI_VERBOSITY_NONE);
+            ADI_VERBOSITY_LOW);
     end
 
 
@@ -337,8 +355,8 @@ program frame_sweep;
     // ------------------------------------------------------------------
     // Done
     // ------------------------------------------------------------------
-    `INFO((""), ADI_VERBOSITY_NONE);
-    `INFO(("Frame sweep complete."), ADI_VERBOSITY_NONE);
+    `INFO((""), ADI_VERBOSITY_LOW);
+    `INFO(("Frame sweep complete."), ADI_VERBOSITY_LOW);
     #100ns;
     `TH.`L_CLK.inst.IF.stop_clock();
     base_env.stop();

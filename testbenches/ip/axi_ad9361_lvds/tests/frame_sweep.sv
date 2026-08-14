@@ -149,6 +149,10 @@ program frame_sweep;
   endtask
 
   initial begin
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
+
     // ------------------------------------------------------------------
     // Environment setup
     // ------------------------------------------------------------------
@@ -176,10 +180,6 @@ program frame_sweep;
     adc_data_i0_vif  = `TH.`ADC_DATA_I0.inst.inst.IF.vif;
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
-
-    current_process = process::self();
-    current_process_random_state = current_process.get_randstate();
-    `INFO(("Randomization state: %s", current_process_random_state), ADI_VERBOSITY_NONE);
 
     base_env.start();
     `TH.`L_CLK.inst.IF.start_clock();

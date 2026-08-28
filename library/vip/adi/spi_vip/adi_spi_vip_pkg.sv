@@ -54,6 +54,7 @@ package adi_spi_vip_pkg;
     protected bit stop_flag;
     protected int default_miso_data;
     protected event tx_mbx_updated;
+    protected bit cs_inactive_mid_transfer_allowed = 0;
 
     adi_spi_vip_if_base vif;
 
@@ -112,7 +113,7 @@ package adi_spi_vip_pkg;
 
               for (int j = 0; j < vif.get_param_NUM_OF_MOSI(); j++) begin
                 if ($isunknown(mosi_logic[j]))
-                  this.error($sformatf("[SPI VIP] MOSI Rx: unknown mosi bit at sample edge!"));
+                  this.error($sformatf("MOSI Rx: unknown mosi bit at sample edge!"));
                 mosi_bit = bit'(mosi_logic[j]);
                 bitqueue_push_lsb(mosi_bit_queue[j], mosi_bit);
               end
@@ -196,7 +197,11 @@ package adi_spi_vip_pkg;
               if (!vif.get_cs_active()) begin
                 // if i!=0, we got !cs_active in the middle of a transaction
                 if (i != 0) begin
-                  this.fatal($sformatf("[SPI VIP] MISO Tx: early exit due to unexpected CS inactive!"));
+                  if (cs_inactive_mid_transfer_allowed) begin
+                    this.warning($sformatf("MISO Tx: CS inactive mid-transaction (allowed by allow_cs_inactive_mid_transfer)"));
+                  end else begin
+                  this.fatal($sformatf("MISO Tx: early exit due to unexpected CS inactive!"));
+                  end
                 end
                 foreach (miso_bits[j]) begin
                   miso_bits[j].delete();
@@ -225,7 +230,7 @@ package adi_spi_vip_pkg;
 
                 foreach (miso_mbx[j]) begin
                   if (i == vif.get_param_DATA_DLENGTH()-1) begin
-                    this.info($sformatf("[SPI VIP] MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
+                    this.info($sformatf("MISO Tx end of transfer."), ADI_VERBOSITY_HIGH);
                     if (!using_default) begin
                       // finally pop an item from the mailbox after a complete transfer
                       miso_mbx[j].get(miso_data[j]);
@@ -272,6 +277,21 @@ package adi_spi_vip_pkg;
       this.default_miso_data = default_data;
     endfunction : set_default_miso_data
 
+    task reset();
+      int miso_cleared = 0;
+      int mosi_cleared = 0;
+      foreach (miso_mbx[i]) miso_cleared += miso_mbx[i].num();
+      foreach (mosi_mbx[i]) mosi_cleared += mosi_mbx[i].num();
+      clear_tx();
+      clear_rx();
+      this.info($sformatf("Reset - cleared %0d MISO, %0d MOSI items, reset transaction counters",
+        miso_cleared, mosi_cleared), ADI_VERBOSITY_HIGH);
+    endtask : reset
+
+    function void allow_cs_inactive_mid_transfer(bit allow);
+      cs_inactive_mid_transfer_allowed = allow;
+    endfunction : allow_cs_inactive_mid_transfer
+
     task put_tx_data(
       input int unsigned data[]);
       foreach (data[i]) begin
@@ -286,6 +306,12 @@ package adi_spi_vip_pkg;
         mosi_mbx[i].get(data[i]);
       end
     endtask
+
+    function int get_num_rx_data();
+      // Per-lane word count; every lane receives one entry per word, so lane 0
+      // is representative.
+      return mosi_mbx[0].num();
+    endfunction
 
     task flush_tx();
       fork
@@ -303,6 +329,23 @@ package adi_spi_vip_pkg;
       join
     endtask
 
+    // Clear receive buffer - discards any pending received data
+    task clear_rx();
+      int dummy;
+      foreach (mosi_mbx[i]) begin
+        while (mosi_mbx[i].try_get(dummy));
+      end
+    endtask
+
+    // Clear send buffer - discards any pending data to be sent
+    task clear_tx();
+      int dummy;
+      int cleared = 0;
+      foreach (miso_mbx[i]) begin
+        while (miso_mbx[i].try_get(dummy)) cleared++;
+      end
+    endtask
+
     task start();
       if (!this.get_active()) begin
         this.set_active();
@@ -311,7 +354,7 @@ package adi_spi_vip_pkg;
             fork
               begin
                 @(posedge this.stop_flag);
-                this.info($sformatf("[SPI VIP] Stop event triggered."), ADI_VERBOSITY_HIGH);
+                this.info($sformatf("Stop event triggered."), ADI_VERBOSITY_HIGH);
                 this.stop_flag = 0;
               end
               begin
@@ -387,6 +430,10 @@ package adi_spi_vip_pkg;
       this.driver.get_rx_data(data);
     endtask : receive_data
 
+    virtual function int get_num_rx_data();
+      return this.driver.get_num_rx_data();
+    endfunction : get_num_rx_data
+
     virtual task automatic receive_data_verify(input int unsigned expected[]);
       int unsigned received[] = new[expected.size()];
       this.driver.get_rx_data(received);
@@ -401,9 +448,27 @@ package adi_spi_vip_pkg;
       this.driver.flush_tx();
     endtask : flush_send
 
+    // Clear receive buffer - discards any pending received data
+    virtual task clear_receive();
+      this.driver.clear_rx();
+    endtask : clear_receive
+
+    // Clear send buffer - discards any pending data to be sent
+    virtual task clear_send();
+      this.driver.clear_tx();
+    endtask : clear_send
+
     virtual function void set_default_miso_data(input int unsigned data);
       this.driver.set_default_miso_data(data);
     endfunction : set_default_miso_data
+
+    virtual task reset();
+      this.driver.reset();
+    endtask : reset
+
+    virtual function void allow_cs_inactive_mid_transfer(bit allow);
+      this.driver.allow_cs_inactive_mid_transfer(allow);
+    endfunction : allow_cs_inactive_mid_transfer
 
   endclass
 

@@ -87,4 +87,28 @@
                                 th``_``vip``_0_VIP_HAS_ACLKEN,\
                                 th``_``vip``_0_VIP_HAS_ARESETN
 
+`define AXIS_TRANSACTION_PARAM(th,vip)  .BYTES_PER_TRANSACTION(``th``_``vip``_0_VIP_DATA_WIDTH/8), \
+                                        .EN_TKEEP(``th``_``vip``_0_VIP_HAS_TKEEP), \
+                                        .EN_TSTRB(``th``_``vip``_0_VIP_HAS_TSTRB), \
+                                        .EN_TLAST(``th``_``vip``_0_VIP_HAS_TLAST), \
+                                        .EN_TUSER((``th``_``vip``_0_VIP_USER_WIDTH) ? 1'b1 : 1'b0), \
+                                        .EN_TID((``th``_``vip``_0_VIP_ID_WIDTH) ? 1'b1 : 1'b0), \
+                                        .EN_TDEST((``th``_``vip``_0_VIP_DEST_WIDTH) ? 1'b1 : 1'b0), \
+                                        .TUSER_BYTE_BASED((``th``_``vip``_0_VIP_USER_BITS_PER_BYTE) ? 1'b1 : 1'b0), \
+                                        .TID_WIDTH((``th``_``vip``_0_VIP_ID_WIDTH) ? ``th``_``vip``_0_VIP_ID_WIDTH : 'd1), \
+                                        .TDEST_WIDTH((``th``_``vip``_0_VIP_DEST_WIDTH) ? ``th``_``vip``_0_VIP_DEST_WIDTH : 'd1), \
+                                        .TUSER_WIDTH((``th``_``vip``_0_VIP_USER_WIDTH) ? ``th``_``vip``_0_VIP_USER_WIDTH : 'd1)
+
+`define AXIS_TRANSACTION_SEQ_PARAM(n) .BYTES_PER_TRANSACTION(``n``_VIP_DATA_WIDTH/8), \
+                                      .EN_TKEEP(``n``_VIP_HAS_TKEEP), \
+                                      .EN_TSTRB(``n``_VIP_HAS_TSTRB), \
+                                      .EN_TLAST(``n``_VIP_HAS_TLAST), \
+                                      .EN_TUSER((``n``_VIP_USER_WIDTH) ? 1'b1 : 1'b0), \
+                                      .EN_TID((``n``_VIP_ID_WIDTH) ? 1'b1 : 1'b0), \
+                                      .EN_TDEST((``n``_VIP_DEST_WIDTH) ? 1'b1 : 1'b0), \
+                                      .TUSER_BYTE_BASED((``n``_VIP_USER_BITS_PER_BYTE) ? 1'b1 : 1'b0), \
+                                      .TID_WIDTH((``n``_VIP_ID_WIDTH) ? ``n``_VIP_ID_WIDTH : 'd1), \
+                                      .TDEST_WIDTH((``n``_VIP_DEST_WIDTH) ? ``n``_VIP_DEST_WIDTH : 'd1), \
+                                      .TUSER_WIDTH((``n``_VIP_USER_WIDTH) ? ``n``_VIP_USER_WIDTH : 'd1)
+
 `endif

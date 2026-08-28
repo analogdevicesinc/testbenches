@@ -200,6 +200,21 @@ package adi_jesd204_pkg;
     // -----------------
     //
     // -----------------
+    function int num_lanes();
+      return link.L * num_links;
+    endfunction : num_lanes
+
+    // -----------------
+    //
+    // -----------------
+    // Every link carries its own LID space, so the lane index wraps at L
+    function int lane_id(int lane);
+      return lane % link.L;
+    endfunction : lane_id
+
+    // -----------------
+    //
+    // -----------------
     function new (string name, m_axi_sequencer_base bus, bit [31:0] base_address, jesd_link link);
 
       super.new(name, bus, base_address);
@@ -315,7 +330,7 @@ package adi_jesd204_pkg;
     // -----------------
     task wait_link_up();
       bit [31:0] val;
-      int timeout = 30;
+      int timeout = 100;
       bit [1:0] link_state;
       bit [2:0] emb_state;
       bit [2:0] cgs_state;
@@ -329,7 +344,7 @@ package adi_jesd204_pkg;
         link_state = `GET_JESD_RX_LINK_STATUS_STATUS_STATE(val);
         // Read lane state
         all_lanes_in_data = 1;
-        for (int i = 0; i < link.L; i++) begin
+        for (int i = 0; i < num_lanes(); i++) begin
           this.bus.RegRead32(this.base_address + i * 'h20 + GetAddrs(JESD_RX_LANEn_STATUS), val);
           if (link.encoding == enc8b10b) begin
             cgs_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
@@ -345,8 +360,7 @@ package adi_jesd204_pkg;
               all_lanes_in_data = 0;
           end
         end
-        // TODO: better estimate the time that link up takes, and re-enable the timeout
-        // timeout--;
+        timeout--;
       end
 
       link_verify();
@@ -379,7 +393,7 @@ package adi_jesd204_pkg;
                                `SET_JESD_RX_SYSREF_STATUS_SYSREF_ALIGNMENT_ERROR(0) |
                                `SET_JESD_RX_SYSREF_STATUS_SYSREF_DETECTED(link.SUBCLASSV == sc1));
       // Check lane status
-      for (int i = 0; i < link.L; i++) begin
+      for (int i = 0; i < num_lanes(); i++) begin
         this.bus.RegRead32(this.base_address + i * 'h20 + GetAddrs(JESD_RX_LANEn_STATUS), val);
         if (link.encoding == enc8b10b) begin
           cgs_state = `GET_JESD_RX_LANEn_STATUS_CGS_STATE(val);
@@ -400,9 +414,9 @@ package adi_jesd204_pkg;
 
       // Check received ILAS config data
       if (link.encoding == enc8b10b) begin
-        for (int i = 0; i < link.L; i++) begin
+        for (int i = 0; i < num_lanes(); i++) begin
           this.bus.RegReadVerify32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS1),
-                                   `SET_JESD_RX_LANEn_ILAS1_LID(i) |
+                                   `SET_JESD_RX_LANEn_ILAS1_LID(lane_id(i)) |
                                    `SET_JESD_RX_LANEn_ILAS1_L(link.L - 1) |
                                    `SET_JESD_RX_LANEn_ILAS1_SCR(link.SCR) |
                                    `SET_JESD_RX_LANEn_ILAS1_F(link.F - 1) |
@@ -418,7 +432,7 @@ package adi_jesd204_pkg;
           this.bus.RegReadVerify32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS3),
                                    `SET_JESD_RX_LANEn_ILAS3_CF(link.CF) |
                                    `SET_JESD_RX_LANEn_ILAS3_HD(link.HD) |
-                                   `SET_JESD_RX_LANEn_ILAS3_FCHK(link.calc_checksum(i)));
+                                   `SET_JESD_RX_LANEn_ILAS3_FCHK(link.calc_checksum(lane_id(i))));
         end
       end
 
@@ -482,9 +496,9 @@ package adi_jesd204_pkg;
 
       //ILAS
       if (link.encoding == enc8b10b) begin
-        for (int i = 0; i < link.L; i++) begin
+        for (int i = 0; i < num_lanes(); i++) begin
           this.bus.RegWrite32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS1),
-                             `SET_JESD_TX_LANEn_ILAS1_LID(i) |
+                             `SET_JESD_TX_LANEn_ILAS1_LID(lane_id(i)) |
                              `SET_JESD_TX_LANEn_ILAS1_L(link.L - 1) |
                              `SET_JESD_TX_LANEn_ILAS1_SCR(link.SCR) |
                              `SET_JESD_TX_LANEn_ILAS1_F(link.F - 1) |
@@ -500,7 +514,7 @@ package adi_jesd204_pkg;
           this.bus.RegWrite32(this.base_address + i * 'h20 + GetAddrs(JESD_TX_LANEn_ILAS3),
                              `SET_JESD_TX_LANEn_ILAS3_CF(link.CF) |
                              `SET_JESD_TX_LANEn_ILAS3_HD(link.HD) |
-                             `SET_JESD_TX_LANEn_ILAS3_FCHK(link.calc_checksum(i)));
+                             `SET_JESD_TX_LANEn_ILAS3_FCHK(link.calc_checksum(lane_id(i))));
         end
 
       end

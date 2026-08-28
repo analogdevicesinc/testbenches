@@ -35,63 +35,48 @@
 
 `include "utils.svh"
 
-package pub_sub_pkg;
+package adi_reporter_pkg;
 
   import logger_pkg::*;
-  import adi_component_pkg::*;
+  import adi_object_pkg::*;
 
-  class adi_subscriber #(type data_type = int) extends adi_component;
-
-    protected static bit [15:0] last_id = 'd0;
-    bit [15:0] id;
+  class adi_reporter extends adi_object;
+    protected adi_reporter parent;
 
     function new(
       input string name,
-      input adi_component parent = null);
+      input adi_reporter parent = null);
 
-      super.new(name, parent);
+      super.new(.name(name));
 
-      this.last_id++;
-      this.id = this.last_id;
-    endfunction: new
+      this.parent = parent;
+    endfunction
 
-    virtual function void update(input data_type data [$]);
-      this.fatal($sformatf("This function is not implemented!"));
-    endfunction: update
-
-  endclass: adi_subscriber
-
-
-  class adi_publisher #(type data_type = int) extends adi_component;
-
-    protected adi_subscriber #(data_type) subscriber_list[bit[15:0]];
-
-    function new(
-      input string name,
-      input adi_component parent = null);
-
-      super.new(name, parent);
-    endfunction: new
-
-    function void subscribe(input adi_subscriber #(data_type) subscriber);
-      if (this.subscriber_list.exists(subscriber.id))
-        this.error($sformatf("Subscriber already on the list!"));
+    function string get_path();
+      if (this.parent == null)
+        return this.name;
       else
-        this.subscriber_list[subscriber.id] = subscriber;
-    endfunction: subscribe
+        return $sformatf("%s.%s", this.parent.get_path(), this.name);
+    endfunction: get_path
 
-    function void unsubscribe(input adi_subscriber #(data_type) subscriber);
-      if (!this.subscriber_list.exists(subscriber.id))
-        this.error($sformatf("Subscriber does not exist on list!"));
-      else
-        this.subscriber_list.delete(subscriber.id);
-    endfunction: unsubscribe
+    function void info(
+      input string message,
+      input adi_verbosity_t verbosity);
 
-    function void notify(input data_type data [$]);
-      foreach (this.subscriber_list[i])
-        this.subscriber_list[i].update(data);
-    endfunction: notify
+      `INFO(("[%s] %s", this.get_path(), message), verbosity);
+    endfunction: info
 
-  endclass: adi_publisher
+    function void warning(input string message);
+      `WARNING(("[%s] %s", this.get_path(), message));
+    endfunction: warning
 
-endpackage
+    function void error(input string message);
+      `ERROR(("[%s] %s", this.get_path(), message));
+    endfunction: error
+
+    function void fatal(input string message);
+      `FATAL(("[%s] %s", this.get_path(), message));
+    endfunction: fatal
+  endclass: adi_reporter
+
+endpackage: adi_reporter_pkg

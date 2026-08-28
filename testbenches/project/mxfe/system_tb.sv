@@ -37,7 +37,7 @@
 
 module system_tb();
 
-  wire rx_sync_0;
+  wire [`RX_NUM_LINKS-1:0] rx_sync_0;
   reg ext_sync = 1'b0;
 
   `TEST_PROGRAM test();

@@ -70,6 +70,9 @@ program test_program;
   xcvr rx_xcvr;
   xcvr tx_xcvr;
 
+  localparam int RX_NUM_OF_CONVERTERS = `RX_JESD_M * `RX_NUM_LINKS;
+  localparam int TX_NUM_OF_CONVERTERS = `TX_JESD_M * `TX_NUM_LINKS;
+
   int use_dds = 1;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
@@ -92,7 +95,7 @@ program test_program;
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 
-    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+    setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
     base_env.start();
     base_env.sys_reset();
@@ -196,7 +199,7 @@ program test_program;
     // -----------------------
     // Configure TPL
     // -----------------------
-    for (int i = 0; i < `RX_JESD_M; i++) begin
+    for (int i = 0; i < TX_NUM_OF_CONVERTERS; i++) begin
       if (use_dds) begin
         // Select DDS as source
         base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA + 'h40 * i + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -314,7 +317,7 @@ program test_program;
     // -----------------------
     // Configure ADC TPL
     // -----------------------
-    for (int i = 0; i < `RX_JESD_M; i++) begin
+    for (int i = 0; i < RX_NUM_OF_CONVERTERS; i++) begin
       base_env.mng.master_sequencer.RegWrite32(`ADC_TPL_BA + 'h40 * i + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
                          `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     end
@@ -377,7 +380,7 @@ program test_program;
     // -----------------------
     // Configure TPL
     // -----------------------
-    for (int i = 0; i < `RX_JESD_M; i++) begin
+    for (int i = 0; i < TX_NUM_OF_CONVERTERS; i++) begin
       if (use_dds) begin
         // Select DDS as source
         base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA + 'h40 * i + GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
@@ -421,7 +424,7 @@ program test_program;
     // -----------------------
     // Configure ADC TPL
     // -----------------------
-    for (int i = 0; i < `RX_JESD_M; i++) begin
+    for (int i = 0; i < RX_NUM_OF_CONVERTERS; i++) begin
       base_env.mng.master_sequencer.RegWrite32(`ADC_TPL_BA + 'h40 * i + GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
                          `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
     end

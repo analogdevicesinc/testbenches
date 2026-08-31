@@ -103,11 +103,13 @@ localparam DEVICE_PID_BCR_DCR = 64'h02ee007c0000DEAD;
 //---------------------------------------------------------------------------
 // I3C Controller instructions
 //---------------------------------------------------------------------------
-localparam I3C_CCC_RSTDAA = 32'h6;
-localparam I3C_CCC_ENTDAA = 32'h7;
-localparam I3C_CCC_DISEC  = 32'h1;
-localparam I3C_CCC_GETPID = 32'h8d;
-localparam I3C_CCC_GETDCR = 32'h8f;
+localparam I3C_CCC_RSTDAA        = 32'h6;
+localparam I3C_CCC_ENTDAA        = 32'h7;
+localparam I3C_CCC_DISEC         = 32'h1;
+localparam I3C_CCC_GETPID        = 32'h8d;
+localparam I3C_CCC_GETDCR        = 32'h8f;
+localparam I3C_CCC_RSTACT_BCAST  = 32'h2a;
+localparam I3C_CCC_RSTACT_DIRECT = 32'h9a;
 //                               { Flags,Length, Addr,  Rnw}
 // CCC, length 0
 localparam  I3C_CCC_CMD_RSTDAA = {3'b100, 12'd0, 7'b0, 1'b0};
@@ -115,6 +117,9 @@ localparam  I3C_CCC_CMD_RSTDAA = {3'b100, 12'd0, 7'b0, 1'b0};
 localparam  I3C_CCC_CMD_DISEC  = {3'b100, 12'd1, 7'b0, 1'b0};
 // CCC, length 0
 localparam I3C_CCC_CMD_ENTDAA  = {3'b100, 12'd0, 7'b0, 1'b0};
+// CCC, length 0
+localparam I3C_CCC_CMD_RSTACT_BCAST  = {3'b100, 12'd1, 7'b0, 1'b0};
+localparam I3C_CCC_CMD_RSTACT_DIRECT = {3'b100, 12'd1, DEVICE_DA1[6:0], 1'b0};
 // Wrong DA, CCC read 6 bytes
 localparam I3C_CMD_GETPID_UDA  = {3'b100, 12'd6,   START_DA[6:0], 1'b1};
 // CCC read 6 bytes
@@ -212,6 +217,55 @@ task print_ibi(input int data);
 endtask
 
 //---------------------------------------------------------------------------
+// Verify the Target Reset Pattern waveform
+//---------------------------------------------------------------------------
+task verify_target_reset_pattern();
+  time last_transition;
+  bit last_sda;
+  bit current_sda;
+
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_TRP, 100000);
+  // The defining byte can end Low. First release SDA while SCL is Low to set
+  // up the pattern's required initial High level; this is not one of the 14.
+  wait (i3c_sda === 1'b1);
+  #1ps;
+  if (i3c_scl !== 1'b0 || `DUT_I3C_BIT_MOD.t !== 1'b0)
+    `FATAL(("RSTACT did not set up SDA High in push-pull mode"));
+  last_transition = $time;
+  last_sda = 1'b1;
+
+  // Fourteen push-pull SDA edges occur while SCL is held Low. The HDR Exit
+  // Pattern on which this is based requires at least tDIG_H (32 ns) per edge.
+  repeat (14) begin
+    // Ignore a change between actively-driven High and High-Z; both are a
+    // logical High on a bus with its required pull-up/high-keeper.
+    do begin
+      @(i3c_sda);
+      current_sda = i3c_sda !== 1'b0;
+    end while (current_sda == last_sda);
+    last_sda = current_sda;
+    if (i3c_scl !== 1'b0)
+      `FATAL(("RSTACT SDA transition occurred while SCL was not Low"));
+    if (`DUT_I3C_BIT_MOD.t !== 1'b0)
+      `FATAL(("RSTACT SDA transition was not push-pull"));
+    if ($time - last_transition < 32ns)
+      `FATAL(("RSTACT SDA transition violated tDIG_H: delta=%0t", $time - last_transition));
+    last_transition = $time;
+  end
+
+  @(negedge i3c_sda);
+  if (i3c_scl !== 1'b1 || $time - last_transition < 32ns)
+    `FATAL(("RSTACT Repeated START timing is invalid: SCL=%b delta=%0t",
+            i3c_scl, $time - last_transition));
+  last_transition = $time;
+  @(posedge i3c_sda);
+  if (i3c_scl !== 1'b1 || `DUT_I3C_BIT_MOD.t !== 1'b1 ||
+      $time - last_transition < 200ns)
+    `FATAL(("RSTACT STOP timing is invalid"));
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
+endtask
+
+//---------------------------------------------------------------------------
 // Enable/disable auto acknowledge
 //---------------------------------------------------------------------------
 logic auto_ack = 1'b1;
@@ -277,7 +331,7 @@ initial begin
     base_env.mng.master_sequencer,
     `I3C_CONTROLLER_BA);
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+  setLoggerVerbosity(ADI_VERBOSITY_MEDIUM);
 
   base_env.start();
   base_env.sys_reset();
@@ -381,6 +435,42 @@ task ccc_i3c_test;
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 0)
     `FATAL(("CMD -> CMDR read length test FAILED"));
+
+  // Test #1b, RSTACT CCC emits the Target Reset Pattern.
+  `INFO(("CCC I3C Test #1b"), ADI_VERBOSITY_LOW);
+  if (i3c_scl !== 1'b1 || `DUT_I3C_BIT_MOD.t !== 1'b1)
+    `FATAL(("RSTACT must begin from the released bus state"));
+
+  i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_0001);
+  i3c_controller.set_cmd_fifo(I3C_CCC_CMD_RSTACT_BCAST); // CCC, length 1
+  i3c_controller.set_cmd_fifo(I3C_CCC_RSTACT_BCAST);
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_MSG_TX, 100000);
+  if (`DUT_I3C_WORD.cmdw_body !== 8'h01)
+    `FATAL(("RSTACT Defining Byte was not transmitted"));
+  verify_target_reset_pattern();
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  print_cmdr (cmdr_fifo_data);
+  if (cmdr_fifo_data[19:8] != 1)
+    `FATAL(("CMD -> CMDR RSTACT length test FAILED"));
+
+  // Test #1c, Direct Write RSTACT targets one attached I3C device.
+  `INFO(("CCC I3C Test #1c"), ADI_VERBOSITY_LOW);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_0001);
+  i3c_controller.set_cmd_fifo(I3C_CCC_CMD_RSTACT_DIRECT);
+  i3c_controller.set_cmd_fifo(I3C_CCC_RSTACT_DIRECT);
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_TARGET_ADDR_PP, 100000);
+  if (`DUT_I3C_WORD.cmdw_body !== {DEVICE_DA1[6:0], 1'b0})
+    `FATAL(("Direct RSTACT targeted the wrong device"));
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_MSG_TX, 100000);
+  if (`DUT_I3C_WORD.cmdw_body !== 8'h01)
+    `FATAL(("Direct RSTACT Defining Byte was not transmitted"));
+  verify_target_reset_pattern();
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  print_cmdr (cmdr_fifo_data);
+  if (cmdr_fifo_data[19:8] != 1 || cmdr_fifo_data[23:20] != 0)
+    `FATAL(("Direct RSTACT receipt test FAILED"));
 
   // Test #2, CCC with length 1 write payload
   `INFO(("CCC I3C Test #2"), ADI_VERBOSITY_LOW);

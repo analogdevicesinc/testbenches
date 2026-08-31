@@ -108,6 +108,8 @@ localparam I3C_CCC_ENTDAA = 32'h7;
 localparam I3C_CCC_DISEC  = 32'h1;
 localparam I3C_CCC_GETPID = 32'h8d;
 localparam I3C_CCC_GETDCR = 32'h8f;
+localparam I3C_CCC_RSTACT_BCAST  = 32'h2a;
+localparam I3C_CCC_RSTACT_DIRECT = 32'h9a;
 //                               { Flags,Length, Addr,  Rnw}
 // CCC, length 0
 localparam  I3C_CCC_CMD_RSTDAA = {3'b100, 12'd0, 7'b0, 1'b0};
@@ -115,6 +117,8 @@ localparam  I3C_CCC_CMD_RSTDAA = {3'b100, 12'd0, 7'b0, 1'b0};
 localparam  I3C_CCC_CMD_DISEC  = {3'b100, 12'd1, 7'b0, 1'b0};
 // CCC, length 0
 localparam I3C_CCC_CMD_ENTDAA  = {3'b100, 12'd0, 7'b0, 1'b0};
+// Target Reset Pattern
+localparam I3C_CMD_TRP = {1'b1, 23'd0};
 // Wrong DA, CCC read 6 bytes
 localparam I3C_CMD_GETPID_UDA  = {3'b100, 12'd6,   START_DA[6:0], 1'b1};
 // CCC read 6 bytes
@@ -300,6 +304,8 @@ initial begin
 
   ccc_i3c_test();
 
+  trp_i3c_test();
+
   priv_i3c_test();
 
   priv_i2c_test();
@@ -452,6 +458,113 @@ task ccc_i3c_test;
     .cmd_almost_empty(1'b0));
 
   `INFO(("CCC I3C Test Done"), ADI_VERBOSITY_LOW);
+endtask
+
+//---------------------------------------------------------------------------
+// Target Reset Pattern I3C Test
+//---------------------------------------------------------------------------
+typedef struct {
+  time t;
+  bit  scl;
+  bit  sda;
+  bit  pp;
+} trp_level_t;
+
+task check_trp(input bit held);
+  trp_level_t q[$];
+  bit scl, sda;
+
+  `WAIT (`DUT_I3C_CORE.trp_hold == 1'b1, 1000000);
+  if (`DUT_I3C_BIT_MOD.nop !== ~held)
+    `FATAL(("TRP did not start from a %s bus", held ? "held" : "released"));
+  while (1) begin
+    #1ps;
+    scl = i3c_scl;
+    sda = i3c_sda !== 1'b0;
+    if (!`DUT_I3C_CORE.trp_hold)
+      break;
+    if (q.size() == 0 || q[$].scl != scl || q[$].sda != sda)
+      q.push_back('{$time, scl, sda, `DUT_I3C_CORE.i3c_t === 1'b0});
+    @(i3c_scl, i3c_sda, `DUT_I3C_CORE.trp_hold);
+  end
+  if (!scl || !sda)
+    `FATAL(("TRP did not release the bus"));
+
+  if (q.size() != 18)
+    `FATAL(("TRP has %0d bus levels, expected 18", q.size()));
+  foreach (q[i]) begin
+    if (q[i].scl != (i >= 15) || q[i].sda != (i < 15 ? i % 2 == 0 : i != 16))
+      `FATAL(("TRP level %0d is SCL %b SDA %b", i, q[i].scl, q[i].sda));
+    if (i < 15 && !q[i].pp)
+      `FATAL(("TRP level %0d is not push-pull", i));
+    // tDIG_H, the last level is cut by the release of the bus.
+    if (i < 17 && q[i+1].t - q[i].t < 32)
+      `FATAL(("TRP level %0d lasted %0t", i, q[i+1].t - q[i].t));
+  end
+endtask
+
+// Queue a RSTACT CCC, broadcast if da is 0, with Defining Byte 0x01.
+task queue_rstact(input bit [6:0] da, input bit sr);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_0001);
+  // {Is CCC, Bcast. header, Sr, Length, DA, RNW}
+  i3c_controller.set_cmd_fifo({1'b1, 1'b0, sr, 12'd1, da, 1'b0});
+  i3c_controller.set_cmd_fifo(da ? I3C_CCC_RSTACT_DIRECT : I3C_CCC_RSTACT_BCAST);
+endtask
+
+// Queue the TRP after the RSTACT CCCs, and check.
+task trp(input bit held, input int rstacts);
+  fork
+    check_trp(held);
+    i3c_controller.set_cmd_fifo(I3C_CMD_TRP);
+  join
+  for (int i = 0; i <= rstacts; i++) begin
+    `WAIT (`DUT_I3C_REGMAP.cmdr_fifo_valid == 1'b1, 1000000);
+    i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+    print_cmdr (cmdr_fifo_data);
+    if (cmdr_fifo_data[23:20] != 0 || cmdr_fifo_data[19:8] != (i < rstacts))
+      `FATAL(("TRP receipt %0d FAILED", i));
+  end
+endtask
+
+task trp_i3c_test();
+  `INFO(("TRP I3C Started"), ADI_VERBOSITY_LOW);
+
+  set_auto_ack(1);
+
+  // Test #1, standalone, targets do the default reset action.
+  `INFO(("TRP I3C Test #1"), ADI_VERBOSITY_LOW);
+  trp(1'b0, 0);
+
+  // Test #2, after a broadcast RSTACT.
+  `INFO(("TRP I3C Test #2"), ADI_VERBOSITY_LOW);
+  queue_rstact(7'd0, 1'b0);
+  trp(1'b0, 1);
+
+  // Test #3, after direct RSTACTs to multiple targets, from a released bus.
+  `INFO(("TRP I3C Test #3"), ADI_VERBOSITY_LOW);
+  queue_rstact(DEVICE_DA1, 1'b1);
+  queue_rstact(DEVICE_DA2, 1'b0);
+  trp(1'b0, 2);
+
+  // Test #4, same, from the bus held by the last RSTACT with Sr.
+  `INFO(("TRP I3C Test #4"), ADI_VERBOSITY_LOW);
+  queue_rstact(DEVICE_DA1, 1'b1);
+  queue_rstact(DEVICE_DA2, 1'b1);
+  trp(1'b1, 2);
+
+  // Test #5, the next transfer begins with a START (the Sr is cleared).
+  `INFO(("TRP I3C Test #5"), ADI_VERBOSITY_LOW);
+  i3c_controller.set_cmd_fifo(I3C_CCC_CMD_RSTDAA);
+  i3c_controller.set_cmd_fifo(I3C_CCC_RSTDAA);
+  `WAIT (`DUT_I3C_WORD.st != `CMDW_NOP, 1000000);
+  if (`DUT_I3C_WORD.st !== `CMDW_START)
+    `FATAL(("Transfer after TRP did not begin with a START"));
+  `WAIT (`DUT_I3C_REGMAP.cmdr_fifo_valid == 1'b1, 1000000);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  if (cmdr_fifo_data[23:20] != 0)
+    `FATAL(("Transfer after TRP FAILED"));
+
+  `INFO(("TRP I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------

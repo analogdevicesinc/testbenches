@@ -1,0 +1,63 @@
+global ad_project_params
+
+# PWM DUT parameters
+
+set ad_project_params(ID)                     0
+set ad_project_params(ASYNC_CLK_EN)           1
+set ad_project_params(N_PWMS)                 1
+set ad_project_params(PWM_EXT_SYNC)           0
+set ad_project_params(EXT_ASYNC_SYNC)         0
+set ad_project_params(SOFTWARE_BRINGUP)       1
+set ad_project_params(EXT_SYNC_PHASE_ALIGN)   0
+set ad_project_params(FORCE_ALIGN)            0
+set ad_project_params(START_AT_SYNC)          1
+set ad_project_params(PULSE_0_WIDTH)          0
+set ad_project_params(PULSE_1_WIDTH)          7
+set ad_project_params(PULSE_2_WIDTH)          7
+set ad_project_params(PULSE_3_WIDTH)          7
+set ad_project_params(PULSE_4_WIDTH)          7
+set ad_project_params(PULSE_5_WIDTH)          7
+set ad_project_params(PULSE_6_WIDTH)          7
+set ad_project_params(PULSE_7_WIDTH)          7
+set ad_project_params(PULSE_8_WIDTH)          7
+set ad_project_params(PULSE_9_WIDTH)          7
+set ad_project_params(PULSE_10_WIDTH)         7
+set ad_project_params(PULSE_11_WIDTH)         7
+set ad_project_params(PULSE_12_WIDTH)         7
+set ad_project_params(PULSE_13_WIDTH)         7
+set ad_project_params(PULSE_14_WIDTH)         7
+set ad_project_params(PULSE_15_WIDTH)         7
+set ad_project_params(PULSE_0_PERIOD)         1024
+set ad_project_params(PULSE_1_PERIOD)         10
+set ad_project_params(PULSE_2_PERIOD)         10
+set ad_project_params(PULSE_3_PERIOD)         10
+set ad_project_params(PULSE_4_PERIOD)         10
+set ad_project_params(PULSE_5_PERIOD)         10
+set ad_project_params(PULSE_6_PERIOD)         10
+set ad_project_params(PULSE_7_PERIOD)         10
+set ad_project_params(PULSE_8_PERIOD)         10
+set ad_project_params(PULSE_9_PERIOD)         10
+set ad_project_params(PULSE_10_PERIOD)        10
+set ad_project_params(PULSE_11_PERIOD)        10
+set ad_project_params(PULSE_12_PERIOD)        10
+set ad_project_params(PULSE_13_PERIOD)        10
+set ad_project_params(PULSE_14_PERIOD)        10
+set ad_project_params(PULSE_15_PERIOD)        10
+set ad_project_params(PULSE_0_OFFSET)         0
+set ad_project_params(PULSE_1_OFFSET)         0
+set ad_project_params(PULSE_2_OFFSET)         0
+set ad_project_params(PULSE_3_OFFSET)         0
+set ad_project_params(PULSE_4_OFFSET)         0
+set ad_project_params(PULSE_5_OFFSET)         0
+set ad_project_params(PULSE_6_OFFSET)         0
+set ad_project_params(PULSE_7_OFFSET)         0
+set ad_project_params(PULSE_8_OFFSET)         0
+set ad_project_params(PULSE_9_OFFSET)         0
+set ad_project_params(PULSE_10_OFFSET)        0
+set ad_project_params(PULSE_11_OFFSET)        0
+set ad_project_params(PULSE_12_OFFSET)        0
+set ad_project_params(PULSE_13_OFFSET)        0
+set ad_project_params(PULSE_14_OFFSET)        0
+set ad_project_params(PULSE_15_OFFSET)        0
+
+set ad_project_params(EXT_CLK_PERIOD)         1.25

@@ -15,6 +15,6 @@ set tx_dma_cfg [list \
   DMA_2D_TRANSFER 0 \
   CYCLIC 0 \
   DMA_DATA_WIDTH_SRC 32 \
-  DMA_DATA_WIDTH_DEST 32 \
+  DMA_DATA_WIDTH_DEST 16 \
 ]
 set ad_project_params(tx_dma_cfg) $tx_dma_cfg

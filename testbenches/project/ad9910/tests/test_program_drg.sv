@@ -33,6 +33,14 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// AD9910 DRG mode testbench.
+//
+// The DRG controller is an open-loop PWM generator: drctl is produced entirely
+// from DRCTL_PERIOD and DRCTL_WIDTH (sync_clk cycle counts). drover is an
+// interrupt/status input only - it does not drive any DUT state machine. Every
+// timing check here is therefore a direct, deterministic measurement of the
+// drctl waveform at the DUT boundary.
+
 `include "utils.svh"
 
 import logger_pkg::*;
@@ -48,330 +56,244 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 program test_program_drg (
   input         pd_clk_tp,
   input         sync_clk_tp,
-  input         main_reset_tp,
-  input         io_reset_tp,
-  input         pw_down_tp,
   output reg    ext_sync_tp,
   input         ad9910_irq_tp,
   input         trig_out_tp,
-  input         osk_tp,
   input         drctl_tp,
   input         drhold_tp,
   output reg    drover_tp,
-  output reg    sync_smp_err_tp,
   output reg    ram_swp_ovr_tp,
   input  [2:0]  profile_tp,
-  input         io_update_tp,
-  input  [17:0] db_o_tp,
+  input  [1:0]  f_o_tp,
+  input  [15:0] db_o_tp,
   input         tx_enable_tp
 );
 
   timeunit 1ns;
   timeprecision 1ps;
 
-  // Register addresses (from axi_ad9910_reg.v)
-  localparam REG_VERSION      = 7'h00;
-  localparam REG_ID           = 7'h01;
-  localparam REG_SCRATCH      = 7'h02;
-  localparam REG_CONTROL      = 7'h10;
-  localparam REG_IRQ_MASK     = 7'h11;
-  localparam REG_IRQ_CLEAR    = 7'h12;
-  localparam REG_IRQ_MON_CFG  = 7'h13;
-  localparam REG_TRIG_CFG     = 7'h14;
-  localparam REG_SYNC_CLK_CNT = 7'h20;
-  localparam REG_RAMP_CTRL    = 7'h21;
-  localparam REG_PROFILE      = 7'h22;
-  localparam REG_IO_UPDATE    = 7'h23;
-  localparam REG_RAMP_CFG     = 7'h24;
-  localparam REG_BST_DELAY    = 7'h25;
-  localparam REG_ALR_DELAY    = 7'h26;
-  localparam REG_BURST_DELAY  = 7'h27;
-  localparam REG_RAMP_BURSTS  = 7'h28;
-  localparam REG_IRQ_START    = 7'h29;
-  localparam REG_IRQ_STOP     = 7'h2a;
-  localparam REG_MON_MAX_PER  = 7'h2b;
-  localparam REG_PD_CLK_CNT   = 7'h40;
-  localparam REG_EXT_SYNC     = 7'h41;
-  localparam REG_PAR_IF_CTRL  = 7'h42;
-  localparam REG_UPDATE_RATE  = 7'h43;
-  localparam REG_DMA_N_PARAM  = 7'h44;
+  // --------------------------
+  // Register addresses (word offsets, from axi_ad9910_reg.v)
+  // --------------------------
+  localparam REG_VERSION        = 7'h00;
+  localparam REG_ID             = 7'h01;
+  localparam REG_SCRATCH        = 7'h02;
+  localparam REG_CONFIG         = 7'h03;
+  localparam REG_DEVICE_INFO    = 7'h07;
+  localparam REG_RESET_CTRL     = 7'h10;
+  localparam REG_IRQ_MASK       = 7'h11;
+  localparam REG_IRQ_TABLE      = 7'h12;
+  localparam REG_IRQ_MON_CFG    = 7'h13;
+  localparam REG_TRIG_OUT_CTRL  = 7'h14;
+  localparam REG_EXT_TRIG_CFG   = 7'h15;
+  localparam REG_SYNC_CLK_CNT   = 7'h20;
+  localparam REG_DRG_CTRL       = 7'h21;
+  localparam REG_PROFILE        = 7'h22;
+  localparam REG_DRCTL_PERIOD   = 7'h23;
+  localparam REG_DRCTL_WIDTH    = 7'h24;
+  localparam REG_BST_DELAY      = 7'h25;
+  localparam REG_RAMP_BURSTS    = 7'h26;
+  localparam REG_BURST_DELAY    = 7'h27;
+  localparam REG_RAMP_CFG       = 7'h28;
+  localparam REG_MON_MAX_PERIOD = 7'h29;
+  localparam REG_IRQ_START      = 7'h2a;
+  localparam REG_IRQ_STOP       = 7'h2b;
+  localparam REG_TRIG_START     = 7'h2c;
+  localparam REG_TRIG_STOP      = 7'h2d;
+  // Parallel-interface group: unused in DRG mode apart from the clock monitor.
+  localparam REG_PD_CLK_CNT     = 7'h40;
 
-  // Control register bits
-  localparam CTRL_CLK_ENB       = 4;
-  localparam CTRL_MMCM_RST      = 3;
-  localparam CTRL_PW_DOWN       = 2;
-  localparam CTRL_DEVICE_RESET  = 1;
-  localparam CTRL_RESET         = 0;
+  // DRG_CTRL (0x21) bit positions
+  localparam DRG_TOGGLE_EN      = 3;
+  localparam DRG_DRCTL_INIT     = 2;
+  localparam DRG_DRHOLD         = 1;
 
-  // Ramp control register bits
-  localparam RAMP_NO_DWELL_HIGH = 5;
-  localparam RAMP_NO_DWELL_LOW  = 4;
-  localparam RAMP_DRCTL_TOG_EN  = 3;
-  localparam RAMP_DRCTL_INIT    = 2;
-  localparam RAMP_DRHOLD        = 1;
-  localparam RAMP_OSK           = 0;
+  // IRQ_MASK / IRQ_TABLE (0x11 / 0x12) bit positions
+  localparam IRQ_INTERVAL_START = 5;
+  localparam IRQ_INTERVAL_STOP  = 4;
+  localparam IRQ_DROVER         = 2;
+  localparam IRQ_BURSTS         = 1;
+  localparam IRQ_RAM_SWP_OVR    = 0;
 
+  // TRIG_OUT_CTRL (0x14): mask occupies [21:16], trig_config [1:0]
+  localparam TRIG_MASK_SHIFT    = 16;
+
+  // Interval monitor / trigger source select (IRQ_MON_CFG, TRIG_OUT_CTRL[1:0])
+  localparam MON_CFG_PERIOD     = 2'd0;
+  localparam MON_CFG_BURST_DLY  = 2'd1;
+  localparam MON_CFG_MAX_PERIOD = 2'd2;
+
+  // RAMP_CFG (0x28)
+  localparam RAMP_CFG_FREE_RUN  = 2'd0;
+  localparam RAMP_CFG_BURST_STOP = 2'd1;
+  localparam RAMP_CFG_PERIOD_STOP = 2'd2;
+
+  // sync_clk is 250 MHz (4 ns period)
+  localparam int CYCLES_PER_US = 250;
+
+  // up_xfer_cntrl initiates a control transfer only when its free-running 6-bit
+  // up_clk counter reads 1 (common/up_xfer_cntrl.v:96), so a register write is
+  // held at the domain crossing for anywhere between 0 and 64 up_clk cycles -
+  // 160 sync_clk cycles at 100 MHz up_clk against 250 MHz sync_clk. Every
+  // interval timed from an AXI write carries that quantization, and it is far
+  // coarser than the synchroniser latency it is easy to mistake it for.
+  localparam int CDC_XFER_JITTER = 160;
+
+  // Settle time covering the up->sync CDC handshake, the 8 sync_clk-cycle
+  // reset_overwrite pulse, and the AXI write pipeline. 4 us is 400 up_clk
+  // cycles, so it always spans a whole up_xfer_cntrl transfer window.
+  localparam int CFG_SETTLE_NS = 4000;
+
+  // Base duty cycle shared by most tests: 4 us period at 250 MHz, 40% duty.
+  // Sized for legibility rather than minimum runtime - a period of a few
+  // hundred nanoseconds packs dozens of edges into any waveform view wide
+  // enough to hold a whole test, so neither drctl nor the ramp it drives can be
+  // read off the trace. The asymmetric duty makes the high and low intervals
+  // distinguishable at a glance, and both are longer than DRG_RAMP_CYCLES so
+  // the modelled ramp reaches its limit in each of them.
+  localparam int PWM_PERIOD = 1000;
+  localparam int PWM_WIDTH  = 400;
+
+  // --------------------------
   // Test environment
+  // --------------------------
   test_harness_env base_env;
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
-  // Test variables
   bit [31:0] read_data;
   bit        test_passed = 1;
-  int        current_test = 0;
+  int        current_test = 0;   // waveform navigation aid
 
   // --------------------------
-  // DRG Counter Model - Simulates AD9910 Digital Ramp Generator
+  // AD9910 digital ramp model
   // --------------------------
-  // Counter parameters
+  // Level-driven integrator: drctl high ramps the counter up, drctl low ramps
+  // it down, and drover is asserted whenever the counter is parked at a limit.
+  // The DUT reads none of this - the model exists to produce a realistic drover
+  // for the interrupt tests and to detect ramps that the programmed DRCTL_WIDTH
+  // is too short to complete.
   localparam int DRG_WIDTH = 18;
   localparam logic [DRG_WIDTH-1:0] DRG_LOWER_LIMIT = 18'd1000;
   localparam logic [DRG_WIDTH-1:0] DRG_UPPER_LIMIT = 18'd5000;
-  localparam logic [DRG_WIDTH-1:0] DRG_STEP_SIZE   = 18'd15;
+  // Step chosen against PWM_WIDTH: a full ramp takes half the base high
+  // interval, so a dwelling ramp shows a clear slope into a clear plateau
+  // instead of a near-vertical edge, and a sawtooth fits exactly two whole
+  // blades into that interval. Both limits stay exact multiples of the step.
+  localparam logic [DRG_WIDTH-1:0] DRG_STEP_SIZE   = 18'd20;
 
-  // DRG state machine
-  typedef enum logic [1:0] {
-    DRG_DWELL_LOWER = 2'd0,
-    DRG_RAMP_UP     = 2'd1,
-    DRG_DWELL_UPPER = 2'd2,
-    DRG_RAMP_DOWN   = 2'd3
-  } drg_state_e;
+  // sync_clk cycles for one full limit-to-limit ramp: (5000-1000)/20
+  localparam int DRG_RAMP_CYCLES = 200;
 
-  drg_state_e           drg_state;
+  // Ramp shape at the limit. DWELL parks there until drctl changes direction -
+  // an AD9910 with both no-dwell bits clear. SAWTOOTH is no-dwell *high* only,
+  // the configuration a repeating chirp is generated with: reaching the upper
+  // limit reloads the lower one so the up-ramp repeats, while the downward
+  // direction still dwells. That asymmetry is what lets the ramp come to rest by
+  // itself whenever drctl is parked low. Those bits live in the AD9910's CFR2
+  // and are written over SPI, so this IP cannot select the shape: the model has
+  // to be told which part it is driving.
+  // Dwell is the starting shape because it is the one an AD9910 comes out of
+  // reset in - a model that retraces before software has written CFR2 would be
+  // claiming a configuration that does not exist yet.
+  typedef enum {DRG_DWELL, DRG_SAWTOOTH} drg_shape_e;
+  drg_shape_e drg_shape = DRG_DWELL;
+
   logic [DRG_WIDTH-1:0] drg_counter;
-  int unsigned          drover_pulse_count;
   bit                   drg_model_enabled = 0;
-  bit [31:0]            ramp_ctrl_val = 0;      // Cached REG_RAMP_CTRL value, updated via read_ramp_ctrl()
-  int unsigned          drg_burst_blade_limit = 0;  // 0 = unlimited, N = auto-hold after N blades
-  int unsigned          drg_burst_blade_count = 0;  // Blades completed in current burst
-  bit                   drg_burst_hold = 0;         // Auto-hold active (burst limit reached)
-  bit                   drctl_d = 0;                // Previous drctl_tp for edge detection
-  logic                 drctl_posedge_det;
-  logic                 drctl_negedge_det;
-  assign                drctl_posedge_det = drctl_tp & !drctl_d;
-  assign                drctl_negedge_det = !drctl_tp & drctl_d;
-  bit                   no_dwell_high;
-  bit                   no_dwell_low;
-  bit                   both_no_dwell;
+  bit                   check_ramp_completion = 0;
+  int unsigned          ramp_truncation_count = 0;
+  int unsigned          drover_rise_count = 0;
+  int unsigned          drg_retrace_count = 0;
+  // Held at module scope so enable_drg_model can resync it: the model only
+  // samples drctl while enabled, so a stale value here would look like a level
+  // change on the first sync_clk cycle after re-enabling.
+  bit                   drg_drctl_prev = 0;
 
-  // DRG counter process - runs concurrently with tests
   initial begin : drg_model
-    // Initialize
-    drg_counter        = DRG_LOWER_LIMIT;
-    drover_tp          = 1'b1;
-    drover_pulse_count = 0;
-    drg_state          = DRG_DWELL_LOWER;
-    drctl_d            = 0;
-
-    // Wait for model to be enabled
-    wait(drg_model_enabled);
-    `INFO(("DRG Model: Started (lower=%0d, upper=%0d, step=%0d)",
-           DRG_LOWER_LIMIT, DRG_UPPER_LIMIT, DRG_STEP_SIZE), ADI_VERBOSITY_LOW);
+    drg_counter = DRG_LOWER_LIMIT;
+    drover_tp   = 1'b1;              // parked at the lower limit
 
     forever begin
       @(posedge sync_clk_tp);
 
-      if (main_reset_tp) begin
-        drg_counter = DRG_LOWER_LIMIT;
-        drg_state   = DRG_DWELL_LOWER;
-        drover_tp   = 1'b1;
-      end else if (!drg_model_enabled || drhold_tp || drg_burst_hold) begin
-        drover_tp = (drg_state == DRG_DWELL_LOWER || drg_state == DRG_DWELL_UPPER);
-      end else begin
-        no_dwell_high  = ramp_ctrl_val[RAMP_NO_DWELL_HIGH];
-        no_dwell_low   = ramp_ctrl_val[RAMP_NO_DWELL_LOW];
-        both_no_dwell  = no_dwell_high & no_dwell_low;
-
-        case (drg_state)
-
-          DRG_DWELL_LOWER: begin
-            drover_tp = 1'b1;
-            if (both_no_dwell) begin
-              if (drctl_posedge_det)
-                drg_state = DRG_RAMP_UP;
-            end else if (no_dwell_high) begin
-              if (drctl_posedge_det)
-                drg_state = DRG_RAMP_UP;
-            end else begin
-              if (drctl_tp)
-                drg_state = DRG_RAMP_UP;
-            end
+      if (drg_model_enabled && !drhold_tp) begin
+        // A level change means the previous ramp is over. If the counter had
+        // not yet reached the limit it was heading for, the interval was too
+        // short - this is the software programming error behind ramps that
+        // never reach their endpoint. Only meaningful while dwelling: a
+        // sawtooth retraces on its own, so no interval can cut it short.
+        if (check_ramp_completion && (drg_shape == DRG_DWELL) &&
+            (drctl_tp != drg_drctl_prev)) begin
+          if (drctl_tp && (drg_counter != DRG_LOWER_LIMIT)) begin
+            ramp_truncation_count++;
+            `ERROR(("DRG Model: down-ramp truncated at %0d (needs %0d sync_clk cycles to reach %0d)",
+                    drg_counter, DRG_RAMP_CYCLES, DRG_LOWER_LIMIT));
           end
-
-          DRG_RAMP_UP: begin
-            drover_tp = 1'b0;
-            if (both_no_dwell && drctl_negedge_det) begin
-              drg_state = DRG_RAMP_DOWN;
-            end else if (drg_counter < DRG_UPPER_LIMIT - DRG_STEP_SIZE) begin
-              drg_counter = drg_counter + DRG_STEP_SIZE;
-            end else begin
-              drover_pulse_count++;
-              if (no_dwell_high) begin
-                drg_burst_blade_count++;
-                `INFO(("DRG Model: Upper limit reached (blade=%0d) - snapping to lower",
-                       drover_pulse_count), ADI_VERBOSITY_LOW);
-                drg_counter = DRG_LOWER_LIMIT;
-                drover_tp   = 1'b1;
-                if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
-                  drg_burst_hold = 1;
-                  `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
-                         drg_burst_blade_limit), ADI_VERBOSITY_LOW);
-                end
-                if (both_no_dwell) begin
-                end else begin
-                  drg_state = DRG_DWELL_LOWER;
-                end
-              end else begin
-                drg_counter = DRG_UPPER_LIMIT;
-                drg_state   = DRG_DWELL_UPPER;
-                drover_tp   = 1'b1;
-                `INFO(("DRG Model: Upper limit reached (count=%0d, transitions=%0d)",
-                       drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
-              end
-            end
+          if (!drctl_tp && (drg_counter != DRG_UPPER_LIMIT)) begin
+            ramp_truncation_count++;
+            `ERROR(("DRG Model: up-ramp truncated at %0d (needs %0d sync_clk cycles to reach %0d)",
+                    drg_counter, DRG_RAMP_CYCLES, DRG_UPPER_LIMIT));
           end
+        end
 
-          DRG_DWELL_UPPER: begin
-            drover_tp = 1'b1;
-            if (both_no_dwell) begin
-              if (drctl_negedge_det)
-                drg_state = DRG_RAMP_DOWN;
-            end else if (no_dwell_low) begin
-              if (drctl_negedge_det)
-                drg_state = DRG_RAMP_DOWN;
-            end else begin
-              if (!drctl_tp)
-                drg_state = DRG_RAMP_DOWN;
-            end
-          end
+        // Going down always dwells at the lower limit. Going up, a sawtooth
+        // reloads the lower limit on the step that would have reached the upper
+        // one, rather than landing there first - so a blade is exactly
+        // DRG_RAMP_CYCLES long and a high interval that is a whole multiple of
+        // it holds a whole number of blades and ends at the bottom. Landing on
+        // the limit first would make a blade one sync_clk cycle longer, leaving a partial
+        // blade that drctl falling turns into a descent instead of a retrace:
+        // the sawtooth-then-triangle shape.
+        if (!drctl_tp) begin
+          drg_counter = (drg_counter <= DRG_LOWER_LIMIT + DRG_STEP_SIZE) ?
+                        DRG_LOWER_LIMIT : drg_counter - DRG_STEP_SIZE;
+        end else if (drg_counter + DRG_STEP_SIZE < DRG_UPPER_LIMIT) begin
+          drg_counter = drg_counter + DRG_STEP_SIZE;
+        end else if (drg_shape == DRG_SAWTOOTH) begin
+          drg_counter = DRG_LOWER_LIMIT;
+          drg_retrace_count++;
+        end else begin
+          drg_counter = DRG_UPPER_LIMIT;
+        end
 
-          DRG_RAMP_DOWN: begin
-            drover_tp = 1'b0;
-            if (both_no_dwell && drctl_posedge_det) begin
-              drg_state = DRG_RAMP_UP;
-            end else if (drg_counter > DRG_LOWER_LIMIT + DRG_STEP_SIZE) begin
-              drg_counter = drg_counter - DRG_STEP_SIZE;
-            end else begin
-              drover_pulse_count++;
-              if (no_dwell_low) begin
-                drg_burst_blade_count++;
-                `INFO(("DRG Model: Lower limit reached (blade=%0d) - snapping to upper",
-                       drover_pulse_count), ADI_VERBOSITY_LOW);
-                drg_counter = DRG_UPPER_LIMIT;
-                drover_tp   = 1'b1;
-                if (drg_burst_blade_limit > 0 && drg_burst_blade_count >= drg_burst_blade_limit) begin
-                  drg_burst_hold = 1;
-                  `INFO(("DRG Model: Burst limit reached (%0d blades) - auto-hold",
-                         drg_burst_blade_limit), ADI_VERBOSITY_LOW);
-                end
-                if (both_no_dwell) begin
-                end else begin
-                  drg_state = DRG_DWELL_UPPER;
-                end
-              end else begin
-                drg_counter = DRG_LOWER_LIMIT;
-                drg_state   = DRG_DWELL_LOWER;
-                drover_tp   = 1'b1;
-                `INFO(("DRG Model: Lower limit reached (count=%0d, transitions=%0d)",
-                       drg_counter, drover_pulse_count), ADI_VERBOSITY_LOW);
-              end
-            end
-          end
+        if (!drover_tp &&
+            ((drg_counter == DRG_UPPER_LIMIT) || (drg_counter == DRG_LOWER_LIMIT)))
+          drover_rise_count++;
 
-        endcase
+        // "The ramp is at a limit" in both shapes, but that reads as a level
+        // wherever the ramp dwells and as a one sync_clk-cycle pulse per blade in a
+        // sawtooth, on the sync_clk cycle the lower limit is reloaded.
+        drover_tp      = (drg_counter == DRG_UPPER_LIMIT) || (drg_counter == DRG_LOWER_LIMIT);
+        drg_drctl_prev = drctl_tp;
       end
-
-      drctl_d = drctl_tp;
     end
   end
 
-  // Task to enable/disable the DRG model
-  task enable_drg_model(input bit enable);
-    drg_model_enabled = enable;
-    if (enable) begin
-      `INFO(("DRG Model: Enabled"), ADI_VERBOSITY_LOW);
-    end else begin
-      `INFO(("DRG Model: Disabled"), ADI_VERBOSITY_LOW);
-    end
+  // check_completion is only meaningful with DRG_DWELL - see the checker in the
+  // model loop.
+  task enable_drg_model(input bit         enable,
+                        input bit         check_completion = 0,
+                        input drg_shape_e shape = DRG_DWELL);
+    drg_counter           = DRG_LOWER_LIMIT;
+    // While disabled the model stops driving drover, so park it low rather
+    // than leaving it asserted - drover is a level source into irq_int[2] and
+    // a stuck-high pin re-latches the interrupt as fast as software clears it.
+    drover_tp             = enable ? 1'b1 : 1'b0;
+    drover_rise_count     = 0;
+    ramp_truncation_count = 0;
+    drg_retrace_count     = 0;
+    drg_drctl_prev        = drctl_tp;   // resync so re-enabling is not seen as an edge
+    check_ramp_completion = check_completion;
+    drg_shape             = shape;
+    drg_model_enabled     = enable;
+    `INFO(("DRG Model: %s, %s (completion check %s)",
+           enable ? "enabled" : "disabled", shape.name(),
+           check_completion ? "on" : "off"), ADI_VERBOSITY_LOW);
   endtask
-
-  // Task to read REG_RAMP_CTRL and update cached value used by the DRG model
-  task read_ramp_ctrl();
-    axi_read(reg_addr(REG_RAMP_CTRL), ramp_ctrl_val);
-    `INFO(("DRG Model: ramp_ctrl_val=0x%02x (no_dwell_high=%0b, no_dwell_low=%0b)",
-           ramp_ctrl_val, ramp_ctrl_val[RAMP_NO_DWELL_HIGH], ramp_ctrl_val[RAMP_NO_DWELL_LOW]), ADI_VERBOSITY_LOW);
-  endtask
-
-  // Task to set burst blade limit (0 = unlimited)
-  task set_drg_burst_limit(input int unsigned limit);
-    drg_burst_blade_limit = limit;
-    drg_burst_blade_count = 0;
-    drg_burst_hold = 0;
-    `INFO(("DRG Model: Burst blade limit set to %0d (0=unlimited)", limit), ADI_VERBOSITY_LOW);
-  endtask
-
-  // Task to start a new burst (resets blade count, releases burst hold).
-  // Sets drctl_d to the opposite of current drctl_tp so the model registers
-  // the appropriate edge on its next iteration: in NO_DWELL_LOW the FSM
-  // drives drctl low after auto-hold and the model needs a negedge to leave
-  // DWELL_UPPER; in NO_DWELL_HIGH the FSM holds drctl high and the model
-  // needs a posedge to leave DWELL_LOWER. Forcing drctl_d=!drctl_tp covers
-  // both directions without inspecting mode bits.
-  task start_new_burst();
-    drg_burst_blade_count = 0;
-    drg_burst_hold = 0;
-    drctl_d = !drctl_tp;
-    `INFO(("DRG Model: New burst started (limit=%0d)", drg_burst_blade_limit), ADI_VERBOSITY_LOW);
-  endtask
-
-  // Task to reset DRG counter to a specific value. Same drctl_d=!drctl_tp
-  // trick as start_new_burst so the model picks up the next FSM-driven edge
-  // regardless of drctl's current level.
-  task reset_drg_counter(input logic [DRG_WIDTH-1:0] value = DRG_LOWER_LIMIT);
-    drg_counter = value;
-    drg_state   = (value >= DRG_UPPER_LIMIT) ? DRG_DWELL_UPPER : DRG_DWELL_LOWER;
-    drover_tp   = 1'b1;
-    drover_pulse_count = 0;
-    drg_burst_blade_count = 0;
-    drg_burst_hold = 0;
-    drctl_d = !drctl_tp;
-    `INFO(("DRG Model: Counter reset to %0d (drover=%b)", value, drover_tp), ADI_VERBOSITY_LOW);
-  endtask
-
-  // Task to wait for N limit transitions (drover_pulse_count increments when limit is reached)
-  task automatic wait_drover_pulses(input int unsigned n_transitions, input int unsigned timeout_us = 100);
-    int unsigned target_count;
-    int unsigned timeout_cycles;
-    int unsigned cycle_count;
-
-    target_count = drover_pulse_count + n_transitions;
-    timeout_cycles = timeout_us * 250;  // Assuming 250 MHz sync_clk
-    cycle_count = 0;
-
-    `INFO(("DRG Model: Waiting for %0d limit transition(s)...", n_transitions), ADI_VERBOSITY_LOW);
-
-    while (drover_pulse_count < target_count && cycle_count < timeout_cycles) begin
-      @(posedge sync_clk_tp);
-      cycle_count++;
-    end
-
-    if (drover_pulse_count >= target_count) begin
-      `INFO(("DRG Model: Got %0d limit transition(s), total=%0d, drover=%b",
-             n_transitions, drover_pulse_count, drover_tp), ADI_VERBOSITY_LOW);
-    end else begin
-      `ERROR(("DRG Model: Timeout waiting for limit transitions (got %0d, expected %0d)",
-              drover_pulse_count, target_count));
-    end
-  endtask
-
-  // Task to get current DRG counter value
-  function logic [DRG_WIDTH-1:0] get_drg_counter();
-    return drg_counter;
-  endfunction
 
   // --------------------------
-  // Wrapper function for AXI read verify
+  // AXI access helpers
   // --------------------------
   task axi_read_v(
     input   [31:0]  raddr,
@@ -385,22 +307,357 @@ program test_program_drg (
     base_env.mng.master_sequencer.RegRead32(raddr, data);
   endtask
 
-  // --------------------------
-  // Wrapper function for AXI write
-  // --------------------------
   task axi_write(
     input [31:0]  waddr,
     input [31:0]  wdata);
     base_env.mng.master_sequencer.RegWrite32(waddr, wdata);
   endtask
 
-  // --------------------------
-  // Register address helper
-  // --------------------------
   function [31:0] reg_addr(input [6:0] offset);
     return `AXI_AD9910_BA + (offset << 2);
   endfunction
 
+  // --------------------------
+  // drctl waveform measurement
+  // --------------------------
+  // Records, for n_periods consecutive drctl duty cycles, the high time and the
+  // rising-edge-to-rising-edge period, both in sync_clk cycles. The first rising
+  // edge only starts the stopwatch, so any partial period in progress when the
+  // task is called is discarded.
+  task automatic measure_drctl_waveform(
+    input  int unsigned n_periods,
+    input  int unsigned timeout_us,
+    output int unsigned high_cycles[],
+    output int unsigned period_cycles[]
+  );
+    bit          prev;
+    bit          started;
+    bit          is_rise;
+    int unsigned cyc_since_rise;
+    int unsigned cyc_high;
+    int unsigned got;
+    int unsigned timeout_cycles;
+
+    high_cycles    = new[n_periods];
+    period_cycles  = new[n_periods];
+    got            = 0;
+    started        = 0;
+    cyc_since_rise = 0;
+    cyc_high       = 0;
+    timeout_cycles = timeout_us * CYCLES_PER_US;
+    prev           = drctl_tp;
+
+    while (got < n_periods && timeout_cycles > 0) begin
+      @(posedge sync_clk_tp);
+      timeout_cycles--;
+
+      is_rise = drctl_tp && !prev;
+      if (is_rise) begin
+        if (started) begin
+          period_cycles[got] = cyc_since_rise;
+          high_cycles[got]   = cyc_high;
+          got++;
+        end
+        started        = 1;
+        cyc_since_rise = 0;
+        cyc_high       = 0;
+      end
+
+      if (started) begin
+        cyc_since_rise++;
+        if (drctl_tp) cyc_high++;
+      end
+
+      prev = drctl_tp;
+    end
+
+    if (got < n_periods) begin
+      `ERROR(("measure_drctl_waveform: timeout - got %0d of %0d periods", got, n_periods));
+      test_passed = 0;
+    end
+  endtask
+
+  // Count sync_clk cycles until drctl reaches the requested level.
+  // Returns the timeout value if the level is never seen.
+  task automatic wait_drctl_level(
+    input  bit          level,
+    input  int unsigned timeout_cyc,
+    output int unsigned cycles
+  );
+    cycles = 0;
+    while ((drctl_tp !== level) && (cycles < timeout_cyc)) begin
+      @(posedge sync_clk_tp);
+      cycles++;
+    end
+  endtask
+
+  // Verify drctl holds a constant level for the whole window.
+  task automatic check_drctl_static(
+    input bit          level,
+    input int unsigned window_cyc,
+    input string       label
+  );
+    bit ok = 1;
+    for (int unsigned k = 0; k < window_cyc; k++) begin
+      @(posedge sync_clk_tp);
+      if (drctl_tp !== level) ok = 0;
+    end
+    if (ok) begin
+      `INFO(("  %s: drctl held %0b for %0d sync_clk cycles - PASSED", label, level, window_cyc),
+            ADI_VERBOSITY_NONE);
+    end else begin
+      `ERROR(("  %s: drctl did not hold %0b for %0d sync_clk cycles", label, level, window_cyc));
+      test_passed = 0;
+    end
+  endtask
+
+  function automatic bit all_equal(input int unsigned a[], input int unsigned v);
+    foreach (a[k]) if (a[k] != v) return 0;
+    return 1;
+  endfunction
+
+  function automatic int unsigned min_of(input int unsigned a[]);
+    int unsigned m = a[0];
+    foreach (a[k]) if (a[k] < m) m = a[k];
+    return m;
+  endfunction
+
+  function automatic int unsigned max_of(input int unsigned a[]);
+    int unsigned m = a[0];
+    foreach (a[k]) if (a[k] > m) m = a[k];
+    return m;
+  endfunction
+
+  function automatic string fmt_array(input int unsigned a[]);
+    string s = "{";
+    foreach (a[k]) s = {s, $sformatf("%0d%s", a[k], (k == a.size()-1) ? "" : ",")};
+    return {s, "}"};
+  endfunction
+
+  // --------------------------
+  // Configuration helpers
+  // --------------------------
+  // Program a drctl duty cycle. Toggle mode is cleared first so that the
+  // period and width writes do not each trigger their own reset_overwrite
+  // (auto_ramp_mode_update watches period/width only while toggle_en is set).
+  // This gives one clean restart with a coherent config instead of a restart
+  // on an intermediate new-period/old-width pair.
+  task automatic program_pwm(input int unsigned p, input int unsigned w);
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
+    axi_write(reg_addr(REG_DRCTL_PERIOD), p);
+    axi_write(reg_addr(REG_DRCTL_WIDTH), w);
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_TOGGLE_EN);
+    #CFG_SETTLE_NS;
+  endtask
+
+  task automatic stop_pwm();
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
+    #CFG_SETTLE_NS;
+  endtask
+
+  // Time the first drctl rising edge after a restart, for a given start delay.
+  //
+  // delay_bst_ramp_delay_val is refreshed only on end_period_d or
+  // reset_overwrite (axi_ad9910.v:773-781), so a BST_DELAY written while the
+  // ramp is stopped is not necessarily the value the next start uses. The
+  // priming run lets periods complete with the new value so it is latched,
+  // then a clean stop/start is timed. Both call sites run the identical
+  // sequence, so the fixed CDC overhead cancels in the difference.
+  task automatic measure_start_delay(
+    input  int unsigned dly,
+    output int unsigned cycles
+  );
+    axi_write(reg_addr(REG_BST_DELAY), dly);
+    axi_write(reg_addr(REG_DRCTL_PERIOD), PWM_PERIOD);
+    axi_write(reg_addr(REG_DRCTL_WIDTH), PWM_WIDTH);
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_TOGGLE_EN);
+    // The delay plus two whole periods: end_period_d has to fire for the new
+    // BST_DELAY to be latched, so the priming window must outlast a period.
+    repeat (dly + 2 * PWM_PERIOD) @(posedge sync_clk_tp);
+
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
+    repeat (dly + 2 * PWM_PERIOD) @(posedge sync_clk_tp);
+
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_TOGGLE_EN);
+    wait_drctl_level(1'b1, 40000, cycles);
+  endtask
+
+  // Measure one burst-delay configuration at the base duty cycle: `bursts`
+  // periods, then a gap widened by `burst_delay`. Checks that the duty cycle
+  // itself is undisturbed, that the grouping is present, and that the boundary
+  // gap grew by the programmed delay. Returns the leftover fixed cost of
+  // entering and leaving the burst-delay state so a caller sweeping the delay
+  // can compare it across values.
+  task automatic check_burst_delay(
+    input  int unsigned bursts,
+    input  int unsigned burst_delay,
+    output int unsigned overhead
+  );
+    int unsigned high_c[];
+    int unsigned per_c[];
+    int unsigned short_gap;
+    int unsigned long_gap;
+    int unsigned n_long;
+    int unsigned n_gaps;
+    int unsigned settle_cyc;
+
+    n_gaps = 3 * bursts;
+
+    // BURST_DELAY is not one of the registers auto_ramp_mode_update watches, so
+    // it is written while stopped and picked up by the restart program_pwm does.
+    stop_pwm();
+    axi_write(reg_addr(REG_BURST_DELAY), burst_delay);
+    program_pwm(PWM_PERIOD, PWM_WIDTH);
+
+    // Three bursts' worth of rising edges: within a burst the gap is one
+    // period, and at each burst boundary it grows by BURST_DELAY.
+    measure_drctl_waveform(n_gaps, 800, high_c, per_c);
+
+    // Two gap values occur, both in sync_clk cycles. Within a burst, successive
+    // rising edges are one PWM period apart (short_gap == PWM_PERIOD). At a burst
+    // boundary the gap grows by the programmed BURST_DELAY (long_gap). n_long
+    // counts the boundaries.
+    short_gap = min_of(per_c);
+    long_gap  = max_of(per_c);
+    n_long    = 0;
+    foreach (per_c[k]) if (per_c[k] > (short_gap + long_gap) / 2) n_long++;
+
+    // "overhead" is the fixed number of extra sync_clk cycles the boundary gap
+    // carries ON TOP OF period + programmed delay. By definition of the two gaps:
+    //
+    //     long_gap  = PWM_PERIOD + BURST_DELAY + overhead
+    //     short_gap = PWM_PERIOD
+    //  => overhead  = long_gap - short_gap - BURST_DELAY
+    //
+    // It is NOT part of the programmed delay: it is the cost of the RTL entering
+    // and leaving the burst-delay state at each boundary (loading burst_delay_cnt,
+    // reloading n_periods_cnt, the FSM stepping across the boundary). Here it
+    // measures a flat 1 sync_clk cycle - so a boundary gap of 1000+delay+1. The
+    // per-point check below only bounds it (<=16) as a sanity limit; the real
+    // proof is in the caller, which sweeps BURST_DELAY and asserts this overhead
+    // stays CONSTANT - a fixed offset across every delay means the delay is
+    // honoured additively rather than scaled somewhere.
+    overhead  = long_gap - short_gap - burst_delay;
+
+    `INFO(("  BURST_DELAY=%0d gaps=%s", burst_delay, fmt_array(per_c)),
+          ADI_VERBOSITY_LOW);
+
+    // The high time must be unaffected by the burst machinery - the delays
+    // shift when drctl toggles, never the pulse shape.
+    if (!all_equal(high_c, PWM_WIDTH)) begin
+      `ERROR(("  BURST_DELAY=%0d disturbed the high time: %s (expected %0d)",
+              burst_delay, fmt_array(high_c), PWM_WIDTH));
+      test_passed = 0;
+    end
+
+    if (short_gap != PWM_PERIOD) begin
+      `ERROR(("  BURST_DELAY=%0d: intra-burst gap=%0d, expected %0d",
+              burst_delay, short_gap, PWM_PERIOD));
+      test_passed = 0;
+    end else if (n_long != 3) begin
+      `ERROR(("  BURST_DELAY=%0d: expected 3 burst boundaries in %0d gaps, found %0d",
+              burst_delay, n_gaps, n_long));
+      test_passed = 0;
+    end else if (overhead > 16) begin
+      `ERROR(("  BURST_DELAY=%0d: boundary gap=%0d, expected ~%0d (overhead %0d exceeds 16 sync_clk cycles)",
+              burst_delay, long_gap, PWM_PERIOD + burst_delay, overhead));
+      test_passed = 0;
+    end else begin
+      `INFO(("  BURST_DELAY=%0d -> %0d short (%0d) / %0d long (%0d), overhead %0d sync_clk cycles - PASSED",
+             burst_delay, n_gaps - n_long, short_gap, n_long, long_gap, overhead),
+            ADI_VERBOSITY_NONE);
+    end
+
+    // Settle at a burst boundary so the last group shown is a whole burst, and
+    // the caller's next stop_pwm() does not cut a burst mid-way (which leaves a
+    // lone triangle). The burst-alignment of the measurement's closing edge is
+    // not fixed - the window can end on either triangle of a burst - so advance
+    // triangle by triangle and stop once drctl stays low longer than the
+    // intra-burst low gap (PWM_PERIOD-PWM_WIDTH). That longer low is a burst
+    // boundary, so the burst that just fell is complete. Cosmetic only: no check
+    // reads this, but it keeps truncated/lone triangles out of the waveform.
+    forever begin
+      wait_drctl_level(1'b0, 2 * PWM_PERIOD, settle_cyc);                 // current triangle's high phase ends
+      wait_drctl_level(1'b1, (PWM_PERIOD - PWM_WIDTH) + 16, settle_cyc);  // next rise within an intra-burst low?
+      if (settle_cyc >= (PWM_PERIOD - PWM_WIDTH) + 16) break;             // timed out -> low is a burst boundary
+    end
+  endtask
+
+  // Measure one duty cycle and check both numbers exactly. The RTL loads
+  // period-1 and counts to 1, so the period is exactly P sync_clk cycles and the
+  // high time exactly W sync_clk cycles - there is no tolerance to allow here.
+  task automatic check_pwm(
+    input int unsigned p,
+    input int unsigned w,
+    input int unsigned n_periods,
+    input int unsigned exp_high,
+    input int unsigned exp_period
+  );
+    int unsigned high_c[];
+    int unsigned per_c[];
+
+    program_pwm(p, w);
+    measure_drctl_waveform(n_periods, 200, high_c, per_c);
+
+    if (all_equal(high_c, exp_high) && all_equal(per_c, exp_period)) begin
+      `INFO(("  P=%0d W=%0d -> high=%0d period=%0d - PASSED", p, w, exp_high, exp_period),
+            ADI_VERBOSITY_NONE);
+    end else begin
+      `ERROR(("  P=%0d W=%0d: expected high=%0d period=%0d, measured high=%s period=%s",
+              p, w, exp_high, exp_period, fmt_array(high_c), fmt_array(per_c)));
+      test_passed = 0;
+    end
+  endtask
+
+  // --------------------------
+  // trig_out pulse measurement
+  // --------------------------
+  // Records the sync_clk cycle offsets of trig_out rising edges relative to the
+  // first edge seen. Both the interval-start and interval-stop sources OR into
+  // the same output pin, so consecutive edges within one monitor window are the
+  // start pulse followed by the stop pulse.
+  task automatic measure_trig_pulses(
+    input  int unsigned n_pulses,
+    input  int unsigned timeout_us,
+    output int unsigned offsets[],
+    output int unsigned got
+  );
+    bit          prev;
+    int unsigned cyc;
+    int unsigned timeout_cycles;
+
+    offsets        = new[n_pulses];
+    got            = 0;
+    cyc            = 0;
+    timeout_cycles = timeout_us * CYCLES_PER_US;
+    prev           = trig_out_tp;
+
+    while (got < n_pulses && timeout_cycles > 0) begin
+      @(posedge sync_clk_tp);
+      timeout_cycles--;
+      cyc++;
+      if (trig_out_tp && !prev) begin
+        offsets[got] = cyc;
+        got++;
+      end
+      prev = trig_out_tp;
+    end
+  endtask
+
+  // Count trig_out rising edges over a fixed observation window.
+  task automatic count_trig_pulses(
+    input  int unsigned window_cyc,
+    output int unsigned count
+  );
+    bit prev;
+    count = 0;
+    prev  = trig_out_tp;
+    for (int unsigned k = 0; k < window_cyc; k++) begin
+      @(posedge sync_clk_tp);
+      if (trig_out_tp && !prev) count++;
+      prev = trig_out_tp;
+    end
+  endtask
 
   // --------------------------
   // Main test sequence
@@ -408,13 +665,9 @@ program test_program_drg (
   initial begin
     setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
-    // Initialize outputs
-    ext_sync_tp = 1'b0;
-    drover_tp = 1'b0;
-    sync_smp_err_tp = 1'b0;
+    ext_sync_tp    = 1'b0;
     ram_swp_ovr_tp = 1'b0;
 
-    // Create environment
     base_env = new(
       .name("Base Environment"),
       .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
@@ -437,711 +690,926 @@ program test_program_drg (
     base_env.start();
     base_env.sys_reset();
 
-    `INFO(("==== AD9910 DRG Mode Testbench ===="), ADI_VERBOSITY_NONE);
+    // The default 1 ms watchdog is tight for this suite: the interval-monitor
+    // tests observe multi-thousand sync_clk-cycle windows. Extended via the watchdog's
+    // public API rather than by editing the shared environment.
+    base_env.simulation_watchdog.update_timer(32'd3_000_000);
+    base_env.simulation_watchdog.reset();
+
+    `INFO(("==== AD9910 DRG Mode Testbench (PWM ramp controller) ===="), ADI_VERBOSITY_NONE);
 
     // ----------------------------------------
-    // Test 1: Sanity test - read version/ID
+    // TC1: Register sanity
     // ----------------------------------------
+    // Every DRG register is written with a distinct pattern and read back. The
+    // register map shifted from 0x23 upward in the PWM rework, so a stale
+    // address lands on a real-but-wrong register and produces no bus error -
+    // only a readback mismatch catches it.
     current_test = 1;
-    `INFO(("Test 1: Sanity test - register access"), ADI_VERBOSITY_NONE);
+    `INFO(("TC1: Register sanity"), ADI_VERBOSITY_NONE);
 
     axi_read(reg_addr(REG_VERSION), read_data);
-    `INFO(("  Version register: 0x%08x", read_data), ADI_VERBOSITY_LOW);
-
+    `INFO(("  VERSION: 0x%08x", read_data), ADI_VERBOSITY_LOW);
     axi_read(reg_addr(REG_ID), read_data);
-    `INFO(("  ID register: 0x%08x", read_data), ADI_VERBOSITY_LOW);
+    `INFO(("  ID: 0x%08x", read_data), ADI_VERBOSITY_LOW);
+    axi_read(reg_addr(REG_DEVICE_INFO), read_data);
+    `INFO(("  DEVICE_INFO: 0x%08x", read_data), ADI_VERBOSITY_LOW);
 
-    // Write and read scratch register
     axi_write(reg_addr(REG_SCRATCH), 32'hDEADBEEF);
     axi_read_v(reg_addr(REG_SCRATCH), 32'hDEADBEEF);
-    `INFO(("  Scratch register test PASSED"), ADI_VERBOSITY_NONE);
+
+    axi_write(reg_addr(REG_DRCTL_PERIOD),   32'h0000_1234);
+    axi_write(reg_addr(REG_DRCTL_WIDTH),    32'h0000_5678);
+    axi_write(reg_addr(REG_BST_DELAY),      32'h0000_9abc);
+    axi_write(reg_addr(REG_RAMP_BURSTS),    32'h0000_def0);
+    axi_write(reg_addr(REG_BURST_DELAY),    32'h0001_1111);
+    axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'h0002_2222);
+    axi_write(reg_addr(REG_IRQ_START),      32'h0003_3333);
+    axi_write(reg_addr(REG_IRQ_STOP),       32'h0004_4444);
+    axi_write(reg_addr(REG_TRIG_START),     32'h0005_5555);
+    axi_write(reg_addr(REG_TRIG_STOP),      32'h0006_6666);
+
+    axi_read_v(reg_addr(REG_DRCTL_PERIOD),   32'h0000_1234);
+    axi_read_v(reg_addr(REG_DRCTL_WIDTH),    32'h0000_5678);
+    axi_read_v(reg_addr(REG_BST_DELAY),      32'h0000_9abc);
+    axi_read_v(reg_addr(REG_RAMP_BURSTS),    32'h0000_def0);  // 20-bit field
+    axi_read_v(reg_addr(REG_BURST_DELAY),    32'h0001_1111);
+    axi_read_v(reg_addr(REG_MON_MAX_PERIOD), 32'h0002_2222);
+    axi_read_v(reg_addr(REG_IRQ_START),      32'h0003_3333);
+    axi_read_v(reg_addr(REG_IRQ_STOP),       32'h0004_4444);
+    axi_read_v(reg_addr(REG_TRIG_START),     32'h0005_5555);
+    axi_read_v(reg_addr(REG_TRIG_STOP),      32'h0006_6666);
+    `INFO(("  Register map readback - PASSED"), ADI_VERBOSITY_NONE);
+
+    // Clear back to a known state before the ramp tests.
+    axi_write(reg_addr(REG_DRCTL_PERIOD),   32'd0);
+    axi_write(reg_addr(REG_DRCTL_WIDTH),    32'd0);
+    axi_write(reg_addr(REG_BST_DELAY),      32'd0);
+    axi_write(reg_addr(REG_RAMP_BURSTS),    32'd0);
+    axi_write(reg_addr(REG_BURST_DELAY),    32'd0);
+    axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'd0);
+    axi_write(reg_addr(REG_IRQ_START),      32'd0);
+    axi_write(reg_addr(REG_IRQ_STOP),       32'd0);
+    axi_write(reg_addr(REG_TRIG_START),     32'd0);
+    axi_write(reg_addr(REG_TRIG_STOP),      32'd0);
 
     // ----------------------------------------
-    // Test 2: Take device out of reset
+    // TC2: Reset release and clock monitor
     // ----------------------------------------
     current_test = 2;
-    `INFO(("Test 2: Device reset sequence"), ADI_VERBOSITY_NONE);
+    `INFO(("TC2: Reset release and clock monitor"), ADI_VERBOSITY_NONE);
 
-    // Release reset (clear reset bits, keep device in known state)
-    axi_write(reg_addr(REG_CONTROL), 32'h00000000);
-    #10us;  // Allow reset to propagate through CDC
+    axi_write(reg_addr(REG_RESET_CTRL), 32'h0);
+    #10us;
 
-    // Debug: Check if sync_clk is running via clock monitor
-    axi_read(reg_addr(REG_SYNC_CLK_CNT), read_data);
-    `INFO(("  Sync clock count: 0x%08x", read_data), ADI_VERBOSITY_LOW);
-    #1us;
-    axi_read(reg_addr(REG_SYNC_CLK_CNT), read_data);
-    `INFO(("  Sync clock count after 1us: 0x%08x", read_data), ADI_VERBOSITY_LOW);
+    // The clock monitors need a full measurement window before they report
+    // anything: up_clock_mon gates on a free-running 16-bit up_clk counter, so
+    // the first capture lands 65536 up_clk cycles (~655 us at 100 MHz) after
+    // reset. That is longer than most of this suite, so the counts are only
+    // logged here and checked at the end in TC16.
+    begin
+      bit [31:0] cnt_a;
+      axi_read(reg_addr(REG_SYNC_CLK_CNT), cnt_a);
+      `INFO(("  SYNC_CLK_CNT this early: 0x%08x (window not yet elapsed)", cnt_a),
+            ADI_VERBOSITY_LOW);
+      `INFO(("  Reset released - PASSED"), ADI_VERBOSITY_NONE);
+    end
 
-    // Verify main_reset, io_reset and pw_down are deasserted
-    if (main_reset_tp == 1'b0 && io_reset_tp == 1'b0 && pw_down_tp == 1'b0) begin
-      `INFO(("  Device reset released - PASSED"), ADI_VERBOSITY_NONE);
+    // Run the ramp model for the whole suite, with the completion checker off.
+    // Only TC12 and TC15 read anything out of it, but leaving it running
+    // makes drg_counter track drctl everywhere, so the waveform shows the ramp
+    // each duty-cycle configuration actually produces instead of a flat line.
+    // Dwell is the baseline, because it is the shape an AD9910 comes out of reset
+    // in: nothing is moving yet either, since no duty cycle has been programmed,
+    // so the counter sits at the lower limit the way the part itself would. Only
+    // TC4 and TC12's retrace check switch to sawtooth, each reverting when
+    // it is done.
+    // Safe because drover reaches an output only through a mask that no test
+    // opens: TRIG_OUT_CTRL selects the interval bits and IRQ_MASK is set one
+    // bit at a time, never IRQ_DROVER except where TC15 wants it. The
+    // checker stays off so the deliberately short intervals in TC5, TC6 and
+    // TC14 do not report truncations - those are the point of those tests.
+    enable_drg_model(1, 0);
+
+    // ----------------------------------------
+    // TC3: Simple mode drctl control
+    // ----------------------------------------
+    // With toggle_en cleared the PWM machinery is bypassed and drctl follows
+    // DRCTL_INIT straight through the CDC.
+    current_test = 3;
+    `INFO(("TC3: Simple mode (toggle_en=0)"), ADI_VERBOSITY_NONE);
+
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_DRCTL_INIT);
+    #CFG_SETTLE_NS;
+    if (drctl_tp === 1'b1) begin
+      `INFO(("  DRCTL_INIT=1 -> drctl high - PASSED"), ADI_VERBOSITY_NONE);
     end else begin
-      `ERROR(("  Device reset failed - main_reset=%b, io_reset=%b, pw_down=%b", main_reset_tp, io_reset_tp, pw_down_tp));
+      `ERROR(("  DRCTL_INIT=1 but drctl=%b", drctl_tp));
       test_passed = 0;
     end
 
-    // Enable DRG model after reset is released
-    reset_drg_counter();
-    enable_drg_model(1);
-
-    // ----------------------------------------
-    // Test 3: Configure DRG mode
-    // ----------------------------------------
-    current_test = 3;
-    `INFO(("Test 3: Configure DRG mode"), ADI_VERBOSITY_NONE);
-
-    // Configure ramp delays
-    axi_write(reg_addr(REG_BST_DELAY), 32'd250);    // Before start delay
-    axi_write(reg_addr(REG_ALR_DELAY), 32'd0);      // After level reached delay
-    axi_write(reg_addr(REG_BURST_DELAY), 32'd200);  // Burst delay
-    axi_write(reg_addr(REG_RAMP_BURSTS), 32'd5);    // Number of bursts
-
-    // Configure ramp control: enable toggle mode, set drctl_init high
-    // Bits: [5] no_dwell_high, [4] no_dwell_low, [3] drctl_toggle_en,
-    //       [2] drctl_init, [1] drhold, [0] osk
-    axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);  // drctl_toggle_en=1, drctl_init=1
-
-    // Verify configuration
-    axi_read_v(reg_addr(REG_BST_DELAY), 32'd250);
-    axi_read_v(reg_addr(REG_RAMP_CTRL), 32'h0C);
-    `INFO(("  DRG configuration - PASSED"), ADI_VERBOSITY_NONE);
-
-    // Verify io_update output pulses when register is written
-    axi_write(reg_addr(REG_IO_UPDATE), 32'h00000001);
-    begin
-      int unsigned timeout = 1250; // 5us at 250 MHz
-      while (!io_update_tp && timeout > 0) begin
-        @(posedge sync_clk_tp);
-        timeout--;
-      end
-      if (timeout > 0) begin
-        `INFO(("  io_update output pulsed - PASSED"), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  io_update output did not pulse within 5us"));
-        test_passed = 0;
-      end
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
+    #CFG_SETTLE_NS;
+    if (drctl_tp === 1'b0) begin
+      `INFO(("  DRCTL_INIT=0 -> drctl low - PASSED"), ADI_VERBOSITY_NONE);
+    end else begin
+      `ERROR(("  DRCTL_INIT=0 but drctl=%b", drctl_tp));
+      test_passed = 0;
     end
 
     // ----------------------------------------
-    // Test 4: Trigger ramp and verify drctl
+    // TC4: PWM basic operation
     // ----------------------------------------
     current_test = 4;
-    `INFO(("Test 4: Ramp operation"), ADI_VERBOSITY_NONE);
+    `INFO(("TC4: PWM basic (P=%0d W=%0d)", PWM_PERIOD, PWM_WIDTH), ADI_VERBOSITY_NONE);
 
-    // Wait for drctl to assert (ramp starts automatically after config + BST_DELAY)
+    // The first test with a real duty cycle to ramp against, so run it in
+    // sawtooth: the ramp keeps moving for as long as drctl holds a level instead
+    // of reaching the limit and parking there for the rest of the interval, which
+    // is what makes the trace read as a repeating chirp. Reverted below - dwell
+    // is the part's reset configuration and stays the suite's baseline, so
+    // sawtooth is only in force where it is being exercised.
+    enable_drg_model(1, 0, DRG_SAWTOOTH);
+
+    check_pwm(PWM_PERIOD, PWM_WIDTH, 6, PWM_WIDTH, PWM_PERIOD);
+
+    enable_drg_model(1, 0, DRG_DWELL);
+
+    // ----------------------------------------
+    // TC5: Duty-cycle sweep
+    // ----------------------------------------
+    current_test = 5;
+    `INFO(("TC5: Duty-cycle sweep"), ADI_VERBOSITY_NONE);
+
+    // Duty sweep at the base period: from a 1-cycle sliver up to nearly the whole
+    // period, so drctl is seen widening across the full 0..100% range at one
+    // fixed, readable period. W=1 is the active_drctl_width_gt_one RTL boundary
+    // and stays a single sync_clk cycle regardless of the period; the rest step
+    // the high fraction from ~5% to ~99%.
     begin
-      int unsigned timeout = 2500; // 10us at 250 MHz
-      while (!drctl_tp && timeout > 0) begin
-        @(posedge sync_clk_tp);
-        timeout--;
-      end
-      if (timeout == 0) begin
-        `ERROR(("drctl did not assert within 10us"));
+      automatic int unsigned duty_w[] = '{1, 50, 200, 400, 500, 600, 800, 950, 990};
+      foreach (duty_w[k])
+        check_pwm(PWM_PERIOD, duty_w[k], 4, duty_w[k], PWM_PERIOD);
+    end
+
+    // Period sweep at 50% duty: from a 100-cycle period up to 4000, so the same
+    // duty is stretched across a wide range of periods. The two shortest (100,
+    // 250) are below DRG_RAMP_CYCLES, so the modelled ramp is truncated there -
+    // deliberate, and the DUT duty check (high==W, period==P) is exact regardless.
+    begin
+      automatic int unsigned per_p[] = '{100, 250, 500, 1000, 2000, 4000};
+      foreach (per_p[k])
+        check_pwm(per_p[k], per_p[k] / 2, 4, per_p[k] / 2, per_p[k]);
+    end
+
+    // Reconfiguring live (without clearing toggle_en first) costs an extra
+    // reset_overwrite per register write, but must still converge on the new
+    // waveform.
+    begin
+      int unsigned high_c[];
+      int unsigned per_c[];
+      axi_write(reg_addr(REG_DRCTL_PERIOD), 32'd800);
+      axi_write(reg_addr(REG_DRCTL_WIDTH),  32'd200);
+      #CFG_SETTLE_NS;
+      measure_drctl_waveform(4, 200, high_c, per_c);
+      if (all_equal(high_c, 200) && all_equal(per_c, 800)) begin
+        `INFO(("  Live reconfigure to P=800 W=200 converged - PASSED"), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Live reconfigure: high=%s period=%s (expected 200 / 800)",
+                fmt_array(high_c), fmt_array(per_c)));
+        test_passed = 0;
       end
     end
 
-    // Wait for DRG model to reach upper limit
-    `INFO(("  Waiting for ramp to reach upper limit..."), ADI_VERBOSITY_LOW);
-    wait_drover_pulses(1, 50);
+    // ----------------------------------------
+    // TC6: Width and period edge cases
+    // ----------------------------------------
+    // Each case selects a different RTL branch: active_drctl_width_nonzero,
+    // active_drctl_width_gt_one, and active_drctl_period_one.
+    current_test = 6;
+    `INFO(("TC6: Width and period edge cases"), ADI_VERBOSITY_NONE);
 
-    // Verify counter reached upper limit
-    `INFO(("  DRG counter value: %0d", get_drg_counter()), ADI_VERBOSITY_LOW);
+    // Each window spans three whole periods, so a duty cycle that had not been
+    // suppressed would have toggled several times inside it.
+    program_pwm(PWM_PERIOD, 0);
+    check_drctl_static(1'b0, 3 * PWM_PERIOD, "W=0");
+
+    program_pwm(PWM_PERIOD, PWM_PERIOD);
+    check_drctl_static(1'b1, 3 * PWM_PERIOD, "W=P");
+
+    program_pwm(PWM_PERIOD, PWM_PERIOD + PWM_PERIOD / 2);
+    check_drctl_static(1'b1, 3 * PWM_PERIOD, "W>P");
+
+    // P=1 is special-cased: drctl toggles every sync_clk cycle and W is
+    // ignored, so the observable waveform is 1 sync_clk cycle high, 1 sync_clk cycle low.
+    begin
+      int unsigned high_c[];
+      int unsigned per_c[];
+      program_pwm(1, 0);
+      measure_drctl_waveform(6, 200, high_c, per_c);
+      if (all_equal(high_c, 1) && all_equal(per_c, 2)) begin
+        `INFO(("  P=1 -> drctl toggles every sync_clk cycle - PASSED"), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  P=1: high=%s period=%s (expected 1 / 2)",
+                fmt_array(high_c), fmt_array(per_c)));
+        test_passed = 0;
+      end
+    end
+
+    stop_pwm();
 
     // ----------------------------------------
-    // Test 4b: Verify ramp toggle mode
+    // TC7: Start delay (DELAY_BST_RAMP_DELAY)
     // ----------------------------------------
-    `INFO(("Test 4b: Ramp toggle - full cycle"), ADI_VERBOSITY_NONE);
+    // The absolute delay from the register write to the first edge includes a
+    // fixed CDC and reset_overwrite overhead, so the check compares the
+    // difference between two programmed values - the overhead cancels.
+    current_test = 7;
+    `INFO(("TC7: Start delay"), ADI_VERBOSITY_NONE);
 
-    // Reset counter and wait for a complete up-down cycle (2 drover pulses)
-    reset_drg_counter();
-    #500ns;
-    `INFO(("  Waiting for complete ramp cycle (up + down)..."), ADI_VERBOSITY_LOW);
-    wait_drover_pulses(3, 100);
+    begin
+      int unsigned t_short;
+      int unsigned t_long;
+      int unsigned delta;
+      // Both delays are of the same order as the duty cycles that follow them
+      // (0.5 and 2.5 periods), so the gap before the first edge can be read off
+      // the trace by comparing it against them.
+      localparam int DLY_SHORT = 500;
+      localparam int DLY_LONG  = 2500;
 
-    `INFO(("  Ramp toggle cycle complete - DRG counter: %0d, drover_pulses: %0d",
-           get_drg_counter(), drover_pulse_count), ADI_VERBOSITY_LOW);
+      stop_pwm();
+      measure_start_delay(DLY_SHORT, t_short);
+      stop_pwm();
+      measure_start_delay(DLY_LONG, t_long);
+
+      delta = t_long - t_short;
+      `INFO(("  first edge at %0d sync_clk cycles (delay=%0d) and %0d sync_clk cycles (delay=%0d), delta=%0d",
+             t_short, DLY_SHORT, t_long, DLY_LONG, delta), ADI_VERBOSITY_LOW);
+
+      // Unlike the drctl period and width, which are measured edge-to-edge
+      // entirely within sync_clk and are therefore exact, this interval is
+      // timed from an AXI write and so includes however long the write sat at
+      // the up_xfer_cntrl crossing. Each of the two measurements is quantized
+      // independently into that 64-up_clk window, so their difference can be
+      // off by a full window either way - CDC_XFER_JITTER, not the handful of
+      // sync_clk cycles a synchroniser would cost. The check is still decisive: the
+      // programmed step is 2000 sync_clk cycles, so a dropped delay reads about -500 and
+      // a doubled one about 2500.
+      if (delta >= (DLY_LONG - DLY_SHORT - CDC_XFER_JITTER) &&
+          delta <= (DLY_LONG - DLY_SHORT + CDC_XFER_JITTER)) begin
+        `INFO(("  Start delay scales correctly (delta=%0d, expected %0d +/-%0d) - PASSED",
+               delta, DLY_LONG - DLY_SHORT, CDC_XFER_JITTER), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Start delay delta=%0d, expected %0d +/-%0d",
+                delta, DLY_LONG - DLY_SHORT, CDC_XFER_JITTER));
+        test_passed = 0;
+      end
+
+      stop_pwm();
+      axi_write(reg_addr(REG_BST_DELAY), 32'd0);
+    end
 
     // ----------------------------------------
-    // Test 5: Verify profile output
+    // TC8: Burst grouping and burst delay
     // ----------------------------------------
-    current_test = 5;
-    `INFO(("Test 5: Profile selection"), ADI_VERBOSITY_NONE);
+    current_test = 8;
+    `INFO(("TC8: Burst grouping"), ADI_VERBOSITY_NONE);
 
-    axi_write(reg_addr(REG_PROFILE), 32'h00000002);
-    #5us;  // Allow CDC to propagate (up_xfer_cntrl needs multiple clock cycles)
+    begin
+      localparam int BURSTS = 2;
+      // Increasing, and spanning half a period to four periods: small enough that
+      // the boundary could be mistaken for a wide period, up to unmistakable. The
+      // smallest is deliberately below one period so the classification is not
+      // resting on the boundary gap being an obvious outlier.
+      automatic int unsigned burst_delays[] = '{500, 1000, 2000, 4000};
+      int unsigned overheads[];
+      bit          overhead_constant;
 
-    `INFO(("  DEBUG: profile_tp = %b", profile_tp), ADI_VERBOSITY_LOW);
+      overheads = new[burst_delays.size()];
 
-    if (profile_tp == 3'b010) begin
-      `INFO(("  Profile output matches - PASSED"), ADI_VERBOSITY_NONE);
+      stop_pwm();
+      axi_write(reg_addr(REG_RAMP_BURSTS), BURSTS);
+
+      foreach (burst_delays[k]) begin
+        check_burst_delay(BURSTS, burst_delays[k], overheads[k]);
+      end
+
+      // Entering and leaving the burst-delay state costs a fixed number of
+      // sync_clk cycles on top of the programmed value. Sweeping is what makes that
+      // testable: a constant offset across every delay says the register is
+      // honoured additively, whereas a cost that grew with the delay would mean
+      // it is being scaled somewhere. A single measurement cannot tell the two
+      // apart - it just reports "close enough".
+      overhead_constant = 1;
+      foreach (overheads[k]) if (overheads[k] != overheads[0]) overhead_constant = 0;
+
+      if (overhead_constant) begin
+        `INFO(("  Boundary overhead constant at %0d sync_clk cycles across delays %s - PASSED",
+               overheads[0], fmt_array(burst_delays)), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Boundary overhead varies with the programmed delay: delays=%s overheads=%s",
+                fmt_array(burst_delays), fmt_array(overheads)));
+        test_passed = 0;
+      end
+
+      stop_pwm();
+      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
+      axi_write(reg_addr(REG_BURST_DELAY), 32'd0);
+    end
+
+    // ----------------------------------------
+    // TC9: Stop modes (RAMP_CFG)
+    // ----------------------------------------
+    current_test = 9;
+    `INFO(("TC9: Stop modes"), ADI_VERBOSITY_NONE);
+
+    // Period stop: exactly one duty cycle, then drctl parks low.
+    begin
+      int unsigned cyc;
+      stop_pwm();
+      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_PERIOD_STOP);
+      program_pwm(PWM_PERIOD, PWM_WIDTH);
+      // Let the one permitted period finish before checking that drctl parks.
+      // program_pwm's settle is a fixed 4 us, which is only one period long at
+      // this configuration and can be consumed entirely by the config sitting
+      // at the CDC, so the period is not necessarily over when it returns.
+      repeat (PWM_PERIOD + CDC_XFER_JITTER) @(posedge sync_clk_tp);
+      check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=period_stop");
+      // Returning to free-run clears stop_event and the ramp resumes.
+      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_FREE_RUN);
+      wait_drctl_level(1'b1, 20000, cyc);
+      if (cyc < 20000) begin
+        `INFO(("  Free-run restart after period stop (%0d sync_clk cycles) - PASSED", cyc),
+              ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Ramp did not restart after clearing RAMP_CFG"));
+        test_passed = 0;
+      end
+    end
+
+    // Burst stop: RAMP_BURSTS periods, then park.
+    begin
+      int unsigned high_c[];
+      int unsigned per_c[];
+      localparam int STOP_BURSTS = 3;
+
+      stop_pwm();
+      axi_write(reg_addr(REG_RAMP_BURSTS), STOP_BURSTS);
+      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_BURST_STOP);
+      program_pwm(PWM_PERIOD, PWM_WIDTH);
+      // As above, but a whole burst is allowed to run before the park.
+      repeat (STOP_BURSTS * PWM_PERIOD + CDC_XFER_JITTER) @(posedge sync_clk_tp);
+      check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=burst_stop");
+
+      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_FREE_RUN);
+      measure_drctl_waveform(4, 200, high_c, per_c);
+      if (all_equal(per_c, PWM_PERIOD)) begin
+        `INFO(("  Free-run restart after burst stop - PASSED"), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  After burst-stop restart: period=%s (expected %0d)",
+                fmt_array(per_c), PWM_PERIOD));
+        test_passed = 0;
+      end
+
+      stop_pwm();
+      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
+      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_FREE_RUN);
+    end
+
+    // ----------------------------------------
+    // TC10: DRHOLD passthrough
+    // ----------------------------------------
+    // drhold is a register -> CDC -> pin passthrough in the current RTL; it
+    // gates nothing inside the DUT. The black-box property is that the pin
+    // tracks the register.
+    current_test = 10;
+    `INFO(("TC10: DRHOLD passthrough"), ADI_VERBOSITY_NONE);
+
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_DRHOLD);
+    #CFG_SETTLE_NS;
+    if (drhold_tp === 1'b1) begin
+      `INFO(("  DRHOLD=1 -> drhold pin high - PASSED"), ADI_VERBOSITY_NONE);
     end else begin
-      `ERROR(("  Profile mismatch - expected 2, got %d", profile_tp));
+      `ERROR(("  DRHOLD=1 but drhold pin=%b", drhold_tp));
+      test_passed = 0;
+    end
+
+    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
+    #CFG_SETTLE_NS;
+    if (drhold_tp === 1'b0) begin
+      `INFO(("  DRHOLD=0 -> drhold pin low - PASSED"), ADI_VERBOSITY_NONE);
+    end else begin
+      `ERROR(("  DRHOLD=0 but drhold pin=%b", drhold_tp));
       test_passed = 0;
     end
 
     // ----------------------------------------
-    // Test 6: Test drhold - verify counter freezes
-    // ----------------------------------------
-    current_test = 6;
-    `INFO(("Test 6: DRHOLD control"), ADI_VERBOSITY_NONE);
-
-    // First, reset counter and let it ramp a bit
-    reset_drg_counter();
-    #2us;  // Let counter ramp up a bit
-
-    // Capture counter value before hold
-    begin
-      logic [DRG_WIDTH-1:0] counter_when_hold_active;
-      logic [DRG_WIDTH-1:0] counter_during_hold;
-      logic [DRG_WIDTH-1:0] counter_after_hold;
-
-      // Set drhold
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0E);  // drctl_toggle_en=1, drctl_init=1, drhold=1
-      axi_read_v(reg_addr(REG_RAMP_CTRL), 32'h0E);
-
-      // Wait for drhold to propagate through CDC
-      begin
-        int unsigned timeout = 2500; // 10us at 250 MHz
-        while (!drhold_tp && timeout > 0) begin
-          @(posedge sync_clk_tp);
-          timeout--;
-        end
-        if (timeout == 0) begin
-          `ERROR(("drhold did not assert within 10us"));
-          test_passed = 0;
-        end
-      end
-
-      // Capture counter value NOW that hold is active
-      counter_when_hold_active = get_drg_counter();
-      `INFO(("  Counter when hold active: %0d", counter_when_hold_active), ADI_VERBOSITY_LOW);
-
-      // Wait and verify counter is frozen
-      #3us;
-      counter_during_hold = get_drg_counter();
-      `INFO(("  Counter after waiting during hold: %0d", counter_during_hold), ADI_VERBOSITY_LOW);
-
-      // Counter should not have changed while hold is active
-      if (counter_during_hold == counter_when_hold_active) begin
-        `INFO(("  Counter frozen during hold - PASSED"), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Counter not frozen - when_active=%0d, during=%0d", counter_when_hold_active, counter_during_hold));
-        test_passed = 0;
-      end
-
-      // Clear drhold
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-      #2us;  // Allow CDC to propagate
-
-      if (drhold_tp == 1'b0) begin
-        `INFO(("  DRHOLD deasserted - PASSED"), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  DRHOLD not deasserted"));
-        test_passed = 0;
-      end
-
-      // Verify counter resumes (or stays at limit if already there)
-      #3us;
-      counter_after_hold = get_drg_counter();
-      `INFO(("  Counter after hold released: %0d (drctl=%b)", counter_after_hold, drctl_tp), ADI_VERBOSITY_LOW);
-
-      // Counter should resume or stay at limit if already at boundary
-      if (counter_after_hold != counter_during_hold) begin
-        `INFO(("  Counter resumed after hold - PASSED"), ADI_VERBOSITY_NONE);
-      end else if (counter_during_hold == DRG_LOWER_LIMIT || counter_during_hold == DRG_UPPER_LIMIT) begin
-        `INFO(("  Counter at limit, hold behavior correct - PASSED"), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Counter did not resume - during=%0d, after=%0d", counter_during_hold, counter_after_hold));
-        test_passed = 0;
-      end
-    end
-
-    // ----------------------------------------
-    // Test 7: Sawtooth mode with inter-blade delay (ALR_DELAY)
-    // Verify that after each blade reaches the upper limit, the DRG
-    // pauses for ALR_DELAY sync_clk cycles before starting the next blade.
-    // ----------------------------------------
-    current_test = 7;
-    `INFO(("Test 7: Sawtooth mode with inter-blade delay"), ADI_VERBOSITY_NONE);
-
-    begin
-      int unsigned blade_start_count;
-      bit [31:0] reg_bst_delay;
-      bit [31:0] reg_alr_delay;
-      int unsigned bst_delay_cycles;
-      int unsigned alr_delay_cycles;
-      int unsigned n_blades = 5;
-      logic [DRG_WIDTH-1:0] counter_before_delay;
-      logic [DRG_WIDTH-1:0] counter_after_delay;
-
-      // Read delay parameters from DUT registers
-      axi_read(reg_addr(REG_BST_DELAY), reg_bst_delay);
-      axi_read(reg_addr(REG_ALR_DELAY), reg_alr_delay);
-      bst_delay_cycles = reg_bst_delay;
-      alr_delay_cycles = reg_alr_delay;
-
-      `INFO(("  Configuration: BST_DELAY=%0d, ALR_DELAY=%0d sync_clk cycles, %0d blades",
-             bst_delay_cycles, alr_delay_cycles, n_blades), ADI_VERBOSITY_LOW);
-
-      // Enable sawtooth mode via NO_DWELL_HIGH, auto-hold after each blade
-      set_drg_burst_limit(1);
-
-      // Set ramp control: no_dwell_high=1, drctl_toggle_en=1, drctl_init=1
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
-      read_ramp_ctrl();
-      #3us;
-
-      // Reset DRG model
-      reset_drg_counter();
-      blade_start_count = drover_pulse_count;
-
-      // Wait BST_DELAY before first blade begins ramping
-      `INFO(("  Waiting BST_DELAY (%0d cycles) before first blade...", bst_delay_cycles), ADI_VERBOSITY_LOW);
-      repeat (bst_delay_cycles) @(posedge sync_clk_tp);
-
-      for (int i = 0; i < n_blades; i++) begin
-        `INFO(("  === Blade %0d/%0d ===", i + 1, n_blades), ADI_VERBOSITY_NONE);
-
-        // Release hold to start this blade
-        start_new_burst();
-
-        // Wait for blade to ramp up to upper limit
-        wait_drover_pulses(1, 50);
-
-        `INFO(("  Blade %0d complete: counter=%0d, drover_pulses=%0d",
-               i + 1, get_drg_counter(), drover_pulse_count), ADI_VERBOSITY_LOW);
-
-        // Verify model auto-held
-        if (!drg_burst_hold) begin
-          `ERROR(("  Blade %0d: model did not auto-hold", i + 1));
-          test_passed = 0;
-        end
-
-        // Apply inter-blade delay (ALR_DELAY) - except after last blade
-        if (i < n_blades - 1) begin
-          counter_before_delay = get_drg_counter();
-
-          `INFO(("  Inter-blade delay: %0d sync_clk cycles", alr_delay_cycles), ADI_VERBOSITY_LOW);
-          repeat (alr_delay_cycles) @(posedge sync_clk_tp);
-
-          counter_after_delay = get_drg_counter();
-
-          // Verify counter stayed frozen during delay
-          if (counter_after_delay != counter_before_delay) begin
-            `ERROR(("  Counter moved during inter-blade delay - before=%0d, after=%0d",
-                    counter_before_delay, counter_after_delay));
-            test_passed = 0;
-          end else begin
-            `INFO(("  Counter frozen during delay - PASSED"), ADI_VERBOSITY_LOW);
-          end
-        end
-      end
-
-      // Verify total blades completed
-      if ((drover_pulse_count - blade_start_count) == n_blades) begin
-        `INFO(("  %0d sawtooth blades with ALR_DELAY=%0d between each - PASSED",
-               n_blades, alr_delay_cycles), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Expected %0d blades, got %0d",
-                n_blades, drover_pulse_count - blade_start_count));
-        test_passed = 0;
-      end
-
-      // Clean up
-      set_drg_burst_limit(0);
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-      read_ramp_ctrl();
-    end
-
-    // ----------------------------------------
-    // Test 8: Burst mode - sawtooth blades with burst limits and delay
-    // driven by REG_RAMP_BURSTS and REG_BURST_DELAY register values
-    // ----------------------------------------
-    current_test = 8;
-    `INFO(("Test 8: Burst mode - sawtooth pattern with burst limits"), ADI_VERBOSITY_NONE);
-
-    begin
-      int unsigned burst1_start_count;
-      int unsigned burst1_end_count;
-      int unsigned burst2_start_count;
-      int unsigned burst2_end_count;
-      bit [31:0] reg_bursts;
-      bit [31:0] reg_burst_delay;
-      int unsigned blades_per_burst;
-      int unsigned burst_delay_cycles;
-      logic [DRG_WIDTH-1:0] counter_before_delay;
-      logic [DRG_WIDTH-1:0] counter_after_delay;
-
-      // Read burst parameters from DUT registers
-      axi_read(reg_addr(REG_RAMP_BURSTS), reg_bursts);
-      axi_read(reg_addr(REG_BURST_DELAY), reg_burst_delay);
-      blades_per_burst = reg_bursts;
-      burst_delay_cycles = reg_burst_delay;
-
-      // Enable sawtooth mode via NO_DWELL_HIGH and set burst blade limit from register value
-      set_drg_burst_limit(blades_per_burst);
-
-      `INFO(("  Configuration: %0d blades/burst, %0d sync_clk cycles delay between bursts",
-             blades_per_burst, burst_delay_cycles), ADI_VERBOSITY_LOW);
-
-      // Set ramp control: no_dwell_high=1, drctl_toggle_en=1, drctl_init=1
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
-      read_ramp_ctrl();
-      #2us;
-
-      // Reset DRG model to lower limit
-      reset_drg_counter();
-      burst1_start_count = drover_pulse_count;
-
-      `INFO(("  DRG starting state: counter=%0d, drctl=%b, drover=%b",
-             get_drg_counter(), drctl_tp, drover_tp), ADI_VERBOSITY_LOW);
-
-      // ========== BURST 1 ==========
-      `INFO(("  === Burst 1: Starting %0d sawtooth blades ===", blades_per_burst), ADI_VERBOSITY_NONE);
-
-      // Wait for first burst to complete (model auto-holds after blades_per_burst)
-      wait_drover_pulses(blades_per_burst, 50);
-      burst1_end_count = drover_pulse_count;
-
-      `INFO(("  Burst 1 complete: %0d blades, burst_hold=%b",
-             burst1_end_count - burst1_start_count, drg_burst_hold), ADI_VERBOSITY_LOW);
-
-      if ((burst1_end_count - burst1_start_count) == blades_per_burst) begin
-        `INFO(("  Burst 1 - %0d sawtooth blades - PASSED", blades_per_burst), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Burst 1 failed - got %0d blades, expected %0d",
-                burst1_end_count - burst1_start_count, blades_per_burst));
-        test_passed = 0;
-      end
-
-      // Verify model auto-held (no 6th blade started)
-      if (drg_burst_hold) begin
-        `INFO(("  Model auto-held after burst - PASSED"), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Model did not auto-hold after burst"));
-        test_passed = 0;
-      end
-
-      // ========== BURST DELAY ==========
-      `INFO(("  === Burst delay: %0d sync_clk cycles ===", burst_delay_cycles), ADI_VERBOSITY_NONE);
-
-      counter_before_delay = get_drg_counter();
-
-      // Wait for the burst delay period (model is already auto-held)
-      repeat (burst_delay_cycles) @(posedge sync_clk_tp);
-
-      counter_after_delay = get_drg_counter();
-      `INFO(("  After delay: counter=%0d (was %0d)", counter_after_delay, counter_before_delay), ADI_VERBOSITY_LOW);
-
-      // Verify counter stayed frozen during delay
-      if (counter_after_delay == counter_before_delay) begin
-        `INFO(("  Burst delay - counter frozen for %0d cycles - PASSED", burst_delay_cycles), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Counter moved during burst delay - before=%0d, after=%0d",
-                counter_before_delay, counter_after_delay));
-        test_passed = 0;
-      end
-
-      // ========== BURST 2 ==========
-      `INFO(("  === Burst 2: Starting %0d sawtooth blades ===", blades_per_burst), ADI_VERBOSITY_NONE);
-
-      burst2_start_count = drover_pulse_count;
-
-      // Release burst hold and start new burst
-      start_new_burst();
-
-      // Wait for second burst to complete
-      wait_drover_pulses(blades_per_burst, 50);
-      burst2_end_count = drover_pulse_count;
-
-      `INFO(("  Burst 2 complete: %0d blades", burst2_end_count - burst2_start_count), ADI_VERBOSITY_LOW);
-
-      if ((burst2_end_count - burst2_start_count) == blades_per_burst) begin
-        `INFO(("  Burst 2 - %0d sawtooth blades - PASSED", blades_per_burst), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Burst 2 failed - got %0d blades, expected %0d",
-                burst2_end_count - burst2_start_count, blades_per_burst));
-        test_passed = 0;
-      end
-
-      // ========== SUMMARY ==========
-      `INFO(("  === Burst mode summary ==="), ADI_VERBOSITY_NONE);
-      `INFO(("  Total blades: %0d (Burst1=%0d + Burst2=%0d)",
-             burst2_end_count - burst1_start_count,
-             burst1_end_count - burst1_start_count,
-             burst2_end_count - burst2_start_count), ADI_VERBOSITY_LOW);
-      `INFO(("  Burst delay: %0d sync_clk cycles", burst_delay_cycles), ADI_VERBOSITY_LOW);
-
-      // Clean up: disable burst limit and switch back to triangle mode
-      set_drg_burst_limit(0);
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-      read_ramp_ctrl();
-    end
-
-    // ----------------------------------------
-    // Test 9: Sawtooth DOWN mode (NO_DWELL_LOW)
-    // Verify that with NO_DWELL_LOW set, the ramp always goes down
-    // and snaps back to the upper limit when the lower limit is reached.
-    // Run a continuous burst of blades with no delay between them.
-    // ----------------------------------------
-    current_test = 9;
-    `INFO(("Test 9: Sawtooth DOWN mode (NO_DWELL_LOW)"), ADI_VERBOSITY_NONE);
-
-    begin
-      int unsigned blade_start_count;
-      int unsigned n_blades = 5;
-
-      // Enable sawtooth DOWN mode via NO_DWELL_LOW, auto-hold after full burst
-      set_drg_burst_limit(n_blades);
-
-      // Set ramp control: no_dwell_low=1, drctl_toggle_en=1, drctl_init=1
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
-      read_ramp_ctrl();
-      #3us;
-
-      // Reset DRG model to UPPER limit (sawtooth down starts from top)
-      reset_drg_counter(DRG_UPPER_LIMIT);
-      blade_start_count = drover_pulse_count;
-
-      `INFO(("  Starting %0d sawtooth DOWN blades (no inter-blade delay)...", n_blades), ADI_VERBOSITY_NONE);
-
-      // Wait for all blades to complete continuously
-      wait_drover_pulses(n_blades, 100);
-
-      `INFO(("  Burst complete: drover_pulses=%0d, burst_hold=%b",
-             drover_pulse_count, drg_burst_hold), ADI_VERBOSITY_LOW);
-
-      // Verify model auto-held after all blades
-      if (drg_burst_hold) begin
-        `INFO(("  Model auto-held after %0d blades - PASSED", n_blades), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Model did not auto-hold after %0d blades", n_blades));
-        test_passed = 0;
-      end
-
-      // Verify total blades completed
-      if ((drover_pulse_count - blade_start_count) == n_blades) begin
-        `INFO(("  %0d sawtooth DOWN blades completed - PASSED", n_blades), ADI_VERBOSITY_NONE);
-      end else begin
-        `ERROR(("  Expected %0d blades, got %0d",
-                n_blades, drover_pulse_count - blade_start_count));
-        test_passed = 0;
-      end
-
-      // Clean up
-      set_drg_burst_limit(0);
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-      read_ramp_ctrl();
-    end
-
-    // ----------------------------------------
-    // Test 10: No-dwell mode cycling (NO_DWELL_HIGH <-> NO_DWELL_LOW)
-    // Direct mode switches between no-dwell modes. Each switch is detected
-    // on sync_clk (auto_ramp_mode_update) and pulses reset_overwrite for
-    // 16 cycles, clearing the FSM/timing counters while the CDC config
-    // registers (no_dwell_*, drctl_toggle_en, etc.) survive. IDLE states
-    // wait for drover_d2=1 before transitioning, eliminating the
-    // stale-edge race that caused the original deadlock.
-    // ----------------------------------------
-    current_test = 10;
-    `INFO(("Test 10: No-dwell mode cycling (NO_DWELL_HIGH <-> NO_DWELL_LOW)"), ADI_VERBOSITY_NONE);
-
-    begin
-      int unsigned phase_start_count;
-      int unsigned blades_per_mode = 2;
-      int unsigned n_iterations = 3;
-
-      // Initial setup via device reset for clean CDC state
-      enable_drg_model(0);
-      axi_write(reg_addr(REG_CONTROL), 32'h02);
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
-      axi_write(reg_addr(REG_BST_DELAY), 32'd250);
-      axi_write(reg_addr(REG_ALR_DELAY), 32'd0);
-      axi_write(reg_addr(REG_CONTROL), 32'h00);
-      read_ramp_ctrl();
-      #1500ns;
-      enable_drg_model(1);
-
-      set_drg_burst_limit(blades_per_mode);
-
-      for (int i = 0; i < n_iterations; i++) begin
-        `INFO(("  === Iteration %0d/%0d ===", i + 1, n_iterations), ADI_VERBOSITY_NONE);
-
-        // --- NO_DWELL_HIGH ---
-        if (i > 0) begin
-          axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
-          read_ramp_ctrl();
-          #1500ns;
-        end
-        reset_drg_counter(DRG_LOWER_LIMIT);
-        start_new_burst();
-        phase_start_count = drover_pulse_count;
-
-        wait_drover_pulses(blades_per_mode, 10);
-
-        `INFO(("  NO_DWELL_HIGH: %0d blades, drctl=%b",
-               drover_pulse_count - phase_start_count, drctl_tp), ADI_VERBOSITY_LOW);
-
-        if (!drg_burst_hold) begin
-          `ERROR(("  Iteration %0d: NO_DWELL_HIGH did not auto-hold", i + 1));
-          test_passed = 0;
-        end
-
-        // --- Switch to NO_DWELL_LOW ---
-        axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
-        read_ramp_ctrl();
-        #1500ns;
-
-        reset_drg_counter(DRG_UPPER_LIMIT);
-        start_new_burst();
-        phase_start_count = drover_pulse_count;
-
-        wait_drover_pulses(blades_per_mode, 10);
-
-        `INFO(("  NO_DWELL_LOW: %0d blades, drctl=%b",
-               drover_pulse_count - phase_start_count, drctl_tp), ADI_VERBOSITY_LOW);
-
-        if (!drg_burst_hold) begin
-          `ERROR(("  Iteration %0d: NO_DWELL_LOW did not auto-hold", i + 1));
-          test_passed = 0;
-        end
-
-        `INFO(("  Iteration %0d complete", i + 1), ADI_VERBOSITY_LOW);
-      end
-
-      `INFO(("  %0d iterations, %0d mode switches completed",
-             n_iterations, n_iterations * 2), ADI_VERBOSITY_NONE);
-
-      // Clean up
-      set_drg_burst_limit(0);
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-      read_ramp_ctrl();
-      #1500ns;
-      reset_drg_counter();
-    end
-
-    // ----------------------------------------
-    // Test 11: Toggle/no-dwell interleaved mode cycling
-    // Cycles: TOGGLE -> NO_DWELL_HIGH -> TOGGLE -> NO_DWELL_LOW
-    // Every change in {no_dwell_high, no_dwell_low, drctl_toggle_en} is
-    // detected by auto_ramp_mode_update (XOR-based, both edges) and
-    // pulses reset_overwrite. CDC config registers reset only on
-    // reset_sync_cd, so they survive each switch.
+    // TC11: Profile output
     // ----------------------------------------
     current_test = 11;
-    `INFO(("Test 11: Toggle/no-dwell interleaved mode cycling"), ADI_VERBOSITY_NONE);
+    `INFO(("TC11: Profile output"), ADI_VERBOSITY_NONE);
+
+    for (int p = 0; p < 8; p++) begin
+      axi_write(reg_addr(REG_PROFILE), p);
+      #CFG_SETTLE_NS;
+      if (profile_tp !== p[2:0]) begin
+        `ERROR(("  PROFILE=%0d but profile pin=%0d", p, profile_tp));
+        test_passed = 0;
+      end
+    end
+    axi_write(reg_addr(REG_PROFILE), 32'd0);
+    `INFO(("  All 8 profile values - PASSED"), ADI_VERBOSITY_NONE);
+
+    // ----------------------------------------
+    // TC12: Ramp model and programming checker
+    // ----------------------------------------
+    // A full limit-to-limit ramp takes DRG_RAMP_CYCLES. When both the high and
+    // low intervals are longer than that, every ramp completes and drover
+    // pulses twice per duty cycle. When an interval is shorter, the AD9910
+    // never reaches its limit - the RTL is behaving correctly, the register
+    // values are simply wrong. This is the failure mode behind a chirp whose
+    // ramps do not match the configured sweep.
+    current_test = 12;
+    `INFO(("TC12: Ramp model and programming checker"), ADI_VERBOSITY_NONE);
 
     begin
-      int unsigned phase_start_count;
-      int unsigned total_phases_passed = 0;
-      int unsigned total_phases = 0;
-      int unsigned blades_per_nodwell = 2;
-      int unsigned pulses_per_toggle = 2;  // 1 full triangle cycle = up + down
-      int unsigned n_iterations = 3;
+      int unsigned rises_before;
+      int unsigned rises_after;
+      // Symmetric duty: both intervals are 500 sync_clk cycles, comfortably longer than
+      // the 200 sync_clk cycles a full ramp needs, so every ramp reaches its limit and parks.
+      localparam int GOOD_P = PWM_PERIOD;
+      localparam int GOOD_W = PWM_PERIOD / 2;
 
-      for (int i = 0; i < n_iterations; i++) begin
-        `INFO(("  === Iteration %0d/%0d ===", i + 1, n_iterations), ADI_VERBOSITY_NONE);
+      stop_pwm();
+      // Dwell, not the suite's sawtooth: this test is about whether the
+      // programmed interval is long enough for a ramp, which only has an
+      // answer when the ramp has an endpoint to fail to reach.
+      enable_drg_model(1, 1, DRG_DWELL);
+      program_pwm(GOOD_P, GOOD_W);
 
-        // --- Phase A: Triangle toggle mode ---
-        `INFO(("  Phase A: TOGGLE mode (0x0C)"), ADI_VERBOSITY_LOW);
-        set_drg_burst_limit(0);
-        axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-        read_ramp_ctrl();
-        reset_drg_counter(DRG_LOWER_LIMIT);
-        #3us;
+      rises_before = drover_rise_count;
+      repeat (4 * GOOD_P) @(posedge sync_clk_tp);
+      rises_after = drover_rise_count;
 
-        phase_start_count = drover_pulse_count;
+      `INFO(("  %0d drover rising edges over 4 periods (expect ~8)",
+             rises_after - rises_before), ADI_VERBOSITY_LOW);
 
-        wait_drover_pulses(pulses_per_toggle, 100);
-        total_phases++;
-
-        if ((drover_pulse_count - phase_start_count) == pulses_per_toggle) begin
-          total_phases_passed++;
-          `INFO(("  TOGGLE: %0d pulses - PASSED", pulses_per_toggle), ADI_VERBOSITY_LOW);
-        end else begin
-          `ERROR(("  TOGGLE: expected %0d pulses, got %0d",
-                  pulses_per_toggle, drover_pulse_count - phase_start_count));
-          test_passed = 0;
-        end
-
-        // --- Phase B: NO_DWELL_HIGH (triggers reset_overwrite) ---
-        `INFO(("  Phase B: Switching to NO_DWELL_HIGH (0x2C)"), ADI_VERBOSITY_LOW);
-        set_drg_burst_limit(blades_per_nodwell);
-        axi_write(reg_addr(REG_RAMP_CTRL), 32'h2C);
-        read_ramp_ctrl();
-        reset_drg_counter(DRG_LOWER_LIMIT);
-        #3us;
-
-        start_new_burst();
-        phase_start_count = drover_pulse_count;
-
-        wait_drover_pulses(blades_per_nodwell, 50);
-        total_phases++;
-
-        if (drg_burst_hold && (drover_pulse_count - phase_start_count) == blades_per_nodwell) begin
-          total_phases_passed++;
-          `INFO(("  NO_DWELL_HIGH: %0d blades - PASSED", blades_per_nodwell), ADI_VERBOSITY_LOW);
-        end else begin
-          `ERROR(("  Iteration %0d: NO_DWELL_HIGH failed (blades=%0d, burst_hold=%b)",
-                  i + 1, drover_pulse_count - phase_start_count, drg_burst_hold));
-          test_passed = 0;
-        end
-
-        // --- Phase C: Back to triangle toggle mode (also triggers reset_overwrite) ---
-        `INFO(("  Phase C: Back to TOGGLE mode (0x0C)"), ADI_VERBOSITY_LOW);
-        set_drg_burst_limit(0);
-        axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-        read_ramp_ctrl();
-        reset_drg_counter(DRG_LOWER_LIMIT);
-        #3us;
-
-        phase_start_count = drover_pulse_count;
-
-        wait_drover_pulses(pulses_per_toggle, 100);
-        total_phases++;
-
-        if ((drover_pulse_count - phase_start_count) == pulses_per_toggle) begin
-          total_phases_passed++;
-          `INFO(("  TOGGLE: %0d pulses - PASSED", pulses_per_toggle), ADI_VERBOSITY_LOW);
-        end else begin
-          `ERROR(("  TOGGLE: expected %0d pulses, got %0d",
-                  pulses_per_toggle, drover_pulse_count - phase_start_count));
-          test_passed = 0;
-        end
-
-        // --- Phase D: NO_DWELL_LOW (triggers reset_overwrite) ---
-        `INFO(("  Phase D: Switching to NO_DWELL_LOW (0x1C)"), ADI_VERBOSITY_LOW);
-        set_drg_burst_limit(blades_per_nodwell);
-        axi_write(reg_addr(REG_RAMP_CTRL), 32'h1C);
-        read_ramp_ctrl();
-        reset_drg_counter(DRG_UPPER_LIMIT);
-        #3us;
-
-        start_new_burst();
-        phase_start_count = drover_pulse_count;
-
-        wait_drover_pulses(blades_per_nodwell, 50);
-        total_phases++;
-
-        if (drg_burst_hold && (drover_pulse_count - phase_start_count) == blades_per_nodwell) begin
-          total_phases_passed++;
-          `INFO(("  NO_DWELL_LOW: %0d blades - PASSED", blades_per_nodwell), ADI_VERBOSITY_LOW);
-        end else begin
-          `ERROR(("  Iteration %0d: NO_DWELL_LOW failed (blades=%0d, burst_hold=%b)",
-                  i + 1, drover_pulse_count - phase_start_count, drg_burst_hold));
-          test_passed = 0;
-        end
-
-        `INFO(("  Iteration %0d complete", i + 1), ADI_VERBOSITY_LOW);
+      if (ramp_truncation_count != 0) begin
+        `ERROR(("  %0d ramp truncations with W=%0d, P-W=%0d (both exceed %0d sync_clk cycles)",
+                ramp_truncation_count, GOOD_W, GOOD_P - GOOD_W, DRG_RAMP_CYCLES));
+        test_passed = 0;
+      end else if ((rises_after - rises_before) < 6) begin
+        `ERROR(("  Only %0d drover edges in 4 periods, expected ~8",
+                rises_after - rises_before));
+        test_passed = 0;
+      end else begin
+        `INFO(("  Ramps complete within both intervals - PASSED"), ADI_VERBOSITY_NONE);
       end
 
-      `INFO(("  %0d/%0d phases passed", total_phases_passed, total_phases), ADI_VERBOSITY_NONE);
+      // Disarm before anything stops the PWM. Clearing toggle_en drops drctl
+      // wherever the ramp happens to be, so it truncates one by definition -
+      // that is a stop, not the programming error the checker looks for. This
+      // was previously masked by the ramp being short enough to always finish
+      // inside the AXI write that stopped it.
+      check_ramp_completion = 0;
+    end
 
-      // Clean up
-      set_drg_burst_limit(0);
-      axi_write(reg_addr(REG_RAMP_CTRL), 32'h0C);
-      read_ramp_ctrl();
+    // Now deliberately program a width too short for the ramp and confirm the
+    // checker catches it. Errors are expected here, so the checker is read
+    // directly rather than being allowed to fail the run.
+    begin
+      int unsigned truncations;
+      localparam int BAD_P = PWM_PERIOD;
+      localparam int BAD_W = 150;    // 150 < DRG_RAMP_CYCLES, so the up-ramp cannot finish
+
+      stop_pwm();
+      // Still dwelling; counted silently here, without the ERROR spam.
+      enable_drg_model(1, 0, DRG_DWELL);
+      program_pwm(BAD_P, BAD_W);
+
+      // Re-arm counting without the logger noise by sampling the counter
+      // ourselves over a fixed window.
+      begin
+        bit          drctl_prev_local;
+        int unsigned bad_edges;
+        bad_edges        = 0;
+        drctl_prev_local = drctl_tp;
+        for (int unsigned k = 0; k < 4 * BAD_P; k++) begin
+          @(posedge sync_clk_tp);
+          if (!drctl_tp && drctl_prev_local && (drg_counter != DRG_UPPER_LIMIT))
+            bad_edges++;
+          drctl_prev_local = drctl_tp;
+        end
+        truncations = bad_edges;
+      end
+
+      if (truncations > 0) begin
+        `INFO(("  W=%0d (< %0d sync_clk ramp cycles) truncated %0d up-ramps, detected - PASSED",
+               BAD_W, DRG_RAMP_CYCLES, truncations), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  W=%0d should truncate the ramp but no truncation was detected", BAD_W));
+        test_passed = 0;
+      end
+
+      stop_pwm();
+    end
+
+    // Sawtooth retrace. With the up-ramp reloading the lower limit instead of
+    // parking on the upper one, a single drctl high interval holds several
+    // complete ramps rather than one ramp followed by a plateau. Nothing else in
+    // the suite depends on this, so a regression to dwell would otherwise be
+    // invisible: every check would still pass and only the waveform would change.
+    begin
+      int unsigned retraces_before;
+      int unsigned retraces_after;
+      // The base duty cycle, so the blades come out whole here too - a width that
+      // is not a multiple of DRG_RAMP_CYCLES ends mid-blade and the last one
+      // reverses into a descent.
+      localparam int SAW_P = PWM_PERIOD;
+      localparam int SAW_W = PWM_WIDTH;
+      // A blade is DRG_RAMP_CYCLES long, so the 400 sync_clk-cycle high interval holds
+      // two. Only the upward direction retraces, so that is two per period, four
+      // across the window - the threshold leaves room for the window opening
+      // mid-interval.
+      localparam int MIN_RETRACES = 3;
+
+      enable_drg_model(1, 0, DRG_SAWTOOTH);
+      program_pwm(SAW_P, SAW_W);
+
+      retraces_before = drg_retrace_count;
+      repeat (2 * SAW_P) @(posedge sync_clk_tp);
+      retraces_after = drg_retrace_count;
+
+      if ((retraces_after - retraces_before) >= MIN_RETRACES) begin
+        `INFO(("  Sawtooth retraced %0d times over 2 periods (expect 4) - PASSED",
+               retraces_after - retraces_before), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Sawtooth retraced %0d times over 2 periods, expected at least %0d",
+                retraces_after - retraces_before, MIN_RETRACES));
+        test_passed = 0;
+      end
+
+      // No-dwell low stays clear, so parking drctl has to bring the ramp to rest
+      // at the lower limit by itself. Without that the counter would keep
+      // retracing downwards for the rest of the simulation, asserting ramp
+      // activity everywhere the DUT is idle.
+      stop_pwm();
+      retraces_before = drg_retrace_count;
+      repeat (DRG_RAMP_CYCLES + 100) @(posedge sync_clk_tp);
+      retraces_after = drg_retrace_count;
+
+      if ((drg_counter == DRG_LOWER_LIMIT) && (retraces_after == retraces_before)) begin
+        `INFO(("  Ramp came to rest at the lower limit with drctl parked - PASSED"),
+              ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  drctl parked low but the ramp is at %0d after %0d further retraces",
+                drg_counter, retraces_after - retraces_before));
+        test_passed = 0;
+      end
+
+      // Back to the baseline for the remaining tests, as at the end of TC4.
+      enable_drg_model(1, 0, DRG_DWELL);
+    end
+
+    // ----------------------------------------
+    // TC13: trig_out interval timing
+    // ----------------------------------------
+    // Max-period mode is used because it is the one monitor source whose
+    // reference counter runs freely: in period and burst-delay modes,
+    // end_period_d also resets ref_cnt (axi_ad9910.v:385-390). TC14 covers
+    // the mode selection itself.
+    //
+    // Contract from the IP docs: the counter loads MONITOR_MAX_PERIOD and counts
+    // down; a pulse is emitted when it equals the programmed match value; both
+    // start and stop OR into trig_out. Pulse spacing is therefore exactly
+    // START_MATCH - STOP_MATCH, independent of the fixed 3 sync_clk-cycle output latency.
+    current_test = 13;
+    `INFO(("TC13: trig_out interval timing (max-period mode)"), ADI_VERBOSITY_NONE);
+
+    begin
+      int unsigned offs[];
+      int unsigned got;
+      int unsigned spacing;
+      automatic int start_match[3] = '{900, 800, 500};
+      automatic int stop_match[3]  = '{800, 400, 100};
+      localparam int MON_MAX = 1000;
+      // In max-period mode the counter arms once per start_event. A start
+      // delay pushes that event past program_pwm's settle window so the
+      // measurement is already listening when the single window opens.
+      localparam int ARM_DELAY = 2000;
+
+      stop_pwm();
+      axi_write(reg_addr(REG_BST_DELAY), ARM_DELAY);
+      axi_write(reg_addr(REG_MON_MAX_PERIOD), MON_MAX);
+      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
+                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_MAX_PERIOD);
+
+      for (int k = 0; k < 3; k++) begin
+        axi_write(reg_addr(REG_TRIG_START), start_match[k]);
+        axi_write(reg_addr(REG_TRIG_STOP), stop_match[k]);
+        // A start event (re-)arms the counter; restarting the PWM produces one.
+        program_pwm(2000, 1000);
+
+        measure_trig_pulses(2, 60, offs, got);
+        if (got < 2) begin
+          `ERROR(("  start=%0d stop=%0d: saw %0d trig_out pulses, expected 2",
+                  start_match[k], stop_match[k], got));
+          test_passed = 0;
+        end else begin
+          spacing = offs[1] - offs[0];
+          if (spacing == (start_match[k] - stop_match[k])) begin
+            `INFO(("  start=%0d stop=%0d -> spacing %0d - PASSED",
+                   start_match[k], stop_match[k], spacing), ADI_VERBOSITY_NONE);
+          end else begin
+            `ERROR(("  start=%0d stop=%0d -> spacing %0d, expected %0d",
+                    start_match[k], stop_match[k], spacing,
+                    start_match[k] - stop_match[k]));
+            test_passed = 0;
+          end
+        end
+        stop_pwm();
+      end
+
+      // A match value of zero disables that pulse.
+      begin
+        int unsigned n_pulses;
+        axi_write(reg_addr(REG_TRIG_START), 32'd0);
+        axi_write(reg_addr(REG_TRIG_STOP), 32'd0);
+        program_pwm(2000, 1000);
+        count_trig_pulses(4000, n_pulses);
+        if (n_pulses == 0) begin
+          `INFO(("  match=0 disables both pulses - PASSED"), ADI_VERBOSITY_NONE);
+        end else begin
+          `ERROR(("  match=0 but %0d trig_out pulses observed", n_pulses));
+          test_passed = 0;
+        end
+        stop_pwm();
+      end
+
+      axi_write(reg_addr(REG_TRIG_OUT_CTRL), 32'd0);
+      axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'd0);
+      axi_write(reg_addr(REG_BST_DELAY), 32'd0);
+    end
+
+    // ----------------------------------------
+    // TC14: Interval monitor source selection
+    // ----------------------------------------
+    // TRIG_CONFIG picks which event reloads the reference counter:
+    //   0 = every duty-cycle period, 1 = every burst delay, 2 = once per start.
+    // The observable consequence is the trig_out pulse rate over a fixed
+    // window, so period mode should out-pulse burst mode by the burst length.
+    current_test = 14;
+    `INFO(("TC14: Interval monitor source selection"), ADI_VERBOSITY_NONE);
+
+    begin
+      int unsigned n_period_mode;
+      int unsigned n_burst_mode;
+      int unsigned n_max_mode;
+      localparam int MON_MAX  = 60;    // shorter than the PWM period
+      // This test compares pulse *rates*, so the observation window has to hold
+      // a good number of duty cycles: the period is kept below the suite's base
+      // value and the window widened to match, rather than the other way round.
+      localparam int PWM_P    = 500;
+      localparam int OBS_CYC  = 20 * PWM_P;
+      localparam int BURSTS   = 4;
+      localparam int ARM_DELAY = 1500; // see TC13: pushes start_event past the settle
+
+      stop_pwm();
+      axi_write(reg_addr(REG_BST_DELAY), ARM_DELAY);
+      axi_write(reg_addr(REG_MON_MAX_PERIOD), MON_MAX);
+      axi_write(reg_addr(REG_TRIG_START), 32'd50);
+      axi_write(reg_addr(REG_TRIG_STOP), 32'd0);      // start pulse only
+      axi_write(reg_addr(REG_RAMP_BURSTS), BURSTS);
+      axi_write(reg_addr(REG_BURST_DELAY), 2 * PWM_P);
+
+      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
+                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_PERIOD);
+      program_pwm(PWM_P, PWM_P / 2);
+      count_trig_pulses(OBS_CYC, n_period_mode);
+      stop_pwm();
+
+      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
+                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_BURST_DLY);
+      program_pwm(PWM_P, PWM_P / 2);
+      count_trig_pulses(OBS_CYC, n_burst_mode);
+      stop_pwm();
+
+      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
+                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_MAX_PERIOD);
+      program_pwm(PWM_P, PWM_P / 2);
+      count_trig_pulses(OBS_CYC, n_max_mode);
+      stop_pwm();
+
+      `INFO(("  pulses over %0d sync_clk cycles: period=%0d burst=%0d max_period=%0d",
+             OBS_CYC, n_period_mode, n_burst_mode, n_max_mode), ADI_VERBOSITY_NONE);
+
+      // Max-period mode arms once per start event rather than per period, so
+      // the pulse count must stay far below the number of duty cycles in the
+      // window (OBS_CYC/PWM_P). It is not pinned to exactly one because
+      // clearing toggle_en also raises reset_overwrite, which re-arms
+      // wait_for_start and can yield a second start event.
+      if (n_max_mode < 1 || n_max_mode > 3) begin
+        `ERROR(("  max-period mode produced %0d pulses, expected 1-3 (window holds %0d periods)",
+                n_max_mode, OBS_CYC / PWM_P));
+        test_passed = 0;
+      end
+
+      // Period mode should fire once per duty cycle; burst mode once per burst.
+      // If either reports zero, the reference counter is not counting: in these
+      // two modes end_period_d also clears trig_ref_cnt and raises
+      // stop_trig_ref_cnt (axi_ad9910.v:465-470), which prevents run_trig_ref_cnt
+      // from latching (axi_ad9910.v:454-462), so the counter only ever holds
+      // MONITOR_MAX_PERIOD or 0 and never reaches an intermediate match value.
+      if (n_period_mode == 0) begin
+        `ERROR(("  period mode produced no trig_out pulses - reference counter never reaches the match value (see axi_ad9910.v:454-470)"));
+        test_passed = 0;
+      end else if (n_burst_mode == 0) begin
+        `ERROR(("  burst-delay mode produced no trig_out pulses - reference counter never reaches the match value (see axi_ad9910.v:454-470)"));
+        test_passed = 0;
+      end else if (n_period_mode <= n_burst_mode) begin
+        `ERROR(("  period mode (%0d) should out-pulse burst mode (%0d)",
+                n_period_mode, n_burst_mode));
+        test_passed = 0;
+      end else begin
+        `INFO(("  Monitor source selection - PASSED"), ADI_VERBOSITY_NONE);
+      end
+
+      axi_write(reg_addr(REG_TRIG_OUT_CTRL), 32'd0);
+      axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'd0);
+      axi_write(reg_addr(REG_TRIG_START), 32'd0);
+      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
+      axi_write(reg_addr(REG_BURST_DELAY), 32'd0);
+    end
+
+    // ----------------------------------------
+    // TC15: IRQ mask, table and write-1-to-clear
+    // ----------------------------------------
+    current_test = 15;
+    `INFO(("TC15: IRQ mask / table / W1C"), ADI_VERBOSITY_NONE);
+
+    begin
+      stop_pwm();
+      axi_write(reg_addr(REG_IRQ_MASK), 32'd0);
+      // The clear reaches the sync domain through the control CDC and
+      // up_irq_clear stays asserted until that transfer completes, so give it
+      // time to land before generating the event it must not swallow.
+      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
+      #CFG_SETTLE_NS;
+
+      // ram_swp_ovr is a plain input, the simplest source to drive.
+      ram_swp_ovr_tp = 1'b1;
+      repeat (50) @(posedge sync_clk_tp);
+      ram_swp_ovr_tp = 1'b0;
+      #CFG_SETTLE_NS;
+
+      if (ad9910_irq_tp === 1'b0) begin
+        `INFO(("  IRQ_MASK=0 keeps irq low with an active source - PASSED"),
+              ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  IRQ_MASK=0 but irq=%b", ad9910_irq_tp));
+        test_passed = 0;
+      end
+
+      axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+      if (read_data[IRQ_RAM_SWP_OVR]) begin
+        `INFO(("  IRQ_TABLE latched ram_swp_ovr (0x%02x) - PASSED", read_data),
+              ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  IRQ_TABLE=0x%02x, ram_swp_ovr bit not latched", read_data));
+        test_passed = 0;
+      end
+
+      // Unmasking an already-latched source must drive irq.
+      axi_write(reg_addr(REG_IRQ_MASK), 32'h1 << IRQ_RAM_SWP_OVR);
+      #CFG_SETTLE_NS;
+      if (ad9910_irq_tp === 1'b1) begin
+        `INFO(("  Unmasking a latched source asserts irq - PASSED"), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Source latched and unmasked but irq=%b", ad9910_irq_tp));
+        test_passed = 0;
+      end
+
+      // W1C clears the latch. The source is no longer asserting, so the bit
+      // must stay clear - a still-active level source would immediately
+      // re-latch.
+      axi_write(reg_addr(REG_IRQ_TABLE), 32'h1 << IRQ_RAM_SWP_OVR);
+      #CFG_SETTLE_NS;
+      axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+      if (!read_data[IRQ_RAM_SWP_OVR] && ad9910_irq_tp === 1'b0) begin
+        `INFO(("  W1C cleared the latch and deasserted irq - PASSED"), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  After W1C: IRQ_TABLE=0x%02x irq=%b", read_data, ad9910_irq_tp));
+        test_passed = 0;
+      end
+
+      // bursts_complete reaches the table through the ramp machinery.
+      axi_write(reg_addr(REG_IRQ_MASK), 32'h1 << IRQ_BURSTS);
+      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
+      #CFG_SETTLE_NS;
+      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd2);
+      axi_write(reg_addr(REG_BURST_DELAY), 2 * PWM_PERIOD);
+      program_pwm(PWM_PERIOD, PWM_WIDTH);
+
+      // White-box cross-check alongside the black-box register read, so a
+      // failure says which half broke: the pulse never being generated, or the
+      // pulse being generated but not latched into IRQ_TABLE.
+      begin
+        automatic int unsigned bc_pulses = 0;
+        automatic int unsigned ep_pulses = 0;
+        automatic int unsigned teb_pulses = 0;
+        automatic int unsigned drctl_rises = 0;
+        automatic bit          drctl_was = drctl_tp;
+        // Ten periods plus the five burst delays between them, with margin.
+        automatic int unsigned guard = 60000;
+
+        // Count duty cycles rather than raw sync_clk cycles: with a burst delay
+        // in play the wall-clock length of a burst depends on three registers
+        // at once, so a fixed window can easily contain no burst boundary at
+        // all. Ten rising edges guarantee five completions at RAMP_BURSTS=2.
+        while (drctl_rises < 10 && guard > 0) begin
+          @(posedge sync_clk_tp);
+          guard--;
+          if (drctl_tp && !drctl_was) drctl_rises++;
+          drctl_was = drctl_tp;
+          if (system_tb.test_harness.axi_ad9910.inst.end_period)         ep_pulses++;
+          if (system_tb.test_harness.axi_ad9910.inst.terminal_end_burst) teb_pulses++;
+          if (system_tb.test_harness.axi_ad9910.inst.bursts_complete)    bc_pulses++;
+        end
+        axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+        // end_period should track drctl_rises one-for-one. If drctl moves
+        // while end_period stays zero, the hierarchical probe is at fault
+        // rather than the DUT.
+        `INFO(("  over %0d duty cycles: end_period=%0d terminal_end_burst=%0d bursts_complete=%0d, IRQ_TABLE=0x%02x",
+               drctl_rises, ep_pulses, teb_pulses, bc_pulses, read_data), ADI_VERBOSITY_LOW);
+
+        if (read_data[IRQ_BURSTS]) begin
+          `INFO(("  bursts_complete latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_NONE);
+        end else if (bc_pulses == 0) begin
+          `ERROR(("  no bursts_complete pulse generated with RAMP_BURSTS=2 (IRQ_TABLE=0x%02x)",
+                  read_data));
+          test_passed = 0;
+        end else begin
+          `ERROR(("  %0d bursts_complete pulses occurred but IRQ_TABLE=0x%02x did not latch bit %0d",
+                  bc_pulses, read_data, IRQ_BURSTS));
+          test_passed = 0;
+        end
+      end
+      stop_pwm();
+
+      // drover is driven by the ramp model and reaches irq_int[2]. Order matters
+      // here: get the ramp running first and only then clear IRQ_TABLE, so that
+      // whatever enabling the model or restarting the PWM latched is wiped and
+      // the bit can only come back from a retrace inside the window below. The
+      // check would otherwise be satisfied by the setup itself rather than by
+      // the ramp - the model asserts drover the moment it is enabled, since it
+      // starts sitting on the lower limit.
+      axi_write(reg_addr(REG_IRQ_MASK), 32'h1 << IRQ_DROVER);
+      program_pwm(PWM_PERIOD, PWM_PERIOD / 2);
+      repeat (PWM_PERIOD) @(posedge sync_clk_tp);
+      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
+      repeat (3 * PWM_PERIOD) @(posedge sync_clk_tp);
+      axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+      if (read_data[IRQ_DROVER]) begin
+        `INFO(("  drover latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  IRQ_TABLE=0x%02x, drover bit not latched", read_data));
+        test_passed = 0;
+      end
+
+      stop_pwm();
+      axi_write(reg_addr(REG_IRQ_MASK), 32'd0);
+      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
+      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
+      axi_write(reg_addr(REG_BURST_DELAY), 32'd0);
+    end
+
+    // ----------------------------------------
+    // TC16: Clock monitors
+    // ----------------------------------------
+    // Deliberately last. up_clock_mon captures a count once per free-running
+    // 16-bit up_clk window (65536 cycles, ~655 us at 100 MHz), so this is the
+    // earliest point in the suite where a reading is available.
+    current_test = 16;
+    `INFO(("TC16: Clock monitors"), ADI_VERBOSITY_NONE);
+
+    begin
+      bit [31:0] sync_cnt;
+      bit [31:0] pd_cnt;
+
+      while ($time < 800us) #10us;
+
+      axi_read(reg_addr(REG_SYNC_CLK_CNT), sync_cnt);
+      axi_read(reg_addr(REG_PD_CLK_CNT), pd_cnt);
+      `INFO(("  SYNC_CLK_CNT=%0d  PD_CLK_COUNT=%0d (both clocks are 250 MHz)",
+             sync_cnt, pd_cnt), ADI_VERBOSITY_LOW);
+
+      if (sync_cnt != 32'd0 && pd_cnt != 32'd0) begin
+        `INFO(("  Both clock monitors report a live clock - PASSED"), ADI_VERBOSITY_NONE);
+      end else begin
+        `ERROR(("  Clock monitor read zero: SYNC_CLK_CNT=%0d PD_CLK_COUNT=%0d",
+                sync_cnt, pd_cnt));
+        test_passed = 0;
+      end
     end
 
     // ----------------------------------------

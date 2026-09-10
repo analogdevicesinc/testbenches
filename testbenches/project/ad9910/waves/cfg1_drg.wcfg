@@ -5,6 +5,7 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
+            <top_module name="adi_api_pkg" />
             <top_module name="adi_axi_agent_pkg" />
             <top_module name="adi_axi_monitor_pkg" />
             <top_module name="adi_common_pkg" />
@@ -13,7 +14,9 @@
             <top_module name="attributes" />
             <top_module name="axi_vip_pkg" />
             <top_module name="glbl" />
+            <top_module name="io_vip_if_base_pkg" />
             <top_module name="ipif_pkg" />
+            <top_module name="irq_handler_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
             <top_module name="math_real" />
@@ -30,6 +33,7 @@
             <top_module name="test_harness_env_pkg" />
             <top_module name="textio" />
             <top_module name="vcomponents" />
+            <top_module name="vip_agent_typedef_pkg" />
             <top_module name="vital_primitives" />
             <top_module name="vital_timing" />
             <top_module name="vpkg" />
@@ -38,12 +42,439 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <zoom_setting>
-      <ZoomStartTime time="0 ps"></ZoomStartTime>
-      <ZoomEndTime time="1 ps"></ZoomEndTime>
-      <Cursor1Time time="0 ps"></Cursor1Time>
-   </zoom_setting>
    <column_width_setting>
+      <NameColumnWidth column_width="220"></NameColumnWidth>
+      <ValueColumnWidth column_width="86"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="0" />
+   <WVObjectSize size="10" />
+   <wvobject type="array" fp_name="/system_tb/test/current_test">
+      <obj_property name="ElementShortName">current_test[31:0]</obj_property>
+      <obj_property name="ObjectShortName">current_test[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_clocks">
+      <obj_property name="label">Clocks &amp; Reset</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/sync_clk_tb">
+         <obj_property name="ElementShortName">sync_clk_tb</obj_property>
+         <obj_property name="ObjectShortName">sync_clk_tb</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/pd_clk_tb">
+         <obj_property name="ElementShortName">pd_clk_tb</obj_property>
+         <obj_property name="ObjectShortName">pd_clk_tb</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/reset_sync_cd">
+         <obj_property name="ElementShortName">reset_sync_cd</obj_property>
+         <obj_property name="ObjectShortName">reset_sync_cd</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/reset_overwrite">
+         <obj_property name="ElementShortName">reset_overwrite</obj_property>
+         <obj_property name="ObjectShortName">reset_overwrite</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/auto_ramp_mode_update">
+         <obj_property name="ElementShortName">auto_ramp_mode_update</obj_property>
+         <obj_property name="ObjectShortName">auto_ramp_mode_update</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_pins">
+      <obj_property name="label">DUT Pins</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/drctl_tb">
+         <obj_property name="ElementShortName">drctl_tb</obj_property>
+         <obj_property name="ObjectShortName">drctl_tb</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/drover_tb">
+         <obj_property name="ElementShortName">drover_tb</obj_property>
+         <obj_property name="ObjectShortName">drover_tb</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/drhold_tb">
+         <obj_property name="ElementShortName">drhold_tb</obj_property>
+         <obj_property name="ObjectShortName">drhold_tb</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/profile_tb">
+         <obj_property name="ElementShortName">profile_tb[2:0]</obj_property>
+         <obj_property name="ObjectShortName">profile_tb[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/ad9910_irq_tb">
+         <obj_property name="ElementShortName">ad9910_irq_tb</obj_property>
+         <obj_property name="ObjectShortName">ad9910_irq_tb</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/trig_out_tb">
+         <obj_property name="ElementShortName">trig_out_tb</obj_property>
+         <obj_property name="ObjectShortName">trig_out_tb</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/ext_sync_tb">
+         <obj_property name="ElementShortName">ext_sync_tb</obj_property>
+         <obj_property name="ObjectShortName">ext_sync_tb</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_pwm">
+      <obj_property name="label">PWM Core (drctl duty cycle)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_init">
+         <obj_property name="ElementShortName">drctl_init</obj_property>
+         <obj_property name="ObjectShortName">drctl_init</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/ramp_period_cnt">
+         <obj_property name="ElementShortName">ramp_period_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ramp_period_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/ramp_period_active">
+         <obj_property name="ElementShortName">ramp_period_active</obj_property>
+         <obj_property name="ObjectShortName">ramp_period_active</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_width_cnt">
+         <obj_property name="ElementShortName">drctl_width_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">drctl_width_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_width_active">
+         <obj_property name="ElementShortName">drctl_width_active</obj_property>
+         <obj_property name="ObjectShortName">drctl_width_active</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_width_last">
+         <obj_property name="ElementShortName">drctl_width_last</obj_property>
+         <obj_property name="ObjectShortName">drctl_width_last</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/start_drctl_period">
+         <obj_property name="ElementShortName">start_drctl_period</obj_property>
+         <obj_property name="ObjectShortName">start_drctl_period</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_period_restart">
+         <obj_property name="ElementShortName">drctl_period_restart</obj_property>
+         <obj_property name="ObjectShortName">drctl_period_restart</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/terminal_lookahead">
+         <obj_property name="ElementShortName">terminal_lookahead</obj_property>
+         <obj_property name="ObjectShortName">terminal_lookahead</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/period_done_pending">
+         <obj_property name="ElementShortName">period_done_pending</obj_property>
+         <obj_property name="ObjectShortName">period_done_pending</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/reload_period_pending">
+         <obj_property name="ElementShortName">reload_period_pending</obj_property>
+         <obj_property name="ObjectShortName">reload_period_pending</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/end_period">
+         <obj_property name="ElementShortName">end_period</obj_property>
+         <obj_property name="ObjectShortName">end_period</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_cfg">
+      <obj_property name="label">Active Config (post-CDC / latched)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_toggle_en_s">
+         <obj_property name="ElementShortName">drctl_toggle_en_s</obj_property>
+         <obj_property name="ObjectShortName">drctl_toggle_en_s</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_init_s">
+         <obj_property name="ElementShortName">drctl_init_s</obj_property>
+         <obj_property name="ObjectShortName">drctl_init_s</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_period_s">
+         <obj_property name="ElementShortName">drctl_period_s[31:0]</obj_property>
+         <obj_property name="ObjectShortName">drctl_period_s[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl_width_s">
+         <obj_property name="ElementShortName">drctl_width_s[31:0]</obj_property>
+         <obj_property name="ObjectShortName">drctl_width_s[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/active_drctl_period_n1">
+         <obj_property name="ElementShortName">active_drctl_period_n1[31:0]</obj_property>
+         <obj_property name="ObjectShortName">active_drctl_period_n1[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/active_drctl_width_n1">
+         <obj_property name="ElementShortName">active_drctl_width_n1[31:0]</obj_property>
+         <obj_property name="ObjectShortName">active_drctl_width_n1[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/active_drctl_period_one">
+         <obj_property name="ElementShortName">active_drctl_period_one</obj_property>
+         <obj_property name="ObjectShortName">active_drctl_period_one</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/active_drctl_width_nonzero">
+         <obj_property name="ElementShortName">active_drctl_width_nonzero</obj_property>
+         <obj_property name="ObjectShortName">active_drctl_width_nonzero</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/active_drctl_width_gt_one">
+         <obj_property name="ElementShortName">active_drctl_width_gt_one</obj_property>
+         <obj_property name="ObjectShortName">active_drctl_width_gt_one</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_burst">
+      <obj_property name="label">Start Delay / Bursts / Stop</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/wait_for_start">
+         <obj_property name="ElementShortName">wait_for_start</obj_property>
+         <obj_property name="ObjectShortName">wait_for_start</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/wait_for_start_cnt">
+         <obj_property name="ElementShortName">wait_for_start_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">wait_for_start_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/start_event">
+         <obj_property name="ElementShortName">start_event</obj_property>
+         <obj_property name="ObjectShortName">start_event</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/toggle_run_ready">
+         <obj_property name="ElementShortName">toggle_run_ready</obj_property>
+         <obj_property name="ObjectShortName">toggle_run_ready</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/n_periods_cnt">
+         <obj_property name="ElementShortName">n_periods_cnt[19:0]</obj_property>
+         <obj_property name="ObjectShortName">n_periods_cnt[19:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/n_periods_last">
+         <obj_property name="ElementShortName">n_periods_last</obj_property>
+         <obj_property name="ObjectShortName">n_periods_last</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/terminal_end_burst">
+         <obj_property name="ElementShortName">terminal_end_burst</obj_property>
+         <obj_property name="ObjectShortName">terminal_end_burst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/end_burst_phase">
+         <obj_property name="ElementShortName">end_burst_phase</obj_property>
+         <obj_property name="ObjectShortName">end_burst_phase</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/bursts_complete">
+         <obj_property name="ElementShortName">bursts_complete</obj_property>
+         <obj_property name="ObjectShortName">bursts_complete</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/start_burst_delay_period">
+         <obj_property name="ElementShortName">start_burst_delay_period</obj_property>
+         <obj_property name="ObjectShortName">start_burst_delay_period</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/burst_delay">
+         <obj_property name="ElementShortName">burst_delay</obj_property>
+         <obj_property name="ObjectShortName">burst_delay</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/burst_delay_cnt">
+         <obj_property name="ElementShortName">burst_delay_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">burst_delay_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/burst_delay_active">
+         <obj_property name="ElementShortName">burst_delay_active</obj_property>
+         <obj_property name="ObjectShortName">burst_delay_active</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/terminal_stop">
+         <obj_property name="ElementShortName">terminal_stop</obj_property>
+         <obj_property name="ObjectShortName">terminal_stop</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/stop_event">
+         <obj_property name="ElementShortName">stop_event</obj_property>
+         <obj_property name="ObjectShortName">stop_event</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/ramp_bursts_val">
+         <obj_property name="ElementShortName">ramp_bursts_val[19:0]</obj_property>
+         <obj_property name="ObjectShortName">ramp_bursts_val[19:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/burst_delay_val">
+         <obj_property name="ElementShortName">burst_delay_val[31:0]</obj_property>
+         <obj_property name="ObjectShortName">burst_delay_val[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_monitor">
+      <obj_property name="label">Interval Monitor (IRQ / trig_out)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/monitor_period">
+         <obj_property name="ElementShortName">monitor_period</obj_property>
+         <obj_property name="ObjectShortName">monitor_period</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/monitor_burst_delay">
+         <obj_property name="ElementShortName">monitor_burst_delay</obj_property>
+         <obj_property name="ObjectShortName">monitor_burst_delay</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/monitor_max_period">
+         <obj_property name="ElementShortName">monitor_max_period</obj_property>
+         <obj_property name="ObjectShortName">monitor_max_period</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/ref_cnt">
+         <obj_property name="ElementShortName">ref_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ref_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/run_ref_cnt">
+         <obj_property name="ElementShortName">run_ref_cnt</obj_property>
+         <obj_property name="ObjectShortName">run_ref_cnt</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/stop_ref_cnt">
+         <obj_property name="ElementShortName">stop_ref_cnt</obj_property>
+         <obj_property name="ObjectShortName">stop_ref_cnt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/irq_start_match">
+         <obj_property name="ElementShortName">irq_start_match[31:0]</obj_property>
+         <obj_property name="ObjectShortName">irq_start_match[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/irq_stop_match">
+         <obj_property name="ElementShortName">irq_stop_match[31:0]</obj_property>
+         <obj_property name="ObjectShortName">irq_stop_match[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/irq_interval_start">
+         <obj_property name="ElementShortName">irq_interval_start</obj_property>
+         <obj_property name="ObjectShortName">irq_interval_start</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/irq_interval_stop">
+         <obj_property name="ElementShortName">irq_interval_stop</obj_property>
+         <obj_property name="ObjectShortName">irq_interval_stop</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/trig_ref_cnt">
+         <obj_property name="ElementShortName">trig_ref_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">trig_ref_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/run_trig_ref_cnt">
+         <obj_property name="ElementShortName">run_trig_ref_cnt</obj_property>
+         <obj_property name="ObjectShortName">run_trig_ref_cnt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/trig_out_start_match">
+         <obj_property name="ElementShortName">trig_out_start_match[31:0]</obj_property>
+         <obj_property name="ObjectShortName">trig_out_start_match[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/trig_out_stop_match">
+         <obj_property name="ElementShortName">trig_out_stop_match[31:0]</obj_property>
+         <obj_property name="ObjectShortName">trig_out_stop_match[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/trig_out_interval_start">
+         <obj_property name="ElementShortName">trig_out_interval_start</obj_property>
+         <obj_property name="ObjectShortName">trig_out_interval_start</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/trig_out_interval_stop">
+         <obj_property name="ElementShortName">trig_out_interval_stop</obj_property>
+         <obj_property name="ObjectShortName">trig_out_interval_stop</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/irq_int">
+         <obj_property name="ElementShortName">irq_int[5:0]</obj_property>
+         <obj_property name="ObjectShortName">irq_int[5:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/trig_out_int">
+         <obj_property name="ElementShortName">trig_out_int[5:0]</obj_property>
+         <obj_property name="ObjectShortName">trig_out_int[5:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_regmap">
+      <obj_property name="label">Register Map (up_clk)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_drctl_toggle_en">
+         <obj_property name="ElementShortName">up_drctl_toggle_en</obj_property>
+         <obj_property name="ObjectShortName">up_drctl_toggle_en</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_drctl_init">
+         <obj_property name="ElementShortName">up_drctl_init</obj_property>
+         <obj_property name="ObjectShortName">up_drctl_init</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_drhold">
+         <obj_property name="ElementShortName">up_drhold</obj_property>
+         <obj_property name="ObjectShortName">up_drhold</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_profile">
+         <obj_property name="ElementShortName">up_profile[2:0]</obj_property>
+         <obj_property name="ObjectShortName">up_profile[2:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_drctl_period">
+         <obj_property name="ElementShortName">up_drctl_period[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_drctl_period[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_drctl_width">
+         <obj_property name="ElementShortName">up_drctl_width[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_drctl_width[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_delay_bst_ramp_delay">
+         <obj_property name="ElementShortName">up_delay_bst_ramp_delay[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_delay_bst_ramp_delay[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_ramp_bursts">
+         <obj_property name="ElementShortName">up_ramp_bursts[19:0]</obj_property>
+         <obj_property name="ObjectShortName">up_ramp_bursts[19:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_burst_delay">
+         <obj_property name="ElementShortName">up_burst_delay[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_burst_delay[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_ramp_config">
+         <obj_property name="ElementShortName">up_ramp_config[1:0]</obj_property>
+         <obj_property name="ObjectShortName">up_ramp_config[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_monitor_max_period">
+         <obj_property name="ElementShortName">up_monitor_max_period[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_monitor_max_period[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_irq_mask">
+         <obj_property name="ElementShortName">up_irq_mask[5:0]</obj_property>
+         <obj_property name="ObjectShortName">up_irq_mask[5:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_irq_start_interval">
+         <obj_property name="ElementShortName">up_irq_start_interval[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_irq_start_interval[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_irq_stop_interval">
+         <obj_property name="ElementShortName">up_irq_stop_interval[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_irq_stop_interval[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_trig_start_interval">
+         <obj_property name="ElementShortName">up_trig_start_interval[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_trig_start_interval[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_axi_ad9910_regmap/up_trig_stop_interval">
+         <obj_property name="ElementShortName">up_trig_stop_interval[31:0]</obj_property>
+         <obj_property name="ObjectShortName">up_trig_stop_interval[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_model">
+      <obj_property name="label">AD9910 Ramp Model (TB)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test/drg_model_enabled">
+         <obj_property name="ElementShortName">drg_model_enabled</obj_property>
+         <obj_property name="ObjectShortName">drg_model_enabled</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test/drg_shape">
+         <obj_property name="ElementShortName">drg_shape[31:0]</obj_property>
+         <obj_property name="ObjectShortName">drg_shape[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test/drg_counter">
+         <obj_property name="ElementShortName">drg_counter[17:0]</obj_property>
+         <obj_property name="ObjectShortName">drg_counter[17:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+         <obj_property name="CellHeight">100</obj_property>
+         <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_FIXED</obj_property>
+         <obj_property name="AnalogYRangeMin">900.000000</obj_property>
+         <obj_property name="AnalogYRRangeMax">5100.000000</obj_property>
+         <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>
+         <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+         <obj_property name="AnalogHorizLine">0.000000</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/test/check_ramp_completion">
+         <obj_property name="ElementShortName">check_ramp_completion</obj_property>
+         <obj_property name="ObjectShortName">check_ramp_completion</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test/drover_rise_count">
+         <obj_property name="ElementShortName">drover_rise_count[31:0]</obj_property>
+         <obj_property name="ObjectShortName">drover_rise_count[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test/ramp_truncation_count">
+         <obj_property name="ElementShortName">ramp_truncation_count[31:0]</obj_property>
+         <obj_property name="ObjectShortName">ramp_truncation_count[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/test/drg_retrace_count">
+         <obj_property name="ElementShortName">drg_retrace_count[31:0]</obj_property>
+         <obj_property name="ObjectShortName">drg_retrace_count[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="grp_parif">
+      <obj_property name="label">Parallel Output (unused in DRG)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/system_tb/f_o_tb">
+         <obj_property name="ElementShortName">f_o_tb[1:0]</obj_property>
+         <obj_property name="ObjectShortName">f_o_tb[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/system_tb/db_o_tb">
+         <obj_property name="ElementShortName">db_o_tb[15:0]</obj_property>
+         <obj_property name="ObjectShortName">db_o_tb[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/system_tb/tx_enable_tb">
+         <obj_property name="ElementShortName">tx_enable_tb</obj_property>
+         <obj_property name="ObjectShortName">tx_enable_tb</obj_property>
+      </wvobject>
+   </wvobject>
 </wave_config>

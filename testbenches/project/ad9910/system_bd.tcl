@@ -45,9 +45,12 @@ global ad_project_params
 # async FIFO handles CDC between DMA and pd_clk domains.
 # ---------------------------------------------------------------
 
-# Create axi_ad9910 instance
+# Create axi_ad9910 instance.
+# MEASURE_CLKS_EN generates the sync_clk/pd_clk monitors behind SYNC_CLK_CNT
+# (0x20) and PD_CLK_COUNT (0x40); without it those registers read zero.
 ad_ip_instance axi_ad9910 axi_ad9910 [list \
   IODELAY_ENABLE 0 \
+  MEASURE_CLKS_EN 1 \
 ]
 
 # Pass-through clock VIPs for pd_clk and sync_clk
@@ -79,46 +82,36 @@ ad_connect pd_clk_vip/clk_out axi_ad9910/pd_clk_in
 ad_cpu_interconnect 0x44A00000 axi_ad9910
 
 # Create external ports for device control
-create_bd_port -dir O ad9910_main_reset
-create_bd_port -dir O ad9910_io_reset
-create_bd_port -dir O pw_down
 create_bd_port -dir I ext_sync
 create_bd_port -dir O ad9910_irq
 create_bd_port -dir O trig_out
 
 # Create external ports for DDS ramp control interface
-create_bd_port -dir O osk
 create_bd_port -dir O drctl
 create_bd_port -dir O drhold
 create_bd_port -dir I drover
-create_bd_port -dir I sync_smp_err
 create_bd_port -dir I ram_swp_ovr
 create_bd_port -dir O -from 2 -to 0 profile
-create_bd_port -dir O io_update
 
 # Create external ports for parallel data interface
-create_bd_port -dir O -from 17 -to 0 db_o
+create_bd_port -dir O -from 1 -to 0 f_o
+create_bd_port -dir O -from 15 -to 0 db_o
 create_bd_port -dir O tx_enable
 
 # Connect device control signals
-ad_connect axi_ad9910/main_reset ad9910_main_reset
-ad_connect axi_ad9910/io_reset ad9910_io_reset
-ad_connect axi_ad9910/pw_down pw_down
 ad_connect axi_ad9910/ext_sync ext_sync
 ad_connect axi_ad9910/irq ad9910_irq
 ad_connect axi_ad9910/trig_out trig_out
 
 # Connect ramp control signals
-ad_connect axi_ad9910/osk osk
 ad_connect axi_ad9910/drctl drctl
 ad_connect axi_ad9910/drhold drhold
 ad_connect axi_ad9910/drover drover
-ad_connect axi_ad9910/sync_smp_err sync_smp_err
 ad_connect axi_ad9910/ram_swp_ovr ram_swp_ovr
 ad_connect axi_ad9910/profile profile
-ad_connect axi_ad9910/io_update io_update
 
 # Connect parallel data interface
+ad_connect axi_ad9910/f_o f_o
 ad_connect axi_ad9910/db_o db_o
 ad_connect axi_ad9910/tx_enable tx_enable
 

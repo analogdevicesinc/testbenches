@@ -136,7 +136,33 @@ program test_program_drg (
 
   bit [31:0] read_data;
   bit        test_passed = 1;
+
+  // K4: the simulation randomization state is reported at the very start, so a
+  // failing run can be reproduced exactly. This and the done messages are the
+  // only ADI_VERBOSITY_NONE messages here - everything else is LOW and so is
+  // silent at the NONE threshold (coding_guidelines F5).
+  process current_process;
+  string  current_process_random_state;
   int        current_test = 0;   // waveform navigation aid
+
+  // Which test cases failed, named in the final summary. The per-TC banners are
+  // ADI_VERBOSITY_LOW and so invisible at the NONE threshold
+  // (coding_guidelines F5), which would otherwise leave a CI log holding an
+  // error message with no indication of which test case produced it. Test cases
+  // run sequentially, so remembering the last one that failed is enough to
+  // de-duplicate repeated failures within one test case.
+  string     failed_tests   = "";
+  int        last_failed_tc = 0;
+
+  // Mark the run failed and remember the test case, for the final summary.
+  task automatic record_failure();
+    test_passed = 1'b0;
+    if (current_test != last_failed_tc) begin
+      failed_tests = {failed_tests, (failed_tests == "") ? "" : ", ",
+                      $sformatf("TC%0d", current_test)};
+      last_failed_tc = current_test;
+    end
+  endtask
 
   // --------------------------
   // AD9910 digital ramp model
@@ -241,7 +267,7 @@ program test_program_drg (
         drg_drctl_prev = drctl_tp;
       end
     end
-  end
+  end : drg_model
 
   // check_completion is only meaningful with DRG_DWELL - see the checker in the
   // model loop.
@@ -324,7 +350,7 @@ program test_program_drg (
 
     if (got < n_periods) begin
       `ERROR(("measure_drctl_waveform: timeout - got %0d of %0d periods", got, n_periods));
-      test_passed = 0;
+      record_failure();
     end
   endtask
 
@@ -355,10 +381,10 @@ program test_program_drg (
     end
     if (ok) begin
       `INFO(("  %s: drctl held %0b for %0d sync_clk cycles - PASSED", label, level, window_cyc),
-            ADI_VERBOSITY_NONE);
+            ADI_VERBOSITY_LOW);
     end else begin
       `ERROR(("  %s: drctl did not hold %0b for %0d sync_clk cycles", label, level, window_cyc));
-      test_passed = 0;
+      record_failure();
     end
   endtask
 
@@ -498,25 +524,25 @@ program test_program_drg (
     if (!all_equal(high_c, PWM_WIDTH)) begin
       `ERROR(("  BURST_DELAY=%0d disturbed the high time: %s (expected %0d)",
               burst_delay, fmt_array(high_c), PWM_WIDTH));
-      test_passed = 0;
+      record_failure();
     end
 
     if (short_gap != PWM_PERIOD) begin
       `ERROR(("  BURST_DELAY=%0d: intra-burst gap=%0d, expected %0d",
               burst_delay, short_gap, PWM_PERIOD));
-      test_passed = 0;
+      record_failure();
     end else if (n_long != 3) begin
       `ERROR(("  BURST_DELAY=%0d: expected 3 burst boundaries in %0d gaps, found %0d",
               burst_delay, n_gaps, n_long));
-      test_passed = 0;
+      record_failure();
     end else if (overhead > 16) begin
       `ERROR(("  BURST_DELAY=%0d: boundary gap=%0d, expected ~%0d (overhead %0d exceeds 16 sync_clk cycles)",
               burst_delay, long_gap, PWM_PERIOD + burst_delay, overhead));
-      test_passed = 0;
+      record_failure();
     end else begin
       `INFO(("  BURST_DELAY=%0d -> %0d short (%0d) / %0d long (%0d), overhead %0d sync_clk cycles - PASSED",
              burst_delay, n_gaps - n_long, short_gap, n_long, long_gap, overhead),
-            ADI_VERBOSITY_NONE);
+            ADI_VERBOSITY_LOW);
     end
 
     // Settle at a burst boundary so the last group shown is a whole burst, and
@@ -552,11 +578,11 @@ program test_program_drg (
 
     if (all_equal(high_c, exp_high) && all_equal(per_c, exp_period)) begin
       `INFO(("  P=%0d W=%0d -> high=%0d period=%0d - PASSED", p, w, exp_high, exp_period),
-            ADI_VERBOSITY_NONE);
+            ADI_VERBOSITY_LOW);
     end else begin
       `ERROR(("  P=%0d W=%0d: expected high=%0d period=%0d, measured high=%s period=%s",
               p, w, exp_high, exp_period, fmt_array(high_c), fmt_array(per_c)));
-      test_passed = 0;
+      record_failure();
     end
   endtask
 
@@ -614,7 +640,12 @@ program test_program_drg (
   // Main test sequence
   // --------------------------
   initial begin
-    setLoggerVerbosity(ADI_VERBOSITY_LOW);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state),
+          ADI_VERBOSITY_NONE);
 
     ext_sync_tp    = 1'b0;
     ram_swp_ovr_tp = 1'b0;
@@ -652,7 +683,7 @@ program test_program_drg (
     base_env.simulation_watchdog.update_timer(32'd3_000_000);
     base_env.simulation_watchdog.reset();
 
-    `INFO(("==== AD9910 DRG Mode Testbench (PWM ramp controller) ===="), ADI_VERBOSITY_NONE);
+    `INFO(("==== AD9910 DRG Mode Testbench (PWM ramp controller) ===="), ADI_VERBOSITY_LOW);
 
     // ----------------------------------------
     // TC1: Register sanity
@@ -663,7 +694,7 @@ program test_program_drg (
     // stale address lands on a real-but-wrong register and produces no bus error -
     // only a readback mismatch catches it.
     current_test = 1;
-    `INFO(("TC1: Register sanity"), ADI_VERBOSITY_NONE);
+    `INFO(("TC1: Register sanity"), ADI_VERBOSITY_LOW);
 
     ad9910.sanity_test();
 
@@ -700,7 +731,7 @@ program test_program_drg (
     ad9910.verify_irq_stop_interval(32'h0004_4444);
     ad9910.verify_trig_start_interval(32'h0005_5555);
     ad9910.verify_trig_stop_interval(32'h0006_6666);
-    `INFO(("  Register map readback - PASSED"), ADI_VERBOSITY_NONE);
+    `INFO(("  Register map readback - PASSED"), ADI_VERBOSITY_LOW);
 
     // Clear back to a known state before the ramp tests.
     ad9910.set_drctl_period(32'd0);
@@ -718,7 +749,7 @@ program test_program_drg (
     // TC2: Reset release and clock monitor
     // ----------------------------------------
     current_test = 2;
-    `INFO(("TC2: Reset release and clock monitor"), ADI_VERBOSITY_NONE);
+    `INFO(("TC2: Reset release and clock monitor"), ADI_VERBOSITY_LOW);
 
     ad9910.set_reset_ctrl(32'h0);
     #10us;
@@ -733,7 +764,7 @@ program test_program_drg (
       ad9910.get_sync_clk_cnt(cnt_a);
       `INFO(("  SYNC_CLK_CNT this early: 0x%08x (window not yet elapsed)", cnt_a),
             ADI_VERBOSITY_LOW);
-      `INFO(("  Reset released - PASSED"), ADI_VERBOSITY_NONE);
+      `INFO(("  Reset released - PASSED"), ADI_VERBOSITY_LOW);
     end
 
     // Run the ramp model for the whole suite, with the completion checker off.
@@ -758,31 +789,31 @@ program test_program_drg (
     // With toggle_en cleared the PWM machinery is bypassed and drctl follows
     // DRCTL_INIT straight through the CDC.
     current_test = 3;
-    `INFO(("TC3: Simple mode (toggle_en=0)"), ADI_VERBOSITY_NONE);
+    `INFO(("TC3: Simple mode (toggle_en=0)"), ADI_VERBOSITY_LOW);
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b1), .drhold(1'b0));
     #(CFG_SETTLE_NS * 1ns);
     if (drctl_tp === 1'b1) begin
-      `INFO(("  DRCTL_INIT=1 -> drctl high - PASSED"), ADI_VERBOSITY_NONE);
+      `INFO(("  DRCTL_INIT=1 -> drctl high - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
       `ERROR(("  DRCTL_INIT=1 but drctl=%b", drctl_tp));
-      test_passed = 0;
+      record_failure();
     end
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
     #(CFG_SETTLE_NS * 1ns);
     if (drctl_tp === 1'b0) begin
-      `INFO(("  DRCTL_INIT=0 -> drctl low - PASSED"), ADI_VERBOSITY_NONE);
+      `INFO(("  DRCTL_INIT=0 -> drctl low - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
       `ERROR(("  DRCTL_INIT=0 but drctl=%b", drctl_tp));
-      test_passed = 0;
+      record_failure();
     end
 
     // ----------------------------------------
     // TC4: PWM basic operation
     // ----------------------------------------
     current_test = 4;
-    `INFO(("TC4: PWM basic (P=%0d W=%0d)", PWM_PERIOD, PWM_WIDTH), ADI_VERBOSITY_NONE);
+    `INFO(("TC4: PWM basic (P=%0d W=%0d)", PWM_PERIOD, PWM_WIDTH), ADI_VERBOSITY_LOW);
 
     // The first test with a real duty cycle to ramp against, so run it in
     // sawtooth: the ramp keeps moving for as long as drctl holds a level instead
@@ -800,7 +831,7 @@ program test_program_drg (
     // TC5: Duty-cycle sweep
     // ----------------------------------------
     current_test = 5;
-    `INFO(("TC5: Duty-cycle sweep"), ADI_VERBOSITY_NONE);
+    `INFO(("TC5: Duty-cycle sweep"), ADI_VERBOSITY_LOW);
 
     // Duty sweep at the base period: from a 1-cycle sliver up to nearly the whole
     // period, so drctl is seen widening across the full 0..100% range at one
@@ -834,11 +865,11 @@ program test_program_drg (
       #(CFG_SETTLE_NS * 1ns);
       measure_drctl_waveform(4, 200, high_c, per_c);
       if (all_equal(high_c, 200) && all_equal(per_c, 800)) begin
-        `INFO(("  Live reconfigure to P=800 W=200 converged - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  Live reconfigure to P=800 W=200 converged - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Live reconfigure: high=%s period=%s (expected 200 / 800)",
                 fmt_array(high_c), fmt_array(per_c)));
-        test_passed = 0;
+        record_failure();
       end
     end
 
@@ -848,7 +879,7 @@ program test_program_drg (
     // Each case selects a different RTL branch: active_drctl_width_nonzero,
     // active_drctl_width_gt_one, and active_drctl_period_one.
     current_test = 6;
-    `INFO(("TC6: Width and period edge cases"), ADI_VERBOSITY_NONE);
+    `INFO(("TC6: Width and period edge cases"), ADI_VERBOSITY_LOW);
 
     // Each window spans three whole periods, so a duty cycle that had not been
     // suppressed would have toggled several times inside it.
@@ -869,11 +900,11 @@ program test_program_drg (
       program_pwm(1, 0);
       measure_drctl_waveform(6, 200, high_c, per_c);
       if (all_equal(high_c, 1) && all_equal(per_c, 2)) begin
-        `INFO(("  P=1 -> drctl toggles every sync_clk cycle - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  P=1 -> drctl toggles every sync_clk cycle - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  P=1: high=%s period=%s (expected 1 / 2)",
                 fmt_array(high_c), fmt_array(per_c)));
-        test_passed = 0;
+        record_failure();
       end
     end
 
@@ -886,7 +917,7 @@ program test_program_drg (
     // fixed CDC and reset_overwrite overhead, so the check compares the
     // difference between two programmed values - the overhead cancels.
     current_test = 7;
-    `INFO(("TC7: Start delay"), ADI_VERBOSITY_NONE);
+    `INFO(("TC7: Start delay"), ADI_VERBOSITY_LOW);
 
     begin
       int unsigned t_short;
@@ -919,11 +950,11 @@ program test_program_drg (
       if (delta >= (DLY_LONG - DLY_SHORT - CDC_XFER_JITTER) &&
           delta <= (DLY_LONG - DLY_SHORT + CDC_XFER_JITTER)) begin
         `INFO(("  Start delay scales correctly (delta=%0d, expected %0d +/-%0d) - PASSED",
-               delta, DLY_LONG - DLY_SHORT, CDC_XFER_JITTER), ADI_VERBOSITY_NONE);
+               delta, DLY_LONG - DLY_SHORT, CDC_XFER_JITTER), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Start delay delta=%0d, expected %0d +/-%0d",
                 delta, DLY_LONG - DLY_SHORT, CDC_XFER_JITTER));
-        test_passed = 0;
+        record_failure();
       end
 
       stop_pwm();
@@ -934,7 +965,7 @@ program test_program_drg (
     // TC8: Burst grouping and burst delay
     // ----------------------------------------
     current_test = 8;
-    `INFO(("TC8: Burst grouping"), ADI_VERBOSITY_NONE);
+    `INFO(("TC8: Burst grouping"), ADI_VERBOSITY_LOW);
 
     begin
       localparam int BURSTS = 2;
@@ -966,11 +997,11 @@ program test_program_drg (
 
       if (overhead_constant) begin
         `INFO(("  Boundary overhead constant at %0d sync_clk cycles across delays %s - PASSED",
-               overheads[0], fmt_array(burst_delays)), ADI_VERBOSITY_NONE);
+               overheads[0], fmt_array(burst_delays)), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Boundary overhead varies with the programmed delay: delays=%s overheads=%s",
                 fmt_array(burst_delays), fmt_array(overheads)));
-        test_passed = 0;
+        record_failure();
       end
 
       stop_pwm();
@@ -982,7 +1013,7 @@ program test_program_drg (
     // TC9: Stop modes (RAMP_CFG)
     // ----------------------------------------
     current_test = 9;
-    `INFO(("TC9: Stop modes"), ADI_VERBOSITY_NONE);
+    `INFO(("TC9: Stop modes"), ADI_VERBOSITY_LOW);
 
     // Period stop: exactly one duty cycle, then drctl parks low.
     begin
@@ -1001,10 +1032,10 @@ program test_program_drg (
       wait_drctl_level(1'b1, 20000, cyc);
       if (cyc < 20000) begin
         `INFO(("  Free-run restart after period stop (%0d sync_clk cycles) - PASSED", cyc),
-              ADI_VERBOSITY_NONE);
+              ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Ramp did not restart after clearing RAMP_CFG"));
-        test_passed = 0;
+        record_failure();
       end
     end
 
@@ -1025,11 +1056,11 @@ program test_program_drg (
       ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
       measure_drctl_waveform(4, 200, high_c, per_c);
       if (all_equal(per_c, PWM_PERIOD)) begin
-        `INFO(("  Free-run restart after burst stop - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  Free-run restart after burst stop - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  After burst-stop restart: period=%s (expected %0d)",
                 fmt_array(per_c), PWM_PERIOD));
-        test_passed = 0;
+        record_failure();
       end
 
       stop_pwm();
@@ -1044,42 +1075,42 @@ program test_program_drg (
     // gates nothing inside the DUT. The black-box property is that the pin
     // tracks the register.
     current_test = 10;
-    `INFO(("TC10: DRHOLD passthrough"), ADI_VERBOSITY_NONE);
+    `INFO(("TC10: DRHOLD passthrough"), ADI_VERBOSITY_LOW);
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b1));
     #(CFG_SETTLE_NS * 1ns);
     if (drhold_tp === 1'b1) begin
-      `INFO(("  DRHOLD=1 -> drhold pin high - PASSED"), ADI_VERBOSITY_NONE);
+      `INFO(("  DRHOLD=1 -> drhold pin high - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
       `ERROR(("  DRHOLD=1 but drhold pin=%b", drhold_tp));
-      test_passed = 0;
+      record_failure();
     end
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
     #(CFG_SETTLE_NS * 1ns);
     if (drhold_tp === 1'b0) begin
-      `INFO(("  DRHOLD=0 -> drhold pin low - PASSED"), ADI_VERBOSITY_NONE);
+      `INFO(("  DRHOLD=0 -> drhold pin low - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
       `ERROR(("  DRHOLD=0 but drhold pin=%b", drhold_tp));
-      test_passed = 0;
+      record_failure();
     end
 
     // ----------------------------------------
     // TC11: Profile output
     // ----------------------------------------
     current_test = 11;
-    `INFO(("TC11: Profile output"), ADI_VERBOSITY_NONE);
+    `INFO(("TC11: Profile output"), ADI_VERBOSITY_LOW);
 
     for (int p = 0; p < 8; p++) begin
       ad9910.set_profile(p);
       #(CFG_SETTLE_NS * 1ns);
       if (profile_tp !== p[2:0]) begin
         `ERROR(("  PROFILE=%0d but profile pin=%0d", p, profile_tp));
-        test_passed = 0;
+        record_failure();
       end
     end
     ad9910.set_profile(32'd0);
-    `INFO(("  All 8 profile values - PASSED"), ADI_VERBOSITY_NONE);
+    `INFO(("  All 8 profile values - PASSED"), ADI_VERBOSITY_LOW);
 
     // ----------------------------------------
     // TC12: Ramp model and programming checker
@@ -1091,7 +1122,7 @@ program test_program_drg (
     // values are simply wrong. This is the failure mode behind a chirp whose
     // ramps do not match the configured sweep.
     current_test = 12;
-    `INFO(("TC12: Ramp model and programming checker"), ADI_VERBOSITY_NONE);
+    `INFO(("TC12: Ramp model and programming checker"), ADI_VERBOSITY_LOW);
 
     begin
       int unsigned rises_before;
@@ -1118,13 +1149,13 @@ program test_program_drg (
       if (ramp_truncation_count != 0) begin
         `ERROR(("  %0d ramp truncations with W=%0d, P-W=%0d (both exceed %0d sync_clk cycles)",
                 ramp_truncation_count, GOOD_W, GOOD_P - GOOD_W, DRG_RAMP_CYCLES));
-        test_passed = 0;
+        record_failure();
       end else if ((rises_after - rises_before) < 6) begin
         `ERROR(("  Only %0d drover edges in 4 periods, expected ~8",
                 rises_after - rises_before));
-        test_passed = 0;
+        record_failure();
       end else begin
-        `INFO(("  Ramps complete within both intervals - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  Ramps complete within both intervals - PASSED"), ADI_VERBOSITY_LOW);
       end
 
       // Disarm before anything stops the PWM. Clearing toggle_en drops drctl
@@ -1166,10 +1197,10 @@ program test_program_drg (
 
       if (truncations > 0) begin
         `INFO(("  W=%0d (< %0d sync_clk ramp cycles) truncated %0d up-ramps, detected - PASSED",
-               BAD_W, DRG_RAMP_CYCLES, truncations), ADI_VERBOSITY_NONE);
+               BAD_W, DRG_RAMP_CYCLES, truncations), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  W=%0d should truncate the ramp but no truncation was detected", BAD_W));
-        test_passed = 0;
+        record_failure();
       end
 
       stop_pwm();
@@ -1203,11 +1234,11 @@ program test_program_drg (
 
       if ((retraces_after - retraces_before) >= MIN_RETRACES) begin
         `INFO(("  Sawtooth retraced %0d times over 2 periods (expect 4) - PASSED",
-               retraces_after - retraces_before), ADI_VERBOSITY_NONE);
+               retraces_after - retraces_before), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Sawtooth retraced %0d times over 2 periods, expected at least %0d",
                 retraces_after - retraces_before, MIN_RETRACES));
-        test_passed = 0;
+        record_failure();
       end
 
       // No-dwell low stays clear, so parking drctl has to bring the ramp to rest
@@ -1221,11 +1252,11 @@ program test_program_drg (
 
       if ((drg_counter == DRG_LOWER_LIMIT) && (retraces_after == retraces_before)) begin
         `INFO(("  Ramp came to rest at the lower limit with drctl parked - PASSED"),
-              ADI_VERBOSITY_NONE);
+              ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  drctl parked low but the ramp is at %0d after %0d further retraces",
                 drg_counter, retraces_after - retraces_before));
-        test_passed = 0;
+        record_failure();
       end
 
       // Back to the baseline for the remaining tests, as at the end of TC4.
@@ -1245,7 +1276,7 @@ program test_program_drg (
     // start and stop OR into trig_out. Pulse spacing is therefore exactly
     // START_MATCH - STOP_MATCH, independent of the fixed 3 sync_clk-cycle output latency.
     current_test = 13;
-    `INFO(("TC13: trig_out interval timing (max-period mode)"), ADI_VERBOSITY_NONE);
+    `INFO(("TC13: trig_out interval timing (max-period mode)"), ADI_VERBOSITY_LOW);
 
     begin
       int unsigned offs[];
@@ -1275,17 +1306,17 @@ program test_program_drg (
         if (got < 2) begin
           `ERROR(("  start=%0d stop=%0d: saw %0d trig_out pulses, expected 2",
                   start_match[k], stop_match[k], got));
-          test_passed = 0;
+          record_failure();
         end else begin
           spacing = offs[1] - offs[0];
           if (spacing == (start_match[k] - stop_match[k])) begin
             `INFO(("  start=%0d stop=%0d -> spacing %0d - PASSED",
-                   start_match[k], stop_match[k], spacing), ADI_VERBOSITY_NONE);
+                   start_match[k], stop_match[k], spacing), ADI_VERBOSITY_LOW);
           end else begin
             `ERROR(("  start=%0d stop=%0d -> spacing %0d, expected %0d",
                     start_match[k], stop_match[k], spacing,
                     start_match[k] - stop_match[k]));
-            test_passed = 0;
+            record_failure();
           end
         end
         stop_pwm();
@@ -1299,10 +1330,10 @@ program test_program_drg (
         program_pwm(2000, 1000);
         count_trig_pulses(4000, n_pulses);
         if (n_pulses == 0) begin
-          `INFO(("  match=0 disables both pulses - PASSED"), ADI_VERBOSITY_NONE);
+          `INFO(("  match=0 disables both pulses - PASSED"), ADI_VERBOSITY_LOW);
         end else begin
           `ERROR(("  match=0 but %0d trig_out pulses observed", n_pulses));
-          test_passed = 0;
+          record_failure();
         end
         stop_pwm();
       end
@@ -1320,7 +1351,7 @@ program test_program_drg (
     // The observable consequence is the trig_out pulse rate over a fixed
     // window, so period mode should out-pulse burst mode by the burst length.
     current_test = 14;
-    `INFO(("TC14: Interval monitor source selection"), ADI_VERBOSITY_NONE);
+    `INFO(("TC14: Interval monitor source selection"), ADI_VERBOSITY_LOW);
 
     begin
       int unsigned n_period_mode;
@@ -1362,7 +1393,7 @@ program test_program_drg (
       stop_pwm();
 
       `INFO(("  pulses over %0d sync_clk cycles: period=%0d burst=%0d max_period=%0d",
-             OBS_CYC, n_period_mode, n_burst_mode, n_max_mode), ADI_VERBOSITY_NONE);
+             OBS_CYC, n_period_mode, n_burst_mode, n_max_mode), ADI_VERBOSITY_LOW);
 
       // Max-period mode arms once per start event rather than per period, so
       // the pulse count must stay far below the number of duty cycles in the
@@ -1372,7 +1403,7 @@ program test_program_drg (
       if (n_max_mode < 1 || n_max_mode > 3) begin
         `ERROR(("  max-period mode produced %0d pulses, expected 1-3 (window holds %0d periods)",
                 n_max_mode, OBS_CYC / PWM_P));
-        test_passed = 0;
+        record_failure();
       end
 
       // Period mode should fire once per duty cycle; burst mode once per burst.
@@ -1383,16 +1414,16 @@ program test_program_drg (
       // MONITOR_MAX_PERIOD or 0 and never reaches an intermediate match value.
       if (n_period_mode == 0) begin
         `ERROR(("  period mode produced no trig_out pulses - reference counter never reaches the match value (see axi_ad9910.v:454-470)"));
-        test_passed = 0;
+        record_failure();
       end else if (n_burst_mode == 0) begin
         `ERROR(("  burst-delay mode produced no trig_out pulses - reference counter never reaches the match value (see axi_ad9910.v:454-470)"));
-        test_passed = 0;
+        record_failure();
       end else if (n_period_mode <= n_burst_mode) begin
         `ERROR(("  period mode (%0d) should out-pulse burst mode (%0d)",
                 n_period_mode, n_burst_mode));
-        test_passed = 0;
+        record_failure();
       end else begin
-        `INFO(("  Monitor source selection - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  Monitor source selection - PASSED"), ADI_VERBOSITY_LOW);
       end
 
       ad9910.set_trig_out_ctrl(.trig_out_mask(6'd0), .trig_config(2'd0));
@@ -1406,7 +1437,7 @@ program test_program_drg (
     // TC15: IRQ mask, table and write-1-to-clear
     // ----------------------------------------
     current_test = 15;
-    `INFO(("TC15: IRQ mask / table / W1C"), ADI_VERBOSITY_NONE);
+    `INFO(("TC15: IRQ mask / table / W1C"), ADI_VERBOSITY_LOW);
 
     begin
       stop_pwm();
@@ -1421,33 +1452,33 @@ program test_program_drg (
       ram_swp_ovr_tp = 1'b1;
       repeat (50) @(posedge sync_clk_tp);
       ram_swp_ovr_tp = 1'b0;
-      #CFG_SETTLE_NS;
+      #(CFG_SETTLE_NS * 1ns);
 
       if (ad9910_irq_tp === 1'b0) begin
         `INFO(("  IRQ_MASK=0 keeps irq low with an active source - PASSED"),
-              ADI_VERBOSITY_NONE);
+              ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  IRQ_MASK=0 but irq=%b", ad9910_irq_tp));
-        test_passed = 0;
+        record_failure();
       end
 
       ad9910.get_irq_table(read_data);
       if (read_data[IRQ_RAM_SWP_OVR]) begin
         `INFO(("  IRQ_TABLE latched ram_swp_ovr (0x%02x) - PASSED", read_data),
-              ADI_VERBOSITY_NONE);
+              ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  IRQ_TABLE=0x%02x, ram_swp_ovr bit not latched", read_data));
-        test_passed = 0;
+        record_failure();
       end
 
       // Unmasking an already-latched source must drive irq.
       ad9910.set_irq_mask(32'h1 << IRQ_RAM_SWP_OVR);
       #(CFG_SETTLE_NS * 1ns);
       if (ad9910_irq_tp === 1'b1) begin
-        `INFO(("  Unmasking a latched source asserts irq - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  Unmasking a latched source asserts irq - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Source latched and unmasked but irq=%b", ad9910_irq_tp));
-        test_passed = 0;
+        record_failure();
       end
 
       // W1C clears the latch. The source is no longer asserting, so the bit
@@ -1457,10 +1488,10 @@ program test_program_drg (
       #(CFG_SETTLE_NS * 1ns);
       ad9910.get_irq_table(read_data);
       if (!read_data[IRQ_RAM_SWP_OVR] && ad9910_irq_tp === 1'b0) begin
-        `INFO(("  W1C cleared the latch and deasserted irq - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  W1C cleared the latch and deasserted irq - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  After W1C: IRQ_TABLE=0x%02x irq=%b", read_data, ad9910_irq_tp));
-        test_passed = 0;
+        record_failure();
       end
 
       // bursts_complete reaches the table through the ramp machinery.
@@ -1504,15 +1535,15 @@ program test_program_drg (
                drctl_rises, ep_pulses, teb_pulses, bc_pulses, read_data), ADI_VERBOSITY_LOW);
 
         if (read_data[IRQ_BURSTS]) begin
-          `INFO(("  bursts_complete latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_NONE);
+          `INFO(("  bursts_complete latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_LOW);
         end else if (bc_pulses == 0) begin
           `ERROR(("  no bursts_complete pulse generated with RAMP_BURSTS=2 (IRQ_TABLE=0x%02x)",
                   read_data));
-          test_passed = 0;
+          record_failure();
         end else begin
           `ERROR(("  %0d bursts_complete pulses occurred but IRQ_TABLE=0x%02x did not latch bit %0d",
                   bc_pulses, read_data, IRQ_BURSTS));
-          test_passed = 0;
+          record_failure();
         end
       end
       stop_pwm();
@@ -1531,10 +1562,10 @@ program test_program_drg (
       repeat (3 * PWM_PERIOD) @(posedge sync_clk_tp);
       ad9910.get_irq_table(read_data);
       if (read_data[IRQ_DROVER]) begin
-        `INFO(("  drover latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  drover latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  IRQ_TABLE=0x%02x, drover bit not latched", read_data));
-        test_passed = 0;
+        record_failure();
       end
 
       stop_pwm();
@@ -1551,7 +1582,7 @@ program test_program_drg (
     // 16-bit up_clk window (65536 cycles, ~655 us at 100 MHz), so this is the
     // earliest point in the suite where a reading is available.
     current_test = 16;
-    `INFO(("TC16: Clock monitors"), ADI_VERBOSITY_NONE);
+    `INFO(("TC16: Clock monitors"), ADI_VERBOSITY_LOW);
 
     begin
       bit [31:0] sync_cnt;
@@ -1565,11 +1596,11 @@ program test_program_drg (
              sync_cnt, pd_cnt), ADI_VERBOSITY_LOW);
 
       if (sync_cnt != 32'd0 && pd_cnt != 32'd0) begin
-        `INFO(("  Both clock monitors report a live clock - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  Both clock monitors report a live clock - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Clock monitor read zero: SYNC_CLK_CNT=%0d PD_CLK_COUNT=%0d",
                 sync_cnt, pd_cnt));
-        test_passed = 0;
+        record_failure();
       end
     end
 
@@ -1582,7 +1613,7 @@ program test_program_drg (
     if (test_passed) begin
       `INFO(("==== ALL TESTS PASSED ===="), ADI_VERBOSITY_NONE);
     end else begin
-      `ERROR(("==== SOME TESTS FAILED ===="));
+      `ERROR(("==== SOME TESTS FAILED ==== (failing: %s)", failed_tests));
     end
 
     `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);

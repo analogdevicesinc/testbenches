@@ -133,7 +133,33 @@ program test_program_par_if (
 
   bit [31:0] read_data;
   bit        test_passed = 1;
+
+  // K4: the simulation randomization state is reported at the very start, so a
+  // failing run can be reproduced exactly. This and the done messages are the
+  // only ADI_VERBOSITY_NONE messages here - everything else is LOW and so is
+  // silent at the NONE threshold (coding_guidelines F5).
+  process current_process;
+  string  current_process_random_state;
   int        current_test = 0;   // waveform navigation aid
+
+  // Which test cases failed, named in the final summary. The per-TC banners are
+  // ADI_VERBOSITY_LOW and so invisible at the NONE threshold
+  // (coding_guidelines F5), which would otherwise leave a CI log holding an
+  // error message with no indication of which test case produced it. Test cases
+  // run sequentially, so remembering the last one that failed is enough to
+  // de-duplicate repeated failures within one test case.
+  string     failed_tests   = "";
+  int        last_failed_tc = 0;
+
+  // Mark the run failed and remember the test case, for the final summary.
+  task automatic record_failure();
+    test_passed = 1'b0;
+    if (current_test != last_failed_tc) begin
+      failed_tests = {failed_tests, (failed_tests == "") ? "" : ", ",
+                      $sformatf("TC%0d", current_test)};
+      last_failed_tc = current_test;
+    end
+  endtask
 
   // --------------------------
   // DDR backdoor helpers
@@ -173,7 +199,7 @@ program test_program_par_if (
       if (monitor_enabled && tx_enable_tp)
         captured.push_back(db_o_tp);
     end
-  end
+  end : db_o_monitor
 
   task enable_monitor();
     captured.delete();
@@ -198,7 +224,7 @@ program test_program_par_if (
     if (captured.size() < target) begin
       `ERROR(("  wait_captures: got %0d of %0d samples after %0d us",
               captured.size(), target, timeout_us));
-      test_passed = 0;
+      record_failure();
     end
   endtask
 
@@ -236,7 +262,7 @@ program test_program_par_if (
       if ($time >= deadline) begin
         `ERROR(("  wait_tx_idle: output still active after %0d ns (rate=%0d)",
                 TX_IDLE_TIMEOUT_NS, rate));
-        test_passed = 0;
+        record_failure();
         return;
       end
     end
@@ -307,7 +333,7 @@ program test_program_par_if (
     mism = 0;
     if (captured.size() < expected.size()) begin
       `ERROR(("  %s: captured %0d of %0d samples", label, captured.size(), expected.size()));
-      test_passed = 0;
+      record_failure();
       return;
     end
     foreach (expected[i]) begin
@@ -320,10 +346,10 @@ program test_program_par_if (
     end
     if (mism == 0)
       `INFO(("  %s: %0d samples verified - PASSED", label, expected.size()),
-            ADI_VERBOSITY_NONE);
+            ADI_VERBOSITY_LOW);
     else begin
       `ERROR(("  %s: %0d mismatches", label, mism));
-      test_passed = 0;
+      record_failure();
     end
   endtask
 
@@ -369,7 +395,12 @@ program test_program_par_if (
   // Main test sequence
   // --------------------------
   initial begin
-    setLoggerVerbosity(ADI_VERBOSITY_LOW);
+    setLoggerVerbosity(ADI_VERBOSITY_NONE);
+
+    current_process = process::self();
+    current_process_random_state = current_process.get_randstate();
+    `INFO(("Randomization state: %s", current_process_random_state),
+          ADI_VERBOSITY_NONE);
 
     // Unused DRG-side outputs held quiet.
     ext_sync_tp    = 1'b0;
@@ -407,7 +438,7 @@ program test_program_par_if (
     base_env.simulation_watchdog.update_timer(32'd5_000_000);
     base_env.simulation_watchdog.reset();
 
-    `INFO(("==== AD9910 Parallel Interface Testbench (PAR_IF) ===="), ADI_VERBOSITY_NONE);
+    `INFO(("==== AD9910 Parallel Interface Testbench (PAR_IF) ===="), ADI_VERBOSITY_LOW);
 
     // Release the core reset. RESET_CTRL.RESET resets to 1 (axi_ad9910_reg.v:157),
     // holding both clock domains until software clears it.
@@ -421,7 +452,7 @@ program test_program_par_if (
     // SCRATCH. Then the PAR_IF RW registers are round-tripped with distinct
     // patterns and CONFIG.MEASURE_CLKS_EN is checked.
     current_test = 1;
-    `INFO(("TC1: Register sanity"), ADI_VERBOSITY_NONE);
+    `INFO(("TC1: Register sanity"), ADI_VERBOSITY_LOW);
     begin
       bit [31:0] pd_cnt;
       bit        measure_clks_en;
@@ -441,10 +472,10 @@ program test_program_par_if (
       // the expectation belongs here rather than in the reset value.
       ad9910.get_config(measure_clks_en);
       if (measure_clks_en)
-        `INFO(("  CONFIG.MEASURE_CLKS_EN = 1 - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  CONFIG.MEASURE_CLKS_EN = 1 - PASSED"), ADI_VERBOSITY_LOW);
       else begin
         `ERROR(("  CONFIG.MEASURE_CLKS_EN = 0, expected 1"));
-        test_passed = 0;
+        record_failure();
       end
 
       ad9910.set_par_update_rate(32'h1234_5678);
@@ -461,10 +492,10 @@ program test_program_par_if (
                              .load_new_rate(1'b0));
       ad9910.get_update_ctrl(trig_mode, enable_p_if, load_new_rate);
       if (enable_p_if)
-        `INFO(("  UPDATE_CTRL readback - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  UPDATE_CTRL readback - PASSED"), ADI_VERBOSITY_LOW);
       else begin
         `ERROR(("  UPDATE_CTRL readback: enable_p_if = %0b, expected 1", enable_p_if));
-        test_passed = 0;
+        record_failure();
       end
       ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
                              .enable_p_if(1'b0),
@@ -473,7 +504,7 @@ program test_program_par_if (
       ad9910.get_pd_clk_count(pd_cnt);
       `INFO(("  PD_CLK_COUNT = %0d (monitor needs ~655 us to update)", pd_cnt),
             ADI_VERBOSITY_LOW);
-      `INFO(("  Register sanity - PASSED"), ADI_VERBOSITY_NONE);
+      `INFO(("  Register sanity - PASSED"), ADI_VERBOSITY_LOW);
     end
 
     // ----------------------------------------
@@ -482,7 +513,7 @@ program test_program_par_if (
     // One 32-bit DDR word carrying two known 16-bit samples. Pins the SRC=32 ->
     // DEST=16 byte/endianness mapping that every later data test relies on.
     current_test = 2;
-    `INFO(("TC2: Single transfer + width mapping"), ADI_VERBOSITY_NONE);
+    `INFO(("TC2: Single transfer + width mapping"), ADI_VERBOSITY_LOW);
     begin
       logic [15:0] samples[];
       samples = '{16'h1111, 16'h2222};   // DDR word 0 = 0x2222_1111
@@ -503,7 +534,7 @@ program test_program_par_if (
     // order. Replaces the old "3 words per config packet" (the RTL now emits one
     // word per trigger, so a packet is just a stream).
     current_test = 3;
-    `INFO(("TC3: Multi-word stream"), ADI_VERBOSITY_NONE);
+    `INFO(("TC3: Multi-word stream"), ADI_VERBOSITY_LOW);
     begin
       logic [15:0] samples[];
       samples = '{16'hAAAA, 16'hBBBB, 16'hCCCC, 16'hDDDD, 16'h0001, 16'hFFFE};
@@ -518,7 +549,7 @@ program test_program_par_if (
     // ----------------------------------------
     // A longer contiguous run at a fast rate; verifies sustained ordered delivery.
     current_test = 4;
-    `INFO(("TC4: Continuous streaming"), ADI_VERBOSITY_NONE);
+    `INFO(("TC4: Continuous streaming"), ADI_VERBOSITY_LOW);
     begin
       localparam int N = 32;
       logic [15:0] samples[];
@@ -536,7 +567,7 @@ program test_program_par_if (
     // Transfer far more than the 16-entry FIFO at a slow drain rate, so the FIFO
     // fills and s_axis_tready backpressures the DMA. No sample may be lost.
     current_test = 5;
-    `INFO(("TC5: Backpressure"), ADI_VERBOSITY_NONE);
+    `INFO(("TC5: Backpressure"), ADI_VERBOSITY_LOW);
     begin
       localparam int N = 64;   // 4x FIFO depth
       logic [15:0] samples[];
@@ -556,7 +587,7 @@ program test_program_par_if (
     // followed by wait_tx_idle, so both drain fully and TC7 starts with an empty
     // FIFO - its "nothing emitted before a trigger" check depends on that.
     current_test = 6;
-    `INFO(("TC6: Update-rate change"), ADI_VERBOSITY_NONE);
+    `INFO(("TC6: Update-rate change"), ADI_VERBOSITY_LOW);
     begin
       localparam int N = 128;
       logic [15:0] samples[];
@@ -587,10 +618,10 @@ program test_program_par_if (
       `INFO(("  %0d-sample transfer: slow(rate=200)=%0t fast(rate=20)=%0t",
              N, t_slow, t_fast), ADI_VERBOSITY_LOW);
       if (t_slow > (t_fast * 2))
-        `INFO(("  Faster rate transfers >2x quicker - PASSED"), ADI_VERBOSITY_NONE);
+        `INFO(("  Faster rate transfers >2x quicker - PASSED"), ADI_VERBOSITY_LOW);
       else begin
         `ERROR(("  Rate change ineffective: slow=%0t fast=%0t", t_slow, t_fast));
-        test_passed = 0;
+        record_failure();
       end
     end
 
@@ -601,7 +632,7 @@ program test_program_par_if (
     // via EXT_TRIG_CFG). Preload the FIFO, then pulse ext_sync and confirm words
     // come out only when triggered.
     current_test = 7;
-    `INFO(("TC7: External trigger (ext_sync)"), ADI_VERBOSITY_NONE);
+    `INFO(("TC7: External trigger (ext_sync)"), ADI_VERBOSITY_LOW);
     begin
       localparam int N = 4;
       logic [15:0] samples[];
@@ -624,7 +655,7 @@ program test_program_par_if (
       // Nothing should have come out yet without a trigger.
       if (captured.size() != 0) begin
         `ERROR(("  %0d samples emitted before any ext_sync trigger", captured.size()));
-        test_passed = 0;
+        record_failure();
       end
 
       // util_ext_sync arms on a RISING edge of ext_sync_arm and fires (sync_armed
@@ -654,9 +685,9 @@ program test_program_par_if (
     // ----------------------------------------
     // 0x43 is a static 2-bit function-select value routed straight to the f_o pins.
     current_test = 8;
-    `INFO(("TC8: F_CFG -> f_o"), ADI_VERBOSITY_NONE);
+    `INFO(("TC8: F_CFG -> f_o"), ADI_VERBOSITY_LOW);
     begin
-      bit ok = 1;
+      automatic bit ok = 1;
       for (int v = 0; v < 4; v++) begin
         ad9910.set_f_cfg(v[1:0]);
         #(CDC_SETTLE_NS * 1ns);   // CDC into pd domain
@@ -666,9 +697,9 @@ program test_program_par_if (
         end
       end
       ad9910.set_f_cfg(2'h0);
-      #CDC_SETTLE_NS;
-      if (ok) `INFO(("  All 4 F_CFG values reflected on f_o - PASSED"), ADI_VERBOSITY_NONE);
-      else    test_passed = 0;
+      #(CDC_SETTLE_NS * 1ns);
+      if (ok) `INFO(("  All 4 F_CFG values reflected on f_o - PASSED"), ADI_VERBOSITY_LOW);
+      else    record_failure();
     end
 
     // ----------------------------------------
@@ -677,7 +708,7 @@ program test_program_par_if (
     // 16-bit sawtooth-up / triangle / sawtooth-down streamed from DDR and checked
     // sample-for-sample at the output.
     current_test = 9;
-    `INFO(("TC9: Ramp data integrity"), ADI_VERBOSITY_NONE);
+    `INFO(("TC9: Ramp data integrity"), ADI_VERBOSITY_LOW);
     begin
       localparam int N = 256;
       localparam int STEP = 512;
@@ -708,7 +739,7 @@ program test_program_par_if (
     if (test_passed)
       `INFO(("==== ALL TESTS PASSED ===="), ADI_VERBOSITY_NONE);
     else
-      `ERROR(("==== SOME TESTS FAILED ===="));
+      `ERROR(("==== SOME TESTS FAILED ==== (failing: %s)", failed_tests));
 
     `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);
     $finish();

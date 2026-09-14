@@ -49,6 +49,8 @@ import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_common_pkg::*;
+import adi_regmap_ad9910_pkg::*;
+import ad9910_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -72,41 +74,9 @@ program test_program_drg (
   timeunit 1ns;
   timeprecision 1ps;
 
-  // --------------------------
-  // Register addresses (word offsets, from axi_ad9910_reg.v)
-  // --------------------------
-  localparam REG_VERSION        = 7'h00;
-  localparam REG_ID             = 7'h01;
-  localparam REG_SCRATCH        = 7'h02;
-  localparam REG_CONFIG         = 7'h03;
-  localparam REG_DEVICE_INFO    = 7'h07;
-  localparam REG_RESET_CTRL     = 7'h10;
-  localparam REG_IRQ_MASK       = 7'h11;
-  localparam REG_IRQ_TABLE      = 7'h12;
-  localparam REG_IRQ_MON_CFG    = 7'h13;
-  localparam REG_TRIG_OUT_CTRL  = 7'h14;
-  localparam REG_EXT_TRIG_CFG   = 7'h15;
-  localparam REG_SYNC_CLK_CNT   = 7'h20;
-  localparam REG_DRG_CTRL       = 7'h21;
-  localparam REG_PROFILE        = 7'h22;
-  localparam REG_DRCTL_PERIOD   = 7'h23;
-  localparam REG_DRCTL_WIDTH    = 7'h24;
-  localparam REG_BST_DELAY      = 7'h25;
-  localparam REG_RAMP_BURSTS    = 7'h26;
-  localparam REG_BURST_DELAY    = 7'h27;
-  localparam REG_RAMP_CFG       = 7'h28;
-  localparam REG_MON_MAX_PERIOD = 7'h29;
-  localparam REG_IRQ_START      = 7'h2a;
-  localparam REG_IRQ_STOP       = 7'h2b;
-  localparam REG_TRIG_START     = 7'h2c;
-  localparam REG_TRIG_STOP      = 7'h2d;
-  // Parallel-interface group: unused in DRG mode apart from the clock monitor.
-  localparam REG_PD_CLK_CNT     = 7'h40;
-
-  // DRG_CTRL (0x21) bit positions
-  localparam DRG_TOGGLE_EN      = 3;
-  localparam DRG_DRCTL_INIT     = 2;
-  localparam DRG_DRHOLD         = 1;
+  // Register offsets and field positions come from adi_regmap_ad9910_pkg and are
+  // reached through ad9910_api - this test holds none of its own. The constants
+  // below are field *values* the tests choose, not register locations.
 
   // IRQ_MASK / IRQ_TABLE (0x11 / 0x12) bit positions
   localparam IRQ_INTERVAL_START = 5;
@@ -115,8 +85,7 @@ program test_program_drg (
   localparam IRQ_BURSTS         = 1;
   localparam IRQ_RAM_SWP_OVR    = 0;
 
-  // TRIG_OUT_CTRL (0x14): mask occupies [21:16], trig_config [1:0]
-  localparam TRIG_MASK_SHIFT    = 16;
+  // IRQ_MASK / TRIG_OUT_MASK are 6-bit fields; the regmap owns where they sit.
 
   // Interval monitor / trigger source select (IRQ_MON_CFG, TRIG_OUT_CTRL[1:0])
   localparam MON_CFG_PERIOD     = 2'd0;
@@ -160,6 +129,10 @@ program test_program_drg (
   test_harness_env base_env;
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+
+  // All axi_ad9910 register access goes through this API (coding_guidelines
+  // I3/I4); register offsets and field positions live in adi_regmap_ad9910_pkg.
+  ad9910_api ad9910;
 
   bit [31:0] read_data;
   bit        test_passed = 1;
@@ -295,28 +268,6 @@ program test_program_drg (
   // --------------------------
   // AXI access helpers
   // --------------------------
-  task axi_read_v(
-    input   [31:0]  raddr,
-    input   [31:0]  vdata);
-    base_env.mng.master_sequencer.RegReadVerify32(raddr, vdata);
-  endtask
-
-  task axi_read(
-    input   [31:0]  raddr,
-    output  [31:0]  data);
-    base_env.mng.master_sequencer.RegRead32(raddr, data);
-  endtask
-
-  task axi_write(
-    input [31:0]  waddr,
-    input [31:0]  wdata);
-    base_env.mng.master_sequencer.RegWrite32(waddr, wdata);
-  endtask
-
-  function [31:0] reg_addr(input [6:0] offset);
-    return `AXI_AD9910_BA + (offset << 2);
-  endfunction
-
   // --------------------------
   // drctl waveform measurement
   // --------------------------
@@ -443,16 +394,16 @@ program test_program_drg (
   // This gives one clean restart with a coherent config instead of a restart
   // on an intermediate new-period/old-width pair.
   task automatic program_pwm(input int unsigned p, input int unsigned w);
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
-    axi_write(reg_addr(REG_DRCTL_PERIOD), p);
-    axi_write(reg_addr(REG_DRCTL_WIDTH), w);
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_TOGGLE_EN);
-    #CFG_SETTLE_NS;
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
+    ad9910.set_drctl_period(p);
+    ad9910.set_drctl_width(w);
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b1), .drctl_init(1'b0), .drhold(1'b0));
+    #(CFG_SETTLE_NS * 1ns);
   endtask
 
   task automatic stop_pwm();
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
-    #CFG_SETTLE_NS;
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
+    #(CFG_SETTLE_NS * 1ns);
   endtask
 
   // Time the first drctl rising edge after a restart, for a given start delay.
@@ -467,18 +418,18 @@ program test_program_drg (
     input  int unsigned dly,
     output int unsigned cycles
   );
-    axi_write(reg_addr(REG_BST_DELAY), dly);
-    axi_write(reg_addr(REG_DRCTL_PERIOD), PWM_PERIOD);
-    axi_write(reg_addr(REG_DRCTL_WIDTH), PWM_WIDTH);
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_TOGGLE_EN);
+    ad9910.set_bst_delay(dly);
+    ad9910.set_drctl_period(PWM_PERIOD);
+    ad9910.set_drctl_width(PWM_WIDTH);
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b1), .drctl_init(1'b0), .drhold(1'b0));
     // The delay plus two whole periods: end_period_d has to fire for the new
     // BST_DELAY to be latched, so the priming window must outlast a period.
     repeat (dly + 2 * PWM_PERIOD) @(posedge sync_clk_tp);
 
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
     repeat (dly + 2 * PWM_PERIOD) @(posedge sync_clk_tp);
 
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_TOGGLE_EN);
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b1), .drctl_init(1'b0), .drhold(1'b0));
     wait_drctl_level(1'b1, 40000, cycles);
   endtask
 
@@ -506,7 +457,7 @@ program test_program_drg (
     // BURST_DELAY is not one of the registers auto_ramp_mode_update watches, so
     // it is written while stopped and picked up by the restart program_pwm does.
     stop_pwm();
-    axi_write(reg_addr(REG_BURST_DELAY), burst_delay);
+    ad9910.set_burst_delay(burst_delay);
     program_pwm(PWM_PERIOD, PWM_WIDTH);
 
     // Three bursts' worth of rising edges: within a burst the gap is one
@@ -690,6 +641,11 @@ program test_program_drg (
     base_env.start();
     base_env.sys_reset();
 
+    ad9910 = new(
+      .name("AD9910 API"),
+      .bus(base_env.mng.master_sequencer),
+      .base_address(`AXI_AD9910_BA));
+
     // The default 1 ms watchdog is tight for this suite: the interval-monitor
     // tests observe multi-thousand sync_clk-cycle windows. Extended via the watchdog's
     // public API rather than by editing the shared environment.
@@ -701,57 +657,62 @@ program test_program_drg (
     // ----------------------------------------
     // TC1: Register sanity
     // ----------------------------------------
-    // Every DRG register is written with a distinct pattern and read back. The
-    // register map shifted from 0x23 upward in the PWM rework, so a stale
-    // address lands on a real-but-wrong register and produces no bus error -
+    // sanity_test() verifies VERSION against its reset value and round-trips
+    // SCRATCH. Then every DRG register is written with a distinct pattern and read
+    // back: the register map shifted from 0x23 upward in the PWM rework, so a
+    // stale address lands on a real-but-wrong register and produces no bus error -
     // only a readback mismatch catches it.
     current_test = 1;
     `INFO(("TC1: Register sanity"), ADI_VERBOSITY_NONE);
 
-    axi_read(reg_addr(REG_VERSION), read_data);
+    ad9910.sanity_test();
+
+    ad9910.get_version(read_data);
     `INFO(("  VERSION: 0x%08x", read_data), ADI_VERBOSITY_LOW);
-    axi_read(reg_addr(REG_ID), read_data);
+    ad9910.get_id(read_data);
     `INFO(("  ID: 0x%08x", read_data), ADI_VERBOSITY_LOW);
-    axi_read(reg_addr(REG_DEVICE_INFO), read_data);
-    `INFO(("  DEVICE_INFO: 0x%08x", read_data), ADI_VERBOSITY_LOW);
+    begin
+      bit [7:0] fpga_technology, fpga_family, speed_grade, dev_package;
+      ad9910.get_device_info(fpga_technology, fpga_family, speed_grade, dev_package);
+      `INFO(("  DEVICE_INFO: technology=%0d family=%0d speed=%0d package=%0d",
+             fpga_technology, fpga_family, speed_grade, dev_package),
+            ADI_VERBOSITY_LOW);
+    end
 
-    axi_write(reg_addr(REG_SCRATCH), 32'hDEADBEEF);
-    axi_read_v(reg_addr(REG_SCRATCH), 32'hDEADBEEF);
+    ad9910.set_drctl_period(32'h0000_1234);
+    ad9910.set_drctl_width(32'h0000_5678);
+    ad9910.set_bst_delay(32'h0000_9abc);
+    ad9910.set_ramp_bursts(32'h0000_def0);
+    ad9910.set_burst_delay(32'h0001_1111);
+    ad9910.set_monitor_max_period(32'h0002_2222);
+    ad9910.set_irq_start_interval(32'h0003_3333);
+    ad9910.set_irq_stop_interval(32'h0004_4444);
+    ad9910.set_trig_start_interval(32'h0005_5555);
+    ad9910.set_trig_stop_interval(32'h0006_6666);
 
-    axi_write(reg_addr(REG_DRCTL_PERIOD),   32'h0000_1234);
-    axi_write(reg_addr(REG_DRCTL_WIDTH),    32'h0000_5678);
-    axi_write(reg_addr(REG_BST_DELAY),      32'h0000_9abc);
-    axi_write(reg_addr(REG_RAMP_BURSTS),    32'h0000_def0);
-    axi_write(reg_addr(REG_BURST_DELAY),    32'h0001_1111);
-    axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'h0002_2222);
-    axi_write(reg_addr(REG_IRQ_START),      32'h0003_3333);
-    axi_write(reg_addr(REG_IRQ_STOP),       32'h0004_4444);
-    axi_write(reg_addr(REG_TRIG_START),     32'h0005_5555);
-    axi_write(reg_addr(REG_TRIG_STOP),      32'h0006_6666);
-
-    axi_read_v(reg_addr(REG_DRCTL_PERIOD),   32'h0000_1234);
-    axi_read_v(reg_addr(REG_DRCTL_WIDTH),    32'h0000_5678);
-    axi_read_v(reg_addr(REG_BST_DELAY),      32'h0000_9abc);
-    axi_read_v(reg_addr(REG_RAMP_BURSTS),    32'h0000_def0);  // 20-bit field
-    axi_read_v(reg_addr(REG_BURST_DELAY),    32'h0001_1111);
-    axi_read_v(reg_addr(REG_MON_MAX_PERIOD), 32'h0002_2222);
-    axi_read_v(reg_addr(REG_IRQ_START),      32'h0003_3333);
-    axi_read_v(reg_addr(REG_IRQ_STOP),       32'h0004_4444);
-    axi_read_v(reg_addr(REG_TRIG_START),     32'h0005_5555);
-    axi_read_v(reg_addr(REG_TRIG_STOP),      32'h0006_6666);
+    ad9910.verify_drctl_period(32'h0000_1234);
+    ad9910.verify_drctl_width(32'h0000_5678);
+    ad9910.verify_bst_delay(32'h0000_9abc);
+    ad9910.verify_ramp_bursts(32'h0000_def0);  // 20-bit field
+    ad9910.verify_burst_delay(32'h0001_1111);
+    ad9910.verify_monitor_max_period(32'h0002_2222);
+    ad9910.verify_irq_start_interval(32'h0003_3333);
+    ad9910.verify_irq_stop_interval(32'h0004_4444);
+    ad9910.verify_trig_start_interval(32'h0005_5555);
+    ad9910.verify_trig_stop_interval(32'h0006_6666);
     `INFO(("  Register map readback - PASSED"), ADI_VERBOSITY_NONE);
 
     // Clear back to a known state before the ramp tests.
-    axi_write(reg_addr(REG_DRCTL_PERIOD),   32'd0);
-    axi_write(reg_addr(REG_DRCTL_WIDTH),    32'd0);
-    axi_write(reg_addr(REG_BST_DELAY),      32'd0);
-    axi_write(reg_addr(REG_RAMP_BURSTS),    32'd0);
-    axi_write(reg_addr(REG_BURST_DELAY),    32'd0);
-    axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'd0);
-    axi_write(reg_addr(REG_IRQ_START),      32'd0);
-    axi_write(reg_addr(REG_IRQ_STOP),       32'd0);
-    axi_write(reg_addr(REG_TRIG_START),     32'd0);
-    axi_write(reg_addr(REG_TRIG_STOP),      32'd0);
+    ad9910.set_drctl_period(32'd0);
+    ad9910.set_drctl_width(32'd0);
+    ad9910.set_bst_delay(32'd0);
+    ad9910.set_ramp_bursts(32'd0);
+    ad9910.set_burst_delay(32'd0);
+    ad9910.set_monitor_max_period(32'd0);
+    ad9910.set_irq_start_interval(32'd0);
+    ad9910.set_irq_stop_interval(32'd0);
+    ad9910.set_trig_start_interval(32'd0);
+    ad9910.set_trig_stop_interval(32'd0);
 
     // ----------------------------------------
     // TC2: Reset release and clock monitor
@@ -759,7 +720,7 @@ program test_program_drg (
     current_test = 2;
     `INFO(("TC2: Reset release and clock monitor"), ADI_VERBOSITY_NONE);
 
-    axi_write(reg_addr(REG_RESET_CTRL), 32'h0);
+    ad9910.set_reset_ctrl(32'h0);
     #10us;
 
     // The clock monitors need a full measurement window before they report
@@ -769,7 +730,7 @@ program test_program_drg (
     // logged here and checked at the end in TC16.
     begin
       bit [31:0] cnt_a;
-      axi_read(reg_addr(REG_SYNC_CLK_CNT), cnt_a);
+      ad9910.get_sync_clk_cnt(cnt_a);
       `INFO(("  SYNC_CLK_CNT this early: 0x%08x (window not yet elapsed)", cnt_a),
             ADI_VERBOSITY_LOW);
       `INFO(("  Reset released - PASSED"), ADI_VERBOSITY_NONE);
@@ -799,8 +760,8 @@ program test_program_drg (
     current_test = 3;
     `INFO(("TC3: Simple mode (toggle_en=0)"), ADI_VERBOSITY_NONE);
 
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_DRCTL_INIT);
-    #CFG_SETTLE_NS;
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b1), .drhold(1'b0));
+    #(CFG_SETTLE_NS * 1ns);
     if (drctl_tp === 1'b1) begin
       `INFO(("  DRCTL_INIT=1 -> drctl high - PASSED"), ADI_VERBOSITY_NONE);
     end else begin
@@ -808,8 +769,8 @@ program test_program_drg (
       test_passed = 0;
     end
 
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
-    #CFG_SETTLE_NS;
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
+    #(CFG_SETTLE_NS * 1ns);
     if (drctl_tp === 1'b0) begin
       `INFO(("  DRCTL_INIT=0 -> drctl low - PASSED"), ADI_VERBOSITY_NONE);
     end else begin
@@ -868,9 +829,9 @@ program test_program_drg (
     begin
       int unsigned high_c[];
       int unsigned per_c[];
-      axi_write(reg_addr(REG_DRCTL_PERIOD), 32'd800);
-      axi_write(reg_addr(REG_DRCTL_WIDTH),  32'd200);
-      #CFG_SETTLE_NS;
+      ad9910.set_drctl_period(32'd800);
+      ad9910.set_drctl_width(32'd200);
+      #(CFG_SETTLE_NS * 1ns);
       measure_drctl_waveform(4, 200, high_c, per_c);
       if (all_equal(high_c, 200) && all_equal(per_c, 800)) begin
         `INFO(("  Live reconfigure to P=800 W=200 converged - PASSED"), ADI_VERBOSITY_NONE);
@@ -966,7 +927,7 @@ program test_program_drg (
       end
 
       stop_pwm();
-      axi_write(reg_addr(REG_BST_DELAY), 32'd0);
+      ad9910.set_bst_delay(32'd0);
     end
 
     // ----------------------------------------
@@ -988,7 +949,7 @@ program test_program_drg (
       overheads = new[burst_delays.size()];
 
       stop_pwm();
-      axi_write(reg_addr(REG_RAMP_BURSTS), BURSTS);
+      ad9910.set_ramp_bursts(BURSTS);
 
       foreach (burst_delays[k]) begin
         check_burst_delay(BURSTS, burst_delays[k], overheads[k]);
@@ -1013,8 +974,8 @@ program test_program_drg (
       end
 
       stop_pwm();
-      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
-      axi_write(reg_addr(REG_BURST_DELAY), 32'd0);
+      ad9910.set_ramp_bursts(32'd0);
+      ad9910.set_burst_delay(32'd0);
     end
 
     // ----------------------------------------
@@ -1027,7 +988,7 @@ program test_program_drg (
     begin
       int unsigned cyc;
       stop_pwm();
-      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_PERIOD_STOP);
+      ad9910.set_ramp_cfg(RAMP_CFG_PERIOD_STOP);
       program_pwm(PWM_PERIOD, PWM_WIDTH);
       // Let the one permitted period finish before checking that drctl parks.
       // program_pwm's settle is a fixed 4 us, which is only one period long at
@@ -1036,7 +997,7 @@ program test_program_drg (
       repeat (PWM_PERIOD + CDC_XFER_JITTER) @(posedge sync_clk_tp);
       check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=period_stop");
       // Returning to free-run clears stop_event and the ramp resumes.
-      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_FREE_RUN);
+      ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
       wait_drctl_level(1'b1, 20000, cyc);
       if (cyc < 20000) begin
         `INFO(("  Free-run restart after period stop (%0d sync_clk cycles) - PASSED", cyc),
@@ -1054,14 +1015,14 @@ program test_program_drg (
       localparam int STOP_BURSTS = 3;
 
       stop_pwm();
-      axi_write(reg_addr(REG_RAMP_BURSTS), STOP_BURSTS);
-      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_BURST_STOP);
+      ad9910.set_ramp_bursts(STOP_BURSTS);
+      ad9910.set_ramp_cfg(RAMP_CFG_BURST_STOP);
       program_pwm(PWM_PERIOD, PWM_WIDTH);
       // As above, but a whole burst is allowed to run before the park.
       repeat (STOP_BURSTS * PWM_PERIOD + CDC_XFER_JITTER) @(posedge sync_clk_tp);
       check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=burst_stop");
 
-      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_FREE_RUN);
+      ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
       measure_drctl_waveform(4, 200, high_c, per_c);
       if (all_equal(per_c, PWM_PERIOD)) begin
         `INFO(("  Free-run restart after burst stop - PASSED"), ADI_VERBOSITY_NONE);
@@ -1072,8 +1033,8 @@ program test_program_drg (
       end
 
       stop_pwm();
-      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
-      axi_write(reg_addr(REG_RAMP_CFG), RAMP_CFG_FREE_RUN);
+      ad9910.set_ramp_bursts(32'd0);
+      ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
     end
 
     // ----------------------------------------
@@ -1085,8 +1046,8 @@ program test_program_drg (
     current_test = 10;
     `INFO(("TC10: DRHOLD passthrough"), ADI_VERBOSITY_NONE);
 
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h1 << DRG_DRHOLD);
-    #CFG_SETTLE_NS;
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b1));
+    #(CFG_SETTLE_NS * 1ns);
     if (drhold_tp === 1'b1) begin
       `INFO(("  DRHOLD=1 -> drhold pin high - PASSED"), ADI_VERBOSITY_NONE);
     end else begin
@@ -1094,8 +1055,8 @@ program test_program_drg (
       test_passed = 0;
     end
 
-    axi_write(reg_addr(REG_DRG_CTRL), 32'h0);
-    #CFG_SETTLE_NS;
+    ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
+    #(CFG_SETTLE_NS * 1ns);
     if (drhold_tp === 1'b0) begin
       `INFO(("  DRHOLD=0 -> drhold pin low - PASSED"), ADI_VERBOSITY_NONE);
     end else begin
@@ -1110,14 +1071,14 @@ program test_program_drg (
     `INFO(("TC11: Profile output"), ADI_VERBOSITY_NONE);
 
     for (int p = 0; p < 8; p++) begin
-      axi_write(reg_addr(REG_PROFILE), p);
-      #CFG_SETTLE_NS;
+      ad9910.set_profile(p);
+      #(CFG_SETTLE_NS * 1ns);
       if (profile_tp !== p[2:0]) begin
         `ERROR(("  PROFILE=%0d but profile pin=%0d", p, profile_tp));
         test_passed = 0;
       end
     end
-    axi_write(reg_addr(REG_PROFILE), 32'd0);
+    ad9910.set_profile(32'd0);
     `INFO(("  All 8 profile values - PASSED"), ADI_VERBOSITY_NONE);
 
     // ----------------------------------------
@@ -1299,14 +1260,14 @@ program test_program_drg (
       localparam int ARM_DELAY = 2000;
 
       stop_pwm();
-      axi_write(reg_addr(REG_BST_DELAY), ARM_DELAY);
-      axi_write(reg_addr(REG_MON_MAX_PERIOD), MON_MAX);
-      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
-                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_MAX_PERIOD);
+      ad9910.set_bst_delay(ARM_DELAY);
+      ad9910.set_monitor_max_period(MON_MAX);
+      ad9910.set_trig_out_ctrl(.trig_out_mask(6'h3 << IRQ_INTERVAL_STOP),
+                               .trig_config(MON_CFG_MAX_PERIOD));
 
       for (int k = 0; k < 3; k++) begin
-        axi_write(reg_addr(REG_TRIG_START), start_match[k]);
-        axi_write(reg_addr(REG_TRIG_STOP), stop_match[k]);
+        ad9910.set_trig_start_interval(start_match[k]);
+        ad9910.set_trig_stop_interval(stop_match[k]);
         // A start event (re-)arms the counter; restarting the PWM produces one.
         program_pwm(2000, 1000);
 
@@ -1333,8 +1294,8 @@ program test_program_drg (
       // A match value of zero disables that pulse.
       begin
         int unsigned n_pulses;
-        axi_write(reg_addr(REG_TRIG_START), 32'd0);
-        axi_write(reg_addr(REG_TRIG_STOP), 32'd0);
+        ad9910.set_trig_start_interval(32'd0);
+        ad9910.set_trig_stop_interval(32'd0);
         program_pwm(2000, 1000);
         count_trig_pulses(4000, n_pulses);
         if (n_pulses == 0) begin
@@ -1346,9 +1307,9 @@ program test_program_drg (
         stop_pwm();
       end
 
-      axi_write(reg_addr(REG_TRIG_OUT_CTRL), 32'd0);
-      axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'd0);
-      axi_write(reg_addr(REG_BST_DELAY), 32'd0);
+      ad9910.set_trig_out_ctrl(.trig_out_mask(6'd0), .trig_config(2'd0));
+      ad9910.set_monitor_max_period(32'd0);
+      ad9910.set_bst_delay(32'd0);
     end
 
     // ----------------------------------------
@@ -1375,27 +1336,27 @@ program test_program_drg (
       localparam int ARM_DELAY = 1500; // see TC13: pushes start_event past the settle
 
       stop_pwm();
-      axi_write(reg_addr(REG_BST_DELAY), ARM_DELAY);
-      axi_write(reg_addr(REG_MON_MAX_PERIOD), MON_MAX);
-      axi_write(reg_addr(REG_TRIG_START), 32'd50);
-      axi_write(reg_addr(REG_TRIG_STOP), 32'd0);      // start pulse only
-      axi_write(reg_addr(REG_RAMP_BURSTS), BURSTS);
-      axi_write(reg_addr(REG_BURST_DELAY), 2 * PWM_P);
+      ad9910.set_bst_delay(ARM_DELAY);
+      ad9910.set_monitor_max_period(MON_MAX);
+      ad9910.set_trig_start_interval(32'd50);
+      ad9910.set_trig_stop_interval(32'd0);      // start pulse only
+      ad9910.set_ramp_bursts(BURSTS);
+      ad9910.set_burst_delay(2 * PWM_P);
 
-      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
-                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_PERIOD);
+      ad9910.set_trig_out_ctrl(.trig_out_mask(6'h3 << IRQ_INTERVAL_STOP),
+                               .trig_config(MON_CFG_PERIOD));
       program_pwm(PWM_P, PWM_P / 2);
       count_trig_pulses(OBS_CYC, n_period_mode);
       stop_pwm();
 
-      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
-                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_BURST_DLY);
+      ad9910.set_trig_out_ctrl(.trig_out_mask(6'h3 << IRQ_INTERVAL_STOP),
+                               .trig_config(MON_CFG_BURST_DLY));
       program_pwm(PWM_P, PWM_P / 2);
       count_trig_pulses(OBS_CYC, n_burst_mode);
       stop_pwm();
 
-      axi_write(reg_addr(REG_TRIG_OUT_CTRL),
-                (32'h3 << (TRIG_MASK_SHIFT + IRQ_INTERVAL_STOP)) | MON_CFG_MAX_PERIOD);
+      ad9910.set_trig_out_ctrl(.trig_out_mask(6'h3 << IRQ_INTERVAL_STOP),
+                               .trig_config(MON_CFG_MAX_PERIOD));
       program_pwm(PWM_P, PWM_P / 2);
       count_trig_pulses(OBS_CYC, n_max_mode);
       stop_pwm();
@@ -1434,11 +1395,11 @@ program test_program_drg (
         `INFO(("  Monitor source selection - PASSED"), ADI_VERBOSITY_NONE);
       end
 
-      axi_write(reg_addr(REG_TRIG_OUT_CTRL), 32'd0);
-      axi_write(reg_addr(REG_MON_MAX_PERIOD), 32'd0);
-      axi_write(reg_addr(REG_TRIG_START), 32'd0);
-      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
-      axi_write(reg_addr(REG_BURST_DELAY), 32'd0);
+      ad9910.set_trig_out_ctrl(.trig_out_mask(6'd0), .trig_config(2'd0));
+      ad9910.set_monitor_max_period(32'd0);
+      ad9910.set_trig_start_interval(32'd0);
+      ad9910.set_ramp_bursts(32'd0);
+      ad9910.set_burst_delay(32'd0);
     end
 
     // ----------------------------------------
@@ -1449,12 +1410,12 @@ program test_program_drg (
 
     begin
       stop_pwm();
-      axi_write(reg_addr(REG_IRQ_MASK), 32'd0);
+      ad9910.set_irq_mask(32'd0);
       // The clear reaches the sync domain through the control CDC and
       // up_irq_clear stays asserted until that transfer completes, so give it
       // time to land before generating the event it must not swallow.
-      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
-      #CFG_SETTLE_NS;
+      ad9910.set_irq_table(32'h3f);
+      #(CFG_SETTLE_NS * 1ns);
 
       // ram_swp_ovr is a plain input, the simplest source to drive.
       ram_swp_ovr_tp = 1'b1;
@@ -1470,7 +1431,7 @@ program test_program_drg (
         test_passed = 0;
       end
 
-      axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+      ad9910.get_irq_table(read_data);
       if (read_data[IRQ_RAM_SWP_OVR]) begin
         `INFO(("  IRQ_TABLE latched ram_swp_ovr (0x%02x) - PASSED", read_data),
               ADI_VERBOSITY_NONE);
@@ -1480,8 +1441,8 @@ program test_program_drg (
       end
 
       // Unmasking an already-latched source must drive irq.
-      axi_write(reg_addr(REG_IRQ_MASK), 32'h1 << IRQ_RAM_SWP_OVR);
-      #CFG_SETTLE_NS;
+      ad9910.set_irq_mask(32'h1 << IRQ_RAM_SWP_OVR);
+      #(CFG_SETTLE_NS * 1ns);
       if (ad9910_irq_tp === 1'b1) begin
         `INFO(("  Unmasking a latched source asserts irq - PASSED"), ADI_VERBOSITY_NONE);
       end else begin
@@ -1492,9 +1453,9 @@ program test_program_drg (
       // W1C clears the latch. The source is no longer asserting, so the bit
       // must stay clear - a still-active level source would immediately
       // re-latch.
-      axi_write(reg_addr(REG_IRQ_TABLE), 32'h1 << IRQ_RAM_SWP_OVR);
-      #CFG_SETTLE_NS;
-      axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+      ad9910.set_irq_table(32'h1 << IRQ_RAM_SWP_OVR);
+      #(CFG_SETTLE_NS * 1ns);
+      ad9910.get_irq_table(read_data);
       if (!read_data[IRQ_RAM_SWP_OVR] && ad9910_irq_tp === 1'b0) begin
         `INFO(("  W1C cleared the latch and deasserted irq - PASSED"), ADI_VERBOSITY_NONE);
       end else begin
@@ -1503,11 +1464,11 @@ program test_program_drg (
       end
 
       // bursts_complete reaches the table through the ramp machinery.
-      axi_write(reg_addr(REG_IRQ_MASK), 32'h1 << IRQ_BURSTS);
-      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
-      #CFG_SETTLE_NS;
-      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd2);
-      axi_write(reg_addr(REG_BURST_DELAY), 2 * PWM_PERIOD);
+      ad9910.set_irq_mask(32'h1 << IRQ_BURSTS);
+      ad9910.set_irq_table(32'h3f);
+      #(CFG_SETTLE_NS * 1ns);
+      ad9910.set_ramp_bursts(32'd2);
+      ad9910.set_burst_delay(2 * PWM_PERIOD);
       program_pwm(PWM_PERIOD, PWM_WIDTH);
 
       // White-box cross-check alongside the black-box register read, so a
@@ -1535,7 +1496,7 @@ program test_program_drg (
           if (system_tb.test_harness.axi_ad9910.inst.terminal_end_burst) teb_pulses++;
           if (system_tb.test_harness.axi_ad9910.inst.bursts_complete)    bc_pulses++;
         end
-        axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+        ad9910.get_irq_table(read_data);
         // end_period should track drctl_rises one-for-one. If drctl moves
         // while end_period stays zero, the hierarchical probe is at fault
         // rather than the DUT.
@@ -1563,12 +1524,12 @@ program test_program_drg (
       // check would otherwise be satisfied by the setup itself rather than by
       // the ramp - the model asserts drover the moment it is enabled, since it
       // starts sitting on the lower limit.
-      axi_write(reg_addr(REG_IRQ_MASK), 32'h1 << IRQ_DROVER);
+      ad9910.set_irq_mask(32'h1 << IRQ_DROVER);
       program_pwm(PWM_PERIOD, PWM_PERIOD / 2);
       repeat (PWM_PERIOD) @(posedge sync_clk_tp);
-      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
+      ad9910.set_irq_table(32'h3f);
       repeat (3 * PWM_PERIOD) @(posedge sync_clk_tp);
-      axi_read(reg_addr(REG_IRQ_TABLE), read_data);
+      ad9910.get_irq_table(read_data);
       if (read_data[IRQ_DROVER]) begin
         `INFO(("  drover latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_NONE);
       end else begin
@@ -1577,10 +1538,10 @@ program test_program_drg (
       end
 
       stop_pwm();
-      axi_write(reg_addr(REG_IRQ_MASK), 32'd0);
-      axi_write(reg_addr(REG_IRQ_TABLE), 32'h3f);
-      axi_write(reg_addr(REG_RAMP_BURSTS), 32'd0);
-      axi_write(reg_addr(REG_BURST_DELAY), 32'd0);
+      ad9910.set_irq_mask(32'd0);
+      ad9910.set_irq_table(32'h3f);
+      ad9910.set_ramp_bursts(32'd0);
+      ad9910.set_burst_delay(32'd0);
     end
 
     // ----------------------------------------
@@ -1598,8 +1559,8 @@ program test_program_drg (
 
       while ($time < 800us) #10us;
 
-      axi_read(reg_addr(REG_SYNC_CLK_CNT), sync_cnt);
-      axi_read(reg_addr(REG_PD_CLK_CNT), pd_cnt);
+      ad9910.get_sync_clk_cnt(sync_cnt);
+      ad9910.get_pd_clk_count(pd_cnt);
       `INFO(("  SYNC_CLK_CNT=%0d  PD_CLK_COUNT=%0d (both clocks are 250 MHz)",
              sync_cnt, pd_cnt), ADI_VERBOSITY_LOW);
 

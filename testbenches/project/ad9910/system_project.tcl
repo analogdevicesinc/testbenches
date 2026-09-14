@@ -35,6 +35,10 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/regmaps/adi_regmap_common_pkg.sv" \
 ]
 
+# axi_ad9910 register map and API driver class, used by both test programs.
+# Also pulls in adi_common_pkg / adi_regmap_pkg / adi_api_pkg via sp_include_regmap.
+source $ad_tb_dir/library/includes/sp_include_ad9910.tcl
+
 # Add mode-specific test files
 if {$ad_project_params(MODE) == "PAR_IF"} {
   source $ad_tb_dir/library/includes/sp_include_dmac.tcl

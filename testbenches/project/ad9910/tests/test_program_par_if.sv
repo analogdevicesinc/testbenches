@@ -60,7 +60,9 @@ import axi_vip_pkg::*;
 import test_harness_env_pkg::*;
 import adi_regmap_pkg::*;
 import adi_regmap_common_pkg::*;
+import adi_regmap_ad9910_pkg::*;
 import adi_regmap_dmac_pkg::*;
+import ad9910_api_pkg::*;
 import dmac_api_pkg::*;
 import dma_trans_pkg::*;
 
@@ -86,29 +88,8 @@ program test_program_par_if (
   timeunit 1ns;
   timeprecision 1ps;
 
-  // --------------------------
-  // Register addresses (word offsets, from axi_ad9910_reg.v)
-  // --------------------------
-  localparam REG_VERSION         = 7'h00;
-  localparam REG_ID              = 7'h01;
-  localparam REG_SCRATCH         = 7'h02;
-  localparam REG_CONFIG          = 7'h03;   // [0] = MEASURE_CLKS_EN (read-only)
-  localparam REG_RESET_CTRL      = 7'h10;   // [0] = core reset (defaults 1)
-  localparam REG_EXT_TRIG_CFG    = 7'h15;   // {ext_sync_disarm, ext_sync_arm}
-  localparam REG_PD_CLK_CNT      = 7'h40;   // pd_clk monitor
-  localparam REG_UPDATE_CTRL     = 7'h41;
-  localparam REG_PAR_UPDATE_RATE = 7'h42;
-  localparam REG_F_CFG           = 7'h43;   // [1:0] driven onto f_o
-  // 0x44 / 0x45 (old DEBUG_SENT_CONFIGS / DEBUG_LAST_SENT_CFG) are removed.
-
-  // UPDATE_CTRL (0x41) bit positions
-  localparam CTRL_LOAD_NEW_RATE      = 0;
-  localparam CTRL_ENABLE_P_IF        = 1;
-  localparam CTRL_TRANSFER_TRIG_MODE = 2;
-
-  // EXT_TRIG_CFG (0x15) bit positions
-  localparam EXT_SYNC_ARM    = 0;
-  localparam EXT_SYNC_DISARM = 1;
+  // Register offsets and field positions come from adi_regmap_ad9910_pkg and are
+  // reached through ad9910_api - this test holds none of its own.
 
   // --------------------------
   // Timing constants (timeunit is 1ns, so these are nanoseconds)
@@ -146,28 +127,13 @@ program test_program_par_if (
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
   dmac_api tx_dma;
 
+  // All axi_ad9910 register access goes through this API (coding_guidelines
+  // I3/I4); register offsets and field positions live in adi_regmap_ad9910_pkg.
+  ad9910_api ad9910;
+
   bit [31:0] read_data;
   bit        test_passed = 1;
   int        current_test = 0;   // waveform navigation aid
-
-  // --------------------------
-  // AXI-Lite register access
-  // --------------------------
-  task axi_write(input [31:0] waddr, input [31:0] wdata);
-    base_env.mng.master_sequencer.RegWrite32(waddr, wdata);
-  endtask
-
-  task axi_read(input [31:0] raddr, output [31:0] data);
-    base_env.mng.master_sequencer.RegRead32(raddr, data);
-  endtask
-
-  task axi_read_v(input [31:0] raddr, input [31:0] vdata);
-    base_env.mng.master_sequencer.RegReadVerify32(raddr, vdata);
-  endtask
-
-  function [31:0] reg_addr(input [6:0] offset);
-    return `AXI_AD9910_BA + (offset << 2);
-  endfunction
 
   // --------------------------
   // DDR backdoor helpers
@@ -295,17 +261,18 @@ program test_program_par_if (
   // Enable the parallel interface at the given internal update rate (0 = fastest,
   // one word per pd_clk). trig_mode 0 = internal rate counter, 1 = external ext_sync.
   task automatic enable_par_if(input [31:0] update_rate, input bit trig_mode = 0);
-    axi_write(reg_addr(REG_PAR_UPDATE_RATE), update_rate);
-    axi_write(reg_addr(REG_UPDATE_CTRL),
-      (trig_mode << CTRL_TRANSFER_TRIG_MODE) |
-      (1 << CTRL_ENABLE_P_IF) |
-      (1 << CTRL_LOAD_NEW_RATE));
-    #CDC_SETTLE_NS;   // CDC of the control word into the pd_clk domain
+    ad9910.set_par_update_rate(update_rate);
+    ad9910.set_update_ctrl(.transfer_trig_mode(trig_mode),
+                           .enable_p_if(1'b1),
+                           .load_new_rate(1'b1));
+    #(CDC_SETTLE_NS * 1ns);   // CDC of the control word into the pd_clk domain
   endtask
 
   task automatic disable_par_if();
-    axi_write(reg_addr(REG_UPDATE_CTRL), 32'h0);
-    #CDC_SETTLE_NS;
+    ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
+                           .enable_p_if(1'b0),
+                           .load_new_rate(1'b0));
+    #(CDC_SETTLE_NS * 1ns);
   endtask
 
   // Run one internal-rate transfer with clean separation from any prior one:
@@ -431,75 +398,79 @@ program test_program_par_if (
     tx_dma = new("TX_DMA", base_env.mng.master_sequencer, `TX_DMA_BA);
     tx_dma.probe();
 
+    ad9910 = new(
+      .name("AD9910 API"),
+      .bus(base_env.mng.master_sequencer),
+      .base_address(`AXI_AD9910_BA));
+
     // Ramp and backpressure TCs run long; widen the default 1 ms watchdog.
     base_env.simulation_watchdog.update_timer(32'd5_000_000);
     base_env.simulation_watchdog.reset();
 
     `INFO(("==== AD9910 Parallel Interface Testbench (PAR_IF) ===="), ADI_VERBOSITY_NONE);
 
-    // Release the core reset (up_reset defaults to 1, holding both clock domains).
-    axi_write(reg_addr(REG_RESET_CTRL), 32'h0);
-    #CDC_SETTLE_NS;
+    // Release the core reset. RESET_CTRL.RESET resets to 1 (axi_ad9910_reg.v:157),
+    // holding both clock domains until software clears it.
+    ad9910.set_reset_ctrl(.reset(1'b0));
+    #(CDC_SETTLE_NS * 1ns);
 
     // ----------------------------------------
     // TC1: Register sanity
     // ----------------------------------------
-    // Reads identity registers, round-trips SCRATCH and the PAR_IF RW registers
-    // with distinct patterns, checks CONFIG.MEASURE_CLKS_EN, and confirms the
-    // removed 0x44/0x45 read 0 - the map shifted in the PWM rework, so a stale
-    // address produces no bus error, only a readback mismatch.
+    // sanity_test() verifies VERSION against its reset value and round-trips
+    // SCRATCH. Then the PAR_IF RW registers are round-tripped with distinct
+    // patterns and CONFIG.MEASURE_CLKS_EN is checked.
     current_test = 1;
     `INFO(("TC1: Register sanity"), ADI_VERBOSITY_NONE);
     begin
       bit [31:0] pd_cnt;
+      bit        measure_clks_en;
+      bit        trig_mode, enable_p_if, load_new_rate;
 
-      axi_read(reg_addr(REG_VERSION), read_data);
+      ad9910.sanity_test();
+
+      ad9910.get_version(read_data);
       `INFO(("  VERSION = 0x%08x", read_data), ADI_VERBOSITY_LOW);
-      axi_read(reg_addr(REG_ID), read_data);
+      ad9910.get_id(read_data);
       `INFO(("  ID = 0x%08x", read_data), ADI_VERBOSITY_LOW);
 
-      axi_write(reg_addr(REG_SCRATCH), 32'hCAFE_BABE);
-      axi_read_v(reg_addr(REG_SCRATCH), 32'hCAFE_BABE);
+      ad9910.set_scratch(32'hCAFE_BABE);
+      ad9910.verify_scratch(32'hCAFE_BABE);
 
-      axi_read(reg_addr(REG_CONFIG), read_data);
-      if (read_data[0])
+      // The regmap records the IP default (0); this BD sets MEASURE_CLKS_EN=1, so
+      // the expectation belongs here rather than in the reset value.
+      ad9910.get_config(measure_clks_en);
+      if (measure_clks_en)
         `INFO(("  CONFIG.MEASURE_CLKS_EN = 1 - PASSED"), ADI_VERBOSITY_NONE);
       else begin
         `ERROR(("  CONFIG.MEASURE_CLKS_EN = 0, expected 1"));
         test_passed = 0;
       end
 
-      axi_write(reg_addr(REG_PAR_UPDATE_RATE), 32'h1234_5678);
-      axi_read_v(reg_addr(REG_PAR_UPDATE_RATE), 32'h1234_5678);
+      ad9910.set_par_update_rate(32'h1234_5678);
+      ad9910.verify_par_update_rate(32'h1234_5678);
 
-      axi_write(reg_addr(REG_F_CFG), 32'h3);
-      axi_read_v(reg_addr(REG_F_CFG), 32'h3);
-      axi_write(reg_addr(REG_F_CFG), 32'h0);
+      ad9910.set_f_cfg(2'h3);
+      ad9910.verify_f_cfg(2'h3);
+      ad9910.set_f_cfg(2'h0);
 
-      // enable_p_if (bit 1) is a plain RW bit; load_new_rate (bit 0) self-clears,
-      // so it is not part of the readback check.
-      axi_write(reg_addr(REG_UPDATE_CTRL), (1 << CTRL_ENABLE_P_IF));
-      axi_read(reg_addr(REG_UPDATE_CTRL), read_data);
-      if (read_data[CTRL_ENABLE_P_IF])
+      // enable_p_if is a plain RW bit; load_new_rate self-clears, so it is not
+      // part of the readback check.
+      ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
+                             .enable_p_if(1'b1),
+                             .load_new_rate(1'b0));
+      ad9910.get_update_ctrl(trig_mode, enable_p_if, load_new_rate);
+      if (enable_p_if)
         `INFO(("  UPDATE_CTRL readback - PASSED"), ADI_VERBOSITY_NONE);
       else begin
-        `ERROR(("  UPDATE_CTRL readback = 0x%08x", read_data));
+        `ERROR(("  UPDATE_CTRL readback: enable_p_if = %0b, expected 1", enable_p_if));
         test_passed = 0;
       end
-      axi_write(reg_addr(REG_UPDATE_CTRL), 32'h0);
+      ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
+                             .enable_p_if(1'b0),
+                             .load_new_rate(1'b0));
 
-      axi_read(reg_addr(7'h44), read_data);
-      if (read_data != 0) begin
-        `ERROR(("  removed reg 0x44 read 0x%08x, expected 0", read_data));
-        test_passed = 0;
-      end
-      axi_read(reg_addr(7'h45), read_data);
-      if (read_data != 0) begin
-        `ERROR(("  removed reg 0x45 read 0x%08x, expected 0", read_data));
-        test_passed = 0;
-      end
-
-      axi_read(reg_addr(REG_PD_CLK_CNT), pd_cnt);
+      ad9910.get_pd_clk_count(pd_cnt);
       `INFO(("  PD_CLK_COUNT = %0d (monitor needs ~655 us to update)", pd_cnt),
             ADI_VERBOSITY_LOW);
       `INFO(("  Register sanity - PASSED"), ADI_VERBOSITY_NONE);
@@ -662,10 +633,11 @@ program test_program_par_if (
       // (a fresh rising edge), with enough settle for the up->pd CDC to carry each
       // level distinctly.
       for (int i = 0; i < N; i++) begin
-        axi_write(reg_addr(REG_EXT_TRIG_CFG), 32'h0);                // clear arm level
-        #CDC_SETTLE_NS;
-        axi_write(reg_addr(REG_EXT_TRIG_CFG), (1 << EXT_SYNC_ARM));  // rising edge -> armed
-        #CDC_SETTLE_NS;
+        // clear the arm level, then re-assert it for a fresh rising edge
+        ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b0));
+        #(CDC_SETTLE_NS * 1ns);
+        ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b1));
+        #(CDC_SETTLE_NS * 1ns);
         ext_sync_tp = 1'b1; #200ns; ext_sync_tp = 1'b0;             // sync_in rising -> fire
         // Wait for THIS trigger's word instead of a blind settle. Stronger as well
         // as shorter: it asserts every individual trigger produces exactly one
@@ -686,14 +658,14 @@ program test_program_par_if (
     begin
       bit ok = 1;
       for (int v = 0; v < 4; v++) begin
-        axi_write(reg_addr(REG_F_CFG), v[31:0]);
-        #CDC_SETTLE_NS;   // CDC into pd domain
+        ad9910.set_f_cfg(v[1:0]);
+        #(CDC_SETTLE_NS * 1ns);   // CDC into pd domain
         if (f_o_tp !== v[1:0]) begin
           `ERROR(("  F_CFG=%0d -> f_o=0x%01x, expected 0x%01x", v, f_o_tp, v[1:0]));
           ok = 0;
         end
       end
-      axi_write(reg_addr(REG_F_CFG), 32'h0);
+      ad9910.set_f_cfg(2'h0);
       #CDC_SETTLE_NS;
       if (ok) `INFO(("  All 4 F_CFG values reflected on f_o - PASSED"), ADI_VERBOSITY_NONE);
       else    test_passed = 0;

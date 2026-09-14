@@ -7,6 +7,7 @@
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_common.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_ad9910.mk
 
 # Remaining test-bench dependencies except test programs
 SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_common_pkg.sv

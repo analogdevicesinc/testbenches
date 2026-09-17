@@ -708,7 +708,7 @@ program test_program_cmos (
   // ADC 0 behavioral model
   initial begin
     forever begin
-      @(posedge `TH.adc_clk);
+      @(posedge `TH.adc_clk_out);
 
       if ((~cnvs_d_0 & adc_0_cnvs_tp && busy_0 == 0) && current_tc.os_en == 0) begin
         if (scki_counter_0 > 0 && scki_counter_0 < scki_edges_0)
@@ -773,7 +773,7 @@ program test_program_cmos (
   // ADC 1 behavioral model
   initial begin
     forever begin
-      @(posedge `TH.adc_clk);
+      @(posedge `TH.adc_clk_out);
 
       if ((~cnvs_d_1 & adc_1_cnvs_tp && busy_1 == 0) && current_tc.os_en == 0) begin
         if (scki_counter_1 > 0 && scki_counter_1 < scki_edges_1)

@@ -685,7 +685,7 @@ program test_program_lvds (
   // ADC 0 busy model
   initial begin
     forever begin
-      @(posedge `TH.adc_clk);
+      @(posedge `TH.adc_clk_out);
 
       if ((~cnvs_d_0 & adc_0_cnvs_tp && busy_0 == 0) && current_tc.os_en == 0) begin
         if (scki_counter_0 > 0 && scki_counter_0 < scki_edges_0)
@@ -734,7 +734,7 @@ program test_program_lvds (
   // ADC 1 busy model
   initial begin
     forever begin
-      @(posedge `TH.adc_clk);
+      @(posedge `TH.adc_clk_out);
 
       if ((~cnvs_d_1 & adc_1_cnvs_tp && busy_1 == 0) && current_tc.os_en == 0) begin
         if (scki_counter_1 > 0 && scki_counter_1 < scki_edges_1)
@@ -783,7 +783,7 @@ program test_program_lvds (
   // ADC 0 LVDS shift register model (triggered on fast_clk edges)
   initial begin
     forever begin
-      @(posedge `TH.adc_fast_clk, negedge `TH.adc_fast_clk);
+      @(posedge `TH.adc_fast_clk_out, negedge `TH.adc_fast_clk_out);
 
       if (adc_0_scki_p_tp ^ scki_p_d_0) begin
         ring_buffer_index_0 = (db_i_index_0 == 'd0) ? ring_buffer_index_0 + 1 :
@@ -805,7 +805,7 @@ program test_program_lvds (
   // ADC 1 LVDS shift register model (triggered on fast_clk edges)
   initial begin
     forever begin
-      @(posedge `TH.adc_fast_clk, negedge `TH.adc_fast_clk);
+      @(posedge `TH.adc_fast_clk_out, negedge `TH.adc_fast_clk_out);
 
       if (adc_1_scki_p_tp ^ scki_p_d_1) begin
         ring_buffer_index_1 = (db_i_index_1 == 'd0) ? ring_buffer_index_1 + 1 :

@@ -256,6 +256,7 @@ program test_program_cmos (
       .base_address(`AD4858_ADC_CLKGEN_BA));
 
     `TH.sys_200m_clk_vip.inst.IF.start_clock();
+    `TH.adc_clk_vip.inst.IF.start_clock();
 
     base_env.start();
     base_env.sys_reset();

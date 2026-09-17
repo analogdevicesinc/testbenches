@@ -78,6 +78,32 @@ disconnect_bd_net [get_bd_nets sys_200m_clk] [get_bd_pins axi_ad4858_1/delay_clk
 ad_connect sys_mem_clk axi_ad4858_0/delay_clk
 ad_connect sys_mem_clk axi_ad4858_1/delay_clk
 
+# ADC clock VIP - bypasses the MMCM in simulation to avoid long lock delay
+ad_ip_instance clk_vip adc_clk_vip [list \
+  INTERFACE_MODE {MASTER} \
+  FREQ_HZ 200000000 \
+]
+adi_sim_add_define "ADC_CLK=adc_clk_vip"
+disconnect_bd_net [get_bd_nets adc_clk] [get_bd_pins adc_clkgen/clk_0]
+ad_connect adc_clk adc_clk_vip/clk_out
+
+create_bd_port -dir O adc_clk_out
+ad_connect adc_clk_out adc_clk_vip/clk_out
+
+if {$LVDS_CMOS_N == 1} {
+  # LVDS also uses a 400MHz fast clock from the MMCM second output - bypass it too
+  ad_ip_instance clk_vip adc_fast_clk_vip [list \
+    INTERFACE_MODE {MASTER} \
+    FREQ_HZ 400000000 \
+  ]
+  adi_sim_add_define "ADC_FAST_CLK=adc_fast_clk_vip"
+  disconnect_bd_net [get_bd_nets adc_fast_clk] [get_bd_pins adc_clkgen/clk_1]
+  ad_connect adc_fast_clk adc_fast_clk_vip/clk_out
+
+  create_bd_port -dir O adc_fast_clk_out
+  ad_connect adc_fast_clk_out adc_fast_clk_vip/clk_out
+}
+
 # AXI address map for ADC 0
 set BA_AD4858_0 0x43C00000
 set_property offset $BA_AD4858_0 [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_axi_ad4858_0}]

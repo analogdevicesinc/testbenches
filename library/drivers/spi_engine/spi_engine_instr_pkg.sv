@@ -13,6 +13,7 @@ package spi_engine_instr_pkg;
 
 // Configuration register instructions
 `define INST_CFG               (32'h0000_2100 | (`SDO_IDLE_STATE << 3) | (`THREE_WIRE << 2) | (`CPOL << 1) | `CPHA)
+`define SET_CFG(cpol,cpha,ddr_en) ((`INST_CFG) & ~32'h13 | ((ddr_en) << 4) | ((cpol) << 1) | (cpha))
 `define INST_PRESCALE          (32'h0000_2000 | `CLOCK_DIVIDER)
 `define INST_DLENGTH           (32'h0000_2200 | `DATA_DLENGTH)
 `define SET_DLENGTH(d)         ((`INST_DLENGTH) & ~32'hFF | (d & 8'hFF))

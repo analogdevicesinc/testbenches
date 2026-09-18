@@ -14,7 +14,6 @@ include $(ADI_TB_DIR)/library/includes/Makeinclude_clk_gen.mk
 ENV_DEPS += $(ADI_HDL_DIR)/library//util_cdc/sync_bits.v
 ENV_DEPS += $(ADI_HDL_DIR)/library//common/ad_edge_detect.v
 
-LIB_DEPS += ad463x_data_capture
 LIB_DEPS += axi_dmac
 LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_pwm_gen

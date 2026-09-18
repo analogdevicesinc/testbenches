@@ -45,10 +45,15 @@ adi_sim_add_define "DEVICE_NO=4858"
 
 # In simulation, ad_mem_hp1_interconnect with sys_ps8 is not needed - the
 # ddr_axi_vip handles memory. Redefine to no-op before sourcing the BD.
+# Also force DMA m_dest_axi onto sys_cpu_clk to eliminate async CDC in the
+# axi_mem_interconnect - multi-clock CDC causes XSim kernel crashes.
+# Override sys_dma_resetn to match sys_cpu_clk domain.
+set sys_dma_resetn sys_cpu_resetn
+
 rename ad_mem_hp1_interconnect ad_mem_hp1_interconnect_orig
 proc ad_mem_hp1_interconnect {p_clk p_name} {
   if {[string match "*sys_ps8*" $p_name]} { return }
-  ad_mem_hp1_interconnect_orig $p_clk $p_name
+  ad_mem_hp1_interconnect_orig sys_cpu_clk $p_name
 }
 
 source $ad_hdl_dir/projects/ad4858_fmcz_dual/common/ad4858_fmcz_bd.tcl
@@ -90,9 +95,6 @@ adi_sim_add_define "ADC_CLK=adc_clk_vip"
 disconnect_bd_net [get_bd_nets adc_clk] [get_bd_pins adc_clkgen/clk_0]
 ad_connect adc_clk adc_clk_vip/clk_out
 
-create_bd_port -dir O adc_clk_out
-ad_connect adc_clk_out adc_clk_vip/clk_out
-
 if {$LVDS_CMOS_N == 1} {
   # LVDS also uses a 400MHz fast clock from the MMCM second output - bypass it too
   ad_ip_instance clk_vip adc_fast_clk_vip [list \
@@ -102,9 +104,6 @@ if {$LVDS_CMOS_N == 1} {
   adi_sim_add_define "ADC_FAST_CLK=adc_fast_clk_vip"
   disconnect_bd_net [get_bd_nets adc_fast_clk] [get_bd_pins adc_clkgen/clk_1]
   ad_connect adc_fast_clk adc_fast_clk_vip/clk_out
-
-  create_bd_port -dir O adc_fast_clk_out
-  ad_connect adc_fast_clk_out adc_fast_clk_vip/clk_out
 }
 
 # AXI address map for ADC 0

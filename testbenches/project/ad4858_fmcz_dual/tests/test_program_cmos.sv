@@ -163,6 +163,7 @@ program test_program_cmos (
 
   int                    test_idx = 0;
   int                    num_tests = 0;
+  int                    dbg_cycle_cnt = 0;
   int                    rx_transfer_id_0;
   int                    rx_transfer_id_1;
 
@@ -262,7 +263,7 @@ program test_program_cmos (
     base_env.sys_reset();
 
     base_env.simulation_watchdog.stop();
-    base_env.simulation_watchdog.update_timer(10000000);
+    base_env.simulation_watchdog.update_timer(300000);
 
     sanity_test();
 
@@ -632,9 +633,9 @@ program test_program_cmos (
     logic crc_err_status;
 
     `INFO(("capture_data: waiting for DMA 0 transfer %0d", rx_transfer_id_0), ADI_VERBOSITY_NONE);
-    dma_0_api.wait_transfer_done(rx_transfer_id_0);
+    dma_0_api.wait_transfer_done(rx_transfer_id_0, , 100);
     `INFO(("capture_data: DMA 0 done, waiting for DMA 1 transfer %0d", rx_transfer_id_1), ADI_VERBOSITY_NONE);
-    dma_1_api.wait_transfer_done(rx_transfer_id_1);
+    dma_1_api.wait_transfer_done(rx_transfer_id_1, , 100);
     `INFO(("capture_data: DMA 1 done"), ADI_VERBOSITY_NONE);
     pwm_0_api.reset();
     pwm_1_api.reset();
@@ -712,7 +713,7 @@ program test_program_cmos (
   // ADC 0 behavioral model
   initial begin
     forever begin
-      @(posedge `TH.adc_clk_out);
+      @(posedge `TH.adc_clk);
 
       if ((~cnvs_d_0 & adc_0_cnvs_tp && busy_0 == 0) && current_tc.os_en == 0) begin
         if (scki_counter_0 > 0 && scki_counter_0 < scki_edges_0)
@@ -722,7 +723,7 @@ program test_program_cmos (
       end
 
       if (~cnvs_d_0 & adc_0_cnvs_tp && busy_0 == 0) begin
-        `INFO(("ADC0 model: CNV rising edge detected"), ADI_VERBOSITY_LOW);
+        `INFO(("ADC0 model: CNV rising edge detected"), ADI_VERBOSITY_NONE);
       end
 
       if ((~cnvs_d_0 & adc_0_cnvs_tp && busy_0 == 0) || busy_os_0 == 1) begin
@@ -748,7 +749,7 @@ program test_program_cmos (
       cnvs_d_0 = adc_0_cnvs_tp;
 
       if (busy_d_0 & !busy_0) begin
-        `INFO(("ADC0 model: conversion done, scki=%b", adc_0_scki_tp), ADI_VERBOSITY_LOW);
+        `INFO(("ADC0 model: conversion done, scki=%b", adc_0_scki_tp), ADI_VERBOSITY_NONE);
         db_i_index_0 = packet_sz - 1;
         ring_buffer_index_0 = 0;
         scki_counter_0 = scki_edges_0;
@@ -771,13 +772,23 @@ program test_program_cmos (
       scki_d2_0 = scki_d_0;
       scki_d_0 = adc_0_scki_tp;
       busy_d_0 = busy_0;
+
+      // Debug: on first 3 busy-fall events, print scki/scko from program ports
+      if (busy_d_0 & !busy_0) begin
+        dbg_cycle_cnt = dbg_cycle_cnt + 1;
+        if (dbg_cycle_cnt <= 3) begin
+          `INFO(("DBG conv#%0d: port scki=%b scko=%b scki_d=%b scki_d2=%b",
+                 dbg_cycle_cnt,
+                 adc_0_scki_tp, adc_0_scko_tp, scki_d_0, scki_d2_0), ADI_VERBOSITY_NONE);
+        end
+      end
     end
   end
 
   // ADC 1 behavioral model
   initial begin
     forever begin
-      @(posedge `TH.adc_clk_out);
+      @(posedge `TH.adc_clk);
 
       if ((~cnvs_d_1 & adc_1_cnvs_tp && busy_1 == 0) && current_tc.os_en == 0) begin
         if (scki_counter_1 > 0 && scki_counter_1 < scki_edges_1)
@@ -838,6 +849,7 @@ program test_program_cmos (
       busy_d_1 = busy_1;
     end
   end
+
 
   // Channel index routing for ADC 0
   generate

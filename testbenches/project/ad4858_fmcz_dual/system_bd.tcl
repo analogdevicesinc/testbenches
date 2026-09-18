@@ -68,15 +68,18 @@ ad_connect sys_200m_clk sys_200m_clk_vip/clk_out
 create_bd_port -dir O sys_200mhz_clk_out
 ad_connect sys_200mhz_clk_out sys_200m_clk_vip/clk_out
 
-# Reconnect delay_clk to sys_mem_clk (400MHz DDR clock, already in the
-# test harness) so IDELAYE3 REFCLK_FREQUENCY >= 300MHz as required.
-# Also set DELAY_REFCLK_FREQ parameter to match.
+# Reconnect delay_clk to 400MHz sys_mem_clk (from ddr_clk_vip) so that
+# IDELAYE3's REFCLK_FREQUENCY ≥300MHz constraint is satisfied.
+# Set DELAY_REFCLK_FREQ to match so the IP wrapper is configured correctly.
 ad_ip_parameter axi_ad4858_0 CONFIG.DELAY_REFCLK_FREQ 400
 ad_ip_parameter axi_ad4858_1 CONFIG.DELAY_REFCLK_FREQ 400
 disconnect_bd_net [get_bd_nets sys_200m_clk] [get_bd_pins axi_ad4858_0/delay_clk]
 disconnect_bd_net [get_bd_nets sys_200m_clk] [get_bd_pins axi_ad4858_1/delay_clk]
 ad_connect sys_mem_clk axi_ad4858_0/delay_clk
 ad_connect sys_mem_clk axi_ad4858_1/delay_clk
+# Disable IDELAYCTRL instantiation — delay_locked becomes 1'b1 immediately.
+ad_ip_parameter axi_ad4858_0 CONFIG.IODELAY_CTRL 0
+ad_ip_parameter axi_ad4858_1 CONFIG.IODELAY_CTRL 0
 
 # ADC clock VIP - bypasses the MMCM in simulation to avoid long lock delay
 ad_ip_instance clk_vip adc_clk_vip [list \

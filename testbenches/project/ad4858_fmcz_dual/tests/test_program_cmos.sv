@@ -163,7 +163,6 @@ program test_program_cmos (
 
   int                    test_idx = 0;
   int                    num_tests = 0;
-  int                    dbg_cycle_cnt = 0;
   int                    rx_transfer_id_0;
   int                    rx_transfer_id_1;
 
@@ -710,6 +709,31 @@ program test_program_cmos (
     end
   end
 
+  // Monitor adc_reset: print on every change
+  initial begin : dbg_reset_monitor
+    forever begin
+      @(`TH.adc_reset);
+      $display("ADC_RESET=%b t=%0t", `TH.adc_reset, $time);
+    end
+  end
+
+  // Monitor packer0 packed_fifo_wr_EN: print each posedge
+  initial begin : dbg_pack_monitor
+    forever begin
+      @(posedge `TH.ad4858_adc_pack_0_packed_fifo_wr_EN);
+      $display("PACK0_EN t=%0t reset=%b", $time, `TH.adc_reset);
+    end
+  end
+
+  // Monitor adc_valid: print first 5 posedges then stop
+  initial begin : dbg_valid_monitor
+    repeat(5) begin
+      @(posedge `TH.axi_ad4858_0_adc_valid);
+      $display("VALID t=%0t reset=%b pack0_en=%b",
+               $time, `TH.adc_reset, `TH.ad4858_adc_pack_0_packed_fifo_wr_EN);
+    end
+  end
+
   // ADC 0 behavioral model
   initial begin
     forever begin
@@ -772,16 +796,6 @@ program test_program_cmos (
       scki_d2_0 = scki_d_0;
       scki_d_0 = adc_0_scki_tp;
       busy_d_0 = busy_0;
-
-      // Debug: on first 3 busy-fall events, print scki/scko from program ports
-      if (busy_d_0 & !busy_0) begin
-        dbg_cycle_cnt = dbg_cycle_cnt + 1;
-        if (dbg_cycle_cnt <= 3) begin
-          `INFO(("DBG conv#%0d: port scki=%b scko=%b scki_d=%b scki_d2=%b",
-                 dbg_cycle_cnt,
-                 adc_0_scki_tp, adc_0_scko_tp, scki_d_0, scki_d2_0), ADI_VERBOSITY_NONE);
-        end
-      end
     end
   end
 

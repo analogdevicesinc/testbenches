@@ -21,15 +21,18 @@ set xcvr_config_required 1
 # Create the project
 adi_sim_project_xilinx $project_name
 
+source $ad_tb_dir/library/includes/sp_include_axis.tcl
 source $ad_tb_dir/library/includes/sp_include_clk_gen.tcl
 source $ad_tb_dir/library/includes/sp_include_converter.tcl
 source $ad_tb_dir/library/includes/sp_include_data_offload.tcl
 source $ad_tb_dir/library/includes/sp_include_dmac.tcl
 source $ad_tb_dir/library/includes/sp_include_jesd.tcl
+source $ad_tb_dir/library/includes/sp_include_scoreboard.tcl
 source $ad_tb_dir/library/includes/sp_include_xcvr.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
+  "environment.sv" \
   "tests/test_program.sv" \
 ]
 

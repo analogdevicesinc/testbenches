@@ -5,13 +5,17 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
+            <top_module name="adc_api_pkg" />
             <top_module name="adi_api_pkg" />
             <top_module name="adi_axi_agent_pkg" />
             <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_axis_agent_pkg" />
+            <top_module name="adi_axis_monitor_pkg" />
             <top_module name="adi_common_pkg" />
             <top_module name="adi_environment_pkg" />
             <top_module name="adi_jesd204_pkg" />
             <top_module name="adi_regmap_adc_pkg" />
+            <top_module name="adi_regmap_clkgen_pkg" />
             <top_module name="adi_regmap_dac_pkg" />
             <top_module name="adi_regmap_dmac_pkg" />
             <top_module name="adi_regmap_jesd_rx_pkg" />
@@ -21,17 +25,26 @@
             <top_module name="adi_vip_pkg" />
             <top_module name="adi_xcvr_pkg" />
             <top_module name="attributes" />
+            <top_module name="axi4stream_vip_pkg" />
             <top_module name="axi_vip_pkg" />
+            <top_module name="clk_gen_api_pkg" />
+            <top_module name="dac_api_pkg" />
+            <top_module name="dma_trans_pkg" />
+            <top_module name="dmac_api_pkg" />
+            <top_module name="environment_pkg" />
             <top_module name="glbl" />
             <top_module name="io_vip_if_base_pkg" />
             <top_module name="ipif_pkg" />
             <top_module name="irq_handler_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
+            <top_module name="m_axis_sequencer_pkg" />
             <top_module name="math_real" />
             <top_module name="numeric_std" />
             <top_module name="pub_sub_pkg" />
             <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="s_axis_sequencer_pkg" />
+            <top_module name="scoreboard_pkg" />
             <top_module name="standard" />
             <top_module name="std" />
             <top_module name="std_logic_1164" />
@@ -53,15 +66,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="92.198000000 us"></ZoomStartTime>
-      <ZoomEndTime time="216.998000001 us"></ZoomEndTime>
-      <Cursor1Time time="116.798000000 us"></Cursor1Time>
+      <ZoomStartTime time="142,920.600 ns"></ZoomStartTime>
+      <ZoomEndTime time="143,047.801 ns"></ZoomEndTime>
+      <Cursor1Time time="142,942.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="177"></NameColumnWidth>
-      <ValueColumnWidth column_width="197"></ValueColumnWidth>
+      <ValueColumnWidth column_width="181"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="109" />
+   <WVObjectSize size="129" />
    <wvobject fp_name="divider137" type="divider">
       <obj_property name="label">TEST SECTION 1</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -127,12 +140,12 @@
       <obj_property name="ObjectShortName">fifo_rd_underflow</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/fifo_rd_data_0">
-      <obj_property name="ElementShortName">fifo_rd_data_0[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_0[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_rd_data_0[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_0[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/fifo_rd_data_1">
-      <obj_property name="ElementShortName">fifo_rd_data_1[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_1[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_rd_data_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_1[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider170" type="divider">
       <obj_property name="label">EX RX CPACK</obj_property>
@@ -163,12 +176,12 @@
       <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_0">
-      <obj_property name="ElementShortName">fifo_wr_data_0[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_data_0[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_wr_data_0[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_0[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_1">
-      <obj_property name="ElementShortName">fifo_wr_data_1[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_data_1[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_wr_data_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_1[31:0]</obj_property>
    </wvobject>
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/m_axis">
       <obj_property name="ElementShortName">m_axis</obj_property>
@@ -178,14 +191,6 @@
       <obj_property name="label">EX RX DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_rx_axi_dma/s_axis">
-      <obj_property name="ElementShortName">s_axis</obj_property>
-      <obj_property name="ObjectShortName">s_axis</obj_property>
-   </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_rx_axi_dma/m_dest_axi">
-      <obj_property name="ElementShortName">m_dest_axi</obj_property>
-      <obj_property name="ObjectShortName">m_dest_axi</obj_property>
-   </wvobject>
    <wvobject fp_name="divider138" type="divider">
       <obj_property name="label">TEST SECTION 2</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -193,14 +198,6 @@
    <wvobject fp_name="divider139" type="divider">
       <obj_property name="label">EX TX DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_axi_dma/m_src_axi">
-      <obj_property name="ElementShortName">m_src_axi</obj_property>
-      <obj_property name="ObjectShortName">m_src_axi</obj_property>
-   </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_axi_dma/m_axis">
-      <obj_property name="ElementShortName">m_axis</obj_property>
-      <obj_property name="ObjectShortName">m_axis</obj_property>
    </wvobject>
    <wvobject fp_name="divider167" type="divider">
       <obj_property name="label">EX TX UPACK</obj_property>
@@ -366,14 +363,6 @@
       <obj_property name="label">EX TX OS DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_os_axi_dma/m_src_axi">
-      <obj_property name="ElementShortName">m_src_axi</obj_property>
-      <obj_property name="ObjectShortName">m_src_axi</obj_property>
-   </wvobject>
-   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_os_axi_dma/m_axis">
-      <obj_property name="ElementShortName">m_axis</obj_property>
-      <obj_property name="ObjectShortName">m_axis</obj_property>
-   </wvobject>
    <wvobject fp_name="divider233" type="divider">
       <obj_property name="label">EX TX OS UPACK</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -411,12 +400,12 @@
       <obj_property name="ObjectShortName">fifo_rd_underflow</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/fifo_rd_data_0">
-      <obj_property name="ElementShortName">fifo_rd_data_0[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_0[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_rd_data_0[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_0[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/fifo_rd_data_1">
-      <obj_property name="ElementShortName">fifo_rd_data_1[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_rd_data_1[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_rd_data_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_1[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider234" type="divider">
       <obj_property name="label">DUT RX OS CPACK</obj_property>
@@ -447,12 +436,12 @@
       <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/fifo_wr_data_0">
-      <obj_property name="ElementShortName">fifo_wr_data_0[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_data_0[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_wr_data_0[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_0[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/fifo_wr_data_1">
-      <obj_property name="ElementShortName">fifo_wr_data_1[15:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_data_1[15:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_wr_data_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_1[31:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/packed_fifo_wr_en">
       <obj_property name="ElementShortName">packed_fifo_wr_en</obj_property>
@@ -463,8 +452,8 @@
       <obj_property name="ObjectShortName">packed_fifo_wr_overflow</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/packed_fifo_wr_data">
-      <obj_property name="ElementShortName">packed_fifo_wr_data[31:0]</obj_property>
-      <obj_property name="ObjectShortName">packed_fifo_wr_data[31:0]</obj_property>
+      <obj_property name="ElementShortName">packed_fifo_wr_data[63:0]</obj_property>
+      <obj_property name="ObjectShortName">packed_fifo_wr_data[63:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/packed_sync">
       <obj_property name="ElementShortName">packed_sync</obj_property>
@@ -483,8 +472,8 @@
       <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/fifo_wr_din">
-      <obj_property name="ElementShortName">fifo_wr_din[31:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_wr_din[31:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_wr_din[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_din[63:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/fifo_wr_overflow">
       <obj_property name="ElementShortName">fifo_wr_overflow</obj_property>
@@ -497,5 +486,105 @@
    <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/m_dest_axi">
       <obj_property name="ElementShortName">m_dest_axi</obj_property>
       <obj_property name="ObjectShortName">m_dest_axi</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider239" type="divider">
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_0">
+      <obj_property name="ElementShortName">fifo_wr_data_0[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_0[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_1">
+      <obj_property name="ElementShortName">fifo_wr_data_1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_1[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_2">
+      <obj_property name="ElementShortName">fifo_wr_data_2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_2[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_3">
+      <obj_property name="ElementShortName">fifo_wr_data_3[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_3[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/m_axis_ready">
+      <obj_property name="ElementShortName">m_axis_ready</obj_property>
+      <obj_property name="ObjectShortName">m_axis_ready</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/m_axis_valid">
+      <obj_property name="ElementShortName">m_axis_valid</obj_property>
+      <obj_property name="ObjectShortName">m_axis_valid</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/m_axis_data">
+      <obj_property name="ElementShortName">m_axis_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_data[127:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/m_axis_keep">
+      <obj_property name="ElementShortName">m_axis_keep[15:0]</obj_property>
+      <obj_property name="ObjectShortName">m_axis_keep[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/m_axis_last">
+      <obj_property name="ElementShortName">m_axis_last</obj_property>
+      <obj_property name="ObjectShortName">m_axis_last</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider241" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/s1_data">
+      <obj_property name="ElementShortName">s1_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">s1_data[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/s1_shift">
+      <obj_property name="ElementShortName">s1_shift</obj_property>
+      <obj_property name="ObjectShortName">s1_shift</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/s1_take_new">
+      <obj_property name="ElementShortName">s1_take_new</obj_property>
+      <obj_property name="ObjectShortName">s1_take_new</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/out_valid">
+      <obj_property name="ElementShortName">out_valid[7:0]</obj_property>
+      <obj_property name="ObjectShortName">out_valid[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/out_data">
+      <obj_property name="ElementShortName">out_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">out_data[127:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/s2_data">
+      <obj_property name="ElementShortName">s2_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">s2_data[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider245" type="divider">
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/s2_data">
+      <obj_property name="ElementShortName">s2_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">s2_data[127:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFD700</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/s2_load">
+      <obj_property name="ElementShortName">s2_load</obj_property>
+      <obj_property name="ObjectShortName">s2_load</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/out_valid">
+      <obj_property name="ElementShortName">out_valid[7:0]</obj_property>
+      <obj_property name="ObjectShortName">out_valid[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/inst/i_cpack/out_data">
+      <obj_property name="ElementShortName">out_data[127:0]</obj_property>
+      <obj_property name="ObjectShortName">out_data[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider250" type="divider">
    </wvobject>
 </wave_config>

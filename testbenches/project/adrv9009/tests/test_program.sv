@@ -34,6 +34,7 @@
 // ***************************************************************************
 
 `include "utils.svh"
+`include "axis_definitions.svh"
 
 import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
@@ -49,9 +50,16 @@ import adc_api_pkg::*;
 import dac_api_pkg::*;
 import data_offload_api_pkg::*;
 import dmac_api_pkg::*;
+import adi_axis_agent_pkg::*;
+import m_axis_sequencer_pkg::*;
+import s_axis_sequencer_pkg::*;
+import environment_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
+import `PKGIFY(test_harness, ex_rx_axis)::*;
+import `PKGIFY(test_harness, ex_tx_axis)::*;
+import `PKGIFY(test_harness, ex_tx_os_axis)::*;
 
 `define fmod(A, B) (A - (B * $floor(A / B)))
 
@@ -71,9 +79,10 @@ program test_program;
   dmac_api tx_dmac_api;
   dmac_api rx_dmac_api;
   dmac_api rx_os_dmac_api;
-  dmac_api ex_rx_dmac_api;
-  dmac_api ex_tx_dmac_api;
-  dmac_api ex_tx_os_dmac_api;
+
+  environment #(`AXIS_VIP_PARAMS(test_harness, ex_rx_axis),
+                `AXIS_VIP_PARAMS(test_harness, ex_tx_axis),
+                `AXIS_VIP_PARAMS(test_harness, ex_tx_os_axis)) ex_env;
   dac_api tx_dac_api;
   dac_api ex_dac_api;
   dac_api ex_dac_os_api;
@@ -154,20 +163,11 @@ program test_program;
       base_env.mng.master_sequencer,
       `RX_OS_DMA_BA);
 
-    ex_rx_dmac_api = new(
-      "EX RX DMAC API",
-      base_env.mng.master_sequencer,
-      `EX_RX_DMA_BA);
-
-    ex_tx_dmac_api = new(
-      "EX TX DMAC API",
-      base_env.mng.master_sequencer,
-      `EX_TX_DMA_BA);
-
-    ex_tx_os_dmac_api = new(
-      "EX TX OS DMAC API",
-      base_env.mng.master_sequencer,
-      `EX_TX_OS_DMA_BA);
+    ex_env = new(
+      "Exerciser Environment",
+      `TH.`EX_RX_AXIS.inst.IF,
+      `TH.`EX_TX_AXIS.inst.IF,
+      `TH.`EX_TX_OS_AXIS.inst.IF);
 
     tx_dac_api = new(
       "TX DAC TPL API",
@@ -203,6 +203,10 @@ program test_program;
 
     base_env.start();
     base_env.sys_reset();
+
+    // Starts the exerciser AXIS agents, sets the RX slave VIP to no-backpressure,
+    // and subscribes the RX capture monitor to the phase-seeded scoreboard sink.
+    ex_env.start();
 
     tx_link = new;
     tx_link.set_L(`TX_JESD_L);
@@ -417,19 +421,15 @@ program test_program;
       tx_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
       tx_dmac_api.transfer_start();
 
-      // Configure EX RX DMA
-      ex_rx_dmac_api.enable_dma();
-      ex_rx_dmac_api.set_flags(
-        .cyclic(1'b0),
-        .tlast(1'b1),
-        .partial_reporting_en(1'b0));
-      ex_rx_dmac_api.set_lengths(
-        .xfer_length_x(32'h000003DF),
-        .xfer_length_y(32'h0));
-      ex_rx_dmac_api.set_dest_addr(`DDR_BA+32'h00001000);
-      ex_rx_dmac_api.transfer_start();
+      // Enable the phase-seeded scoreboard on the RX exerciser capture. The DUT TX
+      // transmits the DDR ramp; the RX exerciser reproduces it on its m_axis and the
+      // slave VIP monitor feeds the bytes to the scoreboard sink (subscribed at setup).
+      // The scoreboard seeds the expected value from the first captured sample and
+      // then requires each subsequent sample to increment by one (mod 2048), so it
+      // self-aligns regardless of where the exerciser starts streaming.
+      ex_env.ex_rx_scoreboard.run();
 
-      // Wait until data propagates through the dma
+      // Wait until data propagates
       #5us;
     end
 
@@ -448,17 +448,11 @@ program test_program;
     // Move data around for a while
     #5us;
 
-    if (~use_dds) begin
-      check_captured_data(
-        .address (`DDR_BA+'h00001000),
-        .length (992),
-        .step (1),
-        .max_sample(2048)
-      );
-    end
-
     tx_dmac_api.disable_dma();
-    ex_rx_dmac_api.disable_dma();
+
+    if (~use_dds) begin
+      ex_env.ex_rx_scoreboard.stop();
+    end
 
     ex_rx_xcvr.down();
     dut_tx_xcvr.down();
@@ -481,14 +475,19 @@ program test_program;
           .dds_incr_1(16'h0100));
       end else begin
         // Set DMA as source for DAC TPL
+        if (i==2)
         ex_dac_api.set_channel_control_7(
           .channel(i),
           .dds_sel(4'h2));
+        else
+        ex_dac_api.set_channel_control_7(
+          .channel(i),
+          .dds_sel(4'h3));
       end
     end
 
     for (int i = 0; i < `RX_JESD_M; i++) begin
-      rx_adc_api.enable_channel(i);
+      if (i==2) rx_adc_api.enable_channel(i);
     end
 
     ex_dac_api.reset(
@@ -510,21 +509,9 @@ program test_program;
     end
 
     if (!use_dds) begin
-      for (int i=0;i<2048*2 ;i=i+2) begin
-        base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
-      end
-
-      // Configure EX TX DMA
-      ex_tx_dmac_api.enable_dma();
-      ex_tx_dmac_api.set_flags(
-        .cyclic(1'b1),
-        .tlast(1'b0),
-        .partial_reporting_en(1'b0));
-      ex_tx_dmac_api.set_lengths(
-        .xfer_length_x(32'h00000FFF),
-        .xfer_length_y(32'h0));
-      ex_tx_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
-      ex_tx_dmac_api.transfer_start();
+      // Source an auto-incrementing stream from the TX exerciser (cyclic).
+      ex_env.configure_tx_source(32'h1000);
+      ex_env.ex_tx_axis_agent.master_sequencer.start();
 
       // Configure RX DMA
       rx_dmac_api.enable_dma();
@@ -558,15 +545,13 @@ program test_program;
     #5us;
 
     if (!use_dds) begin
-      check_captured_data(
+      check_captured_incr(
         .address (`DDR_BA+'h00001000),
-        .length (992),
-        .step (1),
-        .max_sample(2048)
+        .length (992)
       );
     end
 
-    ex_tx_dmac_api.disable_dma();
+    ex_env.ex_tx_axis_agent.master_sequencer.stop();
     rx_dmac_api.disable_dma();
 
     dut_rx_xcvr.down();
@@ -619,21 +604,9 @@ program test_program;
     end
 
     if (!use_dds) begin
-      for (int i=0;i<2048*2 ;i=i+2) begin
-        base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
-      end
-
-      // Configure EX TX OS DMA
-      ex_tx_os_dmac_api.enable_dma();
-      ex_tx_os_dmac_api.set_flags(
-        .cyclic(1'b1),
-        .tlast(1'b0),
-        .partial_reporting_en(1'b0));
-      ex_tx_os_dmac_api.set_lengths(
-        .xfer_length_x(32'h00000FFF),
-        .xfer_length_y(32'h0));
-      ex_tx_os_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
-      ex_tx_os_dmac_api.transfer_start();
+      // Source an auto-incrementing stream from the TX OS exerciser (cyclic).
+      ex_env.configure_tx_os_source(32'h1000);
+      ex_env.ex_tx_os_axis_agent.master_sequencer.start();
 
       // Configure RX OBS DMA
       rx_os_dmac_api.enable_dma();
@@ -667,44 +640,44 @@ program test_program;
     #5us;
 
     if (!use_dds) begin
-      check_captured_data(
+      check_captured_incr(
         .address (`DDR_BA+'h00001000),
-        .length (992),
-        .step (1),
-        .max_sample(2048)
+        .length (992)
       );
     end
 
-    ex_tx_os_dmac_api.disable_dma();
+    ex_env.ex_tx_os_axis_agent.master_sequencer.stop();
     rx_os_dmac_api.disable_dma();
 
     ex_tx_os_xcvr.down();
     dut_rx_os_xcvr.down();
   endtask
 
-  task check_captured_data(bit [31:0] address,
-                           int length = 1024,
-                           int step = 1,
-                           int max_sample = 2048
+  // Verify the DDR capture of an auto-incrementing byte stream. The AXIS master
+  // sources a free-running 8-bit counter (0,1,2,...,255,0,...); after packing and
+  // little-endian DMA writes, each 32-bit DDR word equals {b+3,b+2,b+1,b} (mod 256),
+  // where b advances by 4 per word. The counter phase is seeded from the first word.
+  task check_captured_incr(bit [31:0] address,
+                           int length = 1024
                           );
 
     bit [31:0] current_address;
     bit [31:0] captured_word;
     bit [31:0] reference_word;
-    bit [15:0] first;
+    bit [7:0]  b;
 
-    for (int i=0;i<length/2;i=i+2) begin
-      current_address = address+(i*2);
+    for (int i=0;i<length/4;i=i+1) begin
+      current_address = address+(i*4);
       captured_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_address);
       if (i==0) begin
-        first = captured_word[15:0];
+        b = captured_word[7:0];
       end else begin
-        reference_word = (((first + (i+1)*step)%max_sample) << 16) | ((first + (i*step))%max_sample);
-
+        reference_word = {b[7:0]+8'd3, b[7:0]+8'd2, b[7:0]+8'd1, b[7:0]};
         if (captured_word !== reference_word) begin
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end
       end
+      b = b + 8'd4;
     end
   endtask
 

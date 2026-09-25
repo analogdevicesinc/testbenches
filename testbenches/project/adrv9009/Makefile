@@ -6,14 +6,18 @@
 
 # Makeincludes
 include ../../../scripts/make_tb_path.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_axis.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_clk_gen.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_converter.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_data_offload.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_dmac.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_jesd.mk
+include $(ADI_TB_DIR)/library/includes/Makeinclude_scoreboard.mk
 include $(ADI_TB_DIR)/library/includes/Makeinclude_xcvr.mk
 
 # Remaining test-bench dependencies except test programs
+SV_DEPS += environment.sv
+
 LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_dmac
 LIB_DEPS += data_offload

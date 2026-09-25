@@ -140,7 +140,7 @@ localparam I2C_CMD_3           = {3'b000, 12'd6, DEVICE_SA1[6:0], 1'b0};
 // Write 1 byte
 localparam I2C_CMD_4           = {3'b000, 12'd1, DEVICE_SA1[6:0], 1'b0};
 // HDR Exit Pattern, DA=2
-localparam I3C_CMD_HDR_EXIT    = {1'b1, 8'd0, 3'b000, 12'd0, 7'd2, 1'b0};
+localparam I3C_CMD_HDR_EXIT    = {8'd0, 1'b1, 3'b000, 12'd0, 7'd2, 1'b0};
 
 program test_program (
   input  i3c_irq,
@@ -1181,8 +1181,13 @@ endtask
 task hdr_exit_test();
   `INFO(("HDR Exit Pattern Started"), ADI_VERBOSITY_LOW);
 
+  `INFO(("HDR Exit CMD value: %h", I3C_CMD_HDR_EXIT), ADI_VERBOSITY_LOW);
   i3c_controller.set_cmd_fifo(I3C_CMD_HDR_EXIT);
   `INFO(("HDR Exit CMD written to FIFO"), ADI_VERBOSITY_LOW);
+  `INFO(("Framing sm=%0d st=%0d cmdp_valid=%b cmdp_pattern=%b cmdp_da=%0d",
+    `DUT_I3C_FRAMING.sm, `DUT_I3C_FRAMING.st,
+    `DUT_I3C_FRAMING.cmdp_valid, `DUT_I3C_FRAMING.cmdp_pattern,
+    `DUT_I3C_FRAMING.cmdp_da), ADI_VERBOSITY_LOW);
 
   wait (`DUT_I3C_WORD.st == `CMDW_HDR);
   wait (`DUT_I3C_WORD.st == `CMDW_NOP);

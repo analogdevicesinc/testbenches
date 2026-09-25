@@ -34,7 +34,7 @@
 // ***************************************************************************
 
 `include "utils.svh"
-`include "axis_definitions.svh"
+
 
 package pwmgen_environment_pkg;
 
@@ -44,14 +44,18 @@ package pwmgen_environment_pkg;
   import pwm_gen_api_pkg::*;
 
   class pwmgen_environment extends adi_environment;
-    
-  
+
+    virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(`PWM_CLK_PERIOD)) pwm_clk_vip_if;
 
     //============================================================================
     // Constructor
     //============================================================================
-    function new( input string name);
+    function new(
+      input string name,
+      virtual interface clk_vip_if #(.C_CLK_CLOCK_PERIOD(`PWM_CLK_PERIOD)) pwm_clk_vip_if
+    );
       super.new(name);
+      this.pwm_clk_vip_if = pwm_clk_vip_if;
     endfunction
 
     //============================================================================
@@ -60,14 +64,14 @@ package pwmgen_environment_pkg;
     //   - Start the agents
     //============================================================================
     task start();
-      
+      this.pwm_clk_vip_if.start_clock();
     endtask
 
     //============================================================================
     // Stop subroutine
     //============================================================================
     task stop();
-      
+      this.pwm_clk_vip_if.stop_clock();
     endtask
 
   endclass

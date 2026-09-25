@@ -61,3 +61,5 @@ set ad_project_params(PULSE_14_OFFSET)        0
 set ad_project_params(PULSE_15_OFFSET)        0
 
 set ad_project_params(EXT_CLK_PERIOD)         1.25
+
+set ad_project_params(FPGA_BOARD) "coraz7s"

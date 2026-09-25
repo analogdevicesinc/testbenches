@@ -47,6 +47,7 @@ adi_sim_add_define "PWM_CLK_PERIOD=$ad_project_params(EXT_CLK_PERIOD)"
 ad_ip_instance axi_pwm_gen test_axi_pwm_gen
 ad_ip_parameter test_axi_pwm_gen CONFIG.PULSE_0_PERIOD $ad_project_params(PULSE_0_PERIOD)
 ad_ip_parameter test_axi_pwm_gen CONFIG.PULSE_0_WIDTH $ad_project_params(PULSE_0_WIDTH)
+adi_sim_add_define "PULSE_0_PERIOD=$ad_project_params(PULSE_0_PERIOD)"
 
 ad_connect pwm_clk_vip/clk_out test_axi_pwm_gen/ext_clk
 ad_connect sys_cpu_clk test_axi_pwm_gen/s_axi_aclk

@@ -139,6 +139,8 @@ localparam I2C_CMD_2           = {3'b000, 12'd5, DEVICE_SA2[6:0], 1'b1};
 localparam I2C_CMD_3           = {3'b000, 12'd6, DEVICE_SA1[6:0], 1'b0};
 // Write 1 byte
 localparam I2C_CMD_4           = {3'b000, 12'd1, DEVICE_SA1[6:0], 1'b0};
+// HDR Exit Pattern, DA=2
+localparam I3C_CMD_HDR_EXIT    = {1'b1, 2'b00, 12'd0, 7'd2, 1'b0};
 
 program test_program (
   input  i3c_irq,
@@ -307,6 +309,8 @@ initial begin
   offload_i3c_test();
 
   ibi_i3c_test();
+
+  hdr_exit_test();
 
   base_env.stop();
 
@@ -1169,6 +1173,20 @@ task offload_i3c_test();
   #10ns offload_trigger_l = 1'b0;
 
   `INFO(("Offload I3C Test Done"), ADI_VERBOSITY_LOW);
+endtask
+
+//---------------------------------------------------------------------------
+// HDR Exit Pattern Test
+//---------------------------------------------------------------------------
+task hdr_exit_test();
+  `INFO(("HDR Exit Pattern Started"), ADI_VERBOSITY_LOW);
+
+  i3c_controller.set_cmd_fifo(I3C_CMD_HDR_EXIT);
+
+  wait (`DUT_I3C_WORD.st == `CMDW_HDR);
+  wait (`DUT_I3C_WORD.st == `CMDW_NOP);
+
+  `INFO(("HDR Exit Pattern Done"), ADI_VERBOSITY_LOW);
 endtask
 
 endprogram

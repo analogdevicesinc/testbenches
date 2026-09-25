@@ -8,9 +8,9 @@
 
     <title>Data Offload 2 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
-    <script async="async" src="../../../_static/app.umd.js?v=26d0298f"></script>
+    <script async="async" src="../../../_static/app.umd.js?v=8c78863f"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -109,7 +109,11 @@
 <li><a class="reference internal" href="#cpu-memory-interconnects-addresses">CPU/Memory interconnects addresses</a></li>
 <li><a class="reference internal" href="#test-stimulus">Test stimulus</a></li>
 <li><a class="reference internal" href="#environment-bringup">Environment Bringup</a></li>
-<li><a class="reference internal" href="#data-offload-testing">Data Offload testing</a></li>
+<li><a class="reference internal" href="#data-offload-testing">Data Offload testing</a><ul>
+<li><a class="reference internal" href="#test-program-back-to-back-transfers">test_program: back-to-back transfers</a></li>
+<li><a class="reference internal" href="#test-program-sync-externally-synchronized-transfers">test_program_sync: externally-synchronized transfers</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
 </ul>
 </li>
@@ -271,7 +275,7 @@ Content on this topic
 <p>The purpose of these two testbenches is to validate the functionality of the
 <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/data_offload" target="_blank">library/data_offload</a> IP core.</p>
 <p>The entire HDL documentation can be found
-<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/index.html#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a>.</p>
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
@@ -430,11 +434,11 @@ Options: 0 for RX or 1 for TX</p></li>
 <tr class="row-even"><td><p>axi_intc</p></td>
 <td><p>0x4120_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
-<td><p>0x8000_0000</p></td>
-</tr>
-<tr class="row-even"><td><p>DUT</p></td>
+<tr class="row-odd"><td><p>DUT</p></td>
 <td><p>0x44A0_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
 </tr>
 </tbody>
 </table>
@@ -450,20 +454,38 @@ configurations.</p>
 <p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
-<li><p>Configure the sequencers and the scoreboard</p></li>
 <li><p>Start the environment</p></li>
 <li><p>Start the clocks</p></li>
 <li><p>Assert the resets</p></li>
+<li><p>Configure the sequencers and the scoreboard</p></li>
 </ul>
 </section>
 <section id="data-offload-testing">
 <h3>Data Offload testing<a class="headerlink" href="#data-offload-testing" title="Link to this heading"></a></h3>
+<p>The common steps for both test programs are:</p>
 <ul class="simple">
 <li><p>Configure the Data Offload</p></li>
 <li><p>Start the sequencers and scoreboard</p></li>
-<li><p>Send incremental data and verify all</p></li>
+</ul>
+<p>Depending on the test program, the transfers are triggered and verified
+differently.</p>
+<section id="test-program-back-to-back-transfers">
+<h4>test_program: back-to-back transfers<a class="headerlink" href="#test-program-back-to-back-transfers" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Assert the <em>init_req</em> and send an initial set of transfers of incremental data</p></li>
+<li><p>After a delay, assert the <em>init_req</em> again and send a second set of transfers</p></li>
+<li><p>Verify all transfers back-to-back</p></li>
 <li><p>Wait for scoreboard to complete checking</p></li>
 </ul>
+</section>
+<section id="test-program-sync-externally-synchronized-transfers">
+<h4>test_program_sync: externally-synchronized transfers<a class="headerlink" href="#test-program-sync-externally-synchronized-transfers" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Assert the <em>init_req</em> to arm the offload</p></li>
+<li><p>Release one transfer per external sync pulse and verify all</p></li>
+<li><p>Wait for scoreboard to complete checking</p></li>
+</ul>
+</section>
 </section>
 <section id="stop-the-environment">
 <h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
@@ -557,7 +579,7 @@ clean folder (no runs folder available):</p>
 <tbody>
 <tr class="row-even"><td><p>DATA_OFFLOAD</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/data_offload" target="_blank">library/data_offload</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/index.html#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
 </tbody>
 </table>

@@ -8,9 +8,9 @@
 
     <title>ADI Testbenches coding guidelines &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
-    <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
+    <script async="async" src="../_static/app.umd.js?v=8c78863f"></script>
     <link rel="icon" href="../_static/icon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -268,7 +268,7 @@ Content on this topic
 followed by all HDL testbenches.</p>
 <p>The coding rules are intended to be applied to testbenches written using
 System Verilog.</p>
-<p>The HDL coding guidelines <a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/user_guide/hdl_coding_guidelines.html#hdl-coding-guidelines" target="_blank" title="(in HDL)"><span>ADI HDL coding guidelines</span></a> are also
+<p>The HDL coding guidelines <a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/user_guide/hdl_coding_guidelines/#hdl-coding-guidelines" target="_blank" title="(in HDL)"><span>ADI HDL coding guidelines</span></a> are also
 applicable here. In addition, there are a set of rules for System Verilog,
 listed below.</p>
 </section>
@@ -392,13 +392,13 @@ that is provided in the SystemVerilog header file next to the registermap.</p>
 <p id="example-c2">Case 1: AXI interface not yet connected.</p>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>RX_DMA<span class="w"> </span><span class="mh">0x7C420000</span>
 <span class="nv">ad_cpu_interconnect</span><span class="w"> </span><span class="nv">$RX_DMA</span><span class="w"> </span>dut_rx_dma
-<span class="nv">adi_sim_add_define</span><span class="w"> </span><span class="s2">&quot;RX_DMA_BA=[format &quot;%d&quot; ${RX_DMA}]&quot;</span>
+<span class="nv">adi_sim_add_define</span><span class="w"> </span><span class="s2">"RX_DMA_BA=[format "%d" ${RX_DMA}]"</span>
 </pre></div>
 </div>
 <p>Case 2: AXI interface already connected.</p>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>RX_DMA<span class="w"> </span><span class="mh">0x7C420000</span>
 <span class="nv">set_property</span><span class="w"> </span>offset<span class="w"> </span><span class="nv">$RX_DMA</span><span class="w"> </span><span class="k">[</span><span class="nv">get_bd_addr_segs</span><span class="w"> </span><span class="k">{</span><span class="nv">mng_axi_vip</span><span class="o">/</span>Master_AXI<span class="o">/</span>SEG_data_dut_rx_dma<span class="k">}]</span>
-<span class="nv">adi_sim_add_define</span><span class="w"> </span><span class="s2">&quot;RX_DMA_BA=[format &quot;%d&quot; ${RX_DMA}]&quot;</span>
+<span class="nv">adi_sim_add_define</span><span class="w"> </span><span class="s2">"RX_DMA_BA=[format "%d" ${RX_DMA}]"</span>
 </pre></div>
 </div>
 <p><strong>C3</strong></p>
@@ -406,10 +406,10 @@ that is provided in the SystemVerilog header file next to the registermap.</p>
 of the HDL projects.</p>
 <p id="example-c3">Set FPGA part number in system_project.tcl:</p>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="c"># VCU118 board example:</span>
-<span class="nv">adi_sim_project_xilinx</span><span class="w"> </span><span class="nv">$project_name</span><span class="w"> </span><span class="s2">&quot;xcvu9p-flga2104-2L-e&quot;</span>
+<span class="nv">adi_sim_project_xilinx</span><span class="w"> </span><span class="nv">$project_name</span><span class="w"> </span><span class="s2">"xcvu9p-flga2104-2L-e"</span>
 
 <span class="c"># Xilinx 7-series FPGA example:</span>
-<span class="nv">adi_sim_project_xilinx</span><span class="w"> </span><span class="nv">$project_name</span><span class="w"> </span><span class="s2">&quot;xc7z007sclg400-1&quot;</span>
+<span class="nv">adi_sim_project_xilinx</span><span class="w"> </span><span class="nv">$project_name</span><span class="w"> </span><span class="s2">"xc7z007sclg400-1"</span>
 </pre></div>
 </div>
 <p><strong>C4</strong></p>
@@ -532,26 +532,26 @@ intended to be used.</p>
 <p>Reporting system functions calls from the standard must only be used in VIP
 files related to the block design IP, including the interface and the base
 interface class.</p>
-<div class="highlight-systemverilog notranslate" id="example-f1"><div class="highlight"><pre><span></span><span class="p">$</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Info message example&quot;</span><span class="p">);</span>
+<div class="highlight-systemverilog notranslate" id="example-f1"><div class="highlight"><pre><span></span><span class="p">$</span><span class="n">info</span><span class="p">(</span><span class="s">"Info message example"</span><span class="p">);</span>
 </pre></div>
 </div>
 <p><strong>F2</strong></p>
 <p>Reporting macros must only be used in the test programs.</p>
-<div class="highlight-systemverilog notranslate" id="example-f2"><div class="highlight"><pre><span></span><span class="no">`INFO</span><span class="p">((</span><span class="s">&quot;Info message example&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_LOW</span><span class="p">);</span>
+<div class="highlight-systemverilog notranslate" id="example-f2"><div class="highlight"><pre><span></span><span class="no">`INFO</span><span class="p">((</span><span class="s">"Info message example"</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_LOW</span><span class="p">);</span>
 </pre></div>
 </div>
 <p><strong>F3</strong></p>
 <p>Reporting functions from the base reporting class must be used in classes that
 inherit these functions.</p>
-<div class="highlight-systemverilog notranslate" id="example-f3"><div class="highlight"><pre><span></span><span class="k">this</span><span class="p">.</span><span class="n">info</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">&quot;Data received: %d&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_MEDIUM</span><span class="p">);</span>
+<div class="highlight-systemverilog notranslate" id="example-f3"><div class="highlight"><pre><span></span><span class="k">this</span><span class="p">.</span><span class="n">info</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">"Data received: %d"</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_MEDIUM</span><span class="p">);</span>
 </pre></div>
 </div>
 <p><strong>F4</strong></p>
 <p>Error messages should be used where the simulation may continue if something is
 not working as expected. In every other instance, where the simulation must halt
 immediately, use fatal messages.</p>
-<div class="highlight-systemverilog notranslate" id="example-f4"><div class="highlight"><pre><span></span><span class="k">this</span><span class="p">.</span><span class="n">error</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">&quot;Error, but can continue&quot;</span><span class="p">));</span>
-<span class="k">this</span><span class="p">.</span><span class="n">fatal</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">&quot;Error and cannot continue&quot;</span><span class="p">));</span>
+<div class="highlight-systemverilog notranslate" id="example-f4"><div class="highlight"><pre><span></span><span class="k">this</span><span class="p">.</span><span class="n">error</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">"Error, but can continue"</span><span class="p">));</span>
+<span class="k">this</span><span class="p">.</span><span class="n">fatal</span><span class="p">($</span><span class="n">sformatf</span><span class="p">(</span><span class="s">"Error and cannot continue"</span><span class="p">));</span>
 </pre></div>
 </div>
 <p><strong>F5</strong></p>
@@ -649,9 +649,9 @@ differences and other issues.</p>
 <span class="w">  </span><span class="n">vip_sequencer</span><span class="w"> </span><span class="n">vip_seq</span><span class="p">;</span>
 
 <span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
-<span class="w">    </span><span class="n">vip_drv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Driver&quot;</span><span class="p">);</span>
-<span class="w">    </span><span class="n">vip_mon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Monitor&quot;</span><span class="p">);</span>
-<span class="w">    </span><span class="n">vip_seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Sequencer&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_drv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Driver"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_mon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Monitor"</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Sequencer"</span><span class="p">);</span>
 <span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
 <span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_agent</span>
 </pre></div>
@@ -663,9 +663,9 @@ differences and other issues.</p>
 <span class="w">  </span><span class="n">vip_sequencer</span><span class="w"> </span><span class="n">vip_seq</span><span class="p">;</span>
 
 <span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
-<span class="w">    </span><span class="n">vip_drv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Driver&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
-<span class="w">    </span><span class="n">vip_mon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Monitor&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
-<span class="w">    </span><span class="n">vip_seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Sequencer&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_drv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Driver"</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_mon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Monitor"</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Sequencer"</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
 <span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
 <span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">vip_agent</span>
 </pre></div>
@@ -683,7 +683,7 @@ direct access to the interface parameters if needed.</p>
 <span class="w">  </span><span class="n">vip_agent</span><span class="w"> </span><span class="n">vip_agnt</span><span class="p">;</span>
 
 <span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
-<span class="w">    </span><span class="n">vip_agnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Agent&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_agnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Agent"</span><span class="p">);</span>
 <span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
 <span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">environment</span>
 </pre></div>
@@ -693,7 +693,7 @@ direct access to the interface parameters if needed.</p>
 <span class="w">  </span><span class="n">vip_agent</span><span class="w"> </span><span class="n">vip_agnt</span><span class="p">;</span>
 
 <span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
-<span class="w">    </span><span class="n">vip_agnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;Agent&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">    </span><span class="n">vip_agnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">"Agent"</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
 <span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="k">new</span>
 <span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">environment</span>
 </pre></div>
@@ -728,8 +728,8 @@ inside the environment.</p>
 
 <span class="n">base_env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(...);</span>
 
-<span class="n">mng</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="no">`TH</span><span class="p">.</span><span class="no">`MNG_AXI</span><span class="p">.</span><span class="n">inst</span><span class="p">.</span><span class="n">IF</span><span class="p">);</span>
-<span class="n">ddr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="no">`TH</span><span class="p">.</span><span class="no">`DDR_AXI</span><span class="p">.</span><span class="n">inst</span><span class="p">.</span><span class="n">IF</span><span class="p">);</span>
+<span class="n">mng</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="no">`TH</span><span class="p">.</span><span class="no">`MNG_AXI</span><span class="p">.</span><span class="n">inst</span><span class="p">.</span><span class="n">IF</span><span class="p">);</span>
+<span class="n">ddr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="no">`TH</span><span class="p">.</span><span class="no">`DDR_AXI</span><span class="p">.</span><span class="n">inst</span><span class="p">.</span><span class="n">IF</span><span class="p">);</span>
 
 <span class="no">`LINK</span><span class="p">(</span><span class="n">mng</span><span class="p">,</span><span class="w"> </span><span class="n">base_env</span><span class="p">,</span><span class="w"> </span><span class="n">mng</span><span class="p">)</span>
 <span class="no">`LINK</span><span class="p">(</span><span class="n">ddr</span><span class="p">,</span><span class="w"> </span><span class="n">base_env</span><span class="p">,</span><span class="w"> </span><span class="n">ddr</span><span class="p">)</span>
@@ -751,7 +751,7 @@ that don’t have Version, Magic and Scratch registers.</p>
 <span class="w">  </span><span class="p">...</span>
 <span class="w">  </span><span class="c1">// check scratch register</span>
 <span class="w">  </span><span class="p">...</span>
-<span class="w">  </span><span class="no">`INFO</span><span class="p">((</span><span class="s">&quot;Sanity Test Done&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_LOW</span><span class="p">);</span>
+<span class="w">  </span><span class="no">`INFO</span><span class="p">((</span><span class="s">"Sanity Test Done"</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_LOW</span><span class="p">);</span>
 <span class="k">endtask</span>
 </pre></div>
 </div>
@@ -803,7 +803,7 @@ testbenches.</p>
 
 <span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">randomize_switch</span><span class="p">();</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="n">switch</span><span class="p">.</span><span class="n">randomize</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">      </span><span class="no">`FATAL</span><span class="p">((</span><span class="s">&quot;Randomization failed!&quot;</span><span class="p">));</span>
+<span class="w">      </span><span class="no">`FATAL</span><span class="p">((</span><span class="s">"Randomization failed!"</span><span class="p">));</span>
 <span class="w">    </span><span class="k">end</span>
 <span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="n">randomize_switch</span>
 <span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">randomizer_class</span>
@@ -820,7 +820,7 @@ testbenches.</p>
 
 <span class="w">  </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">randomize_init</span><span class="p">();</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="n">randomize</span><span class="p">())</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">      </span><span class="no">`FATAL</span><span class="p">((</span><span class="s">&quot;Randomization failed!&quot;</span><span class="p">));</span>
+<span class="w">      </span><span class="no">`FATAL</span><span class="p">((</span><span class="s">"Randomization failed!"</span><span class="p">));</span>
 <span class="w">    </span><span class="k">end</span>
 <span class="w">  </span><span class="k">endfunction</span><span class="o">:</span><span class="w"> </span><span class="n">randomize_init</span>
 <span class="kd">endclass</span><span class="p">:</span><span class="w"> </span><span class="nc">randomizer_class</span>
@@ -834,7 +834,7 @@ beginning of the simulation.</p>
 
 <span class="n">current_process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">process</span><span class="o">::</span><span class="n">self</span><span class="p">();</span>
 <span class="n">current_process_random_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_process</span><span class="p">.</span><span class="n">get_randstate</span><span class="p">();</span>
-<span class="no">`INFO</span><span class="p">((</span><span class="s">&quot;Randomization state: %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">current_process_random_state</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_NONE</span><span class="p">);</span>
+<span class="no">`INFO</span><span class="p">((</span><span class="s">"Randomization state: %s"</span><span class="p">,</span><span class="w"> </span><span class="n">current_process_random_state</span><span class="p">),</span><span class="w"> </span><span class="n">ADI_VERBOSITY_NONE</span><span class="p">);</span>
 </pre></div>
 </div>
 <p><strong>K5</strong></p>

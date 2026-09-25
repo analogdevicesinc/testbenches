@@ -146,8 +146,8 @@ CPU/Memory interconnects addresses
 Instance     Address
 ===========  ===========
 axi_intc     0x4120_0000
-ddr_axi_vip  0x8000_0000
 DUT          0x44A0_0000
+ddr_axi_vip  0x8000_0000
 ===========  ===========
 
 Test stimulus
@@ -162,17 +162,35 @@ Environment Bringup
 The steps of the environment bringup are:
 
 * Create the environment
-* Configure the sequencers and the scoreboard
 * Start the environment
 * Start the clocks
 * Assert the resets
+* Configure the sequencers and the scoreboard
 
 Data Offload testing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The common steps for both test programs are:
+
 * Configure the Data Offload
 * Start the sequencers and scoreboard
-* Send incremental data and verify all
+
+Depending on the test program, the transfers are triggered and verified
+differently.
+
+test_program: back-to-back transfers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Assert the *init_req* and send an initial set of transfers of incremental data
+* After a delay, assert the *init_req* again and send a second set of transfers
+* Verify all transfers back-to-back
+* Wait for scoreboard to complete checking
+
+test_program_sync: externally-synchronized transfers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Assert the *init_req* to arm the offload
+* Release one transfer per external sync pulse and verify all
 * Wait for scoreboard to complete checking
 
 Stop the environment

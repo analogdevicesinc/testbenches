@@ -8,9 +8,9 @@
 
     <title>Data Offload 1 &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
-    <script async="async" src="../../../_static/app.umd.js?v=26d0298f"></script>
+    <script async="async" src="../../../_static/app.umd.js?v=8c78863f"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -271,7 +271,7 @@ Content on this topic
 <p>The purpose of these two testbenches is to validate the functionality of the
 <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/data_offload" target="_blank">library/data_offload</a> IP core.</p>
 <p>The entire HDL documentation can be found
-<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/index.html#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a>.</p>
+<a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a>.</p>
 </section>
 <section id="block-design">
 <h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
@@ -414,20 +414,20 @@ Options: 0 for internal or 1 for external</p></li>
 <tr class="row-even"><td><p>axi_intc</p></td>
 <td><p>0x4120_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
-<td><p>0x8000_0000</p></td>
-</tr>
-<tr class="row-even"><td><p>rx_dmac</p></td>
+<tr class="row-odd"><td><p>rx_dmac</p></td>
 <td><p>0x5004_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>tx_dmac</p></td>
+<tr class="row-even"><td><p>tx_dmac</p></td>
 <td><p>0x5005_0000</p></td>
 </tr>
-<tr class="row-even"><td><p>RX_DUT</p></td>
+<tr class="row-odd"><td><p>RX_DUT</p></td>
 <td><p>0x5006_0000</p></td>
 </tr>
-<tr class="row-odd"><td><p>TX_DUT</p></td>
+<tr class="row-even"><td><p>TX_DUT</p></td>
 <td><p>0x5007_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
 </tr>
 </tbody>
 </table>
@@ -443,10 +443,10 @@ configurations.</p>
 <p>The steps of the environment bringup are:</p>
 <ul class="simple">
 <li><p>Create the environment</p></li>
-<li><p>Configure the sequencers</p></li>
 <li><p>Start the environment</p></li>
 <li><p>Start the clocks</p></li>
 <li><p>Assert the resets</p></li>
+<li><p>Configure the sequencers</p></li>
 </ul>
 </section>
 <section id="data-offload-testing">
@@ -551,11 +551,11 @@ clean folder (no runs folder available):</p>
 <tbody>
 <tr class="row-even"><td><p>AXI_DMAC</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/index.html#axi-dmac" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/#axi-dmac" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>DATA_OFFLOAD</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/data_offload" target="_blank">library/data_offload</a></p></td>
-<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/index.html#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/data_offload/#data-offload" target="_blank" title="(in HDL)"><span class="xref std std-ref">here</span></a></p></td>
 </tr>
 </tbody>
 </table>

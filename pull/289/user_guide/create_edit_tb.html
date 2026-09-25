@@ -8,9 +8,9 @@
 
     <title>Creation and Editing of HDL Testbenches &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
-    <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
+    <script async="async" src="../_static/app.umd.js?v=8c78863f"></script>
     <link rel="icon" href="../_static/icon.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -332,7 +332,7 @@ source files type:</p>
 </pre></div>
 </div>
 <p>The file can be included without the path in <code class="docutils literal notranslate"><span class="pre">test_program.sv</span></code> as:</p>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;my_file.vh&quot;</span>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="no">`include</span><span class="w"> </span><span class="s">"my_file.vh"</span>
 
 <span class="c1">// ...</span>
 
@@ -463,13 +463,13 @@ called <cite>my_vip</cite> and testbench called <cite>my_ip_testbench</cite>:</p
 <span class="nv">my_vip_path</span><span class="o">=</span><span class="nv">$ADI_TB_DIR</span>/library/vip/adi/my_vip
 <span class="nv">tb_path</span><span class="o">=</span><span class="nv">$ADI_TB_DIR</span>/testbenches/ip/my_ip_testbench
 
-<span class="nv">my_vip_files</span><span class="o">=</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="nv">$my_vip_path</span><span class="w"> </span><span class="p">;</span><span class="w"> </span>find<span class="w"> </span>.<span class="w"> </span>-maxdepth<span class="w"> </span><span class="m">1</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.v&quot;</span><span class="w"> </span>-or<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.vh&quot;</span><span class="w"> </span>-or<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.sv&quot;</span><span class="k">)</span>
+<span class="nv">my_vip_files</span><span class="o">=</span><span class="k">$(</span><span class="nb">command</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="nv">$my_vip_path</span><span class="w"> </span><span class="p">;</span><span class="w"> </span>find<span class="w"> </span>.<span class="w"> </span>-maxdepth<span class="w"> </span><span class="m">1</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.v"</span><span class="w"> </span>-or<span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.vh"</span><span class="w"> </span>-or<span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.sv"</span><span class="k">)</span>
 
 <span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nv">$my_vip_files</span>
 <span class="k">do</span>
 <span class="w">     </span><span class="nv">f</span><span class="o">=</span><span class="k">$(</span>basename<span class="w"> </span><span class="nv">$f</span><span class="k">)</span>
-<span class="w">     </span>tee<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span><span class="nv">$tb_path</span><span class="w"> </span>-wholename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tb_path</span><span class="s2">/runs/cfg*/cfg*.ip_user_files/bd/test_harness/ipshared/*/</span><span class="nv">$f</span><span class="s2">&quot;</span><span class="k">)</span><span class="w"> </span>&lt;<span class="w"> </span><span class="nv">$my_vip_path</span>/<span class="nv">$f</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
-<span class="w">     </span>tee<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span><span class="nv">$tb_path</span><span class="w"> </span>-wholename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$tb_path</span><span class="s2">/runs/cfg*/cfg*.gen/sources_1/bd/test_harness/ipshared/*/</span><span class="nv">$f</span><span class="s2">&quot;</span><span class="k">)</span><span class="w"> </span>&lt;<span class="w"> </span><span class="nv">$my_vip_path</span>/<span class="nv">$f</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="w">     </span>tee<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span><span class="nv">$tb_path</span><span class="w"> </span>-wholename<span class="w"> </span><span class="s2">"</span><span class="nv">$tb_path</span><span class="s2">/runs/cfg*/cfg*.ip_user_files/bd/test_harness/ipshared/*/</span><span class="nv">$f</span><span class="s2">"</span><span class="k">)</span><span class="w"> </span>&lt;<span class="w"> </span><span class="nv">$my_vip_path</span>/<span class="nv">$f</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="w">     </span>tee<span class="w"> </span><span class="k">$(</span>find<span class="w"> </span><span class="nv">$tb_path</span><span class="w"> </span>-wholename<span class="w"> </span><span class="s2">"</span><span class="nv">$tb_path</span><span class="s2">/runs/cfg*/cfg*.gen/sources_1/bd/test_harness/ipshared/*/</span><span class="nv">$f</span><span class="s2">"</span><span class="k">)</span><span class="w"> </span>&lt;<span class="w"> </span><span class="nv">$my_vip_path</span>/<span class="nv">$f</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
 <span class="k">done</span>
 </pre></div>
 </div>

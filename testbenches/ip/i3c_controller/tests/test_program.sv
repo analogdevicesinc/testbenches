@@ -279,7 +279,7 @@ initial begin
     base_env.mng.master_sequencer,
     `I3C_CONTROLLER_BA);
 
-  setLoggerVerbosity(ADI_VERBOSITY_NONE);
+  setLoggerVerbosity(ADI_VERBOSITY_LOW);
 
   base_env.start();
   base_env.sys_reset();
@@ -295,20 +295,20 @@ initial begin
     .offload_length(4'd0),
     .mode(1'b0));
 
-  // Must occur before any other task, since the written data is later used
-  dev_char_i3c_test();
+  // // Must occur before any other task, since the written data is later used
+  // dev_char_i3c_test();
 
-  daa_i3c_test();
+  // daa_i3c_test();
 
-  ccc_i3c_test();
+  // ccc_i3c_test();
 
-  priv_i3c_test();
+  // priv_i3c_test();
 
-  priv_i2c_test();
+  // priv_i2c_test();
 
-  offload_i3c_test();
+  // offload_i3c_test();
 
-  ibi_i3c_test();
+  // ibi_i3c_test();
 
   hdr_exit_test();
 

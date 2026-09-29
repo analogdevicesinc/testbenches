@@ -1190,7 +1190,8 @@ task hdr_exit_test();
     `DUT_I3C_FRAMING.cmdp_da), ADI_VERBOSITY_LOW);
 
   wait (`DUT_I3C_WORD.st == `CMDW_HDR);
-  wait (`DUT_I3C_WORD.st == `CMDW_NOP);
+  wait (`DUT_I3C_BIT_MOD.nop == 1);
+  repeat (4) @(posedge i3c_clk);
 
   `INFO(("HDR Exit Pattern Done"), ADI_VERBOSITY_LOW);
 endtask

@@ -47,6 +47,8 @@ module system_tb();
   wire offload_sdi_ready;
   wire offload_trigger;
 
+  pullup(i3c_sda);
+
   ad_iobuf #(
     .DATA_WIDTH(1)
   ) i_iobuf_sda (

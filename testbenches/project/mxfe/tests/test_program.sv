@@ -162,7 +162,9 @@ program test_program;
     // =======================
     // JESD LINK TEST - DMA - DO -TDD
     // =======================
-    jesd_link_test(0,0,0,1);
+    if (`TDD_SUPPORT) begin
+      jesd_link_test(0,0,0,1);
+    end
 
     // =======================
     // JESD LINK TEST - DDS - EXT_SYNC

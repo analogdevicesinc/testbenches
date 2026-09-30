@@ -77,6 +77,7 @@ program test_program;
   logic [3:0] rx_transfer_id;
 
   int use_dds = 1;
+  localparam int unsigned DMA_CLK_FREQ = 300000000;
   // Through the offload the TX pattern must fit it, as it replays only what
   // it stored; in bypass a short cyclic DMA transfer would underflow instead
   localparam int TX_OFFLOAD_BYTES = (`DAC_OFFLOAD_SIZE < 8192) ? `DAC_OFFLOAD_SIZE : 8192;
@@ -135,7 +136,12 @@ program test_program;
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
-    `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
+    // The DMA is as wide as the TPL, so it needs a faster clock than the
+    // device clock to cover the per-burst gaps, or TX underflows in bypass
+    if (rx_ll.calc_device_clk() >= DMA_CLK_FREQ) begin
+      `ERROR(("Device clock %0d Hz leaves the DMA no headroom", rx_ll.calc_device_clk()));
+    end
+    `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(DMA_CLK_FREQ));
 
     `TH.`REF_CLK.inst.IF.start_clock();
     `TH.`DEVICE_CLK.inst.IF.start_clock();

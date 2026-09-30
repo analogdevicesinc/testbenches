@@ -42,6 +42,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import adi_regmap_dmac_pkg::*;
+import dmac_api_pkg::*;
 import adi_regmap_jesd_tx_pkg::*;
 import adi_regmap_jesd_rx_pkg::*;
 import adi_regmap_common_pkg::*;
@@ -69,6 +70,11 @@ program test_program;
   tx_link_layer tx_ll;
   xcvr rx_xcvr;
   xcvr tx_xcvr;
+
+  dmac_api tx_dma_api;
+  dmac_api rx_dma_api;
+  logic [3:0] tx_transfer_id;
+  logic [3:0] rx_transfer_id;
 
   int use_dds = 1;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
@@ -119,6 +125,9 @@ program test_program;
 
     tx_xcvr = new("TX_XCVR", base_env.mng.master_sequencer, `TX_XCVR_BA);
     tx_xcvr.probe();
+
+    tx_dma_api = new("TX DMA API", base_env.mng.master_sequencer, `TX_DMA_BA);
+    rx_dma_api = new("RX DMA API", base_env.mng.master_sequencer, `RX_DMA_BA);
 
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
@@ -287,6 +296,7 @@ program test_program;
                          `SET_DMAC_X_LENGTH_X_LENGTH(32'h00001FFF));
       base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_SRC_ADDRESS),
                          `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000));
+      tx_dma_api.transfer_id_get(tx_transfer_id);
       base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       // Configure RX DMA
@@ -298,10 +308,15 @@ program test_program;
                          `SET_DMAC_X_LENGTH_X_LENGTH(32'h000007FF));
       base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_DEST_ADDRESS),
                          `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00002000));
+      rx_dma_api.transfer_id_get(rx_transfer_id);
       base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-      // Wait until data propagates through the dma+offload
-      #5us;
+      if (tx_bypass) begin
+        // A cyclic transfer never completes
+        #5us;
+      end else begin
+        tx_dma_api.wait_transfer_done(.transfer_id(tx_transfer_id), .timeut_in_us(10));
+      end
     end
 
     tx_ll.link_up();
@@ -331,6 +346,7 @@ program test_program;
     #5us;
 
     if (~use_dds) begin
+      rx_dma_api.wait_transfer_done(.transfer_id(rx_transfer_id), .timeut_in_us(10));
       check_captured_data(
         .address (`DDR_BA+'h00002000),
         .length (1024),

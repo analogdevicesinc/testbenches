@@ -365,6 +365,11 @@ program test_program;
     rx_ll.link_down();
     tx_ll.link_down();
 
+    if (tx_bypass) begin
+      // The cyclic transfer never ends and would block the next TX transfer
+      tx_dma_api.disable_dma();
+    end
+
     base_env.mng.master_sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_RSTN(0));
     base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA + GetAddrs(DAC_COMMON_REG_RSTN),

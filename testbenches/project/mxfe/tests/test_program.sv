@@ -77,6 +77,9 @@ program test_program;
   logic [3:0] rx_transfer_id;
 
   int use_dds = 1;
+  // Through the offload the TX pattern must fit it, as it replays only what
+  // it stored; in bypass a short cyclic DMA transfer would underflow instead
+  localparam int TX_OFFLOAD_BYTES = (`DAC_OFFLOAD_SIZE < 8192) ? `DAC_OFFLOAD_SIZE : 8192;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
@@ -295,7 +298,7 @@ program test_program;
                          `SET_DMAC_FLAGS_CYCLIC(tx_bypass) |
                          `SET_DMAC_FLAGS_TLAST(1));
       base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_X_LENGTH),
-                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h00001FFF));
+                         `SET_DMAC_X_LENGTH_X_LENGTH((tx_bypass ? 8192 : TX_OFFLOAD_BYTES)-1));
       base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_SRC_ADDRESS),
                          `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000));
       tx_dma_api.transfer_id_get(tx_transfer_id);
@@ -353,7 +356,7 @@ program test_program;
         .address (`DDR_BA+'h00002000),
         .length (1024),
         .step (1),
-        .max_sample(4096)
+        .max_sample((tx_bypass ? 8192 : TX_OFFLOAD_BYTES)/2)
       );
     end
 

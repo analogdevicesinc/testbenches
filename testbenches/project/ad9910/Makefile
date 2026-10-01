@@ -13,6 +13,7 @@ include $(ADI_TB_DIR)/library/includes/Makeinclude_ad9910.mk
 SV_DEPS += $(ADI_TB_DIR)/library/regmaps/adi_regmap_common_pkg.sv
 
 LIB_DEPS += axi_ad9910
+LIB_DEPS += axi_dmac
 
 # config files should have the following format
 #  cfg_<param1>_<param2>.tcl

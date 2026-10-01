@@ -1,12 +1,4 @@
-Base design to be copied when starting to work on a new testbench.
-
-By default includes:
-
- * all the files that are needed for any testbench
- * scoreboard and auxiliary module imports, ready to be integrated
- * new environment file ready to expand the base test harness environment
- * test program that powers up and shuts down the system
- * option to add manual seeding
+Usage :
 
 Run all tests in batch mode:
 
@@ -32,4 +24,10 @@ Where:
 
  * <name of cfg> is a file from the cfgs directory without the tcl extension of format cfg\*
  * <name of test> is a file from the tests directory without the tcl extension
+
+
+Available configuration and test pairs (a test must be run with its own cfg):
+
+ * cfg1_drg    : test_program_drg    - DRG control (PWM ramp generator)
+ * cfg2_par_if : test_program_par_if - parallel data interface (DMA to db_o)
 

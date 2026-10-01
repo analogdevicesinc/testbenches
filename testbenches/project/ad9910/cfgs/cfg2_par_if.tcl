@@ -3,6 +3,11 @@ global ad_project_params
 # AD9910 Parallel Interface mode configuration
 set ad_project_params(MODE) PAR_IF
 
+# Target board. Without this adi_resolve_fpga_target picks a board at random,
+# so the build depends on which device families the local Vivado install has.
+# "zed" decodes to xc7z020clg484-1, matching system_project.tcl.
+set ad_project_params(FPGA_BOARD) "zed"
+
 # TX DMA: reads from DDR (AXI MM) → outputs AXI-Stream to axi_ad9910
 set tx_dma_cfg [list \
   DMA_TYPE_SRC 0 \

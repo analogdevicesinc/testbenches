@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The purpose of this testbench is to validate the axi_ad9910 IP core, the FPGA-side controller for the AD9910 Direct Digital Synthesizer (DDS), as used by the projects/admfm8000_evalz reference design." name="description" />
+
+    <title>AD9910 &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=b1d7a81a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script async="async" src="../../../_static/app.umd.js?v=daa30c51"></script>
+    <link rel="icon" href="../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ADA4355" href="../ada4355/index.html" />
+    <link rel="prev" title="AD9083" href="../ad9083/index.html" />
+   
+  
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
+        
+        <a id="logo" href="../../../index.html">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">AD9910</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#block-design">Block design</a><ul>
+<li><a class="reference internal" href="#block-diagram">Block diagram</a></li>
+<li><a class="reference internal" href="#configuration-parameters-and-modes">Configuration parameters and modes</a><ul>
+<li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#available-configurations-tests-combinations">Available configurations &amp; tests combinations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cpu-memory-interconnect-addresses">CPU/Memory interconnect addresses</a></li>
+<li><a class="reference internal" href="#interrupts">Interrupts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-stimulus">Test stimulus</a><ul>
+<li><a class="reference internal" href="#environment-bringup">Environment bringup</a></li>
+<li><a class="reference internal" href="#stop-the-environment">Stop the environment</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-program-drg">test_program_drg</a><ul>
+<li><a class="reference internal" href="#drg-model">DRG model</a></li>
+<li><a class="reference internal" href="#register-sanity-tc1">Register sanity (TC1)</a></li>
+<li><a class="reference internal" href="#reset-release-tc2">Reset release (TC2)</a></li>
+<li><a class="reference internal" href="#simple-mode-tc3">Simple mode (TC3)</a></li>
+<li><a class="reference internal" href="#pwm-basic-operation-tc4">PWM basic operation (TC4)</a></li>
+<li><a class="reference internal" href="#duty-cycle-sweep-tc5">Duty-cycle sweep (TC5)</a></li>
+<li><a class="reference internal" href="#width-and-period-edge-cases-tc6">Width and period edge cases (TC6)</a></li>
+<li><a class="reference internal" href="#start-delay-tc7">Start delay (TC7)</a></li>
+<li><a class="reference internal" href="#burst-grouping-tc8">Burst grouping (TC8)</a></li>
+<li><a class="reference internal" href="#stop-modes-tc9">Stop modes (TC9)</a></li>
+<li><a class="reference internal" href="#drhold-passthrough-tc10">DRHOLD passthrough (TC10)</a></li>
+<li><a class="reference internal" href="#profile-output-tc11">Profile output (TC11)</a></li>
+<li><a class="reference internal" href="#ramp-model-and-programming-checker-tc12">Ramp model and programming checker (TC12)</a></li>
+<li><a class="reference internal" href="#trig-out-interval-timing-tc13">trig_out interval timing (TC13)</a></li>
+<li><a class="reference internal" href="#interval-monitor-source-selection-tc14">Interval monitor source selection (TC14)</a></li>
+<li><a class="reference internal" href="#irq-mask-table-and-write-1-to-clear-tc15">IRQ mask, table and write-1-to-clear (TC15)</a></li>
+<li><a class="reference internal" href="#clock-monitors-tc16">Clock monitors (TC16)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#test-program-par-if">test_program_par_if</a><ul>
+<li><a class="reference internal" href="#id2">Register sanity (TC1)</a></li>
+<li><a class="reference internal" href="#single-transfer-and-width-mapping-tc2">Single transfer and width mapping (TC2)</a></li>
+<li><a class="reference internal" href="#multi-word-stream-tc3">Multi-word stream (TC3)</a></li>
+<li><a class="reference internal" href="#continuous-streaming-tc4">Continuous streaming (TC4)</a></li>
+<li><a class="reference internal" href="#backpressure-tc5">Backpressure (TC5)</a></li>
+<li><a class="reference internal" href="#update-rate-change-tc6">Update-rate change (TC6)</a></li>
+<li><a class="reference internal" href="#external-trigger-tc7">External trigger (TC7)</a></li>
+<li><a class="reference internal" href="#f-cfg-to-f-o-tc8">F_CFG to f_o (TC8)</a></li>
+<li><a class="reference internal" href="#ramp-data-integrity-tc9">Ramp data integrity (TC9)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-the-testbench">Building the testbench</a></li>
+<li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#hdl-related-dependencies-forming-the-dut">HDL related dependencies forming the DUT</a></li>
+<li><a class="reference internal" href="#testbenches-related-dependencies">Testbenches related dependencies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-information">More information</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../index.html">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction.html">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository.html">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/releases.html">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_tb.html">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/hierarchy.html">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/create_edit_tb.html">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/coding_guidelines.html">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/debug_tb.html">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/docs_guidelines.html">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../library/index.html">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/index.html">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/common/index.html">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/scoreboard/index.html">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/watchdog/index.html">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/data_offload/index.html">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/dmac/index.html">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/jesd/index.html">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/spi_engine/index.html">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/xcvr/index.html">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../library/regmaps/index.html">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/utilities/index.html">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/irq_handler/index.html">IRQ Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/test_harness/index.html">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../library/vip/index.html">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/adi/index.html">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/io_vip/index.html">IO VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/spi_vip/index.html">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/index.html">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axi_vip/index.html">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_agent.html">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/m_axi_sequencer.html">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/s_axi_sequencer.html">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_monitor.html">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axis_vip/index.html">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_agent.html">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/m_axis_sequencer.html">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/s_axis_sequencer.html">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_monitor.html">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/clk_vip/index.html">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/rst_vip/index.html">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1"/><div class="collapse"><a class="reference internal" href="../../ip_based/index.html">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axi_tdd/index.html">AXI TDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/axis_sequencers/index.html">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/base/index.html">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_flock/index.html">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_loopback/index.html">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/dma_sg/index.html">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/i3c_controller/index.html">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/irq_handler/index.html">IRQ handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/jesd_loopback/index.html">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo/index.html">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_axis_fifo_asym/index.html">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ip_based/util_pack/index.html">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../ad463x/index.html">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad485x/index.html">AD485X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad57xx/index.html">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad738x/index.html">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad7606/index.html">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad7616/index.html">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad9083/index.html">AD9083</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AD9910</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ada4355/index.html">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9001/index.html">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cn0363/index.html">CN0363</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cn0577_adaq2387x/index.html">CN0577/ADAQ2387X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fmcomms2/index.html">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ltc2378/index.html">LTC2378</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pluto/index.html">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pulsar_adc/index.html">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Testbenches</a></li><li><a href="../index.html">Project Based</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="ad9910">
+<span id="id1"></span><h1>AD9910<a class="headerlink" href="#ad9910" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The purpose of this testbench is to validate the <code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> IP core, the
+FPGA-side controller for the AD9910 Direct Digital Synthesizer (DDS), as used
+by the <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/projects/admfm8000_evalz" target="_blank">projects/admfm8000_evalz</a> reference design.</p>
+<p>The IP has two independent functions, and the testbench has one configuration
+for each:</p>
+<ul class="simple">
+<li><p><strong>Digital Ramp Generator (DRG) control</strong> — <code class="docutils literal notranslate"><span class="pre">drctl</span></code> is generated as an
+open-loop PWM waveform from two programmed sync_clk cycle counts,
+<code class="docutils literal notranslate"><span class="pre">DRCTL_PERIOD</span></code> and <code class="docutils literal notranslate"><span class="pre">DRCTL_WIDTH</span></code>, with optional start delay, burst
+grouping, stop modes, interval monitors and interrupts. <code class="docutils literal notranslate"><span class="pre">drover</span></code> is a
+status input only; it feeds the interrupt and trigger logic and drives no
+state machine.</p></li>
+<li><p><strong>Parallel data interface</strong> — 16-bit samples are streamed from DDR by a DMA
+over AXI-Stream, through the IP’s asynchronous FIFO, and out on
+<code class="docutils literal notranslate"><span class="pre">db_o[15:0]</span></code>/<code class="docutils literal notranslate"><span class="pre">tx_enable</span></code> at a programmable update rate or on an external
+trigger. <code class="docutils literal notranslate"><span class="pre">f_o[1:0]</span></code> is driven statically from a register.</p></li>
+</ul>
+<p>The entire HDL documentation can be found here
+<span class="xref std std-ref">ADMFM8000-EVALZ HDL project</span>.</p>
+</section>
+<section id="block-design">
+<h2>Block design<a class="headerlink" href="#block-design" title="Link to this heading"></a></h2>
+<p>The testbench block design includes the <code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> IP core along with VIPs
+used for clocking, reset, PS and DDR simulations. The <code class="docutils literal notranslate"><span class="pre">sync_clk</span></code> and
+<code class="docutils literal notranslate"><span class="pre">pd_clk</span></code> signals are generated directly in the testbench at 250 MHz, standing
+in for the clock outputs of the AD9910 device, and reach the IP through
+pass-through clock VIPs. The IP is instantiated with <code class="docutils literal notranslate"><span class="pre">MEASURE_CLKS_EN=1</span></code>, so
+the sync_clk and pd_clk monitor registers are available.</p>
+<p>The block design depends on the <code class="docutils literal notranslate"><span class="pre">MODE</span></code> parameter:</p>
+<ul class="simple">
+<li><p><strong>DRG</strong> — the AXI-Stream input of <code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> is tied off and no DMA is
+instantiated.</p></li>
+<li><p><strong>PAR_IF</strong> — a TX <code class="docutils literal notranslate"><span class="pre">axi_dmac</span></code> reads samples from the DDR VIP over AXI-MM
+and drives the <code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> AXI-Stream input.</p></li>
+</ul>
+<p>In both modes the DDS control and data outputs (<code class="docutils literal notranslate"><span class="pre">drctl</span></code>, <code class="docutils literal notranslate"><span class="pre">drhold</span></code>,
+<code class="docutils literal notranslate"><span class="pre">profile</span></code>, <code class="docutils literal notranslate"><span class="pre">db_o</span></code>, <code class="docutils literal notranslate"><span class="pre">f_o</span></code>, <code class="docutils literal notranslate"><span class="pre">tx_enable</span></code>, <code class="docutils literal notranslate"><span class="pre">trig_out</span></code> and the IP
+interrupt) are brought out of the block design and observed directly by the
+test program, which also drives the <code class="docutils literal notranslate"><span class="pre">drover</span></code>, <code class="docutils literal notranslate"><span class="pre">ram_swp_ovr</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ext_sync</span></code> inputs.</p>
+<section id="block-diagram">
+<h3>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h3>
+<p>The data path and clock domains are depicted in the below diagram:</p>
+<a class="reference internal image-reference" href="../../../_images/ad9910_tb.svg"><img alt="AD9910 Testbench block diagram" class="align-center" src="../../../_images/ad9910_tb.svg" width="800" />
+</a>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only in PAR_IF mode (<code class="docutils literal notranslate"><span class="pre">cfg2_par_if</span></code>)</p></li>
+</ul>
+</div>
+</section>
+<section id="configuration-parameters-and-modes">
+<h3>Configuration parameters and modes<a class="headerlink" href="#configuration-parameters-and-modes" title="Link to this heading"></a></h3>
+<p>The following parameters of this project can be configured:</p>
+<ul class="simple">
+<li><p>MODE: Defines which function of the <code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> IP is under test.
+Options: DRG - Digital Ramp Generator control, PAR_IF - Parallel data
+interface</p></li>
+<li><p>tx_dma_cfg: The <code class="docutils literal notranslate"><span class="pre">axi_dmac</span></code> configuration, used only in PAR_IF mode. The
+DMA reads 32-bit words from DDR and emits 16-bit AXI-Stream beats
+(<code class="docutils literal notranslate"><span class="pre">DMA_DATA_WIDTH_SRC</span> <span class="pre">32</span></code>, <code class="docutils literal notranslate"><span class="pre">DMA_DATA_WIDTH_DEST</span> <span class="pre">16</span></code>), matching the
+16-bit <code class="docutils literal notranslate"><span class="pre">s_axis</span></code> input of the IP.</p></li>
+</ul>
+<section id="configuration-files">
+<h4>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h4>
+<p>The following configuration files are available:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" rowspan="2"><p>Configuration
+mode</p></th>
+<th class="head"><p>Parameters</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>MODE</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>cfg1_drg</p></td>
+<td><p>DRG</p></td>
+</tr>
+<tr class="row-even"><td><p>cfg2_par_if</p></td>
+<td><p>PAR_IF</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="tests">
+<h4>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h4>
+<p>The following test program files are available:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test program</p></th>
+<th class="head"><p>Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>test_program_drg</p></td>
+<td><p>Tests the DRG control function (PWM ramp generator,
+bursts, stop modes, interval monitors, interrupts).</p></td>
+</tr>
+<tr class="row-odd"><td><p>test_program_par_if</p></td>
+<td><p>Tests the parallel data interface (DMA to <code class="docutils literal notranslate"><span class="pre">db_o</span></code>).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="available-configurations-tests-combinations">
+<h4>Available configurations &amp; tests combinations<a class="headerlink" href="#available-configurations-tests-combinations" title="Link to this heading"></a></h4>
+<p>Each test program must be paired with the configuration of the same mode:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Configuration</p></th>
+<th class="head"><p>Test</p></th>
+<th class="head"><p>Build command</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cfg1_drg</p></td>
+<td><p>test_program_drg</p></td>
+<td><p>make CFG=cfg1_drg TST=test_program_drg</p></td>
+</tr>
+<tr class="row-odd"><td><p>cfg2_par_if</p></td>
+<td><p>test_program_par_if</p></td>
+<td><p>make CFG=cfg2_par_if TST=test_program_par_if</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition error">
+<p class="admonition-title">Error</p>
+<p>Mixing a wrong pair of CFG and TST is not supported. The PAR_IF test
+program relies on the TX DMA, which only the PAR_IF configuration
+instantiates. Please use the matching mode.</p>
+</div>
+</section>
+</section>
+<section id="cpu-memory-interconnect-addresses">
+<h3>CPU/Memory interconnect addresses<a class="headerlink" href="#cpu-memory-interconnect-addresses" title="Link to this heading"></a></h3>
+<p>Below are the CPU/Memory interconnect addresses used in this project:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance</p></th>
+<th class="head"><p>Address</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>axi_intc</p></td>
+<td><p>0x4120_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_ad9910</p></td>
+<td><p>0x44A0_0000</p></td>
+</tr>
+<tr class="row-even"><td><p>tx_dma *</p></td>
+<td><p>0x44A3_0000</p></td>
+</tr>
+<tr class="row-odd"><td><p>ddr_axi_vip</p></td>
+<td><p>0x8000_0000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only in PAR_IF mode (<code class="docutils literal notranslate"><span class="pre">cfg2_par_if</span></code>)</p></li>
+</ul>
+</div>
+</section>
+<section id="interrupts">
+<h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading"></a></h3>
+<p>Below are the Programmable Logic interrupts used in this project:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Instance name</p></th>
+<th class="head"><p>HDL</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>tx_dma *</p></td>
+<td><p>13</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only in PAR_IF mode (<code class="docutils literal notranslate"><span class="pre">cfg2_par_if</span></code>)</p></li>
+</ul>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> interrupt is not routed to the interrupt controller. It is
+brought out of the block design as <code class="docutils literal notranslate"><span class="pre">ad9910_irq</span></code> and checked directly by the
+test program.</p>
+</section>
+</section>
+<section id="test-stimulus">
+<h2>Test stimulus<a class="headerlink" href="#test-stimulus" title="Link to this heading"></a></h2>
+<p>Both test programs set the logger to <code class="docutils literal notranslate"><span class="pre">ADI_VERBOSITY_NONE</span></code>, so a passing run
+prints only the randomization state, <code class="docutils literal notranslate"><span class="pre">====</span> <span class="pre">ALL</span> <span class="pre">TESTS</span> <span class="pre">PASSED</span> <span class="pre">====</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Testbench</span> <span class="pre">done!</span></code>. Errors are always printed. When a check fails, the final
+summary names the failing test cases, e.g.
+<code class="docutils literal notranslate"><span class="pre">====</span> <span class="pre">SOME</span> <span class="pre">TESTS</span> <span class="pre">FAILED</span> <span class="pre">====</span> <span class="pre">(failing:</span> <span class="pre">TC14)</span></code>. To see the per-test progress
+messages, raise the verbosity to <code class="docutils literal notranslate"><span class="pre">ADI_VERBOSITY_LOW</span></code> in the test program.</p>
+<p>All <code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> register access goes through the <code class="docutils literal notranslate"><span class="pre">ad9910_api</span></code> driver, so
+neither test program contains register offsets or field positions.</p>
+<section id="environment-bringup">
+<h3>Environment bringup<a class="headerlink" href="#environment-bringup" title="Link to this heading"></a></h3>
+<p>The steps of the environment bringup, common to both test programs, are:</p>
+<ul class="simple">
+<li><p>Print the randomization state, so that a failing run can be reproduced</p></li>
+<li><p>Create the test harness environment</p></li>
+<li><p>Start the environment</p></li>
+<li><p>Assert the system reset</p></li>
+<li><p>Extend the simulation watchdog (3 ms for DRG, 5 ms for PAR_IF)</p></li>
+</ul>
+</section>
+<section id="stop-the-environment">
+<h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
+<p>The steps of stopping the environment, common to both test programs, are:</p>
+<ul class="simple">
+<li><p>Stop the test harness environment</p></li>
+<li><p>Report the overall pass/fail status and the failing test cases, if any</p></li>
+</ul>
+</section>
+</section>
+<section id="test-program-drg">
+<h2>test_program_drg<a class="headerlink" href="#test-program-drg" title="Link to this heading"></a></h2>
+<p>Because <code class="docutils literal notranslate"><span class="pre">drctl</span></code> is produced by deterministic counters, the duty-cycle checks
+assert exact sync_clk cycle counts with no tolerance: a programmed period of
+<code class="docutils literal notranslate"><span class="pre">P</span></code> and width of <code class="docutils literal notranslate"><span class="pre">W</span></code> must measure exactly <code class="docutils literal notranslate"><span class="pre">P</span></code> sync_clk cycles rising edge
+to rising edge, and exactly <code class="docutils literal notranslate"><span class="pre">W</span></code> sync_clk cycles high. Most tests use a base
+duty cycle of <code class="docutils literal notranslate"><span class="pre">P=1000</span></code>, <code class="docutils literal notranslate"><span class="pre">W=400</span></code> (4 µs at 40%), sized so the waveforms stay
+readable.</p>
+<p>The only exception is any interval timed from an AXI register write. The IP’s
+up_clk to sync_clk control transfer starts only once per 64 up_clk cycles, so a
+write can wait up to 160 sync_clk cycles at the crossing. Such checks allow that
+much tolerance.</p>
+<section id="drg-model">
+<h3>DRG model<a class="headerlink" href="#drg-model" title="Link to this heading"></a></h3>
+<p>The test program includes a behavioral model of the AD9910 digital ramp
+generator that runs throughout the suite. It is a level-driven integrator:
+while <code class="docutils literal notranslate"><span class="pre">drctl</span></code> is high the ramp counter steps up, while it is low the counter
+steps down, and <code class="docutils literal notranslate"><span class="pre">drover</span></code> is asserted whenever the counter sits at a limit.
+The DUT reads none of the model’s state. The model exists to supply a realistic
+<code class="docutils literal notranslate"><span class="pre">drover</span></code> for the interrupt tests, to detect programming errors, and to show in
+the waveform the ramp that each duty-cycle configuration produces.</p>
+<p>The following parameters are fixed in the model:</p>
+<ul class="simple">
+<li><p>DRG_LOWER_LIMIT: 1000 (ramp lower boundary)</p></li>
+<li><p>DRG_UPPER_LIMIT: 5000 (ramp upper boundary)</p></li>
+<li><p>DRG_STEP_SIZE: 20 (increment/decrement per sync_clk cycle)</p></li>
+<li><p>DRG_RAMP_CYCLES: 200 (sync_clk cycles for one full limit-to-limit ramp)</p></li>
+</ul>
+<p>The model supports two ramp shapes. The shape is selected in the AD9910 itself
+over SPI, not by this IP, so the test tells the model which one to emulate:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DRG_DWELL</span></code> — the ramp parks at a limit until <code class="docutils literal notranslate"><span class="pre">drctl</span></code> changes level.
+This is the AD9910’s reset configuration and the suite’s default.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DRG_SAWTOOTH</span></code> — emulates no-dwell high: on reaching the upper limit the
+counter reloads the lower limit and ramps up again, while the downward
+direction still dwells. Used only in TC4 and in part of TC12.</p></li>
+</ul>
+<p>With the completion checker armed, the model flags any ramp that has not reached
+its limit when <code class="docutils literal notranslate"><span class="pre">drctl</span></code> changes level. That means the programmed interval was
+shorter than <code class="docutils literal notranslate"><span class="pre">DRG_RAMP_CYCLES</span></code>. The checker is armed only in TC12, because
+other tests program short intervals on purpose.</p>
+</section>
+<section id="register-sanity-tc1">
+<h3>Register sanity (TC1)<a class="headerlink" href="#register-sanity-tc1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Run the API sanity test: verify VERSION against its reset value and
+write/read back the SCRATCH register</p></li>
+<li><p>Read and log the ID and DEVICE_INFO registers</p></li>
+<li><p>Write a distinct pattern to each DRG register (DRCTL_PERIOD, DRCTL_WIDTH,
+BST_DELAY, RAMP_BURSTS, BURST_DELAY, MONITOR_MAX_PERIOD and the four
+IRQ/trigger interval match registers), then read each back and compare</p></li>
+<li><p>Clear all of them back to zero</p></li>
+</ul>
+</section>
+<section id="reset-release-tc2">
+<h3>Reset release (TC2)<a class="headerlink" href="#reset-release-tc2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Clear RESET_CTRL. The core comes out of reset held, so software must release
+it</p></li>
+<li><p>Read and log SYNC_CLK_CNT. The clock monitor only captures once per 65536
+up_clk cycles (~655 µs), so its value is checked later, in TC16</p></li>
+<li><p>Enable the DRG model in <code class="docutils literal notranslate"><span class="pre">DRG_DWELL</span></code> shape, with the completion checker off</p></li>
+</ul>
+</section>
+<section id="simple-mode-tc3">
+<h3>Simple mode (TC3)<a class="headerlink" href="#simple-mode-tc3" title="Link to this heading"></a></h3>
+<p>With <code class="docutils literal notranslate"><span class="pre">drctl_toggle_en</span></code> cleared the PWM generator is bypassed:</p>
+<ul class="simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">drctl_init=1</span></code> and verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> goes high</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">drctl_init=0</span></code> and verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> goes low</p></li>
+</ul>
+</section>
+<section id="pwm-basic-operation-tc4">
+<h3>PWM basic operation (TC4)<a class="headerlink" href="#pwm-basic-operation-tc4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Switch the DRG model to <code class="docutils literal notranslate"><span class="pre">DRG_SAWTOOTH</span></code></p></li>
+<li><p>Program <code class="docutils literal notranslate"><span class="pre">P=1000</span></code>, <code class="docutils literal notranslate"><span class="pre">W=400</span></code> and measure 6 consecutive duty cycles</p></li>
+<li><p>Verify every high time is exactly 400 and every period exactly 1000 sync_clk
+cycles</p></li>
+<li><p>Switch the DRG model back to <code class="docutils literal notranslate"><span class="pre">DRG_DWELL</span></code></p></li>
+</ul>
+</section>
+<section id="duty-cycle-sweep-tc5">
+<h3>Duty-cycle sweep (TC5)<a class="headerlink" href="#duty-cycle-sweep-tc5" title="Link to this heading"></a></h3>
+<p>Every point is measured over 4 duty cycles and checked exactly:</p>
+<ul class="simple">
+<li><p>Duty sweep at <code class="docutils literal notranslate"><span class="pre">P=1000</span></code>: <code class="docutils literal notranslate"><span class="pre">W</span></code> = 1, 50, 200, 400, 500, 600, 800, 950, 990.
+<code class="docutils literal notranslate"><span class="pre">W=1</span></code> covers the single-cycle width boundary in the RTL</p></li>
+<li><p>Period sweep at 50% duty: <code class="docutils literal notranslate"><span class="pre">P</span></code> = 100, 250, 500, 1000, 2000, 4000</p></li>
+<li><p>Live reconfiguration: write <code class="docutils literal notranslate"><span class="pre">P=800</span></code>, <code class="docutils literal notranslate"><span class="pre">W=200</span></code> without first clearing toggle
+mode, and verify the output converges on the new waveform</p></li>
+</ul>
+</section>
+<section id="width-and-period-edge-cases-tc6">
+<h3>Width and period edge cases (TC6)<a class="headerlink" href="#width-and-period-edge-cases-tc6" title="Link to this heading"></a></h3>
+<p>Each case exercises a distinct branch of the RTL:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">W=0</span></code>: verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> stays low for 3 periods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">W=P</span></code>: verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> stays high for 3 periods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">W&gt;P</span></code> (<code class="docutils literal notranslate"><span class="pre">W=1.5P</span></code>): verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> stays high for 3 periods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">P=1</span></code>: verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> toggles every sync_clk cycle (1 cycle high, period
+of 2) and that <code class="docutils literal notranslate"><span class="pre">W</span></code> is ignored</p></li>
+</ul>
+</section>
+<section id="start-delay-tc7">
+<h3>Start delay (TC7)<a class="headerlink" href="#start-delay-tc7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Measure the time from enabling the PWM to the first <code class="docutils literal notranslate"><span class="pre">drctl</span></code> rising edge,
+with BST_DELAY set to 500 and then to 2500 sync_clk cycles</p></li>
+<li><p>Verify the difference between the two is 2000 sync_clk cycles, within the
+160 sync_clk cycle control-transfer tolerance. Taking the difference cancels
+the fixed register-write overhead</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A BST_DELAY value written while the ramp is stopped is only latched at the
+next period boundary, so the first restart after the write still uses the
+old value. Each measurement therefore runs a priming period with the new
+value before the timed stop/start.</p>
+</div>
+</section>
+<section id="burst-grouping-tc8">
+<h3>Burst grouping (TC8)<a class="headerlink" href="#burst-grouping-tc8" title="Link to this heading"></a></h3>
+<p>With <code class="docutils literal notranslate"><span class="pre">RAMP_BURSTS=2</span></code> and the base duty cycle, BURST_DELAY is swept over 500,
+1000, 2000 and 4000 sync_clk cycles. For each value, 6 rising-edge gaps are
+measured and the test checks that:</p>
+<ul class="simple">
+<li><p>every high time is still exactly <code class="docutils literal notranslate"><span class="pre">W=400</span></code></p></li>
+<li><p>the gap inside a burst is exactly one period (1000)</p></li>
+<li><p>exactly 3 gaps are burst boundaries</p></li>
+<li><p>the extra boundary overhead beyond <code class="docutils literal notranslate"><span class="pre">P</span> <span class="pre">+</span> <span class="pre">BURST_DELAY</span></code> is at most 16 sync_clk
+cycles</p></li>
+</ul>
+<p>It then checks that the boundary overhead is the same at all four delays. A
+constant offset shows the delay is added, not scaled.</p>
+</section>
+<section id="stop-modes-tc9">
+<h3>Stop modes (TC9)<a class="headerlink" href="#stop-modes-tc9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RAMP_CFG=2</span></code> (stop after period): let the one permitted period run, then
+verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> stays low for 2 periods. Writing <code class="docutils literal notranslate"><span class="pre">RAMP_CFG=0</span></code> must restart
+the ramp</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RAMP_CFG=1</span></code> (stop after burst) with <code class="docutils literal notranslate"><span class="pre">RAMP_BURSTS=3</span></code>: let the burst run,
+then verify <code class="docutils literal notranslate"><span class="pre">drctl</span></code> stays low for 2 periods. Writing <code class="docutils literal notranslate"><span class="pre">RAMP_CFG=0</span></code> must
+restart the ramp with the programmed period</p></li>
+</ul>
+</section>
+<section id="drhold-passthrough-tc10">
+<h3>DRHOLD passthrough (TC10)<a class="headerlink" href="#drhold-passthrough-tc10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Set and clear the DRHOLD bit, and verify the <code class="docutils literal notranslate"><span class="pre">drhold</span></code> output follows it</p></li>
+</ul>
+</section>
+<section id="profile-output-tc11">
+<h3>Profile output (TC11)<a class="headerlink" href="#profile-output-tc11" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Write all 8 values to the PROFILE register and verify each appears on
+<code class="docutils literal notranslate"><span class="pre">profile[2:0]</span></code></p></li>
+</ul>
+</section>
+<section id="ramp-model-and-programming-checker-tc12">
+<h3>Ramp model and programming checker (TC12)<a class="headerlink" href="#ramp-model-and-programming-checker-tc12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DRG_DWELL</span></code> with the completion checker armed, <code class="docutils literal notranslate"><span class="pre">P=1000</span></code>, <code class="docutils literal notranslate"><span class="pre">W=500</span></code>: both
+intervals are longer than a full ramp, so verify there are no truncations and
+at least 6 <code class="docutils literal notranslate"><span class="pre">drover</span></code> rising edges over 4 periods (8 expected)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DRG_DWELL</span></code>, <code class="docutils literal notranslate"><span class="pre">W=150</span></code>: shorter than a full ramp, so verify that truncated
+up-ramps are detected</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DRG_SAWTOOTH</span></code>, <code class="docutils literal notranslate"><span class="pre">P=1000</span></code>, <code class="docutils literal notranslate"><span class="pre">W=400</span></code>: verify at least 3 retraces over
+2 periods (4 expected), then stop the PWM and verify the ramp comes to rest
+at the lower limit</p></li>
+<li><p>Switch the DRG model back to <code class="docutils literal notranslate"><span class="pre">DRG_DWELL</span></code></p></li>
+</ul>
+</section>
+<section id="trig-out-interval-timing-tc13">
+<h3>trig_out interval timing (TC13)<a class="headerlink" href="#trig-out-interval-timing-tc13" title="Link to this heading"></a></h3>
+<p>The interval monitor loads MONITOR_MAX_PERIOD and counts down, pulsing
+<code class="docutils literal notranslate"><span class="pre">trig_out</span></code> when the counter equals the start or stop match value. In
+max-period mode, with <code class="docutils literal notranslate"><span class="pre">MONITOR_MAX_PERIOD=1000</span></code>:</p>
+<ul class="simple">
+<li><p>For start/stop match pairs 900/800, 800/400 and 500/100, verify two
+<code class="docutils literal notranslate"><span class="pre">trig_out</span></code> pulses whose spacing is exactly <code class="docutils literal notranslate"><span class="pre">START</span> <span class="pre">-</span> <span class="pre">STOP</span></code> sync_clk cycles</p></li>
+<li><p>With both match values 0, verify no <code class="docutils literal notranslate"><span class="pre">trig_out</span></code> pulse over 4000 sync_clk
+cycles</p></li>
+</ul>
+</section>
+<section id="interval-monitor-source-selection-tc14">
+<h3>Interval monitor source selection (TC14)<a class="headerlink" href="#interval-monitor-source-selection-tc14" title="Link to this heading"></a></h3>
+<p>The monitor source selects which event reloads the reference counter: every
+period (0), every burst delay (1), or once per start (2, max-period). With
+<code class="docutils literal notranslate"><span class="pre">P=500</span></code>, <code class="docutils literal notranslate"><span class="pre">RAMP_BURSTS=4</span></code> and a start pulse only, <code class="docutils literal notranslate"><span class="pre">trig_out</span></code> pulses are
+counted over 20 periods in each mode, and the test checks that:</p>
+<ul class="simple">
+<li><p>max-period mode produces 1 to 3 pulses</p></li>
+<li><p>period and burst-delay modes both produce pulses</p></li>
+<li><p>period mode produces more pulses than burst-delay mode</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TC14 currently fails. In period and burst-delay modes the reference
+counter is loaded but never decremented, so it never reaches the match value
+and no pulse is produced. Only max-period mode works. The same logic drives
+the interval interrupts, which are affected in the same way. This is an
+<code class="docutils literal notranslate"><span class="pre">axi_ad9910</span></code> RTL issue, not a testbench issue, and TC14 is expected to pass
+once it is fixed.</p>
+</div>
+</section>
+<section id="irq-mask-table-and-write-1-to-clear-tc15">
+<h3>IRQ mask, table and write-1-to-clear (TC15)<a class="headerlink" href="#irq-mask-table-and-write-1-to-clear-tc15" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>With IRQ_MASK cleared, pulse <code class="docutils literal notranslate"><span class="pre">ram_swp_ovr</span></code> and verify the interrupt output
+stays low while IRQ_TABLE latches the event</p></li>
+<li><p>Unmask the latched source and verify the interrupt output goes high</p></li>
+<li><p>Write 1 to the IRQ_TABLE bit and verify both the latch and the interrupt clear</p></li>
+<li><p>Run 10 duty cycles with <code class="docutils literal notranslate"><span class="pre">RAMP_BURSTS=2</span></code> and verify <code class="docutils literal notranslate"><span class="pre">bursts_complete</span></code> is
+latched in IRQ_TABLE. Internal <code class="docutils literal notranslate"><span class="pre">end_period</span></code>/<code class="docutils literal notranslate"><span class="pre">bursts_complete</span></code> pulses are
+counted alongside, so a failure shows whether the event was never generated
+or was generated but not latched</p></li>
+<li><p>Start the ramp, clear IRQ_TABLE, and verify the <code class="docutils literal notranslate"><span class="pre">drover</span></code> bit latches from
+the model’s ramp within 3 periods. Clearing after the start ensures the latch
+comes from the ramp, not from the setup</p></li>
+</ul>
+</section>
+<section id="clock-monitors-tc16">
+<h3>Clock monitors (TC16)<a class="headerlink" href="#clock-monitors-tc16" title="Link to this heading"></a></h3>
+<p>This test runs last, once the first 65536-up_clk monitor window has elapsed:</p>
+<ul class="simple">
+<li><p>Read SYNC_CLK_CNT and PD_CLK_COUNT and verify both report a running clock</p></li>
+</ul>
+</section>
+</section>
+<section id="test-program-par-if">
+<h2>test_program_par_if<a class="headerlink" href="#test-program-par-if" title="Link to this heading"></a></h2>
+<p>The IP has no transfer-status register, so every transfer is verified by an
+output monitor. It captures <code class="docutils literal notranslate"><span class="pre">db_o[15:0]</span></code> on each pd_clk cycle where
+<code class="docutils literal notranslate"><span class="pre">tx_enable</span></code> is high, one entry per emitted word, and the captures are compared
+sample-for-sample against the samples written to DDR.</p>
+<p>A few properties of the data path that the tests rely on:</p>
+<ul class="simple">
+<li><p>The transfer engine emits one 16-bit word per trigger.</p></li>
+<li><p>PAR_UPDATE_RATE is a period divider: with a value of <code class="docutils literal notranslate"><span class="pre">R</span></code> a word is emitted
+every <code class="docutils literal notranslate"><span class="pre">R+1</span></code> pd_clk cycles, so <code class="docutils literal notranslate"><span class="pre">R=0</span></code> is the fastest setting (one word per
+pd_clk). It is ignored in external-trigger mode.</p></li>
+<li><p>The DMA unpacks each 32-bit DDR word into two 16-bit beats, low half first.</p></li>
+<li><p>Between transfers the test waits for <code class="docutils literal notranslate"><span class="pre">tx_enable</span></code> to stay low for longer
+than one emission period. This drains any residual FIFO content, so each
+capture starts from an empty FIFO.</p></li>
+</ul>
+<p>After the environment bringup, the core reset is released by clearing
+RESET_CTRL.</p>
+<section id="id2">
+<h3>Register sanity (TC1)<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Run the API sanity test: verify VERSION against its reset value and
+write/read back the SCRATCH register</p></li>
+<li><p>Verify CONFIG reports <code class="docutils literal notranslate"><span class="pre">MEASURE_CLKS_EN=1</span></code></p></li>
+<li><p>Write/read back PAR_UPDATE_RATE, F_CFG and the <code class="docutils literal notranslate"><span class="pre">enable_p_if</span></code> bit of
+UPDATE_CTRL</p></li>
+</ul>
+</section>
+<section id="single-transfer-and-width-mapping-tc2">
+<h3>Single transfer and width mapping (TC2)<a class="headerlink" href="#single-transfer-and-width-mapping-tc2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Write one 32-bit DDR word holding two known samples and transfer it</p></li>
+<li><p>Verify both samples appear in order, which pins down the 32-bit to 16-bit
+width and ordering that every later test relies on</p></li>
+</ul>
+</section>
+<section id="multi-word-stream-tc3">
+<h3>Multi-word stream (TC3)<a class="headerlink" href="#multi-word-stream-tc3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Transfer 6 distinct samples and verify they appear in order</p></li>
+</ul>
+</section>
+<section id="continuous-streaming-tc4">
+<h3>Continuous streaming (TC4)<a class="headerlink" href="#continuous-streaming-tc4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Transfer 32 sequential samples at a fast update rate and verify they all
+appear in order</p></li>
+</ul>
+</section>
+<section id="backpressure-tc5">
+<h3>Backpressure (TC5)<a class="headerlink" href="#backpressure-tc5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Transfer 64 samples, four times the 16-entry FIFO depth, at a slow update
+rate, so the FIFO fills and backpressures the DMA</p></li>
+<li><p>Verify no sample is lost or reordered</p></li>
+</ul>
+</section>
+<section id="update-rate-change-tc6">
+<h3>Update-rate change (TC6)<a class="headerlink" href="#update-rate-change-tc6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Time a full 128-sample transfer at update rate 200 and then at 20</p></li>
+<li><p>Verify the faster rate completes the transfer more than twice as quickly</p></li>
+</ul>
+</section>
+<section id="external-trigger-tc7">
+<h3>External trigger (TC7)<a class="headerlink" href="#external-trigger-tc7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Select external-trigger mode, load 4 samples into the FIFO and verify
+nothing is emitted before any trigger</p></li>
+<li><p>For each sample, re-arm the external sync through EXT_TRIG_CFG (arming is
+edge-sensitive, so the arm bit is cleared and set again), pulse <code class="docutils literal notranslate"><span class="pre">ext_sync</span></code>,
+and verify exactly one new word is emitted</p></li>
+<li><p>Verify all 4 samples appear in order</p></li>
+</ul>
+</section>
+<section id="f-cfg-to-f-o-tc8">
+<h3>F_CFG to f_o (TC8)<a class="headerlink" href="#f-cfg-to-f-o-tc8" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Write all 4 values to F_CFG and verify each appears on <code class="docutils literal notranslate"><span class="pre">f_o[1:0]</span></code></p></li>
+</ul>
+</section>
+<section id="ramp-data-integrity-tc9">
+<h3>Ramp data integrity (TC9)<a class="headerlink" href="#ramp-data-integrity-tc9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Stream a 256-sample 16-bit sawtooth-up, triangle and sawtooth-down ramp at
+the fastest update rate</p></li>
+<li><p>Verify each ramp sample-for-sample</p></li>
+</ul>
+</section>
+</section>
+<section id="building-the-testbench">
+<h2>Building the testbench<a class="headerlink" href="#building-the-testbench" title="Link to this heading"></a></h2>
+<p>The testbench is built upon ADI’s generic HDL reference design framework.
+ADI does not distribute compiled files of these projects so they must be built
+from the sources available <a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/" target="_blank">here</a> and <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/" target="_blank">here</a>,
+with the specified hierarchy described <a class="reference internal" href="../../../user_guide/build_tb.html#build-tb-set-up-tb-repo"><span class="std std-ref">Set up the Testbenches repository</span></a>.
+To get the source you must
+<a class="icon link reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank">clone</a>
+the HDL repository, and then build the project as follows:.</p>
+<p><strong>Linux/Cygwin/WSL</strong></p>
+<p><em>Example 1</em></p>
+<p>Build all the possible combinations of tests and configurations, using only the
+command line.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad9910
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad9910$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 2</em></p>
+<p>Build all the possible combinations of tests and configurations, using the
+Vivado GUI. This command will launch Vivado, will run the simulation and display
+the waveforms.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad9910
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad9910$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 3</em></p>
+<p>Build a particular combination of test and configuration, using the Vivado GUI.
+This command will launch Vivado, will run the simulation and display the
+waveforms.</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad9910
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad9910$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg1_drg<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_drg<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p><em>Example 4</em></p>
+<p>Build the parallel data interface test:</p>
+<div class="code-shell"><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>testbenches/project/ad9910
+</pre></div>
+</div>
+<div class="clear-left"></div></div><div><div class="no-select float-left highlight-default notranslate"><div class="highlight"><pre><span></span>user@analog:~/testbenches/project/ad9910$
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CFG</span><span class="o">=</span>cfg2_par_if<span class="w"> </span><span class="nv">TST</span><span class="o">=</span>test_program_par_if<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>gui
+</pre></div>
+</div>
+<div class="clear-left"></div></div></div><p>The built projects can be found in the <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder, where each configuration
+specific build has it’s own folder named after the configuration file’s name.
+Example: if the following command was run for a single configuration in the
+clean folder (no runs folder available):</p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">CFG=cfg1_drg</span></code></p>
+<p>Then the subfolder under <code class="docutils literal notranslate"><span class="pre">runs</span></code> name will be:</p>
+<p><code class="docutils literal notranslate"><span class="pre">cfg1_drg</span></code></p>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
+<section id="hdl-related-dependencies-forming-the-dut">
+<h3>HDL related dependencies forming the DUT<a class="headerlink" href="#hdl-related-dependencies-forming-the-dut" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IP name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AXI_AD9910</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_ad9910" target="_blank">library/axi_ad9910</a></p></td>
+<td><p><span class="xref std std-ref">axi_ad9910</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_DMAC *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/axi_dmac" target="_blank">library/axi_dmac</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/axi_dmac/#axi-dmac" target="_blank" title="(in HDL)"><span>AXI DMAC</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> instantiated only in PAR_IF mode (<code class="docutils literal notranslate"><span class="pre">cfg2_par_if</span></code>)</p></li>
+</ul>
+</div>
+</section>
+<section id="testbenches-related-dependencies">
+<h3>Testbenches related dependencies<a class="headerlink" href="#testbenches-related-dependencies" title="Link to this heading"></a></h3>
+<p>Common with most testbenches:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>IRQ_HANDLER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/irq_handler_pkg.sv" target="_blank">library/utilities/irq_handler_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>LOGGER_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/logger_pkg.sv" target="_blank">library/utilities/logger_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>M_AXI_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/m_axi_sequencer.sv" target="_blank">library/vip/amd/m_axi_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>REG_ACCESSOR</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/reg_accessor.sv" target="_blank">library/regmaps/reg_accessor.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>S_AXI_SEQUENCER</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/s_axi_sequencer.sv" target="_blank">library/vip/amd/s_axi_sequencer.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>TEST_HARNESS_ENV</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/test_harness_env.sv" target="_blank">library/utilities/test_harness_env.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/utilities/test_harness/index.html#test-harness"><span class="std std-ref">Test Harness</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>UTILS</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/utils.svh" target="_blank">library/utilities/utils.svh</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>WATCHDOG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/common/watchdog.sv" target="_blank">library/drivers/common/watchdog.sv</a></p></td>
+<td><p><a class="reference internal" href="../../../library/drivers/common/watchdog/index.html#watchdog"><span class="std std-ref">Watchdog</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Testbench specific dependencies:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>SV dependency name</p></th>
+<th class="head"><p>Source code link</p></th>
+<th class="head"><p>Documentation link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ADI_REGMAP_AD9910_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_ad9910_pkg.sv" target="_blank">library/regmaps/adi_regmap_ad9910_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_common_pkg.sv" target="_blank">library/regmaps/adi_regmap_common_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADI_REGMAP_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv" target="_blank">library/regmaps/adi_regmap_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>AD9910_API</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/ad9910_api_pkg.sv" target="_blank">library/drivers/ad9910_api_pkg.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>DMA_TRANS *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dma_trans.sv" target="_blank">library/drivers/dmac/dma_trans.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>DMAC_API *</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI_VIP_PKG</p></td>
+<td><p>—</p></td>
+<td><p><a class="icon link reference external" href="https://www.xilinx.com/products/intellectual-property/axi-vip.html" target="_blank">AXI Verification IP (VIP)</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Legend</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> used only by <code class="docutils literal notranslate"><span class="pre">test_program_par_if</span></code></p></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="more-information">
+<h2>More information<a class="headerlink" href="#more-information" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../../user_guide/index.html#user-guide"><span class="std std-ref">ADI Testbenches User guide</span></a></p></li>
+</ul>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../ad9083/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD9083</a>
+    <a href="../ada4355/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADA4355</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1500" height="760" viewBox="0 0 1500 760" style="shape-rendering:crispEdges">
+<title>AD9910 testbench block diagram</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#000000"/></marker></defs>
+<rect x="0" y="0" width="1500" height="760" fill="#ffffff"/>
+<rect x="4" y="4" width="1492" height="752" fill="none" stroke="#000000" stroke-width="1.5"/>
+<rect x="30" y="40" width="975" height="695" fill="none" stroke="#3c4650" stroke-width="3"/>
+<text x="517" y="62" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold">TOP MODULE</text>
+<rect x="140" y="82" width="330" height="34" fill="none" stroke="#000000" stroke-width="2.5"/>
+<text x="305" y="100" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:19px;font-weight:bold">PS AXI VIP</text>
+<rect x="115" y="135" width="875" height="585" fill="none" stroke="#3c4650" stroke-width="2.5"/>
+<text x="552" y="160" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:19px;font-weight:bold">PROJECT LEVEL BLOCK DESIGN (DUT)</text>
+<rect x="1180" y="45" width="290" height="690" fill="none" stroke="#000000" stroke-width="3"/>
+<text x="1325" y="70" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold">TEST MODULE</text>
+<rect x="1210" y="95" width="230" height="620" fill="none" stroke="#000000" stroke-width="2.5"/>
+<text x="1325" y="122" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:19px;font-weight:bold">TESTBENCH</text>
+<rect x="42" y="300" width="34" height="230" fill="#ffffff" stroke="#000000" stroke-width="2.5"/>
+<text x="59" y="415" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:19px;font-weight:bold" transform="rotate(-90 59 415)">DDR VIP</text>
+<rect x="140" y="225" width="160" height="415" fill="none" stroke="#000000" stroke-width="1.2" stroke-dasharray="4,3"/>
+<text x="220" y="612" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">dma_clk</text>
+<text x="220" y="628" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">= 200MHz</text>
+<rect x="160" y="250" width="34" height="330" fill="#ffffff" stroke="#000000" stroke-width="2.5"/>
+<text x="177" y="415" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:18px;font-weight:bold" transform="rotate(-90 177 415)">MEMORY INTERCONNECT</text>
+<rect x="230" y="270" width="48" height="320" fill="#cccccc" stroke="#000000" stroke-width="1.5"/>
+<text x="254" y="430" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:19px;font-weight:bold" transform="rotate(-90 254 430)">TX_DMA *</text>
+<line x1="76" y1="415" x2="160" y2="415" stroke="#000000" stroke-width="1.5"/>
+<line x1="194" y1="415" x2="230" y2="415" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="212" y="403" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">32b</text>
+<rect x="345" y="190" width="485" height="505" fill="#f7f7f7" stroke="#000000" stroke-width="2"/>
+<text x="587" y="218" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:28px;font-weight:bold">AXI AD9910</text>
+<rect x="365" y="255" width="140" height="80" fill="#e6e6e6" stroke="#000000" stroke-width="2"/>
+<text x="435" y="285" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:17px;font-weight:normal">AXI</text>
+<text x="435" y="307" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:17px;font-weight:normal">REGMAP</text>
+<text x="435" y="350" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">up_clk = 100MHz</text>
+<rect x="545" y="240" width="270" height="245" fill="none" stroke="#000000" stroke-width="1.2" stroke-dasharray="4,3"/>
+<text x="640" y="474" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">sync_clk = 250MHz</text>
+<rect x="560" y="255" width="240" height="80" fill="#e6e6e6" stroke="#000000" stroke-width="2"/>
+<text x="680" y="283" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:17px;font-weight:normal">PWM RAMP</text>
+<text x="680" y="305" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:17px;font-weight:normal">GENERATOR</text>
+<rect x="560" y="368" width="240" height="92" fill="#e6e6e6" stroke="#000000" stroke-width="2"/>
+<text x="680" y="400" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:16px;font-weight:normal">INTERVAL MONITORS</text>
+<text x="680" y="424" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:16px;font-weight:normal">IRQ / TRIG_OUT</text>
+<line x1="680" y1="335" x2="680" y2="368" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="545" y="500" width="270" height="180" fill="none" stroke="#000000" stroke-width="1.2" stroke-dasharray="4,3"/>
+<text x="640" y="669" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">pd_clk = 250MHz</text>
+<rect x="560" y="515" width="240" height="140" fill="#e6e6e6" stroke="#000000" stroke-width="2"/>
+<text x="680" y="555" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:17px;font-weight:normal">PARALLEL</text>
+<text x="680" y="577" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:17px;font-weight:normal">INTERFACE</text>
+<text x="680" y="603" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">FIFO 16x16 / ODDR</text>
+<line x1="505" y1="295" x2="560" y2="295" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<polyline points="505,320 525,320 525,530 560,530" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="278" y1="575" x2="560" y2="575" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="420" y="563" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">16b AXI-Stream</text>
+<rect x="860" y="334" width="110" height="32" fill="#e6e6e6" stroke="#000000" stroke-width="1.5"/>
+<text x="915" y="350" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">CLK VIP</text>
+<rect x="860" y="599" width="110" height="32" fill="#e6e6e6" stroke="#000000" stroke-width="1.5"/>
+<text x="915" y="615" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">CLK VIP</text>
+<line x1="860" y1="350" x2="830" y2="350" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="860" y1="615" x2="830" y2="615" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="830" y1="270" x2="1210" y2="270" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="259" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">DRCTL_TP</text>
+<line x1="830" y1="295" x2="1210" y2="295" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="284" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">DRHOLD_TP</text>
+<line x1="830" y1="320" x2="1210" y2="320" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="309" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">PROFILE_TP[2:0]</text>
+<line x1="1210" y1="350" x2="970" y2="350" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="339" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">SYNC_CLK_TP 250MHz</text>
+<line x1="1210" y1="385" x2="830" y2="385" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="374" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">DROVER_TP</text>
+<line x1="1210" y1="410" x2="830" y2="410" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="399" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">RAM_SWP_OVR_TP</text>
+<line x1="830" y1="435" x2="1210" y2="435" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="424" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">TRIG_OUT_TP</text>
+<line x1="830" y1="460" x2="1210" y2="460" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="449" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">AD9910_IRQ_TP</text>
+<line x1="830" y1="530" x2="1210" y2="530" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="519" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">DB_O_TP[15:0]</text>
+<line x1="830" y1="555" x2="1210" y2="555" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="544" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">F_O_TP[1:0]</text>
+<line x1="830" y1="580" x2="1210" y2="580" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="569" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">TX_ENABLE_TP</text>
+<line x1="1210" y1="615" x2="970" y2="615" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="604" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">PD_CLK_TP 250MHz</text>
+<line x1="1210" y1="650" x2="830" y2="650" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="1105" y="639" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal">EXT_SYNC_TP</text>
+<rect x="1235" y="360" width="180" height="90" fill="#e6e6e6" stroke="#000000" stroke-width="2"/>
+<text x="1325" y="393" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:16px;font-weight:normal">DRG MODEL</text>
+<text x="1325" y="417" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">(drctl -&gt; drover)</text>
+<rect x="1235" y="520" width="180" height="90" fill="#e6e6e6" stroke="#000000" stroke-width="2"/>
+<text x="1325" y="553" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:16px;font-weight:normal">OUTPUT</text>
+<text x="1325" y="577" text-anchor="middle" dominant-baseline="middle" style="font-family:'DejaVu Sans',Arial,Helvetica,sans-serif;font-size:13px;font-weight:normal">MONITOR (db_o)</text>
+</svg>

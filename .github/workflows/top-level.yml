@@ -27,13 +27,13 @@ jobs:
     - name: Build doc
       working-directory: docs
       run: |
-        make html
+        make dirhtml
 
     - name: Store the generated doc
       uses: actions/upload-artifact@v4
       with:
-        name: html
-        path: docs/_build/html
+        name: dirhtml
+        path: docs/_build/dirhtml
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,5 +44,5 @@ jobs:
     steps:
     - uses: analogdevicesinc/doctools/gh-pages-deploy@action
       with:
-        name: html
+        name: dirhtml
 

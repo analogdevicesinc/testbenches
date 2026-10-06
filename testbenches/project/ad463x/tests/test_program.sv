@@ -531,7 +531,7 @@ program test_program (
   task store_fifo_expected_data();
     // FIFO path always uses SPI Engine capture (samples on POSEDGE)
     // This is different from Offload path which uses ad463x_data_capture for CLK_MODE=1
-    // DDR mode only affects ad463x_data_capture, not SPI Engine FIFO
+    // FIFO test runs SDR (ddr_en=0), DDR interleaving only used by offload path
     if (`CLK_MODE == 0) begin
       // CLK_MODE=0: hw_captured_data is captured on posedge
       sdi_fifo_data_store = hw_captured_data[0];
@@ -573,15 +573,16 @@ program test_program (
     // Step 1: Prepare lane data (apply DDR interleaving if needed)
     if (`DDR_EN == 1) begin
       // DDR: replicate hardware interleave from spi_engine_execution_shiftreg.v
-      // Hardware uses interleaved_n_leads (negedge-leading, CPOL=0 CPHA=1):
-      //   [j*2+1] = data_shift_n[j],  [j*2] = (j>0) ? data_shift_p[j-1] : sdi[i]
-      // At posedge latch, data_shift_p is one capture behind the testbench arrays,
-      // so data_shift_p[j-1] maps to hw_captured_data_p[j] and sdi[i] to [0].
+      // RTL interleaving (sdi_negedge=1): even bits from posedge captures,
+      // odd bits from negedge captures. Both shift registers lag the IDDR
+      // outputs by one edge (NBA ordering), and the interleave mux uses
+      // sdi_cap_p/n directly for the latest pair (j=0).
+      // TB arrays capture in the same order: bit [0] = last captured.
       for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
         lane_data[lane] = 32'd0;
         for (int j = 0; j < 16; j++) begin
           lane_data[lane][j*2]   = hw_captured_data_p[lane][j];
-          lane_data[lane][j*2+1] = hw_captured_data_n[lane][j+1];
+          lane_data[lane][j*2+1] = hw_captured_data_n[lane][j];
         end
       end
     end else begin

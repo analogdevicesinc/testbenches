@@ -1,10 +1,43 @@
+# ***************************************************************************
+# ***************************************************************************
+# Copyright (C) 2022-2026 Analog Devices, Inc. All rights reserved.
+#
+# In this HDL repository, there are many different and unique modules, consisting
+# of various HDL (Verilog or VHDL) components. The individual modules are
+# developed independently, and may be accompanied by separate and unique license
+# terms.
+#
+# The user should read each of these license terms, and understand the
+# freedoms and responsibilities that he or she has by using this source/core.
+#
+# This core is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE.
+#
+# Redistribution and use of source or resulting binaries, with or without modification
+# of this file, are permitted under one of the following two license terms:
+#
+#   1. The GNU General Public License version 2 as published by the
+#      Free Software Foundation, which can be found in the top level directory
+#      of this repository (LICENSE_GPL2), and also online at:
+#      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+#
+# OR
+#
+#   2. An ADI specific BSD license, which can be found in the top level directory
+#      of this repository (LICENSE_ADIBSD), and also on-line at:
+#      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+#      This will allow to generate bit files and not release the source code,
+#      as long as it attaches to an ADI device.
+#
+# ***************************************************************************
+# ***************************************************************************
+
 global ad_project_params
 
 source "$ad_hdl_dir/projects/common/xilinx/data_offload_bd.tcl"
 
 ## DUT configuration
-
-set data_path_width $ad_project_params(DATA_PATH_WIDTH)
 
 set path_type $ad_project_params(PATH_TYPE)
 set offload_mem_type $ad_project_params(MEM_TYPE)
@@ -19,53 +52,6 @@ set src_clock_freq $ad_project_params(SRC_CLOCK_FREQ)
 set dst_clock_freq $ad_project_params(DST_CLOCK_FREQ)
 set mem_clock_freq 300000000
 
-set dst_ready_mode $ad_project_params(DST_READY_MODE)
-set dst_ready_high $ad_project_params(DST_READY_HIGH)
-set dst_ready_low  $ad_project_params(DST_READY_LOW)
-
-set src_transfers_initial_count $ad_project_params(SRC_TRANSFERS_INITIAL_COUNT)
-set src_transfers_length $ad_project_params(SRC_TRANSFERS_LENGTH)
-set src_transfers_delay $ad_project_params(SRC_TRANSFERS_DELAY)
-set src_transfers_delayed_count $ad_project_params(SRC_TRANSFERS_DELAYED_COUNT)
-
-set time_to_wait $ad_project_params(TIME_TO_WAIT)
-
-## Define passthrough
-
-if {[info exists ad_project_params(OFFLOAD_TRANSFER_LENGTH)]} {
-  set offload_transfer_length $ad_project_params(OFFLOAD_TRANSFER_LENGTH)
-  adi_sim_add_define "OFFLOAD_TRANSFER_LENGTH=$offload_transfer_length"
-}
-adi_sim_add_define "OFFLOAD_PATH_TYPE=$path_type"
-adi_sim_add_define "DST_READY_MODE=$dst_ready_mode"
-adi_sim_add_define "DST_READY_HIGH=$dst_ready_high"
-adi_sim_add_define "DST_READY_LOW=$dst_ready_low"
-adi_sim_add_define "SRC_TRANSFERS_INITIAL_COUNT=$src_transfers_initial_count"
-adi_sim_add_define "SRC_TRANSFERS_LENGTH=$src_transfers_length"
-adi_sim_add_define "SRC_TRANSFERS_DELAY=$src_transfers_delay"
-adi_sim_add_define "SRC_TRANSFERS_DELAYED_COUNT=$src_transfers_delayed_count"
-adi_sim_add_define "TIME_TO_WAIT=$time_to_wait"
-adi_sim_add_define "OFFLOAD_ONESHOT=$offload_oneshot"
-
-################################################################################
-# Create interface ports -- clocks and resets
-################################################################################
-
-# system clock/reset
-
-ad_ip_instance clk_vip sys_clk_vip
-adi_sim_add_define "SYS_CLK=sys_clk_vip"
-ad_ip_parameter sys_clk_vip CONFIG.INTERFACE_MODE {MASTER}
-ad_ip_parameter sys_clk_vip CONFIG.FREQ_HZ {100000000}
-
-ad_ip_instance rst_vip sys_rst_vip
-adi_sim_add_define "SYS_RST=sys_rst_vip"
-ad_ip_parameter sys_rst_vip CONFIG.INTERFACE_MODE {MASTER}
-ad_ip_parameter sys_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
-ad_ip_parameter sys_rst_vip CONFIG.ASYNCHRONOUS {NO}
-
-ad_connect sys_clk_vip/clk_out sys_rst_vip/sync_clk
-
 ################################################################################
 # DUTs - Data Offload and its DMA's
 ################################################################################
@@ -78,60 +64,21 @@ ad_data_offload_create DUT \
                        $offload_dst_dwidth \
                        $ext_mem_axi_data_width \
 
+set DO_BA 0x44A00000
+ad_cpu_interconnect $DO_BA DUT
+adi_sim_add_define "DOFF_BA=[format "%d" ${DO_BA}]"
 
-create_bd_port -dir I -type data init_req
-ad_connect init_req DUT/init_req
+# Data Offload control signals
 
-create_bd_port -dir I -type data sync_ext
-ad_connect sync_ext DUT/sync_ext
+ad_ip_instance io_vip init_req_io_vip
+adi_sim_add_define "INIT_REQ=init_req_io_vip"
+ad_connect sys_clk_vip/clk_out init_req_io_vip/clk
+ad_connect init_req_io_vip/o DUT/init_req
 
-################################################################################
-# mng_axi - AXI4 VIP for configuration
-################################################################################
-
-ad_ip_instance axi_vip mng_axi
-adi_sim_add_define "MNG_AXI=mng_axi"
-set_property -dict [list CONFIG.ADDR_WIDTH {32} \
-                         CONFIG.ARUSER_WIDTH {0} \
-                         CONFIG.AWUSER_WIDTH {0} \
-                         CONFIG.BUSER_WIDTH {0} \
-                         CONFIG.DATA_WIDTH {32} \
-                         CONFIG.HAS_BRESP {1} \
-                         CONFIG.HAS_BURST {0} \
-                         CONFIG.HAS_CACHE {0} \
-                         CONFIG.HAS_LOCK {0} \
-                         CONFIG.HAS_PROT {1} \
-                         CONFIG.HAS_QOS {0} \
-                         CONFIG.HAS_REGION {0} \
-                         CONFIG.HAS_RRESP {1} \
-                         CONFIG.HAS_WSTRB {1} \
-                         CONFIG.ID_WIDTH {0} \
-                         CONFIG.INTERFACE_MODE {MASTER} \
-                         CONFIG.PROTOCOL {AXI4LITE} \
-                         CONFIG.READ_WRITE_MODE {READ_WRITE} \
-                         CONFIG.RUSER_BITS_PER_BYTE {0} \
-                         CONFIG.RUSER_WIDTH {0} \
-                         CONFIG.SUPPORTS_NARROW {0} \
-                         CONFIG.WUSER_BITS_PER_BYTE {0} \
-                         CONFIG.WUSER_WIDTH {0}] [get_bd_cells mng_axi]
-
-# Connect AXI VIP to DUT
-
-ad_connect DUT/s_axi mng_axi/M_AXI
-
-ad_connect sys_clk_vip/clk_out DUT/s_axi_aclk
-ad_connect sys_clk_vip/clk_out mng_axi/aclk
-
-ad_connect sys_rst_vip/rst_out DUT/s_axi_aresetn
-ad_connect sys_rst_vip/rst_out mng_axi/aresetn
-
-# Create address segments
-
-create_bd_addr_seg -range 0x00010000 -offset 0x44A00000 \
-    [get_bd_addr_spaces mng_axi/Master_AXI] \
-    [get_bd_addr_segs DUT/i_data_offload/s_axi/axi_lite] \
-    SEG_data_offload_0_axi_lite
-adi_sim_add_define "DOFF_BA=[format "%d" 0x44A00000]"
+ad_ip_instance io_vip sync_ext_io_vip
+adi_sim_add_define "SYNC_EXT=sync_ext_io_vip"
+ad_connect sys_clk_vip/clk_out sync_ext_io_vip/clk
+ad_connect sync_ext_io_vip/o DUT/sync_ext
 
 # source clock/reset
 
@@ -140,12 +87,10 @@ adi_sim_add_define "SRC_CLK=src_clk_vip"
 ad_ip_parameter src_clk_vip CONFIG.INTERFACE_MODE {MASTER}
 ad_ip_parameter src_clk_vip CONFIG.FREQ_HZ $src_clock_freq
 
-ad_ip_instance rst_vip src_rst_vip
-adi_sim_add_define "SRC_RST=src_rst_vip"
-ad_ip_parameter src_rst_vip CONFIG.INTERFACE_MODE {MASTER}
-ad_ip_parameter src_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
-ad_ip_parameter src_rst_vip CONFIG.ASYNCHRONOUS {NO}
-ad_connect src_clk_vip/clk_out src_rst_vip/sync_clk
+ad_ip_instance proc_sys_reset src_axis_rstgen
+ad_ip_parameter src_axis_rstgen CONFIG.C_EXT_RST_WIDTH 1
+ad_connect sys_rst_vip/rst_out src_axis_rstgen/ext_reset_in
+ad_connect src_clk_vip/clk_out src_axis_rstgen/slowest_sync_clk
 
 # destination clock/reset
 
@@ -154,23 +99,10 @@ adi_sim_add_define "DST_CLK=dst_clk_vip"
 ad_ip_parameter dst_clk_vip CONFIG.INTERFACE_MODE {MASTER}
 ad_ip_parameter dst_clk_vip CONFIG.FREQ_HZ $dst_clock_freq
 
-ad_ip_instance rst_vip dst_rst_vip
-adi_sim_add_define "DST_RST=dst_rst_vip"
-ad_ip_parameter dst_rst_vip CONFIG.INTERFACE_MODE {MASTER}
-ad_ip_parameter dst_rst_vip CONFIG.RST_POLARITY {ACTIVE_LOW}
-ad_ip_parameter dst_rst_vip CONFIG.ASYNCHRONOUS {NO}
-ad_connect dst_clk_vip/clk_out dst_rst_vip/sync_clk
-
-# DDR/HBM clock/reset
-
-ad_ip_instance clk_vip mem_clk_vip
-adi_sim_add_define "MEM_CLK=mem_clk_vip"
-ad_ip_parameter mem_clk_vip CONFIG.INTERFACE_MODE {MASTER}
-ad_ip_parameter mem_clk_vip CONFIG.FREQ_HZ $mem_clock_freq
-
-create_bd_port -dir I mem_rst_n
-
-
+ad_ip_instance proc_sys_reset dst_axis_rstgen
+ad_ip_parameter dst_axis_rstgen CONFIG.C_EXT_RST_WIDTH 1
+ad_connect sys_rst_vip/rst_out dst_axis_rstgen/ext_reset_in
+ad_connect dst_clk_vip/clk_out dst_axis_rstgen/slowest_sync_clk
 
 ################################################################################
 # src_m_axis_vip  - Master AXIS VIP for source interface
@@ -183,17 +115,13 @@ ad_ip_parameter src_axis CONFIG.HAS_TREADY {1}
 ad_ip_parameter src_axis CONFIG.HAS_TLAST {1}
 ad_ip_parameter src_axis CONFIG.TDATA_NUM_BYTES [expr $offload_src_dwidth/8]
 
-ad_connect src_clk_vip/clk_out src_axis/aclk
-ad_connect src_rst_vip/rst_out src_axis/aresetn
+ad_connect src_axis/aclk    src_clk_vip/clk_out
+ad_connect src_axis/aresetn src_axis_rstgen/peripheral_aresetn
 
-ad_connect src_clk_vip/clk_out DUT/s_axis_aclk
-ad_connect src_rst_vip/rst_out DUT/s_axis_aresetn
+ad_connect DUT/s_axis_aclk    src_clk_vip/clk_out
+ad_connect DUT/s_axis_aresetn src_axis_rstgen/peripheral_aresetn
 
 ad_connect src_axis/m_axis DUT/s_axis
-# Always assert tready for RX tests
-if !$path_type {
-  ad_connect src_axis/m_axis_tready VCC
-}
 
 if $offload_mem_type {
   ad_connect DUT/i_data_offload/ddr_calib_done VCC
@@ -209,11 +137,11 @@ ad_ip_parameter dst_axis CONFIG.INTERFACE_MODE {SLAVE}
 ad_ip_parameter dst_axis CONFIG.TDATA_NUM_BYTES [expr $offload_dst_dwidth/8]
 ad_ip_parameter dst_axis CONFIG.HAS_TLAST {1}
 
-ad_connect dst_clk_vip/clk_out dst_axis/aclk
-ad_connect dst_rst_vip/rst_out dst_axis/aresetn
+ad_connect dst_axis/aclk    dst_clk_vip/clk_out
+ad_connect dst_axis/aresetn dst_axis_rstgen/peripheral_aresetn
 
-ad_connect dst_clk_vip/clk_out DUT/m_axis_aclk
-ad_connect dst_rst_vip/rst_out DUT/m_axis_aresetn
+ad_connect DUT/m_axis_aclk    dst_clk_vip/clk_out
+ad_connect DUT/m_axis_aresetn dst_axis_rstgen/peripheral_aresetn
 
 ad_connect DUT/m_axis dst_axis/s_axis
 
@@ -221,17 +149,26 @@ if {$offload_mem_type == 2} {
 
   source $ad_hdl_dir/library/util_hbm/scripts/adi_util_hbm.tcl
 
-  set hbm_clk mem_clk_vip/clk_out
-  set hbm_reset  mem_rst_n
+  # HBM clock/reset
+
+  ad_ip_instance clk_vip mem_clk_vip
+  adi_sim_add_define "MEM_CLK=mem_clk_vip"
+  ad_ip_parameter mem_clk_vip CONFIG.INTERFACE_MODE {MASTER}
+  ad_ip_parameter mem_clk_vip CONFIG.FREQ_HZ $mem_clock_freq
+
+  ad_ip_instance proc_sys_reset mem_rstgen
+  ad_ip_parameter mem_rstgen CONFIG.C_EXT_RST_WIDTH 1
+  ad_connect sys_rst_vip/rst_out mem_rstgen/ext_reset_in
+  ad_connect mem_clk_vip/clk_out mem_rstgen/slowest_sync_clk
+
+  set hbm_clk   mem_clk_vip/clk_out
+  set hbm_reset mem_rstgen/peripheral_aresetn
 
   global hbm_sim
   set hbm_sim 1
   ad_create_hbm HBM_VIP
 
   ad_connect_hbm HBM_VIP DUT/storage_unit $hbm_clk $hbm_reset
-
-  #ad_connect HBM_VIP/HBM_REF_CLK_0 $sys_cpu_clk
-  #ad_connect HBM_VIP/APB_0_PCLK $sys_cpu_clk
 
   assign_bd_address
   set num_m [get_property CONFIG.NUM_M [get_bd_cells /DUT/storage_unit]]

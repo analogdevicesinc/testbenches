@@ -303,6 +303,15 @@ package adi_spi_vip_pkg;
       join
     endtask
 
+    task flush_rx();
+      int unsigned temp;
+      foreach (mosi_mbx[i]) begin
+        while (mosi_mbx[i].num() > 0) begin
+          mosi_mbx[i].get(temp);
+        end
+      end
+    endtask
+
     task start();
       if (!this.get_active()) begin
         this.set_active();
@@ -400,6 +409,10 @@ package adi_spi_vip_pkg;
     virtual task flush_send();
       this.driver.flush_tx();
     endtask : flush_send
+
+    virtual task flush_receive();
+      this.driver.flush_rx();
+    endtask : flush_receive
 
     virtual function void set_default_miso_data(input int unsigned data);
       this.driver.set_default_miso_data(data);

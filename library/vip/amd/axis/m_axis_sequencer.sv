@@ -39,65 +39,61 @@
 package m_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
-  import adi_vip_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_sequencer_pkg::*;
   import logger_pkg::*;
+  import adi_object_pkg::*;
+  import adi_axis_transaction_pkg::*;
+  import adi_axis_packet_pkg::*;
+  import adi_axis_frame_pkg::*;
+  import adi_fifo_class_pkg::*;
+  import adi_axis_config_pkg::*;
 
-  typedef enum {
-      DATA_GEN_MODE_TEST_DATA,        // get data from test
-      DATA_GEN_MODE_TEST_DATA_TKEEP,  // get data from test, with user-defined tkeep
-      DATA_GEN_MODE_AUTO_INCR,        // autogenerate incrementing data until aborted
-      DATA_GEN_MODE_AUTO_INCR_TKEEP,  // autogenerate incrementing data until aborted, with user-defined tkeep
-      DATA_GEN_MODE_AUTO_RAND         // autogenerate randomized data until aborted
-  } data_gen_mode_t;
-
-  typedef enum bit [1:0] {
-    STOP_POLICY_DATA_BEAT = 2'h1,        // disable after the data beat has been transferred
-    STOP_POLICY_PACKET = 2'h2,           // disable after the packet has been transferred
-    STOP_POLICY_DESCRIPTOR_QUEUE = 2'h3  // disable after the packet queue has been transferred
+  typedef enum bit [2:0] {
+    STOP_POLICY_TRANSACTION = 3'h0, // disable after transaction has been transferred
+    STOP_POLICY_PACKET = 3'h1,      // disable after packet has been transferred
+    STOP_POLICY_FRAME = 3'h2,       // disable after frame has been transferred
+    STOP_POLICY_SEQUENCE = 3'h3,    // disable after sequence has been transferred
+    STOP_POLICY_QUEUE = 3'h4        // disable after all sequences queue has been transferred
   } stop_policy_t;
 
 
   virtual class m_axis_sequencer_base extends adi_sequencer;
 
+    // sequencer status bits
     protected bit enabled;
-    protected bit generator_running;
-    protected bit sender_running;
-    protected bit queue_empty_sig;
+    protected bit sequencer_running;
+    protected bit sequences_empty_sig;
+    protected bit transaction_in_progress;
+    protected bit packet_in_progress;
+    protected bit frame_in_progress;
+    protected bit sequence_in_progress;
+
+    // delays between transactions
+    protected int transaction_delay; // delay in clock cycles
+    protected int packet_delay; // delay in clock cycles
+    protected int frame_delay; // delay in clock cycles
+    protected int sequence_delay; // delay in clock cycles
+
+    // events
     protected event disable_ev;
+    protected event disable_sender_ev;
+    protected event trigger_transaction_ev;
+    protected event transaction_sent_ev;
+    protected event packet_sent_ev;
+    protected event frame_sent_ev;
+    protected event sequence_sent_ev;
+    protected event new_sequence_ev;
+    protected event sequences_empty_ev;
 
-    protected data_gen_mode_t data_gen_mode;
-
-    protected bit descriptor_gen_mode;  // 0 - get descriptor from test;
-                                        // 1 - autogenerate descriptor based on the first descriptor from test until aborted
-    protected bit keep_all; // 0 - bytes can be set to be invalid
-                            // 1 - all bytes are always valid, data is generated only for the set part
-
-    protected int byte_count;
-
-    protected int data_beat_delay; // delay in clock cycles
-    protected int descriptor_delay; // delay in clock cycles
+    protected bit repeat_transaction_mode; // 0 - get transaction from test stimulus
+                                           // 1 - autogenerate transaction based on the first transaction from test until sequencer is stopped
 
     protected stop_policy_t stop_policy;
 
-    protected event data_av_ev;
-    protected event beat_done;
-    protected event packet_done;
-    protected event queue_empty;
-    protected event byte_stream_ev;
-    protected event tkeep_stream_ev;
-    protected event queue_ev;
+    axi4stream_transaction xilinx_trans_object;
 
-    protected axi4stream_transaction trans;
-    protected xil_axi4stream_data_byte byte_stream [$];
-    protected xil_axi4stream_strb tkeep_stream [$];
-
-    typedef struct{
-      int num_bytes;
-      bit gen_last;
-      bit gen_sync;
-    } descriptor_t;
-
-    protected descriptor_t descriptor_q [$];
+    adi_fifo_class #(adi_object) sequences;
 
     // new
     function new(
@@ -106,17 +102,23 @@ package m_axis_sequencer_pkg;
 
       super.new(name, parent);
 
-      this.trans = new();
-
       this.enabled = 1'b0;
-      this.data_gen_mode = DATA_GEN_MODE_AUTO_INCR;
-      this.descriptor_gen_mode = 1'b0;
-      this.byte_count = 0;
-      this.data_beat_delay = 0;
-      this.descriptor_delay = 0;
-      this.stop_policy = STOP_POLICY_DATA_BEAT;
-      this.queue_empty_sig = 1;
-      this.keep_all = 1;
+      this.repeat_transaction_mode = 1'b0;
+      this.transaction_delay = 0;
+      this.packet_delay = 0;
+      this.frame_delay = 0;
+      this.sequence_delay = 0;
+      this.stop_policy = STOP_POLICY_TRANSACTION;
+      this.sequences_empty_sig = 1;
+      this.sequences_empty_sig = 1;
+      this.transaction_in_progress = 0;
+      this.packet_in_progress = 0;
+      this.frame_in_progress = 0;
+      this.sequence_in_progress = 0;
+
+      xilinx_trans_object = new();
+
+      this.sequences = new();
     endfunction: new
 
     // set vif proxy to drive outputs with 0 when inactive
@@ -128,188 +130,277 @@ package m_axis_sequencer_pkg;
     // wait for set amount of clock cycles
     pure virtual task wait_clk_count(input int wait_clocks);
 
-    // pack the byte stream into transfers(beats) then in packets by setting the tlast
-    pure virtual protected task packetize();
+    // wait for driver to be idle
+    pure virtual task wait_driver_idle();
 
-    pure virtual protected task sender();
+    // processes and sends transactions out to the driver
+    pure virtual task sender();
 
-    // create transfer based on data beats per packet
-    pure virtual function void add_xfer_descriptor_sample_count(
-      input int data_beats_per_packet,
-      input int gen_tlast = 1,
-      input int gen_sync = 1);
+    pure virtual protected task axis_transaction_check(
+      input adi_object next_sequence,
+      output bit valid);
+    pure virtual protected task axis_packet_check(
+      input adi_object next_sequence,
+      output bit valid);
+    pure virtual protected task axis_frame_check(
+      input adi_object next_sequence,
+      output bit valid);
 
-    // wait until data beat is sent
-    pure virtual task beat_sent();
-
-    // wait until packet is sent
-    pure virtual task packet_sent();
 
     // set disable policy
     function void set_stop_policy(input stop_policy_t stop_policy);
       if (enabled) begin
-        this.error($sformatf("Sequencer must be disabled before configuring stop policy"));
+        this.error($sformatf("Sequencer must be disabled before configuring stop policy!"));
       end
       this.stop_policy = stop_policy;
       this.info($sformatf("Disable policy configured"), ADI_VERBOSITY_HIGH);
     endfunction: set_stop_policy
 
     // set data generation mode
-    function void set_data_gen_mode(input data_gen_mode_t data_gen_mode);
+    function void set_repeat_transaction_mode(input bit repeat_transaction_mode);
       if (enabled) begin
-        this.error($sformatf("Sequencer must be disabled before configuring data generation mode"));
+        this.error($sformatf("Sequencer must be disabled before configuring transaction generation mode"));
       end
-      this.data_gen_mode = data_gen_mode;
-      this.info($sformatf("Data generation mode configured"), ADI_VERBOSITY_HIGH);
-    endfunction: set_data_gen_mode
+      this.repeat_transaction_mode = repeat_transaction_mode;
+      this.info($sformatf("transaction generation mode configured"), ADI_VERBOSITY_HIGH);
+    endfunction: set_repeat_transaction_mode
 
-    // set data generation mode
-    function void set_descriptor_gen_mode(input bit descriptor_gen_mode);
-      if (enabled)
-        this.error($sformatf("Sequencer must be disabled before configuring descriptor generation mode"));
-      this.descriptor_gen_mode = descriptor_gen_mode;
-      this.info($sformatf("Descriptor generation mode configured"), ADI_VERBOSITY_HIGH);
-    endfunction: set_descriptor_gen_mode
+    // set transaction delay
+    function void set_transaction_delay(input int transaction_delay);
+      this.transaction_delay = transaction_delay;
+      this.info($sformatf("Transaction delay configured"), ADI_VERBOSITY_HIGH);
+    endfunction: set_transaction_delay
 
-    // set data beat delay
-    function void set_data_beat_delay(input int data_beat_delay);
-      this.data_beat_delay = data_beat_delay;
-      this.info($sformatf("Data beat delay configured"), ADI_VERBOSITY_HIGH);
-    endfunction: set_data_beat_delay
+    // set packet delay
+    function void set_packet_delay(input int packet_delay);
+      this.packet_delay = packet_delay;
+      this.info($sformatf("Packet delay configured"), ADI_VERBOSITY_HIGH);
+    endfunction: set_packet_delay
 
-    // set descriptor delay
-    function void set_descriptor_delay(input int descriptor_delay);
-      this.descriptor_delay = descriptor_delay;
-      this.info($sformatf("Descriptor delay configured"), ADI_VERBOSITY_HIGH);
-    endfunction: set_descriptor_delay
+    // set frame delay
+    function void set_frame_delay(input int frame_delay);
+      this.frame_delay = frame_delay;
+      this.info($sformatf("Frame delay configured"), ADI_VERBOSITY_HIGH);
+    endfunction: set_frame_delay
 
-    // set all bytes valid in a sample, sets keep to 1
-    function void set_keep_all();
-      if (enabled) begin
-        this.error($sformatf("Sequencer must be disabled before configuring keep all parameter"));
+    // set sequence delay
+    function void set_sequence_delay(input int sequence_delay);
+      this.sequence_delay = sequence_delay;
+      this.info($sformatf("Sequence delay configured"), ADI_VERBOSITY_HIGH);
+    endfunction: set_sequence_delay
+
+    // add transaction to the queue
+    function void add_transaction(input adi_object axis_transaction);
+      void'(this.sequences.push(axis_transaction));
+      this.sequences_empty_sig = 0;
+      ->>this.new_sequence_ev;
+    endfunction: add_transaction
+
+    // add packet to the queue
+    function void add_packet(input adi_object axis_packet);
+      void'(this.sequences.push(axis_packet));
+      this.sequences_empty_sig = 0;
+      ->>this.new_sequence_ev;
+    endfunction: add_packet
+
+    // add frame to the queue
+    function void add_frame(input adi_object axis_frame);
+      void'(this.sequences.push(axis_frame));
+      this.sequences_empty_sig = 0;
+      ->>this.new_sequence_ev;
+    endfunction: add_frame
+
+    // add sequence to the queue
+    function void add_sequence(adi_fifo_class #(adi_object) new_sequence);
+      void'(this.sequences.push(new_sequence));
+      this.sequences_empty_sig = 0;
+      ->>this.new_sequence_ev;
+    endfunction: add_sequence
+
+    // wait until data beat is sent
+    virtual task transaction_sent();
+      if (this.transaction_in_progress) begin
+        @this.transaction_sent_ev;
       end
-      this.keep_all = 1;
-    endfunction: set_keep_all
+    endtask: transaction_sent
 
-    // bytes in a sample may not be valid, sets some bits of keep to 0
-    function void set_keep_some();
-      if (enabled) begin
-        this.error($sformatf("Sequencer must be disabled before configuring keep all parameter"));
+    // wait until packet is sent
+    virtual task packet_sent();
+      if (this.packet_in_progress) begin
+        @this.packet_sent_ev;
       end
-      this.keep_all = 0;
-    endfunction: set_keep_some
+    endtask: packet_sent
 
-    // create transfer descriptor
-    function void add_xfer_descriptor_byte_count(
-      input int bytes_to_generate,
-      input int gen_last = 1,
-      input int gen_sync = 1);
+    // wait until packet is sent
+    virtual task frame_sent();
+      if (this.frame_in_progress) begin
+        @this.frame_sent_ev;
+      end
+    endtask: frame_sent
 
-      descriptor_t descriptor;
-      descriptor.num_bytes = bytes_to_generate;
-      descriptor.gen_last = gen_last;
-      descriptor.gen_sync = gen_sync;
-      // this.info($sformatf("Updating generator with %0d bytes with last %0d, sync %0d",
-      //          bytes_to_generate, gen_last, gen_sync), ADI_VERBOSITY_HIGH);
-
-      descriptor_q.push_back(descriptor);
-      this.queue_empty_sig = 0;
-      ->>queue_ev;
-    endfunction: add_xfer_descriptor_byte_count
-
-    // descriptor delay subroutine
-    // - can be overridden in inherited classes for more specific delay generation
-    protected task descriptor_delay_subroutine();
-      wait_clk_count(descriptor_delay);
-    endtask: descriptor_delay_subroutine
+    // wait until packet is sent
+    virtual task sequence_sent();
+      if (this.sequence_in_progress) begin
+        @this.sequence_sent_ev;
+      end
+    endtask: sequence_sent
 
     // wait until queue is empty
-    task wait_empty_descriptor_queue();
-      if (this.queue_empty_sig) begin
+    task wait_empty_sequences();
+      if (!this.sequences_empty_sig) begin
+        @this.sequences_empty_ev;
+      end
+    endtask: wait_empty_sequences
+
+    // clear sequences queue
+    task clear_sequences();
+      this.sequences.delete();
+    endtask: clear_sequences
+
+    // transaction delay subroutine
+    protected task transaction_delay_subroutine();
+      this.xilinx_trans_object.set_delay(this.transaction_delay);
+    endtask: transaction_delay_subroutine
+
+    // packet delay subroutine
+    protected task packet_delay_subroutine();
+      this.wait_clk_count(packet_delay);
+    endtask: packet_delay_subroutine
+
+    // frame delay subroutine
+    protected task frame_delay_subroutine();
+      this.wait_clk_count(frame_delay);
+    endtask: frame_delay_subroutine
+
+    // sequence delay subroutine
+    protected task sequence_delay_subroutine();
+      this.wait_clk_count(sequence_delay);
+    endtask: sequence_delay_subroutine
+
+    // type-check for sequence
+    protected task axis_sequence_check(
+      input adi_object next_sequence,
+      output bit valid);
+
+      adi_fifo_class #(adi_object) cast_object;
+      adi_object extracted_sequence;
+
+      valid = 1;
+
+      if ($cast(cast_object, next_sequence) == 0) begin
+        valid = 0;
         return;
       end
-      @queue_empty;
-    endtask: wait_empty_descriptor_queue
 
-    // clear queue
-    task clear_descriptor_queue();
-      descriptor_q.delete();
-    endtask: clear_descriptor_queue
+      if (!this.enabled && this.stop_policy == STOP_POLICY_SEQUENCE) begin
+        return;
+      end
 
-    // generate transfer with transfer descriptors
-    protected task generator();
-      this.info($sformatf("Generator started"), ADI_VERBOSITY_HIGH);
-      this.generator_running = 1;
-      fork begin
-        fork
-          begin
-            @disable_ev;
-            case (stop_policy)
-              STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
-              STOP_POLICY_PACKET: packet_sent();
-              STOP_POLICY_DATA_BEAT: beat_sent();
-            endcase
-          end
-          forever begin
-            if (descriptor_q.size() > 0) begin
-              if (enabled || (!enabled && stop_policy == STOP_POLICY_DESCRIPTOR_QUEUE)) begin
-                packetize();
-                descriptor_delay_subroutine();
-              end else begin
-                packet_sent();
-              end
-            end else begin
-              this.queue_empty_sig = 1;
-              ->> queue_empty;
-              @queue_ev;
+      for(int i=0; i<cast_object.size(); i++) begin
+        extracted_sequence = cast_object.pop();
+        this.check_main_class(extracted_sequence, valid);
+        if (!valid) begin
+          return;
+        end
+        void'(cast_object.push(extracted_sequence));
+      end
+
+      return;
+    endtask: axis_sequence_check
+
+    // type-check all posibilities
+    protected task check_main_class(
+      input adi_object next_sequence,
+      output bit valid);
+
+      valid = 1;
+
+      this.axis_sequence_check(next_sequence, valid);
+      if (!valid) begin
+        this.axis_frame_check(next_sequence, valid);
+        if (!valid) begin
+          this.axis_packet_check(next_sequence, valid);
+          if (!valid) begin
+            this.axis_transaction_check(next_sequence, valid);
+            if (!valid) begin
+              return;
             end
           end
-        join_any
-        disable fork;
-      end join
-      this.generator_running = 0;
-    endtask: generator
+        end
+      end
+    endtask: check_main_class
 
-    // function
-    function void push_byte_for_stream(xil_axi4stream_data_byte byte_stream);
-      this.byte_stream.push_back(byte_stream);
-      ->>byte_stream_ev;
-    endfunction: push_byte_for_stream
+    task sequencer();
+      // next sequence object
+      adi_object next_sequence;
+      bit valid;
 
-    function void push_tkeep_for_stream(xil_axi4stream_strb tkeep_stream);
-      this.tkeep_stream.push_back(tkeep_stream);
-      ->>tkeep_stream_ev;
-    endfunction: push_tkeep_for_stream
+      forever begin
+        fork begin
+          fork
+            begin
+              @disable_ev;
+            end
+            begin
+              if (this.sequences.size() == 0) begin
+                this.sequences_empty_sig = 1;
+                ->>sequences_empty_ev;
+                @new_sequence_ev;
+              end
+            end
+          join_any
+          disable fork;
+        end join
 
-    // descriptor delay subroutine
-    // - can be overridden in inherited classes for more specific delay generation
-    protected task data_beat_delay_subroutine();
-      trans.set_delay(data_beat_delay);
-    endtask: data_beat_delay_subroutine
+        if (!this.enabled && (stop_policy != STOP_POLICY_QUEUE || this.sequences.size() == 'd0)) begin
+          ->>this.disable_sender_ev;
+          this.sequencer_running = 0;
+          return;
+        end
+
+        next_sequence = this.sequences.pop();
+        if (this.repeat_transaction_mode) begin
+          void'(this.sequences.push(next_sequence));
+        end
+
+        this.sequence_in_progress = 1;
+        // check which one is it's main class
+        this.check_main_class(next_sequence, valid);
+        if (!valid) begin
+          this.fatal($sformatf("Sequence found in the sequence list is not compatible with this AXIS Sequencer!"));
+        end
+        this.sequence_in_progress = 0;
+
+        this.sequence_delay_subroutine();
+
+        ->>this.sequence_sent_ev;
+        this.info($sformatf("Axis sequence sent"), ADI_VERBOSITY_HIGH);
+      end
+    endtask: sequencer
 
     task start();
-      this.info($sformatf("Sequencer started"), ADI_VERBOSITY_HIGH);
-      if (this.generator_running || this.sender_running) begin
+      if (this.sequencer_running) begin
         if (this.enabled) begin
           this.warning($sformatf("Sequencer is already running!"));
         end else begin
-          this.warning($sformatf("Sequencer is still running!"));
+          this.warning($sformatf("Sequencer is still running, ending the task!"));
         end
         return;
       end
+      this.info($sformatf("Sequencer started"), ADI_VERBOSITY_HIGH);
       this.enabled = 1;
       fork
-        generator();
-        sender();
+        this.sequencer();
+        this.sender();
       join_none
+      this.sequencer_running = 1;
     endtask: start
 
     task stop();
       this.info($sformatf("Sequencer stopped"), ADI_VERBOSITY_HIGH);
       this.enabled = 0;
-      this.byte_count = 0;
-      ->> this.disable_ev;
-      #1step;
+      ->>this.disable_ev;
+      this.wait_clk_count(2);
     endtask: stop
 
   endclass: m_axis_sequencer_base
@@ -319,42 +410,25 @@ package m_axis_sequencer_pkg;
 
     protected axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver;
 
+    protected adi_axis_transaction transaction_object;
+
+
     function new(
       input string name,
       input axi4stream_mst_driver #(`AXIS_VIP_IF_PARAMS(AXIS)) driver,
       input adi_agent parent = null);
+
+      adi_axis_config axis_cfg = new(`AXIS_TRANSACTION_SEQ_PARAM(AXIS));
 
       super.new(name, parent);
 
       this.driver = driver;
 
       this.driver.vif_proxy.set_no_insert_x_when_keep_low(1);
+
+      this.transaction_object = new(.cfg(axis_cfg));
     endfunction: new
 
-    // wait until data beat is sent
-    virtual task beat_sent();
-      if (this.driver.is_driver_idle()) begin
-        return;
-      end
-      @beat_done;
-    endtask: beat_sent
-
-    // wait until packet is sent
-    virtual task packet_sent();
-      if (this.driver.is_driver_idle() && this.trans.get_last()) begin
-        return;
-      end
-      @packet_done;
-    endtask: packet_sent
-
-    // create transfer based on data beats per packet
-    virtual function void add_xfer_descriptor_sample_count(
-      input int data_beats_per_packet,
-      input int gen_tlast = 1,
-      input int gen_sync = 1);
-
-      add_xfer_descriptor_byte_count(data_beats_per_packet*AXIS_VIP_DATA_WIDTH/8, gen_tlast, gen_sync);
-    endfunction: add_xfer_descriptor_sample_count
 
     // set vif proxy to drive outputs with 0 when inactive
     virtual task set_inactive_drive_output_0();
@@ -373,186 +447,188 @@ package m_axis_sequencer_pkg;
       this.driver.vif_proxy.wait_aclks(wait_clocks);
     endtask: wait_clk_count
 
-    // pack the byte stream into transfers(beats) then in packets by setting the tlast
-    virtual protected task packetize();
-      xil_axi4stream_data_byte data[];
-      xil_axi4stream_strb keep[];
-      int packet_length;
-      int byte_per_beat;
-      descriptor_t descriptor;
-
-      this.info($sformatf("packetize start"), ADI_VERBOSITY_HIGH);
-      byte_per_beat = AXIS_VIP_DATA_WIDTH/8;
-      descriptor = this.descriptor_q.pop_front();
-
-      // put a copy of the descriptor back into the queue and continue processing
-      if (this.descriptor_gen_mode == 1 && enabled) begin
-        this.descriptor_q.push_back(descriptor);
+    // wait for driver to be idle
+    virtual task wait_driver_idle();
+      while (!this.driver.is_driver_idle()) begin
+        this.wait_clk_count(1);
       end
+    endtask: wait_driver_idle
 
-      packet_length = descriptor.num_bytes / byte_per_beat;
-      if (packet_length*byte_per_beat < descriptor.num_bytes) begin
-        packet_length++;
-      end
+    virtual task sender();
+      xil_axi4stream_data_byte tdata[];
+      xil_axi4stream_strb tkeep[];
+      xil_axi4stream_strb tstrb[];
+      bit tlast;
+      xil_axi4stream_uint tid;
+      xil_axi4stream_uint tdest;
+      xil_axi4stream_user_beat tuser;
 
-      if (this.keep_all) begin
-        descriptor.num_bytes = packet_length*byte_per_beat;
-      end
+      tdata = new[this.transaction_object.cfg.BYTES_PER_TRANSACTION];
+      tkeep = new[this.transaction_object.cfg.BYTES_PER_TRANSACTION];
+      tstrb = new[this.transaction_object.cfg.BYTES_PER_TRANSACTION];
 
-      for (int tc=0; tc<packet_length; tc++) begin : packet_loop
-        data = new[byte_per_beat];
-        for (int i=0; i<byte_per_beat; i++) begin
-          data[i] = 'd0;
-        end
-        keep = new[byte_per_beat];
-        for (int i=0; i<byte_per_beat; i++) begin
-          data[i] = 'd0;
-          keep[i] = 1'b0;
-        end
-
-        for (int i=0; i<byte_per_beat && (keep_all || tc*byte_per_beat+i<descriptor.num_bytes); i++) begin
-          case (data_gen_mode)
-            DATA_GEN_MODE_TEST_DATA: begin
-              // block transfer until we get data from byte stream queue
-              if (byte_stream.size() == 0) begin
-                fork begin
-                  fork
-                    @byte_stream_ev;
-                    begin
-                      @disable_ev;
-                      if (tc==0 && i==0) begin
-                        case (stop_policy)
-                          STOP_POLICY_PACKET: ->> packet_done;
-                          STOP_POLICY_DATA_BEAT: ->> beat_done;
-                          default: ;
-                        endcase
-                      end
-                    end
-                  join_any
-                  disable fork;
-                end join
-              end
-              data[i] = byte_stream.pop_front();
-              keep[i] = 1'b1;
-            end
-            DATA_GEN_MODE_TEST_DATA_TKEEP: begin
-              // block transfer until we get data from byte stream queue
-              if (byte_stream.size() == 0 || tkeep_stream.size() == 0) begin
-                fork begin
-                  fork
-                    begin
-                      if (byte_stream.size() == 0) begin
-                        @byte_stream_ev;
-                      end
-                      if (tkeep_stream.size() == 0) begin
-                        @tkeep_stream_ev;
-                      end
-                    end
-                    begin
-                      @disable_ev;
-                      if (tc==0 && i==0) begin
-                        case (stop_policy)
-                          STOP_POLICY_PACKET: ->> packet_done;
-                          STOP_POLICY_DATA_BEAT: ->> beat_done;
-                          default: ;
-                        endcase
-                      end
-                    end
-                  join_any
-                  disable fork;
-                end join
-              end
-              data[i] = byte_stream.pop_front();
-              keep[i] = tkeep_stream.pop_front();
-            end
-            DATA_GEN_MODE_AUTO_INCR: begin
-              data[i] = this.byte_count++;
-              keep[i] = 1'b1;
-            end
-            DATA_GEN_MODE_AUTO_INCR_TKEEP: begin
-              // block transfer until we get data from tkeep stream queue
-              if (tkeep_stream.size() == 0) begin
-                fork begin
-                  fork
-                    @tkeep_stream_ev;
-                    begin
-                      @disable_ev;
-                      if (tc==0 && i==0) begin
-                        case (stop_policy)
-                          STOP_POLICY_PACKET: ->> packet_done;
-                          STOP_POLICY_DATA_BEAT: ->> beat_done;
-                          default: ;
-                        endcase
-                      end
-                    end
-                  join_any
-                  disable fork;
-                end join
-              end
-              data[i] = byte_count++;;
-              keep[i] = tkeep_stream.pop_front();
-            end
-            DATA_GEN_MODE_AUTO_RAND: begin
-              data[i] = $random;
-              keep[i] = 1'b1;
-            end
-          endcase
-        end
-
-        this.info($sformatf("generating axis transaction"), ADI_VERBOSITY_HIGH);
-        this.trans = this.driver.create_transaction();
-        this.trans.set_data(data);
-        this.trans.set_id('h0);
-        this.trans.set_dest('h0);
-
-        this.data_beat_delay_subroutine();
-
-        if (AXIS_VIP_HAS_TKEEP) begin
-          this.trans.set_keep(keep);
-        end
-
-        if (AXIS_VIP_HAS_TLAST) begin
-          this.trans.set_last((tc == packet_length-1) & descriptor.gen_last);
-        end
-
-        if (AXIS_VIP_USER_WIDTH > 0) begin
-          this.trans.set_user_beat((tc == 0) & descriptor.gen_sync);
-        end
-
-        ->> data_av_ev;
-        this.info($sformatf("waiting transfer to complete"), ADI_VERBOSITY_HIGH);
-        @this.beat_done;
-      end
-    endtask: packetize
-
-    // packet sender function
-    virtual protected task sender();
       this.info($sformatf("Sender started"), ADI_VERBOSITY_HIGH);
-      this.sender_running = 1;
       fork begin
         fork
           begin
-            @this.disable_ev;
-            case (this.stop_policy)
-              STOP_POLICY_DESCRIPTOR_QUEUE: wait_empty_descriptor_queue();
-              STOP_POLICY_PACKET: packet_sent();
-              STOP_POLICY_DATA_BEAT: beat_sent();
-            endcase
+            @this.disable_sender_ev;
           end
           forever begin
-            @this.data_av_ev;
-            this.info($sformatf("sending axis transaction"), ADI_VERBOSITY_HIGH);
-            this.driver.send(this.trans);
-            ->> this.beat_done;
-            if (this.trans.get_last()) begin
-              ->> this.packet_done;
+            @this.trigger_transaction_ev;
+
+            this.info($sformatf("Processing axis transaction"), ADI_VERBOSITY_HIGH);
+
+            this.xilinx_trans_object = this.driver.create_transaction();
+            this.xilinx_trans_object.set_delay('d0);
+
+            // extract information from object
+            for (int i=0; i<this.transaction_object.cfg.BYTES_PER_TRANSACTION; i++) begin
+              tdata[i] = this.transaction_object.bytes[i].tdata;
+              tkeep[i] = this.transaction_object.bytes[i].tkeep;
+              tstrb[i] = this.transaction_object.bytes[i].tstrb;
             end
+            tlast = this.transaction_object.tlast;
+            tid = this.transaction_object.tid;
+            tdest = this.transaction_object.tdest;
+            if (AXIS_VIP_USER_BITS_PER_BYTE) begin
+              for (int i=0; i<this.transaction_object.cfg.BYTES_PER_TRANSACTION; i++) begin
+                tuser[AXIS_VIP_USER_WIDTH/(AXIS_VIP_DATA_WIDTH/8)*i+:AXIS_VIP_USER_WIDTH/(AXIS_VIP_DATA_WIDTH/8)] = this.transaction_object.bytes[i].tuser;
+              end
+            end else begin
+              tuser = this.transaction_object.tuser;
+            end
+
+            // create transaction
+            this.xilinx_trans_object.set_data(tdata);
+            if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_KEEP) begin
+              this.xilinx_trans_object.set_keep(tkeep);
+            end
+            if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_STRB) begin
+              this.xilinx_trans_object.set_strb(tstrb);
+            end
+            if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_LAST) begin
+              this.xilinx_trans_object.set_last(tlast);
+            end
+            if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_ID) begin
+              this.xilinx_trans_object.set_id(tid[this.driver.C_XIL_AXI4STREAM_ID_WIDTH-1:0]);
+            end
+            if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_DEST) begin
+              this.xilinx_trans_object.set_dest(tdest[this.driver.C_XIL_AXI4STREAM_DEST_WIDTH-1:0]);
+            end
+            if (AXIS_VIP_SIGNAL_SET & XIL_AXI4STREAM_SIGSET_USER) begin
+              this.xilinx_trans_object.set_user_beat(tuser[this.driver.C_XIL_AXI4STREAM_USER_WIDTH-1:0]);
+            end
+
+            this.driver.send(this.xilinx_trans_object);
+            while (this.driver.is_driver_idle()) begin
+              this.wait_clk_count(1);
+            end
+
+            this.transaction_delay_subroutine();
+
+            this.info($sformatf("Axis transaction sent"), ADI_VERBOSITY_HIGH);
+            ->>this.transaction_sent_ev;
           end
         join_any
         disable fork;
       end join
-      this.sender_running = 0;
     endtask: sender
+
+    // type-check for transaction
+    virtual protected task axis_transaction_check(
+      input adi_object next_sequence,
+      output bit valid);
+
+      adi_axis_transaction cast_object;
+
+      valid = 1;
+
+      if ($cast(cast_object, next_sequence) == 0) begin
+        valid = 0;
+        return;
+      end
+
+      if (!this.enabled && this.stop_policy == STOP_POLICY_TRANSACTION) begin
+        return;
+      end
+
+      cast_object.copy(this.transaction_object);
+
+      ->>this.trigger_transaction_ev;
+      @this.transaction_sent_ev;
+
+      return;
+    endtask: axis_transaction_check
+
+    // type-check for packet
+    virtual protected task axis_packet_check(
+      input adi_object next_sequence,
+      output bit valid);
+
+      adi_axis_packet cast_object;
+
+      valid = 1;
+
+      if ($cast(cast_object, next_sequence) == 0) begin
+        valid = 0;
+        return;
+      end
+
+      if (!this.enabled && this.stop_policy == STOP_POLICY_PACKET) begin
+        return;
+      end
+
+      this.packet_in_progress = 1;
+      for (int i=0; i<cast_object.transactions.size(); i++) begin
+        this.axis_transaction_check(cast_object.transactions[i], valid);
+        if (!valid) begin
+          return;
+        end
+      end
+      this.packet_in_progress = 0;
+
+      this.packet_delay_subroutine();
+
+      ->>this.packet_sent_ev;
+      this.info($sformatf("Axis packet sent"), ADI_VERBOSITY_HIGH);
+
+      return;
+    endtask: axis_packet_check
+
+    // type-check for frame
+    virtual protected task axis_frame_check(
+      input adi_object next_sequence,
+      output bit valid);
+
+      adi_axis_frame cast_object;
+
+      valid = 1;
+
+      if ($cast(cast_object, next_sequence) == 0) begin
+        valid = 0;
+        return;
+      end
+
+      if (!this.enabled && this.stop_policy == STOP_POLICY_FRAME) begin
+        return;
+      end
+
+      this.frame_in_progress = 1;
+      for (int i=0; i<cast_object.packets.size(); i++) begin
+        this.axis_packet_check(cast_object.packets[i], valid);
+        if (!valid) begin
+          return;
+        end
+      end
+      this.frame_in_progress = 0;
+
+      this.frame_delay_subroutine();
+      this.info($sformatf("Axis frame sent"), ADI_VERBOSITY_HIGH);
+
+      ->>this.frame_sent_ev;
+
+      return;
+    endtask: axis_frame_check
 
   endclass: m_axis_sequencer
 

@@ -11,6 +11,8 @@ include $(ADI_TB_DIR)/library/includes/Makeinclude_scoreboard.mk
 
 # Remaining test-bench dependencies except test programs
 SV_DEPS += environment.sv
+SV_DEPS += $(ADI_TB_DIR)/testbenches/ip/util_axis_fifo/status_signals_pkg.sv
+SV_DEPS += status_signals_asym_pkg.sv
 
 LIB_DEPS := util_cdc
 LIB_DEPS += util_axis_fifo
@@ -27,7 +29,7 @@ CFG_FILES := $(notdir $(wildcard cfgs/cfg*.tcl))
 # Format is: <configuration>:<test name>
 TESTS := $(foreach cfg, $(basename $(CFG_FILES)), $(addprefix $(cfg):, $(TP)))
 
-include ../../../scripts/project-sim.mk
+include $(ADI_TB_DIR)/scripts/project-sim.mk
 
 # usage:
 #

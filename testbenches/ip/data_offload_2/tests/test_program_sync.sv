@@ -73,7 +73,7 @@ module test_program_sync (
     //=========================================================================
 
     env.src_axis_seq.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-    env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
+    env.src_axis_seq.add_xfer_transaction_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
 
     env.dst_axis_seq.set_mode(`DST_READY_MODE);
     env.dst_axis_seq.set_high_time(`DST_READY_HIGH);
@@ -138,7 +138,7 @@ module test_program_sync (
 
     //init_req <= 1'b1;
     #100ns;
-    // env.src_axis_seq.add_xfer_descriptor_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
+    // env.src_axis_seq.add_xfer_transaction_byte_count(`SRC_TRANSFERS_LENGTH, 1, 0);
 
     // @env.src_axis_seq.queue_empty;
     // init_req <= 1'b0;

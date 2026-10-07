@@ -23,7 +23,8 @@ source $ad_tb_dir/library/includes/sp_include_scoreboard.tcl
 adi_sim_project_files [list \
   "environment.sv" \
   "tests/test_program.sv" \
-  "tests/test_tkeep.sv" \
+  "$ad_tb_dir/testbenches/ip/util_axis_fifo/status_signals_pkg.sv" \
+  "status_signals_asym_pkg.sv" \
 ]
 
 #set a default test program

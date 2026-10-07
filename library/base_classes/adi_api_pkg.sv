@@ -35,63 +35,67 @@
 
 `include "utils.svh"
 
-package pub_sub_pkg;
+package adi_api_pkg;
 
   import logger_pkg::*;
   import adi_component_pkg::*;
+  import m_axi_sequencer_pkg::*;
+  import axi_vip_pkg::*;
 
-  class adi_subscriber #(type data_type = int) extends adi_component;
+  class adi_api extends adi_component;
 
-    protected static bit [15:0] last_id = 'd0;
-    bit [15:0] id;
+    protected m_axi_sequencer_base bus;
+    protected bit [31:0] base_address;
+
+    // Semantic versioning
+    bit [7:0] ver_major;
+    bit [7:0] ver_minor;
+    bit [7:0] ver_patch;
 
     function new(
       input string name,
+      input m_axi_sequencer_base bus,
+      input bit [31:0] base_address,
       input adi_component parent = null);
 
       super.new(name, parent);
 
-      this.last_id++;
-      this.id = this.last_id;
+      this.bus = bus;
+      this.base_address = base_address;
     endfunction: new
 
-    virtual function void update(input data_type data [$]);
-      this.fatal($sformatf("This function is not implemented!"));
-    endfunction: update
 
-  endclass: adi_subscriber
+    virtual task probe();
+      bit [31:0] val;
+      this.bus.RegRead32(this.base_address + 'h0, val);
+      {ver_major, ver_minor, ver_patch} = val;
+      this.info($sformatf("Found peripheral version: %0d.%0d.%s", ver_major, ver_minor, ver_patch), ADI_VERBOSITY_HIGH);
+    endtask
 
+    task axi_read(
+      input  xil_axi_ulong addr,
+      output bit [31:0] data,
+      input  bit priority_packet = 0);
 
-  class adi_publisher #(type data_type = int) extends adi_component;
+      this.bus.RegRead32(this.base_address + addr, data);
+    endtask: axi_read
 
-    protected adi_subscriber #(data_type) subscriber_list[bit[15:0]];
+    task axi_write(
+      input xil_axi_ulong addr,
+      input bit [31:0] data,
+      input bit priority_packet = 0);
 
-    function new(
-      input string name,
-      input adi_component parent = null);
+      this.bus.RegWrite32(this.base_address + addr, data);
+    endtask: axi_write
 
-      super.new(name, parent);
-    endfunction: new
+    task axi_verify(
+      input xil_axi_ulong addr,
+      input bit [31:0] data,
+      input bit priority_packet = 0);
 
-    function void subscribe(input adi_subscriber #(data_type) subscriber);
-      if (this.subscriber_list.exists(subscriber.id))
-        this.error($sformatf("Subscriber already on the list!"));
-      else
-        this.subscriber_list[subscriber.id] = subscriber;
-    endfunction: subscribe
+      this.bus.RegReadVerify32(this.base_address + addr, data);
+    endtask: axi_verify
 
-    function void unsubscribe(input adi_subscriber #(data_type) subscriber);
-      if (!this.subscriber_list.exists(subscriber.id))
-        this.error($sformatf("Subscriber does not exist on list!"));
-      else
-        this.subscriber_list.delete(subscriber.id);
-    endfunction: unsubscribe
+  endclass: adi_api
 
-    function void notify(input data_type data [$]);
-      foreach (this.subscriber_list[i])
-        this.subscriber_list[i].update(data);
-    endfunction: notify
-
-  endclass: adi_publisher
-
-endpackage
+endpackage: adi_api_pkg

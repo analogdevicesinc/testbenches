@@ -38,7 +38,7 @@
 package scoreboard_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
   import pub_sub_pkg::*;
 
   class scoreboard #(type data_type = int) extends adi_component;

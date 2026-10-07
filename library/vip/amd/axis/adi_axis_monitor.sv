@@ -39,7 +39,8 @@ package adi_axis_monitor_pkg;
 
   import axi4stream_vip_pkg::*;
   import logger_pkg::*;
-  import adi_vip_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_monitor_pkg::*;
   import pub_sub_pkg::*;
 
 

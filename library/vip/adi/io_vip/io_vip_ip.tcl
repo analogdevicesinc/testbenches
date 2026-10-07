@@ -12,9 +12,14 @@ adi_ip_files io_vip_top [list \
   "io_vip_top.v" \
   "io_vip_if.sv" \
   "io_vip_if_base_pkg.sv" \
+  "bd/bd.tcl" \
 ]
 
+set_property used_in_simulation false [get_files ./bd/bd.tcl]
+set_property used_in_synthesis false [get_files ./bd/bd.tcl]
+
 adi_ip_properties_lite io_vip
+adi_ip_bd util_axis_fifo "bd/bd.tcl"
 
 set cc [ipx::current_core]
 
@@ -83,8 +88,8 @@ set_property -dict [list \
 
 ipgui::add_param -name "ASYNC" -component $cc -parent $general_group
 set_property -dict [list \
-  "display_name" "Asynchronous clock" \
-  "tooltip" "\[ASYNC\] Set clock mode" \
+  "display_name" "Asynchronous to clock" \
+  "tooltip" "\[ASYNC\] Are the IO signals synchronized to a clock?" \
 ] [ipgui::get_guiparamspec -name "ASYNC" -component $cc]
 
 ## Create and save the XGUI file

@@ -2,7 +2,7 @@ global ad_project_params
 
 set ad_project_params(LINK_MODE) 1
 
-set ad_project_params(REF_CLK_RATE) 500
+set ad_project_params(REF_CLK_RATE) 250
 set ad_project_params(LANE_RATE) 10
 set ad_project_params(PLL_TYPE) QPLL0
 

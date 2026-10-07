@@ -1,0 +1,16 @@
+# cocotb verification framework — Python dependencies
+#
+# cocotb 2.0's --timing support requires Verilator >= 5.0 (the distro 4.x will
+# not work); Verilator itself is installed separately (see env.sh / README).
+#
+# Recreate the venv with:
+#   python3 -m venv .venv && . .venv/bin/activate
+#   pip install -r requirements.txt
+
+cocotb==2.0.1
+cocotb-bus==0.3.0
+
+# Pulled in transitively (pinned for reproducibility):
+#   find_libpython==0.5.1   (cocotb)
+#   packaging==26.2         (cocotb)
+#   scapy==2.7.0            (cocotb-bus)

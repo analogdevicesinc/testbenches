@@ -61,7 +61,7 @@ package adi_regmap_pkg;
   function bit [31:0] SetField(reg_t register,
                                string field,
                                bit [31:0] value);
-    bit [31:0] ret = 'h0;
+    automatic bit [31:0] ret = 'h0;
     int lsb, msb;
 
     if (!register.fields.exists(field))
@@ -83,7 +83,7 @@ package adi_regmap_pkg;
   function bit [31:0] GetField(reg_t register,
                                string field,
                                bit [31:0] regvalue);
-    bit [31:0] ret = 'h0;
+    automatic bit [31:0] ret = 'h0;
     int lsb, msb;
 
     if (!register.fields.exists(field))
@@ -106,7 +106,7 @@ package adi_regmap_pkg;
                                   string field,
                                   bit [31:0] regvalue,
                                   bit [31:0] curregvalue);
-    bit [31:0] ret = curregvalue;
+    automatic bit [31:0] ret = curregvalue;
 
     if (!register.fields.exists(field))
       `FATAL(("Field %s in reg %s does not exists", field, register.name));

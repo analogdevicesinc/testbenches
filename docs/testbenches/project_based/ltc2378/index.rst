@@ -332,16 +332,16 @@ Testbench specific dependencies:
      - :git-testbenches:`library/regmaps/adi_regmap_spi_engine_pkg.sv`
      - ---
    * - CLK_GEN_API
-     - :git-testbenches:`library/drivers/clk_gen/clk_gen_api.sv`
+     - :git-testbenches:`library/drivers/clk_gen_api_pkg.sv`
      - ---
    * - DMAC_API
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
    * - PWM_GEN_API
-     - :git-testbenches:`library/drivers/pwm_gen/pwm_gen_api.sv`
+     - :git-testbenches:`library/drivers/pwm_gen_api_pkg.sv`
      - ---
    * - SPI_ENGINE_API
-     - :git-testbenches:`library/drivers/spi_engine/spi_engine_api.sv`
+     - :git-testbenches:`library/drivers/spi_engine/spi_engine_api_pkg.sv`
      - ---
    * - SPI_ENGINE_INSTR_PKG
      - :git-testbenches:`library/drivers/spi_engine/spi_engine_instr_pkg.sv`

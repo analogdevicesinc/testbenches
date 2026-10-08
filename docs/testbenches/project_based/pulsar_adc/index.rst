@@ -307,10 +307,10 @@ Testbench specific dependencies:
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
    * - M_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/m_axis_sequencer.sv`
+     - :git-testbenches:`library/vip/amd/axis/m_axis_sequencer.sv`
      - ---
    * - S_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/s_axis_sequencer.sv`
+     - :git-testbenches:`library/vip/amd/axis/s_axis_sequencer.sv`
      - ---
 
 .. include:: ../../../common/more_information.rst

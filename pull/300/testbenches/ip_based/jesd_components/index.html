@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The component-level testbenches verify individual JESD204 IP modules in isolation. They are located in the HDL repository at library/jesd204/tb." name="description" />
+
+    <title>JESD204 Components &#8212; Testbenches  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=b1d7a81a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script async="async" src="../../../_static/app.umd.js?v=daa30c51"></script>
+    <link rel="icon" href="../../../_static/icon.svg"/>
+    <link rel="index" title="Index" href="../../../genindex/" />
+    <link rel="search" title="Search" href="../../../search/" />
+    <link rel="next" title="JESD Loopback" href="../jesd_loopback/" />
+    <link rel="prev" title="IRQ handler" href="../irq_handler/" />
+   
+  
+  
+  
+  <meta name="repository" content="testbenches">
+  <meta name="version" content="">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://developer.analog.com/" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Documentation</label>
+        
+        <a id="logo" href="../../../">
+          <div>HDL Testbenches</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">JESD204 Components</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#supported-simulators">Supported Simulators</a></li>
+<li><a class="reference internal" href="#available-testbenches">Available Testbenches</a><ul>
+<li><a class="reference internal" href="#link-layer-register-map">Link Layer - Register Map</a></li>
+<li><a class="reference internal" href="#link-layer-core">Link Layer - Core</a></li>
+<li><a class="reference internal" href="#loopback-full-tx-to-rx-stack">Loopback (Full TX to RX Stack)</a></li>
+<li><a class="reference internal" href="#scrambler-descrambler">Scrambler/Descrambler</a></li>
+<li><a class="reference internal" href="#frame-handling">Frame Handling</a></li>
+<li><a class="reference internal" href="#soft-pcs-8b10b-physical-coding-sublayer">Soft PCS (8b10b Physical Coding Sublayer)</a></li>
+<li><a class="reference internal" href="#utility">Utility</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-and-running">Building and Running</a></li>
+<li><a class="reference internal" href="#resources">Resources</a><ul>
+<li><a class="reference internal" href="#hdl-dependencies">HDL Dependencies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-information">More information</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="no-logo" href="../../../">
+      Testbenches
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">HDL Testbenches</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/">User Guide</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/introduction/">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/git_repository/">Git repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/releases/">Releases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_tb/">Build a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/hierarchy/">Repository hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/create_edit_tb/">Creation and editing of HDL testbenches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/coding_guidelines/">Testbenches coding guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/debug_tb/">Debugging a testbench</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/docs_guidelines/">Documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../library/">Library</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/">Drivers</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1-1" id="toctree-collapse-2-1-1"/><div class="collapse"><a class="reference internal" href="../../../library/drivers/common/">Common</a><label for="toctree-collapse-2-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/scoreboard/">Scoreboard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/drivers/common/watchdog/">Watchdog</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/data_offload/">Data Offload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/dmac/">DMAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/jesd/">JESD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/spi_engine/">SPI Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/drivers/xcvr/">XCVR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../library/regmaps/">Registermaps</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/utilities/">Utilities</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/irq_handler/">IRQ Handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../library/utilities/test_harness/">Test Harness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../library/vip/">Verification IPs (VIP)</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-1" id="toctree-collapse-2-3-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/adi/">ADI</a><label for="toctree-collapse-2-3-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/io_vip/">IO VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/adi/spi_vip/">SPI VIP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2" id="toctree-collapse-2-3-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/">AMD</a><label for="toctree-collapse-2-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-1" id="toctree-collapse-2-3-2-1"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axi_vip/">AXI VIP</a><label for="toctree-collapse-2-3-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_agent/">ADI AXI Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/m_axi_sequencer/">ADI AXI Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/s_axi_sequencer/">ADI AXI Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axi_vip/adi_axi_monitor/">ADI AXI Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3-2-2" id="toctree-collapse-2-3-2-2"/><div class="collapse"><a class="reference internal" href="../../../library/vip/amd/axis_vip/">AXIS VIP</a><label for="toctree-collapse-2-3-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_agent/">ADI AXIS Agent</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/m_axis_sequencer/">ADI AXIS Master Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/s_axis_sequencer/">ADI AXIS Slave Sequencer</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../library/vip/amd/axis_vip/adi_axis_monitor/">ADI AXIS Monitor</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/clk_vip/">Clock VIP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../library/vip/amd/rst_vip/">Reset VIP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="../../">Testbenches</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-1" id="toctree-collapse-3-1" checked=""/><div class="collapse"><a class="reference internal" href="../">IP Based</a><label for="toctree-collapse-3-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../axi_tdd/">AXI TDD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axis_sequencers/">AXIS Sequencers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../base/">Base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_flock/">DMA Framelock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_loopback/">DMA Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dma_sg/">DMA Scatter-Gather</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../i3c_controller/">I3C Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../irq_handler/">IRQ handler</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">JESD204 Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../jesd_loopback/">JESD Loopback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo/">Util AXIS FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_axis_fifo_asym/">Util AXIS FIFO Asymmetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../util_pack/">Util Pack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3-2" id="toctree-collapse-3-2"/><div class="collapse"><a class="reference internal" href="../../project_based/">Project Based</a><label for="toctree-collapse-3-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad463x/">AD463x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad485x/">AD485X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad57xx/">AD57XX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad738x/">AD738x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7606/">AD7606</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad7616/">AD7616</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ad9083/">AD9083</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ada4355/">ADA4355</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9001/">ADRV9001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/adrv9009/">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/cn0363/">CN0363</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/cn0577_adaq2387x/">CN0577/ADAQ2387X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/fmcomms2/">FMCOMMS2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/ltc2378/">LTC2378</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/pluto/">PLUTO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../project_based/pulsar_adc/">PulSAR ADC PMDZ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../">Testbenches</a></li><li><a href="../">IP Based</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="jesd204-components">
+<span id="jesd-components"></span><h1>JESD204 Components<a class="headerlink" href="#jesd204-components" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The component-level testbenches verify individual JESD204 IP modules in
+isolation. They are located in the HDL repository at
+<a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/tb" target="_blank">library/jesd204/tb</a>.</p>
+<p>These testbenches complement the system-level testbenches (like
+<a class="reference internal" href="../jesd_loopback/#jesd-loopback"><span class="std std-ref">JESD Loopback</span></a>) by testing specific functionality at a granular level
+and supporting multiple simulators.</p>
+</section>
+<section id="supported-simulators">
+<h2>Supported Simulators<a class="headerlink" href="#supported-simulators" title="Link to this heading"></a></h2>
+<p>The simulator can be selected through the <code class="docutils literal notranslate"><span class="pre">SIMULATOR</span></code> environment variable:</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>$SIMULATOR</p></th>
+<th class="head"><p>Simulator</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>modelsim</p></td>
+<td><p>Mentor/Siemens ModelSim/QuestaSim</p></td>
+</tr>
+<tr class="row-odd"><td><p>xsim</p></td>
+<td><p>AMD Xilinx Vivado Simulator</p></td>
+</tr>
+<tr class="row-even"><td><p>xcelium</p></td>
+<td><p>Cadence Xcelium</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>(default)</em></p></td>
+<td><p>Icarus Verilog (iverilog)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="available-testbenches">
+<h2>Available Testbenches<a class="headerlink" href="#available-testbenches" title="Link to this heading"></a></h2>
+<section id="link-layer-register-map">
+<h3>Link Layer - Register Map<a class="headerlink" href="#link-layer-register-map" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Testbench</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>axi_jesd204_rx_regmap_tb</p></td>
+<td><p>Verifies AXI register read/write interface for RX link layer peripheral</p></td>
+</tr>
+<tr class="row-odd"><td><p>axi_jesd204_tx_regmap_tb</p></td>
+<td><p>Verifies AXI register read/write interface for TX link layer peripheral</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="link-layer-core">
+<h3>Link Layer - Core<a class="headerlink" href="#link-layer-core" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Testbench</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>rx_tb</p></td>
+<td><p>Tests RX link layer core including PHY ready and lane alignment</p></td>
+</tr>
+<tr class="row-odd"><td><p>rx_cgs_tb</p></td>
+<td><p>Tests Code Group Synchronization (CGS) state machine</p></td>
+</tr>
+<tr class="row-even"><td><p>rx_ctrl_tb</p></td>
+<td><p>Tests RX control logic</p></td>
+</tr>
+<tr class="row-odd"><td><p>rx_lane_tb</p></td>
+<td><p>Tests individual RX lane handling</p></td>
+</tr>
+<tr class="row-even"><td><p>tx_tb</p></td>
+<td><p>Tests TX link layer with multi-link SYNC handling</p></td>
+</tr>
+<tr class="row-odd"><td><p>tx_ctrl_phase_tb</p></td>
+<td><p>Tests TX control phase alignment</p></td>
+</tr>
+<tr class="row-even"><td><p>tx_64b_tb</p></td>
+<td><p>Tests TX 64b66b mode (JESD204C)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="loopback-full-tx-to-rx-stack">
+<h3>Loopback (Full TX to RX Stack)<a class="headerlink" href="#loopback-full-tx-to-rx-stack" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Testbench</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>loopback_tb</p></td>
+<td><p>Full 8b10b JESD204B loopback test with data integrity verification</p></td>
+</tr>
+<tr class="row-odd"><td><p>loopback_64b_tb</p></td>
+<td><p>Full 64b66b JESD204C loopback test</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="scrambler-descrambler">
+<h3>Scrambler/Descrambler<a class="headerlink" href="#scrambler-descrambler" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Testbench</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>scrambler_tb</p></td>
+<td><p>Tests 8b10b scrambler/descrambler loopback integrity</p></td>
+</tr>
+<tr class="row-odd"><td><p>scrambler_64b_tb</p></td>
+<td><p>Tests 64b66b scrambler/descrambler using reference vectors</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="frame-handling">
+<h3>Frame Handling<a class="headerlink" href="#frame-handling" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Testbench</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>frame_align_tb</p></td>
+<td><p>Tests frame alignment with configurable error injection</p></td>
+</tr>
+<tr class="row-odd"><td><p>jesd204_frame_align_replace_tb</p></td>
+<td><p>Tests character replacement at frame boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p>jesd204_frame_mark_tb</p></td>
+<td><p>Tests SOF/EOF frame marking logic</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="soft-pcs-8b10b-physical-coding-sublayer">
+<h3>Soft PCS (8b10b Physical Coding Sublayer)<a class="headerlink" href="#soft-pcs-8b10b-physical-coding-sublayer" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Testbench</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>soft_pcs_8b10b_sequence_tb</p></td>
+<td><p>Tests 8b10b encoder output sequences</p></td>
+</tr>
+<tr class="row-odd"><td><p>soft_pcs_8b10b_table_tb</p></td>
+<td><p>Verifies 8b10b encoding lookup table</p></td>
+</tr>
+<tr class="row-even"><td><p>soft_pcs_loopback_tb</p></td>
+<td><p>Tests soft PCS encode/decode loopback</p></td>
+</tr>
+<tr class="row-odd"><td><p>soft_pcs_pattern_align_tb</p></td>
+<td><p>Tests comma pattern detection and alignment</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="utility">
+<h3>Utility<a class="headerlink" href="#utility" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Testbench</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>crc12_tb</p></td>
+<td><p>Tests CRC-12 calculation per JESD204C specification</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="building-and-running">
+<h2>Building and Running<a class="headerlink" href="#building-and-running" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Open a Cygwin or bash terminal</p></li>
+<li><p>Navigate to the testbench folder:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>library/jesd204/tb
+</pre></div>
+</div>
+</li>
+<li><p>(Optional) Set the simulator:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">SIMULATOR</span><span class="o">=</span>xsim
+</pre></div>
+</div>
+</li>
+<li><p>Run a testbench:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./loopback_tb
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Output files:</p>
+<ul class="simple">
+<li><p>VCD waveforms: <code class="docutils literal notranslate"><span class="pre">vcd/&lt;testbench_name&gt;.vcd</span></code></p></li>
+<li><p>Simulation logs: <code class="docutils literal notranslate"><span class="pre">&lt;testbench_name&gt;_&lt;simulator&gt;.log</span></code></p></li>
+</ul>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
+<section id="hdl-dependencies">
+<h3>HDL Dependencies<a class="headerlink" href="#hdl-dependencies" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 40.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Source</p></th>
+<th class="head"><p>Documentation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>jesd204_rx</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/jesd204_rx" target="_blank">library/jesd204/jesd204_rx</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/axi_jesd204_rx/#axi-jesd204-rx" target="_blank" title="(in HDL)"><span>JESD204B/C Link Receive Peripheral</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>jesd204_tx</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/jesd204_tx" target="_blank">library/jesd204/jesd204_tx</a></p></td>
+<td><p><a class="icon link reference external" href="https://analogdevicesinc.github.io/hdl/library/jesd204/axi_jesd204_tx/#axi-jesd204-tx" target="_blank" title="(in HDL)"><span>JESD204B/C Link Transmit Peripheral</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>jesd204_scrambler</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/jesd204_common" target="_blank">library/jesd204/jesd204_common</a></p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>jesd204_lmfc</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/hdl/tree/main/library/jesd204/jesd204_common" target="_blank">library/jesd204/jesd204_common</a></p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="more-information">
+<h2>More information<a class="headerlink" href="#more-information" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../../user_guide/#user-guide"><span class="std std-ref">ADI Testbenches User guide</span></a></p></li>
+</ul>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Link to this heading"></a></h2>
+<p><a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">Analog Devices, Inc.</a> will provide <strong>limited</strong> online support for anyone
+using the <a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/" target="_blank">reference design</a> with <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> components via
+the <a class="icon ez reference external" href="https://ez.analog.com/fpga" target="_blank">EngineerZone</a> FPGA reference designs forum.</p>
+<p>It should be noted, that the older the tools’ versions and release branches
+are, the lower the chances to receive support from <a class="icon link reference external" href="https://www.analog.com/en/index.html" target="_blank">ADI</a> engineers.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../irq_handler/" title="Previous document (Alt+Shift+LeftArrow)" class="prev">IRQ handler</a>
+    <a href="../jesd_loopback/" title="Next document (Alt+Shift+RightArrow)" class="next">JESD Loopback</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024-2025, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

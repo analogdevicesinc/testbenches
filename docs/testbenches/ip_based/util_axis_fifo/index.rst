@@ -207,10 +207,10 @@ Testbench specific dependencies:
      - Source code link
      - Documentation link
    * - M_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/m_axis_sequencer.sv`
+     - :git-testbenches:`library/vip/amd/axis/m_axis_sequencer.sv`
      - ---
    * - S_AXIS_SEQUENCER
-     - :git-testbenches:`library/vip/amd/s_axis_sequencer.sv`
+     - :git-testbenches:`library/vip/amd/axis/s_axis_sequencer.sv`
      - ---
    * - SCOREBOARD
      - :git-testbenches:`library/drivers/common/scoreboard.sv`

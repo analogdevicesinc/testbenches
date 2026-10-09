@@ -325,7 +325,7 @@ Testbench specific dependencies:
      - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
      - ---
    * - ADI_REGMAP_PWM_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_pwm_pkg.sv`
+     - :git-testbenches:`library/regmaps/adi_regmap_pwm_gen_pkg.sv`
      - ---
    * - ADI_REGMAP_SPI_ENGINE_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_spi_engine_pkg.sv`

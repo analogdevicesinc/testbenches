@@ -1,0 +1,57 @@
+# Data unstable under held valid - SDI handshake unstable under sub-word ready-stall at clk_div=0 (FLAG EXEC-F1)
+- code revision: hdl_repo 8ae99f4c (main branch, Wed Jun 24)
+- Requirement: EXEC-FLOW-05 - `sdi_data` must stay stable while `sdi_data_valid` is asserted and unaccepted (valid/ready handshake stability).
+- Test: `test_flow_control.py::test_sdi_handshake_stability` (fails on current RTL; second home of EXEC-FLOW-05).
+- Symptom: at `clk_div=0`, if the consumer stalls (`sdi_data_ready` low) for less than a word period, a new word is fully shifted in and overwrites the previous one before it is accepted - `sdi_data` changes under an unaccepted valid, corrupting/dropping the stalled word. With `clk_div=2` and bounded stalls: zero violations, correct data.
+- Root cause: (spi_engine_execution_shiftreg.v) the SDI datapath has no hold on the captured word - at `clk_div=0` a full word shifts in every word period, so the engine effectively requires `sdi_data_ready` to be granted within one word period. There is no backpressure guarantee that the downstream consumer honors that.
+- Decision needed: treat as a documented operating constraint (downstream SDI FIFO must accept within a word period, i.e. model realistic backpressure) or add a hold/skid so the captured word survives an arbitrary stall at `clk_div=0`.
+- Run Command: `WAVES=1 COCOTB_TESTCASE=test_sdi_handshake_stability make` (waveform in the run's `sim_build/<NNN>_<timestamp>/dump.fst`)
+- Wave signals:
+  - dut::sdi_data
+  - dut::sdi_data_valid
+  - dut::sdi_data_ready
+  - dut::transfer_active
+  - dut::shiftreg::trigger_rx_s
+  - dut::shiftreg::trigger_rx_d
+  - dut::shiftreg::sdi_data_latch
+
+# Register not cleared by reset - Sticky sdo_data_ready survives reset (FLAG EXEC-F10)
+- code revision: hdl_repo 8ae99f4c (main branch, Wed Jun 24)
+- Requirement: EXEC-SDO-04 - the engine must not request SDO data (`sdo_data_ready`) with no write instruction in flight; a reset must return the SDO request handshake to idle.
+- Test: `test_flow_control.py::test_sdo_ready_cleared_by_reset` (fails on current RTL; second home of EXEC-SDO-04).
+- Symptom: in FIFO mode (`s_offload_active=0`), `sdo_data_ready` asserts with no command pending and no valid write instruction - but only after a prior transfer, and the state survives an intervening `resetn` pulse.
+- Root cause: (spi_engine_execution.v) `exec_transfer_cmd_reg` is set inside `if (exec_cmd)` and has NO reset branch, so it stays 1 across reset. It feeds the shiftreg as `exec_cmd`, and the prefetch gate `sdo_data_ready_int = (...) && (s_offload_active || (exec_cmd & index_ready))` then asserts `sdo_data_ready` post-reset with no transfer in flight - an AXI-stream/protocol violation (state not cleared by reset).
+- Decision needed: reset SHOULD clear `exec_transfer_cmd_reg` (RTL fix), or a post-reset non-transfer command is a required power-on step (document the sequence).
+- Run Command: `WAVES=1 COCOTB_TESTCASE=test_sdo_ready_cleared_by_reset make` (waveform in the run's `sim_build/<NNN>_<timestamp>/dump.fst`)
+- Wave signals:
+  - dut::resetn
+  - dut::s_offload_active
+  - dut::sdo_data_valid
+  - dut::sdo_data_ready
+  - dut::exec_transfer_cmd_reg
+  - dut::shiftreg::exec_cmd
+  - dut::shiftreg::index_ready
+  - dut::shiftreg::sdo_data_ready_int
+
+# Missing lane-mask gate - Offload prefetch ignores the SDO lane mask
+- code revision: hdl_repo 8ae99f4c (main branch, Wed Jun 24)
+- Requirement: EXEC-OFF-02 - offload prefetch requires ALL SDO lanes active; with a sub-mask (some lanes inactive) the engine must wait for the write instruction instead of prefetching.
+- Test (white-box): `test_offload.py::test_offload_prefetch_requires_all_lanes` (fails hard on current RTL; skipped at `NUM_OF_SDIO<2`) - proves `sdo_data_ready` prefetch fires under a sub-mask.
+- Test (black-box): `test_offload.py::test_offload_submask_no_stream_corruption` (fails hard on current RTL; skipped at `NUM_OF_SDIO<3`) - proves the prefetch actually **corrupts the SDO bus data**: same command/data/mask, the offload-mode SPI-bus SDO words differ from FIFO mode (stream slides by one, wrong lane mapping). Sweeps every observable sub-mask **and** the timing phase (offset from lane-mask re-pulse to data arrival), because the corruption is phase-dependent - a single phase can miss it.
+- Symptom: with `s_offload_active=1` and a sub-mask leaving some lanes inactive, the engine prefetches an SDO word during the lane-mask scan window (before the lane map is built), instead of waiting for the write instruction. The early-consumed word is mapped with a stale `lane_lookup[]`/`last_active_idx`, so the whole SDO stream shifts by one and lands on the wrong lanes - observed black-box on the SPI bus at `NUM_OF_SDIO>=3` (e.g. sub-mask `0b101`: FIFO `[186,76,28,73,...]` vs offload `[28,76,73,183,...]`). At `NUM_OF_SDIO<=2` the sub-mask leaves at most one active lane (identity map), so the corruption is not observable. **Phase-dependent:** whether it corrupts depends on which cycle of the ~`NUM_OF_SDIO`-cycle lane-scan rebuild consumes the prefetched word. Some (mask, phase) points are clean - e.g. mask `0b011` corrupts at phases 1..N but is clean at phase 0 - so the test must sweep the phase, not pin one.
+- Impact: this is an internal ordering fault of the execution module, independent of the offload IP - it accepts an SDO word before its own lane map is ready. Given SDO data valid during the scan, it produces wrong data on the wire under a legal offload+sub-mask configuration.
+- Root cause: (spi_engine_execution_shiftreg.v) the prefetch gate `sdo_data_ready_int = (...) && (s_offload_active || (exec_cmd & index_ready))` lets `s_offload_active` bypass `index_ready` (= assembler `lane_cfg_ready`, "lane-mask scan complete"). No lane-mask/scan-done term guards the offload branch.
+- Suggested fix: require `index_ready` in the offload branch too, e.g. `... && index_ready && (s_offload_active || exec_cmd)`. Efficiency toll is negligible: `index_ready` only deasserts for ~NUM_OF_SDIO cycles per lane-mask change (not per word/transfer), so steady-state throughput is unchanged.
+- Decision needed: add the scan-done (and/or all-lanes) gate to the RTL, or correct `spi_engine_execution.rst` if the requirement is not intended.
+- Run Command (white-box): `PARAM_NUM_OF_SDIO=2 WAVES=1 COCOTB_TESTCASE=test_offload_prefetch_requires_all_lanes make`
+- Run Command (black-box): `PARAM_NUM_OF_SDIO=3 WAVES=1 COCOTB_TESTCASE=test_offload_submask_no_stream_corruption make` (needs NUM_OF_SDIO>=3; waveform in the run's `sim_build/<NNN>_<timestamp>/dump.fst`)
+- Wave signals:
+  - dut::s_offload_active
+  - dut::sdo_data_valid
+  - dut::sdo_data_ready
+  - dut::sdo_lane_mask
+  - dut::sdo   (SPI-bus output - where the corruption is observable)
+  - dut::shiftreg::exec_cmd
+  - dut::shiftreg::index_ready
+  - dut::shiftreg::sdo_data_ready_int
+  - dut::shiftreg::sdo_data_assemble::lane_cfg_ready

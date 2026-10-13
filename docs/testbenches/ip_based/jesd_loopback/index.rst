@@ -10,6 +10,25 @@ The purpose of this testbench is to test the JESD framework in loopback mode.
 
 The entire HDL documentation can be found at :external+hdl:ref:`jesd204`.
 
+There are two system-level JESD loopback testbenches available:
+
+.. list-table::
+   :widths: 25 75
+   :header-rows: 1
+
+   * - Testbench
+     - Description
+   * - jesd_loopback
+     - Uses ADI IP as Physical Layer; supports both JESD204B (8b10b) and
+       JESD204C (64b66b) modes
+   * - jesd_loopback_64b
+     - Uses Xilinx PHY as Physical Layer; JESD204C (64b66b) mode only
+
+The ``jesd_loopback_64b`` testbench is located at
+:git-testbenches:`testbenches/ip/jesd_loopback_64b` and targets Xilinx boards
+(VCU118, VCU128) with native GTY transceiver support for higher lane rates
+(up to 24.75 Gbps).
+
 Block design
 -------------------------------------------------------------------------------
 

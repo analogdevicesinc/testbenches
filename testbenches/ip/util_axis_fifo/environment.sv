@@ -45,6 +45,7 @@ package environment_pkg;
   import s_axis_sequencer_pkg::*;
   import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
+  import adi_axis_transaction_pkg::*;
 
   class util_axis_fifo_environment #(`AXIS_VIP_PARAM_DECL(input_axis), `AXIS_VIP_PARAM_DECL(output_axis), int INPUT_CLK, int OUTPUT_CLK) extends adi_environment;
 
@@ -54,7 +55,7 @@ package environment_pkg;
     adi_axis_master_agent #(`AXIS_VIP_PARAM_ORDER(input_axis)) input_axis_agent;
     adi_axis_slave_agent #(`AXIS_VIP_PARAM_ORDER(output_axis)) output_axis_agent;
 
-    scoreboard #(logic [7:0]) scoreboard_inst;
+    scoreboard #(adi_axis_transaction) scoreboard_inst;
 
     //============================================================================
     // Constructor
@@ -84,16 +85,69 @@ package environment_pkg;
     // Configure environment
     //============================================================================
     task configure();
-      // configuration for input
-      this.input_axis_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-      this.input_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.input_axis_agent.master_sequencer.set_descriptor_gen_mode(1);
-      this.input_axis_agent.master_sequencer.set_data_beat_delay(0);
-      this.input_axis_agent.master_sequencer.set_descriptor_delay(0);
+      int policy_randomizer;
+
+      // configure input
+
+      // stop policy
+      policy_randomizer = $urandom_range(1, 5);
+      case (policy_randomizer)
+        'd1: this.input_axis_agent.master_sequencer.set_stop_policy(.stop_policy(STOP_POLICY_TRANSACTION));
+        'd2: this.input_axis_agent.master_sequencer.set_stop_policy(.stop_policy(STOP_POLICY_PACKET));
+        'd3: this.input_axis_agent.master_sequencer.set_stop_policy(.stop_policy(STOP_POLICY_FRAME));
+        'd4: this.input_axis_agent.master_sequencer.set_stop_policy(.stop_policy(STOP_POLICY_SEQUENCE));
+        'd5: this.input_axis_agent.master_sequencer.set_stop_policy(.stop_policy(STOP_POLICY_QUEUE));
+      endcase
+
+      // delays
+      this.input_axis_agent.master_sequencer.set_transaction_delay(.transaction_delay($urandom_range(0, 10)));
+      this.input_axis_agent.master_sequencer.set_packet_delay(.packet_delay($urandom_range(0, 10)));
+      this.input_axis_agent.master_sequencer.set_frame_delay(.frame_delay($urandom_range(0, 10)));
+      this.input_axis_agent.master_sequencer.set_sequence_delay(.sequence_delay($urandom_range(0, 10)));
+
+      // miscellaneous
+      this.input_axis_agent.master_sequencer.set_repeat_transaction_mode(.repeat_transaction_mode(1));
       this.input_axis_agent.master_sequencer.set_inactive_drive_output_0();
 
-      // configuration for output
-      this.output_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
+      // configure output
+
+      // ready generation policy
+      policy_randomizer = $urandom_range(1, 8);
+      case (policy_randomizer)
+        'd1: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE));
+        'd2: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_SINGLE));
+        'd3: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_EVENTS));
+        'd4: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_OSC));
+        'd5: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_RANDOM));
+        'd6: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_AFTER_VALID_SINGLE));
+        'd7: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_AFTER_VALID_EVENTS));
+        'd8: this.output_axis_agent.slave_sequencer.set_mode(.mode(XIL_AXI4STREAM_READY_GEN_AFTER_VALID_OSC));
+      endcase
+
+      // random high/low times
+      if ($urandom_range(0, 1)) begin
+        this.output_axis_agent.slave_sequencer.set_use_variable_ranges();
+      end else begin
+        this.output_axis_agent.slave_sequencer.clr_use_variable_ranges();
+      end
+
+      // high times
+      this.output_axis_agent.slave_sequencer.set_high_time(.high_time($urandom_range(1, 10)));
+      this.output_axis_agent.slave_sequencer.set_high_time_range(
+        .high_time_min($urandom_range(1, 5)),
+        .high_time_max($urandom_range(5, 10)));
+
+      // low times
+      this.output_axis_agent.slave_sequencer.set_low_time(.low_time($urandom_range(1, 10)));
+      this.output_axis_agent.slave_sequencer.set_low_time_range(
+        .low_time_min($urandom_range(1, 5)),
+        .low_time_max($urandom_range(5, 10)));
+
+      // event counts
+      this.output_axis_agent.slave_sequencer.set_event_count(.event_count($urandom_range(1, 10)));
+      this.output_axis_agent.slave_sequencer.set_event_count_range(
+        .event_count_min($urandom_range(1, 5)),
+        .event_count_max($urandom_range(5, 10)));
     endtask
 
     //============================================================================
@@ -116,6 +170,8 @@ package environment_pkg;
     // Run subroutine
     //============================================================================
     task run();
+      this.input_axis_agent.master_sequencer.start();
+      this.output_axis_agent.slave_sequencer.start();
       fork
         this.scoreboard_inst.run();
       join_none
@@ -125,11 +181,13 @@ package environment_pkg;
     // Stop subroutine
     //============================================================================
     task stop();
-      this.input_clk_vip_if.stop_clock();
-      this.output_clk_vip_if.stop_clock();
+      this.input_axis_agent.master_sequencer.wait_driver_idle();
 
       this.input_axis_agent.stop_master();
       this.output_axis_agent.stop_slave();
+
+      this.input_clk_vip_if.stop_clock();
+      this.output_clk_vip_if.stop_clock();
     endtask
 
   endclass

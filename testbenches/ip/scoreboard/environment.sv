@@ -42,16 +42,15 @@ package environment_pkg;
   import logger_pkg::*;
   import adi_environment_pkg::*;
 
-  import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
-  import m_axi_sequencer_pkg::*;
-  import s_axi_sequencer_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;
   import adi_axi_agent_pkg::*;
   import adi_axis_agent_pkg::*;
   import scoreboard_pkg::*;
   import vip_agent_typedef_pkg::*;
+  import adi_axis_packet_pkg::*;
+  import axis_transaction_to_byte_adapter_pkg::*;
 
 
   class scoreboard_environment extends adi_environment;
@@ -59,11 +58,12 @@ package environment_pkg;
     // Agents
     adi_axis_agent_base adc_src_axis_agent;
     adi_axis_agent_base dac_dst_axis_agent;
-    adi_axi_agent_base adc_dst_axi_pt_agent;
-    adi_axi_agent_base dac_src_axi_pt_agent;
 
     scoreboard #(logic [7:0]) scoreboard_tx;
     scoreboard #(logic [7:0]) scoreboard_rx;
+
+    axis_transaction_to_byte_adapter axis_adapter_tx;
+    axis_transaction_to_byte_adapter axis_adapter_rx;
 
     //============================================================================
     // Constructor
@@ -77,21 +77,26 @@ package environment_pkg;
 
       this.adc_src_axis_agent = new("ADC Source AXI Stream Agent", MASTER, this);
       this.dac_dst_axis_agent = new("DAC Destination AXI Stream Agent", SLAVE, this);
-      this.adc_dst_axi_pt_agent = new("ADC Destination AXI Agent", PASSTHROUGH, this);
-      this.dac_src_axi_pt_agent = new("DAC Source AXI Agent", PASSTHROUGH, this);
 
       this.scoreboard_tx = new("Data Offload TX Scoreboard", this);
       this.scoreboard_rx = new("Data Offload RX Scoreboard", this);
+
+      this.axis_adapter_tx = new(
+        .name("Axis Adapter TX"),
+        .parent(this));
+
+      this.axis_adapter_rx = new(
+        .name("Axis Adapter RX"),
+        .parent(this));
     endfunction
 
     //============================================================================
     // Configure environment
     //   - Configure the sequencer VIPs with an initial configuration before starting them
     //============================================================================
-    task configure(int bytes_to_generate);
+    task configure(input adi_axis_packet axis_packet);
       // ADC stub
-      this.adc_src_axis_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_AUTO_INCR);
-      this.adc_src_axis_agent.master_sequencer.add_xfer_descriptor_byte_count(bytes_to_generate, 0, 0);
+      this.adc_src_axis_agent.master_sequencer.add_packet(axis_packet);
 
       // DAC stub
       this.dac_dst_axis_agent.slave_sequencer.set_mode(XIL_AXI4STREAM_READY_GEN_NO_BACKPRESSURE);
@@ -106,22 +111,19 @@ package environment_pkg;
       this.adc_src_axis_agent.start_master();
       this.dac_dst_axis_agent.start_slave();
 
-      this.dac_dst_axis_agent.monitor.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
+      this.dac_dst_axis_agent.monitor.publisher.subscribe(this.axis_adapter_tx.subscriber);
+      this.axis_adapter_tx.publisher.subscribe(this.scoreboard_tx.subscriber_sink);
 
-      this.adc_src_axis_agent.monitor.publisher.subscribe(this.scoreboard_rx.subscriber_source);
+      this.adc_src_axis_agent.monitor.publisher.subscribe(this.axis_adapter_rx.subscriber);
+      this.axis_adapter_rx.publisher.subscribe(this.scoreboard_rx.subscriber_source);
     endtask
 
     //============================================================================
     // Run subroutine
     //============================================================================
     task run();
-      fork
-        this.adc_src_axis_agent.master_sequencer.start();
-        this.dac_dst_axis_agent.slave_sequencer.start();
-
-        this.scoreboard_tx.run();
-        this.scoreboard_rx.run();
-      join_none
+      this.scoreboard_tx.run();
+      this.scoreboard_rx.run();
     endtask
 
     //============================================================================

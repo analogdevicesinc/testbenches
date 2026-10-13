@@ -38,6 +38,7 @@
 package tdd_api_pkg;
 
   import logger_pkg::*;
+  import adi_component_pkg::*;
   import adi_api_pkg::*;
   import adi_regmap_tdd_gen_pkg::*;
   import adi_regmap_pkg::*;

@@ -5,9 +5,7 @@
 package environment_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
   import adi_environment_pkg::*;
-  import axi_vip_pkg::*;
   import axi4stream_vip_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;

@@ -39,6 +39,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import test_harness_env_pkg::*;
+import adi_axi_agent_pkg::*;
 import dmac_api_pkg::*;
 import adc_api_pkg::*;
 import pwm_gen_api_pkg::*;
@@ -63,7 +64,9 @@ program test_program (
 timeunit 1ns;
 timeprecision 1ps;
 
-test_harness_env #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip), `AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) base_env;
+test_harness_env base_env;
+adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
+adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
 
 dmac_api dmac_api_inst;
 pwm_gen_api pwm_gen_api_inst;
@@ -83,35 +86,44 @@ initial begin
     .dma_clk_vip_if(`TH.`DMA_CLK.inst.IF),
     .ddr_clk_vip_if(`TH.`DDR_CLK.inst.IF),
     .sys_rst_vip_if(`TH.`SYS_RST.inst.IF),
-    .mng_vip_if(`TH.`MNG_AXI.inst.IF),
-    .ddr_vip_if(`TH.`DDR_AXI.inst.IF));
+    .irq_base_address(`IRQ_C_BA),
+    .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
+
+  mng = new(
+    .name(""),
+    .master_vip_if(`TH.`MNG_AXI.inst.IF));
+  ddr = new(
+    .name(""),
+    .slave_vip_if(`TH.`DDR_AXI.inst.IF));
+
+  `LINK(mng, base_env, mng)
+  `LINK(ddr, base_env, ddr)
 
   dmac_api_inst = new(
     .name("CN0577 DMAC API"),
-    .bus(base_env.mng.sequencer),
+    .bus(base_env.mng.master_sequencer),
     .base_address(`AXI_LTC2387_DMA_BA));
 
   pwm_gen_api_inst = new(
     .name("CN0577 AXI PWM GEN API"),
-    .bus(base_env.mng.sequencer),
+    .bus(base_env.mng.master_sequencer),
     .base_address(`AXI_PWM_GEN_BA));
 
   ltc2387_adc_api = new(
     .name("LTC2387 ADC Common API"),
-    .bus(base_env.mng.sequencer),
+    .bus(base_env.mng.master_sequencer),
     .base_address(`AXI_LTC2387_BA));
 
   ltc2387_common_api = new(
     .name("LTC2387 Common API"),
-    .bus(base_env.mng.sequencer),
+    .bus(base_env.mng.master_sequencer),
     .base_address(`AXI_LTC2387_BA));
 
   setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
-  base_env.start();
-
   `TH.`REF_CLK.inst.IF.start_clock();
 
+  base_env.start();
   base_env.sys_reset();
 
   sanity_tests();
@@ -447,7 +459,7 @@ task data_acquisition_test();
    #2000ns;
 
   for (int i=0; i<=((NUM_OF_TRANSFERS) -1); i=i+1) begin
-    captured_word_arr[i] = base_env.ddr.agent.mem_model.backdoor_memory_read_4byte(xil_axi_uint'(`DDR_BA + 4*i));
+    captured_word_arr[i] = base_env.ddr.slave_sequencer.BackdoorRead32(xil_axi_uint'(`DDR_BA + 4*i));
   end
 
   `INFO(("captured_word_arr: %x; dma_data_store_arr %x", captured_word_arr, dma_data_store_arr), ADI_VERBOSITY_LOW);

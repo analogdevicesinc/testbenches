@@ -8,7 +8,7 @@
 // terms.
 //
 // The user should read each of these license terms, and understand the
-// freedoms and responsabilities that he or she has by using this source/core.
+// freedoms and responsibilities that he or she has by using this source/core.
 //
 // This core is distributed in the hope that it will be useful, but WITHOUT ANY
 // WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -122,9 +122,26 @@ package spi_engine_api_pkg;
       this.axi_write(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_EN), `SET_AXI_SPI_ENGINE_OFFLOAD0_EN_OFFLOAD0_EN(0));
     endtask
 
+    task get_offload_status(output logic offload_enabled);
+      this.axi_read(GetAddrs(AXI_SPI_ENGINE_OFFLOAD0_STATUS), val);
+      offload_enabled = `GET_AXI_SPI_ENGINE_OFFLOAD0_STATUS_OFFLOAD0_STATUS(val);
+    endtask
+
+    task wait_offload_disabled();
+      logic offload_enabled;
+      do begin
+        this.get_offload_status(offload_enabled);
+      end while (offload_enabled);
+    endtask
+
     task get_sync_id(output logic [31:0] sync_id);
       this.axi_read(GetAddrs(AXI_SPI_ENGINE_SYNC_ID), val);
       sync_id = `GET_AXI_SPI_ENGINE_SYNC_ID_SYNC_ID(val);
+    endtask
+
+    task get_offload_sync_id(output logic [31:0] offload_sync_id);
+      this.axi_read(GetAddrs(AXI_SPI_ENGINE_OFFLOAD_SYNC_ID), val);
+      offload_sync_id = `GET_AXI_SPI_ENGINE_OFFLOAD_SYNC_ID_OFFLOAD_SYNC_ID(val);
     endtask
 
     task get_irq_pending(output logic [31:0] irq_pending);

@@ -10,6 +10,9 @@ proc create_jesd_exerciser { \
   {JESD_L 4 } \
   {JESD_S 2 } \
   {JESD_NP 12} \
+  {JESD_ADDR 0x40000000} \
+  {TPL_ADDR  0x40010000} \
+  {XCVR_ADDR 0x40020000} \
 } {
 
   # TODO set these constant for now
@@ -42,7 +45,7 @@ proc create_jesd_exerciser { \
   } else {
     set TPL_DATAPATH_WIDTH [expr max($JESD_F,$DATAPATH_WIDTH)]
   }
-
+  set SAMPLES_PER_CHANNEL [expr $NUM_OF_LANES * 8 * $TPL_DATAPATH_WIDTH / ($NUM_OF_CONVERTERS * $SAMPLE_WIDTH)]
 
   set top_design [current_bd_design]
 
@@ -50,32 +53,31 @@ proc create_jesd_exerciser { \
 
   if {$TX_OR_RX_N == 1} {
     set rxtx tx
+    set pack2 upack2
     set tpl_core tx_tpl_core/dac_tpl_core
     set TX_NUM_OF_LANES $NUM_OF_LANES
     set RX_NUM_OF_LANES 0
   } else {
     set rxtx rx
+    set pack2 cpack2
     set tpl_core rx_tpl_core/adc_tpl_core
     set TX_NUM_OF_LANES 0
     set RX_NUM_OF_LANES $NUM_OF_LANES
   }
 
   # create common system interface
-  create_bd_port -dir I sys_cpu_clk
+  create_bd_port -dir I -type clk sys_cpu_clk
   create_bd_port -dir I sys_cpu_resetn
 
-  create_bd_port -dir I device_clk
-  create_bd_port -dir I link_clk
+  create_bd_port -dir I -type clk device_clk
+  create_bd_port -dir I -type clk link_clk
   create_bd_port -dir I ref_clk
-
 
   ad_ip_instance util_adxcvr util_xcvr
   ad_ip_parameter util_xcvr CONFIG.TX_NUM_OF_LANES $TX_NUM_OF_LANES
   ad_ip_parameter util_xcvr CONFIG.RX_NUM_OF_LANES $RX_NUM_OF_LANES
   ad_ip_parameter util_xcvr CONFIG.LINK_MODE $ENCODER_SEL
   ad_ip_parameter util_xcvr CONFIG.TX_LANE_RATE $LANE_RATE
-  ad_ip_parameter util_xcvr CONFIG.XCVR_TYPE.VALUE_SRC USER
-  ad_ip_parameter util_xcvr CONFIG.XCVR_TYPE {9}
 
   ad_ip_instance axi_adxcvr axi_xcvr
   ad_ip_parameter axi_xcvr CONFIG.ID 0
@@ -83,12 +85,9 @@ proc create_jesd_exerciser { \
   ad_ip_parameter axi_xcvr CONFIG.NUM_OF_LANES $NUM_OF_LANES
   ad_ip_parameter axi_xcvr CONFIG.TX_OR_RX_N $TX_OR_RX_N
   ad_ip_parameter axi_xcvr CONFIG.QPLL_ENABLE 1
-  ad_ip_parameter axi_xcvr CONFIG.XCVR_TYPE.VALUE_SRC USER
-  ad_ip_parameter axi_xcvr CONFIG.XCVR_TYPE {9}
 
   adi_axi_jesd204_${rxtx}_create axi_jesd $NUM_OF_LANES $NUM_LINKS $ENCODER_SEL
   ad_ip_parameter axi_jesd/${rxtx} CONFIG.TPL_DATA_PATH_WIDTH $TPL_DATAPATH_WIDTH
-
 
   adi_tpl_jesd204_${rxtx}_create ${rxtx}_tpl_core $NUM_OF_LANES \
                                                   $NUM_OF_CONVERTERS \
@@ -96,10 +95,16 @@ proc create_jesd_exerciser { \
                                                   $SAMPLE_WIDTH \
                                                   $TPL_DATAPATH_WIDTH \
                                                   $DMA_SAMPLE_WIDTH
-
   if {$TX_OR_RX_N == 0} {
     ad_ip_parameter ${rxtx}_tpl_core/adc_tpl_core CONFIG.EN_FRAME_ALIGN {0}
   }
+
+  ad_ip_instance util_${pack2} util_pack
+  ad_ip_parameter util_pack CONFIG.NUM_OF_CHANNELS $NUM_OF_CONVERTERS
+  ad_ip_parameter util_pack CONFIG.SAMPLES_PER_CHANNEL $SAMPLES_PER_CHANNEL
+  ad_ip_parameter util_pack CONFIG.SAMPLE_DATA_WIDTH $SAMPLE_WIDTH
+
+  # connections
 
   for {set i 0} {$i < $NUM_OF_LANES} {incr i} {
     ad_xcvrpll  ref_clk  util_xcvr/cpll_ref_clk_$i
@@ -114,19 +119,28 @@ proc create_jesd_exerciser { \
   ad_connect  sys_cpu_resetn util_xcvr/up_rstn
   ad_connect  sys_cpu_clk    util_xcvr/up_clk
 
-  ad_connect device_clk $tpl_core/link_clk
-
   if {$TX_OR_RX_N == 1} {
-    ad_connect tx_tpl_core/link axi_jesd/tx_data
+    ad_connect tx_tpl_core/dac_valid_0 util_pack/fifo_rd_en
     for {set i 0} {$i < $NUM_OF_CONVERTERS} {incr i} {
-      make_bd_pins_external [get_bd_pins tx_tpl_core/dac_data_$i]
+      ad_connect tx_tpl_core/dac_data_$i util_pack/fifo_rd_data_$i
+      ad_connect tx_tpl_core/dac_enable_$i util_pack/enable_$i
     }
+    ad_connect tx_tpl_core/dac_dunf util_pack/fifo_rd_underflow
+
+    ad_connect tx_tpl_core/link axi_jesd/tx_data
   } else {
+
+    ad_connect rx_tpl_core/adc_valid_0 util_pack/fifo_wr_en
+    for {set i 0} {$i < $NUM_OF_CONVERTERS} {incr i} {
+      ad_connect rx_tpl_core/adc_enable_$i util_pack/enable_$i
+      ad_connect rx_tpl_core/adc_data_$i util_pack/fifo_wr_data_$i
+    }
+    ad_connect rx_tpl_core/adc_dovf util_pack/fifo_wr_overflow
+
     ad_connect axi_jesd/rx_data_tdata  rx_tpl_core/link_data
     ad_connect axi_jesd/rx_data_tvalid rx_tpl_core/link_valid
+    ad_connect axi_jesd/rx_sof         rx_tpl_core/link_sof
   }
-
-  # connections
 
   # Workaround: ad_xcvrcon was made for a singe util_xcvr, reset it's internal counters
   global xcvr_index
@@ -141,6 +155,9 @@ proc create_jesd_exerciser { \
 
   ad_xcvrcon  util_xcvr axi_xcvr axi_jesd {} link_clk device_clk
 
+  ad_connect device_clk $tpl_core/link_clk
+  ad_connect device_clk util_pack/clk
+  ad_connect device_clk_rstgen/peripheral_reset util_pack/reset
 
   # list of peripherals to connect to the control interface
   set peripherals {axi_jesd axi_xcvr}
@@ -164,13 +181,26 @@ proc create_jesd_exerciser { \
 
   make_bd_intf_pins_external  [get_bd_intf_pins interconnect/S00_AXI]
 
+  if {$TX_OR_RX_N == 1} {
+    make_bd_intf_pins_external  [get_bd_intf_pins util_pack/s_axis]
+    set jesd_seg axi_jesd/tx_axi/s_axi/axi_lite
+    set tpl_seg tx_tpl_core/dac_tpl_core/s_axi/axi_lite
+  } else {
+    ad_ip_parameter util_pack CONFIG.INTERFACE_TYPE 0
+    make_bd_intf_pins_external  [get_bd_intf_pins util_pack/m_axis]
+    set jesd_seg axi_jesd/rx_axi/s_axi/axi_lite
+    set tpl_seg rx_tpl_core/adc_tpl_core/s_axi/axi_lite
+  }
+
+  # Assign addresses to internal peripherals
+  create_bd_addr_seg -range 64K -offset $JESD_ADDR [get_bd_addr_spaces S00_AXI_0] [get_bd_addr_segs $jesd_seg] SEG_axi_jesd
+  create_bd_addr_seg -range 64K -offset $TPL_ADDR  [get_bd_addr_spaces S00_AXI_0] [get_bd_addr_segs $tpl_seg] SEG_tpl_core
+  create_bd_addr_seg -range 64K -offset $XCVR_ADDR [get_bd_addr_spaces S00_AXI_0] [get_bd_addr_segs axi_xcvr/s_axi/axi_lite] SEG_axi_xcvr
 
   validate_bd_design
-
   save_bd_design
   close_bd_design [current_bd_design]
 
   current_bd_design [get_bd_designs $top_design]
 
 }
-

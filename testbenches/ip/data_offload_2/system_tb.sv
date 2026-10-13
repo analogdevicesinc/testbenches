@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2021 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -33,23 +33,11 @@
 // ***************************************************************************
 // ***************************************************************************
 
-
 `include "utils.svh"
 
 module system_tb();
 
-    wire init_req;
-    wire sync_ext;
-
-    `TEST_PROGRAM test(
-      .init_req (init_req),
-      .sync_ext (sync_ext),
-      .mem_rst_n (mem_rst_n)
-      );
-    test_harness `TH (
-      .init_req (init_req),
-      .sync_ext (sync_ext),
-      .mem_rst_n (mem_rst_n)
-    );
+  `TEST_PROGRAM test();
+  test_harness `TH ();
 
 endmodule

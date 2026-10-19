@@ -573,16 +573,13 @@ program test_program (
     // Step 1: Prepare lane data (apply DDR interleaving if needed)
     if (`DDR_EN == 1) begin
       // DDR: replicate hardware interleave from spi_engine_execution_shiftreg.v
-      // RTL interleaving (sdi_negedge=1): even bits from posedge captures,
-      // odd bits from negedge captures. Both shift registers lag the IDDR
-      // outputs by one edge (NBA ordering), and the interleave mux uses
-      // sdi_cap_p/n directly for the latest pair (j=0).
-      // TB arrays capture in the same order: bit [0] = last captured.
+      // RTL interleaving (sdi_negedge=0, CPOL=CPHA=0): even bits from negedge
+      // captures, odd bits from posedge captures.
       for (int lane = 0; lane < `NUM_OF_MISO; lane++) begin
         lane_data[lane] = 32'd0;
         for (int j = 0; j < 16; j++) begin
-          lane_data[lane][j*2]   = hw_captured_data_p[lane][j];
-          lane_data[lane][j*2+1] = hw_captured_data_n[lane][j];
+          lane_data[lane][j*2]   = hw_captured_data_n[lane][j];
+          lane_data[lane][j*2+1] = hw_captured_data_p[lane][j];
         end
       end
     end else begin
@@ -721,9 +718,10 @@ program test_program (
 
     // Configure the Offload module
     // Note: Lane masks are set in init() via fifo_command, not in offload sequence
-    // CPOL=0, CPHA=1: offload captures on negedge of echo_sclk
+    // DDR requires CPOL=CPHA=0; SDR captures on negedge (CPHA=1)
+    // bit offload_cpha = ~`DDR_EN & 1;
     current_ddr_en = `DDR_EN & 1;
-    spi_api.fifo_offload_command(`SET_CFG(0, 1, `DDR_EN));
+    spi_api.fifo_offload_command(`SET_CFG(0, ~`DDR_EN & 1, `DDR_EN));
     spi_api.fifo_offload_command(`INST_PRESCALE);
     spi_api.fifo_offload_command(`INST_DLENGTH);
     spi_api.fifo_offload_command(`SET_CS(8'hFE));

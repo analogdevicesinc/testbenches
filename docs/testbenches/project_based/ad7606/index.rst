@@ -48,8 +48,8 @@ Configuration files
 
 The following configuration files are available:
 
-   +-----------------------+------------------------------------------+
-   | Configuration mode    | Parameters                               |
+   +-----------------------+-------------------------------------------+
+   | Configuration mode    | Parameters                                |
    |                       +------------+---------+------+-------------+
    |                       | DEV_CONFIG | EXT_CLK | INTF | NUM_OF_SDIO |
    +=======================+============+=========+======+=============+

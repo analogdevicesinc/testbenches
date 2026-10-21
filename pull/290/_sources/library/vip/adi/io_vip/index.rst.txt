@@ -28,7 +28,7 @@ Files
      - Connects the VIP module with the interface.
    * - :git-testbenches:`library/vip/adi/io_vip/io_vip_if.sv`
      - SystemVerilog source for the VIP interface.
-   * - :git-testbenches:`library/vip/adi/io_vip/io_vip_base_pkg.sv`
+   * - :git-testbenches:`library/vip/adi/io_vip/io_vip_if_base_pkg.sv`
      - SystemVerilog source for the VIP interface base class.
    * - :git-testbenches:`library/vip/adi/io_vip/io_vip_top.v`
      - Verilog source file for the top module.

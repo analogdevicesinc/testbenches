@@ -16,8 +16,8 @@ Templates
 
 Templates are available:
 
-* :git-testbenches:`docs/projects/ip_based/template` (:ref:`rendered <ip_based_template>`).
-* :git-testbenches:`docs/projects/project_based/template` (:ref:`rendered <project_based_template>`).
+* :git-testbenches:`docs/testbenches/ip_based/template` (:ref:`rendered <ip_based_template>`).
+* :git-testbenches:`docs/testbenches/project_based/template` (:ref:`rendered <project_based_template>`).
 
 Remove the ``:orphan:`` in the first line, it is to hide the templates from the
 `TOC tree <https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-toctree>`_,

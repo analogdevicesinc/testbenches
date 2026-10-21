@@ -1,5 +1,6 @@
 runs/
 results/
+sim_build*/
 *.log
 *.pb
 ipcache
@@ -106,6 +107,7 @@ tmp-clearbox
 *.bin
 __pycache__
 _build
+*.egg-info
 .qsys_edit
 .github/CODEOWNERS
 .github/PULL_REQUEST_TEMPLATE.md

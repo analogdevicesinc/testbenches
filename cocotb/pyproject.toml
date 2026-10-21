@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spi-engine-cocotb-framework"
+version = "0.1.0"
+description = "Reusable cocotb verification framework for ADI IP testbenches"
+requires-python = ">=3.10"
+
+[project.scripts]
+view_waveform = "framework.view_waveform:main"
+
+[tool.setuptools]
+packages = ["framework", "framework.spi", "framework.sweep"]

@@ -117,8 +117,10 @@ localparam  I3C_CCC_CMD_RSTDAA = {3'b100, 12'd0, 7'b0, 1'b0};
 localparam  I3C_CCC_CMD_DISEC  = {3'b100, 12'd1, 7'b0, 1'b0};
 // CCC, length 0
 localparam I3C_CCC_CMD_ENTDAA  = {3'b100, 12'd0, 7'b0, 1'b0};
-// Target Reset Pattern
-localparam I3C_CMD_TRP = {1'b1, 23'd0};
+// Bus pattern, command 1 selects the pattern type
+localparam I3C_CMD_PATTERN      = {1'b1, 23'd0};
+localparam I3C_PATTERN_TRP      = 32'd0;
+localparam I3C_PATTERN_HDR_EXIT = 32'd1;
 // Wrong DA, CCC read 6 bytes
 localparam I3C_CMD_GETPID_UDA  = {3'b100, 12'd6,   START_DA[6:0], 1'b1};
 // CCC read 6 bytes
@@ -304,7 +306,7 @@ initial begin
 
   ccc_i3c_test();
 
-  trp_i3c_test();
+  pattern_i3c_test();
 
   priv_i3c_test();
 
@@ -385,8 +387,37 @@ task ccc_i3c_test;
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 0)
+  if (cmdr_fifo_data[19:8] != 0) begin
     `FATAL(("CMD -> CMDR read length test FAILED"));
+  end
+
+  // Test #1b, RSTACT CCC followed by the Target Reset Pattern.
+  `INFO(("CCC I3C Test #1b"), ADI_VERBOSITY_LOW);
+  if (i3c_scl !== 1'b1 || `DUT_I3C_BIT_MOD.t !== 1'b1) begin
+    `FATAL(("RSTACT must begin from the released bus state"));
+  end
+
+  queue_rstact(7'd0, 1'b0);
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_MSG_TX, 100000);
+  if (`DUT_I3C_WORD.cmdw_body !== 8'h01) begin
+    `FATAL(("RSTACT Defining Byte was not transmitted"));
+  end
+  pattern(1'b0, 1'b0, 1);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+
+  // Test #1c, Direct Write RSTACT targets one attached I3C device.
+  `INFO(("CCC I3C Test #1c"), ADI_VERBOSITY_LOW);
+  queue_rstact(DEVICE_DA1, 1'b0);
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_TARGET_ADDR_PP, 100000);
+  if (`DUT_I3C_WORD.cmdw_body !== {DEVICE_DA1[6:0], 1'b0}) begin
+    `FATAL(("Direct RSTACT targeted the wrong device"));
+  end
+  `WAIT (`DUT_I3C_WORD.st == `CMDW_MSG_TX, 100000);
+  if (`DUT_I3C_WORD.cmdw_body !== 8'h01) begin
+    `FATAL(("Direct RSTACT Defining Byte was not transmitted"));
+  end
+  pattern(1'b0, 1'b0, 1);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
 
   // Test #2, CCC with length 1 write payload
   `INFO(("CCC I3C Test #2"), ADI_VERBOSITY_LOW);
@@ -397,8 +428,9 @@ task ccc_i3c_test;
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 1)
+  if (cmdr_fifo_data[19:8] != 1) begin
     `FATAL(("CMD -> CMDR write length test FAILED"));
+  end
 
   // Test #3, CCC with length 6 read payload but DA is unknown
   `INFO(("CCC I3C Test #3"), ADI_VERBOSITY_LOW);
@@ -408,8 +440,9 @@ task ccc_i3c_test;
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[23:20] != 8)
+  if (cmdr_fifo_data[23:20] != 8) begin
     `FATAL(("#4: CMD -> CMDR UDA_ERROR assertion FAILED"));
+  end
 
   // Test #4, CCC with length 6 read payload, DA is known
   `INFO(("CCC I3C Test #4"), ADI_VERBOSITY_LOW);
@@ -427,8 +460,9 @@ task ccc_i3c_test;
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 6)
+  if (cmdr_fifo_data[19:8] != 6) begin
     `FATAL(("CMD -> CMDR read length test FAILED"));
+  end
 
   // Test #5, CCC with length 1 read payload, DA is known
   `INFO(("CCC I3C Test #5"), ADI_VERBOSITY_LOW);
@@ -444,8 +478,9 @@ task ccc_i3c_test;
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 1)
+  if (cmdr_fifo_data[19:8] != 1) begin
     `FATAL(("CMD -> CMDR read length test FAILED"));
+  end
   // Mask CMDR interrupt
   i3c_controller.set_irq_mask(
     .daa_pending(1'b0),
@@ -461,22 +496,32 @@ task ccc_i3c_test;
 endtask
 
 //---------------------------------------------------------------------------
-// Target Reset Pattern I3C Test
+// Bus Patterns I3C Test
 //---------------------------------------------------------------------------
 typedef struct {
   time t;
   bit  scl;
   bit  sda;
   bit  pp;
-} trp_level_t;
+} pattern_level_t;
 
-task check_trp(input bit held);
-  trp_level_t q[$];
+// Check the bus levels of the Target Reset Pattern (TRP) or the HDR Exit
+// Pattern, started from a held or released bus.
+task check_pattern(input bit hdr_exit, input bit held);
+  pattern_level_t q[$];
+  string name;
+  int toggles;
   bit scl, sda;
+  bit scl_e, sda_e;
+
+  q.delete();
+  name = hdr_exit ? "HDR Exit" : "TRP";
+  // Levels while SCL is Low, the first is the SDA High setup.
+  toggles = hdr_exit ? 8 : 15;
 
   `WAIT (`DUT_I3C_CORE.trp_hold == 1'b1, 1000000);
   if (`DUT_I3C_BIT_MOD.nop !== ~held) begin
-    `FATAL(("TRP did not start from a %s bus", held ? "held" : "released"));
+    `FATAL(("%s did not start from a %s bus", name, held ? "held" : "released"));
   end
   while (1) begin
     #1ps;
@@ -491,22 +536,26 @@ task check_trp(input bit held);
     @(i3c_scl, i3c_sda, `DUT_I3C_CORE.trp_hold);
   end
   if (!scl || !sda) begin
-    `FATAL(("TRP did not release the bus"));
+    `FATAL(("%s did not release the bus", name));
   end
 
-  if (q.size() != 18) begin
-    `FATAL(("TRP has %0d bus levels, expected 18", q.size()));
+  // TRP: Sr and STOP, HDR Exit: STOP (push-pull).
+  if (q.size() != toggles + (hdr_exit ? 2 : 3)) begin
+    `FATAL(("%s has %0d bus levels, expected %0d", name, q.size(),
+            toggles + (hdr_exit ? 2 : 3)));
   end
   foreach (q[i]) begin
-    if (q[i].scl != (i >= 15) || q[i].sda != (i < 15 ? i % 2 == 0 : i != 16)) begin
-      `FATAL(("TRP level %0d is SCL %b SDA %b", i, q[i].scl, q[i].sda));
+    scl_e = i >= toggles;
+    sda_e = i < toggles ? i % 2 == 0 : (hdr_exit ? i != toggles : i != toggles + 1);
+    if (q[i].scl != scl_e || q[i].sda != sda_e) begin
+      `FATAL(("%s level %0d is SCL %b SDA %b", name, i, q[i].scl, q[i].sda));
     end
-    if (i < 15 && !q[i].pp) begin
-      `FATAL(("TRP level %0d is not push-pull", i));
+    if ((hdr_exit || i < toggles) && !q[i].pp) begin
+      `FATAL(("%s level %0d is not push-pull", name, i));
     end
     // tDIG_H, the last level is cut by the release of the bus.
-    if (i < 17 && q[i+1].t - q[i].t < 32) begin
-      `FATAL(("TRP level %0d lasted %0t", i, q[i+1].t - q[i].t));
+    if (i < q.size() - 1 && q[i+1].t - q[i].t < 32) begin
+      `FATAL(("%s level %0d lasted %0t", name, i, q[i+1].t - q[i].t));
     end
   end
 endtask
@@ -519,63 +568,73 @@ task queue_rstact(input bit [6:0] da, input bit sr);
   i3c_controller.set_cmd_fifo(da ? I3C_CCC_RSTACT_DIRECT : I3C_CCC_RSTACT_BCAST);
 endtask
 
-// Queue the TRP after the RSTACT CCCs, and check.
-task trp(input bit held, input int rstacts);
+// Queue the bus pattern instruction.
+task queue_pattern(input bit hdr_exit);
+  i3c_controller.set_cmd_fifo(I3C_CMD_PATTERN);
+  i3c_controller.set_cmd_fifo(hdr_exit ? I3C_PATTERN_HDR_EXIT : I3C_PATTERN_TRP);
+endtask
+
+// Queue the pattern after the queued RSTACT CCCs, and check.
+task pattern(input bit hdr_exit, input bit held, input int rstacts);
   fork
-    check_trp(held);
-    i3c_controller.set_cmd_fifo(I3C_CMD_TRP);
+    check_pattern(hdr_exit, held);
+    queue_pattern(hdr_exit);
   join
   for (int i = 0; i <= rstacts; i++) begin
     `WAIT (`DUT_I3C_REGMAP.cmdr_fifo_valid == 1'b1, 1000000);
     i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
     print_cmdr (cmdr_fifo_data);
     if (cmdr_fifo_data[23:20] != 0 || cmdr_fifo_data[19:8] != (i < rstacts)) begin
-      `FATAL(("TRP receipt %0d FAILED", i));
+      `FATAL(("Pattern receipt %0d FAILED", i));
     end
   end
 endtask
 
-task trp_i3c_test();
-  `INFO(("TRP I3C Started"), ADI_VERBOSITY_LOW);
+task pattern_i3c_test();
+  `INFO(("Bus Patterns I3C Started"), ADI_VERBOSITY_LOW);
 
   set_auto_ack(1);
 
-  // Test #1, standalone, targets do the default reset action.
-  `INFO(("TRP I3C Test #1"), ADI_VERBOSITY_LOW);
-  trp(1'b0, 0);
+  // Test #1, standalone TRP, targets do the default reset action.
+  `INFO(("Bus Patterns I3C Test #1"), ADI_VERBOSITY_LOW);
+  pattern(1'b0, 1'b0, 0);
 
-  // Test #2, after a broadcast RSTACT.
-  `INFO(("TRP I3C Test #2"), ADI_VERBOSITY_LOW);
-  queue_rstact(7'd0, 1'b0);
-  trp(1'b0, 1);
-
-  // Test #3, after direct RSTACTs to multiple targets, from a released bus.
-  `INFO(("TRP I3C Test #3"), ADI_VERBOSITY_LOW);
+  // Test #2, TRP after direct RSTACTs to multiple targets, from a released bus.
+  `INFO(("Bus Patterns I3C Test #2"), ADI_VERBOSITY_LOW);
   queue_rstact(DEVICE_DA1, 1'b1);
   queue_rstact(DEVICE_DA2, 1'b0);
-  trp(1'b0, 2);
+  pattern(1'b0, 1'b0, 2);
 
-  // Test #4, same, from the bus held by the last RSTACT with Sr.
-  `INFO(("TRP I3C Test #4"), ADI_VERBOSITY_LOW);
+  // Test #3, same, from the bus held by the last RSTACT with Sr.
+  `INFO(("Bus Patterns I3C Test #3"), ADI_VERBOSITY_LOW);
   queue_rstact(DEVICE_DA1, 1'b1);
   queue_rstact(DEVICE_DA2, 1'b1);
-  trp(1'b1, 2);
+  pattern(1'b0, 1'b1, 2);
 
-  // Test #5, the next transfer begins with a START (the Sr is cleared).
-  `INFO(("TRP I3C Test #5"), ADI_VERBOSITY_LOW);
+  // Test #4, standalone HDR Exit Pattern.
+  `INFO(("Bus Patterns I3C Test #4"), ADI_VERBOSITY_LOW);
+  pattern(1'b1, 1'b0, 0);
+
+  // Test #5, HDR Exit Pattern from the bus held by a CCC with Sr.
+  `INFO(("Bus Patterns I3C Test #5"), ADI_VERBOSITY_LOW);
+  queue_rstact(7'd0, 1'b1);
+  pattern(1'b1, 1'b1, 1);
+
+  // Test #6, the next transfer begins with a START (the Sr is cleared).
+  `INFO(("Bus Patterns I3C Test #6"), ADI_VERBOSITY_LOW);
   i3c_controller.set_cmd_fifo(I3C_CCC_CMD_RSTDAA);
   i3c_controller.set_cmd_fifo(I3C_CCC_RSTDAA);
   `WAIT (`DUT_I3C_WORD.st != `CMDW_NOP, 1000000);
   if (`DUT_I3C_WORD.st !== `CMDW_START) begin
-    `FATAL(("Transfer after TRP did not begin with a START"));
+    `FATAL(("Transfer after the pattern did not begin with a START"));
   end
   `WAIT (`DUT_I3C_REGMAP.cmdr_fifo_valid == 1'b1, 1000000);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   if (cmdr_fifo_data[23:20] != 0) begin
-    `FATAL(("Transfer after TRP FAILED"));
+    `FATAL(("Transfer after the pattern FAILED"));
   end
 
-  `INFO(("TRP I3C Test Done"), ADI_VERBOSITY_LOW);
+  `INFO(("Bus Patterns I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask
 
 //---------------------------------------------------------------------------
@@ -699,49 +758,61 @@ task priv_i3c_test();
 
   // Read Results
 
-  if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_CMDR_PENDING])
+  if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_CMDR_PENDING]) begin
     `FATAL(("#0: IRQ CMDR FAILED"));
+  end
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8]) // Wrote all bytes
+  if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8]) begin // Wrote all bytes
     `FATAL(("#1: CMD -> CMDR write length test FAILED"));
-  if (cmdr_fifo_data[23:20] != 0)
+  end
+  if (cmdr_fifo_data[23:20] != 0) begin
     `FATAL(("#1: CMD -> CMDR NO_ERROR assertion FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != I3C_CMD_3[19:8]) // Read all bytes
+  if (cmdr_fifo_data[19:8] != I3C_CMD_3[19:8]) begin // Read all bytes
     `FATAL(("#2: CMD -> CMDR read length test FAILED"));
-  if (cmdr_fifo_data[23:20] != 0)
+  end
+  if (cmdr_fifo_data[23:20] != 0) begin
     `FATAL(("#2: CMD -> CMDR NO_ERROR assertion FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 1) // Read one byte
+  if (cmdr_fifo_data[19:8] != 1) begin // Read one byte
     `FATAL(("#3: CMD -> CMDR read length test FAILED"));
-  if (cmdr_fifo_data[23:20] != 6)
+  end
+  if (cmdr_fifo_data[23:20] != 6) begin
     `FATAL(("#3: CMD -> CMDR NACK_RESP assertion FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[23:20] != 8)
+  if (cmdr_fifo_data[23:20] != 8) begin
     `FATAL(("#4: CMD -> CMDR UDA_ERROR assertion FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 0) // Wrote no bytes
+  if (cmdr_fifo_data[19:8] != 0) begin // Wrote no bytes
     `FATAL(("#5: CMD -> CMDR write length test FAILED"));
-  if (cmdr_fifo_data[23:20] != 4)
+  end
+  if (cmdr_fifo_data[23:20] != 4) begin
     `FATAL(("#5: CMD -> CMDR CEO_ERROR assertion FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != I3C_CMD_5[19:8]) // Read all bytes
+  if (cmdr_fifo_data[19:8] != I3C_CMD_5[19:8]) begin // Read all bytes
     `FATAL(("#6: CMD -> CMDR read length test FAILED"));
-  if (cmdr_fifo_data[23:20] != 0)
+  end
+  if (cmdr_fifo_data[23:20] != 0) begin
     `FATAL(("#6: CMD -> CMDR NO_ERROR assertion FAILED"));
+  end
 
   // Mask CMDR interrupt
   i3c_controller.set_irq_mask(
@@ -790,8 +861,9 @@ task priv_i2c_test();
   i3c_controller.set_cmd_fifo(I2C_CMD_2);
   wait (`DUT_I3C_BIT_MOD.nop == 0);
   // Assert is in I²C mode
-  if (`DUT_I3C_BIT_MOD.i2c_mode !== 1)
-   `ERROR(("Not in I2C mode!"));
+  if (`DUT_I3C_BIT_MOD.i2c_mode !== 1) begin
+    `ERROR(("Not in I2C mode!"));
+  end
   // Dummy HIGH peripheral write
   wait (`DUT_I3C_WORD.st == `CMDW_I2C_RX);
   set_auto_ack(0);
@@ -817,8 +889,9 @@ task priv_i2c_test();
   // Wait a while to write second payload, stalling the bus
   wait (`DUT_I3C_BIT_MOD.sm == 1);
   #10000ns;
-  if (i3c_scl !== 0)
+  if (i3c_scl !== 0) begin
     `FATAL(("Bus is not stalled (SCL != 0)"));
+  end
   i3c_controller.write_sdo_fifo_data_32_bit(32'h0000_00DE);
   wait (`DUT_I3C_BIT_MOD.nop == 1);
 
@@ -836,31 +909,37 @@ task priv_i2c_test();
 
   // Read Results
 
-  if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_CMDR_PENDING])
+  if (~`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_CMDR_PENDING]) begin
     `FATAL(("#0: IRQ CMDR FAILED"));
+  end
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != I2C_CMD_1[19:8]) // Wrote all bytes
+  if (cmdr_fifo_data[19:8] != I2C_CMD_1[19:8]) begin // Wrote all bytes
     `FATAL(("#1: CMD -> CMDR write length test FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[23:20] == 4'd1)
+  if (cmdr_fifo_data[23:20] == 4'd1) begin
     `FATAL(("#2: CMD -> CMDR CE0_ERROR check FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 12'd6) // Wrote 6 bytes
+  if (cmdr_fifo_data[19:8] != 12'd6) begin // Wrote 6 bytes
     `FATAL(("#3: CMD -> CMDR write length test FAILED"));
+  end
 
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != 12'd0) // Wrote 0 bytes
+  if (cmdr_fifo_data[19:8] != 12'd0) begin // Wrote 0 bytes
     `ERROR(("#4: CMD -> CMDR write length test FAILED"));
-  if (cmdr_fifo_data[23:20] != 4'd6)
+  end
+  if (cmdr_fifo_data[23:20] != 4'd6) begin
     `ERROR(("#4: CMD -> CMDR NACK_RESP check FAILED"));
+  end
 
   // Mask CMDR interrupt
   i3c_controller.set_irq_mask(
@@ -919,8 +998,9 @@ task ibi_i3c_test();
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
   i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi(ibi_fifo_data);
-  if (ibi_fifo_data[23:17] != DEVICE_DA1)
+  if (ibi_fifo_data[23:17] != DEVICE_DA1) begin
     `FATAL(("Wrong IBI DA"));
+  end
 
   // Test #2, peripheral does an IBI request by sending its DA during broadcast
   // address.
@@ -945,15 +1025,17 @@ task ibi_i3c_test();
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
   i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi (ibi_fifo_data);
-  if (ibi_fifo_data[23:17] != DEVICE_DA1)
+  if (ibi_fifo_data[23:17] != DEVICE_DA1) begin
     `FATAL(("Wrong IBI DA"));
+  end
 
   wait (i3c_irq); // cmdr_irq
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8])
+  if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8]) begin
     `FATAL(("CMD transfer after resolving IBI FAILED"));
+  end
 
   // Test #3, peripheral does IBI request by pulling SDA low,
   // but the DA is unkown.
@@ -965,8 +1047,9 @@ task ibi_i3c_test();
   write_ibi_da(START_DA);
 
   #10000ns;
-  if (`DUT_I3C_REGMAP.ibi_fifo_valid)
+  if (`DUT_I3C_REGMAP.ibi_fifo_valid) begin
     `FATAL(("IBI should not have thrown IBI"));
+  end
 
   // Test #4, peripheral does an IBI request by sending its DA during broadcast
   // address, but the DA is unknown
@@ -991,10 +1074,12 @@ task ibi_i3c_test();
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   print_cmdr (cmdr_fifo_data);
-  if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8])
+  if (cmdr_fifo_data[19:8] != I3C_CMD_1[19:8]) begin
     `FATAL(("CMD transfer after resolving IBI FAILED"));
-  if (`DUT_I3C_REGMAP.ibi_fifo_valid)
+  end
+  if (`DUT_I3C_REGMAP.ibi_fifo_valid) begin
     `FATAL(("IBI should not throwed IBI"));
+  end
 
   // Test #5, peripheral does IBI request by pulling SDA low, DA is known but
   // BCR[2] is Low (no following MDB)
@@ -1010,8 +1095,9 @@ task ibi_i3c_test();
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING);
   i3c_controller.read_ibi_fifo(ibi_fifo_data);
   print_ibi(ibi_fifo_data);
-  if (ibi_fifo_data[23:17] != DEVICE_DA1+1)
+  if (ibi_fifo_data[23:17] != DEVICE_DA1+1) begin
     `FATAL(("Wrong IBI DA"));
+  end
 
   // Test #6, peripheral does IBI request by pulling SDA low, but
   // IBI is disabled while listening to them.
@@ -1029,8 +1115,9 @@ task ibi_i3c_test();
   write_ibi_da(DEVICE_DA1+1);
 
   #10000ns;
-  if (`DUT_I3C_REGMAP.ibi_fifo_valid)
+  if (`DUT_I3C_REGMAP.ibi_fifo_valid) begin
     `FATAL(("IBI should not have thrown IBI"));
+  end
 
   // Test #7, peripheral does IBI request by pulling SDA low right after a
   // transfer, before the bus available condition, and a TRP is queued.
@@ -1046,19 +1133,21 @@ task ibi_i3c_test();
   set_auto_ack(1);
   i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
   i3c_controller.set_cmd_fifo(I3C_CMD_1);
+  // The pattern type (command 1) is queued with the IBI request.
+  i3c_controller.set_cmd_fifo(I3C_CMD_PATTERN);
   `WAIT (`STOP, 1000000);
   `WAIT (`DUT_I3C_BIT_MOD.nop == 1'b1, 1000000);
   set_auto_ack(0);
   fork
     write_ibi_da(DEVICE_DA1+1);
-    i3c_controller.set_cmd_fifo(I3C_CMD_TRP);
+    i3c_controller.set_cmd_fifo(I3C_PATTERN_TRP);
     begin
       `WAIT (`DUT_I3C_FRAMING.ibi_requested_auto == 1'b1, 1000000);
       if (!`DUT_I3C_FRAMING.cmdp_valid || !`DUT_I3C_FRAMING.cmdp_trp) begin
         `FATAL(("TRP was not pending when the IBI was served"));
       end
     end
-    check_trp(1'b0);
+    check_pattern(1'b0, 1'b0);
   join
 
   // The IBI is served before the TRP.
@@ -1119,8 +1208,9 @@ task daa_i3c_test();
     .cmdr_almost_full(1'b0),
     .cmd_almost_empty(1'b0));
 
-  if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level)
+  if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level) begin
     `FATAL(("SDI FIFO must be empty for the DAA procedure"));
+  end
 
   set_auto_ack(1);
   // Disable IBI
@@ -1143,12 +1233,14 @@ task daa_i3c_test();
   `INFO(("GOT DAA IRQ"), ADI_VERBOSITY_LOW);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
-  if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
+  if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2) begin
     `FATAL(("Wrong SDI FIFO level"));
+  end
   i3c_controller.read_sdi_fifo(sdi_fifo_data);
   i3c_controller.read_sdi_fifo(sdi_fifo_data);
-  if (`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_DAA_PENDING])
+  if (`DUT_I3C_REGMAP.up_irq_pending[`I3C_REGMAP_IRQ_DAA_PENDING]) begin
     `FATAL(("DAA IRQ should have been cleared"));
+  end
   `INFO(("Writing DA 1"), ADI_VERBOSITY_LOW);
   i3c_controller.write_sdo_fifo_data_4_byte(
     .data0({DEVICE_DA1, ~^DEVICE_DA1[6:0]}),
@@ -1164,8 +1256,9 @@ task daa_i3c_test();
   #10000ns
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_DAA_PENDING);
   // Assert 2x32-bit in SDI FIFO (PID+BCR+DCR)
-  if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2)
+  if (`DUT_I3C_REGMAP.i_sdi_fifo.m_axis_level != 2) begin
     `FATAL(("Wrong SDI FIFO level"));
+  end
   dev_char_state <= 1'b1;
   i3c_controller.read_sdi_fifo(sdi_fifo_data);
   i3c_controller.read_sdi_fifo(sdi_fifo_data);
@@ -1253,8 +1346,9 @@ task dev_char_i3c_test();
     .is_i2c(1'b0));
   i3c_controller.read_dev_char(dev_char_data);
   `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_LOW);
-  if (dev_char_data[3:0] != dev_char_0 || dev_char_data[15:9] != DEVICE_DA1)
+  if (dev_char_data[3:0] != dev_char_0 || dev_char_data[15:9] != DEVICE_DA1) begin
     `FATAL(("DEV_CHAR_0 FAILED"));
+  end
   // Read second and check value
   i3c_controller.set_dev_char(
     .addr(DEVICE_DA2),
@@ -1265,8 +1359,9 @@ task dev_char_i3c_test();
     .is_i2c(1'b0));
   i3c_controller.read_dev_char(dev_char_data);
   `INFO(("[%t] Got DEV_CHAR_0 %h", $time, dev_char_data), ADI_VERBOSITY_LOW);
-  if (dev_char_data[3:0] != dev_char_1 || dev_char_data[15:9] != DEVICE_DA2)
+  if (dev_char_data[3:0] != dev_char_1 || dev_char_data[15:9] != DEVICE_DA2) begin
     `FATAL(("DEV_CHAR_0 FAILED"));
+  end
 
   `INFO(("Device Characteristics I3C Test Done"), ADI_VERBOSITY_LOW);
 endtask

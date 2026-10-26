@@ -63,6 +63,7 @@ ad_connect i3c/offload_sdi offload_sdi
 ad_connect offload_trigger i3c/trigger
 
 ad_connect sys_cpu_clk i3c/clk
+ad_connect sys_cpu_clk i3c/s_axi_aclk
 ad_connect sys_cpu_resetn i3c/reset_n
 
 ad_cpu_interconnect 0x44a00000 i3c/host_interface

@@ -134,6 +134,7 @@ adi_sim_add_define "RX_OFFLOAD_BA=[format "%d" ${RX_OFFLOAD}]"
 set TX_OFFLOAD 0x7C440000
 set_property offset $TX_OFFLOAD [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_mxfe_tx_data_offload}]
 adi_sim_add_define "TX_OFFLOAD_BA=[format "%d" ${TX_OFFLOAD}]"
+adi_sim_add_define "DAC_OFFLOAD_SIZE=$dac_data_offload_size"
 
 set TDD 0x7C460000
 adi_sim_add_define "TDD_BA=[format "%d" ${TDD}]"

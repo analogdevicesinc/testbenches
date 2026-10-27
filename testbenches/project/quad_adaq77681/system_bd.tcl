@@ -60,9 +60,6 @@ ad_cpu_interconnect 0x44c00000 quad_adaq77681_trigger_gen
 ad_ip_instance adi_spi_vip spi_s_vip $ad_project_params(spi_s_vip_cfg)
 adi_sim_add_define "SPI_S=spi_s_vip"
 
-# Create a new interface with Monitor mode
-create_bd_intf_port -mode Monitor -vlnv analog.com:interface:spi_engine_rtl:1.0 quad_adaq77681_spi_vip
-
 # it is necessary to remove the connection with the input ports quad_ada77681_drdy
 ad_disconnect quad_adaq77681_drdy drdy_buf/Op1
 ad_connect  concat_spi_trigger/In3   quad_adaq77681_trigger_gen/pwm_0
@@ -75,7 +72,6 @@ ad_connect  concat_spi_trigger/dout  drdy_buf/Op1
 # it is necessary to remove the connection with the master interface of the quad_ada77681_bd
 ad_disconnect quad_adaq77681_spi quad_adaq77681/m_spi
 ad_connect spi_s_vip/s_spi quad_adaq77681/m_spi
-ad_connect quad_adaq77681_spi_vip quad_adaq77681/m_spi
 
 create_bd_port -dir O quad_adaq77681_spi_vip_clk
 create_bd_port -dir O quad_adaq77681_irq

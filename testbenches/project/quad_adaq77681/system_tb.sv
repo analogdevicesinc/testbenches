@@ -45,11 +45,6 @@ module system_tb();
     .quad_adaq77681_irq(quad_adaq77681_irq));
 
   test_harness `TH (
-    .quad_adaq77681_spi_vip_clk(),
-    .quad_adaq77681_spi_vip_sclk(),
-    .quad_adaq77681_spi_vip_cs(),
-    .quad_adaq77681_spi_vip_sdi(),
-    .quad_adaq77681_spi_vip_sdo(),
     .quad_adaq77681_irq(quad_adaq77681_irq));
 
 endmodule

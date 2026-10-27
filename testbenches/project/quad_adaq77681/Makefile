@@ -18,6 +18,7 @@ SV_DEPS += spi_environment.sv
 
 LIB_DEPS += axi_clkgen
 LIB_DEPS += axi_dmac
+LIB_DEPS += axi_pwm_gen
 LIB_DEPS += spi_engine/axi_spi_engine
 LIB_DEPS += spi_engine/spi_engine_execution
 LIB_DEPS += spi_engine/spi_engine_interconnect

@@ -41,6 +41,12 @@ import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
 import environment_pkg::*;
 import watchdog_pkg::*;
+import adi_axis_packet_pkg::*;
+import m_axis_sequencer_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
+import adi_axis_rand_obj_pkg::*;
+import status_signals_asym_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -48,7 +54,7 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 import `PKGIFY(test_harness, input_axis)::*;
 import `PKGIFY(test_harness, output_axis)::*;
 
-program test_program ();
+module test_program ();
 
   timeunit 1ns;
   timeprecision 1ps;
@@ -62,6 +68,14 @@ program test_program ();
   util_axis_fifo_environment #(`AXIS_VIP_PARAMS(test_harness, input_axis), `AXIS_VIP_PARAMS(test_harness, output_axis), `INPUT_CLK, `OUTPUT_CLK) uaf_env;
 
   watchdog send_data_wd;
+
+  adi_axis_config axis_cfg;
+  adi_axis_rand_config axis_rand_cfg;
+  adi_axis_rand_obj axis_rand_obj;
+
+  adi_axis_packet axis_packet;
+
+  status_signals_asym status_signals_obj;
 
   initial begin
 
@@ -87,6 +101,20 @@ program test_program ();
                   `TH.`INPUT_AXIS.inst.IF,
                   `TH.`OUTPUT_AXIS.inst.IF);
 
+    status_signals_obj = new(
+      .name("Util AXIS FIFO Status Signals Verification"),
+      .async(`ASYNC_CLK),
+      .address(`ADDRESS_WIDTH),
+      .almost_empty(`ALMOST_EMPTY_THRESHOLD),
+      .almost_full(`ALMOST_FULL_THRESHOLD),
+      .input_width(`INPUT_WIDTH),
+      .output_width(`OUTPUT_WIDTH),
+      .reduced_fifo(`REDUCED_FIFO),
+      .master_status_signals_vip_if(`TH.`MASTER_STATUS_SIGNALS.inst.inst.IF.vif),
+      .slave_status_signals_vip_if(`TH.`SLAVE_STATUS_SIGNALS.inst.inst.IF.vif),
+      .master_control_signals_vip_if(`TH.`MASTER_CONTROL_SIGNALS.inst.inst.IF.vif),
+      .slave_control_signals_vip_if(`TH.`SLAVE_CONTROL_SIGNALS.inst.inst.IF.vif));
+
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
@@ -95,43 +123,62 @@ program test_program ();
     base_env.sys_reset();
 
     uaf_env.configure();
-    uaf_env.input_axis_agent.master_sequencer.set_keep_some();
 
     uaf_env.run();
 
-    send_data_wd = new("Util AXIS FIFO Watchdog", 500000, "Send data");
+    status_signals_obj.start();
 
+    send_data_wd = new("Util AXIS FIFO Asym Watchdog", 10**6 * 2, "Send data");
+
+    // stop the integrated watchdog, as this testbench has another watchdog that is better suited for this test
+    base_env.simulation_watchdog.stop();
     send_data_wd.start();
 
-    uaf_env.input_axis_agent.master_sequencer.start();
+    axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, input_axis));
+    axis_rand_cfg = new();
+    axis_rand_obj = new();
+
+    axis_rand_cfg.randomize_configuration();
 
     // stimulus
-    repeat($urandom_range(5,10)) begin
+    repeat($urandom_range(5, 10)) begin
       send_data_wd.reset();
 
-      if ((!`TKEEP_EN || !`TLAST_EN) && `INPUT_WIDTH < `OUTPUT_WIDTH) begin
-        repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_sample_count($urandom_range(1,128)*`OUTPUT_WIDTH/`INPUT_WIDTH, `TLAST_EN, 0);
-        end
+      // if (test_harness_input_axis_0_VIP_HAS_TLAST && test_harness_input_axis_0_VIP_HAS_TKEEP && test_harness_input_axis_0_VIP_DATA_WIDTH >= test_harness_output_axis_0_VIP_DATA_WIDTH) begin
+      if (test_harness_input_axis_0_VIP_HAS_TLAST && test_harness_input_axis_0_VIP_HAS_TKEEP) begin
+        axis_packet = new(
+          .transactions_per_packet($urandom_range(1, 20)),
+          .cfg(axis_cfg),
+          .rand_cfg(adi_axis_rand_config'(axis_rand_cfg.clone())),
+          .rand_obj(adi_axis_rand_obj'(axis_rand_obj.clone())));
       end else begin
-        repeat($urandom_range(1,5)) begin
-          uaf_env.input_axis_agent.master_sequencer.add_xfer_descriptor_byte_count($urandom_range(1,1024), `TLAST_EN, 0);
-        end
+        axis_packet = new(
+          .transactions_per_packet(`MAX(test_harness_input_axis_0_VIP_DATA_WIDTH, test_harness_output_axis_0_VIP_DATA_WIDTH) / `MIN(test_harness_input_axis_0_VIP_DATA_WIDTH, test_harness_output_axis_0_VIP_DATA_WIDTH) * $urandom_range(1, 5)),
+          .cfg(axis_cfg),
+          .rand_cfg(adi_axis_rand_config'(axis_rand_cfg.clone())),
+          .rand_obj(adi_axis_rand_obj'(axis_rand_obj.clone())));
       end
 
-      #($urandom_range(1,10)*1us);
+      repeat($urandom_range(1, 2)) begin
+        axis_packet.randomize_packet();
 
-      uaf_env.input_axis_agent.master_sequencer.clear_descriptor_queue();
-      uaf_env.input_axis_agent.master_sequencer.wait_empty_descriptor_queue();
+        uaf_env.input_axis_agent.master_sequencer.add_packet(axis_packet);
+      end
+
+      #($urandom_range(1, 10)*1us);
+
+      uaf_env.input_axis_agent.master_sequencer.clear_sequences();
+      uaf_env.input_axis_agent.master_sequencer.wait_empty_sequences();
+      uaf_env.input_axis_agent.master_sequencer.sequence_sent();
 
       uaf_env.scoreboard_inst.wait_until_complete();
 
       `INFO(("Packet finished."), ADI_VERBOSITY_LOW);
     end
 
-    send_data_wd.stop();
+    status_signals_obj.wait_triggers();
 
-    #100ns;
+    send_data_wd.stop();
 
     uaf_env.stop();
     base_env.stop();
@@ -141,4 +188,4 @@ program test_program ();
 
   end
 
-endprogram
+endmodule

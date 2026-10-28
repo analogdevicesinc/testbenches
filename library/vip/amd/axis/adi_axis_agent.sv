@@ -39,8 +39,8 @@
 package adi_axis_agent_pkg;
 
   import logger_pkg::*;
-  import adi_vip_pkg::*;
   import adi_environment_pkg::*;
+  import adi_agent_pkg::*;
   import axi4stream_vip_pkg::*;
   import m_axis_sequencer_pkg::*;
   import s_axis_sequencer_pkg::*;

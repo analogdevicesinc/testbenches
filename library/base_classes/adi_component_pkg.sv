@@ -35,19 +35,18 @@
 
 `include "utils.svh"
 
-package adi_environment_pkg;
+package adi_component_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_environment_pkg::*;
+  import adi_reporter_pkg::*;
 
-  class adi_environment extends adi_component;
+  class adi_component extends adi_reporter;
     function new(
       input string name,
-      input adi_environment parent = null);
+      input adi_component parent = null);
 
       super.new(name, parent);
     endfunction: new
-  endclass: adi_environment
+  endclass: adi_component
 
-endpackage: adi_environment_pkg
+endpackage: adi_component_pkg

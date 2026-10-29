@@ -38,7 +38,7 @@
 package scoreboard_pack_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
   import scoreboard_pkg::*;
 
   typedef enum {

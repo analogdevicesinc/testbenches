@@ -38,11 +38,11 @@
 package irq_handler_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
   import adi_api_pkg::*;
   import m_axi_sequencer_pkg::*;
   import io_vip_if_base_pkg::*;
-  
+
   class irq_handler_class extends adi_api;
 
     protected io_vip_if_base irq_vip_if;
@@ -51,7 +51,7 @@ package irq_handler_pkg;
     protected bit [31:0] irq_valid_list;
 
     protected bit software_testing;
-  
+
     // constructor
     function new(
       input string name,
@@ -59,7 +59,7 @@ package irq_handler_pkg;
       input bit [31:0] base_address,
       input io_vip_if_base irq_vip_if,
       input adi_component parent = null);
-      
+
       super.new(name, bus, base_address, parent);
 
       this.irq_vip_if = irq_vip_if;

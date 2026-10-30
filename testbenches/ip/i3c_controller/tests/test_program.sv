@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -120,6 +120,10 @@ localparam I3C_CCC_CMD_ENTDAA  = {3'b100, 12'd0, 7'b0, 1'b0};
 // CCC, length 0
 localparam I3C_CCC_CMD_RSTACT_BCAST  = {3'b100, 12'd1, 7'b0, 1'b0};
 localparam I3C_CCC_CMD_RSTACT_DIRECT = {3'b100, 12'd1, DEVICE_DA1[6:0], 1'b0};
+// Bus pattern, command 1 selects the pattern type
+localparam I3C_CMD_PATTERN      = {1'b1, 23'd0};
+localparam I3C_PATTERN_TRP      = 32'd0;
+localparam I3C_PATTERN_HDR_EXIT = 32'd1;
 // Wrong DA, CCC read 6 bytes
 localparam I3C_CMD_GETPID_UDA  = {3'b100, 12'd6,   START_DA[6:0], 1'b1};
 // CCC read 6 bytes
@@ -217,26 +221,32 @@ task print_ibi(input int data);
 endtask
 
 //---------------------------------------------------------------------------
-// Verify the Target Reset Pattern waveform
+// Send a bus pattern and verify the Target Reset or HDR Exit Pattern waveform
 //---------------------------------------------------------------------------
-task verify_target_reset_pattern();
+task send_pattern(input bit pattern_type);
   time last_transition;
   bit last_sda;
   bit current_sda;
 
-  `WAIT (`DUT_I3C_WORD.st == `CMDW_TRP, 100000);
-  // The defining byte can end Low. First release SDA while SCL is Low to set
-  // up the pattern's required initial High level; this is not one of the 14.
+  fork
+    begin
+      i3c_controller.set_cmd_fifo(I3C_CMD_PATTERN);
+      i3c_controller.set_cmd_fifo(pattern_type ? I3C_PATTERN_HDR_EXIT : I3C_PATTERN_TRP);
+      `WAIT (`DUT_I3C_CORE.trp_hold == 1'b1, 100000);
+    end
+  join
+  // The pattern first drives SDA High while SCL is Low; this is not an edge.
   wait (i3c_sda === 1'b1);
   #1ps;
-  if (i3c_scl !== 1'b0 || `DUT_I3C_BIT_MOD.t !== 1'b0)
-    `FATAL(("RSTACT did not set up SDA High in push-pull mode"));
+  if (i3c_scl !== 1'b0 || `DUT_I3C_CORE.i3c_t !== 1'b0) begin
+    `FATAL(("Pattern did not set up SDA High in push-pull mode"));
+  end
   last_transition = $time;
   last_sda = 1'b1;
 
-  // Fourteen push-pull SDA edges occur while SCL is held Low. The HDR Exit
-  // Pattern on which this is based requires at least tDIG_H (32 ns) per edge.
-  repeat (14) begin
+  // Fourteen (TRP) or seven (HDR Exit) push-pull SDA edges occur while SCL is
+  // held Low, requiring at least tDIG_H (32 ns) per edge.
+  repeat (pattern_type ? 7 : 14) begin
     // Ignore a change between actively-driven High and High-Z; both are a
     // logical High on a bus with its required pull-up/high-keeper.
     do begin
@@ -244,25 +254,33 @@ task verify_target_reset_pattern();
       current_sda = i3c_sda !== 1'b0;
     end while (current_sda == last_sda);
     last_sda = current_sda;
-    if (i3c_scl !== 1'b0)
-      `FATAL(("RSTACT SDA transition occurred while SCL was not Low"));
-    if (`DUT_I3C_BIT_MOD.t !== 1'b0)
-      `FATAL(("RSTACT SDA transition was not push-pull"));
-    if ($time - last_transition < 32ns)
-      `FATAL(("RSTACT SDA transition violated tDIG_H: delta=%0t", $time - last_transition));
+    if (i3c_scl !== 1'b0) begin
+      `FATAL(("Pattern SDA transition occurred while SCL was not Low"));
+    end
+    if (`DUT_I3C_CORE.i3c_t !== 1'b0) begin
+      `FATAL(("Pattern SDA transition was not push-pull"));
+    end
+    if ($time - last_transition < 32ns) begin
+      `FATAL(("Pattern SDA transition violated tDIG_H: delta=%0t", $time - last_transition));
+    end
     last_transition = $time;
   end
 
-  @(negedge i3c_sda);
-  if (i3c_scl !== 1'b1 || $time - last_transition < 32ns)
-    `FATAL(("RSTACT Repeated START timing is invalid: SCL=%b delta=%0t",
-            i3c_scl, $time - last_transition));
-  last_transition = $time;
+  if (!pattern_type) begin
+    @(negedge i3c_sda);
+    if (i3c_scl !== 1'b1 || $time - last_transition < 32ns) begin
+      `FATAL(("TRP Repeated START timing is invalid: SCL=%b delta=%0t",
+              i3c_scl, $time - last_transition));
+    end
+    last_transition = $time;
+  end
+  // The TRP STOP is open-drain, the HDR Exit STOP is push-pull.
   @(posedge i3c_sda);
-  if (i3c_scl !== 1'b1 || `DUT_I3C_BIT_MOD.t !== 1'b1 ||
-      $time - last_transition < 200ns)
-    `FATAL(("RSTACT STOP timing is invalid"));
-  wait (`DUT_I3C_BIT_MOD.nop == 1);
+  if (i3c_scl !== 1'b1 || `DUT_I3C_CORE.i3c_t !== !pattern_type ||
+      $time - last_transition < 32ns) begin
+    `FATAL(("Pattern STOP timing is invalid"));
+  end
+  wait (`DUT_I3C_CORE.trp_hold == 1'b0);
 endtask
 
 //---------------------------------------------------------------------------
@@ -436,7 +454,7 @@ task ccc_i3c_test;
   if (cmdr_fifo_data[19:8] != 0)
     `FATAL(("CMD -> CMDR read length test FAILED"));
 
-  // Test #1b, RSTACT CCC emits the Target Reset Pattern.
+  // Test #1b, RSTACT CCC followed by the Target Reset Pattern.
   `INFO(("CCC I3C Test #1b"), ADI_VERBOSITY_LOW);
   if (i3c_scl !== 1'b1 || `DUT_I3C_BIT_MOD.t !== 1'b1)
     `FATAL(("RSTACT must begin from the released bus state"));
@@ -447,12 +465,15 @@ task ccc_i3c_test;
   `WAIT (`DUT_I3C_WORD.st == `CMDW_MSG_TX, 100000);
   if (`DUT_I3C_WORD.cmdw_body !== 8'h01)
     `FATAL(("RSTACT Defining Byte was not transmitted"));
-  verify_target_reset_pattern();
+  send_pattern(1'b0);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 1)
     `FATAL(("CMD -> CMDR RSTACT length test FAILED"));
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  if (cmdr_fifo_data[23:8] != 0)
+    `FATAL(("TRP receipt test FAILED"));
 
   // Test #1c, Direct Write RSTACT targets one attached I3C device.
   `INFO(("CCC I3C Test #1c"), ADI_VERBOSITY_LOW);
@@ -465,12 +486,23 @@ task ccc_i3c_test;
   `WAIT (`DUT_I3C_WORD.st == `CMDW_MSG_TX, 100000);
   if (`DUT_I3C_WORD.cmdw_body !== 8'h01)
     `FATAL(("Direct RSTACT Defining Byte was not transmitted"));
-  verify_target_reset_pattern();
+  send_pattern(1'b0);
   i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
   i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
   print_cmdr (cmdr_fifo_data);
   if (cmdr_fifo_data[19:8] != 1 || cmdr_fifo_data[23:20] != 0)
     `FATAL(("Direct RSTACT receipt test FAILED"));
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  if (cmdr_fifo_data[23:8] != 0)
+    `FATAL(("Direct TRP receipt test FAILED"));
+
+  // Test #1d, HDR Exit Pattern.
+  `INFO(("CCC I3C Test #1d"), ADI_VERBOSITY_LOW);
+  send_pattern(1'b1);
+  i3c_controller.set_irq_pending(1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING);
+  i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+  if (cmdr_fifo_data[23:8] != 0)
+    `FATAL(("HDR Exit receipt test FAILED"));
 
   // Test #2, CCC with length 1 write payload
   `INFO(("CCC I3C Test #2"), ADI_VERBOSITY_LOW);

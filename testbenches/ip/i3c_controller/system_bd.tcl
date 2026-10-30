@@ -1,6 +1,6 @@
 # ***************************************************************************
 # ***************************************************************************
-# Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+# Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 #
 # In this HDL repository, there are many different and unique modules, consisting
 # of various HDL (Verilog or VHDL) components. The individual modules are
@@ -63,6 +63,7 @@ ad_connect i3c/offload_sdi offload_sdi
 ad_connect offload_trigger i3c/trigger
 
 ad_connect sys_cpu_clk i3c/clk
+ad_connect sys_cpu_clk i3c/s_axi_aclk
 ad_connect sys_cpu_resetn i3c/reset_n
 
 ad_cpu_interconnect 0x44a00000 i3c/host_interface

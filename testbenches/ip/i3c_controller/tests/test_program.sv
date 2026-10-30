@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -223,7 +223,7 @@ endtask
 //---------------------------------------------------------------------------
 // Send a bus pattern and verify the Target Reset or HDR Exit Pattern waveform
 //---------------------------------------------------------------------------
-task send_pattern(input bit hdr_exit);
+task send_pattern(input bit pattern_type);
   time last_transition;
   bit last_sda;
   bit current_sda;
@@ -231,21 +231,22 @@ task send_pattern(input bit hdr_exit);
   fork
     begin
       i3c_controller.set_cmd_fifo(I3C_CMD_PATTERN);
-      i3c_controller.set_cmd_fifo(hdr_exit ? I3C_PATTERN_HDR_EXIT : I3C_PATTERN_TRP);
+      i3c_controller.set_cmd_fifo(pattern_type ? I3C_PATTERN_HDR_EXIT : I3C_PATTERN_TRP);
+      `WAIT (`DUT_I3C_CORE.trp_hold == 1'b1, 100000);
     end
-  join_none
-  `WAIT (`DUT_I3C_CORE.trp_hold == 1'b1, 100000);
+  join
   // The pattern first drives SDA High while SCL is Low; this is not an edge.
   wait (i3c_sda === 1'b1);
   #1ps;
-  if (i3c_scl !== 1'b0 || `DUT_I3C_CORE.i3c_t !== 1'b0)
+  if (i3c_scl !== 1'b0 || `DUT_I3C_CORE.i3c_t !== 1'b0) begin
     `FATAL(("Pattern did not set up SDA High in push-pull mode"));
+  end
   last_transition = $time;
   last_sda = 1'b1;
 
   // Fourteen (TRP) or seven (HDR Exit) push-pull SDA edges occur while SCL is
   // held Low, requiring at least tDIG_H (32 ns) per edge.
-  repeat (hdr_exit ? 7 : 14) begin
+  repeat (pattern_type ? 7 : 14) begin
     // Ignore a change between actively-driven High and High-Z; both are a
     // logical High on a bus with its required pull-up/high-keeper.
     do begin
@@ -253,27 +254,32 @@ task send_pattern(input bit hdr_exit);
       current_sda = i3c_sda !== 1'b0;
     end while (current_sda == last_sda);
     last_sda = current_sda;
-    if (i3c_scl !== 1'b0)
+    if (i3c_scl !== 1'b0) begin
       `FATAL(("Pattern SDA transition occurred while SCL was not Low"));
-    if (`DUT_I3C_CORE.i3c_t !== 1'b0)
+    end
+    if (`DUT_I3C_CORE.i3c_t !== 1'b0) begin
       `FATAL(("Pattern SDA transition was not push-pull"));
-    if ($time - last_transition < 32ns)
+    end
+    if ($time - last_transition < 32ns) begin
       `FATAL(("Pattern SDA transition violated tDIG_H: delta=%0t", $time - last_transition));
+    end
     last_transition = $time;
   end
 
-  if (!hdr_exit) begin
+  if (!pattern_type) begin
     @(negedge i3c_sda);
-    if (i3c_scl !== 1'b1 || $time - last_transition < 32ns)
+    if (i3c_scl !== 1'b1 || $time - last_transition < 32ns) begin
       `FATAL(("TRP Repeated START timing is invalid: SCL=%b delta=%0t",
               i3c_scl, $time - last_transition));
+    end
     last_transition = $time;
   end
   // The TRP STOP is open-drain, the HDR Exit STOP is push-pull.
   @(posedge i3c_sda);
-  if (i3c_scl !== 1'b1 || `DUT_I3C_CORE.i3c_t !== !hdr_exit ||
-      $time - last_transition < 32ns)
+  if (i3c_scl !== 1'b1 || `DUT_I3C_CORE.i3c_t !== !pattern_type ||
+      $time - last_transition < 32ns) begin
     `FATAL(("Pattern STOP timing is invalid"));
+  end
   wait (`DUT_I3C_CORE.trp_hold == 1'b0);
 endtask
 

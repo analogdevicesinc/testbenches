@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="840" viewBox="0 0 1160 840" font-family="Arial"><title>AD4858_FMCZ_DUAL LVDS testbench block diagram</title><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker><marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#754d00"/></marker></defs>
+<rect x="1" y="1" width="1158" height="838" fill="#fff" stroke="#000" stroke-width="2"/>
+<rect x="20" y="14" width="15" height="16" fill="#ffcccc" stroke="#a01414" stroke-width="2"/>
+<text x="42" y="27" text-anchor="start" font-size="12" fill="#000">Receive path</text>
+<line x1="140" y1="22" x2="166" y2="22" stroke="#754d00" stroke-width="1.5" stroke-dasharray="5,5"/>
+<text x="172" y="27" text-anchor="start" font-size="12" fill="#000">Clock domain / clock</text>
+<text x="1136" y="28" text-anchor="end" font-size="20" font-weight="bold" fill="#000">AD4858_FMCZ_DUAL LVDS testbench</text>
+<rect x="20" y="250" width="40" height="330" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text transform="translate(46,415) rotate(-90)" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">DDR VIP</text>
+<rect x="80" y="70" width="720" height="730" fill="none" stroke="#000" stroke-width="2"/>
+<text x="440" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">PROJECT LEVEL BLOCK DESIGN (DUT)</text>
+<rect x="560" y="105" width="220" height="36" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="670" y="128" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">PS AXI VIP</text>
+<rect x="95" y="165" width="70" height="560" fill="none" stroke="#754d00" stroke-width="2" stroke-dasharray="8,8"/>
+<text x="130" y="697" text-anchor="middle" font-size="10.7" fill="#754d00">sys_cpu_clk</text>
+<text x="130" y="710" text-anchor="middle" font-size="10.7" fill="#754d00">=100MHz</text>
+<rect x="105" y="190" width="40" height="480" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text transform="translate(131,430) rotate(-90)" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">MEMORY INTERCONNECT</text>
+<rect x="175" y="165" width="590" height="560" fill="none" stroke="#754d00" stroke-width="2" stroke-dasharray="8,8"/>
+<text x="635" y="715" text-anchor="middle" font-size="10.7" fill="#754d00">adc_clk=100MHz</text>
+<polyline points="105,430 60,430" fill="none" stroke="#000" stroke-width="1.5"/>
+<rect x="190" y="170" width="50" height="190" fill="#ffcccc" stroke="#a01414" stroke-width="2"/>
+<text transform="translate(221,265) rotate(-90)" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">AXI DMAC (0)</text>
+<rect x="270" y="170" width="50" height="190" fill="#ffcccc" stroke="#a01414" stroke-width="2"/>
+<text transform="translate(301,265) rotate(-90)" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">UTIL CPACK2 (0)</text>
+<rect x="400" y="170" width="150" height="190" fill="#ffcccc" stroke="#a01414" stroke-width="2"/>
+<text x="475" y="190" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">AXI AD485X (0)</text>
+<text x="475" y="206" text-anchor="middle" font-size="12" fill="#000">LVDS</text>
+<polygon points="190,259 153,259 153,256 145,265 153,274 153,271 190,271" fill="#a01414"/>
+<text x="171.5" y="269" text-anchor="middle" font-size="12" fill="#fff">64b</text>
+<polygon points="270,259 248,259 248,256 240,265 248,274 248,271 270,271" fill="#a01414"/>
+<text x="259.0" y="269" text-anchor="middle" font-size="12" fill="#fff">256b</text>
+<polygon points="400,259 328,259 328,256 320,265 328,274 328,271 400,271" fill="#a01414"/>
+<text x="364.0" y="269" text-anchor="middle" font-size="12" fill="#fff">8 x 32b</text>
+<polyline points="550,222 818,222" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="218" text-anchor="middle" font-size="12" fill="#000">adc_0_scki_p</text>
+<polyline points="550,244 818,244" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="240" text-anchor="middle" font-size="12" fill="#000">adc_0_scki_n</text>
+<polyline points="818,266 550,266" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="262" text-anchor="middle" font-size="12" fill="#000">adc_0_scko_p</text>
+<polyline points="818,288 550,288" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="284" text-anchor="middle" font-size="12" fill="#000">adc_0_scko_n</text>
+<polyline points="818,310 550,310" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="306" text-anchor="middle" font-size="12" fill="#000">adc_0_sdo_p</text>
+<polyline points="818,332 550,332" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="328" text-anchor="middle" font-size="12" fill="#000">adc_0_sdo_n</text>
+<polyline points="818,354 550,354" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="350" text-anchor="middle" font-size="12" fill="#000">adc_0_busy</text>
+<rect x="580" y="368" width="150" height="34" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="655" y="390" text-anchor="middle" font-size="15" font-weight="bold" fill="#000">AXI PWM GEN (0)</text>
+<polyline points="580,385 520,385 520,365" fill="none" stroke="#000" stroke-width="1.5"/>
+<polyline points="520,365 520,361" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="550" y="379" text-anchor="middle" font-size="12" fill="#000">cnvs</text>
+<polyline points="730,385 818,385" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="766" y="379" text-anchor="middle" font-size="12" fill="#000">adc_0_cnv</text>
+<rect x="818" y="170" width="26" height="232" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text transform="translate(833,286) rotate(-90)" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">IO VIP (0)</text>
+<polyline points="350,345 400,345" fill="none" stroke="#754d00" stroke-width="1.5" marker-end="url(#ahb)"/>
+<rect x="190" y="450" width="50" height="190" fill="#ffcccc" stroke="#a01414" stroke-width="2"/>
+<text transform="translate(221,545) rotate(-90)" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">AXI DMAC (1)</text>
+<rect x="270" y="450" width="50" height="190" fill="#ffcccc" stroke="#a01414" stroke-width="2"/>
+<text transform="translate(301,545) rotate(-90)" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">UTIL CPACK2 (1)</text>
+<rect x="400" y="450" width="150" height="190" fill="#ffcccc" stroke="#a01414" stroke-width="2"/>
+<text x="475" y="470" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">AXI AD485X (1)</text>
+<text x="475" y="486" text-anchor="middle" font-size="12" fill="#000">LVDS</text>
+<polygon points="190,539 153,539 153,536 145,545 153,554 153,551 190,551" fill="#a01414"/>
+<text x="171.5" y="549" text-anchor="middle" font-size="12" fill="#fff">64b</text>
+<polygon points="270,539 248,539 248,536 240,545 248,554 248,551 270,551" fill="#a01414"/>
+<text x="259.0" y="549" text-anchor="middle" font-size="12" fill="#fff">256b</text>
+<polygon points="400,539 328,539 328,536 320,545 328,554 328,551 400,551" fill="#a01414"/>
+<text x="364.0" y="549" text-anchor="middle" font-size="12" fill="#fff">8 x 32b</text>
+<polyline points="550,502 818,502" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="498" text-anchor="middle" font-size="12" fill="#000">adc_1_scki_p</text>
+<polyline points="550,524 818,524" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="520" text-anchor="middle" font-size="12" fill="#000">adc_1_scki_n</text>
+<polyline points="818,546 550,546" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#ah)"/>
+<text x="684" y="542" text-anchor="middle" font-size="11" fill="#000">adc_1_scko_p (SSI_N=1 only)</text>
+<polyline points="818,568 550,568" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#ah)"/>
+<text x="684" y="564" text-anchor="middle" font-size="11" fill="#000">adc_1_scko_n (SSI_N=1 only)</text>
+<polyline points="818,590 550,590" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="586" text-anchor="middle" font-size="12" fill="#000">adc_1_sdo_p</text>
+<polyline points="818,612 550,612" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="608" text-anchor="middle" font-size="12" fill="#000">adc_1_sdo_n</text>
+<polyline points="818,634 550,634" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="684" y="630" text-anchor="middle" font-size="12" fill="#000">adc_1_busy</text>
+<rect x="580" y="648" width="150" height="34" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="655" y="670" text-anchor="middle" font-size="15" font-weight="bold" fill="#000">AXI PWM GEN (1)</text>
+<polyline points="580,665 520,665 520,645" fill="none" stroke="#000" stroke-width="1.5"/>
+<polyline points="520,645 520,641" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="550" y="659" text-anchor="middle" font-size="12" fill="#000">cnvs</text>
+<polyline points="730,665 818,665" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="766" y="659" text-anchor="middle" font-size="12" fill="#000">adc_1_cnv</text>
+<rect x="818" y="450" width="26" height="232" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text transform="translate(833,566) rotate(-90)" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">IO VIP (1)</text>
+<polyline points="350,625 400,625" fill="none" stroke="#754d00" stroke-width="1.5" marker-end="url(#ahb)"/>
+<rect x="880" y="70" width="250" height="730" fill="none" stroke="#000" stroke-width="2"/>
+<text x="1005" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">TEST MODULE</text>
+<rect x="895" y="105" width="220" height="680" fill="none" stroke="#000" stroke-width="2"/>
+<text x="1005" y="128" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">TESTBENCH</text>
+<rect x="910" y="140" width="190" height="62" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="1005" y="163" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">TEST PROGRAM</text>
+<text x="1005" y="180" text-anchor="middle" font-size="11" fill="#000">AXI config, expected data</text>
+<text x="1005" y="194" text-anchor="middle" font-size="11" fill="#000">generation, DDR data check</text>
+<rect x="910" y="170" width="190" height="232" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="1005" y="270" text-anchor="middle" font-size="15" font-weight="bold" fill="#000">ADC 0 MODEL</text>
+<text x="1005" y="290" text-anchor="middle" font-size="12" fill="#000">AD4858 LVDS</text>
+<text x="1005" y="306" text-anchor="middle" font-size="11" fill="#000">SSI (echo clock)</text>
+<polyline points="844,286 910,286" fill="none" stroke="#000" stroke-width="1.5"/>
+<rect x="910" y="450" width="190" height="232" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="1005" y="550" text-anchor="middle" font-size="15" font-weight="bold" fill="#000">ADC 1 MODEL</text>
+<text x="1005" y="570" text-anchor="middle" font-size="12" fill="#000">AD4858 LVDS</text>
+<text x="1005" y="586" text-anchor="middle" font-size="11" fill="#000">SSI / NSSI (SSI_N)</text>
+<polyline points="844,566 910,566" fill="none" stroke="#000" stroke-width="1.5"/>
+<polyline points="910,123 780,123" fill="none" stroke="#000" stroke-width="1.5" marker-end="url(#ah)"/>
+<text x="845" y="117" text-anchor="middle" font-size="12" fill="#000">AXI API</text>
+<rect x="190" y="750" width="120" height="36" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="250" y="768" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">SYS 200M CLK VIP</text>
+<text x="250" y="781" text-anchor="middle" font-size="10" fill="#000">unused (IODELAY off)</text>
+<rect x="560" y="750" width="150" height="36" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="635" y="772" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">ADC CLK VIP 100MHz</text>
+<polyline points="635,750 635,725" fill="none" stroke="#754d00" stroke-width="1.5" marker-end="url(#ahb)"/>
+<rect x="350" y="750" width="170" height="36" fill="#e8e8e8" stroke="#000" stroke-width="2"/>
+<text x="435" y="772" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">ADC FAST CLK VIP 200MHz</text>
+<polyline points="435,750 435,705 350,705 350,625" fill="none" stroke="#754d00" stroke-width="1.5"/>
+<polyline points="350,625 350,365" fill="none" stroke="#754d00" stroke-width="1.5"/>
+<circle cx="350" cy="345" r="3" fill="#754d00"/>
+<circle cx="350" cy="625" r="3" fill="#754d00"/>
+<text x="425" y="698" text-anchor="middle" font-size="10.7" fill="#754d00">adc_fast_clk=200MHz</text>
+</svg>

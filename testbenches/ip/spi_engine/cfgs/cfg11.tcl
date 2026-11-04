@@ -21,7 +21,7 @@ set ad_project_params(NUM_OF_MOSI)          $num_mosi_lanes
 set ad_project_params(SDI_DELAY)            1
 set ad_project_params(ECHO_SCLK)            0
 set ad_project_params(CMD_MEM_ADDR_WIDTH)   4
-set ad_project_params(DATA_MEM_ADDR_WIDTH)  4
+set ad_project_params(DATA_MEM_ADDR_WIDTH)  6
 set ad_project_params(SDI_FIFO_ADDR_WIDTH)  7
 set ad_project_params(SDO_FIFO_ADDR_WIDTH)  7
 set ad_project_params(SYNC_FIFO_ADDR_WIDTH) 4

@@ -1032,6 +1032,56 @@ task ibi_i3c_test();
   if (`DUT_I3C_REGMAP.ibi_fifo_valid)
     `FATAL(("IBI should not have thrown IBI"));
 
+  // Test #7, peripheral does IBI request by pulling SDA low right after a
+  // transfer, before the bus available condition, and a TRP is queued.
+  // Expected result: the controller serves the IBI first, then yields the TRP.
+
+  // Listen & Enable IBI
+  i3c_controller.configure_ibi(
+    .listen(1'b1),
+    .enable(1'b1));
+
+  #12000ns;
+  `INFO(("IBI I3C Test #7"), ADI_VERBOSITY_LOW);
+  set_auto_ack(1);
+  i3c_controller.write_sdo_fifo_data_32_bit(32'hDEAD_BEEF);
+  i3c_controller.set_cmd_fifo(I3C_CMD_1);
+  `WAIT (`STOP, 1000000);
+  `WAIT (`DUT_I3C_BIT_MOD.nop == 1'b1, 1000000);
+  set_auto_ack(0);
+  fork
+    write_ibi_da(DEVICE_DA1+1);
+    i3c_controller.set_cmd_fifo(I3C_CMD_TRP);
+    begin
+      `WAIT (`DUT_I3C_FRAMING.ibi_requested_auto == 1'b1, 1000000);
+      if (!`DUT_I3C_FRAMING.cmdp_valid || !`DUT_I3C_FRAMING.cmdp_trp) begin
+        `FATAL(("TRP was not pending when the IBI was served"));
+      end
+    end
+    check_trp(1'b0);
+  join
+
+  // The IBI is served before the TRP.
+  if (!`DUT_I3C_REGMAP.ibi_fifo_valid) begin
+    `FATAL(("IBI was not served before the TRP"));
+  end
+  i3c_controller.read_ibi_fifo(ibi_fifo_data);
+  print_ibi(ibi_fifo_data);
+  if (ibi_fifo_data[23:17] != DEVICE_DA1+1) begin
+    `FATAL(("Wrong IBI DA"));
+  end
+  for (int i = 0; i < 2; i++) begin
+    `WAIT (`DUT_I3C_REGMAP.cmdr_fifo_valid == 1'b1, 1000000);
+    i3c_controller.get_cmdr_fifo(cmdr_fifo_data);
+    print_cmdr (cmdr_fifo_data);
+    if (cmdr_fifo_data[23:20] != 0 ||
+        cmdr_fifo_data[19:8] != (i ? 0 : I3C_CMD_1[19:8])) begin
+      `FATAL(("CMD/TRP receipt %0d after resolving IBI FAILED", i));
+    end
+  end
+  i3c_controller.set_irq_pending((1'b1 << `I3C_REGMAP_IRQ_IBI_PENDING) |
+                                 (1'b1 << `I3C_REGMAP_IRQ_CMDR_PENDING));
+
   set_auto_ack(1);
 
   // Clear any sdi data from the cmd

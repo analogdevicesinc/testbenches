@@ -53,20 +53,19 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 // Wait statement with timeout
 //---------------------------------------------------------------------------
 `define WAIT(CONDITION, TIMEOUT) \
-  fork \
-    begin \
-      fork \
+  begin \
+    automatic process wait_timeout; \
+    fork \
       begin \
+        wait_timeout = process::self(); \
         #``TIMEOUT``ns \
         `FATAL(("Wait statement expired.")); \
       end \
-      begin \
-        wait (CONDITION); \
-      end \
-      join_any \
-      disable fork; \
-    end \
-  join
+    join_none \
+    #0; \
+    wait (CONDITION); \
+    if (wait_timeout != null) wait_timeout.kill(); \
+  end
 
 //---------------------------------------------------------------------------
 // Aliases

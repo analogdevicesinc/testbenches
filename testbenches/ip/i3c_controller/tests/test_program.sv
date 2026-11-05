@@ -42,6 +42,7 @@
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
+import watchdog_pkg::*;
 import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
 import i3c_controller_api_pkg::*;
@@ -53,20 +54,12 @@ import `PKGIFY(test_harness, ddr_axi_vip)::*;
 // Wait statement with timeout
 //---------------------------------------------------------------------------
 `define WAIT(CONDITION, TIMEOUT) \
-  fork \
-    begin \
-      fork \
-      begin \
-        #``TIMEOUT``ns \
-        `FATAL(("Wait statement expired.")); \
-      end \
-      begin \
-        wait (CONDITION); \
-      end \
-      join_any \
-      disable fork; \
-    end \
-  join
+  begin \
+    automatic watchdog wait_watchdog = new("Wait", TIMEOUT, "Wait statement expired."); \
+    wait_watchdog.start(); \
+    wait (CONDITION); \
+    wait_watchdog.stop(); \
+  end
 
 //---------------------------------------------------------------------------
 // Aliases

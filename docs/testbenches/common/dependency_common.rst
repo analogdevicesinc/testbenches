@@ -16,8 +16,8 @@ Common with most testbenches:
    * - M_AXI_SEQUENCER
      - :git-testbenches:`library/vip/amd/m_axi_sequencer.sv`
      - ---
-   * - REG_ACCESSOR
-     - :git-testbenches:`library/regmaps/reg_accessor.sv`
+   * - ADI_VIP_PKG
+     - :git-testbenches:`library/utilities/adi_vip_pkg.sv`
      - ---
    * - S_AXI_SEQUENCER
      - :git-testbenches:`library/vip/amd/s_axi_sequencer.sv`

@@ -101,7 +101,7 @@ define sim
 $(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
 $(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS) FORCE
 	$(RUN_PRE_OPT)$$(call simulate, \
-		$(CMD_PRE) flock runs/$(1)/.lock sh -c "$(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(CMD_POST)", \
+		$(CMD_PRE) flock runs/$(1)/.lock sh -c "$(M_VIVADO) $(RUN_SIM_PATH) -tclargs $(1) $(2) $(MODE) $(SEED) $(CMD_POST)", \
 		$$@, \
 		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
 		Run $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
@@ -120,6 +120,10 @@ endif
 endif
 
 MODE ?= batch
+
+# Optional fixed SV seed for reproducible runs (e.g. SEED=1782486167).
+# Empty -> run_sim.tcl leaves the project default (-sv_seed random).
+SEED ?=
 
 STOP_ON_ERROR ?= y
 

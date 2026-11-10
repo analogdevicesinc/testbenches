@@ -11,12 +11,26 @@ if {$argc < 3} {
   set mode [lindex $argv 2]
 }
 
+# Optional 4th arg: fixed SV seed for reproducible runs. Empty -> keep the
+# project default (-sv_seed random, set in adi_sim.tcl).
+set sv_seed ""
+if {$argc >= 4} {
+  set sv_seed [lindex $argv 3]
+}
+
 # Set the project name
 set project_name [file rootname $topology_file]
 
 adi_open_project "runs/$project_name/$project_name.xpr"
 
 adi_update_define TEST_PROGRAM $test_program
+
+# Override the random seed with a fixed value when SEED was passed in.
+if {$sv_seed ne ""} {
+  puts "run_sim: forcing -sv_seed $sv_seed"
+  set_property -name {xsim.simulate.xsim.more_options} \
+    -value "-sv_seed $sv_seed" -objects [get_filesets sim_1]
+}
 
 launch_simulation
 

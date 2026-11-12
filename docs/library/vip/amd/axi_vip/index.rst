@@ -21,13 +21,13 @@ sequencer, monitor and wrapper class.
 Inheritance diagram for AMD AXI VIP
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. svg:: ./library/vip/amd/axi_vip/amd_axi_inheritance.svg
+.. svg:: ./amd_axi_inheritance.svg
    :align: center
 
 Aggregation diagram for AMD AXI VIP
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. svg:: ./library/vip/amd/axi_vip/amd_axi_aggregation.svg
+.. svg:: ./amd_axi_aggregation.svg
    :align: center
 
 Components

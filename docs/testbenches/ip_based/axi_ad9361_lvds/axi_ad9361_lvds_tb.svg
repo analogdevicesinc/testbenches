@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   sodipodi0:docname="axi_ad9361_lvds_tb.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   style="shape-rendering:crispEdges"
+   id="svg6470"
+   version="1.1"
+   viewBox="0 0 900 500"
+   height="500"
+   width="900"
+   sodipodi:docname="axi_ad9361_lvds_tb.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:sodipodi0="http://sodipodi.sourceforge.net/DTD/sodipodi-0.0.dtd">
+  <sodipodi:namedview
+     id="namedview95"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.87407407"
+     inkscape:cx="392.98729"
+     inkscape:cy="257.41525"
+     inkscape:window-width="1680"
+     inkscape:window-height="979"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs6464">
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-2"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-2"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-3"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-3"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-4"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-4"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-5"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-5"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-6"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-6"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-7"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-7"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-8"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-8"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-8-8"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-8-9"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker-arrow-5-0"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path-arrow-5-1"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.4)" />
+    </marker>
+  </defs>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <!-- ================================================================ -->
+    <!-- TOP MODULE outer box -->
+    <!-- ================================================================ -->
+    <rect
+       y="14.953054"
+       x="14.953054"
+       height="463.17316"
+       width="660.09387"
+       id="top-module-box"
+       style="fill:none;stroke:#3f4b55;stroke-width:1.90611;stroke-linecap:round;stroke-linejoin:round" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:18px;font-family:Arial;fill:#000000"
+       x="270"
+       y="45"
+       id="top-module-label">TOP MODULE</text>
+    <!-- ================================================================ -->
+    <!-- TEST MODULE outer box (right) -->
+    <!-- ================================================================ -->
+    <rect
+       y="14.952388"
+       x="689.95239"
+       height="462.36551"
+       width="195.09523"
+       id="test-module-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.90477;stroke-linecap:square;stroke-linejoin:round" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:18px;font-family:Arial;fill:#000000"
+       x="708"
+       y="45"
+       id="test-module-label">TEST MODULE</text>
+    <!-- TEST PROGRAM inner box -->
+    <rect
+       y="59.946484"
+       x="707.94647"
+       height="387.8157"
+       width="162.10703"
+       id="testbench-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.39297;stroke-linecap:square;stroke-linejoin:round" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:13px;font-family:Arial;fill:#000000"
+       x="718"
+       y="85"
+       id="testbench-label">TEST PROGRAM</text>
+    <!-- ================================================================ -->
+    <!-- DUT: axi_ad9361 (centre) -->
+    <!-- ================================================================ -->
+    <rect
+       y="185"
+       x="214"
+       height="200"
+       width="200"
+       id="dut-box"
+       style="fill:#e5e5e5;fill-opacity:1;stroke:#000000;stroke-width:1.5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:14px;font-family:Arial;fill:#000000"
+       x="272"
+       y="271"
+       id="dut-label">axi_ad9361</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:11px;font-family:Arial;fill:#555555"
+       x="256"
+       y="293"
+       id="dut-sublabel">(CMOS_OR_LVDS_N=0)</text>
+    <!-- ================================================================ -->
+    <!-- L_CLK VIP (top, vertical) -->
+    <!-- ================================================================ -->
+    <rect
+       y="60"
+       x="214"
+       height="100"
+       width="200"
+       id="lclk-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:12px;font-family:Arial;fill:#000000"
+       x="282"
+       y="103"
+       id="lclk-label">l_clk_vip</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10px;font-family:Arial;fill:#555555"
+       x="269"
+       y="120"
+       id="lclk-sublabel">CLK VIP (250 MHz)</text>
+    <!-- Arrow: l_clk_vip → dut/clk -->
+    <path
+       id="arrow-lclk-dut"
+       d="m 314,160 v 20"
+       style="fill:none;stroke:#000000;stroke-width:2;marker-end:url(#marker-arrow)" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-family:Arial;fill:#000000"
+       x="319"
+       y="175"
+       id="label-lclk-dut">clk</text>
+    <!-- ================================================================ -->
+    <!-- RX VIPs (left side) -->
+    <!-- ================================================================ -->
+    <!-- rx_clk_vip -->
+    <rect
+       y="64.880783"
+       x="29.880781"
+       height="45.238438"
+       width="80.916405"
+       id="rxclk-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.26156" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:11px;font-family:Arial;fill:#000000"
+       x="38"
+       y="84"
+       id="rxclk-label">rx_clk_vip</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="38"
+       y="100"
+       id="rxclk-sublabel">IO VIP (master)</text>
+    <!-- rx_frame_vip -->
+    <rect
+       y="129.88078"
+       x="29.880781"
+       height="45.238438"
+       width="80.916405"
+       id="rxframe-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.26156" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:11px;font-family:Arial;fill:#000000"
+       x="38"
+       y="149"
+       id="rxframe-label">rx_frame_vip</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="38"
+       y="165"
+       id="rxframe-sublabel">IO VIP (master)</text>
+    <!-- rx_data_vip -->
+    <rect
+       y="194.88513"
+       x="29.88513"
+       height="45.22974"
+       width="82.051773"
+       id="rxdata-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.27026" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:11px;font-family:Arial;fill:#000000"
+       x="38"
+       y="214"
+       id="rxdata-label">rx_data_vip</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="38"
+       y="230"
+       id="rxdata-sublabel">IO VIP (master)</text>
+    <!-- mng_axi_vip -->
+    <rect
+       y="349.8786"
+       x="29.878593"
+       height="45.242813"
+       width="80.348747"
+       id="mng-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25719" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:11px;font-family:Arial;fill:#000000"
+       x="38"
+       y="369"
+       id="mng-label">mng_axi_vip</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="38"
+       y="387"
+       id="mng-sublabel">AXI4-Lite master</text>
+    <!-- Arrows: RX VIPs → DUT -->
+    <path
+       id="arrow-rxclk"
+       d="m 111,88 h 97.39407"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-2)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="118"
+       y="82"
+       id="label-rxclk">rx_clk_in_p/n</text>
+    <path
+       id="arrow-rxframe"
+       d="M 111.82203,153 H 210.9322"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-3)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="118"
+       y="147"
+       id="label-rxframe">rx_frame_in_p/n</text>
+    <path
+       id="arrow-rxdata"
+       d="m 112.39407,218 h 96.25"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-4)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="118"
+       y="212"
+       id="label-rxdata">rx_data_in_p/n[5:0]</text>
+    <!-- Arrow: mng_axi_vip → DUT (AXI4-Lite) -->
+    <path
+       id="arrow-axi"
+       d="M 112.39407,365 H 209.2161"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-5)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="118"
+       y="359"
+       id="label-axi">s_axi (0x44A0_0000)</text>
+    <!-- ================================================================ -->
+    <!-- TX / ADC VIPs (right side, inside TOP MODULE) -->
+    <!-- ================================================================ -->
+    <!-- tx_frame_vip -->
+    <rect
+       y="65"
+       x="510"
+       height="45"
+       width="115"
+       id="txframe-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:11px;font-family:Arial;fill:#000000"
+       x="518"
+       y="84"
+       id="txframe-label">tx_frame_vip</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="518"
+       y="100"
+       id="txframe-sublabel">IO VIP (slave)</text>
+    <!-- tx_data_vip -->
+    <rect
+       y="126"
+       x="510"
+       height="45"
+       width="115"
+       id="txdata-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:11px;font-family:Arial;fill:#000000"
+       x="518"
+       y="145"
+       id="txdata-label">tx_data_vip</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="518"
+       y="161"
+       id="txdata-sublabel">IO VIP (slave)</text>
+    <!-- adc_valid_i0_vip -->
+    <rect
+       y="210"
+       x="510"
+       height="40"
+       width="115"
+       id="adcvalid-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:10px;font-family:Arial;fill:#000000"
+       x="518"
+       y="226"
+       id="adcvalid-label">adc_valid_i0/q0</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="518"
+       y="242"
+       id="adcvalid-sublabel">IO VIP (slave)</text>
+    <!-- adc_data_i0_vip -->
+    <rect
+       y="265"
+       x="510"
+       height="40"
+       width="115"
+       id="adcdata-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:10px;font-family:Arial;fill:#000000"
+       x="518"
+       y="281"
+       id="adcdata-label">adc_data_i0/q0</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="518"
+       y="297"
+       id="adcdata-sublabel">IO VIP (slave)</text>
+    <!-- adc_valid/data_i1/q1_vip -->
+    <rect
+       y="320"
+       x="510"
+       height="40"
+       width="115"
+       id="adcr2-box"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:10px;font-family:Arial;fill:#000000"
+       x="518"
+       y="336"
+       id="adcr2-label">adc_*_i1/q1</text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9px;font-family:Arial;fill:#555555"
+       x="518"
+       y="352"
+       id="adcr2-sublabel">IO VIP (slave)</text>
+    <!-- Arrows: DUT → TX/ADC VIPs -->
+    <path
+       id="arrow-txframe"
+       d="m 416,88 h 89.71825"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-6)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="419"
+       y="82"
+       id="label-txframe">tx_frame_out_p</text>
+    <path
+       id="arrow-txdata"
+       d="m 416,153 h 88.10029"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-7)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="419"
+       y="147"
+       id="label-txdata">tx_data_out_p[5:0]</text>
+    <path
+       id="arrow-adcvalid"
+       d="m 416,230 h 88.10029"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-8)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="419"
+       y="224"
+       id="label-adcvalid">adc_valid_i0/q0</text>
+    <path
+       id="arrow-adcdata"
+       d="m 416,285 h 88.90927"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="419"
+       y="279"
+       id="label-adcdata">adc_data_i0/q0[15:0]</text>
+    <path
+       id="arrow-adcr2"
+       d="m 416,340 h 86.48234"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-2)"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="419"
+       y="334"
+       id="label-adcr2">adc_*_i1/q1 (2R2T)</text>
+    <!-- ================================================================ -->
+    <!-- Arrows from right-side VIPs into TEST PROGRAM -->
+    <!-- ================================================================ -->
+    <path
+       id="arrow-vip-tp-txframe"
+       d="m 625,88 h 78"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-3)" />
+    <path
+       id="arrow-vip-tp-txdata"
+       d="m 625,153 h 78"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-4)" />
+    <path
+       id="arrow-vip-tp-adcvalid"
+       d="m 625,230 h 78"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-5)" />
+    <path
+       id="arrow-vip-tp-adcdata"
+       d="m 625,285 h 78"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-6)" />
+    <path
+       id="arrow-vip-tp-adcr2"
+       d="m 625,340 h 78"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-7)" />
+    <!-- Arrow: TEST PROGRAM → mng_axi_vip (AXI writes) -->
+    <path
+       id="arrow-tp-mng"
+       d="M 707.00424,418 H 630 V 393 H 114.5339"
+       style="fill:none;stroke:#000000;stroke-width:1.5;marker-end:url(#marker-arrow-8)"
+       sodipodi:nodetypes="cccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="715"
+       y="415"
+       id="label-tp-mng">AXI register</text>
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="715"
+       y="428"
+       id="label-tp-mng2">access</text>
+    <!-- Arrow: TEST PROGRAM → rx_frame/data_vip (drive RX) -->
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="715"
+       y="165"
+       id="label-tp-rxframe">drive RX</text>
+    <text
+       xml:space="preserve"
+       style="font-size:9px;font-family:Arial;fill:#000000"
+       x="715"
+       y="178"
+       id="label-tp-rxframe2">frame/data</text>
+    <!-- ================================================================ -->
+    <!-- NOT gates label (differential complement) -->
+    <!-- ================================================================ -->
+    <!-- ================================================================ -->
+    <!-- Clock label at bottom -->
+    <!-- ================================================================ -->
+    <path
+       id="arrow-tp-mng-8"
+       d="m 708.22811,202.7428 h -68.42373 v -25 H 151.22387"
+       style="fill:none;stroke:#000000;stroke-width:1.5;shape-rendering:crispEdges"
+       sodipodi:nodetypes="cccc" />
+    <path
+       id="arrow-axi-7"
+       d="m 151.17443,152.94492 v 25.16012"
+       style="fill:none;stroke:#000000;stroke-width:1.5;shape-rendering:crispEdges"
+       sodipodi:nodetypes="cc" />
+  </g>
+</svg>

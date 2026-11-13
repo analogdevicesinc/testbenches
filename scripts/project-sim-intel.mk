@@ -1,0 +1,181 @@
+####################################################################################
+####################################################################################
+## Copyright (C) 2026 Analog Devices, Inc.
+####################################################################################
+####################################################################################
+
+include $(ADI_TB_DIR)/library/includes/Makeinclude_common_intel.mk
+
+include $(ADI_HDL_DIR)/quiet.mk
+
+ENV_DEPS += $(foreach dep,$(LIB_DEPS),$(ADI_HDL_DIR)/library/$(dep)/.timestamp_intel)
+ENV_DEPS += $(foreach dep,$(SIM_LIB_DEPS),$(ADI_TB_DIR)/library/vip/adi/$(dep)/.timestamp_intel)
+
+SHELL:=/bin/bash
+
+# simulate - Run a sim command and look in logfile for errors; creates JUnit XML
+# Questa prefixes its transcript lines with "# ", it is stripped before the
+# error patterns are matched
+# $(1): Command to execute
+# $(2): Logfile name
+# $(3): Textual description of the start of the task
+# $(4): Textual description of the end of the task
+# $(5): configuration name
+# $(6): test  name
+FOLDER=$(shell basename $(CURDIR))
+define simulate
+@echo "$(strip $(3)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)] ..."
+RUN_SCRIPT=false; \
+if [ -f $(CURDIR)/runs/$(strip $(5))/system_good.tmp ] || [ $(6) = BuildEnv ]; then \
+	RUN_SCRIPT=true; \
+fi; \
+START=$$(date +%s); \
+if [[ $$RUN_SCRIPT == true ]]; then \
+	$(strip $(1)) >> $(strip $(2)) 2>&1; \
+else \
+	"" >> $(strip $(2)) 2>&1; \
+fi; \
+(ERR=0; \
+END=$$(date +%s); \
+DIFF=$$(( $$END - $$START )); \
+ERRS=`sed 's/^# //' $(2) | grep -w -i -e ^error -e ^fatal -e ^fatal_error -e "\[ERROR\]" -e "\[FATAL\]" -e "while\\ executing" -e "\*\* Error" -e "\*\* Fatal" -e " ERROR: " -e " FAILURE: " -C 10 |  sed 's/</\&lt;/g' | sed 's/>/\&gt;/g'`; \
+if [[ -n $$ERRS ]]; then \
+	ERR=1; \
+fi; \
+JUnitFile='results/$(strip $(5))_$(strip $(6)).xml'; \
+echo \<testsuite\> > $$JUnitFile; \
+echo \<testcase classname=\"$(FOLDER)_$(strip $(5))\" name=\"$(strip $(6))\" time=\"$$DIFF\" \> >> $$JUnitFile; \
+echo -n "$(strip $(4)) [$(HL)$(CURDIR)/$(strip $(2))$(NC)]"; \
+if [[ $$RUN_SCRIPT == false ]]; then \
+	echo " $(RED)SKIPPED$(NC)"; \
+	echo \<skipped\> >> $$JUnitFile; \
+	echo "Test skipped because the system project didn't build successfully!" >> $$JUnitFile; \
+	echo \<\/skipped\> >> $$JUnitFile; \
+elif [ $$ERR = 0 ]; then \
+	echo " $(GREEN)OK$(NC)"; \
+	echo \<passed\/\> >> $$JUnitFile; \
+	echo '' > $(CURDIR)/runs/$(strip $(5))/system_good.tmp; \
+else \
+	echo " $(RED)FAILED$(NC)"; \
+	echo "For details see $(HL)$(CURDIR)/$(strip $(2))$(NC)"; \
+	echo ""; \
+	echo \<failure\> >> $$JUnitFile; \
+	echo "$$ERRS" >> $$JUnitFile; \
+	echo \<\/failure\> >> $$JUnitFile; \
+fi; \
+echo \<\/testcase\> >> $$JUnitFile; \
+echo \<\/testsuite\> >> $$JUnitFile; \
+exit $$ERR);
+endef
+
+RUN_SIM_PATH = $(ADI_TB_DIR)/scripts/run_sim_intel.tcl
+
+# This rule template will build the environment
+# $(1): configuration name
+define build
+$(addprefix runs/,$(1)/system_project.log) : $(addprefix cfgs/,$(1).tcl) $(ENV_DEPS)
+	-rm -rf $(addprefix runs/,$(1))
+	mkdir -p runs
+	mkdir -p $(addprefix runs/,$(1))
+	mkdir -p results
+	$(RUN_PRE_OPT)$$(call simulate, \
+		$(M_QUARTUS) system_project.tcl $(1).tcl, \
+		$$@, \
+		Building $(HL)$(strip $(1))$(NC) env, \
+		Build $(HL)$(strip $(1))$(NC) env, \
+		$(1), \
+		BuildEnv)
+endef
+
+# This rule template will run the simulation
+# $(1): configuration name
+# $(2): test name
+define sim
+$(1) += $(addprefix runs/,$(addprefix $(1)/,$(2).log))
+$(addprefix runs/,$(addprefix $(1)/,$(2).log)): $(addprefix runs/,$(1)/system_project.log) $(addprefix tests/,$(2).sv) $(SV_DEPS) FORCE
+	$(RUN_PRE_OPT)$$(call simulate, \
+		flock runs/$(1)/.lock sh -c "cd runs/$(1) && $(M_VSIM) -do 'do $(RUN_SIM_PATH) $(1) $(2) $(MODE)'", \
+		$$@, \
+		Running $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
+		Run $(HL)$(strip $(2))$(NC) test on $(HL)$(strip $(1))$(NC) env, \
+		$(1), \
+		$(2))
+FORCE:
+endef
+
+# Run an arbitrary test on an arbitrary configuration by taking
+# the values from the command line and overwriting the target goal
+ifneq ($(CFG),)
+ifneq ($(TST),)
+TESTS += $(CFG):$(TST)
+.DEFAULT_GOAL := runs/$(CFG)/$(TST).log
+endif
+endif
+
+MODE ?= batch
+
+STOP_ON_ERROR ?= y
+
+ifeq ($(STOP_ON_ERROR), y)
+	RUN_PRE_OPT =
+else
+	RUN_PRE_OPT = -
+endif
+
+M_QUARTUS := quartus_sh -t
+
+ifeq ($(MODE), gui)
+M_VSIM := vsim -gui
+else
+M_VSIM := vsim -c
+endif
+
+BUILD_CFGS =
+# Extract the list of configurations
+$(foreach cfg_test, $(TESTS),\
+	$(eval cfg = $(word 1,$(subst :, ,$(cfg_test)))) \
+	$(eval BUILD_CFGS += $(cfg))\
+)
+# Make list unique
+BUILD_CFGS := $(sort $(BUILD_CFGS))
+
+.PHONY: all clean $(BUILD_CFGS)
+
+all: $(BUILD_CFGS)
+
+clean:
+	-rm -rf runs
+	-rm -rf results
+
+# Create here the targets which build the libraries
+FORCE:
+$(ADI_HDL_DIR)/library/%/.timestamp_intel: FORCE
+	flock $(dir $@).lock sh -c " \
+	$(MAKE) -C $(dir $@) intel; \
+	"; exit $$?
+
+# Create here the targets which build the sim libraries
+FORCE:
+$(ADI_TB_DIR)/library/vip/adi/%/.timestamp_intel: FORCE
+	flock $(dir $@).lock -c " \
+	$(MAKE) -C $(dir $@) intel; \
+	"; exit $$?
+
+# Create here the targets which build the test env
+$(foreach cfg, $(BUILD_CFGS), $(eval $(call build, $(cfg))))
+
+# Create here the targets which run the actual simulations
+# TESTS format:  <configuration>:<test name>
+$(foreach cfg_test, $(TESTS),\
+	$(eval cfg = $(strip $(word 1,$(subst :, ,$(cfg_test))))) \
+	$(eval test = $(strip $(word 2,$(subst :, ,$(cfg_test))))) \
+	$(eval $(call sim,$(cfg),$(test))) \
+)
+
+# Group sim targets based on env config so we can run easily all test
+# from one configuration
+# e.g "make cfg1"  will run all tests associated to that configuration
+$(foreach cfg, $(BUILD_CFGS),\
+	$(eval $(cfg): $($(cfg))) \
+)
+

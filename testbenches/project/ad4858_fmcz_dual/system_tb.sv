@@ -39,8 +39,6 @@
 
 module system_tb();
   generate
-    wire sys_200m_clk_tb;
-
     if (`LVDS_CMOS_N == 0) begin
       // ADC 0 CMOS wires
       wire adc_0_scki_tb;
@@ -96,7 +94,6 @@ module system_tb();
         .adc_1_lane_6_tp(adc_1_lane_6_tb),
         .adc_1_lane_7_tp(adc_1_lane_7_tb));
       test_harness `TH (
-        .sys_200mhz_clk_out(sys_200m_clk_tb),
         // ADC 0
         .adc_0_cnv(adc_0_cnv_tb),
         .adc_0_busy(adc_0_busy_tb),
@@ -163,7 +160,6 @@ module system_tb();
         .adc_1_sdo_p_tp(adc_1_sdo_p_tb),
         .adc_1_sdo_n_tp(adc_1_sdo_n_tb));
       test_harness `TH (
-        .sys_200mhz_clk_out(sys_200m_clk_tb),
         // ADC 0
         .adc_0_cnv(adc_0_cnv_tb),
         .adc_0_busy(adc_0_busy_tb),

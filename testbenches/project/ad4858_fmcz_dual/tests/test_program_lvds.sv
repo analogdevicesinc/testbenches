@@ -256,9 +256,9 @@ program test_program_lvds (
       .bus(base_env.mng.master_sequencer),
       .base_address(`AD4858_ADC_CLKGEN_BA));
 
-    `TH.sys_200m_clk_vip.inst.IF.start_clock();
-    `TH.adc_clk_vip.inst.IF.start_clock();
-    `TH.adc_fast_clk_vip.inst.IF.start_clock();
+    `TH.`SYS_200M_CLK.inst.IF.start_clock();
+    `TH.`ADC_CLK.inst.IF.start_clock();
+    `TH.`ADC_FAST_CLK.inst.IF.start_clock();
 
     base_env.start();
     base_env.sys_reset();
@@ -324,7 +324,9 @@ program test_program_lvds (
 
     base_env.stop();
 
-    `TH.sys_200m_clk_vip.inst.IF.stop_clock();
+    `TH.`SYS_200M_CLK.inst.IF.stop_clock();
+    `TH.`ADC_CLK.inst.IF.stop_clock();
+    `TH.`ADC_FAST_CLK.inst.IF.stop_clock();
 
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();

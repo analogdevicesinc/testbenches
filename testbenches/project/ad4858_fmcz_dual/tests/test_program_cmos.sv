@@ -255,8 +255,8 @@ program test_program_cmos (
       .bus(base_env.mng.master_sequencer),
       .base_address(`AD4858_ADC_CLKGEN_BA));
 
-    `TH.sys_200m_clk_vip.inst.IF.start_clock();
-    `TH.adc_clk_vip.inst.IF.start_clock();
+    `TH.`SYS_200M_CLK.inst.IF.start_clock();
+    `TH.`ADC_CLK.inst.IF.start_clock();
 
     base_env.start();
     base_env.sys_reset();
@@ -317,7 +317,8 @@ program test_program_cmos (
 
     base_env.stop();
 
-    `TH.sys_200m_clk_vip.inst.IF.stop_clock();
+    `TH.`SYS_200M_CLK.inst.IF.stop_clock();
+    `TH.`ADC_CLK.inst.IF.stop_clock();
 
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
     $finish();
@@ -341,7 +342,7 @@ program test_program_cmos (
   endtask: run_test_case
 
   task configure_adc(input test_case_t tc);
-    `INFO(("configure_adc: start"), ADI_VERBOSITY_NONE);
+    `INFO(("configure_adc: start"), ADI_VERBOSITY_LOW);
     // Configure ADC 0
     adc_api_ad4858_0.reset(
       .ce_n(1'b0),
@@ -384,7 +385,7 @@ program test_program_cmos (
     adc_api_ad4858_1.set_common_control_3(
       .crc_en(tc.crc_en),
       .custom_control(adc_custom_ctrl));
-    `INFO(("configure_adc: done"), ADI_VERBOSITY_NONE);
+    `INFO(("configure_adc: done"), ADI_VERBOSITY_LOW);
   endtask: configure_adc
 
   task reset_all();
@@ -463,18 +464,38 @@ program test_program_cmos (
   endtask: reset_all
 
   task enable_adc_ch();
-    `INFO(("enable_adc_ch: start"), ADI_VERBOSITY_NONE);
+    `INFO(("enable_adc_ch: start"), ADI_VERBOSITY_LOW);
     for (int i = 0; i < NUMB_OF_CH; i=i+1) begin
       adc_api_ad4858_0.enable_channel(i);
       adc_api_ad4858_1.enable_channel(i);
     end
-    `INFO(("enable_adc_ch: done"), ADI_VERBOSITY_NONE);
+    `INFO(("enable_adc_ch: done"), ADI_VERBOSITY_LOW);
   endtask: enable_adc_ch
 
   task transmission_config();
-    `INFO(("transmission_config: enabling clkgen"), ADI_VERBOSITY_NONE);
+    `INFO(("transmission_config: enabling clkgen"), ADI_VERBOSITY_LOW);
     clkgen_api.enable_clkgen();
-    `INFO(("transmission_config: clkgen enabled"), ADI_VERBOSITY_NONE);
+    `INFO(("transmission_config: clkgen enabled"), ADI_VERBOSITY_LOW);
+
+    // PWM 0
+    pwm_0_api.reset();
+    pwm_0_api.pulse_period_config(0, PERIOD);
+    pwm_0_api.pulse_width_config(0, 'd8);
+    pwm_0_api.load_config();
+    pwm_0_api.start();
+
+    // PWM 1
+    pwm_1_api.reset();
+    pwm_1_api.pulse_period_config(0, PERIOD);
+    pwm_1_api.pulse_width_config(0, 'd8);
+    pwm_1_api.load_config();
+    pwm_1_api.start();
+
+    // util_cpack2 outputs a zero word for the first conversion after the
+    // channels are enabled. Let two conversions pass (one conversion is
+    // 4 * PERIOD adc_clk cycles) before the DMAs start capturing, so
+    // that word is not stored.
+    repeat (8 * PERIOD) @(posedge `TH.adc_clk_out);
 
     // DMA 0
     dma_0_api.enable_dma();
@@ -501,21 +522,7 @@ program test_program_cmos (
     dma_1_api.set_dest_addr(`DDR_BA + NO_OF_B + 1);
     dma_1_api.transfer_id_get(rx_transfer_id_1);
     dma_1_api.transfer_start();
-
-    // PWM 0
-    pwm_0_api.reset();
-    pwm_0_api.pulse_period_config(0, PERIOD);
-    pwm_0_api.pulse_width_config(0, 'd8);
-    pwm_0_api.load_config();
-    pwm_0_api.start();
-
-    // PWM 1
-    pwm_1_api.reset();
-    pwm_1_api.pulse_period_config(0, PERIOD);
-    pwm_1_api.pulse_width_config(0, 'd8);
-    pwm_1_api.load_config();
-    pwm_1_api.start();
-    `INFO(("transmission_config: done, waiting for DMA 0"), ADI_VERBOSITY_NONE);
+    `INFO(("transmission_config: done, waiting for DMA 0"), ADI_VERBOSITY_LOW);
   endtask: transmission_config
 
   task prepare_data(input test_case_t tc);
@@ -631,11 +638,11 @@ program test_program_cmos (
     int          word_addr;
     logic crc_err_status;
 
-    `INFO(("capture_data: waiting for DMA 0 transfer %0d", rx_transfer_id_0), ADI_VERBOSITY_NONE);
+    `INFO(("capture_data: waiting for DMA 0 transfer %0d", rx_transfer_id_0), ADI_VERBOSITY_LOW);
     dma_0_api.wait_transfer_done(rx_transfer_id_0, , 100);
-    `INFO(("capture_data: DMA 0 done, waiting for DMA 1 transfer %0d", rx_transfer_id_1), ADI_VERBOSITY_NONE);
+    `INFO(("capture_data: DMA 0 done, waiting for DMA 1 transfer %0d", rx_transfer_id_1), ADI_VERBOSITY_LOW);
     dma_1_api.wait_transfer_done(rx_transfer_id_1, , 100);
-    `INFO(("capture_data: DMA 1 done"), ADI_VERBOSITY_NONE);
+    `INFO(("capture_data: DMA 1 done"), ADI_VERBOSITY_LOW);
     pwm_0_api.reset();
     pwm_1_api.reset();
 
@@ -709,31 +716,6 @@ program test_program_cmos (
     end
   end
 
-  // Monitor adc_reset: print on every change
-  initial begin : dbg_reset_monitor
-    forever begin
-      @(`TH.adc_reset);
-      $display("ADC_RESET=%b t=%0t", `TH.adc_reset, $time);
-    end
-  end
-
-  // Monitor packer0 packed_fifo_wr_EN: print each posedge
-  initial begin : dbg_pack_monitor
-    forever begin
-      @(posedge `TH.ad4858_adc_pack_0_packed_fifo_wr_EN);
-      $display("PACK0_EN t=%0t reset=%b", $time, `TH.adc_reset);
-    end
-  end
-
-  // Monitor adc_valid: print first 5 posedges then stop
-  initial begin : dbg_valid_monitor
-    repeat(5) begin
-      @(posedge `TH.axi_ad4858_0_adc_valid);
-      $display("VALID t=%0t reset=%b pack0_en=%b",
-               $time, `TH.adc_reset, `TH.ad4858_adc_pack_0_packed_fifo_wr_EN);
-    end
-  end
-
   // ADC 0 behavioral model
   initial begin
     forever begin
@@ -747,7 +729,7 @@ program test_program_cmos (
       end
 
       if (~cnvs_d_0 & adc_0_cnvs_tp && busy_0 == 0) begin
-        `INFO(("ADC0 model: CNV rising edge detected"), ADI_VERBOSITY_NONE);
+        `INFO(("ADC0 model: CNV rising edge detected"), ADI_VERBOSITY_LOW);
       end
 
       if ((~cnvs_d_0 & adc_0_cnvs_tp && busy_0 == 0) || busy_os_0 == 1) begin
@@ -773,7 +755,7 @@ program test_program_cmos (
       cnvs_d_0 = adc_0_cnvs_tp;
 
       if (busy_d_0 & !busy_0) begin
-        `INFO(("ADC0 model: conversion done, scki=%b", adc_0_scki_tp), ADI_VERBOSITY_NONE);
+        `INFO(("ADC0 model: conversion done, scki=%b", adc_0_scki_tp), ADI_VERBOSITY_LOW);
         db_i_index_0 = packet_sz - 1;
         ring_buffer_index_0 = 0;
         scki_counter_0 = scki_edges_0;

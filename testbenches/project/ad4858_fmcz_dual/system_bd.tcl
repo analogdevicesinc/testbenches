@@ -35,10 +35,6 @@
 
 global ad_project_params
 
-# system level parameters
-set DEVICE "AD4858"
-adi_sim_add_define "DEVICE_NO=4858"
-
 #
 #  Block design under test
 #
@@ -84,9 +80,6 @@ ad_ip_instance clk_vip sys_200m_clk_vip [list \
 adi_sim_add_define "SYS_200M_CLK=sys_200m_clk_vip"
 ad_connect sys_200m_clk sys_200m_clk_vip/clk_out
 
-create_bd_port -dir O sys_200mhz_clk_out
-ad_connect sys_200mhz_clk_out sys_200m_clk_vip/clk_out
-
 # Disable IDELAYCTRL instantiation — delay_locked becomes 1'b1 immediately.
 ad_ip_parameter axi_ad4858_0 CONFIG.IODELAY_CTRL 0
 ad_ip_parameter axi_ad4858_1 CONFIG.IODELAY_CTRL 0
@@ -109,7 +102,7 @@ create_bd_port -dir O adc_clk_out
 ad_connect adc_clk_out adc_clk_vip/clk_out
 
 if {$LVDS_CMOS_N == 1} {
-  # LVDS also uses a 400MHz fast clock from the MMCM second output - bypass it too
+  # LVDS also uses a fast clock from the MMCM second output - bypass it too
   ad_ip_instance clk_vip adc_fast_clk_vip [list \
     INTERFACE_MODE {MASTER} \
     FREQ_HZ 200000000 \
@@ -117,9 +110,6 @@ if {$LVDS_CMOS_N == 1} {
   adi_sim_add_define "ADC_FAST_CLK=adc_fast_clk_vip"
   disconnect_bd_net [get_bd_nets adc_fast_clk] [get_bd_pins adc_clkgen/clk_1]
   ad_connect adc_fast_clk adc_fast_clk_vip/clk_out
-
-  create_bd_port -dir O adc_fast_clk_out
-  ad_connect adc_fast_clk_out adc_fast_clk_vip/clk_out
 }
 
 # AXI address map for ADC 0

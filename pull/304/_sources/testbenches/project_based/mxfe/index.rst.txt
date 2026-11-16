@@ -102,8 +102,6 @@ The following parameters of this testbench can be configured:
 -  LANE_RATE: the JESD204 lane rate in Gbps
 -  PLL_TYPE: the transceiver PLL type (QPLL0 or QPLL1)
 -  [RX/TX]_LANE_RATE: per-direction lane rate in Gbps
--  [RX/TX]_PLL_SEL: transceiver PLL selection (2 = QPLL1); set in some
-   configuration files, but not used by the AD9081 block design
 -  [RX/TX]_NUM_LINKS: number of JESD204 links
 -  [RX/TX]_JESD_M: number of converters per link
 -  [RX/TX]_JESD_L: number of lanes per link
@@ -169,13 +167,6 @@ The following configuration files are available:
      - 10
      - 16.5
      - 10
-   * - RX_PLL_SEL
-     - ---
-     - 2
-     - 2
-     - 2
-     - 2
-     - ---
    * - TX_LANE_RATE
      - 10
      - 16.5
@@ -183,13 +174,6 @@ The following configuration files are available:
      - 10
      - 16.5
      - 10
-   * - TX_PLL_SEL
-     - ---
-     - 2
-     - 2
-     - 2
-     - 2
-     - ---
    * - RX_NUM_LINKS
      - 1
      - 1
@@ -343,11 +327,11 @@ Tests
 
 The following test program file is available:
 
-============ ==========================================
+============ ============================================
 Test program Usage
-============ ==========================================
-test_program Tests the MxFE JESD204 project data paths.
-============ ==========================================
+============ ============================================
+test_program Tests the MxFE JESD204 interface data paths.
+============ ============================================
 
 Available configurations & tests combinations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -437,54 +421,45 @@ JESD link test (DDS)
 
 Tests the JESD204 data path using DDS-generated tones:
 
-* **TX PHY initialization** — bring up the TX transceiver.
-* **DAC TPL configuration** — for each TX converter, select DDS as the data
-  source and configure tone amplitude (``DDS_SCALE_1``) and frequency increment
-  (``DDS_INCR_1``).
-* **Release DAC reset** — deassert ``RSTN`` on the DAC common block.
-* **Synchronize DDS cores** — trigger DDS synchronization via the DAC common
-  control register.
-* **Configure data offload** — set the RX offload to one-shot mode and the TX
-  offload to normal (non-bypass) mode, without hardware sync.
-* **Bring up TX link** — start the TX link layer.
-* **RX PHY initialization** — bring up the RX transceiver.
-* **ADC TPL configuration** — enable all RX converter channels.
-* **Release ADC reset** — deassert ``RSTN`` on the ADC common block.
-* **Bring up RX link** — start the RX link layer.
-* **Wait for link-up** — wait for both TX and RX link layers to report
-  link-up status.
-* **Simulation delay** — wait 5 us for data flow and link stabilization.
-* **Link shutdown** — bring down both links and transceivers.
+* Initialize the TX PHY.
+* Configure the DAC TPL: select DDS as the data source for each TX converter
+  and set the tone amplitude and frequency.
+* Release the DAC reset.
+* Synchronize the DDS cores.
+* Configure the RX data offload in one-shot mode and the TX data offload in
+  normal mode, without hardware sync.
+* Bring up the TX link.
+* Initialize the RX PHY.
+* Enable all ADC TPL channels.
+* Release the ADC reset.
+* Bring up the RX link.
+* Wait for both links to report link-up status.
+* Wait 5 us for data to flow.
+* Bring down both links and transceivers.
 
 JESD link test (DMA)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Tests the JESD204 data path using DMA-based stimulus:
 
-* **TX PHY initialization** — bring up the TX transceiver.
-* **DAC TPL configuration** — for each TX converter, select DMA as the data
-  source.
-* **Release DAC reset** — deassert ``RSTN`` on the DAC common block.
-* **Configure data offload** — set the RX offload to one-shot mode and the TX
-  offload to normal (non-bypass) mode, without hardware sync.
-* **Write test data to DDR** — write a deterministic incremental pattern to
-  DDR memory via ``BackdoorWrite32``. Handles both 16-bit and 12-bit sample
-  packing (based on ``TX_JESD_NP``).
-* **Configure TX DMA** — enable the TX DMA engine, set transfer length, source
-  address, and submit the transfer.
-* **Configure RX DMA** — enable the RX DMA engine, set transfer length,
-  destination address, and submit the transfer.
-* **Wait for data propagation** — wait 5 us for DMA and offload.
-* **Bring up TX link** — start the TX link layer.
-* **RX PHY initialization** — bring up the RX transceiver.
-* **ADC TPL configuration** — enable all RX converter channels.
-* **Release ADC reset** — deassert ``RSTN`` on the ADC common block.
-* **Bring up RX link** — start the RX link layer.
-* **Wait for link-up** — wait for both links to report link-up status.
-* **Simulation delay** — wait 5 us for data flow.
-* **Verify captured data** — call ``check_captured_data`` to verify the
-  received data in DDR matches the expected incremental pattern.
-* **Link shutdown** — bring down both links and transceivers.
+* Initialize the TX PHY.
+* Select DMA as the data source for each TX converter.
+* Release the DAC reset.
+* Configure the RX data offload in one-shot mode and the TX data offload in
+  normal mode, without hardware sync.
+* Write an incremental pattern to DDR memory, packed according to
+  ``TX_JESD_NP`` (16-bit or 12-bit samples).
+* Configure and start the TX and RX DMA transfers.
+* Wait 5 us for the data to propagate.
+* Bring up the TX link.
+* Initialize the RX PHY.
+* Enable all ADC TPL channels.
+* Release the ADC reset.
+* Bring up the RX link.
+* Wait for both links to report link-up status.
+* Wait 5 us for data to flow.
+* Verify that the data captured in DDR matches the expected pattern.
+* Bring down both links and transceivers.
 
 JESD link test (DMA — RX/TX bypass)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -502,9 +477,8 @@ the data offloads. The test is run for every configuration, but the TDD engine
 (``axi_tdd_0``) is instantiated only when ``TDD_SUPPORT=1`` (``cfg6_m16_l8_tdd``);
 for the other configurations the TDD register writes have no target:
 
-* **TX offload** — set to single-shot mode with hardware sync.
-* **RX offload** — set to single-shot mode with hardware sync.
-* **TDD configuration** — configure the TDD engine:
+* Configure the TX and RX data offloads in one-shot mode with hardware sync.
+* Configure the TDD engine:
 
   - Set frame length to 2048 cycles.
   - Configure channel 0 (TX trigger): ON at cycle 0, OFF at cycle 10.
@@ -522,16 +496,13 @@ JESD link test (DDS — external sync)
 Tests the external synchronization mechanism with DDS-generated tones:
 
 * Bring up the full TX and RX data paths (same as the DDS test).
-* **Configure data offload** — set RX offload to one-shot mode with a defined
-  transfer length.
-* **Arm external sync** — write to DAC and ADC TPL sync control registers and
-  verify both report armed status via ``DAC_SYNC_STATUS`` and ``ADC_SYNC``.
-* **Trigger external sync** — pulse the ``ext_sync`` signal for one
-  ``device_clk`` cycle.
-* **Verify sync capture** — confirm that both DAC and ADC TPL blocks have
-  captured the sync event (status transitions from armed to triggered). The
-  received data is not checked in this test.
-* **Link shutdown** — bring down links and transceivers.
+* Configure the RX data offload in one-shot mode.
+* Arm the external sync in the DAC and ADC TPLs and check that both report
+  the armed status.
+* Pulse ``ext_sync`` for one ``device_clk`` cycle.
+* Check that both DAC and ADC TPLs captured the sync event. The received data
+  is not checked in this test.
+* Bring down both links and transceivers.
 
 JESD link test (DMA — external sync)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -543,13 +514,8 @@ above. Only the sync status is verified; the captured data is not checked.
 Stop the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Environment Stop
-   - The base testbench environment is stopped to end the test.
-* Stop All Clocks
-   - All clocks started previously (``REF_CLK``, ``DEVICE_CLK``,
-     ``SYSREF_CLK``) are stopped to ensure clean shutdown.
-* Reporting
-   - A final informational message indicates that the test has completed.
+* Stop the environment
+* Stop the clocks
 
 Building the testbench
 -------------------------------------------------------------------------------
@@ -691,9 +657,6 @@ Testbench specific dependencies:
      - ---
    * - DMAC_API
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
-     - ---
-   * - TDD_API
-     - :git-testbenches:`library/drivers/tdd_api_pkg.sv`
      - ---
    * - ADI_REGMAP_DMAC_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`

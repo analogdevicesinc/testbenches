@@ -8,9 +8,9 @@
 
     <title>MxFE &#8212; Testbenches  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=b1d7a81a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=07ad7716" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
-    <script async="async" src="../../../_static/app.umd.js?v=048c1170"></script>
+    <script async="async" src="../../../_static/app.umd.js?v=2fe15c61"></script>
     <link rel="icon" href="../../../_static/icon.svg"/>
     <link rel="index" title="Index" href="../../../genindex/" />
     <link rel="search" title="Search" href="../../../search/" />
@@ -390,8 +390,6 @@ and the PS AXI VIP to the DDR VIP</p></td>
 <li><p>LANE_RATE: the JESD204 lane rate in Gbps</p></li>
 <li><p>PLL_TYPE: the transceiver PLL type (QPLL0 or QPLL1)</p></li>
 <li><p>[RX/TX]_LANE_RATE: per-direction lane rate in Gbps</p></li>
-<li><p>[RX/TX]_PLL_SEL: transceiver PLL selection (2 = QPLL1); set in some
-configuration files, but not used by the AD9081 block design</p></li>
 <li><p>[RX/TX]_NUM_LINKS: number of JESD204 links</p></li>
 <li><p>[RX/TX]_JESD_M: number of converters per link</p></li>
 <li><p>[RX/TX]_JESD_L: number of lanes per link</p></li>
@@ -463,29 +461,13 @@ configuration files, but not used by the AD9081 block design</p></li>
 <td><p>16.5</p></td>
 <td><p>10</p></td>
 </tr>
-<tr class="row-odd"><td><p>RX_PLL_SEL</p></td>
-<td><p>—</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-even"><td><p>TX_LANE_RATE</p></td>
+<tr class="row-odd"><td><p>TX_LANE_RATE</p></td>
 <td><p>10</p></td>
 <td><p>16.5</p></td>
 <td><p>16.5</p></td>
 <td><p>10</p></td>
 <td><p>16.5</p></td>
 <td><p>10</p></td>
-</tr>
-<tr class="row-odd"><td><p>TX_PLL_SEL</p></td>
-<td><p>—</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>2</p></td>
-<td><p>—</p></td>
 </tr>
 <tr class="row-even"><td><p>RX_NUM_LINKS</p></td>
 <td><p>1</p></td>
@@ -671,7 +653,7 @@ configuration files, but not used by the AD9081 block design</p></li>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>test_program</p></td>
-<td><p>Tests the MxFE JESD204 project data paths.</p></td>
+<td><p>Tests the MxFE JESD204 interface data paths.</p></td>
 </tr>
 </tbody>
 </table>
@@ -810,54 +792,45 @@ sequencer with their respective base addresses.</p></li>
 <h3>JESD link test (DDS)<a class="headerlink" href="#jesd-link-test-dds" title="Link to this heading"></a></h3>
 <p>Tests the JESD204 data path using DDS-generated tones:</p>
 <ul class="simple">
-<li><p><strong>TX PHY initialization</strong> — bring up the TX transceiver.</p></li>
-<li><p><strong>DAC TPL configuration</strong> — for each TX converter, select DDS as the data
-source and configure tone amplitude (<code class="docutils literal notranslate"><span class="pre">DDS_SCALE_1</span></code>) and frequency increment
-(<code class="docutils literal notranslate"><span class="pre">DDS_INCR_1</span></code>).</p></li>
-<li><p><strong>Release DAC reset</strong> — deassert <code class="docutils literal notranslate"><span class="pre">RSTN</span></code> on the DAC common block.</p></li>
-<li><p><strong>Synchronize DDS cores</strong> — trigger DDS synchronization via the DAC common
-control register.</p></li>
-<li><p><strong>Configure data offload</strong> — set the RX offload to one-shot mode and the TX
-offload to normal (non-bypass) mode, without hardware sync.</p></li>
-<li><p><strong>Bring up TX link</strong> — start the TX link layer.</p></li>
-<li><p><strong>RX PHY initialization</strong> — bring up the RX transceiver.</p></li>
-<li><p><strong>ADC TPL configuration</strong> — enable all RX converter channels.</p></li>
-<li><p><strong>Release ADC reset</strong> — deassert <code class="docutils literal notranslate"><span class="pre">RSTN</span></code> on the ADC common block.</p></li>
-<li><p><strong>Bring up RX link</strong> — start the RX link layer.</p></li>
-<li><p><strong>Wait for link-up</strong> — wait for both TX and RX link layers to report
-link-up status.</p></li>
-<li><p><strong>Simulation delay</strong> — wait 5 us for data flow and link stabilization.</p></li>
-<li><p><strong>Link shutdown</strong> — bring down both links and transceivers.</p></li>
+<li><p>Initialize the TX PHY.</p></li>
+<li><p>Configure the DAC TPL: select DDS as the data source for each TX converter
+and set the tone amplitude and frequency.</p></li>
+<li><p>Release the DAC reset.</p></li>
+<li><p>Synchronize the DDS cores.</p></li>
+<li><p>Configure the RX data offload in one-shot mode and the TX data offload in
+normal mode, without hardware sync.</p></li>
+<li><p>Bring up the TX link.</p></li>
+<li><p>Initialize the RX PHY.</p></li>
+<li><p>Enable all ADC TPL channels.</p></li>
+<li><p>Release the ADC reset.</p></li>
+<li><p>Bring up the RX link.</p></li>
+<li><p>Wait for both links to report link-up status.</p></li>
+<li><p>Wait 5 us for data to flow.</p></li>
+<li><p>Bring down both links and transceivers.</p></li>
 </ul>
 </section>
 <section id="jesd-link-test-dma">
 <h3>JESD link test (DMA)<a class="headerlink" href="#jesd-link-test-dma" title="Link to this heading"></a></h3>
 <p>Tests the JESD204 data path using DMA-based stimulus:</p>
 <ul class="simple">
-<li><p><strong>TX PHY initialization</strong> — bring up the TX transceiver.</p></li>
-<li><p><strong>DAC TPL configuration</strong> — for each TX converter, select DMA as the data
-source.</p></li>
-<li><p><strong>Release DAC reset</strong> — deassert <code class="docutils literal notranslate"><span class="pre">RSTN</span></code> on the DAC common block.</p></li>
-<li><p><strong>Configure data offload</strong> — set the RX offload to one-shot mode and the TX
-offload to normal (non-bypass) mode, without hardware sync.</p></li>
-<li><p><strong>Write test data to DDR</strong> — write a deterministic incremental pattern to
-DDR memory via <code class="docutils literal notranslate"><span class="pre">BackdoorWrite32</span></code>. Handles both 16-bit and 12-bit sample
-packing (based on <code class="docutils literal notranslate"><span class="pre">TX_JESD_NP</span></code>).</p></li>
-<li><p><strong>Configure TX DMA</strong> — enable the TX DMA engine, set transfer length, source
-address, and submit the transfer.</p></li>
-<li><p><strong>Configure RX DMA</strong> — enable the RX DMA engine, set transfer length,
-destination address, and submit the transfer.</p></li>
-<li><p><strong>Wait for data propagation</strong> — wait 5 us for DMA and offload.</p></li>
-<li><p><strong>Bring up TX link</strong> — start the TX link layer.</p></li>
-<li><p><strong>RX PHY initialization</strong> — bring up the RX transceiver.</p></li>
-<li><p><strong>ADC TPL configuration</strong> — enable all RX converter channels.</p></li>
-<li><p><strong>Release ADC reset</strong> — deassert <code class="docutils literal notranslate"><span class="pre">RSTN</span></code> on the ADC common block.</p></li>
-<li><p><strong>Bring up RX link</strong> — start the RX link layer.</p></li>
-<li><p><strong>Wait for link-up</strong> — wait for both links to report link-up status.</p></li>
-<li><p><strong>Simulation delay</strong> — wait 5 us for data flow.</p></li>
-<li><p><strong>Verify captured data</strong> — call <code class="docutils literal notranslate"><span class="pre">check_captured_data</span></code> to verify the
-received data in DDR matches the expected incremental pattern.</p></li>
-<li><p><strong>Link shutdown</strong> — bring down both links and transceivers.</p></li>
+<li><p>Initialize the TX PHY.</p></li>
+<li><p>Select DMA as the data source for each TX converter.</p></li>
+<li><p>Release the DAC reset.</p></li>
+<li><p>Configure the RX data offload in one-shot mode and the TX data offload in
+normal mode, without hardware sync.</p></li>
+<li><p>Write an incremental pattern to DDR memory, packed according to
+<code class="docutils literal notranslate"><span class="pre">TX_JESD_NP</span></code> (16-bit or 12-bit samples).</p></li>
+<li><p>Configure and start the TX and RX DMA transfers.</p></li>
+<li><p>Wait 5 us for the data to propagate.</p></li>
+<li><p>Bring up the TX link.</p></li>
+<li><p>Initialize the RX PHY.</p></li>
+<li><p>Enable all ADC TPL channels.</p></li>
+<li><p>Release the ADC reset.</p></li>
+<li><p>Bring up the RX link.</p></li>
+<li><p>Wait for both links to report link-up status.</p></li>
+<li><p>Wait 5 us for data to flow.</p></li>
+<li><p>Verify that the data captured in DDR matches the expected pattern.</p></li>
+<li><p>Bring down both links and transceivers.</p></li>
 </ul>
 </section>
 <section id="jesd-link-test-dma-rx-tx-bypass">
@@ -874,9 +847,8 @@ the data offloads. The test is run for every configuration, but the TDD engine
 (<code class="docutils literal notranslate"><span class="pre">axi_tdd_0</span></code>) is instantiated only when <code class="docutils literal notranslate"><span class="pre">TDD_SUPPORT=1</span></code> (<code class="docutils literal notranslate"><span class="pre">cfg6_m16_l8_tdd</span></code>);
 for the other configurations the TDD register writes have no target:</p>
 <ul class="simple">
-<li><p><strong>TX offload</strong> — set to single-shot mode with hardware sync.</p></li>
-<li><p><strong>RX offload</strong> — set to single-shot mode with hardware sync.</p></li>
-<li><p><strong>TDD configuration</strong> — configure the TDD engine:</p>
+<li><p>Configure the TX and RX data offloads in one-shot mode with hardware sync.</p></li>
+<li><p>Configure the TDD engine:</p>
 <ul>
 <li><p>Set frame length to 2048 cycles.</p></li>
 <li><p>Configure channel 0 (TX trigger): ON at cycle 0, OFF at cycle 10.</p></li>
@@ -895,16 +867,13 @@ verification, the TDD engine is disabled.</p></li>
 <p>Tests the external synchronization mechanism with DDS-generated tones:</p>
 <ul class="simple">
 <li><p>Bring up the full TX and RX data paths (same as the DDS test).</p></li>
-<li><p><strong>Configure data offload</strong> — set RX offload to one-shot mode with a defined
-transfer length.</p></li>
-<li><p><strong>Arm external sync</strong> — write to DAC and ADC TPL sync control registers and
-verify both report armed status via <code class="docutils literal notranslate"><span class="pre">DAC_SYNC_STATUS</span></code> and <code class="docutils literal notranslate"><span class="pre">ADC_SYNC</span></code>.</p></li>
-<li><p><strong>Trigger external sync</strong> — pulse the <code class="docutils literal notranslate"><span class="pre">ext_sync</span></code> signal for one
-<code class="docutils literal notranslate"><span class="pre">device_clk</span></code> cycle.</p></li>
-<li><p><strong>Verify sync capture</strong> — confirm that both DAC and ADC TPL blocks have
-captured the sync event (status transitions from armed to triggered). The
-received data is not checked in this test.</p></li>
-<li><p><strong>Link shutdown</strong> — bring down links and transceivers.</p></li>
+<li><p>Configure the RX data offload in one-shot mode.</p></li>
+<li><p>Arm the external sync in the DAC and ADC TPLs and check that both report
+the armed status.</p></li>
+<li><p>Pulse <code class="docutils literal notranslate"><span class="pre">ext_sync</span></code> for one <code class="docutils literal notranslate"><span class="pre">device_clk</span></code> cycle.</p></li>
+<li><p>Check that both DAC and ADC TPLs captured the sync event. The received data
+is not checked in this test.</p></li>
+<li><p>Bring down both links and transceivers.</p></li>
 </ul>
 </section>
 <section id="jesd-link-test-dma-external-sync">
@@ -916,28 +885,8 @@ above. Only the sync status is verified; the captured data is not checked.</p>
 <section id="stop-the-environment">
 <h3>Stop the environment<a class="headerlink" href="#stop-the-environment" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><dl class="simple">
-<dt>Environment Stop</dt><dd><ul>
-<li><p>The base testbench environment is stopped to end the test.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Stop All Clocks</dt><dd><ul>
-<li><p>All clocks started previously (<code class="docutils literal notranslate"><span class="pre">REF_CLK</span></code>, <code class="docutils literal notranslate"><span class="pre">DEVICE_CLK</span></code>,
-<code class="docutils literal notranslate"><span class="pre">SYSREF_CLK</span></code>) are stopped to ensure clean shutdown.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>Reporting</dt><dd><ul>
-<li><p>A final informational message indicates that the test has completed.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
+<li><p>Stop the environment</p></li>
+<li><p>Stop the clocks</p></li>
 </ul>
 </section>
 </section>
@@ -1167,51 +1116,47 @@ clean folder (no runs folder available):</p>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/dmac/dmac_api.sv" target="_blank">library/drivers/dmac/dmac_api.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>TDD_API</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/drivers/tdd_api_pkg.sv" target="_blank">library/drivers/tdd_api_pkg.sv</a></p></td>
-<td><p>—</p></td>
-</tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_DMAC_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dmac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dmac_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_PKG</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_pkg.sv" target="_blank">library/regmaps/adi_regmap_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_ADC_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_ADC_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_adc_pkg.sv" target="_blank">library/regmaps/adi_regmap_adc_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_COMMON_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_common_pkg.sv" target="_blank">library/regmaps/adi_regmap_common_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_DAC_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_DAC_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_dac_pkg.sv" target="_blank">library/regmaps/adi_regmap_dac_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_JESD_RX_PKG</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_JESD_RX_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_rx_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_rx_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_JESD_TX_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_JESD_TX_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_tx_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_tx_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_JESD_TPL_PKG</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_JESD_TPL_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_jesd_tpl_pkg.sv" target="_blank">library/regmaps/adi_regmap_jesd_tpl_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_XCVR_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_XCVR_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_xcvr_pkg.sv" target="_blank">library/regmaps/adi_regmap_xcvr_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-even"><td><p>ADI_REGMAP_TDD_GEN_PKG</p></td>
+<tr class="row-odd"><td><p>ADI_REGMAP_TDD_GEN_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_tdd_gen_pkg.sv" target="_blank">library/regmaps/adi_regmap_tdd_gen_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>ADI_REGMAP_TDD_TRANS_PKG</p></td>
+<tr class="row-even"><td><p>ADI_REGMAP_TDD_TRANS_PKG</p></td>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/adi_regmap_tdd_trans_pkg.sv" target="_blank">library/regmaps/adi_regmap_tdd_trans_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>

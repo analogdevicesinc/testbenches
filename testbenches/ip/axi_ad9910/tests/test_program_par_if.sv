@@ -57,9 +57,9 @@ import logger_pkg::*;
 import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import test_harness_env_pkg::*;
+import watchdog_pkg::*;
 import ad9910_api_pkg::*;
 import dmac_api_pkg::*;
-import dma_trans_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
@@ -88,9 +88,10 @@ program test_program_par_if;
   // wait_tx_idle / wait_captures.
   localparam int unsigned CDC_SETTLE_NS = 2000;
 
-  // Safety net for wait_tx_idle. Draining a full 16-entry FIFO at the slowest
+  // wait_tx_idle's watchdog timer. Draining a full 16-entry FIFO at the slowest
   // rate used here (200, i.e. a 201-cycle period) takes 16*201 pd_clk = 12.9 us
-  // at 250 MHz, so this only ever expires if the output is genuinely stuck.
+  // at 250 MHz, so it only ever expires - fatally - if the output is genuinely
+  // stuck.
   localparam int unsigned TX_IDLE_TIMEOUT_NS = 50000;
 
   // DDR source base for the DMA. The generated DDR_BASE macro expands to the bare
@@ -172,7 +173,7 @@ program test_program_par_if;
   task automatic ddr_write_samples(input [31:0] base_addr, input logic [15:0] s[]);
     int unsigned nwords;
     logic [15:0] lo, hi;
-    nwords = (s.size() + 1) / 2;
+    nwords = $ceil(s.size() / 2.0);
     for (int i = 0; i < nwords; i++) begin
       lo = s[2*i];
       hi = ((2*i + 1) < s.size()) ? s[2*i + 1] : 16'h0;
@@ -187,23 +188,23 @@ program test_program_par_if;
   // tx_enable is high yields one entry per emitted sample - the only way to
   // observe transfers now that the debug counters are gone.
   logic [15:0] captured [$];
-  bit          monitor_enabled = 0;
+  bit          db_o_monitor_enabled = 0;
 
   initial begin : db_o_monitor
     forever begin
       @(posedge `TH.`PD_CLK_VIP.clk_out);
-      if (monitor_enabled && get_tx_enable())
+      if (db_o_monitor_enabled && get_tx_enable())
         captured.push_back(get_db_o());
     end
   end : db_o_monitor
 
-  task enable_monitor();
+  task enable_db_o_monitor();
     captured.delete();
-    monitor_enabled = 1;
+    db_o_monitor_enabled = 1;
   endtask
 
-  task disable_monitor();
-    monitor_enabled = 0;
+  task disable_db_o_monitor();
+    db_o_monitor_enabled = 0;
   endtask
 
   // Poll the capture queue until it holds `target` samples or the timeout
@@ -247,35 +248,34 @@ program test_program_par_if;
   // drain actually needs.
   task automatic wait_tx_idle(input [31:0] rate);
     int unsigned quiet, run;
-    time         deadline;
+    watchdog     idle_wd;
     quiet    = tx_idle_quiet(rate);
     run      = 0;
-    deadline = $time + TX_IDLE_TIMEOUT_NS;
+    idle_wd = new("wait_tx_idle watchdog", TX_IDLE_TIMEOUT_NS,
+                  $sformatf("wait_tx_idle: output still active after %0d ns (rate=%0d)",
+                            TX_IDLE_TIMEOUT_NS, rate));
+    idle_wd.start();
     while (run < quiet) begin
       @(posedge `TH.`PD_CLK_VIP.clk_out);
       run = get_tx_enable() ? 0 : (run + 1);
-      if ($time >= deadline) begin
-        `ERROR(("  wait_tx_idle: output still active after %0d ns (rate=%0d)",
-                TX_IDLE_TIMEOUT_NS, rate));
-        return;
-      end
     end
+    idle_wd.stop();
   endtask
 
   // --------------------------
   // TX DMA + interface control
   // --------------------------
   // Start a TX DMA of `nsamples` 16-bit samples from DDR (2 bytes each, packed
-  // two per 32-bit source word, so the byte length is nsamples*2).
+  // two per 32-bit source word, so the byte length is nsamples*2; X_LENGTH is
+  // programmed as that minus one).
   task automatic start_dma_samples(input [31:0] src_addr, input int unsigned nsamples);
-    dma_segment seg;
-    int tid;
-    tx_dma.enable_dma();
-    tx_dma.set_flags(.cyclic(1'b0), .tlast(1'b0), .partial_reporting_en(1'b0));
-    seg = new(tx_dma.get_params());
-    seg.length   = nsamples * 2;
-    seg.src_addr = src_addr;
-    tx_dma.submit_transfer(seg, tid);
+    tx_dma.set_flags(
+      .cyclic(1'b0),
+      .tlast(1'b0),
+      .partial_reporting_en(1'b0));
+    tx_dma.set_src_addr(src_addr);
+    tx_dma.set_lengths(nsamples * 2 - 1, 0);
+    tx_dma.transfer_start();
   endtask
 
   // Enable the parallel interface at the given internal update rate (0 = fastest,
@@ -309,11 +309,11 @@ program test_program_par_if;
                               input [31:0] rate, input int unsigned timeout_us);
     enable_par_if(rate);
     wait_tx_idle(rate);   // drain any residual from a prior transfer (monitor off)
-    enable_monitor();     // clear and begin capturing the fresh transfer
+    enable_db_o_monitor(); // clear and begin capturing the fresh transfer
     start_dma_samples(src, nsamples);
     wait_captures(nsamples, timeout_us);
     wait_tx_idle(rate);   // let the transfer fully finish before disabling
-    disable_monitor();
+    disable_db_o_monitor();
     disable_par_if();
     `INFO(("  (%0d samples captured)", captured.size()), ADI_VERBOSITY_LOW);
   endtask
@@ -321,13 +321,15 @@ program test_program_par_if;
   // --------------------------
   // Stream comparison
   // --------------------------
-  // Compare the captured samples against an expected array (order and value).
+  // Compare the captured samples against an expected array (order, value and
+  // count). wait_captures returns as soon as enough samples have arrived, so
+  // extra words emitted after them are only caught by the exact count here.
   task automatic check_stream(input logic [15:0] expected[], input string label);
     int unsigned mism;
     mism = 0;
-    if (captured.size() < expected.size()) begin
-      `ERROR(("  %s: captured %0d of %0d samples", label, captured.size(), expected.size()));
-      return;
+    if (captured.size() != expected.size()) begin
+      `ERROR(("  %s: captured %0d samples, expected %0d", label, captured.size(), expected.size()));
+      if (captured.size() < expected.size()) return;
     end
     foreach (expected[i]) begin
       if (captured[i] !== expected[i]) begin
@@ -422,6 +424,7 @@ program test_program_par_if;
     // DMA driver over the manager sequencer.
     tx_dma = new("TX_DMA", base_env.mng.master_sequencer, `TX_DMA_BA);
     tx_dma.probe();
+    tx_dma.enable_dma();
 
     ad9910 = new(
       .name("AD9910 API"),
@@ -589,23 +592,23 @@ program test_program_par_if;
 
       ddr_write_samples(DDR_BASE, samples);
       enable_par_if(.update_rate(32'd200));
-      wait_tx_idle(32'd200); enable_monitor();
+      wait_tx_idle(32'd200); enable_db_o_monitor();
       t0 = $time;
       start_dma_samples(DDR_BASE, N);
       wait_captures(N, 4000);
       t_slow = $time - t0;
       wait_tx_idle(32'd200);   // full drain, so TC7 starts with an empty FIFO
-      disable_monitor(); disable_par_if();
+      disable_db_o_monitor(); disable_par_if();
 
       ddr_write_samples(DDR_BASE, samples);
       enable_par_if(.update_rate(32'd20));
-      wait_tx_idle(32'd20); enable_monitor();
+      wait_tx_idle(32'd20); enable_db_o_monitor();
       t0 = $time;
       start_dma_samples(DDR_BASE, N);
       wait_captures(N, 4000);
       t_fast = $time - t0;
       wait_tx_idle(32'd20);
-      disable_monitor(); disable_par_if();
+      disable_db_o_monitor(); disable_par_if();
 
       `INFO(("  %0d-sample transfer: slow(rate=200)=%0t fast(rate=20)=%0t",
              N, t_slow, t_fast), ADI_VERBOSITY_LOW);
@@ -631,7 +634,7 @@ program test_program_par_if;
       foreach (samples[i]) samples[i] = 16'h7000 + i[15:0];
 
       ddr_write_samples(DDR_BASE, samples);
-      enable_monitor();
+      enable_db_o_monitor();
       // External trigger mode; internal rate irrelevant.
       enable_par_if(.update_rate(32'd0), .trig_mode(1'b1));
       // Load the samples into the FIFO (they wait for triggers).
@@ -666,7 +669,7 @@ program test_program_par_if;
         wait_captures(i + 1, 10);
       end
       disable_par_if();
-      disable_monitor();
+      disable_db_o_monitor();
       check_stream(samples, "External trigger");
     end
 

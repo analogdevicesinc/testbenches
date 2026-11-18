@@ -33,19 +33,11 @@ The testbench block design includes the ``axi_ad9910`` IP core along with VIPs
 used for clocking, reset, PS and DDR simulations. The ``sync_clk`` and
 ``pd_clk`` signals are generated at 250 MHz by master clock VIPs, standing in
 for the clock outputs of the AD9910 device. The test program starts and stops
-them. The IP is instantiated with
-``MEASURE_CLKS_EN=1``, so
-the sync_clk and pd_clk monitor registers are available.
+them. The IP is instantiated with ``MEASURE_CLKS_EN=1``, so the sync_clk and
+pd_clk monitor registers are available.
 
-The block design depends on the ``MODE`` parameter:
-
--  **DRG** — the AXI-Stream input of ``axi_ad9910`` is tied off and no DMA is
-   instantiated.
--  **PAR_IF** — a TX ``axi_dmac`` reads samples from the DDR VIP over AXI-MM
-   and drives the ``axi_ad9910`` AXI-Stream input.
-
-In both modes every device-side pin of ``axi_ad9910`` connects to an IO VIP,
-clocked by the domain the pin belongs to. Slave IO VIPs sample the DDS control
+Every device-side pin of ``axi_ad9910`` connects to an IO VIP, clocked by the
+domain the pin belongs to. Slave IO VIPs sample the DDS control
 and data outputs (``drctl``, ``drhold``, ``profile``, ``db_o``, ``f_o``,
 ``tx_enable``, ``trig_out`` and the IP interrupt) for the test program, and
 master IO VIPs drive the ``drover``, ``ram_swp_ovr`` and ``ext_sync`` inputs.
@@ -72,9 +64,14 @@ Configuration parameters and modes
 
 The following parameters of this project can be configured:
 
--  MODE: Defines which function of the ``axi_ad9910`` IP is under test.
-   Options: DRG - Digital Ramp Generator control, PAR_IF - Parallel data
-   interface
+-  MODE: Defines which function of the ``axi_ad9910`` IP is under test, and
+   the block design built for it. Options:
+
+   -  DRG - Digital Ramp Generator control. The AXI-Stream input of
+      ``axi_ad9910`` is tied off and no DMA is instantiated.
+   -  PAR_IF - Parallel data interface. A TX ``axi_dmac`` reads samples from
+      the DDR VIP over AXI-MM and drives the ``axi_ad9910`` AXI-Stream input.
+
 -  tx_dma_cfg: The ``axi_dmac`` configuration, used only in PAR_IF mode. The
    DMA reads 32-bit words from DDR and emits 16-bit AXI-Stream beats
    (``DMA_DATA_WIDTH_SRC 32``, ``DMA_DATA_WIDTH_DEST 16``), matching the

@@ -133,7 +133,7 @@ program test_program_drg (
   // I3/I4); register offsets and field positions live in adi_regmap_ad9910_pkg.
   ad9910_api ad9910;
 
-  bit [31:0] read_data;
+  logic [31:0] read_data;
   bit        test_passed = 1;
 
   // K4: the simulation randomization state is reported at the very start, so a
@@ -702,7 +702,7 @@ program test_program_drg (
     ad9910.get_id(read_data);
     `INFO(("  ID: 0x%08x", read_data), ADI_VERBOSITY_LOW);
     begin
-      bit [7:0] fpga_technology, fpga_family, speed_grade, dev_package;
+      logic [7:0] fpga_technology, fpga_family, speed_grade, dev_package;
       ad9910.get_device_info(fpga_technology, fpga_family, speed_grade, dev_package);
       `INFO(("  DEVICE_INFO: technology=%0d family=%0d speed=%0d package=%0d",
              fpga_technology, fpga_family, speed_grade, dev_package),
@@ -759,7 +759,7 @@ program test_program_drg (
     // reset. That is longer than most of this suite, so the counts are only
     // logged here and checked at the end in TC16.
     begin
-      bit [31:0] cnt_a;
+      logic [31:0] cnt_a;
       ad9910.get_sync_clk_cnt(cnt_a);
       `INFO(("  SYNC_CLK_CNT this early: 0x%08x (window not yet elapsed)", cnt_a),
             ADI_VERBOSITY_LOW);
@@ -1584,8 +1584,8 @@ program test_program_drg (
     `INFO(("TC16: Clock monitors"), ADI_VERBOSITY_LOW);
 
     begin
-      bit [31:0] sync_cnt;
-      bit [31:0] pd_cnt;
+      logic [31:0] sync_cnt;
+      logic [31:0] pd_cnt;
 
       while ($time < 800us) #10us;
 

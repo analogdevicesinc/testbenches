@@ -130,7 +130,7 @@ program test_program_par_if (
   // I3/I4); register offsets and field positions live in adi_regmap_ad9910_pkg.
   ad9910_api ad9910;
 
-  bit [31:0] read_data;
+  logic [31:0] read_data;
   bit        test_passed = 1;
 
   // K4: the simulation randomization state is reported at the very start, so a
@@ -453,9 +453,9 @@ program test_program_par_if (
     current_test = 1;
     `INFO(("TC1: Register sanity"), ADI_VERBOSITY_LOW);
     begin
-      bit [31:0] pd_cnt;
-      bit        measure_clks_en;
-      bit        trig_mode, enable_p_if, load_new_rate;
+      logic [31:0] pd_cnt;
+      logic        measure_clks_en;
+      logic        trig_mode, enable_p_if, load_new_rate;
 
       ad9910.sanity_test();
 

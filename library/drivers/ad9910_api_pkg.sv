@@ -70,7 +70,7 @@ package ad9910_api_pkg;
 
     // REG_VERSION
     task get_version(
-      output bit [31:0] version);
+      output logic [31:0] version);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_VERSION), this.val);
       version = `GET_AXI_AD9910_REG_VERSION_VERSION(this.val);
@@ -78,7 +78,7 @@ package ad9910_api_pkg;
 
     // REG_ID
     task get_id(
-      output bit [31:0] id);
+      output logic [31:0] id);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_ID), this.val);
       id = `GET_AXI_AD9910_REG_ID_ID(this.val);
@@ -99,7 +99,7 @@ package ad9910_api_pkg;
     endtask: verify_scratch
 
     task get_scratch(
-      output bit [31:0] scratch);
+      output logic [31:0] scratch);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_SCRATCH), this.val);
       scratch = `GET_AXI_AD9910_REG_SCRATCH_SCRATCH(this.val);
@@ -107,7 +107,7 @@ package ad9910_api_pkg;
 
     // REG_CONFIG
     task get_config(
-      output bit measure_clks_en);
+      output logic measure_clks_en);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_CONFIG), this.val);
       measure_clks_en = `GET_AXI_AD9910_REG_CONFIG_MEASURE_CLKS_EN(this.val);
@@ -115,10 +115,10 @@ package ad9910_api_pkg;
 
     // REG_DEVICE_INFO
     task get_device_info(
-      output bit [7:0] fpga_technology,
-      output bit [7:0] fpga_family,
-      output bit [7:0] speed_grade,
-      output bit [7:0] dev_package);
+      output logic [7:0] fpga_technology,
+      output logic [7:0] fpga_family,
+      output logic [7:0] speed_grade,
+      output logic [7:0] dev_package);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_DEVICE_INFO), this.val);
       fpga_technology = `GET_AXI_AD9910_REG_DEVICE_INFO_FPGA_TECHNOLOGY(this.val);
@@ -142,7 +142,7 @@ package ad9910_api_pkg;
     endtask: verify_reset_ctrl
 
     task get_reset_ctrl(
-      output bit reset);
+      output logic reset);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_RESET_CTRL), this.val);
       reset = `GET_AXI_AD9910_REG_RESET_CTRL_RESET(this.val);
@@ -163,7 +163,7 @@ package ad9910_api_pkg;
     endtask: verify_irq_mask
 
     task get_irq_mask(
-      output bit [5:0] irq_mask);
+      output logic [5:0] irq_mask);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_IRQ_MASK), this.val);
       irq_mask = `GET_AXI_AD9910_REG_IRQ_MASK_IRQ_MASK(this.val);
@@ -184,7 +184,7 @@ package ad9910_api_pkg;
     endtask: verify_irq_table
 
     task get_irq_table(
-      output bit [5:0] irq_table);
+      output logic [5:0] irq_table);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_IRQ_TABLE), this.val);
       irq_table = `GET_AXI_AD9910_REG_IRQ_TABLE_IRQ_TABLE(this.val);
@@ -205,7 +205,7 @@ package ad9910_api_pkg;
     endtask: verify_irq_mon_cfg
 
     task get_irq_mon_cfg(
-      output bit [1:0] irq_monitor_config);
+      output logic [1:0] irq_monitor_config);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_IRQ_MON_CFG), this.val);
       irq_monitor_config = `GET_AXI_AD9910_REG_IRQ_MON_CFG_IRQ_MONITOR_CONFIG(this.val);
@@ -222,8 +222,8 @@ package ad9910_api_pkg;
     endtask: set_trig_out_ctrl
 
     task get_trig_out_ctrl(
-      output bit [5:0] trig_out_mask,
-      output bit [1:0] trig_config);
+      output logic [5:0] trig_out_mask,
+      output logic [1:0] trig_config);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_TRIG_OUT_CTRL), this.val);
       trig_out_mask = `GET_AXI_AD9910_REG_TRIG_OUT_CTRL_TRIG_OUT_MASK(this.val);
@@ -241,8 +241,8 @@ package ad9910_api_pkg;
     endtask: set_ext_trig_cfg
 
     task get_ext_trig_cfg(
-      output bit ext_sync_disarm,
-      output bit ext_sync_arm);
+      output logic ext_sync_disarm,
+      output logic ext_sync_arm);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_EXT_TRIG_CFG), this.val);
       ext_sync_disarm = `GET_AXI_AD9910_REG_EXT_TRIG_CFG_EXT_SYNC_DISARM(this.val);
@@ -251,7 +251,7 @@ package ad9910_api_pkg;
 
     // REG_SYNC_CLK_CNT
     task get_sync_clk_cnt(
-      output bit [31:0] sync_clk_count);
+      output logic [31:0] sync_clk_count);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_SYNC_CLK_CNT), this.val);
       sync_clk_count = `GET_AXI_AD9910_REG_SYNC_CLK_CNT_SYNC_CLK_COUNT(this.val);
@@ -270,9 +270,9 @@ package ad9910_api_pkg;
     endtask: set_drg_ctrl
 
     task get_drg_ctrl(
-      output bit drctl_toggle_en,
-      output bit drctl_init,
-      output bit drhold);
+      output logic drctl_toggle_en,
+      output logic drctl_init,
+      output logic drhold);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_DRG_CTRL), this.val);
       drctl_toggle_en = `GET_AXI_AD9910_REG_DRG_CTRL_DRCTL_TOGGLE_EN(this.val);
@@ -295,7 +295,7 @@ package ad9910_api_pkg;
     endtask: verify_profile
 
     task get_profile(
-      output bit [2:0] profile);
+      output logic [2:0] profile);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_PROFILE), this.val);
       profile = `GET_AXI_AD9910_REG_PROFILE_PROFILE(this.val);
@@ -316,7 +316,7 @@ package ad9910_api_pkg;
     endtask: verify_drctl_period
 
     task get_drctl_period(
-      output bit [31:0] drctl_period);
+      output logic [31:0] drctl_period);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_DRCTL_PERIOD), this.val);
       drctl_period = `GET_AXI_AD9910_REG_DRCTL_PERIOD_DRCTL_PERIOD(this.val);
@@ -337,7 +337,7 @@ package ad9910_api_pkg;
     endtask: verify_drctl_width
 
     task get_drctl_width(
-      output bit [31:0] drctl_width);
+      output logic [31:0] drctl_width);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_DRCTL_WIDTH), this.val);
       drctl_width = `GET_AXI_AD9910_REG_DRCTL_WIDTH_DRCTL_WIDTH(this.val);
@@ -358,7 +358,7 @@ package ad9910_api_pkg;
     endtask: verify_bst_delay
 
     task get_bst_delay(
-      output bit [31:0] delay_bst_ramp_delay);
+      output logic [31:0] delay_bst_ramp_delay);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_BST_DELAY), this.val);
       delay_bst_ramp_delay = `GET_AXI_AD9910_REG_BST_DELAY_DELAY_BST_RAMP_DELAY(this.val);
@@ -379,7 +379,7 @@ package ad9910_api_pkg;
     endtask: verify_ramp_bursts
 
     task get_ramp_bursts(
-      output bit [19:0] ramp_bursts);
+      output logic [19:0] ramp_bursts);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_RAMP_BURSTS), this.val);
       ramp_bursts = `GET_AXI_AD9910_REG_RAMP_BURSTS_RAMP_BURSTS(this.val);
@@ -400,7 +400,7 @@ package ad9910_api_pkg;
     endtask: verify_burst_delay
 
     task get_burst_delay(
-      output bit [31:0] burst_delay);
+      output logic [31:0] burst_delay);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_BURST_DELAY), this.val);
       burst_delay = `GET_AXI_AD9910_REG_BURST_DELAY_BURST_DELAY(this.val);
@@ -421,7 +421,7 @@ package ad9910_api_pkg;
     endtask: verify_ramp_cfg
 
     task get_ramp_cfg(
-      output bit [1:0] ramp_config);
+      output logic [1:0] ramp_config);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_RAMP_CFG), this.val);
       ramp_config = `GET_AXI_AD9910_REG_RAMP_CFG_RAMP_CONFIG(this.val);
@@ -442,7 +442,7 @@ package ad9910_api_pkg;
     endtask: verify_monitor_max_period
 
     task get_monitor_max_period(
-      output bit [31:0] monitor_max_period);
+      output logic [31:0] monitor_max_period);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_MONITOR_MAX_PERIOD), this.val);
       monitor_max_period = `GET_AXI_AD9910_REG_MONITOR_MAX_PERIOD_MONITOR_MAX_PERIOD(this.val);
@@ -463,7 +463,7 @@ package ad9910_api_pkg;
     endtask: verify_irq_start_interval
 
     task get_irq_start_interval(
-      output bit [31:0] irq_start_interval);
+      output logic [31:0] irq_start_interval);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_IRQ_START_INTERVAL), this.val);
       irq_start_interval = `GET_AXI_AD9910_REG_IRQ_START_INTERVAL_IRQ_START_INTERVAL(this.val);
@@ -484,7 +484,7 @@ package ad9910_api_pkg;
     endtask: verify_irq_stop_interval
 
     task get_irq_stop_interval(
-      output bit [31:0] irq_stop_interval);
+      output logic [31:0] irq_stop_interval);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_IRQ_STOP_INTERVAL), this.val);
       irq_stop_interval = `GET_AXI_AD9910_REG_IRQ_STOP_INTERVAL_IRQ_STOP_INTERVAL(this.val);
@@ -505,7 +505,7 @@ package ad9910_api_pkg;
     endtask: verify_trig_start_interval
 
     task get_trig_start_interval(
-      output bit [31:0] trig_start_interval);
+      output logic [31:0] trig_start_interval);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_TRIG_START_INTERVAL), this.val);
       trig_start_interval = `GET_AXI_AD9910_REG_TRIG_START_INTERVAL_TRIG_START_INTERVAL(this.val);
@@ -526,7 +526,7 @@ package ad9910_api_pkg;
     endtask: verify_trig_stop_interval
 
     task get_trig_stop_interval(
-      output bit [31:0] trig_stop_interval);
+      output logic [31:0] trig_stop_interval);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_TRIG_STOP_INTERVAL), this.val);
       trig_stop_interval = `GET_AXI_AD9910_REG_TRIG_STOP_INTERVAL_TRIG_STOP_INTERVAL(this.val);
@@ -534,7 +534,7 @@ package ad9910_api_pkg;
 
     // REG_PD_CLK_COUNT
     task get_pd_clk_count(
-      output bit [31:0] pd_clk_count);
+      output logic [31:0] pd_clk_count);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_PD_CLK_COUNT), this.val);
       pd_clk_count = `GET_AXI_AD9910_REG_PD_CLK_COUNT_PD_CLK_COUNT(this.val);
@@ -553,9 +553,9 @@ package ad9910_api_pkg;
     endtask: set_update_ctrl
 
     task get_update_ctrl(
-      output bit transfer_trig_mode,
-      output bit enable_p_if,
-      output bit load_new_rate);
+      output logic transfer_trig_mode,
+      output logic enable_p_if,
+      output logic load_new_rate);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_UPDATE_CTRL), this.val);
       transfer_trig_mode = `GET_AXI_AD9910_REG_UPDATE_CTRL_TRANSFER_TRIG_MODE(this.val);
@@ -578,7 +578,7 @@ package ad9910_api_pkg;
     endtask: verify_par_update_rate
 
     task get_par_update_rate(
-      output bit [31:0] par_update_rate);
+      output logic [31:0] par_update_rate);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_PAR_UPDATE_RATE), this.val);
       par_update_rate = `GET_AXI_AD9910_REG_PAR_UPDATE_RATE_PAR_UPDATE_RATE(this.val);
@@ -599,7 +599,7 @@ package ad9910_api_pkg;
     endtask: verify_f_cfg
 
     task get_f_cfg(
-      output bit [1:0] f_cfg);
+      output logic [1:0] f_cfg);
 
       this.axi_read(GetAddrs(AXI_AD9910_REG_F_CFG), this.val);
       f_cfg = `GET_AXI_AD9910_REG_F_CFG_F_CFG(this.val);

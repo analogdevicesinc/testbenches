@@ -6,9 +6,9 @@ AXI AD9910
 Overview
 -------------------------------------------------------------------------------
 
-The purpose of this testbench is to validate the ``axi_ad9910`` IP core, the
-FPGA-side controller for the AD9910 Direct Digital Synthesizer (DDS), as used
-by the :git-hdl:`projects/admfm8000_evalz` reference design.
+The purpose of this testbench is to validate the functionality of the
+:git-hdl:`library/axi_ad9910` IP core, the FPGA-side controller for the
+AD9910 Direct Digital Synthesizer (DDS).
 
 The IP has two independent functions, and the testbench has one configuration
 for each:
@@ -24,8 +24,7 @@ for each:
    ``db_o[15:0]``/``tx_enable`` at a programmable update rate or on an external
    trigger. ``f_o[1:0]`` is driven statically from a register.
 
-The entire HDL documentation can be found here
-:external+hdl:ref:`ADMFM8000-EVALZ HDL project <admfm8000_evalz>`.
+The entire HDL documentation can be found at :external+hdl:ref:`axi_ad9910`.
 
 Block design
 -------------------------------------------------------------------------------

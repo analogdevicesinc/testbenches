@@ -59,7 +59,6 @@ import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import test_harness_env_pkg::*;
 import adi_regmap_pkg::*;
-import adi_regmap_common_pkg::*;
 import adi_regmap_ad9910_pkg::*;
 import adi_regmap_dmac_pkg::*;
 import ad9910_api_pkg::*;

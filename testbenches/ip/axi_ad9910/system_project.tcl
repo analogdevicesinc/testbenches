@@ -27,13 +27,7 @@ if {$ad_project_params(MODE) == "PAR_IF"} {
 set use_smartconnect 1
 
 # Create the project
-adi_sim_project_xilinx $project_name "xc7z020clg484-1"
-
-# Add common test files
-adi_sim_project_files [list \
-  "$ad_tb_dir/library/regmaps/adi_regmap_pkg.sv" \
-  "$ad_tb_dir/library/regmaps/adi_regmap_common_pkg.sv" \
-]
+adi_sim_project_xilinx $project_name
 
 # axi_ad9910 register map and API driver class, used by both test programs.
 # Also pulls in adi_common_pkg / adi_regmap_pkg / adi_api_pkg via sp_include_regmap.

@@ -617,9 +617,6 @@ Testbench specific dependencies:
    * - ADI_REGMAP_AD9910_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_ad9910_pkg.sv`
      - ---
-   * - ADI_REGMAP_COMMON_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_common_pkg.sv`
-     - ---
    * - ADI_REGMAP_DMAC_PKG *
      - :git-testbenches:`library/regmaps/adi_regmap_dmac_pkg.sv`
      - ---

@@ -179,6 +179,13 @@ banner and every check its result.
 All ``axi_ad9910`` register access goes through the ``ad9910_api`` driver, so
 neither test program contains register offsets or field positions.
 
+Register writes reach the core's sync_clk and pd_clk domains through
+``up_xfer_cntrl``, which starts a transfer only once every 64 up_clk cycles,
+and interrupt status returns through ``up_xfer_status`` the same way. Neither
+test program waits a fixed time for a crossing. Each direction has a task that
+counts the worst-case number of source-clock and destination-clock edges, so
+the waits stay correct if a clock frequency changes.
+
 Environment bringup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -308,9 +315,10 @@ Start delay (TC7)
 
 * Measure the time from enabling the PWM to the first ``drctl`` rising edge,
   with BST_DELAY set to 500 and then to 2500 sync_clk cycles
-* Verify the difference between the two is 2000 sync_clk cycles, within the
-  160 sync_clk cycle control-transfer tolerance. Taking the difference cancels
-  the fixed register-write overhead
+* Verify the difference between the two is 2000 sync_clk cycles, within one
+  control-transfer window. The window is 64 up_clk cycles, which the test
+  measures in sync_clk cycles at startup (161 at 100 MHz up_clk). Taking the
+  difference cancels the fixed register-write overhead
 
 .. note::
 
@@ -420,7 +428,8 @@ IRQ mask, table and write-1-to-clear (TC15)
 Clock monitors (TC16)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This test runs last, once the first 65536-up_clk monitor window has elapsed:
+This test runs last. It waits until two 65536-up_clk monitor windows have
+passed since the reset release, so a full-window count has been captured:
 
 * Read SYNC_CLK_CNT and PD_CLK_COUNT and verify both report a running clock
 

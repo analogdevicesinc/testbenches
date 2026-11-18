@@ -82,18 +82,43 @@ program test_program_drg;
   // sync_clk is 250 MHz (4 ns period)
   localparam int CYCLES_PER_US = 250;
 
-  // up_xfer_cntrl initiates a control transfer only when its free-running 6-bit
-  // up_clk counter reads 1 (common/up_xfer_cntrl.v:96), so a register write is
-  // held at the domain crossing for anywhere between 0 and 64 up_clk cycles -
-  // 160 sync_clk cycles at 100 MHz up_clk against 250 MHz sync_clk. Every
-  // interval timed from an AXI write carries that quantization, and it is far
-  // coarser than the synchroniser latency it is easy to mistake it for.
-  localparam int CDC_XFER_JITTER = 160;
+  // Clock-domain crossing, in cycles of the clocks involved. Control registers
+  // reach sync_clk through i_xfer_cntrl_sd, an up_xfer_cntrl, and IRQ status
+  // comes back through i_xfer_status_sd, an up_xfer_status
+  // (axi_ad9910_reg.v:342-406). Both latch on the source side only when a
+  // free-running 6-bit counter in the source clock reads 1
+  // (common/up_xfer_cntrl.v:96, common/up_xfer_status.v:94), so a value can wait
+  // a whole 64-cycle window there; the destination then takes it on the 3rd edge
+  // of its toggle synchroniser. Counting edges of both clocks keeps the waits
+  // correct whatever the frequencies are, provided the previous transfer's
+  // handshake (4 destination + 3 source edges) fits inside one window - true
+  // while neither clock is more than 15x slower than the other.
+  localparam int unsigned XFER_WINDOW_CYCLES = 64;
+  localparam int unsigned XFER_SYNC_CYCLES   = 3;
+  // sync_clk cycles for the core to act on a landed control value: 1 for
+  // auto_ramp_mode_update to see the change, the 8-cycle reset_overwrite pulse,
+  // then the config latch and output registers. 16 rounds that up.
+  localparam int unsigned SYNC_CONSUMER_SYNC_CLK = 16;
+  // sync_clk cycles from an event to irq_int: drover's 2-flop synchroniser plus
+  // the irq_int register. ram_swp_ovr goes straight into irq_int.
+  localparam int unsigned IRQ_SOURCE_SYNC_CLK = 3;
+  // ad_rst releases its reset 5 destination-clock edges after rst_async falls
+  // (common/ad_rst.v).
+  localparam int unsigned RST_SYNC_CYCLES = 5;
+  // up_clock_mon measures over a free-running 16-bit up_clk window. Two windows
+  // after the reset release, a full-window count has certainly been captured.
+  localparam int unsigned CLK_MON_WINDOW_UP_CLK = 65536;
 
-  // Settle time covering the up->sync CDC handshake, the 8 sync_clk-cycle
-  // reset_overwrite pulse, and the AXI write pipeline. 4 us is 400 up_clk
-  // cycles, so it always spans a whole up_xfer_cntrl transfer window.
-  localparam int CFG_SETTLE_NS = 4000;
+  // How far one up_xfer_cntrl window can shift an interval timed from an AXI
+  // write, in sync_clk cycles - 160 at 100 MHz up_clk against 250 MHz sync_clk.
+  // Measured at bringup by counting sync_clk edges across one window, rather
+  // than derived from nominal frequencies. Every interval timed from an AXI write
+  // carries that quantization, and it is far coarser than the synchroniser
+  // latency it is easy to mistake it for.
+  int cdc_xfer_jitter;
+
+  // up_clk edges since the core reset was released, for the clock monitors.
+  int unsigned up_clk_since_reset = 0;
 
   // Base duty cycle shared by most tests: 4 us period at 250 MHz, 40% duty.
   // Sized for legibility rather than minimum runtime - a period of a few
@@ -423,6 +448,66 @@ program test_program_drg;
   endfunction
 
   // --------------------------
+  // Clock-domain crossing waits
+  // --------------------------
+  task automatic wait_up_clk(input int unsigned n);
+    repeat (n) @(posedge `TH.`SYS_CLK.clk_out);
+  endtask
+
+  // Wait until the last register write has taken effect in the sync_clk domain.
+  task automatic wait_up_to_sync_xfer();
+    wait_up_clk(XFER_WINDOW_CYCLES);
+    repeat (XFER_SYNC_CYCLES + SYNC_CONSUMER_SYNC_CLK) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+  endtask
+
+  // Wait until an IRQ_TABLE write-1-to-clear has run its course. up_irq_clear
+  // stays set until the transfer carrying it completes, and only the next
+  // transfer drops irq_clear again in the sync_clk domain - two windows.
+  task automatic wait_irq_clear_xfer();
+    wait_up_to_sync_xfer();
+    wait_up_to_sync_xfer();
+  endtask
+
+  // Wait until the current sync_clk-domain IRQ state is readable in IRQ_TABLE.
+  task automatic wait_sync_to_up_status();
+    repeat (IRQ_SOURCE_SYNC_CLK + XFER_WINDOW_CYCLES) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+    wait_up_clk(XFER_SYNC_CYCLES + 1);
+  endtask
+
+  // Wait until a RESET_CTRL release has propagated into both core domains.
+  task automatic wait_core_reset_release();
+    fork
+      repeat (RST_SYNC_CYCLES) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      repeat (RST_SYNC_CYCLES) @(posedge `TH.`PD_CLK_VIP.clk_out);
+    join
+  endtask
+
+  // Count sync_clk edges across one up_xfer_cntrl window (see cdc_xfer_jitter),
+  // starting on an up_clk edge so the window is a whole 64 up_clk periods. The
+  // inner fork keeps `disable fork` from reaching processes this one started
+  // earlier, such as the simulation watchdog.
+  task automatic measure_cdc_xfer_jitter();
+    int n;
+    n = 0;
+    wait_up_clk(1);
+    fork
+      begin
+        fork
+          wait_up_clk(XFER_WINDOW_CYCLES);
+          forever begin
+            @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+            n++;
+          end
+        join_any
+        disable fork;
+      end
+    join
+    cdc_xfer_jitter = n + 1;
+    `INFO(("  One up_xfer_cntrl window = %0d sync_clk cycles (cdc_xfer_jitter)", cdc_xfer_jitter),
+          ADI_VERBOSITY_LOW);
+  endtask
+
+  // --------------------------
   // Configuration helpers
   // --------------------------
   // Program a drctl duty cycle. Toggle mode is cleared first so that the
@@ -435,12 +520,12 @@ program test_program_drg;
     ad9910.set_drctl_period(p);
     ad9910.set_drctl_width(w);
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b1), .drctl_init(1'b0), .drhold(1'b0));
-    #(CFG_SETTLE_NS * 1ns);
+    wait_up_to_sync_xfer();
   endtask
 
   task automatic stop_pwm();
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
-    #(CFG_SETTLE_NS * 1ns);
+    wait_up_to_sync_xfer();
   endtask
 
   // Time the first drctl rising edge after a restart, for a given start delay.
@@ -679,6 +764,7 @@ program test_program_drg;
     `TH.`SYNC_CLK_VIP.inst.IF.start_clock();
     `TH.`PD_CLK_VIP.inst.IF.start_clock();
     base_env.sys_reset();
+    measure_cdc_xfer_jitter();
 
     ad9910 = new(
       .name("AD9910 API"),
@@ -760,7 +846,13 @@ program test_program_drg;
     `INFO(("TC2: Reset release and clock monitor"), ADI_VERBOSITY_LOW);
 
     ad9910.set_reset_ctrl(32'h0);
-    #10us;
+    wait_core_reset_release();
+    fork
+      forever begin
+        wait_up_clk(1);
+        up_clk_since_reset++;
+      end
+    join_none
 
     // The clock monitors need a full measurement window before they report
     // anything: up_clock_mon gates on a free-running 16-bit up_clk counter, so
@@ -800,7 +892,7 @@ program test_program_drg;
     `INFO(("TC3: Simple mode (toggle_en=0)"), ADI_VERBOSITY_LOW);
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b1), .drhold(1'b0));
-    #(CFG_SETTLE_NS * 1ns);
+    wait_up_to_sync_xfer();
     if (get_drctl() === 1'b1) begin
       `INFO(("  DRCTL_INIT=1 -> drctl high - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
@@ -808,7 +900,7 @@ program test_program_drg;
     end
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
-    #(CFG_SETTLE_NS * 1ns);
+    wait_up_to_sync_xfer();
     if (get_drctl() === 1'b0) begin
       `INFO(("  DRCTL_INIT=0 -> drctl low - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
@@ -868,7 +960,7 @@ program test_program_drg;
       int unsigned per_c[];
       ad9910.set_drctl_period(32'd800);
       ad9910.set_drctl_width(32'd200);
-      #(CFG_SETTLE_NS * 1ns);
+      wait_up_to_sync_xfer();
       measure_drctl_waveform(4, 200, high_c, per_c);
       if (all_equal(high_c, 200) && all_equal(per_c, 800)) begin
         `INFO(("  Live reconfigure to P=800 W=200 converged - PASSED"), ADI_VERBOSITY_LOW);
@@ -947,17 +1039,17 @@ program test_program_drg;
       // timed from an AXI write and so includes however long the write sat at
       // the up_xfer_cntrl crossing. Each of the two measurements is quantized
       // independently into that 64-up_clk window, so their difference can be
-      // off by a full window either way - CDC_XFER_JITTER, not the handful of
+      // off by a full window either way - cdc_xfer_jitter, not the handful of
       // sync_clk cycles a synchroniser would cost. The check is still decisive: the
       // programmed step is 2000 sync_clk cycles, so a dropped delay reads about -500 and
       // a doubled one about 2500.
-      if (delta >= (DLY_LONG - DLY_SHORT - CDC_XFER_JITTER) &&
-          delta <= (DLY_LONG - DLY_SHORT + CDC_XFER_JITTER)) begin
+      if (delta >= (DLY_LONG - DLY_SHORT - cdc_xfer_jitter) &&
+          delta <= (DLY_LONG - DLY_SHORT + cdc_xfer_jitter)) begin
         `INFO(("  Start delay scales correctly (delta=%0d, expected %0d +/-%0d) - PASSED",
-               delta, DLY_LONG - DLY_SHORT, CDC_XFER_JITTER), ADI_VERBOSITY_LOW);
+               delta, DLY_LONG - DLY_SHORT, cdc_xfer_jitter), ADI_VERBOSITY_LOW);
       end else begin
         `ERROR(("  Start delay delta=%0d, expected %0d +/-%0d",
-                delta, DLY_LONG - DLY_SHORT, CDC_XFER_JITTER));
+                delta, DLY_LONG - DLY_SHORT, cdc_xfer_jitter));
       end
 
       stop_pwm();
@@ -1027,7 +1119,7 @@ program test_program_drg;
       // program_pwm's settle is a fixed 4 us, which is only one period long at
       // this configuration and can be consumed entirely by the config sitting
       // at the CDC, so the period is not necessarily over when it returns.
-      repeat (PWM_PERIOD + CDC_XFER_JITTER) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      repeat (PWM_PERIOD + cdc_xfer_jitter) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=period_stop");
       // Returning to free-run clears stop_event and the ramp resumes.
       ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
@@ -1051,7 +1143,7 @@ program test_program_drg;
       ad9910.set_ramp_cfg(RAMP_CFG_BURST_STOP);
       program_pwm(PWM_PERIOD, PWM_WIDTH);
       // As above, but a whole burst is allowed to run before the park.
-      repeat (STOP_BURSTS * PWM_PERIOD + CDC_XFER_JITTER) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      repeat (STOP_BURSTS * PWM_PERIOD + cdc_xfer_jitter) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=burst_stop");
 
       ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
@@ -1078,7 +1170,7 @@ program test_program_drg;
     `INFO(("TC10: DRHOLD passthrough"), ADI_VERBOSITY_LOW);
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b1));
-    #(CFG_SETTLE_NS * 1ns);
+    wait_up_to_sync_xfer();
     if (get_drhold() === 1'b1) begin
       `INFO(("  DRHOLD=1 -> drhold pin high - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
@@ -1086,7 +1178,7 @@ program test_program_drg;
     end
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
-    #(CFG_SETTLE_NS * 1ns);
+    wait_up_to_sync_xfer();
     if (get_drhold() === 1'b0) begin
       `INFO(("  DRHOLD=0 -> drhold pin low - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
@@ -1101,7 +1193,7 @@ program test_program_drg;
 
     for (int p = 0; p < 8; p++) begin
       ad9910.set_profile(p);
-      #(CFG_SETTLE_NS * 1ns);
+      wait_up_to_sync_xfer();
       if (get_profile() !== p[2:0]) begin
         `ERROR(("  PROFILE=%0d but profile pin=%0d", p, get_profile()));
       end
@@ -1431,13 +1523,13 @@ program test_program_drg;
       // up_irq_clear stays asserted until that transfer completes, so give it
       // time to land before generating the event it must not swallow.
       ad9910.set_irq_table(32'h3f);
-      #(CFG_SETTLE_NS * 1ns);
+      wait_irq_clear_xfer();
 
       // ram_swp_ovr is a plain input, the simplest source to drive.
       set_ram_swp_ovr(1'b1);
       repeat (50) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       set_ram_swp_ovr(1'b0);
-      #(CFG_SETTLE_NS * 1ns);
+      wait_sync_to_up_status();
 
       if (get_ad9910_irq() === 1'b0) begin
         `INFO(("  IRQ_MASK=0 keeps irq low with an active source - PASSED"),
@@ -1456,7 +1548,7 @@ program test_program_drg;
 
       // Unmasking an already-latched source must drive irq.
       ad9910.set_irq_mask(32'h1 << IRQ_RAM_SWP_OVR);
-      #(CFG_SETTLE_NS * 1ns);
+      wait_up_to_sync_xfer();
       if (get_ad9910_irq() === 1'b1) begin
         `INFO(("  Unmasking a latched source asserts irq - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
@@ -1467,7 +1559,8 @@ program test_program_drg;
       // must stay clear - a still-active level source would immediately
       // re-latch.
       ad9910.set_irq_table(32'h1 << IRQ_RAM_SWP_OVR);
-      #(CFG_SETTLE_NS * 1ns);
+      wait_irq_clear_xfer();
+      wait_sync_to_up_status();
       ad9910.get_irq_table(read_data);
       if (!read_data[IRQ_RAM_SWP_OVR] && get_ad9910_irq() === 1'b0) begin
         `INFO(("  W1C cleared the latch and deasserted irq - PASSED"), ADI_VERBOSITY_LOW);
@@ -1478,7 +1571,7 @@ program test_program_drg;
       // bursts_complete reaches the table through the ramp machinery.
       ad9910.set_irq_mask(32'h1 << IRQ_BURSTS);
       ad9910.set_irq_table(32'h3f);
-      #(CFG_SETTLE_NS * 1ns);
+      wait_irq_clear_xfer();
       ad9910.set_ramp_bursts(32'd2);
       ad9910.set_burst_delay(2 * PWM_PERIOD);
       program_pwm(PWM_PERIOD, PWM_WIDTH);
@@ -1566,7 +1659,7 @@ program test_program_drg;
       logic [31:0] sync_cnt;
       logic [31:0] pd_cnt;
 
-      while ($time < 800us) #10us;
+      wait (up_clk_since_reset >= 2 * CLK_MON_WINDOW_UP_CLK);
 
       ad9910.get_sync_clk_cnt(sync_cnt);
       ad9910.get_pd_clk_count(pd_cnt);

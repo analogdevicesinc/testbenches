@@ -75,18 +75,26 @@ program test_program_par_if;
   // --------------------------
   // Timing constants (timeunit is 1ns, so these are nanoseconds)
   // --------------------------
-  // Worst-case up_clk -> pd_clk control-word latency. i_xfer_cntrl_pd is a 39-bit
-  // up_xfer_cntrl (axi_ad9910_reg.v:409) and up_xfer_cntrl initiates a transfer
-  // only when its free-running 6-bit up_clk counter reads 1
-  // (common/up_xfer_cntrl.v:97), so a register write is held at the crossing for
-  // up to 64 up_clk cycles = 640 ns at 100 MHz, plus the 2-stage pd_clk
-  // synchroniser (~12 ns). 2 us is ~3x that window.
-  //
-  // This is the ONLY place a blind wait is unavoidable: the pd-domain control
-  // word exposes no readable done bit, so there is nothing to poll. Every other
-  // wait in this file is an event wait on the DUT's own output - see
-  // wait_tx_idle / wait_captures.
-  localparam int unsigned CDC_SETTLE_NS = 2000;
+  // Clock-domain crossing, in cycles of the clocks involved. Every control
+  // register reaches pd_clk through i_xfer_cntrl_pd, an up_xfer_cntrl
+  // (axi_ad9910_reg.v:409). Its up_clk side latches a new value only when a
+  // free-running 6-bit counter reads 1 (common/up_xfer_cntrl.v:96), so a write
+  // can wait a whole 64-cycle window there; the pd_clk side then takes it on the
+  // 3rd edge of its toggle synchroniser. Counting edges of both clocks keeps the
+  // waits correct whatever the two frequencies are, provided the previous
+  // transfer's handshake (4 pd_clk + 3 up_clk) fits inside one window - true
+  // while pd_clk is faster than up_clk/15.
+  localparam int unsigned XFER_WINDOW_UP_CLK = 64;
+  localparam int unsigned XFER_SYNC_D_CLK    = 3;
+  // pd_clk cycles for the interface to act on a value once it has landed: the
+  // util_ext_sync edge detect, the f_o output register and the transfer engine.
+  localparam int unsigned PD_CONSUMER_PD_CLK = 4;
+  // ad_rst releases its reset 5 destination-clock edges after rst_async falls
+  // (common/ad_rst.v).
+  localparam int unsigned RST_SYNC_D_CLK     = 5;
+  // util_ext_sync samples sync_in through two flops; holding it for 2 pd_clk
+  // edges guarantees at least one of them sees it high.
+  localparam int unsigned EXT_SYNC_PULSE_PD_CLK = 2;
 
   // wait_tx_idle's watchdog timer. Draining a full 16-entry FIFO at the slowest
   // rate used here (200, i.e. a 201-cycle period) takes 16*201 pd_clk = 12.9 us
@@ -263,6 +271,24 @@ program test_program_par_if;
   endtask
 
   // --------------------------
+  // Clock-domain crossing waits
+  // --------------------------
+  task automatic wait_up_clk(input int unsigned n);
+    repeat (n) @(posedge `TH.`SYS_CLK.clk_out);
+  endtask
+
+  // Wait until the last register write has taken effect in the pd_clk domain.
+  task automatic wait_up_to_pd_xfer();
+    wait_up_clk(XFER_WINDOW_UP_CLK);
+    repeat (XFER_SYNC_D_CLK + PD_CONSUMER_PD_CLK) @(posedge `TH.`PD_CLK_VIP.clk_out);
+  endtask
+
+  // Wait until a RESET_CTRL release has propagated into the pd_clk domain.
+  task automatic wait_pd_reset_release();
+    repeat (RST_SYNC_D_CLK) @(posedge `TH.`PD_CLK_VIP.clk_out);
+  endtask
+
+  // --------------------------
   // TX DMA + interface control
   // --------------------------
   // Start a TX DMA of `nsamples` 16-bit samples from DDR (2 bytes each, packed
@@ -285,14 +311,14 @@ program test_program_par_if;
     ad9910.set_update_ctrl(.transfer_trig_mode(trig_mode),
                            .enable_p_if(1'b1),
                            .load_new_rate(1'b1));
-    #(CDC_SETTLE_NS * 1ns);   // CDC of the control word into the pd_clk domain
+    wait_up_to_pd_xfer();
   endtask
 
   task automatic disable_par_if();
     ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
                            .enable_p_if(1'b0),
                            .load_new_rate(1'b0));
-    #(CDC_SETTLE_NS * 1ns);
+    wait_up_to_pd_xfer();
   endtask
 
   // Run one internal-rate transfer with clean separation from any prior one:
@@ -440,7 +466,7 @@ program test_program_par_if;
     // Release the core reset. RESET_CTRL.RESET resets to 1 (axi_ad9910_reg.v:157),
     // holding both clock domains until software clears it.
     ad9910.set_reset_ctrl(.reset(1'b0));
-    #(CDC_SETTLE_NS * 1ns);
+    wait_pd_reset_release();
 
     // ----------------------------------------
     // TC1: Register sanity
@@ -659,10 +685,12 @@ program test_program_par_if;
       for (int i = 0; i < N; i++) begin
         // clear the arm level, then re-assert it for a fresh rising edge
         ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b0));
-        #(CDC_SETTLE_NS * 1ns);
+        wait_up_to_pd_xfer();
         ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b1));
-        #(CDC_SETTLE_NS * 1ns);
-        set_ext_sync(1'b1); #200ns; set_ext_sync(1'b0);             // sync_in rising -> fire
+        wait_up_to_pd_xfer();
+        set_ext_sync(1'b1); // sync_in rising -> fire
+        repeat (EXT_SYNC_PULSE_PD_CLK) @(posedge `TH.`PD_CLK_VIP.clk_out);
+        set_ext_sync(1'b0);
         // Wait for THIS trigger's word instead of a blind settle. Stronger as well
         // as shorter: it asserts every individual trigger produces exactly one
         // word, where the old fixed wait only checked the total at the end.
@@ -683,14 +711,14 @@ program test_program_par_if;
       automatic bit ok = 1;
       for (int v = 0; v < 4; v++) begin
         ad9910.set_f_cfg(v[1:0]);
-        #(CDC_SETTLE_NS * 1ns);   // CDC into pd domain
+        wait_up_to_pd_xfer();
         if (get_f_o() !== v[1:0]) begin
           `ERROR(("  F_CFG=%0d -> f_o=0x%01x, expected 0x%01x", v, get_f_o(), v[1:0]));
           ok = 0;
         end
       end
       ad9910.set_f_cfg(2'h0);
-      #(CDC_SETTLE_NS * 1ns);
+      wait_up_to_pd_xfer();
       if (ok) `INFO(("  All 4 F_CFG values reflected on f_o - PASSED"), ADI_VERBOSITY_LOW);
     end
 

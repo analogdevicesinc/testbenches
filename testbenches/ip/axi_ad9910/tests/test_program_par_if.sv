@@ -121,8 +121,6 @@ program test_program_par_if;
   // I3/I4); register offsets and field positions live in adi_regmap_ad9910_pkg.
   ad9910_api ad9910;
 
-  logic [31:0] read_data;
-
   // K4: the simulation randomization state is reported at the very start, so a
   // failing run can be reproduced exactly. This and "Testbench done!" are the
   // only ADI_VERBOSITY_NONE messages here - everything else is LOW and so is
@@ -350,12 +348,19 @@ program test_program_par_if;
   // Compare the captured samples against an expected array (order, value and
   // count). wait_captures returns as soon as enough samples have arrived, so
   // extra words emitted after them are only caught by the exact count here.
-  task automatic check_stream(input logic [15:0] expected[], input string label);
+  // With fatal set, a failure ends the run once the individual mismatches have
+  // been reported - for a check every later data test depends on.
+  task automatic check_stream(input logic [15:0] expected[], input string label,
+                              input bit fatal = 0);
     int unsigned mism;
     mism = 0;
     if (captured.size() != expected.size()) begin
       `ERROR(("  %s: captured %0d samples, expected %0d", label, captured.size(), expected.size()));
-      if (captured.size() < expected.size()) return;
+      if (captured.size() < expected.size()) begin
+        if (fatal)
+          `FATAL(("  %s failed; the later data checks depend on it", label));
+        return;
+      end
     end
     foreach (expected[i]) begin
       if (captured[i] !== expected[i]) begin
@@ -371,6 +376,8 @@ program test_program_par_if;
     else begin
       `ERROR(("  %s: %0d mismatches", label, mism));
     end
+    if (fatal && (mism != 0 || captured.size() != expected.size()))
+      `FATAL(("  %s failed; the later data checks depend on it", label));
   endtask
 
   // --------------------------
@@ -472,24 +479,15 @@ program test_program_par_if;
     // TC1: Register sanity
     // ----------------------------------------
     // sanity_test() verifies VERSION against its reset value and round-trips
-    // SCRATCH. Then the PAR_IF RW registers are round-tripped with distinct
-    // patterns and CONFIG.MEASURE_CLKS_EN is checked.
+    // SCRATCH, then CONFIG.MEASURE_CLKS_EN is checked. The PAR_IF registers are
+    // not read back here: the later TCs program them and check the output.
     current_test = 1;
     `INFO(("TC1: Register sanity"), ADI_VERBOSITY_LOW);
     begin
       logic [31:0] pd_cnt;
       logic        measure_clks_en;
-      logic        trig_mode, enable_p_if, load_new_rate;
 
       ad9910.sanity_test();
-
-      ad9910.get_version(read_data);
-      `INFO(("  VERSION = 0x%08x", read_data), ADI_VERBOSITY_LOW);
-      ad9910.get_id(read_data);
-      `INFO(("  ID = 0x%08x", read_data), ADI_VERBOSITY_LOW);
-
-      ad9910.set_scratch(32'hCAFE_BABE);
-      ad9910.verify_scratch(32'hCAFE_BABE);
 
       // The regmap records the IP default (0); this BD sets MEASURE_CLKS_EN=1, so
       // the expectation belongs here rather than in the reset value.
@@ -499,28 +497,6 @@ program test_program_par_if;
       else begin
         `ERROR(("  CONFIG.MEASURE_CLKS_EN = 0, expected 1"));
       end
-
-      ad9910.set_par_update_rate(32'h1234_5678);
-      ad9910.verify_par_update_rate(32'h1234_5678);
-
-      ad9910.set_f_cfg(2'h3);
-      ad9910.verify_f_cfg(2'h3);
-      ad9910.set_f_cfg(2'h0);
-
-      // enable_p_if is a plain RW bit; load_new_rate self-clears, so it is not
-      // part of the readback check.
-      ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
-                             .enable_p_if(1'b1),
-                             .load_new_rate(1'b0));
-      ad9910.get_update_ctrl(trig_mode, enable_p_if, load_new_rate);
-      if (enable_p_if)
-        `INFO(("  UPDATE_CTRL readback - PASSED"), ADI_VERBOSITY_LOW);
-      else begin
-        `ERROR(("  UPDATE_CTRL readback: enable_p_if = %0b, expected 1", enable_p_if));
-      end
-      ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
-                             .enable_p_if(1'b0),
-                             .load_new_rate(1'b0));
 
       ad9910.get_pd_clk_count(pd_cnt);
       `INFO(("  PD_CLK_COUNT = %0d (monitor needs ~655 us to update)", pd_cnt),
@@ -545,7 +521,7 @@ program test_program_par_if;
       if (captured.size() >= 2)
         `INFO(("  captured = 0x%04x, 0x%04x (DDR word 0x2222_1111)",
                captured[0], captured[1]), ADI_VERBOSITY_LOW);
-      check_stream(samples, "Single transfer / mapping");
+      check_stream(samples, "Single transfer / mapping", .fatal(1));
     end
 
     // ----------------------------------------

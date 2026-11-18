@@ -172,7 +172,9 @@ Test stimulus
 Both test programs set the logger to ``ADI_VERBOSITY_NONE``, so a passing run
 prints only the randomization state and ``Testbench done!``. Errors are always
 printed and recorded in the test log, and a run passes when the log holds none.
-To trace where a failure comes from, raise the verbosity to
+A failure that leaves every later check meaningless is fatal instead and ends
+the run: in cfg2_par_if, the width mapping (TC2); in cfg1_drg, the
+simple-mode ``drctl`` path and the base duty cycle (TC3, TC4). To trace where a failure comes from, raise the verbosity to
 ``ADI_VERBOSITY_LOW`` in the test program: every test case then prints a
 banner and every check its result.
 
@@ -256,11 +258,7 @@ Register sanity (TC1)
 
 * Run the API sanity test: verify VERSION against its reset value and
   write/read back the SCRATCH register
-* Read and log the ID and DEVICE_INFO registers
-* Write a distinct pattern to each DRG register (DRCTL_PERIOD, DRCTL_WIDTH,
-  BST_DELAY, RAMP_BURSTS, BURST_DELAY, MONITOR_MAX_PERIOD and the four
-  IRQ/trigger interval match registers), then read each back and compare
-* Clear all of them back to zero
+* Read and log the DEVICE_INFO register
 
 Reset release (TC2)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -471,8 +469,6 @@ Register sanity (TC1)
 * Run the API sanity test: verify VERSION against its reset value and
   write/read back the SCRATCH register
 * Verify CONFIG reports ``MEASURE_CLKS_EN=1``
-* Write/read back PAR_UPDATE_RATE, F_CFG and the ``enable_p_if`` bit of
-  UPDATE_CTRL
 
 Single transfer and width mapping (TC2)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -703,10 +703,12 @@ program test_program_drg;
     input int unsigned w,
     input int unsigned n_periods,
     input int unsigned exp_high,
-    input int unsigned exp_period
+    input int unsigned exp_period,
+    input bit          fatal = 0     // end the run on failure
   );
     int unsigned high_c[];
     int unsigned per_c[];
+    string       msg;
 
     program_pwm(p, w);
     measure_drctl_waveform(n_periods, 200, high_c, per_c);
@@ -715,8 +717,12 @@ program test_program_drg;
       `INFO(("  P=%0d W=%0d -> high=%0d period=%0d - PASSED", p, w, exp_high, exp_period),
             ADI_VERBOSITY_LOW);
     end else begin
-      `ERROR(("  P=%0d W=%0d: expected high=%0d period=%0d, measured high=%s period=%s",
-              p, w, exp_high, exp_period, fmt_array(high_c), fmt_array(per_c)));
+      msg = $sformatf("  P=%0d W=%0d: expected high=%0d period=%0d, measured high=%s period=%s",
+                      p, w, exp_high, exp_period, fmt_array(high_c), fmt_array(per_c));
+      if (fatal)
+        `FATAL(("%s", msg));
+      else
+        `ERROR(("%s", msg));
     end
   endtask
 
@@ -826,19 +832,13 @@ program test_program_drg;
     // TC1: Register sanity
     // ----------------------------------------
     // sanity_test() verifies VERSION against its reset value and round-trips
-    // SCRATCH. Then every DRG register is written with a distinct pattern and read
-    // back: the register map shifted from 0x23 upward in the PWM rework, so a
-    // stale address lands on a real-but-wrong register and produces no bus error -
-    // only a readback mismatch catches it.
+    // SCRATCH; DEVICE_INFO is logged. The DRG registers are not read back here:
+    // the later TCs program them and check the resulting behaviour.
     current_test = 1;
     `INFO(("TC1: Register sanity"), ADI_VERBOSITY_LOW);
 
     ad9910.sanity_test();
 
-    ad9910.get_version(read_data);
-    `INFO(("  VERSION: 0x%08x", read_data), ADI_VERBOSITY_LOW);
-    ad9910.get_id(read_data);
-    `INFO(("  ID: 0x%08x", read_data), ADI_VERBOSITY_LOW);
     begin
       logic [7:0] fpga_technology, fpga_family, speed_grade, dev_package;
       ad9910.get_device_info(fpga_technology, fpga_family, speed_grade, dev_package);
@@ -846,41 +846,6 @@ program test_program_drg;
              fpga_technology, fpga_family, speed_grade, dev_package),
             ADI_VERBOSITY_LOW);
     end
-
-    ad9910.set_drctl_period(32'h0000_1234);
-    ad9910.set_drctl_width(32'h0000_5678);
-    ad9910.set_bst_delay(32'h0000_9abc);
-    ad9910.set_ramp_bursts(32'h0000_def0);
-    ad9910.set_burst_delay(32'h0001_1111);
-    ad9910.set_monitor_max_period(32'h0002_2222);
-    ad9910.set_irq_start_interval(32'h0003_3333);
-    ad9910.set_irq_stop_interval(32'h0004_4444);
-    ad9910.set_trig_start_interval(32'h0005_5555);
-    ad9910.set_trig_stop_interval(32'h0006_6666);
-
-    ad9910.verify_drctl_period(32'h0000_1234);
-    ad9910.verify_drctl_width(32'h0000_5678);
-    ad9910.verify_bst_delay(32'h0000_9abc);
-    ad9910.verify_ramp_bursts(32'h0000_def0);  // 20-bit field
-    ad9910.verify_burst_delay(32'h0001_1111);
-    ad9910.verify_monitor_max_period(32'h0002_2222);
-    ad9910.verify_irq_start_interval(32'h0003_3333);
-    ad9910.verify_irq_stop_interval(32'h0004_4444);
-    ad9910.verify_trig_start_interval(32'h0005_5555);
-    ad9910.verify_trig_stop_interval(32'h0006_6666);
-    `INFO(("  Register map readback - PASSED"), ADI_VERBOSITY_LOW);
-
-    // Clear back to a known state before the ramp tests.
-    ad9910.set_drctl_period(32'd0);
-    ad9910.set_drctl_width(32'd0);
-    ad9910.set_bst_delay(32'd0);
-    ad9910.set_ramp_bursts(32'd0);
-    ad9910.set_burst_delay(32'd0);
-    ad9910.set_monitor_max_period(32'd0);
-    ad9910.set_irq_start_interval(32'd0);
-    ad9910.set_irq_stop_interval(32'd0);
-    ad9910.set_trig_start_interval(32'd0);
-    ad9910.set_trig_stop_interval(32'd0);
 
     // ----------------------------------------
     // TC2: Reset release and clock monitor
@@ -930,7 +895,9 @@ program test_program_drg;
     // TC3: Simple mode drctl control
     // ----------------------------------------
     // With toggle_en cleared the PWM machinery is bypassed and drctl follows
-    // DRCTL_INIT straight through the CDC.
+    // DRCTL_INIT straight through the CDC. Both checks are fatal: this is the
+    // simplest path into the sync_clk domain, so if it fails the core is still in
+    // reset or the control CDC is broken, and every later test depends on both.
     current_test = 3;
     `INFO(("TC3: Simple mode (toggle_en=0)"), ADI_VERBOSITY_LOW);
 
@@ -939,7 +906,7 @@ program test_program_drg;
     if (get_drctl() === 1'b1) begin
       `INFO(("  DRCTL_INIT=1 -> drctl high - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
-      `ERROR(("  DRCTL_INIT=1 but drctl=%b", get_drctl()));
+      `FATAL(("  DRCTL_INIT=1 but drctl=%b", get_drctl()));
     end
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
@@ -947,7 +914,7 @@ program test_program_drg;
     if (get_drctl() === 1'b0) begin
       `INFO(("  DRCTL_INIT=0 -> drctl low - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
-      `ERROR(("  DRCTL_INIT=0 but drctl=%b", get_drctl()));
+      `FATAL(("  DRCTL_INIT=0 but drctl=%b", get_drctl()));
     end
 
     // ----------------------------------------
@@ -964,7 +931,8 @@ program test_program_drg;
     // sawtooth is only in force where it is being exercised.
     enable_drg_model(1, 0, DRG_SAWTOOTH);
 
-    check_pwm(PWM_PERIOD, PWM_WIDTH, 6, PWM_WIDTH, PWM_PERIOD);
+    // Fatal: the rest of the suite runs on this duty cycle.
+    check_pwm(PWM_PERIOD, PWM_WIDTH, 6, PWM_WIDTH, PWM_PERIOD, .fatal(1));
 
     enable_drg_model(1, 0, DRG_DWELL);
 

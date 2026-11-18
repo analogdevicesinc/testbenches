@@ -60,10 +60,14 @@ package ad9910_api_pkg;
     endfunction: new
 
     // I2: version and scratch. This IP has no CORE_MAGIC register, so the
-    // magic check other APIs perform is not applicable.
+    // magic check other APIs perform is not applicable. ID is not checked
+    // either: it reads back the instance's ID parameter, which the integrating
+    // design chooses, so it has no fixed expected value.
     task sanity_test();
+      // version
       this.axi_verify(GetAddrs(AXI_AD9910_REG_VERSION),
         `SET_AXI_AD9910_REG_VERSION_VERSION(`DEFAULT_AXI_AD9910_REG_VERSION_VERSION));
+      // scratch
       this.axi_write(GetAddrs(AXI_AD9910_REG_SCRATCH), `SET_AXI_AD9910_REG_SCRATCH_SCRATCH(32'hdeadbeef));
       this.axi_verify(GetAddrs(AXI_AD9910_REG_SCRATCH), `SET_AXI_AD9910_REG_SCRATCH_SCRATCH(32'hdeadbeef));
     endtask: sanity_test

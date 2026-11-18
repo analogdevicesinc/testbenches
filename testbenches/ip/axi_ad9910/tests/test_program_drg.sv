@@ -54,21 +54,7 @@ import ad9910_api_pkg::*;
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-program test_program_drg (
-  input         pd_clk_tp,
-  input         sync_clk_tp,
-  output reg    ext_sync_tp,
-  input         ad9910_irq_tp,
-  input         trig_out_tp,
-  input         drctl_tp,
-  input         drhold_tp,
-  output reg    drover_tp,
-  output reg    ram_swp_ovr_tp,
-  input  [2:0]  profile_tp,
-  input  [1:0]  f_o_tp,
-  input  [15:0] db_o_tp,
-  input         tx_enable_tp
-);
+program test_program_drg;
 
   timeunit 1ns;
   timeprecision 1ps;
@@ -144,6 +130,54 @@ program test_program_drg (
   string  current_process_random_state;
   int        current_test = 0;   // waveform navigation aid
 
+  // --------------------------
+  // Device-side pins, through the IO VIPs
+  // --------------------------
+  // The DUT's pins connect only to IO VIPs in the block design. The SLAVE VIPs
+  // sample through a clocking block, so after a sync_clk edge get_io() returns
+  // the value from just before that edge. The MASTER VIPs drive on a sync_clk or
+  // pd_clk edge.
+  function automatic logic get_drctl();
+    logic [1023:0] v = `TH.`DRCTL_VIP.inst.inst.IF.vif.get_io();
+    return v[0];
+  endfunction
+
+  function automatic logic get_drhold();
+    logic [1023:0] v = `TH.`DRHOLD_VIP.inst.inst.IF.vif.get_io();
+    return v[0];
+  endfunction
+
+  function automatic logic [2:0] get_profile();
+    logic [1023:0] v = `TH.`PROFILE_VIP.inst.inst.IF.vif.get_io();
+    return v[2:0];
+  endfunction
+
+  function automatic logic get_trig_out();
+    logic [1023:0] v = `TH.`TRIG_OUT_VIP.inst.inst.IF.vif.get_io();
+    return v[0];
+  endfunction
+
+  function automatic logic get_ad9910_irq();
+    logic [1023:0] v = `TH.`AD9910_IRQ_VIP.inst.inst.IF.vif.get_io();
+    return v[0];
+  endfunction
+
+  // The ramp model reads back the drover level it drives.
+  logic drover_level = 1'b0;
+
+  function automatic void set_drover(input logic v);
+    drover_level = v;
+    `TH.`DROVER_VIP.inst.inst.IF.vif.set_io(v);
+  endfunction
+
+  function automatic void set_ram_swp_ovr(input logic v);
+    `TH.`RAM_SWP_OVR_VIP.inst.inst.IF.vif.set_io(v);
+  endfunction
+
+  function automatic void set_ext_sync(input logic v);
+    `TH.`EXT_SYNC_VIP.inst.inst.IF.vif.set_io(v);
+  endfunction
+
   // Which test cases failed, named in the final summary. The per-TC banners are
   // ADI_VERBOSITY_LOW and so invisible at the NONE threshold
   // (coding_guidelines F5), which would otherwise leave a CI log holding an
@@ -209,26 +243,28 @@ program test_program_drg (
   bit                   drg_drctl_prev = 0;
 
   initial begin : drg_model
+    logic drctl;
     drg_counter = DRG_LOWER_LIMIT;
-    drover_tp   = 1'b1;              // parked at the lower limit
+    set_drover(1'b1);                // parked at the lower limit
 
     forever begin
-      @(posedge sync_clk_tp);
+      @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      drctl = get_drctl();
 
-      if (drg_model_enabled && !drhold_tp) begin
+      if (drg_model_enabled && !get_drhold()) begin
         // A level change means the previous ramp is over. If the counter had
         // not yet reached the limit it was heading for, the interval was too
         // short - this is the software programming error behind ramps that
         // never reach their endpoint. Only meaningful while dwelling: a
         // sawtooth retraces on its own, so no interval can cut it short.
         if (check_ramp_completion && (drg_shape == DRG_DWELL) &&
-            (drctl_tp != drg_drctl_prev)) begin
-          if (drctl_tp && (drg_counter != DRG_LOWER_LIMIT)) begin
+            (drctl != drg_drctl_prev)) begin
+          if (drctl && (drg_counter != DRG_LOWER_LIMIT)) begin
             ramp_truncation_count++;
             `ERROR(("DRG Model: down-ramp truncated at %0d (needs %0d sync_clk cycles to reach %0d)",
                     drg_counter, DRG_RAMP_CYCLES, DRG_LOWER_LIMIT));
           end
-          if (!drctl_tp && (drg_counter != DRG_UPPER_LIMIT)) begin
+          if (!drctl && (drg_counter != DRG_UPPER_LIMIT)) begin
             ramp_truncation_count++;
             `ERROR(("DRG Model: up-ramp truncated at %0d (needs %0d sync_clk cycles to reach %0d)",
                     drg_counter, DRG_RAMP_CYCLES, DRG_UPPER_LIMIT));
@@ -243,7 +279,7 @@ program test_program_drg (
         // the limit first would make a blade one sync_clk cycle longer, leaving a partial
         // blade that drctl falling turns into a descent instead of a retrace:
         // the sawtooth-then-triangle shape.
-        if (!drctl_tp) begin
+        if (!drctl) begin
           drg_counter = (drg_counter <= DRG_LOWER_LIMIT + DRG_STEP_SIZE) ?
                         DRG_LOWER_LIMIT : drg_counter - DRG_STEP_SIZE;
         end else if (drg_counter + DRG_STEP_SIZE < DRG_UPPER_LIMIT) begin
@@ -255,15 +291,15 @@ program test_program_drg (
           drg_counter = DRG_UPPER_LIMIT;
         end
 
-        if (!drover_tp &&
+        if (!drover_level &&
             ((drg_counter == DRG_UPPER_LIMIT) || (drg_counter == DRG_LOWER_LIMIT)))
           drover_rise_count++;
 
         // "The ramp is at a limit" in both shapes, but that reads as a level
         // wherever the ramp dwells and as a one sync_clk-cycle pulse per blade in a
         // sawtooth, on the sync_clk cycle the lower limit is reloaded.
-        drover_tp      = (drg_counter == DRG_UPPER_LIMIT) || (drg_counter == DRG_LOWER_LIMIT);
-        drg_drctl_prev = drctl_tp;
+        set_drover((drg_counter == DRG_UPPER_LIMIT) || (drg_counter == DRG_LOWER_LIMIT));
+        drg_drctl_prev = drctl;
       end
     end
   end : drg_model
@@ -277,11 +313,11 @@ program test_program_drg (
     // While disabled the model stops driving drover, so park it low rather
     // than leaving it asserted - drover is a level source into irq_int[2] and
     // a stuck-high pin re-latches the interrupt as fast as software clears it.
-    drover_tp             = enable ? 1'b1 : 1'b0;
+    set_drover(enable ? 1'b1 : 1'b0);
     drover_rise_count     = 0;
     ramp_truncation_count = 0;
     drg_retrace_count     = 0;
-    drg_drctl_prev        = drctl_tp;   // resync so re-enabling is not seen as an edge
+    drg_drctl_prev        = get_drctl();   // resync so re-enabling is not seen as an edge
     check_ramp_completion = check_completion;
     drg_shape             = shape;
     drg_model_enabled     = enable;
@@ -321,13 +357,13 @@ program test_program_drg (
     cyc_since_rise = 0;
     cyc_high       = 0;
     timeout_cycles = timeout_us * CYCLES_PER_US;
-    prev           = drctl_tp;
+    prev           = get_drctl();
 
     while (got < n_periods && timeout_cycles > 0) begin
-      @(posedge sync_clk_tp);
+      @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       timeout_cycles--;
 
-      is_rise = drctl_tp && !prev;
+      is_rise = get_drctl() && !prev;
       if (is_rise) begin
         if (started) begin
           period_cycles[got] = cyc_since_rise;
@@ -341,10 +377,10 @@ program test_program_drg (
 
       if (started) begin
         cyc_since_rise++;
-        if (drctl_tp) cyc_high++;
+        if (get_drctl()) cyc_high++;
       end
 
-      prev = drctl_tp;
+      prev = get_drctl();
     end
 
     if (got < n_periods) begin
@@ -361,8 +397,8 @@ program test_program_drg (
     output int unsigned cycles
   );
     cycles = 0;
-    while ((drctl_tp !== level) && (cycles < timeout_cyc)) begin
-      @(posedge sync_clk_tp);
+    while ((get_drctl() !== level) && (cycles < timeout_cyc)) begin
+      @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       cycles++;
     end
   endtask
@@ -375,8 +411,8 @@ program test_program_drg (
   );
     bit ok = 1;
     for (int unsigned k = 0; k < window_cyc; k++) begin
-      @(posedge sync_clk_tp);
-      if (drctl_tp !== level) ok = 0;
+      @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      if (get_drctl() !== level) ok = 0;
     end
     if (ok) begin
       `INFO(("  %s: drctl held %0b for %0d sync_clk cycles - PASSED", label, level, window_cyc),
@@ -449,10 +485,10 @@ program test_program_drg (
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b1), .drctl_init(1'b0), .drhold(1'b0));
     // The delay plus two whole periods: end_period_d has to fire for the new
     // BST_DELAY to be latched, so the priming window must outlast a period.
-    repeat (dly + 2 * PWM_PERIOD) @(posedge sync_clk_tp);
+    repeat (dly + 2 * PWM_PERIOD) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
-    repeat (dly + 2 * PWM_PERIOD) @(posedge sync_clk_tp);
+    repeat (dly + 2 * PWM_PERIOD) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b1), .drctl_init(1'b0), .drhold(1'b0));
     wait_drctl_level(1'b1, 40000, cycles);
@@ -606,17 +642,17 @@ program test_program_drg (
     got            = 0;
     cyc            = 0;
     timeout_cycles = timeout_us * CYCLES_PER_US;
-    prev           = trig_out_tp;
+    prev           = get_trig_out();
 
     while (got < n_pulses && timeout_cycles > 0) begin
-      @(posedge sync_clk_tp);
+      @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       timeout_cycles--;
       cyc++;
-      if (trig_out_tp && !prev) begin
+      if (get_trig_out() && !prev) begin
         offsets[got] = cyc;
         got++;
       end
-      prev = trig_out_tp;
+      prev = get_trig_out();
     end
   endtask
 
@@ -627,11 +663,11 @@ program test_program_drg (
   );
     bit prev;
     count = 0;
-    prev  = trig_out_tp;
+    prev  = get_trig_out();
     for (int unsigned k = 0; k < window_cyc; k++) begin
-      @(posedge sync_clk_tp);
-      if (trig_out_tp && !prev) count++;
-      prev = trig_out_tp;
+      @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      if (get_trig_out() && !prev) count++;
+      prev = get_trig_out();
     end
   endtask
 
@@ -646,8 +682,8 @@ program test_program_drg (
     `INFO(("Randomization state: %s", current_process_random_state),
           ADI_VERBOSITY_NONE);
 
-    ext_sync_tp    = 1'b0;
-    ram_swp_ovr_tp = 1'b0;
+    set_ext_sync(1'b0);
+    set_ram_swp_ovr(1'b0);
 
     base_env = new(
       .name("Base Environment"),
@@ -669,6 +705,8 @@ program test_program_drg (
     `LINK(ddr, base_env, ddr)
 
     base_env.start();
+    `TH.`SYNC_CLK_VIP.inst.IF.start_clock();
+    `TH.`PD_CLK_VIP.inst.IF.start_clock();
     base_env.sys_reset();
 
     ad9910 = new(
@@ -792,19 +830,19 @@ program test_program_drg (
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b1), .drhold(1'b0));
     #(CFG_SETTLE_NS * 1ns);
-    if (drctl_tp === 1'b1) begin
+    if (get_drctl() === 1'b1) begin
       `INFO(("  DRCTL_INIT=1 -> drctl high - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
-      `ERROR(("  DRCTL_INIT=1 but drctl=%b", drctl_tp));
+      `ERROR(("  DRCTL_INIT=1 but drctl=%b", get_drctl()));
       record_failure();
     end
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
     #(CFG_SETTLE_NS * 1ns);
-    if (drctl_tp === 1'b0) begin
+    if (get_drctl() === 1'b0) begin
       `INFO(("  DRCTL_INIT=0 -> drctl low - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
-      `ERROR(("  DRCTL_INIT=0 but drctl=%b", drctl_tp));
+      `ERROR(("  DRCTL_INIT=0 but drctl=%b", get_drctl()));
       record_failure();
     end
 
@@ -1024,7 +1062,7 @@ program test_program_drg (
       // program_pwm's settle is a fixed 4 us, which is only one period long at
       // this configuration and can be consumed entirely by the config sitting
       // at the CDC, so the period is not necessarily over when it returns.
-      repeat (PWM_PERIOD + CDC_XFER_JITTER) @(posedge sync_clk_tp);
+      repeat (PWM_PERIOD + CDC_XFER_JITTER) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=period_stop");
       // Returning to free-run clears stop_event and the ramp resumes.
       ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
@@ -1049,7 +1087,7 @@ program test_program_drg (
       ad9910.set_ramp_cfg(RAMP_CFG_BURST_STOP);
       program_pwm(PWM_PERIOD, PWM_WIDTH);
       // As above, but a whole burst is allowed to run before the park.
-      repeat (STOP_BURSTS * PWM_PERIOD + CDC_XFER_JITTER) @(posedge sync_clk_tp);
+      repeat (STOP_BURSTS * PWM_PERIOD + CDC_XFER_JITTER) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=burst_stop");
 
       ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
@@ -1078,19 +1116,19 @@ program test_program_drg (
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b1));
     #(CFG_SETTLE_NS * 1ns);
-    if (drhold_tp === 1'b1) begin
+    if (get_drhold() === 1'b1) begin
       `INFO(("  DRHOLD=1 -> drhold pin high - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
-      `ERROR(("  DRHOLD=1 but drhold pin=%b", drhold_tp));
+      `ERROR(("  DRHOLD=1 but drhold pin=%b", get_drhold()));
       record_failure();
     end
 
     ad9910.set_drg_ctrl(.drctl_toggle_en(1'b0), .drctl_init(1'b0), .drhold(1'b0));
     #(CFG_SETTLE_NS * 1ns);
-    if (drhold_tp === 1'b0) begin
+    if (get_drhold() === 1'b0) begin
       `INFO(("  DRHOLD=0 -> drhold pin low - PASSED"), ADI_VERBOSITY_LOW);
     end else begin
-      `ERROR(("  DRHOLD=0 but drhold pin=%b", drhold_tp));
+      `ERROR(("  DRHOLD=0 but drhold pin=%b", get_drhold()));
       record_failure();
     end
 
@@ -1103,8 +1141,8 @@ program test_program_drg (
     for (int p = 0; p < 8; p++) begin
       ad9910.set_profile(p);
       #(CFG_SETTLE_NS * 1ns);
-      if (profile_tp !== p[2:0]) begin
-        `ERROR(("  PROFILE=%0d but profile pin=%0d", p, profile_tp));
+      if (get_profile() !== p[2:0]) begin
+        `ERROR(("  PROFILE=%0d but profile pin=%0d", p, get_profile()));
         record_failure();
       end
     end
@@ -1139,7 +1177,7 @@ program test_program_drg (
       program_pwm(GOOD_P, GOOD_W);
 
       rises_before = drover_rise_count;
-      repeat (4 * GOOD_P) @(posedge sync_clk_tp);
+      repeat (4 * GOOD_P) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       rises_after = drover_rise_count;
 
       `INFO(("  %0d drover rising edges over 4 periods (expect ~8)",
@@ -1184,12 +1222,12 @@ program test_program_drg (
         bit          drctl_prev_local;
         int unsigned bad_edges;
         bad_edges        = 0;
-        drctl_prev_local = drctl_tp;
+        drctl_prev_local = get_drctl();
         for (int unsigned k = 0; k < 4 * BAD_P; k++) begin
-          @(posedge sync_clk_tp);
-          if (!drctl_tp && drctl_prev_local && (drg_counter != DRG_UPPER_LIMIT))
+          @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+          if (!get_drctl() && drctl_prev_local && (drg_counter != DRG_UPPER_LIMIT))
             bad_edges++;
-          drctl_prev_local = drctl_tp;
+          drctl_prev_local = get_drctl();
         end
         truncations = bad_edges;
       end
@@ -1228,7 +1266,7 @@ program test_program_drg (
       program_pwm(SAW_P, SAW_W);
 
       retraces_before = drg_retrace_count;
-      repeat (2 * SAW_P) @(posedge sync_clk_tp);
+      repeat (2 * SAW_P) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       retraces_after = drg_retrace_count;
 
       if ((retraces_after - retraces_before) >= MIN_RETRACES) begin
@@ -1246,7 +1284,7 @@ program test_program_drg (
       // activity everywhere the DUT is idle.
       stop_pwm();
       retraces_before = drg_retrace_count;
-      repeat (DRG_RAMP_CYCLES + 100) @(posedge sync_clk_tp);
+      repeat (DRG_RAMP_CYCLES + 100) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       retraces_after = drg_retrace_count;
 
       if ((drg_counter == DRG_LOWER_LIMIT) && (retraces_after == retraces_before)) begin
@@ -1448,16 +1486,16 @@ program test_program_drg (
       #(CFG_SETTLE_NS * 1ns);
 
       // ram_swp_ovr is a plain input, the simplest source to drive.
-      ram_swp_ovr_tp = 1'b1;
-      repeat (50) @(posedge sync_clk_tp);
-      ram_swp_ovr_tp = 1'b0;
+      set_ram_swp_ovr(1'b1);
+      repeat (50) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      set_ram_swp_ovr(1'b0);
       #(CFG_SETTLE_NS * 1ns);
 
-      if (ad9910_irq_tp === 1'b0) begin
+      if (get_ad9910_irq() === 1'b0) begin
         `INFO(("  IRQ_MASK=0 keeps irq low with an active source - PASSED"),
               ADI_VERBOSITY_LOW);
       end else begin
-        `ERROR(("  IRQ_MASK=0 but irq=%b", ad9910_irq_tp));
+        `ERROR(("  IRQ_MASK=0 but irq=%b", get_ad9910_irq()));
         record_failure();
       end
 
@@ -1473,10 +1511,10 @@ program test_program_drg (
       // Unmasking an already-latched source must drive irq.
       ad9910.set_irq_mask(32'h1 << IRQ_RAM_SWP_OVR);
       #(CFG_SETTLE_NS * 1ns);
-      if (ad9910_irq_tp === 1'b1) begin
+      if (get_ad9910_irq() === 1'b1) begin
         `INFO(("  Unmasking a latched source asserts irq - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
-        `ERROR(("  Source latched and unmasked but irq=%b", ad9910_irq_tp));
+        `ERROR(("  Source latched and unmasked but irq=%b", get_ad9910_irq()));
         record_failure();
       end
 
@@ -1486,10 +1524,10 @@ program test_program_drg (
       ad9910.set_irq_table(32'h1 << IRQ_RAM_SWP_OVR);
       #(CFG_SETTLE_NS * 1ns);
       ad9910.get_irq_table(read_data);
-      if (!read_data[IRQ_RAM_SWP_OVR] && ad9910_irq_tp === 1'b0) begin
+      if (!read_data[IRQ_RAM_SWP_OVR] && get_ad9910_irq() === 1'b0) begin
         `INFO(("  W1C cleared the latch and deasserted irq - PASSED"), ADI_VERBOSITY_LOW);
       end else begin
-        `ERROR(("  After W1C: IRQ_TABLE=0x%02x irq=%b", read_data, ad9910_irq_tp));
+        `ERROR(("  After W1C: IRQ_TABLE=0x%02x irq=%b", read_data, get_ad9910_irq()));
         record_failure();
       end
 
@@ -1509,7 +1547,7 @@ program test_program_drg (
         automatic int unsigned ep_pulses = 0;
         automatic int unsigned teb_pulses = 0;
         automatic int unsigned drctl_rises = 0;
-        automatic bit          drctl_was = drctl_tp;
+        automatic bit          drctl_was = get_drctl();
         // Ten periods plus the five burst delays between them, with margin.
         automatic int unsigned guard = 60000;
 
@@ -1518,10 +1556,10 @@ program test_program_drg (
         // at once, so a fixed window can easily contain no burst boundary at
         // all. Ten rising edges guarantee five completions at RAMP_BURSTS=2.
         while (drctl_rises < 10 && guard > 0) begin
-          @(posedge sync_clk_tp);
+          @(posedge `TH.`SYNC_CLK_VIP.clk_out);
           guard--;
-          if (drctl_tp && !drctl_was) drctl_rises++;
-          drctl_was = drctl_tp;
+          if (get_drctl() && !drctl_was) drctl_rises++;
+          drctl_was = get_drctl();
           if (system_tb.test_harness.axi_ad9910.inst.end_period)         ep_pulses++;
           if (system_tb.test_harness.axi_ad9910.inst.terminal_end_burst) teb_pulses++;
           if (system_tb.test_harness.axi_ad9910.inst.bursts_complete)    bc_pulses++;
@@ -1556,9 +1594,9 @@ program test_program_drg (
       // starts sitting on the lower limit.
       ad9910.set_irq_mask(32'h1 << IRQ_DROVER);
       program_pwm(PWM_PERIOD, PWM_PERIOD / 2);
-      repeat (PWM_PERIOD) @(posedge sync_clk_tp);
+      repeat (PWM_PERIOD) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       ad9910.set_irq_table(32'h3f);
-      repeat (3 * PWM_PERIOD) @(posedge sync_clk_tp);
+      repeat (3 * PWM_PERIOD) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
       ad9910.get_irq_table(read_data);
       if (read_data[IRQ_DROVER]) begin
         `INFO(("  drover latched in IRQ_TABLE - PASSED"), ADI_VERBOSITY_LOW);
@@ -1607,6 +1645,8 @@ program test_program_drg (
     // Final report
     // ----------------------------------------
     #1us;
+    `TH.`SYNC_CLK_VIP.inst.IF.stop_clock();
+    `TH.`PD_CLK_VIP.inst.IF.stop_clock();
     base_env.stop();
 
     if (test_passed) begin

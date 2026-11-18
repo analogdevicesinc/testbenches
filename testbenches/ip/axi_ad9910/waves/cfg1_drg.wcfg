@@ -55,13 +55,13 @@
    <wvobject type="group" fp_name="grp_clocks">
       <obj_property name="label">Clocks &amp; Reset</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/system_tb/sync_clk_tb">
-         <obj_property name="ElementShortName">sync_clk_tb</obj_property>
-         <obj_property name="ObjectShortName">sync_clk_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/sync_clk">
+         <obj_property name="ElementShortName">sync_clk</obj_property>
+         <obj_property name="ObjectShortName">sync_clk</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/pd_clk_tb">
-         <obj_property name="ElementShortName">pd_clk_tb</obj_property>
-         <obj_property name="ObjectShortName">pd_clk_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/pd_clk_in">
+         <obj_property name="ElementShortName">pd_clk_in</obj_property>
+         <obj_property name="ObjectShortName">pd_clk_in</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/reset_sync_cd">
          <obj_property name="ElementShortName">reset_sync_cd</obj_property>
@@ -79,33 +79,33 @@
    <wvobject type="group" fp_name="grp_pins">
       <obj_property name="label">DUT Pins</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/system_tb/drctl_tb">
-         <obj_property name="ElementShortName">drctl_tb</obj_property>
-         <obj_property name="ObjectShortName">drctl_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drctl">
+         <obj_property name="ElementShortName">drctl</obj_property>
+         <obj_property name="ObjectShortName">drctl</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/drover_tb">
-         <obj_property name="ElementShortName">drover_tb</obj_property>
-         <obj_property name="ObjectShortName">drover_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drover">
+         <obj_property name="ElementShortName">drover</obj_property>
+         <obj_property name="ObjectShortName">drover</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/drhold_tb">
-         <obj_property name="ElementShortName">drhold_tb</obj_property>
-         <obj_property name="ObjectShortName">drhold_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/drhold">
+         <obj_property name="ElementShortName">drhold</obj_property>
+         <obj_property name="ObjectShortName">drhold</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/profile_tb">
-         <obj_property name="ElementShortName">profile_tb[2:0]</obj_property>
-         <obj_property name="ObjectShortName">profile_tb[2:0]</obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/profile">
+         <obj_property name="ElementShortName">profile[2:0]</obj_property>
+         <obj_property name="ObjectShortName">profile[2:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/ad9910_irq_tb">
-         <obj_property name="ElementShortName">ad9910_irq_tb</obj_property>
-         <obj_property name="ObjectShortName">ad9910_irq_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/irq">
+         <obj_property name="ElementShortName">irq</obj_property>
+         <obj_property name="ObjectShortName">irq</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/trig_out_tb">
-         <obj_property name="ElementShortName">trig_out_tb</obj_property>
-         <obj_property name="ObjectShortName">trig_out_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/trig_out">
+         <obj_property name="ElementShortName">trig_out</obj_property>
+         <obj_property name="ObjectShortName">trig_out</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/ext_sync_tb">
-         <obj_property name="ElementShortName">ext_sync_tb</obj_property>
-         <obj_property name="ObjectShortName">ext_sync_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/ext_sync">
+         <obj_property name="ElementShortName">ext_sync</obj_property>
+         <obj_property name="ObjectShortName">ext_sync</obj_property>
       </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="grp_pwm">
@@ -464,17 +464,17 @@
    <wvobject type="group" fp_name="grp_parif">
       <obj_property name="label">Parallel Output (unused in DRG)</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/system_tb/f_o_tb">
-         <obj_property name="ElementShortName">f_o_tb[1:0]</obj_property>
-         <obj_property name="ObjectShortName">f_o_tb[1:0]</obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/f_o">
+         <obj_property name="ElementShortName">f_o[1:0]</obj_property>
+         <obj_property name="ObjectShortName">f_o[1:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/db_o_tb">
-         <obj_property name="ElementShortName">db_o_tb[15:0]</obj_property>
-         <obj_property name="ObjectShortName">db_o_tb[15:0]</obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/db_o">
+         <obj_property name="ElementShortName">db_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">db_o[15:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/tx_enable_tb">
-         <obj_property name="ElementShortName">tx_enable_tb</obj_property>
-         <obj_property name="ObjectShortName">tx_enable_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/tx_enable">
+         <obj_property name="ElementShortName">tx_enable</obj_property>
+         <obj_property name="ObjectShortName">tx_enable</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

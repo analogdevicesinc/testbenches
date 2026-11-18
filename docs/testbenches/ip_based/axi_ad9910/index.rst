@@ -32,9 +32,10 @@ Block design
 
 The testbench block design includes the ``axi_ad9910`` IP core along with VIPs
 used for clocking, reset, PS and DDR simulations. The ``sync_clk`` and
-``pd_clk`` signals are generated directly in the testbench at 250 MHz, standing
-in for the clock outputs of the AD9910 device, and reach the IP through
-pass-through clock VIPs. The IP is instantiated with ``MEASURE_CLKS_EN=1``, so
+``pd_clk`` signals are generated at 250 MHz by master clock VIPs, standing in
+for the clock outputs of the AD9910 device. The test program starts and stops
+them. The IP is instantiated with
+``MEASURE_CLKS_EN=1``, so
 the sync_clk and pd_clk monitor registers are available.
 
 The block design depends on the ``MODE`` parameter:
@@ -44,11 +45,13 @@ The block design depends on the ``MODE`` parameter:
 -  **PAR_IF** — a TX ``axi_dmac`` reads samples from the DDR VIP over AXI-MM
    and drives the ``axi_ad9910`` AXI-Stream input.
 
-In both modes the DDS control and data outputs (``drctl``, ``drhold``,
-``profile``, ``db_o``, ``f_o``, ``tx_enable``, ``trig_out`` and the IP
-interrupt) are brought out of the block design and observed directly by the
-test program, which also drives the ``drover``, ``ram_swp_ovr`` and
-``ext_sync`` inputs.
+In both modes every device-side pin of ``axi_ad9910`` connects to an IO VIP,
+clocked by the domain the pin belongs to. Slave IO VIPs sample the DDS control
+and data outputs (``drctl``, ``drhold``, ``profile``, ``db_o``, ``f_o``,
+``tx_enable``, ``trig_out`` and the IP interrupt) for the test program, and
+master IO VIPs drive the ``drover``, ``ram_swp_ovr`` and ``ext_sync`` inputs.
+A slave IO VIP samples through a clocking block, so after a clock edge it
+returns the value from just before that edge.
 
 Block diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -631,6 +634,9 @@ Testbench specific dependencies:
      - ---
    * - DMAC_API *
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
+     - ---
+   * - IO_VIP
+     - :git-testbenches:`library/vip/adi/io_vip/io_vip.sv`
      - ---
    * - AXI_VIP_PKG
      - ---

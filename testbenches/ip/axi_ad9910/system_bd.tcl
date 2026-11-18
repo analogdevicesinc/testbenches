@@ -53,69 +53,60 @@ ad_ip_instance axi_ad9910 axi_ad9910 [list \
   MEASURE_CLKS_EN 1 \
 ]
 
-# Pass-through clock VIPs for pd_clk and sync_clk
-# Allows test program to monitor or override clocks at runtime
+# Master clock VIPs for sync_clk and pd_clk, standing in for the AD9910's
+# SYNC_CLK and PDCLK outputs. Started and stopped by the test program.
 ad_ip_instance clk_vip pd_clk_vip [list \
-  INTERFACE_MODE {PASS_THROUGH} \
+  INTERFACE_MODE {MASTER} \
   FREQ_HZ 250000000 \
 ]
 adi_sim_add_define "PD_CLK_VIP=pd_clk_vip"
 
 ad_ip_instance clk_vip sync_clk_vip [list \
-  INTERFACE_MODE {PASS_THROUGH} \
+  INTERFACE_MODE {MASTER} \
   FREQ_HZ 250000000 \
 ]
 adi_sim_add_define "SYNC_CLK_VIP=sync_clk_vip"
 
-# Route external clock ports through the VIPs to the DUT
-create_bd_port -dir I sync_clk_in
-ad_connect sync_clk_in sync_clk_vip/clk_in
 ad_connect sync_clk_vip/clk_out axi_ad9910/sync_clk
+ad_connect pd_clk_vip/clk_out axi_ad9910/pd_clk_in
 
 ad_connect sys_cpu_clk axi_ad9910/delay_clk
-
-create_bd_port -dir I pd_clk_in
-ad_connect pd_clk_in pd_clk_vip/clk_in
-ad_connect pd_clk_vip/clk_out axi_ad9910/pd_clk_in
 
 # Connect AXI interface
 set BA_AD9910 0x44A00000
 ad_cpu_interconnect $BA_AD9910 axi_ad9910
 adi_sim_add_define "AXI_AD9910_BA=[format "%d" ${BA_AD9910}]"
 
-# Create external ports for device control
-create_bd_port -dir I ext_sync
-create_bd_port -dir O ad9910_irq
-create_bd_port -dir O trig_out
-
-# Create external ports for DDS ramp control interface
-create_bd_port -dir O drctl
-create_bd_port -dir O drhold
-create_bd_port -dir I drover
-create_bd_port -dir I ram_swp_ovr
-create_bd_port -dir O -from 2 -to 0 profile
-
-# Create external ports for parallel data interface
-create_bd_port -dir O -from 1 -to 0 f_o
-create_bd_port -dir O -from 15 -to 0 db_o
-create_bd_port -dir O tx_enable
-
-# Connect device control signals
-ad_connect axi_ad9910/ext_sync ext_sync
-ad_connect axi_ad9910/irq ad9910_irq
-ad_connect axi_ad9910/trig_out trig_out
-
-# Connect ramp control signals
-ad_connect axi_ad9910/drctl drctl
-ad_connect axi_ad9910/drhold drhold
-ad_connect axi_ad9910/drover drover
-ad_connect axi_ad9910/ram_swp_ovr ram_swp_ovr
-ad_connect axi_ad9910/profile profile
-
-# Connect parallel data interface
-ad_connect axi_ad9910/f_o f_o
-ad_connect axi_ad9910/db_o db_o
-ad_connect axi_ad9910/tx_enable tx_enable
+# IO VIPs for the device-side pins. MASTER VIPs (MODE 1) drive the AD9910's
+# outputs into the DUT; SLAVE VIPs (MODE 0) sample the DUT's outputs for the
+# test program. Each is clocked by the domain its pin belongs to. Every VIP is
+# built in both modes, since the DUT has all of the pins in both.
+#   VIP                MODE WIDTH clock         DUT pin
+foreach {vip mode width clk pin} {
+  ext_sync_vip         1    1     pd_clk_vip    ext_sync
+  drover_vip           1    1     sync_clk_vip  drover
+  ram_swp_ovr_vip      1    1     sync_clk_vip  ram_swp_ovr
+  ad9910_irq_vip       0    1     sync_clk_vip  irq
+  trig_out_vip         0    1     sync_clk_vip  trig_out
+  drctl_vip            0    1     sync_clk_vip  drctl
+  drhold_vip           0    1     sync_clk_vip  drhold
+  profile_vip          0    3     sync_clk_vip  profile
+  f_o_vip              0    2     pd_clk_vip    f_o
+  db_o_vip             0    16    pd_clk_vip    db_o
+  tx_enable_vip        0    1     pd_clk_vip    tx_enable
+} {
+  ad_ip_instance io_vip $vip [list \
+    MODE $mode \
+    WIDTH $width \
+  ]
+  adi_sim_add_define "[string toupper $vip]=$vip"
+  ad_connect $clk/clk_out $vip/clk
+  if {$mode == 1} {
+    ad_connect $vip/o axi_ad9910/$pin
+  } else {
+    ad_connect axi_ad9910/$pin $vip/i
+  }
+}
 
 # AXI-Stream interface configuration (MODE-dependent)
 if {$ad_project_params(MODE) == "PAR_IF"} {
@@ -153,9 +144,6 @@ if {$ad_project_params(MODE) == "PAR_IF"} {
   ad_connect sys_cpu_resetn axi_ad9910/s_axis_aresetn
 
   # Tie AXI-Stream inputs to ground
-  create_bd_port -dir O s_axis_tready
-  ad_connect axi_ad9910/s_axis_tready s_axis_tready
-
   ad_connect axi_ad9910/s_axis_tvalid GND
   ad_connect axi_ad9910/s_axis_tlast GND
   ad_connect axi_ad9910/s_axis_tdata GND

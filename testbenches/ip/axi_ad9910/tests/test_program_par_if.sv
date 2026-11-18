@@ -68,21 +68,7 @@ import dma_trans_pkg::*;
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
 
-program test_program_par_if (
-  input         pd_clk_tp,
-  input         sync_clk_tp,
-  output reg    ext_sync_tp,
-  input         ad9910_irq_tp,
-  input         trig_out_tp,
-  input         drctl_tp,
-  input         drhold_tp,
-  output reg    drover_tp,
-  output reg    ram_swp_ovr_tp,
-  input  [2:0]  profile_tp,
-  input  [1:0]  f_o_tp,
-  input  [15:0] db_o_tp,
-  input         tx_enable_tp
-);
+program test_program_par_if;
 
   timeunit 1ns;
   timeprecision 1ps;
@@ -141,6 +127,40 @@ program test_program_par_if (
   string  current_process_random_state;
   int        current_test = 0;   // waveform navigation aid
 
+  // --------------------------
+  // Device-side pins, through the IO VIPs
+  // --------------------------
+  // The DUT's pins connect only to IO VIPs in the block design. The SLAVE VIPs
+  // sample through a clocking block, so after a pd_clk edge get_io() returns
+  // the value from just before that edge. The MASTER VIPs drive on a pd_clk or
+  // sync_clk edge.
+  function automatic logic [15:0] get_db_o();
+    logic [1023:0] v = `TH.`DB_O_VIP.inst.inst.IF.vif.get_io();
+    return v[15:0];
+  endfunction
+
+  function automatic logic get_tx_enable();
+    logic [1023:0] v = `TH.`TX_ENABLE_VIP.inst.inst.IF.vif.get_io();
+    return v[0];
+  endfunction
+
+  function automatic logic [1:0] get_f_o();
+    logic [1023:0] v = `TH.`F_O_VIP.inst.inst.IF.vif.get_io();
+    return v[1:0];
+  endfunction
+
+  function automatic void set_ext_sync(input logic v);
+    `TH.`EXT_SYNC_VIP.inst.inst.IF.vif.set_io(v);
+  endfunction
+
+  function automatic void set_drover(input logic v);
+    `TH.`DROVER_VIP.inst.inst.IF.vif.set_io(v);
+  endfunction
+
+  function automatic void set_ram_swp_ovr(input logic v);
+    `TH.`RAM_SWP_OVR_VIP.inst.inst.IF.vif.set_io(v);
+  endfunction
+
   // Which test cases failed, named in the final summary. The per-TC banners are
   // ADI_VERBOSITY_LOW and so invisible at the NONE threshold
   // (coding_guidelines F5), which would otherwise leave a CI log holding an
@@ -194,9 +214,9 @@ program test_program_par_if (
 
   initial begin : db_o_monitor
     forever begin
-      @(posedge pd_clk_tp);
-      if (monitor_enabled && tx_enable_tp)
-        captured.push_back(db_o_tp);
+      @(posedge `TH.`PD_CLK_VIP.clk_out);
+      if (monitor_enabled && get_tx_enable())
+        captured.push_back(get_db_o());
     end
   end : db_o_monitor
 
@@ -219,7 +239,7 @@ program test_program_par_if (
     time deadline;
     deadline = $time + (timeout_us * 1000);
     while ((captured.size() < target) && ($time < deadline))
-      @(posedge pd_clk_tp);
+      @(posedge `TH.`PD_CLK_VIP.clk_out);
     if (captured.size() < target) begin
       `ERROR(("  wait_captures: got %0d of %0d samples after %0d us",
               captured.size(), target, timeout_us));
@@ -256,8 +276,8 @@ program test_program_par_if (
     run      = 0;
     deadline = $time + TX_IDLE_TIMEOUT_NS;
     while (run < quiet) begin
-      @(posedge pd_clk_tp);
-      run = tx_enable_tp ? 0 : (run + 1);
+      @(posedge `TH.`PD_CLK_VIP.clk_out);
+      run = get_tx_enable() ? 0 : (run + 1);
       if ($time >= deadline) begin
         `ERROR(("  wait_tx_idle: output still active after %0d ns (rate=%0d)",
                 TX_IDLE_TIMEOUT_NS, rate));
@@ -402,9 +422,9 @@ program test_program_par_if (
           ADI_VERBOSITY_NONE);
 
     // Unused DRG-side outputs held quiet.
-    ext_sync_tp    = 1'b0;
-    drover_tp      = 1'b0;
-    ram_swp_ovr_tp = 1'b0;
+    set_ext_sync(1'b0);
+    set_drover(1'b0);
+    set_ram_swp_ovr(1'b0);
 
     base_env = new(
       .name("Base Environment"),
@@ -422,6 +442,8 @@ program test_program_par_if (
     `LINK(ddr, base_env, ddr)
 
     base_env.start();
+    `TH.`SYNC_CLK_VIP.inst.IF.start_clock();
+    `TH.`PD_CLK_VIP.inst.IF.start_clock();
     base_env.sys_reset();
 
     // DMA driver over the manager sequencer.
@@ -668,7 +690,7 @@ program test_program_par_if (
         #(CDC_SETTLE_NS * 1ns);
         ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b1));
         #(CDC_SETTLE_NS * 1ns);
-        ext_sync_tp = 1'b1; #200ns; ext_sync_tp = 1'b0;             // sync_in rising -> fire
+        set_ext_sync(1'b1); #200ns; set_ext_sync(1'b0);             // sync_in rising -> fire
         // Wait for THIS trigger's word instead of a blind settle. Stronger as well
         // as shorter: it asserts every individual trigger produces exactly one
         // word, where the old fixed wait only checked the total at the end.
@@ -690,8 +712,8 @@ program test_program_par_if (
       for (int v = 0; v < 4; v++) begin
         ad9910.set_f_cfg(v[1:0]);
         #(CDC_SETTLE_NS * 1ns);   // CDC into pd domain
-        if (f_o_tp !== v[1:0]) begin
-          `ERROR(("  F_CFG=%0d -> f_o=0x%01x, expected 0x%01x", v, f_o_tp, v[1:0]));
+        if (get_f_o() !== v[1:0]) begin
+          `ERROR(("  F_CFG=%0d -> f_o=0x%01x, expected 0x%01x", v, get_f_o(), v[1:0]));
           ok = 0;
         end
       end
@@ -733,6 +755,8 @@ program test_program_par_if (
     // Final report
     // ----------------------------------------
     #1us;
+    `TH.`SYNC_CLK_VIP.inst.IF.stop_clock();
+    `TH.`PD_CLK_VIP.inst.IF.stop_clock();
     base_env.stop();
 
     if (test_passed)

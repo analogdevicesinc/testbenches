@@ -58,13 +58,13 @@
    <wvobject type="group" fp_name="grp_clocks">
       <obj_property name="label">Clocks &amp; Reset</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/system_tb/pd_clk_tb">
-         <obj_property name="ElementShortName">pd_clk_tb</obj_property>
-         <obj_property name="ObjectShortName">pd_clk_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/pd_clk_in">
+         <obj_property name="ElementShortName">pd_clk_in</obj_property>
+         <obj_property name="ObjectShortName">pd_clk_in</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/sync_clk_tb">
-         <obj_property name="ElementShortName">sync_clk_tb</obj_property>
-         <obj_property name="ObjectShortName">sync_clk_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/sync_clk">
+         <obj_property name="ElementShortName">sync_clk</obj_property>
+         <obj_property name="ObjectShortName">sync_clk</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_ad9910_interface/reset_pd">
          <obj_property name="ElementShortName">reset_pd</obj_property>
@@ -137,9 +137,9 @@
    <wvobject type="group" fp_name="grp_transfer">
       <obj_property name="label">Transfer engine</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="logic" fp_name="/system_tb/ext_sync_tb">
-         <obj_property name="ElementShortName">ext_sync_tb</obj_property>
-         <obj_property name="ObjectShortName">ext_sync_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/ext_sync">
+         <obj_property name="ElementShortName">ext_sync</obj_property>
+         <obj_property name="ObjectShortName">ext_sync</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/i_ad9910_interface/transfer_trig_mode">
          <obj_property name="ElementShortName">transfer_trig_mode</obj_property>
@@ -180,18 +180,18 @@
          <obj_property name="ObjectShortName">dds_data[15:0]</obj_property>
          <obj_property name="Radix">HEXRADIX</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/system_tb/tx_enable_tb">
-         <obj_property name="ElementShortName">tx_enable_tb</obj_property>
-         <obj_property name="ObjectShortName">tx_enable_tb</obj_property>
+      <wvobject type="logic" fp_name="/system_tb/test_harness/axi_ad9910/inst/tx_enable">
+         <obj_property name="ElementShortName">tx_enable</obj_property>
+         <obj_property name="ObjectShortName">tx_enable</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/f_o_tb">
-         <obj_property name="ElementShortName">f_o_tb[1:0]</obj_property>
-         <obj_property name="ObjectShortName">f_o_tb[1:0]</obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/f_o">
+         <obj_property name="ElementShortName">f_o[1:0]</obj_property>
+         <obj_property name="ObjectShortName">f_o[1:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/system_tb/db_o_tb">
-         <obj_property name="ElementShortName">db_o_tb[15:0]</obj_property>
-         <obj_property name="ObjectShortName">db_o_tb[15:0]</obj_property>
+      <wvobject type="array" fp_name="/system_tb/test_harness/axi_ad9910/inst/db_o">
+         <obj_property name="ElementShortName">db_o[15:0]</obj_property>
+         <obj_property name="ObjectShortName">db_o[15:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
          <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
          <obj_property name="CellHeight">100</obj_property>

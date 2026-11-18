@@ -346,12 +346,22 @@ constant offset shows the delay is added, not scaled.
 Stop modes (TC9)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ``RAMP_CFG=2`` (stop after period): let the one permitted period run, then
-  verify ``drctl`` stays low for 2 periods. Writing ``RAMP_CFG=0`` must restart
-  the ramp
-* ``RAMP_CFG=1`` (stop after burst) with ``RAMP_BURSTS=3``: let the burst run,
-  then verify ``drctl`` stays low for 2 periods. Writing ``RAMP_CFG=0`` must
-  restart the ramp with the programmed period
+* ``RAMP_CFG=2`` (stop after period): count the periods until ``drctl`` has
+  stayed low for 2 periods, and verify exactly 1 ran. Writing ``RAMP_CFG=0``
+  must restart the ramp
+* ``RAMP_CFG=1`` (stop after burst) with ``RAMP_BURSTS=3``: count the periods
+  the same way and verify exactly 3 ran. Writing ``RAMP_CFG=0`` must restart
+  the ramp with the programmed period
+
+.. warning::
+
+   TC9 currently fails. Both stop modes run one period more than permitted:
+   2 after a period stop and 4 after a 3-period burst. When the last permitted
+   period ends, ``stop_event`` is set one sync_clk cycle after
+   ``start_drctl_period`` has already fired again, so one more period starts
+   and runs to completion before ``drctl`` parks. This is an ``axi_ad9910``
+   RTL issue, not a testbench issue, and TC9 is expected to pass once it is
+   fixed.
 
 DRHOLD passthrough (TC10)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

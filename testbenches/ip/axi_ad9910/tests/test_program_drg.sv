@@ -424,6 +424,49 @@ program test_program_drg;
     end
   endtask
 
+  // Count drctl periods (rising edges) until drctl has stayed low for quiet_cyc
+  // sync_clk cycles, i.e. until a stop mode has parked it. Run it alongside the
+  // restart, so the first period cannot be missed. Gives up after max_cyc
+  // sync_clk cycles of activity, so a ramp that never parks fails with a count
+  // instead of running into the simulation watchdog.
+  task automatic count_periods_to_park(
+    input  int unsigned quiet_cyc,
+    input  int unsigned max_cyc,
+    output int unsigned n
+  );
+    bit          was;
+    int unsigned quiet;
+    int unsigned cyc;
+    n     = 0;
+    quiet = 0;
+    cyc   = 0;
+    was   = get_drctl();
+    while (quiet < quiet_cyc && cyc < max_cyc + quiet_cyc) begin
+      @(posedge `TH.`SYNC_CLK_VIP.clk_out);
+      cyc++;
+      if (get_drctl() && !was) n++;
+      quiet = get_drctl() ? 0 : quiet + 1;
+      was   = get_drctl();
+    end
+    if (quiet < quiet_cyc)
+      `ERROR(("  drctl did not park low within %0d sync_clk cycles", max_cyc + quiet_cyc));
+  endtask
+
+  // A stop mode must run exactly the permitted number of periods. axi_ad9910
+  // currently runs one more: stop_event is set a cycle after start_drctl_period
+  // can already fire again (axi_ad9910.v:578-640).
+  task automatic check_period_count(
+    input int unsigned n,
+    input int unsigned expected,
+    input string       label
+  );
+    if (n == expected)
+      `INFO(("  %s: %0d period(s), then drctl parked low - PASSED", label, n),
+            ADI_VERBOSITY_LOW);
+    else
+      `ERROR(("  %s: %0d period(s) ran before drctl parked, expected %0d", label, n, expected));
+  endtask
+
   function automatic bit all_equal(input int unsigned a[], input int unsigned v);
     foreach (a[k]) if (a[k] != v) return 0;
     return 1;
@@ -1112,15 +1155,14 @@ program test_program_drg;
     // Period stop: exactly one duty cycle, then drctl parks low.
     begin
       int unsigned cyc;
+      int unsigned n;
       stop_pwm();
       ad9910.set_ramp_cfg(RAMP_CFG_PERIOD_STOP);
-      program_pwm(PWM_PERIOD, PWM_WIDTH);
-      // Let the one permitted period finish before checking that drctl parks.
-      // program_pwm's settle is a fixed 4 us, which is only one period long at
-      // this configuration and can be consumed entirely by the config sitting
-      // at the CDC, so the period is not necessarily over when it returns.
-      repeat (PWM_PERIOD + cdc_xfer_jitter) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
-      check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=period_stop");
+      fork
+        program_pwm(PWM_PERIOD, PWM_WIDTH);
+        count_periods_to_park(2 * PWM_PERIOD, 4 * PWM_PERIOD, n);
+      join
+      check_period_count(n, 1, "RAMP_CFG=period_stop");
       // Returning to free-run clears stop_event and the ramp resumes.
       ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
       wait_drctl_level(1'b1, 20000, cyc);
@@ -1136,15 +1178,18 @@ program test_program_drg;
     begin
       int unsigned high_c[];
       int unsigned per_c[];
+      int unsigned n;
       localparam int STOP_BURSTS = 3;
 
       stop_pwm();
       ad9910.set_ramp_bursts(STOP_BURSTS);
       ad9910.set_ramp_cfg(RAMP_CFG_BURST_STOP);
-      program_pwm(PWM_PERIOD, PWM_WIDTH);
       // As above, but a whole burst is allowed to run before the park.
-      repeat (STOP_BURSTS * PWM_PERIOD + cdc_xfer_jitter) @(posedge `TH.`SYNC_CLK_VIP.clk_out);
-      check_drctl_static(1'b0, 2 * PWM_PERIOD, "RAMP_CFG=burst_stop");
+      fork
+        program_pwm(PWM_PERIOD, PWM_WIDTH);
+        count_periods_to_park(2 * PWM_PERIOD, (STOP_BURSTS + 3) * PWM_PERIOD, n);
+      join
+      check_period_count(n, STOP_BURSTS, "RAMP_CFG=burst_stop");
 
       ad9910.set_ramp_cfg(RAMP_CFG_FREE_RUN);
       measure_drctl_waveform(4, 200, high_c, per_c);

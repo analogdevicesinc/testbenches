@@ -329,7 +329,7 @@ Testbench specific dependencies:
      - Source code link
      - Documentation link
    * - ADC_API
-     - :git-testbenches:`library/drivers/adc/adc_api.sv`
+     - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
    * - ADI_REGMAP_ADC_PKG
      - :git-testbenches:`library/regmaps/adi_regmap_adc_pkg.sv`
@@ -347,7 +347,7 @@ Testbench specific dependencies:
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
    * - TDD_API *
-     - :git-testbenches:`library/drivers/tdd/tdd_api.sv`
+     - :git-testbenches:`library/drivers/tdd_api_pkg.sv`
      - ---
 
 .. admonition:: Legend

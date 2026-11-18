@@ -229,7 +229,7 @@ Testbench specific dependencies:
      - :git-testbenches:`library/regmaps/adi_regmap_pkg.sv`
      - ---
    * - ADI_REGMAP_TDD_GEN_PKG
-     - :git-testbenches:`library/regmaps/adi_regmap_tdd_gen_pkg.`
+     - :git-testbenches:`library/regmaps/adi_regmap_tdd_gen_pkg.sv`
      - ---
 
 .. include:: ../../../common/more_information.rst

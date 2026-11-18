@@ -14,13 +14,13 @@ Common with most testbenches:
      - :git-testbenches:`library/utilities/logger_pkg.sv`
      - ---
    * - M_AXI_SEQUENCER
-     - :git-testbenches:`library/vip/amd/m_axi_sequencer.sv`
+     - :git-testbenches:`library/vip/amd/axi/m_axi_sequencer.sv`
      - ---
    * - REG_ACCESSOR
      - :git-testbenches:`library/regmaps/reg_accessor.sv`
      - ---
    * - S_AXI_SEQUENCER
-     - :git-testbenches:`library/vip/amd/s_axi_sequencer.sv`
+     - :git-testbenches:`library/vip/amd/axi/s_axi_sequencer.sv`
      - ---
    * - TEST_HARNESS_ENV
      - :git-testbenches:`library/utilities/test_harness_env.sv`

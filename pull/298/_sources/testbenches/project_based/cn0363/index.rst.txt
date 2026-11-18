@@ -343,7 +343,7 @@ Testbench specific dependencies:
      - :git-testbenches:`library/drivers/dmac/dmac_api.sv`
      - ---
    * - SPI_ENGINE_API
-     - :git-testbenches:`library/drivers/spi_engine/spi_engine_api.sv`
+     - :git-testbenches:`library/drivers/spi_engine/spi_engine_api_pkg.sv`
      - ---
    * - SPI_ENGINE_INSTR_PKG
      - :git-testbenches:`library/drivers/spi_engine/spi_engine_instr_pkg.sv`

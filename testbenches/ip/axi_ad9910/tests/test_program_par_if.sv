@@ -54,13 +54,9 @@
 `include "axi_definitions.svh"
 
 import logger_pkg::*;
-import adi_environment_pkg::*;
 import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
 import test_harness_env_pkg::*;
-import adi_regmap_pkg::*;
-import adi_regmap_ad9910_pkg::*;
-import adi_regmap_dmac_pkg::*;
 import ad9910_api_pkg::*;
 import dmac_api_pkg::*;
 import dma_trans_pkg::*;
@@ -117,10 +113,9 @@ program test_program_par_if;
   ad9910_api ad9910;
 
   logic [31:0] read_data;
-  bit        test_passed = 1;
 
   // K4: the simulation randomization state is reported at the very start, so a
-  // failing run can be reproduced exactly. This and the done messages are the
+  // failing run can be reproduced exactly. This and "Testbench done!" are the
   // only ADI_VERBOSITY_NONE messages here - everything else is LOW and so is
   // silent at the NONE threshold (coding_guidelines F5).
   process current_process;
@@ -161,24 +156,6 @@ program test_program_par_if;
     `TH.`RAM_SWP_OVR_VIP.inst.inst.IF.vif.set_io(v);
   endfunction
 
-  // Which test cases failed, named in the final summary. The per-TC banners are
-  // ADI_VERBOSITY_LOW and so invisible at the NONE threshold
-  // (coding_guidelines F5), which would otherwise leave a CI log holding an
-  // error message with no indication of which test case produced it. Test cases
-  // run sequentially, so remembering the last one that failed is enough to
-  // de-duplicate repeated failures within one test case.
-  string     failed_tests   = "";
-  int        last_failed_tc = 0;
-
-  // Mark the run failed and remember the test case, for the final summary.
-  task automatic record_failure();
-    test_passed = 1'b0;
-    if (current_test != last_failed_tc) begin
-      failed_tests = {failed_tests, (failed_tests == "") ? "" : ", ",
-                      $sformatf("TC%0d", current_test)};
-      last_failed_tc = current_test;
-    end
-  endtask
 
   // --------------------------
   // DDR backdoor helpers
@@ -243,7 +220,6 @@ program test_program_par_if;
     if (captured.size() < target) begin
       `ERROR(("  wait_captures: got %0d of %0d samples after %0d us",
               captured.size(), target, timeout_us));
-      record_failure();
     end
   endtask
 
@@ -281,7 +257,6 @@ program test_program_par_if;
       if ($time >= deadline) begin
         `ERROR(("  wait_tx_idle: output still active after %0d ns (rate=%0d)",
                 TX_IDLE_TIMEOUT_NS, rate));
-        record_failure();
         return;
       end
     end
@@ -352,7 +327,6 @@ program test_program_par_if;
     mism = 0;
     if (captured.size() < expected.size()) begin
       `ERROR(("  %s: captured %0d of %0d samples", label, captured.size(), expected.size()));
-      record_failure();
       return;
     end
     foreach (expected[i]) begin
@@ -368,7 +342,6 @@ program test_program_par_if;
             ADI_VERBOSITY_LOW);
     else begin
       `ERROR(("  %s: %0d mismatches", label, mism));
-      record_failure();
     end
   endtask
 
@@ -496,7 +469,6 @@ program test_program_par_if;
         `INFO(("  CONFIG.MEASURE_CLKS_EN = 1 - PASSED"), ADI_VERBOSITY_LOW);
       else begin
         `ERROR(("  CONFIG.MEASURE_CLKS_EN = 0, expected 1"));
-        record_failure();
       end
 
       ad9910.set_par_update_rate(32'h1234_5678);
@@ -516,7 +488,6 @@ program test_program_par_if;
         `INFO(("  UPDATE_CTRL readback - PASSED"), ADI_VERBOSITY_LOW);
       else begin
         `ERROR(("  UPDATE_CTRL readback: enable_p_if = %0b, expected 1", enable_p_if));
-        record_failure();
       end
       ad9910.set_update_ctrl(.transfer_trig_mode(1'b0),
                              .enable_p_if(1'b0),
@@ -642,7 +613,6 @@ program test_program_par_if;
         `INFO(("  Faster rate transfers >2x quicker - PASSED"), ADI_VERBOSITY_LOW);
       else begin
         `ERROR(("  Rate change ineffective: slow=%0t fast=%0t", t_slow, t_fast));
-        record_failure();
       end
     end
 
@@ -676,7 +646,6 @@ program test_program_par_if;
       // Nothing should have come out yet without a trigger.
       if (captured.size() != 0) begin
         `ERROR(("  %0d samples emitted before any ext_sync trigger", captured.size()));
-        record_failure();
       end
 
       // util_ext_sync arms on a RISING edge of ext_sync_arm and fires (sync_armed
@@ -720,7 +689,6 @@ program test_program_par_if;
       ad9910.set_f_cfg(2'h0);
       #(CDC_SETTLE_NS * 1ns);
       if (ok) `INFO(("  All 4 F_CFG values reflected on f_o - PASSED"), ADI_VERBOSITY_LOW);
-      else    record_failure();
     end
 
     // ----------------------------------------
@@ -752,17 +720,12 @@ program test_program_par_if;
     end
 
     // ----------------------------------------
-    // Final report
+    // Finish
     // ----------------------------------------
     #1us;
     `TH.`SYNC_CLK_VIP.inst.IF.stop_clock();
     `TH.`PD_CLK_VIP.inst.IF.stop_clock();
     base_env.stop();
-
-    if (test_passed)
-      `INFO(("==== ALL TESTS PASSED ===="), ADI_VERBOSITY_NONE);
-    else
-      `ERROR(("==== SOME TESTS FAILED ==== (failing: %s)", failed_tests));
 
     `INFO(("Testbench done!"), ADI_VERBOSITY_NONE);
     $finish();

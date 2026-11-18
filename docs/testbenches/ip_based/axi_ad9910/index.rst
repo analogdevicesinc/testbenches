@@ -170,11 +170,11 @@ Test stimulus
 -------------------------------------------------------------------------------
 
 Both test programs set the logger to ``ADI_VERBOSITY_NONE``, so a passing run
-prints only the randomization state, ``==== ALL TESTS PASSED ====`` and
-``Testbench done!``. Errors are always printed. When a check fails, the final
-summary names the failing test cases, e.g.
-``==== SOME TESTS FAILED ==== (failing: TC14)``. To see the per-test progress
-messages, raise the verbosity to ``ADI_VERBOSITY_LOW`` in the test program.
+prints only the randomization state and ``Testbench done!``. Errors are always
+printed and recorded in the test log, and a run passes when the log holds none.
+To trace where a failure comes from, raise the verbosity to
+``ADI_VERBOSITY_LOW`` in the test program: every test case then prints a
+banner and every check its result.
 
 All ``axi_ad9910`` register access goes through the ``ad9910_api`` driver, so
 neither test program contains register offsets or field positions.
@@ -196,7 +196,6 @@ Stop the environment
 The steps of stopping the environment, common to both test programs, are:
 
 * Stop the test harness environment
-* Report the overall pass/fail status and the failing test cases, if any
 
 test_program_drg
 -------------------------------------------------------------------------------

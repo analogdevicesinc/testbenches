@@ -199,8 +199,9 @@ program test_program_par_if;
   initial begin : db_o_monitor
     forever begin
       @(posedge `TH.`PD_CLK_VIP.clk_out);
-      if (db_o_monitor_enabled && get_tx_enable())
+      if (db_o_monitor_enabled && get_tx_enable()) begin
         captured.push_back(get_db_o());
+      end
     end
   end : db_o_monitor
 
@@ -222,8 +223,9 @@ program test_program_par_if;
   task automatic wait_captures(input int unsigned target, input int unsigned timeout_us);
     time deadline;
     deadline = $time + (timeout_us * 1000);
-    while ((captured.size() < target) && ($time < deadline))
+    while ((captured.size() < target) && ($time < deadline)) begin
       @(posedge `TH.`PD_CLK_VIP.clk_out);
+    end
     if (captured.size() < target) begin
       `ERROR(("  wait_captures: got %0d of %0d samples after %0d us",
               captured.size(), target, timeout_us));
@@ -255,8 +257,8 @@ program test_program_par_if;
   task automatic wait_tx_idle(input [31:0] rate);
     int unsigned quiet, run;
     watchdog     idle_wd;
-    quiet    = tx_idle_quiet(rate);
-    run      = 0;
+    quiet = tx_idle_quiet(rate);
+    run   = 0;
     idle_wd = new("wait_tx_idle watchdog", TX_IDLE_TIMEOUT_NS,
                   $sformatf("wait_tx_idle: output still active after %0d ns (rate=%0d)",
                             TX_IDLE_TIMEOUT_NS, rate));
@@ -357,27 +359,30 @@ program test_program_par_if;
     if (captured.size() != expected.size()) begin
       `ERROR(("  %s: captured %0d samples, expected %0d", label, captured.size(), expected.size()));
       if (captured.size() < expected.size()) begin
-        if (fatal)
+        if (fatal) begin
           `FATAL(("  %s failed; the later data checks depend on it", label));
+        end
         return;
       end
     end
     foreach (expected[i]) begin
       if (captured[i] !== expected[i]) begin
-        if (mism < 10)
+        if (mism < 10) begin
           `ERROR(("  %s: sample %0d = 0x%04x, expected 0x%04x",
                   label, i, captured[i], expected[i]));
+        end
         mism++;
       end
     end
-    if (mism == 0)
+    if (mism == 0) begin
       `INFO(("  %s: %0d samples verified - PASSED", label, expected.size()),
             ADI_VERBOSITY_LOW);
-    else begin
+    end else begin
       `ERROR(("  %s: %0d mismatches", label, mism));
     end
-    if (fatal && (mism != 0 || captured.size() != expected.size()))
+    if (fatal && (mism != 0 || captured.size() != expected.size())) begin
       `FATAL(("  %s failed; the later data checks depend on it", label));
+    end
   endtask
 
   // --------------------------
@@ -406,16 +411,306 @@ program test_program_par_if;
       s[i] = v;
       if (going_up) begin
         if (hi - v < step[15:0]) begin
-          if (mode == RAMP_TRIANGLE) begin v = hi; going_up = 0; end
-          else                             v = lo;                  // saw up wraps
-        end else v = v + step[15:0];
+          if (mode == RAMP_TRIANGLE) begin
+            v = hi;
+            going_up = 0;
+          end else begin
+            v = lo;  // saw up wraps
+          end
+        end else begin
+          v = v + step[15:0];
+        end
       end else begin
         if (v - lo < step[15:0]) begin
-          if (mode == RAMP_TRIANGLE) begin v = lo; going_up = 1; end
-          else                             v = hi;                  // saw down wraps
-        end else v = v - step[15:0];
+          if (mode == RAMP_TRIANGLE) begin
+            v = lo;
+            going_up = 1;
+          end else begin
+            v = hi;  // saw down wraps
+          end
+        end else begin
+          v = v - step[15:0];
+        end
       end
     end
+  endtask
+
+  // ----------------------------------------
+  // TC1: Register sanity
+  // ----------------------------------------
+  // sanity_test() verifies VERSION against its reset value and round-trips
+  // SCRATCH, then CONFIG.MEASURE_CLKS_EN is checked. The PAR_IF registers are
+  // not read back here: the later TCs program them and check the output.
+  task automatic register_sanity_test();
+    logic [31:0] pd_cnt;
+    logic        measure_clks_en;
+
+    current_test = 1;
+    `INFO(("TC1: Register sanity"), ADI_VERBOSITY_LOW);
+
+    ad9910.sanity_test();
+
+    // The regmap records the IP default (0); this BD sets MEASURE_CLKS_EN=1, so
+    // the expectation belongs here rather than in the reset value.
+    ad9910.get_config(measure_clks_en);
+    if (measure_clks_en) begin
+      `INFO(("  CONFIG.MEASURE_CLKS_EN = 1 - PASSED"), ADI_VERBOSITY_LOW);
+    end else begin
+      `ERROR(("  CONFIG.MEASURE_CLKS_EN = 0, expected 1"));
+    end
+
+    ad9910.get_pd_clk_count(pd_cnt);
+    `INFO(("  PD_CLK_COUNT = %0d (monitor needs ~655 us to update)", pd_cnt),
+          ADI_VERBOSITY_LOW);
+    `INFO(("  Register sanity - PASSED"), ADI_VERBOSITY_LOW);
+  endtask
+
+  // ----------------------------------------
+  // TC2: Single-word transfer + width mapping
+  // ----------------------------------------
+  // One 32-bit DDR word carrying two known 16-bit samples. Pins the SRC=32 ->
+  // DEST=16 byte/endianness mapping that every later data test relies on.
+  task automatic single_transfer_test();
+    logic [15:0] samples[];
+
+    current_test = 2;
+    `INFO(("TC2: Single transfer + width mapping"), ADI_VERBOSITY_LOW);
+
+    samples = '{16'h1111, 16'h2222};   // DDR word 0 = 0x2222_1111
+
+    ddr_write_samples(DDR_BASE, samples);
+    run_transfer(DDR_BASE, 2, 32'd100, 200);
+
+    if (captured.size() >= 2) begin
+      `INFO(("  captured = 0x%04x, 0x%04x (DDR word 0x2222_1111)",
+             captured[0], captured[1]), ADI_VERBOSITY_LOW);
+    end
+    check_stream(samples, "Single transfer / mapping", .fatal(1));
+  endtask
+
+  // ----------------------------------------
+  // TC3: Multi-word stream (in order)
+  // ----------------------------------------
+  // Several distinct samples streamed at the internal rate; all must appear in
+  // order. Replaces the old "3 words per config packet" (the RTL now emits one
+  // word per trigger, so a packet is just a stream).
+  task automatic multi_word_stream_test();
+    logic [15:0] samples[];
+
+    current_test = 3;
+    `INFO(("TC3: Multi-word stream"), ADI_VERBOSITY_LOW);
+
+    samples = '{16'hAAAA, 16'hBBBB, 16'hCCCC, 16'hDDDD, 16'h0001, 16'hFFFE};
+
+    ddr_write_samples(DDR_BASE, samples);
+    run_transfer(DDR_BASE, samples.size(), 32'd50, 200);
+    check_stream(samples, "Multi-word stream");
+  endtask
+
+  // ----------------------------------------
+  // TC4: Continuous streaming
+  // ----------------------------------------
+  // A longer contiguous run at a fast rate; verifies sustained ordered delivery.
+  task automatic continuous_streaming_test();
+    localparam int N = 32;
+    logic [15:0] samples[];
+
+    current_test = 4;
+    `INFO(("TC4: Continuous streaming"), ADI_VERBOSITY_LOW);
+
+    samples = new[N];
+    foreach (samples[i]) begin
+      samples[i] = 16'h1000 + i[15:0];
+    end
+
+    ddr_write_samples(DDR_BASE, samples);
+    run_transfer(DDR_BASE, N, 32'd10, 500);
+    check_stream(samples, "Continuous streaming");
+  endtask
+
+  // ----------------------------------------
+  // TC5: Backpressure (deeper than the FIFO)
+  // ----------------------------------------
+  // Transfer far more than the 16-entry FIFO at a slow drain rate, so the FIFO
+  // fills and s_axis_tready backpressures the DMA. No sample may be lost.
+  task automatic backpressure_test();
+    localparam int N = 64;   // 4x FIFO depth
+    logic [15:0] samples[];
+
+    current_test = 5;
+    `INFO(("TC5: Backpressure"), ADI_VERBOSITY_LOW);
+
+    samples = new[N];
+    foreach (samples[i]) begin
+      samples[i] = 16'h5000 + i[15:0];
+    end
+
+    ddr_write_samples(DDR_BASE, samples);
+    run_transfer(DDR_BASE, N, 32'd200, 2000);   // slow drain -> FIFO fills
+    check_stream(samples, "Backpressure");
+  endtask
+
+  // ----------------------------------------
+  // TC6: Update-rate change
+  // ----------------------------------------
+  // Time a full N-sample transfer at a slow vs fast internal rate: the faster
+  // rate must complete the same transfer at least ~2x quicker. Each transfer is
+  // followed by wait_tx_idle, so both drain fully and TC7 starts with an empty
+  // FIFO - its "nothing emitted before a trigger" check depends on that.
+  task automatic update_rate_change_test();
+    localparam int N = 128;
+    logic [15:0] samples[];
+    time t0, t_slow, t_fast;
+
+    current_test = 6;
+    `INFO(("TC6: Update-rate change"), ADI_VERBOSITY_LOW);
+
+    samples = new[N];
+    foreach (samples[i]) begin
+      samples[i] = 16'h6000 + i[15:0];
+    end
+
+    ddr_write_samples(DDR_BASE, samples);
+    enable_par_if(.update_rate(32'd200));
+    wait_tx_idle(32'd200); enable_db_o_monitor();
+    t0 = $time;
+    start_dma_samples(DDR_BASE, N);
+    wait_captures(N, 4000);
+    t_slow = $time - t0;
+    wait_tx_idle(32'd200);   // full drain, so TC7 starts with an empty FIFO
+    disable_db_o_monitor(); disable_par_if();
+
+    ddr_write_samples(DDR_BASE, samples);
+    enable_par_if(.update_rate(32'd20));
+    wait_tx_idle(32'd20); enable_db_o_monitor();
+    t0 = $time;
+    start_dma_samples(DDR_BASE, N);
+    wait_captures(N, 4000);
+    t_fast = $time - t0;
+    wait_tx_idle(32'd20);
+    disable_db_o_monitor(); disable_par_if();
+
+    `INFO(("  %0d-sample transfer: slow(rate=200)=%0t fast(rate=20)=%0t",
+           N, t_slow, t_fast), ADI_VERBOSITY_LOW);
+    if (t_slow > (t_fast * 2)) begin
+      `INFO(("  Faster rate transfers >2x quicker - PASSED"), ADI_VERBOSITY_LOW);
+    end else begin
+      `ERROR(("  Rate change ineffective: slow=%0t fast=%0t", t_slow, t_fast));
+    end
+  endtask
+
+  // ----------------------------------------
+  // TC7: External trigger (ext_sync)
+  // ----------------------------------------
+  // In external-trigger mode the DUT emits one word per ext_sync event (armed
+  // via EXT_TRIG_CFG). Preload the FIFO, then pulse ext_sync and confirm words
+  // come out only when triggered.
+  task automatic ext_trigger_test();
+    localparam int N = 4;
+    logic [15:0] samples[];
+
+    current_test = 7;
+    `INFO(("TC7: External trigger (ext_sync)"), ADI_VERBOSITY_LOW);
+
+    samples = new[N];
+    foreach (samples[i]) begin
+      samples[i] = 16'h7000 + i[15:0];
+    end
+
+    ddr_write_samples(DDR_BASE, samples);
+    enable_db_o_monitor();
+    // External trigger mode; internal rate irrelevant.
+    enable_par_if(.update_rate(32'd0), .trig_mode(1'b1));
+    // Load the samples into the FIFO (they wait for triggers).
+    start_dma_samples(DDR_BASE, N);
+    // Deliberately a blind wait, and deliberately generous: this one has to let
+    // the DMA actually land samples in the FIFO, because the check below is
+    // negative. Shortening it would let the check pass vacuously - with an empty
+    // FIFO there is nothing to wrongly emit. No FIFO level is readable, so there
+    // is nothing to gate on.
+    #5us;
+
+    // Nothing should have come out yet without a trigger.
+    if (captured.size() != 0) begin
+      `ERROR(("  %0d samples emitted before any ext_sync trigger", captured.size()));
+    end
+
+    // util_ext_sync arms on a RISING edge of ext_sync_arm and fires (sync_armed
+    // falls -> start_transfer) on a rising edge of sync_in. ext_sync_arm is a
+    // level register, so each word needs the arm level cleared then re-asserted
+    // (a fresh rising edge), with enough settle for the up->pd CDC to carry each
+    // level distinctly.
+    for (int i = 0; i < N; i++) begin
+      // clear the arm level, then re-assert it for a fresh rising edge
+      ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b0));
+      wait_up_to_pd_xfer();
+      ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b1));
+      wait_up_to_pd_xfer();
+      set_ext_sync(1'b1); // sync_in rising -> fire
+      repeat (EXT_SYNC_PULSE_PD_CLK) @(posedge `TH.`PD_CLK_VIP.clk_out);
+      set_ext_sync(1'b0);
+      // Wait for THIS trigger's word instead of a blind settle. Stronger as well
+      // as shorter: it asserts every individual trigger produces exactly one
+      // word, where the old fixed wait only checked the total at the end.
+      wait_captures(i + 1, 10);
+    end
+    disable_par_if();
+    disable_db_o_monitor();
+    check_stream(samples, "External trigger");
+  endtask
+
+  // ----------------------------------------
+  // TC8: F_CFG drives f_o
+  // ----------------------------------------
+  // 0x43 is a static 2-bit function-select value routed straight to the f_o pins.
+  task automatic f_cfg_test();
+    automatic bit ok = 1;
+
+    current_test = 8;
+    `INFO(("TC8: F_CFG -> f_o"), ADI_VERBOSITY_LOW);
+
+    for (int v = 0; v < 4; v++) begin
+      ad9910.set_f_cfg(v[1:0]);
+      wait_up_to_pd_xfer();
+      if (get_f_o() !== v[1:0]) begin
+        `ERROR(("  F_CFG=%0d -> f_o=0x%01x, expected 0x%01x", v, get_f_o(), v[1:0]));
+        ok = 0;
+      end
+    end
+    ad9910.set_f_cfg(2'h0);
+    wait_up_to_pd_xfer();
+    if (ok) begin
+      `INFO(("  All 4 F_CFG values reflected on f_o - PASSED"), ADI_VERBOSITY_LOW);
+    end
+  endtask
+
+  // ----------------------------------------
+  // TC9: Ramp data integrity
+  // ----------------------------------------
+  // 16-bit sawtooth-up / triangle / sawtooth-down streamed from DDR and checked
+  // sample-for-sample at the output.
+  task automatic ramp_integrity_test();
+    localparam int N = 256;
+    localparam int STEP = 512;
+    logic [15:0] samples[];
+
+    current_test = 9;
+    `INFO(("TC9: Ramp data integrity"), ADI_VERBOSITY_LOW);
+
+    build_ramp(samples, N, 16'h0000, 16'hFF00, STEP, RAMP_SAW_UP);
+    ddr_write_samples(DDR_BASE, samples);
+    run_transfer(DDR_BASE, N, 32'd0, 2000);
+    check_stream(samples, "Ramp sawtooth-up");
+
+    build_ramp(samples, N, 16'h0000, 16'hFF00, STEP, RAMP_TRIANGLE);
+    ddr_write_samples(DDR_BASE, samples);
+    run_transfer(DDR_BASE, N, 32'd0, 2000);
+    check_stream(samples, "Ramp triangle");
+
+    build_ramp(samples, N, 16'h0000, 16'hFF00, STEP, RAMP_SAW_DOWN);
+    ddr_write_samples(DDR_BASE, samples);
+    run_transfer(DDR_BASE, N, 32'd0, 2000);
+    check_stream(samples, "Ramp sawtooth-down");
   endtask
 
   // --------------------------
@@ -475,256 +770,15 @@ program test_program_par_if;
     ad9910.set_reset_ctrl(.reset(1'b0));
     wait_pd_reset_release();
 
-    // ----------------------------------------
-    // TC1: Register sanity
-    // ----------------------------------------
-    // sanity_test() verifies VERSION against its reset value and round-trips
-    // SCRATCH, then CONFIG.MEASURE_CLKS_EN is checked. The PAR_IF registers are
-    // not read back here: the later TCs program them and check the output.
-    current_test = 1;
-    `INFO(("TC1: Register sanity"), ADI_VERBOSITY_LOW);
-    begin
-      logic [31:0] pd_cnt;
-      logic        measure_clks_en;
-
-      ad9910.sanity_test();
-
-      // The regmap records the IP default (0); this BD sets MEASURE_CLKS_EN=1, so
-      // the expectation belongs here rather than in the reset value.
-      ad9910.get_config(measure_clks_en);
-      if (measure_clks_en)
-        `INFO(("  CONFIG.MEASURE_CLKS_EN = 1 - PASSED"), ADI_VERBOSITY_LOW);
-      else begin
-        `ERROR(("  CONFIG.MEASURE_CLKS_EN = 0, expected 1"));
-      end
-
-      ad9910.get_pd_clk_count(pd_cnt);
-      `INFO(("  PD_CLK_COUNT = %0d (monitor needs ~655 us to update)", pd_cnt),
-            ADI_VERBOSITY_LOW);
-      `INFO(("  Register sanity - PASSED"), ADI_VERBOSITY_LOW);
-    end
-
-    // ----------------------------------------
-    // TC2: Single-word transfer + width mapping
-    // ----------------------------------------
-    // One 32-bit DDR word carrying two known 16-bit samples. Pins the SRC=32 ->
-    // DEST=16 byte/endianness mapping that every later data test relies on.
-    current_test = 2;
-    `INFO(("TC2: Single transfer + width mapping"), ADI_VERBOSITY_LOW);
-    begin
-      logic [15:0] samples[];
-      samples = '{16'h1111, 16'h2222};   // DDR word 0 = 0x2222_1111
-
-      ddr_write_samples(DDR_BASE, samples);
-      run_transfer(DDR_BASE, 2, 32'd100, 200);
-
-      if (captured.size() >= 2)
-        `INFO(("  captured = 0x%04x, 0x%04x (DDR word 0x2222_1111)",
-               captured[0], captured[1]), ADI_VERBOSITY_LOW);
-      check_stream(samples, "Single transfer / mapping", .fatal(1));
-    end
-
-    // ----------------------------------------
-    // TC3: Multi-word stream (in order)
-    // ----------------------------------------
-    // Several distinct samples streamed at the internal rate; all must appear in
-    // order. Replaces the old "3 words per config packet" (the RTL now emits one
-    // word per trigger, so a packet is just a stream).
-    current_test = 3;
-    `INFO(("TC3: Multi-word stream"), ADI_VERBOSITY_LOW);
-    begin
-      logic [15:0] samples[];
-      samples = '{16'hAAAA, 16'hBBBB, 16'hCCCC, 16'hDDDD, 16'h0001, 16'hFFFE};
-
-      ddr_write_samples(DDR_BASE, samples);
-      run_transfer(DDR_BASE, samples.size(), 32'd50, 200);
-      check_stream(samples, "Multi-word stream");
-    end
-
-    // ----------------------------------------
-    // TC4: Continuous streaming
-    // ----------------------------------------
-    // A longer contiguous run at a fast rate; verifies sustained ordered delivery.
-    current_test = 4;
-    `INFO(("TC4: Continuous streaming"), ADI_VERBOSITY_LOW);
-    begin
-      localparam int N = 32;
-      logic [15:0] samples[];
-      samples = new[N];
-      foreach (samples[i]) samples[i] = 16'h1000 + i[15:0];
-
-      ddr_write_samples(DDR_BASE, samples);
-      run_transfer(DDR_BASE, N, 32'd10, 500);
-      check_stream(samples, "Continuous streaming");
-    end
-
-    // ----------------------------------------
-    // TC5: Backpressure (deeper than the FIFO)
-    // ----------------------------------------
-    // Transfer far more than the 16-entry FIFO at a slow drain rate, so the FIFO
-    // fills and s_axis_tready backpressures the DMA. No sample may be lost.
-    current_test = 5;
-    `INFO(("TC5: Backpressure"), ADI_VERBOSITY_LOW);
-    begin
-      localparam int N = 64;   // 4x FIFO depth
-      logic [15:0] samples[];
-      samples = new[N];
-      foreach (samples[i]) samples[i] = 16'h5000 + i[15:0];
-
-      ddr_write_samples(DDR_BASE, samples);
-      run_transfer(DDR_BASE, N, 32'd200, 2000);   // slow drain -> FIFO fills
-      check_stream(samples, "Backpressure");
-    end
-
-    // ----------------------------------------
-    // TC6: Update-rate change
-    // ----------------------------------------
-    // Time a full N-sample transfer at a slow vs fast internal rate: the faster
-    // rate must complete the same transfer at least ~2x quicker. Each transfer is
-    // followed by wait_tx_idle, so both drain fully and TC7 starts with an empty
-    // FIFO - its "nothing emitted before a trigger" check depends on that.
-    current_test = 6;
-    `INFO(("TC6: Update-rate change"), ADI_VERBOSITY_LOW);
-    begin
-      localparam int N = 128;
-      logic [15:0] samples[];
-      time t0, t_slow, t_fast;
-      samples = new[N];
-      foreach (samples[i]) samples[i] = 16'h6000 + i[15:0];
-
-      ddr_write_samples(DDR_BASE, samples);
-      enable_par_if(.update_rate(32'd200));
-      wait_tx_idle(32'd200); enable_db_o_monitor();
-      t0 = $time;
-      start_dma_samples(DDR_BASE, N);
-      wait_captures(N, 4000);
-      t_slow = $time - t0;
-      wait_tx_idle(32'd200);   // full drain, so TC7 starts with an empty FIFO
-      disable_db_o_monitor(); disable_par_if();
-
-      ddr_write_samples(DDR_BASE, samples);
-      enable_par_if(.update_rate(32'd20));
-      wait_tx_idle(32'd20); enable_db_o_monitor();
-      t0 = $time;
-      start_dma_samples(DDR_BASE, N);
-      wait_captures(N, 4000);
-      t_fast = $time - t0;
-      wait_tx_idle(32'd20);
-      disable_db_o_monitor(); disable_par_if();
-
-      `INFO(("  %0d-sample transfer: slow(rate=200)=%0t fast(rate=20)=%0t",
-             N, t_slow, t_fast), ADI_VERBOSITY_LOW);
-      if (t_slow > (t_fast * 2))
-        `INFO(("  Faster rate transfers >2x quicker - PASSED"), ADI_VERBOSITY_LOW);
-      else begin
-        `ERROR(("  Rate change ineffective: slow=%0t fast=%0t", t_slow, t_fast));
-      end
-    end
-
-    // ----------------------------------------
-    // TC7: External trigger (ext_sync)
-    // ----------------------------------------
-    // In external-trigger mode the DUT emits one word per ext_sync event (armed
-    // via EXT_TRIG_CFG). Preload the FIFO, then pulse ext_sync and confirm words
-    // come out only when triggered.
-    current_test = 7;
-    `INFO(("TC7: External trigger (ext_sync)"), ADI_VERBOSITY_LOW);
-    begin
-      localparam int N = 4;
-      logic [15:0] samples[];
-      samples = new[N];
-      foreach (samples[i]) samples[i] = 16'h7000 + i[15:0];
-
-      ddr_write_samples(DDR_BASE, samples);
-      enable_db_o_monitor();
-      // External trigger mode; internal rate irrelevant.
-      enable_par_if(.update_rate(32'd0), .trig_mode(1'b1));
-      // Load the samples into the FIFO (they wait for triggers).
-      start_dma_samples(DDR_BASE, N);
-      // Deliberately a blind wait, and deliberately generous: this one has to let
-      // the DMA actually land samples in the FIFO, because the check below is
-      // negative. Shortening it would let the check pass vacuously - with an empty
-      // FIFO there is nothing to wrongly emit. No FIFO level is readable, so there
-      // is nothing to gate on.
-      #5us;
-
-      // Nothing should have come out yet without a trigger.
-      if (captured.size() != 0) begin
-        `ERROR(("  %0d samples emitted before any ext_sync trigger", captured.size()));
-      end
-
-      // util_ext_sync arms on a RISING edge of ext_sync_arm and fires (sync_armed
-      // falls -> start_transfer) on a rising edge of sync_in. ext_sync_arm is a
-      // level register, so each word needs the arm level cleared then re-asserted
-      // (a fresh rising edge), with enough settle for the up->pd CDC to carry each
-      // level distinctly.
-      for (int i = 0; i < N; i++) begin
-        // clear the arm level, then re-assert it for a fresh rising edge
-        ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b0));
-        wait_up_to_pd_xfer();
-        ad9910.set_ext_trig_cfg(.ext_sync_disarm(1'b0), .ext_sync_arm(1'b1));
-        wait_up_to_pd_xfer();
-        set_ext_sync(1'b1); // sync_in rising -> fire
-        repeat (EXT_SYNC_PULSE_PD_CLK) @(posedge `TH.`PD_CLK_VIP.clk_out);
-        set_ext_sync(1'b0);
-        // Wait for THIS trigger's word instead of a blind settle. Stronger as well
-        // as shorter: it asserts every individual trigger produces exactly one
-        // word, where the old fixed wait only checked the total at the end.
-        wait_captures(i + 1, 10);
-      end
-      disable_par_if();
-      disable_db_o_monitor();
-      check_stream(samples, "External trigger");
-    end
-
-    // ----------------------------------------
-    // TC8: F_CFG drives f_o
-    // ----------------------------------------
-    // 0x43 is a static 2-bit function-select value routed straight to the f_o pins.
-    current_test = 8;
-    `INFO(("TC8: F_CFG -> f_o"), ADI_VERBOSITY_LOW);
-    begin
-      automatic bit ok = 1;
-      for (int v = 0; v < 4; v++) begin
-        ad9910.set_f_cfg(v[1:0]);
-        wait_up_to_pd_xfer();
-        if (get_f_o() !== v[1:0]) begin
-          `ERROR(("  F_CFG=%0d -> f_o=0x%01x, expected 0x%01x", v, get_f_o(), v[1:0]));
-          ok = 0;
-        end
-      end
-      ad9910.set_f_cfg(2'h0);
-      wait_up_to_pd_xfer();
-      if (ok) `INFO(("  All 4 F_CFG values reflected on f_o - PASSED"), ADI_VERBOSITY_LOW);
-    end
-
-    // ----------------------------------------
-    // TC9: Ramp data integrity
-    // ----------------------------------------
-    // 16-bit sawtooth-up / triangle / sawtooth-down streamed from DDR and checked
-    // sample-for-sample at the output.
-    current_test = 9;
-    `INFO(("TC9: Ramp data integrity"), ADI_VERBOSITY_LOW);
-    begin
-      localparam int N = 256;
-      localparam int STEP = 512;
-      logic [15:0] samples[];
-
-      build_ramp(samples, N, 16'h0000, 16'hFF00, STEP, RAMP_SAW_UP);
-      ddr_write_samples(DDR_BASE, samples);
-      run_transfer(DDR_BASE, N, 32'd0, 2000);
-      check_stream(samples, "Ramp sawtooth-up");
-
-      build_ramp(samples, N, 16'h0000, 16'hFF00, STEP, RAMP_TRIANGLE);
-      ddr_write_samples(DDR_BASE, samples);
-      run_transfer(DDR_BASE, N, 32'd0, 2000);
-      check_stream(samples, "Ramp triangle");
-
-      build_ramp(samples, N, 16'h0000, 16'hFF00, STEP, RAMP_SAW_DOWN);
-      ddr_write_samples(DDR_BASE, samples);
-      run_transfer(DDR_BASE, N, 32'd0, 2000);
-      check_stream(samples, "Ramp sawtooth-down");
-    end
+    register_sanity_test();
+    single_transfer_test();
+    multi_word_stream_test();
+    continuous_streaming_test();
+    backpressure_test();
+    update_rate_change_test();
+    ext_trigger_test();
+    f_cfg_test();
+    ramp_integrity_test();
 
     // ----------------------------------------
     // Finish

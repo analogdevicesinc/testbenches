@@ -133,9 +133,6 @@ if {$ad_project_params(MODE) == "PAR_IF"} {
   # DMA AXI-Stream output → DUT AXI-Stream input
   ad_connect tx_dma/m_axis axi_ad9910/s_axis
 
-  # TLAST is not part of the DUT bus interface; tie to GND
-  ad_connect axi_ad9910/s_axis_tlast GND
-
   # DMA DDR read port → memory interconnect
   ad_mem_hp0_interconnect $sys_dma_clk tx_dma/m_src_axi
 

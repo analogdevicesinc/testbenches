@@ -79,7 +79,9 @@ ad_connect pd_clk_in pd_clk_vip/clk_in
 ad_connect pd_clk_vip/clk_out axi_ad9910/pd_clk_in
 
 # Connect AXI interface
-ad_cpu_interconnect 0x44A00000 axi_ad9910
+set BA_AD9910 0x44A00000
+ad_cpu_interconnect $BA_AD9910 axi_ad9910
+adi_sim_add_define "AXI_AD9910_BA=[format "%d" ${BA_AD9910}]"
 
 # Create external ports for device control
 create_bd_port -dir I ext_sync
@@ -137,15 +139,12 @@ if {$ad_project_params(MODE) == "PAR_IF"} {
   ad_mem_hp0_interconnect $sys_dma_clk tx_dma/m_src_axi
 
   # DMA register access via CPU interconnect
-  ad_cpu_interconnect 0x44A30000 tx_dma
+  set BA_TX_DMA 0x44A30000
+  ad_cpu_interconnect $BA_TX_DMA tx_dma
+  adi_sim_add_define "TX_DMA_BA=[format "%d" ${BA_TX_DMA}]"
 
   # DMA interrupt
   ad_cpu_interrupt ps-13 mb-12 tx_dma/irq
-
-  # Set DMA base address define
-  set BA_TX_DMA 0x44A30000
-  set_property offset $BA_TX_DMA [get_bd_addr_segs {mng_axi_vip/Master_AXI/SEG_data_tx_dma}]
-  adi_sim_add_define "TX_DMA_BA=[format "%d" ${BA_TX_DMA}]"
 
 } else {
 
@@ -162,7 +161,3 @@ if {$ad_project_params(MODE) == "PAR_IF"} {
   ad_connect axi_ad9910/s_axis_tdata GND
 
 }
-
-# Set base address define
-set BA_AD9910 0x44A00000
-adi_sim_add_define "AXI_AD9910_BA=[format "%d" ${BA_AD9910}]"

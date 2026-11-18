@@ -1,6 +1,6 @@
-.. _ad9910:
+.. _axi_ad9910:
 
-AD9910
+AXI AD9910
 ================================================================================
 
 Overview
@@ -55,7 +55,7 @@ Block diagram
 
 The data path and clock domains are depicted in the below diagram:
 
-.. image:: ./ad9910_tb.svg
+.. image:: ./axi_ad9910_tb.svg
    :width: 800
    :align: center
    :alt: AD9910 Testbench block diagram
@@ -527,7 +527,7 @@ command line.
 .. shell::
    :showuser:
 
-   $cd testbenches/project/ad9910
+   $cd testbenches/ip/axi_ad9910
    $make
 
 *Example 2*
@@ -539,7 +539,7 @@ the waveforms.
 .. shell::
    :showuser:
 
-   $cd testbenches/project/ad9910
+   $cd testbenches/ip/axi_ad9910
    $make MODE=gui
 
 *Example 3*
@@ -551,7 +551,7 @@ waveforms.
 .. shell::
    :showuser:
 
-   $cd testbenches/project/ad9910
+   $cd testbenches/ip/axi_ad9910
    $make CFG=cfg1_drg TST=test_program_drg MODE=gui
 
 *Example 4*
@@ -561,7 +561,7 @@ Build the parallel data interface test:
 .. shell::
    :showuser:
 
-   $cd testbenches/project/ad9910
+   $cd testbenches/ip/axi_ad9910
    $make CFG=cfg2_par_if TST=test_program_par_if MODE=gui
 
 The built projects can be found in the ``runs`` folder, where each configuration

@@ -302,6 +302,13 @@ instances:
   DDR)
 * Configure and start both PWM generators for conversion triggering
 * Wait for both DMA transfers to complete (in parallel)
+
+.. note::
+
+   The CMOS test program starts the PWM generators first and waits two
+   conversions before it configures and starts the DMAs. The first packed word
+   that ``util_cpack2`` outputs after the channels are enabled is zero, so the
+   DMAs only start capturing after that word has been output.
 * Verify the data captured in DDR from each ADC against the expected values
 * Perform CRC verification on each channel
 * Reset the ADC models before the next test case

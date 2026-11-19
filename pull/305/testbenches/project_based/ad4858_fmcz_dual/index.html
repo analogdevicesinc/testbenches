@@ -657,6 +657,15 @@ instances:</p>
 DDR)</p></li>
 <li><p>Configure and start both PWM generators for conversion triggering</p></li>
 <li><p>Wait for both DMA transfers to complete (in parallel)</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The CMOS test program starts the PWM generators first and waits two
+conversions before it configures and starts the DMAs. The first packed word
+that <code class="docutils literal notranslate"><span class="pre">util_cpack2</span></code> outputs after the channels are enabled is zero, so the
+DMAs only start capturing after that word has been output.</p>
+</div>
+<ul class="simple">
 <li><p>Verify the data captured in DDR from each ADC against the expected values</p></li>
 <li><p>Perform CRC verification on each channel</p></li>
 <li><p>Reset the ADC models before the next test case</p></li>
@@ -837,8 +846,8 @@ clean folder (no runs folder available):</p>
 <td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/vip/amd/axi/m_axi_sequencer.sv" target="_blank">library/vip/amd/axi/m_axi_sequencer.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
-<tr class="row-odd"><td><p>REG_ACCESSOR</p></td>
-<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/regmaps/reg_accessor.sv" target="_blank">library/regmaps/reg_accessor.sv</a></p></td>
+<tr class="row-odd"><td><p>ADI_VIP_PKG</p></td>
+<td><p><a class="icon git reference external" href="https://github.com/analogdevicesinc/testbenches/tree/main/library/utilities/adi_vip_pkg.sv" target="_blank">library/utilities/adi_vip_pkg.sv</a></p></td>
 <td><p>—</p></td>
 </tr>
 <tr class="row-even"><td><p>S_AXI_SEQUENCER</p></td>

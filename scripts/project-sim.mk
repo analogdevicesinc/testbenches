@@ -1,6 +1,6 @@
 ####################################################################################
 ####################################################################################
-## Copyright (C) 2018-2024 Analog Devices, Inc.
+## Copyright (C) 2018-2024,2026 Analog Devices, Inc.
 ####################################################################################
 ####################################################################################
 
@@ -116,6 +116,20 @@ ifneq ($(CFG),)
 ifneq ($(TST),)
 TESTS += $(CFG):$(TST)
 .DEFAULT_GOAL := runs/$(CFG)/$(TST).log
+endif
+endif
+
+# Run a specific test on all configurations
+ifeq ($(CFG),)
+ifneq ($(TST),)
+TESTS := $(filter %:$(TST), $(TESTS))
+endif
+endif
+
+# Run all tests on a specific configuration
+ifneq ($(CFG),)
+ifeq ($(TST),)
+TESTS := $(filter $(CFG):%, $(TESTS))
 endif
 endif
 

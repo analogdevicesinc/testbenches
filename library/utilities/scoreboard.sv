@@ -38,8 +38,9 @@
 package scoreboard_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
   import pub_sub_pkg::*;
+  import adi_fifo_pkg::*;
 
   class scoreboard #(type data_type = int) extends adi_component;
 
@@ -47,7 +48,7 @@ package scoreboard_pkg;
 
       protected scoreboard #(data_type) scoreboard_ref;
 
-      protected data_type byte_stream [$];
+      adi_fifo #(data_type) data_fifo;
 
       function new(
         input string name,
@@ -56,36 +57,25 @@ package scoreboard_pkg;
 
         super.new(name, parent);
 
+        this.data_fifo = new();
+
         this.scoreboard_ref = scoreboard_ref;
       endfunction: new
 
-      virtual function void update(input data_type data [$]);
+      virtual task update(input adi_fifo #(data_type) data);
         this.info($sformatf("Data received: %d", data.size()), ADI_VERBOSITY_MEDIUM);
 
         if (this.scoreboard_ref.get_enabled()) begin
-          while (data.size()) begin
-            this.byte_stream.push_back(data.pop_front());
+          if (!this.data_fifo.size()) begin
+            data.copy(this.data_fifo);
+          end else begin
+            while (data.size()) begin
+              void'(this.data_fifo.push(data.pop()));
+            end
           end
-
           this.scoreboard_ref.compare_transaction();
         end
-      endfunction: update
-
-      function data_type get_data();
-        return this.byte_stream.pop_front();
-      endfunction: get_data
-
-      function void put_data(data_type data);
-        this.byte_stream.push_back(data);
-      endfunction: put_data
-
-      function int get_size();
-        return this.byte_stream.size();
-      endfunction: get_size
-
-      function void clear_stream();
-        this.byte_stream.delete();
-      endfunction: clear_stream
+      endtask: update
 
     endclass: subscriber_class
 
@@ -93,16 +83,21 @@ package scoreboard_pkg;
     subscriber_class subscriber_source;
     subscriber_class subscriber_sink;
 
-    typedef enum bit { CYCLIC=0, ONESHOT } sink_type_t;
+    typedef enum bit {
+      CYCLIC=0,
+      ONESHOT
+    } sink_type_t;
     protected sink_type_t sink_type;
 
     // counters and synchronizers
     protected bit enabled;
-    protected bit byte_streams_empty_sig;
+    protected bit data_fifos_empty_sig;
 
     // protected event end_of_first_cycle;
-    protected event byte_streams_empty;
+    protected event data_fifos_empty;
     protected event stop_scoreboard;
+
+    protected semaphore subscriber_sem;
 
     // constructor
     function new(
@@ -111,12 +106,14 @@ package scoreboard_pkg;
 
       super.new(name, parent);
 
-      this.subscriber_source = new("Subscriber Source", this);
-      this.subscriber_sink = new("Subscriber Sink", this);
+      this.subscriber_source = new("Subscriber Source", this, this);
+      this.subscriber_sink = new("Subscriber Sink", this, this);
 
       this.enabled = 0;
       this.sink_type = ONESHOT;
-      this.byte_streams_empty_sig = 1;
+      this.data_fifos_empty_sig = 1;
+
+      this.subscriber_sem = new(1);
     endfunction: new
 
     // run task
@@ -129,8 +126,9 @@ package scoreboard_pkg;
     // stop scoreboard
     task stop();
       this.enabled = 0;
-      this.clear_streams();
-      this.byte_streams_empty_sig = 1;
+      this.clear_fifos();
+      this.data_fifos_empty_sig = 1;
+      -> this.data_fifos_empty;
     endtask: stop
 
     function bit get_enabled();
@@ -148,50 +146,88 @@ package scoreboard_pkg;
 
     // get sink type
     function bit get_sink_type();
-      return this.sink_type;
+      return bit'(this.sink_type);
     endfunction: get_sink_type
 
-    // clear source and sink byte streams
-    protected function void clear_streams();
-      this.subscriber_source.clear_stream();
-      this.subscriber_source.clear_stream();
-    endfunction: clear_streams
+    // clear source and sink fifos
+    protected task clear_fifos();
+      this.subscriber_sem.get(1);
+      this.subscriber_source.data_fifo.delete();
+      this.subscriber_sink.data_fifo.delete();
+      this.subscriber_sem.put(1);
+    endtask: clear_fifos
 
-    // wait until source and sink byte streams are empty, full check
+    // wait until source and sink fifos are empty, full check
     task wait_until_complete();
-      if (this.byte_streams_empty_sig)
+      this.subscriber_sem.get(1);
+      if (this.data_fifos_empty_sig == 1) begin
+        this.subscriber_sem.put(1);
         return;
-      @this.byte_streams_empty;
+      end
+      this.subscriber_sem.put(1);
+      @this.data_fifos_empty;
     endtask: wait_until_complete
 
     // compare the collected data
-    virtual function void compare_transaction();
-      data_type source_byte;
-      data_type sink_byte;
+    virtual task compare_transaction();
+      data_type source_data;
+      data_type sink_data;
 
-      this.byte_streams_empty_sig = 0;
+      adi_fifo #(data_type) source_data_fifo;
+      adi_fifo #(data_type) sink_data_fifo;
 
-      if (this.enabled == 0)
+      int min_size;
+
+      this.subscriber_sem.get(1);
+      if (this.enabled == 0) begin
+        this.subscriber_sem.put(1);
         return;
+      end
 
-      while ((this.subscriber_source.get_size() > 0) &&
-            (this.subscriber_sink.get_size() > 0)) begin
-        source_byte = this.subscriber_source.get_data();
-        if (this.sink_type == CYCLIC)
-          this.subscriber_source.put_data(source_byte);
-        sink_byte = this.subscriber_sink.get_data();
-        this.info($sformatf("Source-sink data: exp %h - rcv %h", source_byte, sink_byte), ADI_VERBOSITY_MEDIUM);
-        if (source_byte != sink_byte) begin
-          this.error($sformatf("Failed at: exp %h - rcv %h", source_byte, sink_byte));
+      if ((this.subscriber_source.data_fifo.size() > 0) ||
+        (this.subscriber_sink.data_fifo.size() > 0)) begin
+
+        this.data_fifos_empty_sig = 0;
+      end
+
+      if ((this.subscriber_source.data_fifo.size() > 0) &&
+        (this.subscriber_sink.data_fifo.size() > 0)) begin
+
+        source_data_fifo = new();
+        sink_data_fifo = new();
+
+        this.subscriber_source.data_fifo.copy(source_data_fifo);
+        this.subscriber_sink.data_fifo.copy(sink_data_fifo);
+
+        source_data_fifo.delete();
+        sink_data_fifo.delete();
+
+        min_size = `MIN(this.subscriber_source.data_fifo.size(), this.subscriber_sink.data_fifo.size());
+        for (int i=0; i<min_size; i++) begin
+          source_data = this.subscriber_source.data_fifo.pop();
+          if (this.sink_type == CYCLIC) begin
+            void'(this.subscriber_source.data_fifo.push(source_data));
+          end
+          void'(source_data_fifo.push(source_data));
+          sink_data = this.subscriber_sink.data_fifo.pop();
+          void'(sink_data_fifo.push(sink_data));
+        end
+        this.info($sformatf("Comparing source-sink data"), ADI_VERBOSITY_MEDIUM);
+        if (!source_data_fifo.compare(sink_data_fifo)) begin
+          this.error($sformatf("Source-sink data doesn't match!"));
+        end
+
+        if ((this.subscriber_source.data_fifo.size() == 0) &&
+          (this.subscriber_sink.data_fifo.size() == 0)) begin
+          this.data_fifos_empty_sig = 1;
+          -> this.data_fifos_empty;
+          this.info($sformatf("Empty"), ADI_VERBOSITY_MEDIUM);
+        end else begin
+          this.info($sformatf("Sizes: %d - %d", this.subscriber_source.data_fifo.size(), this.subscriber_sink.data_fifo.size()), ADI_VERBOSITY_MEDIUM);
         end
       end
-
-      if ((this.subscriber_source.get_size() == 0) &&
-          (this.subscriber_sink.get_size() == 0)) begin
-        this.byte_streams_empty_sig = 1;
-        ->this.byte_streams_empty;
-      end
-    endfunction: compare_transaction
+      this.subscriber_sem.put(1);
+    endtask: compare_transaction
 
   endclass
 

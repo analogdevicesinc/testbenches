@@ -46,10 +46,6 @@ package spi_environment_pkg;
   import adi_spi_vip_pkg::*;
   import adi_spi_vip_if_base_pkg::*;
 
-  `ifdef DEF_SDO_STREAMING
-    import `PKGIFY(test_harness, sdo_src)::*;
-  `endif
-
   class spi_environment extends adi_environment;
 
     // Agents
@@ -92,7 +88,6 @@ package spi_environment_pkg;
     task configure();
       `ifdef DEF_SDO_STREAMING
         this.sdo_src_agent.master_sequencer.set_stop_policy(STOP_POLICY_PACKET);
-        this.sdo_src_agent.master_sequencer.set_data_gen_mode(DATA_GEN_MODE_TEST_DATA);
       `endif
     endtask
 

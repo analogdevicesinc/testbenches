@@ -39,9 +39,9 @@
 package adi_axi_agent_pkg;
 
   import logger_pkg::*;
-  import adi_vip_pkg::*;
-  import adi_environment_pkg::*;
   import axi_vip_pkg::*;
+  import adi_environment_pkg::*;
+  import adi_agent_pkg::*;
   import m_axi_sequencer_pkg::*;
   import s_axi_sequencer_pkg::*;
   import adi_axi_monitor_pkg::*;

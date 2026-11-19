@@ -35,19 +35,58 @@
 
 `include "utils.svh"
 
-package adi_environment_pkg;
+package adi_fifo_class_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
-  import adi_environment_pkg::*;
+  import adi_object_pkg::*;
+  import adi_fifo_pkg::*;
 
-  class adi_environment extends adi_component;
+  class adi_fifo_class #(type data_type = int) extends adi_fifo#(.data_type(data_type));
+
     function new(
-      input string name,
-      input adi_environment parent = null);
+      input string name = "",
+      input int depth = 0);
 
-      super.new(name, parent);
+      super.new(.name(name));
+
+      this.depth = depth;
     endfunction: new
-  endclass: adi_environment
 
-endpackage: adi_environment_pkg
+    virtual function adi_object clone();
+      adi_fifo_class #(data_type) object;
+
+      object = new(
+        .name(this.name),
+        .depth(this.depth));
+
+      this.copy(.object(object));
+
+      return object;
+    endfunction: clone
+
+    virtual function bit do_compare(input adi_object object);
+      adi_fifo_class #(data_type) cast_object;
+      data_type local_storage;
+      data_type object_storage;
+
+      if ($cast(cast_object, object) == 0) begin
+        `FATAL(("Cast object %s type is not compatible with current object %s type!", object.sprint(), this.sprint()));
+      end
+
+      for (int i=0; i<this.size(); i++) begin
+        local_storage = this.pop();
+        void'(this.push(.data(local_storage)));
+
+        object_storage = cast_object.pop();
+        void'(cast_object.push(.data(object_storage)));
+
+        if (local_storage.compare(.object(object_storage)) == 0) begin
+          return 0;
+        end
+      end
+      return 1;
+    endfunction: do_compare
+
+  endclass: adi_fifo_class
+
+endpackage: adi_fifo_class_pkg

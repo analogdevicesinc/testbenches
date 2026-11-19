@@ -49,9 +49,17 @@ import clk_gen_api_pkg::*;
 import spi_engine_instr_pkg::*;
 import adi_spi_vip_pkg::*;
 import axi_vip_pkg::*;
+import adi_axis_packet_pkg::*;
+import adi_axis_config_pkg::*;
+import adi_axis_rand_config_pkg::*;
+import adi_axis_rand_obj_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
+
+`ifdef DEF_SDO_STREAMING
+  import `PKGIFY(test_harness, sdo_src)::*;
+`endif
 
 //---------------------------------------------------------------------------
 // SPI Engine configuration parameters
@@ -286,7 +294,6 @@ program test_slowdata (
     `INFO(("Transfer generation finished."), ADI_VERBOSITY_LOW);
   endtask
 
-
   task generate_double_rtransfer_cmd(
      input [7:0] sync_id,
      input [7:0] sdi_lane_mask,
@@ -348,17 +355,31 @@ program test_slowdata (
   //---------------------------------------------------------------------------
   // SPI Engine SDO data
   //---------------------------------------------------------------------------
-  task sdo_stream_gen(
-      input [`DATA_DLENGTH-1:0] tx_data[]);
-    xil_axi4stream_data_byte data[((`DATA_WIDTH/8) * (`NUM_OF_MOSI))-1:0];
+  task sdo_stream_gen(input [`DATA_DLENGTH-1:0] tx_data[]);
     `ifdef DEF_SDO_STREAMING
+      xil_axi4stream_data_byte data[((`DATA_WIDTH/8) * (`NUM_OF_MOSI))-1:0];
+      adi_axis_config axis_cfg;
+      adi_axis_rand_config axis_rand_cfg;
+      adi_axis_rand_obj axis_rand_obj;
+      adi_axis_packet axis_packet;
+
+      axis_cfg = new(`AXIS_TRANSACTION_PARAM(test_harness, sdo_src));
+      axis_rand_cfg = new();
+      axis_rand_obj = new();
+
+      axis_packet = new(
+        .bytes_per_packet((`DATA_WIDTH/8) * (`NUM_OF_MOSI)),
+        .cfg(axis_cfg),
+        .rand_cfg(axis_rand_cfg),
+        .rand_obj(axis_rand_obj));
+
       for (int i = 0; i < `NUM_OF_MOSI; i++) begin
         for (int j = 0; j < (`DATA_WIDTH/8); j++) begin
-          data[i * (`DATA_WIDTH/8) + j] = (tx_data[i] & (8'hFF << 8*j)) >> 8*j;
-          spi_env.sdo_src_agent.master_sequencer.push_byte_for_stream(data[i * (`DATA_WIDTH/8) + j]);
+          axis_packet.transactions[(i*(`DATA_WIDTH/8) + j) / axis_packet.cfg.BYTES_PER_TRANSACTION].bytes[(i*(`DATA_WIDTH/8) + j) % axis_packet.cfg.BYTES_PER_TRANSACTION].update_tdata((tx_data[i] & (8'hFF << 8*j)) >> 8*j);
         end
       end
-      spi_env.sdo_src_agent.master_sequencer.add_xfer_descriptor_byte_count((`DATA_WIDTH/8) * (`NUM_OF_MOSI),0,0);
+
+      spi_env.sdo_src_agent.master_sequencer.add_packet(axis_packet);
     `endif
   endtask
 

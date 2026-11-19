@@ -36,14 +36,23 @@
 global ad_project_params
 
 set ASYNC_CLK $ad_project_params(ASYNC_CLK)
-set TKEEP_EN $ad_project_params(TKEEP_EN)
-set TLAST_EN $ad_project_params(TLAST_EN)
 set DATA_WIDTH $ad_project_params(DATA_WIDTH)
+set TKEEP_EN $ad_project_params(TKEEP_EN)
+set TSTRB_EN $ad_project_params(TSTRB_EN)
+set TLAST_EN $ad_project_params(TLAST_EN)
+set TUSER_EN $ad_project_params(TUSER_EN)
+set TID_EN $ad_project_params(TID_EN)
+set TDEST_EN $ad_project_params(TDEST_EN)
+set TUSER_WIDTH $ad_project_params(TUSER_WIDTH)
+set TID_WIDTH $ad_project_params(TID_WIDTH)
+set TDEST_WIDTH $ad_project_params(TDEST_WIDTH)
 set ADDRESS_WIDTH $ad_project_params(ADDRESS_WIDTH)
+set ALMOST_EMPTY_THRESHOLD $ad_project_params(ALMOST_EMPTY_THRESHOLD)
+set ALMOST_FULL_THRESHOLD $ad_project_params(ALMOST_FULL_THRESHOLD)
 set INPUT_CLK $ad_project_params(INPUT_CLK)
 set OUTPUT_CLK $ad_project_params(OUTPUT_CLK)
 
-# Input clock
+# Input-output clocking and resets
 ad_ip_instance clk_vip input_clk_vip [ list \
   INTERFACE_MODE {MASTER} \
   FREQ_HZ [expr pow(10, 9)/$INPUT_CLK] \
@@ -74,17 +83,35 @@ ad_connect output_clk output_rstgen/slowest_sync_clk
 ad_connect input_resetn input_rstgen/peripheral_aresetn
 ad_connect output_resetn output_rstgen/peripheral_aresetn
 
-ad_ip_instance util_axis_fifo util_axis_fifo_DUT [list \
-  ASYNC_CLK $ASYNC_CLK \
-  DATA_WIDTH $DATA_WIDTH \
-  ADDRESS_WIDTH $ADDRESS_WIDTH \
-  M_AXIS_REGISTERED 1 \
-  ALMOST_EMPTY_THRESHOLD 0 \
-  ALMOST_FULL_THRESHOLD 0 \
-  TLAST_EN $TLAST_EN \
-  TKEEP_EN $TKEEP_EN \
-  REMOVE_NULL_BEAT_EN 0 \
-]
+# DUT
+# Test BD automation script
+if {[expr int(rand()*2)] == 1} {
+  ad_ip_instance util_axis_fifo util_axis_fifo_DUT [list \
+    ASYNC_CLK $ASYNC_CLK \
+    DATA_WIDTH $DATA_WIDTH \
+    ADDRESS_WIDTH $ADDRESS_WIDTH \
+    M_AXIS_REGISTERED 1 \
+    ALMOST_EMPTY_THRESHOLD $ALMOST_EMPTY_THRESHOLD \
+    ALMOST_FULL_THRESHOLD $ALMOST_FULL_THRESHOLD \
+    TKEEP_EN $TKEEP_EN \
+    TSTRB_EN $TSTRB_EN \
+    TLAST_EN $TLAST_EN \
+    TUSER_EN $TUSER_EN \
+    TID_EN $TID_EN \
+    TDEST_EN $TDEST_EN \
+    TUSER_WIDTH $TUSER_WIDTH \
+    TID_WIDTH $TID_WIDTH \
+    TDEST_WIDTH $TDEST_WIDTH \
+  ]
+} else {
+  ad_ip_instance util_axis_fifo util_axis_fifo_DUT [list \
+    ASYNC_CLK $ASYNC_CLK \
+    ADDRESS_WIDTH $ADDRESS_WIDTH \
+    M_AXIS_REGISTERED 1 \
+    ALMOST_EMPTY_THRESHOLD $ALMOST_EMPTY_THRESHOLD \
+    ALMOST_FULL_THRESHOLD $ALMOST_FULL_THRESHOLD \
+  ]
+}
 
 ad_connect input_clk util_axis_fifo_DUT/s_axis_aclk
 ad_connect input_resetn util_axis_fifo_DUT/s_axis_aresetn
@@ -92,14 +119,17 @@ ad_connect input_resetn util_axis_fifo_DUT/s_axis_aresetn
 ad_connect output_clk util_axis_fifo_DUT/m_axis_aclk
 ad_connect output_resetn util_axis_fifo_DUT/m_axis_aresetn
 
+# AXI Stream VIPs
 ad_ip_instance axi4stream_vip input_axis [list \
   INTERFACE_MODE {MASTER} \
-  HAS_TREADY {1} \
-  TDEST_WIDTH {0} \
-  TID_WIDTH {0} \
-  HAS_TLAST $TLAST_EN \
-  HAS_TKEEP $TKEEP_EN \
   TDATA_NUM_BYTES [expr {$DATA_WIDTH/8}] \
+  HAS_TREADY {1} \
+  HAS_TKEEP $TKEEP_EN \
+  HAS_TSTRB $TSTRB_EN \
+  HAS_TLAST $TLAST_EN \
+  TUSER_WIDTH [expr $TUSER_WIDTH * $TUSER_EN] \
+  TID_WIDTH [expr $TID_WIDTH * $TID_EN] \
+  TDEST_WIDTH [expr $TDEST_WIDTH * $TDEST_EN] \
 ]
 adi_sim_add_define "INPUT_AXIS=input_axis"
 
@@ -110,9 +140,13 @@ ad_connect util_axis_fifo_DUT/s_axis input_axis/m_axis
 
 ad_ip_instance axi4stream_vip output_axis [list \
   INTERFACE_MODE {SLAVE} \
-  HAS_TLAST $TLAST_EN \
-  HAS_TKEEP $TKEEP_EN \
   TDATA_NUM_BYTES [expr {$DATA_WIDTH/8}] \
+  HAS_TKEEP $TKEEP_EN \
+  HAS_TSTRB $TSTRB_EN \
+  HAS_TLAST $TLAST_EN \
+  TUSER_WIDTH [expr $TUSER_WIDTH * $TUSER_EN] \
+  TID_WIDTH [expr $TID_WIDTH * $TID_EN] \
+  TDEST_WIDTH [expr $TDEST_WIDTH * $TDEST_EN] \
 ]
 adi_sim_add_define "OUTPUT_AXIS=output_axis"
 
@@ -120,3 +154,78 @@ ad_connect output_clk output_axis/aclk
 ad_connect output_resetn output_axis/aresetn
 
 ad_connect util_axis_fifo_DUT/m_axis output_axis/s_axis
+
+if {$ADDRESS_WIDTH != 0} {
+  # IO VIPs
+  ad_ip_instance io_vip master_status_signals_vip [ list \
+    ASYNC {false} \
+    MODE {0} \
+  ]
+  adi_sim_add_define "MASTER_STATUS_SIGNALS=master_status_signals_vip"
+
+  ad_ip_instance io_vip slave_status_signals_vip [ list \
+    ASYNC {false} \
+    MODE {0} \
+  ]
+  adi_sim_add_define "SLAVE_STATUS_SIGNALS=slave_status_signals_vip"
+
+  ad_ip_instance io_vip master_control_signals_vip [ list \
+    ASYNC {false} \
+    MODE 0 \
+  ]
+  adi_sim_add_define "MASTER_CONTROL_SIGNALS=master_control_signals_vip"
+
+  ad_ip_instance io_vip slave_control_signals_vip [ list \
+    ASYNC {false} \
+    MODE 0 \
+  ]
+  adi_sim_add_define "SLAVE_CONTROL_SIGNALS=slave_control_signals_vip"
+
+  ad_ip_instance xlconcat master_status_signals_concat [list \
+    NUM_PORTS 5 \
+  ]
+
+  ad_ip_instance xlconcat slave_status_signals_concat [list \
+    NUM_PORTS 5 \
+  ]
+
+  ad_ip_instance xlconcat master_control_signals_concat [list \
+    NUM_PORTS 2 \
+  ]
+
+  ad_ip_instance xlconcat slave_control_signals_concat [list \
+    NUM_PORTS 2 \
+  ]
+
+  ad_connect input_clk slave_status_signals_vip/clk
+  ad_connect input_clk slave_control_signals_vip/clk
+  ad_connect output_clk master_status_signals_vip/clk
+  ad_connect output_clk master_control_signals_vip/clk
+
+  ad_connect slave_status_signals_vip/i slave_status_signals_concat/dout
+  ad_connect slave_control_signals_vip/i slave_control_signals_concat/dout
+  ad_connect master_status_signals_vip/i master_status_signals_concat/dout
+  ad_connect master_control_signals_vip/i master_control_signals_concat/dout
+
+  ad_connect slave_status_signals_concat/In0 util_axis_fifo_DUT/s_axis_empty
+  ad_connect slave_status_signals_concat/In1 util_axis_fifo_DUT/s_axis_almost_empty
+  ad_connect slave_status_signals_concat/In2 util_axis_fifo_DUT/s_axis_full
+  ad_connect slave_status_signals_concat/In3 util_axis_fifo_DUT/s_axis_almost_full
+  ad_connect slave_status_signals_concat/In4 util_axis_fifo_DUT/s_axis_room
+
+  ad_connect slave_control_signals_concat/In0 util_axis_fifo_DUT/s_axis_valid
+  ad_connect slave_control_signals_concat/In1 util_axis_fifo_DUT/s_axis_ready
+  ad_connect util_axis_fifo_DUT/s_axis_valid input_axis/m_axis_tvalid
+  ad_connect util_axis_fifo_DUT/s_axis_ready input_axis/m_axis_tready
+
+  ad_connect master_status_signals_concat/In0 util_axis_fifo_DUT/m_axis_empty
+  ad_connect master_status_signals_concat/In1 util_axis_fifo_DUT/m_axis_almost_empty
+  ad_connect master_status_signals_concat/In2 util_axis_fifo_DUT/m_axis_full
+  ad_connect master_status_signals_concat/In3 util_axis_fifo_DUT/m_axis_almost_full
+  ad_connect master_status_signals_concat/In4 util_axis_fifo_DUT/m_axis_level
+
+  ad_connect master_control_signals_concat/In0 util_axis_fifo_DUT/m_axis_valid
+  ad_connect master_control_signals_concat/In1 util_axis_fifo_DUT/m_axis_ready
+  ad_connect util_axis_fifo_DUT/m_axis_valid output_axis/s_axis_tvalid
+  ad_connect util_axis_fifo_DUT/m_axis_ready output_axis/s_axis_tready
+}

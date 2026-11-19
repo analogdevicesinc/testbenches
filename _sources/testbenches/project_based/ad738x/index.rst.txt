@@ -221,9 +221,6 @@ HDL related dependencies forming the DUT
    * - IP name
      - Source code link
      - Documentation link
-   * - AD738x_DATA_CAPTURE
-     - :git-hdl:`library/ad738x_data_capture`
-     - ---
    * - AXI_CLKGEN
      - :git-hdl:`library/axi_clkgen`
      - :external+hdl:ref:`axi_clkgen`

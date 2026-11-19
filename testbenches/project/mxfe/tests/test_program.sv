@@ -42,6 +42,7 @@ import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
 import adi_regmap_dmac_pkg::*;
+import dmac_api_pkg::*;
 import adi_regmap_jesd_tx_pkg::*;
 import adi_regmap_jesd_rx_pkg::*;
 import adi_regmap_common_pkg::*;
@@ -70,7 +71,16 @@ program test_program;
   xcvr rx_xcvr;
   xcvr tx_xcvr;
 
+  dmac_api tx_dma_api;
+  dmac_api rx_dma_api;
+  logic [3:0] tx_transfer_id;
+  logic [3:0] rx_transfer_id;
+
   int use_dds = 1;
+  localparam int unsigned DMA_CLK_FREQ = 300000000;
+  // Through the offload the TX pattern must fit it, as it replays only what
+  // it stored; in bypass a short cyclic DMA transfer would underflow instead
+  localparam int TX_OFFLOAD_BYTES = (`DAC_OFFLOAD_SIZE < 8192) ? `DAC_OFFLOAD_SIZE : 8192;
   bit [31:0] lane_rate_khz = `RX_LANE_RATE*1000000;
   longint unsigned lane_rate = lane_rate_khz*1000;
 
@@ -120,10 +130,18 @@ program test_program;
     tx_xcvr = new("TX_XCVR", base_env.mng.master_sequencer, `TX_XCVR_BA);
     tx_xcvr.probe();
 
+    tx_dma_api = new("TX DMA API", base_env.mng.master_sequencer, `TX_DMA_BA);
+    rx_dma_api = new("RX DMA API", base_env.mng.master_sequencer, `RX_DMA_BA);
+
     `TH.`REF_CLK.inst.IF.set_clk_frq(.user_frequency(`REF_CLK_RATE*1000000));
     `TH.`DEVICE_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
     `TH.`SYSREF_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_sysref_clk()));
-    `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(rx_ll.calc_device_clk()));
+    // The DMA is as wide as the TPL, so it needs a faster clock than the
+    // device clock to cover the per-burst gaps, or TX underflows in bypass
+    if (rx_ll.calc_device_clk() >= DMA_CLK_FREQ) begin
+      `ERROR(("Device clock %0d Hz leaves the DMA no headroom", rx_ll.calc_device_clk()));
+    end
+    `TH.`DMA_CLK.inst.IF.set_clk_frq(.user_frequency(DMA_CLK_FREQ));
 
     `TH.`REF_CLK.inst.IF.start_clock();
     `TH.`DEVICE_CLK.inst.IF.start_clock();
@@ -153,7 +171,9 @@ program test_program;
     // =======================
     // JESD LINK TEST - DMA - DO -TDD
     // =======================
-    jesd_link_test(0,0,0,1);
+    if (`TDD_SUPPORT) begin
+      jesd_link_test(0,0,0,1);
+    end
 
     // =======================
     // JESD LINK TEST - DDS - EXT_SYNC
@@ -284,9 +304,10 @@ program test_program;
                          `SET_DMAC_FLAGS_CYCLIC(tx_bypass) |
                          `SET_DMAC_FLAGS_TLAST(1));
       base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_X_LENGTH),
-                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h00001FFF));
+                         `SET_DMAC_X_LENGTH_X_LENGTH((tx_bypass ? 8192 : TX_OFFLOAD_BYTES)-1));
       base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_SRC_ADDRESS),
                          `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000));
+      tx_dma_api.transfer_id_get(tx_transfer_id);
       base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
       // Configure RX DMA
@@ -298,10 +319,15 @@ program test_program;
                          `SET_DMAC_X_LENGTH_X_LENGTH(32'h000007FF));
       base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_DEST_ADDRESS),
                          `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00002000));
+      rx_dma_api.transfer_id_get(rx_transfer_id);
       base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
                          `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-      // Wait until data propagates through the dma+offload
-      #5us;
+      if (tx_bypass) begin
+        // A cyclic transfer never completes
+        #5us;
+      end else begin
+        tx_dma_api.wait_transfer_done(.transfer_id(tx_transfer_id), .timeut_in_us(10));
+      end
     end
 
     tx_ll.link_up();
@@ -331,11 +357,12 @@ program test_program;
     #5us;
 
     if (~use_dds) begin
+      rx_dma_api.wait_transfer_done(.transfer_id(rx_transfer_id), .timeut_in_us(10));
       check_captured_data(
         .address (`DDR_BA+'h00002000),
         .length (1024),
         .step (1),
-        .max_sample(4096)
+        .max_sample((tx_bypass ? 8192 : TX_OFFLOAD_BYTES)/2)
       );
     end
 
@@ -346,6 +373,11 @@ program test_program;
 
     rx_ll.link_down();
     tx_ll.link_down();
+
+    if (tx_bypass) begin
+      // The cyclic transfer never ends and would block the next TX transfer
+      tx_dma_api.disable_dma();
+    end
 
     base_env.mng.master_sequencer.RegWrite32(`ADC_TPL_BA + GetAddrs(ADC_COMMON_REG_RSTN),
                        `SET_ADC_COMMON_REG_RSTN_RSTN(0));

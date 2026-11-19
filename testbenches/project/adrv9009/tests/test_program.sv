@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2014-2024 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2014-2024, 2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -41,21 +41,17 @@ import adi_regmap_pkg::*;
 import axi_vip_pkg::*;
 import axi4stream_vip_pkg::*;
 import logger_pkg::*;
-import adi_regmap_dmac_pkg::*;
-import adi_regmap_jesd_tx_pkg::*;
-import adi_regmap_jesd_rx_pkg::*;
-import adi_regmap_common_pkg::*;
-import adi_regmap_dac_pkg::*;
-import adi_regmap_adc_pkg::*;
 import adi_jesd204_pkg::*;
 import adi_xcvr_pkg::*;
+import clk_gen_api_pkg::*;
+import common_api_pkg::*;
+import adc_api_pkg::*;
+import dac_api_pkg::*;
+import data_offload_api_pkg::*;
+import dmac_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
-
-`define LINK_MODE 2
-`define MODE_8B10B 1
-`define MODE_64B66B 2
 
 `define fmod(A, B) (A - (B * $floor(A / B)))
 
@@ -68,6 +64,22 @@ program test_program;
 
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
+
+  clk_gen_api tx_clkgen_api;
+  clk_gen_api rx_clkgen_api;
+  clk_gen_api rx_os_clkgen_api;
+  dmac_api tx_dmac_api;
+  dmac_api rx_dmac_api;
+  dmac_api rx_os_dmac_api;
+  dmac_api ex_rx_dmac_api;
+  dmac_api ex_tx_dmac_api;
+  dmac_api ex_tx_os_dmac_api;
+  dac_api tx_dac_api;
+  dac_api ex_dac_api;
+  dac_api ex_dac_os_api;
+  adc_api rx_adc_api;
+  adc_api rx_os_adc_api;
+  adc_api ex_adc_api;
 
   bit [31:0] lane_rate_khz = `LANE_RATE*1000000;
   longint lane_rate = lane_rate_khz*1000;
@@ -96,7 +108,7 @@ program test_program;
 
   initial begin
 
-    //creating environment
+    // Create environment
     base_env = new(
       .name("Base Environment"),
       .sys_clk_vip_if(`TH.`SYS_CLK.inst.IF),
@@ -111,6 +123,81 @@ program test_program;
 
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
+
+    tx_clkgen_api = new(
+      "TX CLKGEN API",
+      base_env.mng.master_sequencer,
+      `AXI_CLKGEN_TX_BA);
+
+    rx_clkgen_api = new(
+      "RX CLKGEN API",
+      base_env.mng.master_sequencer,
+      `AXI_CLKGEN_RX_BA);
+
+    rx_os_clkgen_api = new(
+      "RX OS CLKGEN API",
+      base_env.mng.master_sequencer,
+      `AXI_CLKGEN_RX_OS_BA);
+
+    tx_dmac_api = new(
+      "TX DMAC API",
+      base_env.mng.master_sequencer,
+      `TX_DMA_BA);
+
+    rx_dmac_api = new(
+      "RX DMAC API",
+      base_env.mng.master_sequencer,
+      `RX_DMA_BA);
+
+    rx_os_dmac_api = new(
+      "RX OS DMAC API",
+      base_env.mng.master_sequencer,
+      `RX_OS_DMA_BA);
+
+    ex_rx_dmac_api = new(
+      "EX RX DMAC API",
+      base_env.mng.master_sequencer,
+      `EX_RX_DMA_BA);
+
+    ex_tx_dmac_api = new(
+      "EX TX DMAC API",
+      base_env.mng.master_sequencer,
+      `EX_TX_DMA_BA);
+
+    ex_tx_os_dmac_api = new(
+      "EX TX OS DMAC API",
+      base_env.mng.master_sequencer,
+      `EX_TX_OS_DMA_BA);
+
+    tx_dac_api = new(
+      "TX DAC TPL API",
+      base_env.mng.master_sequencer,
+      `DAC_TPL_BA);
+
+    ex_dac_api = new(
+      "EX DAC TPL API",
+      base_env.mng.master_sequencer,
+      `EX_DAC_TPL_BA);
+
+    ex_dac_os_api = new(
+      "EX DAC OS TPL API",
+      base_env.mng.master_sequencer,
+      `EX_DAC_OS_TPL_BA);
+
+    rx_adc_api = new(
+      "RX ADC TPL API",
+      base_env.mng.master_sequencer,
+      `ADC_TPL_BA);
+
+    rx_os_adc_api = new(
+      "RX OS ADC TPL API",
+      base_env.mng.master_sequencer,
+      `ADC_OS_TPL_BA);
+
+    ex_adc_api = new(
+      "EX ADC TPL API",
+      base_env.mng.master_sequencer,
+      `EX_ADC_TPL_BA);
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
@@ -269,64 +356,86 @@ program test_program;
   end
 
   task tx_tpl_test(int use_dds);
+    for (int i = 0; i < `TX_JESD_M; i++) begin
+      if (use_dds) begin
+        // Select DDS as source
+        tx_dac_api.set_channel_control_7(
+          .channel(i),
+          .dds_sel(4'h0));
+        // Configure tone amplitude and frequency
+        tx_dac_api.set_channel_control_1(
+          .channel(i),
+          .dds_scale_1(16'h0fff));
+        tx_dac_api.set_channel_control_2(
+          .channel(i),
+          .dds_init_1(16'h0000),
+          .dds_incr_1(16'h0100));
+      end else begin
+        // Set DMA as source for DAC TPL
+        tx_dac_api.set_channel_control_7(
+          .channel(i),
+          .dds_sel(4'h2));
+      end
+    end
+
+    for (int i = 0; i < `TX_JESD_M; i++) begin
+      ex_adc_api.enable_channel(i);
+    end
+
+    tx_dac_api.reset(
+      .ce_n(1'b0),
+      .mmcm_rstn(1'b0),
+      .rstn(1'b1));
+    ex_adc_api.reset(
+      .ce_n(1'b0),
+      .mmcm_rstn(1'b0),
+      .rstn(1'b1));
+
+    if (use_dds) begin
+      // Sync DDS cores
+      tx_dac_api.set_common_control_1(
+        .sync(1'b1),
+        .ext_sync_arm(1'b0),
+        .ext_sync_disarm(1'b0),
+        .manual_sync_request(1'b0));
+    end
+
     if (!use_dds) begin
       for (int i=0;i<2048*2 ;i=i+2) begin
         base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
       end
 
       // Configure TX DMA
-      base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_CONTROL),
-                         `SET_DMAC_CONTROL_ENABLE(1));
-      base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_FLAGS),
-                         `SET_DMAC_FLAGS_TLAST(1));
-      base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_X_LENGTH),
-                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h00000FFF));
-      base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_SRC_ADDRESS),
-                         `SET_DMAC_SRC_ADDRESS_SRC_ADDRESS(`DDR_BA+32'h00000000));
-      base_env.mng.master_sequencer.RegWrite32(`TX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
+      tx_dmac_api.enable_dma();
+      tx_dmac_api.set_flags(
+        .cyclic(1'b0),
+        .tlast(1'b1),
+        .partial_reporting_en(1'b0));
+      tx_dmac_api.set_lengths(
+        .xfer_length_x(32'h00000FFF),
+        .xfer_length_y(32'h0));
+      tx_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
+      tx_dmac_api.transfer_start();
+
+      // Configure EX RX DMA
+      ex_rx_dmac_api.enable_dma();
+      ex_rx_dmac_api.set_flags(
+        .cyclic(1'b0),
+        .tlast(1'b1),
+        .partial_reporting_en(1'b0));
+      ex_rx_dmac_api.set_lengths(
+        .xfer_length_x(32'h000003DF),
+        .xfer_length_y(32'h0));
+      ex_rx_dmac_api.set_dest_addr(`DDR_BA+32'h00001000);
+      ex_rx_dmac_api.transfer_start();
+
+      // Wait until data propagates through the dma
       #5us;
     end
 
-    for (int i = 0; i < `TX_JESD_M; i++) begin
-      if (use_dds) begin
-        // Select DDS as source
-        base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
-        // Configure tone amplitude and frequency
-        base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
-        base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
+    // Bring-Up DUT TX Path
+    tx_clkgen_api.enable_clkgen();
 
-      end else begin
-        // Set DMA as source for DAC TPL
-        base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
-      end
-    end
-
-    for (int i = 0; i < `TX_JESD_M; i++) begin
-      base_env.mng.master_sequencer.RegWrite32(`EX_ADC_TPL_BA+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-                         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
-    end
-
-
-    base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA+GetAddrs(DAC_COMMON_REG_RSTN),
-                       `SET_DAC_COMMON_REG_RSTN_RSTN(1));
-    base_env.mng.master_sequencer.RegWrite32(`EX_ADC_TPL_BA+GetAddrs(ADC_COMMON_REG_RSTN),
-                       `SET_ADC_COMMON_REG_RSTN_RSTN(1));
-
-    if (use_dds) begin
-      // Sync DDS cores
-      base_env.mng.master_sequencer.RegWrite32(`DAC_TPL_BA+GetAddrs(DAC_COMMON_REG_CNTRL_1),
-                         `SET_DAC_COMMON_REG_CNTRL_1_SYNC(1));
-    end
-
-    // -----------------------
-    // bringup DUT TX path
-    // -----------------------
-    base_env.mng.master_sequencer.RegWrite32(`AXI_CLKGEN_TX_BA + 'h40, 3);
     dut_tx_xcvr.up();
     dut_tx_ll.link_up();
 
@@ -336,7 +445,20 @@ program test_program;
     dut_tx_ll.wait_link_up();
     ex_rx_ll.wait_link_up();
 
-    #10us;
+    // Move data around for a while
+    #5us;
+
+    if (~use_dds) begin
+      check_captured_data(
+        .address (`DDR_BA+'h00001000),
+        .length (992),
+        .step (1),
+        .max_sample(2048)
+      );
+    end
+
+    tx_dmac_api.disable_dma();
+    ex_rx_dmac_api.disable_dma();
 
     ex_rx_xcvr.down();
     dut_tx_xcvr.down();
@@ -346,35 +468,83 @@ program test_program;
     for (int i = 0; i < `RX_JESD_M; i++) begin
       if (use_dds) begin
         // Select DDS as source
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
+        ex_dac_api.set_channel_control_7(
+          .channel(i),
+          .dds_sel(4'h0));
         // Configure tone amplitude and frequency
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
-
+        ex_dac_api.set_channel_control_1(
+          .channel(i),
+          .dds_scale_1(16'h0fff));
+        ex_dac_api.set_channel_control_2(
+          .channel(i),
+          .dds_init_1(16'h0000),
+          .dds_incr_1(16'h0100));
       end else begin
         // Set DMA as source for DAC TPL
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
+        ex_dac_api.set_channel_control_7(
+          .channel(i),
+          .dds_sel(4'h2));
       end
     end
 
     for (int i = 0; i < `RX_JESD_M; i++) begin
-      base_env.mng.master_sequencer.RegWrite32(`ADC_TPL_BA+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-                         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+      rx_adc_api.enable_channel(i);
     end
 
-    base_env.mng.master_sequencer.RegWrite32(`EX_DAC_TPL_BA+GetAddrs(DAC_COMMON_REG_RSTN),
-                       `SET_DAC_COMMON_REG_RSTN_RSTN(1));
-    base_env.mng.master_sequencer.RegWrite32(`ADC_TPL_BA+GetAddrs(ADC_COMMON_REG_RSTN),
-                       `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    ex_dac_api.reset(
+      .ce_n(1'b0),
+      .mmcm_rstn(1'b0),
+      .rstn(1'b1));
+    rx_adc_api.reset(
+      .ce_n(1'b0),
+      .mmcm_rstn(1'b0),
+      .rstn(1'b1));
 
-    // -----------------------
-    // bringup DUT RX path
-    // -----------------------
-    base_env.mng.master_sequencer.RegWrite32(`AXI_CLKGEN_RX_BA + 'h40, 3);
+    if (use_dds) begin
+      // Sync DDS cores
+      ex_dac_api.set_common_control_1(
+        .sync(1'b1),
+        .ext_sync_arm(1'b0),
+        .ext_sync_disarm(1'b0),
+        .manual_sync_request(1'b0));
+    end
+
+    if (!use_dds) begin
+      for (int i=0;i<2048*2 ;i=i+2) begin
+        base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
+      end
+
+      // Configure EX TX DMA
+      ex_tx_dmac_api.enable_dma();
+      ex_tx_dmac_api.set_flags(
+        .cyclic(1'b1),
+        .tlast(1'b0),
+        .partial_reporting_en(1'b0));
+      ex_tx_dmac_api.set_lengths(
+        .xfer_length_x(32'h00000FFF),
+        .xfer_length_y(32'h0));
+      ex_tx_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
+      ex_tx_dmac_api.transfer_start();
+
+      // Configure RX DMA
+      rx_dmac_api.enable_dma();
+      rx_dmac_api.set_flags(
+        .cyclic(1'b0),
+        .tlast(1'b1),
+        .partial_reporting_en(1'b0));
+      rx_dmac_api.set_lengths(
+        .xfer_length_x(32'h000003DF),
+        .xfer_length_y(32'h0));
+      rx_dmac_api.set_dest_addr(`DDR_BA+32'h00001000);
+      rx_dmac_api.transfer_start();
+
+      // Wait until data propagates through the dma
+      #5us;
+    end
+
+    // Bring-Up DUT RX Path
+    rx_clkgen_api.enable_clkgen();
+
     ex_tx_xcvr.up();
     ex_tx_ll.link_up();
 
@@ -384,32 +554,20 @@ program test_program;
     ex_tx_ll.wait_link_up();
     dut_rx_ll.wait_link_up();
 
-    #10us;
+    // Move data around for a while
+    #5us;
 
-    // Configure RX DMA
     if (!use_dds) begin
-      base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_CONTROL),
-                         `SET_DMAC_CONTROL_ENABLE(1));
-      base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_FLAGS),
-                         `SET_DMAC_FLAGS_TLAST(1));
-      base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_X_LENGTH),
-                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003DF));
-      base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_DEST_ADDRESS),
-                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00001000));
-      base_env.mng.master_sequencer.RegWrite32(`RX_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-
-      #5us;
-
       check_captured_data(
         .address (`DDR_BA+'h00001000),
         .length (992),
         .step (1),
         .max_sample(2048)
       );
-
-      #10us;
     end
+
+    ex_tx_dmac_api.disable_dma();
+    rx_dmac_api.disable_dma();
 
     dut_rx_xcvr.down();
     ex_tx_xcvr.down();
@@ -419,35 +577,83 @@ program test_program;
     for (int i = 0; i < `RX_OS_JESD_M; i++) begin
       if (use_dds) begin
         // Select DDS as source
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_OS_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(0));
+        ex_dac_os_api.set_channel_control_7(
+          .channel(i),
+          .dds_sel(4'h0));
         // Configure tone amplitude and frequency
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_OS_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_1),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_1_DDS_SCALE_1(16'h0fff));
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_OS_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_2),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_2_DDS_INCR_1(16'h0100));
-
+        ex_dac_os_api.set_channel_control_1(
+          .channel(i),
+          .dds_scale_1(16'h0fff));
+        ex_dac_os_api.set_channel_control_2(
+          .channel(i),
+          .dds_init_1(16'h0000),
+          .dds_incr_1(16'h0100));
       end else begin
         // Set DMA as source for DAC TPL
-        base_env.mng.master_sequencer.RegWrite32(`EX_DAC_OS_TPL_BA+'h40*i+GetAddrs(DAC_CHANNEL_REG_CHAN_CNTRL_7),
-                           `SET_DAC_CHANNEL_REG_CHAN_CNTRL_7_DAC_DDS_SEL(2));
+        ex_dac_os_api.set_channel_control_7(
+          .channel(i),
+          .dds_sel(4'h2));
       end
     end
 
     for (int i = 0; i < `RX_OS_JESD_M; i++) begin
-      base_env.mng.master_sequencer.RegWrite32(`ADC_OS_TPL_BA+'h40*i+GetAddrs(ADC_CHANNEL_REG_CHAN_CNTRL),
-                         `SET_ADC_CHANNEL_REG_CHAN_CNTRL_ENABLE(1));
+      rx_os_adc_api.enable_channel(i);
     end
 
-    base_env.mng.master_sequencer.RegWrite32(`EX_DAC_OS_TPL_BA+GetAddrs(DAC_COMMON_REG_RSTN),
-                       `SET_DAC_COMMON_REG_RSTN_RSTN(1));
-    base_env.mng.master_sequencer.RegWrite32(`ADC_OS_TPL_BA+GetAddrs(ADC_COMMON_REG_RSTN),
-                       `SET_ADC_COMMON_REG_RSTN_RSTN(1));
+    ex_dac_os_api.reset(
+      .ce_n(1'b0),
+      .mmcm_rstn(1'b0),
+      .rstn(1'b1));
+    rx_os_adc_api.reset(
+      .ce_n(1'b0),
+      .mmcm_rstn(1'b0),
+      .rstn(1'b1));
 
-    // -----------------------
-    // bringup DUT RX OBS path
-    // -----------------------
-    base_env.mng.master_sequencer.RegWrite32(`AXI_CLKGEN_RX_OS_BA + 'h40, 3);
+    if (use_dds) begin
+      // Sync DDS cores
+      ex_dac_os_api.set_common_control_1(
+        .sync(1'b1),
+        .ext_sync_arm(1'b0),
+        .ext_sync_disarm(1'b0),
+        .manual_sync_request(1'b0));
+    end
+
+    if (!use_dds) begin
+      for (int i=0;i<2048*2 ;i=i+2) begin
+        base_env.ddr.slave_sequencer.BackdoorWrite32(xil_axi_uint'(`DDR_BA+i*2),(((i+1)) << 16) | i ,15);
+      end
+
+      // Configure EX TX OS DMA
+      ex_tx_os_dmac_api.enable_dma();
+      ex_tx_os_dmac_api.set_flags(
+        .cyclic(1'b1),
+        .tlast(1'b0),
+        .partial_reporting_en(1'b0));
+      ex_tx_os_dmac_api.set_lengths(
+        .xfer_length_x(32'h00000FFF),
+        .xfer_length_y(32'h0));
+      ex_tx_os_dmac_api.set_src_addr(`DDR_BA+32'h00000000);
+      ex_tx_os_dmac_api.transfer_start();
+
+      // Configure RX OBS DMA
+      rx_os_dmac_api.enable_dma();
+      rx_os_dmac_api.set_flags(
+        .cyclic(1'b0),
+        .tlast(1'b1),
+        .partial_reporting_en(1'b0));
+      rx_os_dmac_api.set_lengths(
+        .xfer_length_x(32'h000003DF),
+        .xfer_length_y(32'h0));
+      rx_os_dmac_api.set_dest_addr(`DDR_BA+32'h00001000);
+      rx_os_dmac_api.transfer_start();
+
+      // Wait until data propagates through the dma
+      #5us;
+    end
+
+    // Bring-Up DUT RX OBS Path
+    rx_os_clkgen_api.enable_clkgen();
+
     ex_tx_os_xcvr.up();
     ex_tx_os_ll.link_up();
 
@@ -457,23 +663,10 @@ program test_program;
     ex_tx_os_ll.wait_link_up();
     dut_rx_os_ll.wait_link_up();
 
-    #10us;
+    // Move data around for a while
+    #5us;
 
-    // Configure RX OBS DMA
     if (!use_dds) begin
-      base_env.mng.master_sequencer.RegWrite32(`RX_OS_DMA_BA+GetAddrs(DMAC_CONTROL),
-                         `SET_DMAC_CONTROL_ENABLE(1));
-      base_env.mng.master_sequencer.RegWrite32(`RX_OS_DMA_BA+GetAddrs(DMAC_FLAGS),
-                         `SET_DMAC_FLAGS_TLAST(1));
-      base_env.mng.master_sequencer.RegWrite32(`RX_OS_DMA_BA+GetAddrs(DMAC_X_LENGTH),
-                         `SET_DMAC_X_LENGTH_X_LENGTH(32'h000003DF));
-      base_env.mng.master_sequencer.RegWrite32(`RX_OS_DMA_BA+GetAddrs(DMAC_DEST_ADDRESS),
-                         `SET_DMAC_DEST_ADDRESS_DEST_ADDRESS(`DDR_BA+32'h00001000));
-      base_env.mng.master_sequencer.RegWrite32(`RX_OS_DMA_BA+GetAddrs(DMAC_TRANSFER_SUBMIT),
-                         `SET_DMAC_TRANSFER_SUBMIT_TRANSFER_SUBMIT(1));
-
-      #5us;
-
       check_captured_data(
         .address (`DDR_BA+'h00001000),
         .length (992),
@@ -481,6 +674,9 @@ program test_program;
         .max_sample(2048)
       );
     end
+
+    ex_tx_os_dmac_api.disable_dma();
+    rx_os_dmac_api.disable_dma();
 
     ex_tx_os_xcvr.down();
     dut_rx_os_xcvr.down();
@@ -495,26 +691,17 @@ program test_program;
     bit [31:0] current_address;
     bit [31:0] captured_word;
     bit [31:0] reference_word;
-    bit [7:0] first, second;
+    bit [15:0] first;
 
     for (int i=0;i<length/2;i=i+2) begin
       current_address = address+(i*2);
       captured_word = base_env.ddr.slave_sequencer.BackdoorRead32(current_address);
       if (i==0) begin
-        first = captured_word[15:8];
-        second = captured_word[7:0];
-
+        first = captured_word[15:0];
       end else begin
-        second = (second + 8'h02);
-        reference_word = {first, (second+ 8'h01), first, second};
+        reference_word = (((first + (i+1)*step)%max_sample) << 16) | ((first + (i*step))%max_sample);
 
-        if (second == 8'hfe) begin
-          first = (first + 8'h01);
-        end
-
-        `INFO(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word), ADI_VERBOSITY_LOW);
-
-        if (i > 20 && captured_word !== reference_word) begin
+        if (captured_word !== reference_word) begin
           `ERROR(("Address 0x%h Expected 0x%h found 0x%h",current_address,reference_word,captured_word));
         end
       end

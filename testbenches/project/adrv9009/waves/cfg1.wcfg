@@ -5,156 +5,497 @@
    <db_ref_list>
       <db_ref path="system_tb_behav.wdb" id="1">
          <top_modules>
+            <top_module name="adi_api_pkg" />
+            <top_module name="adi_axi_agent_pkg" />
+            <top_module name="adi_axi_monitor_pkg" />
+            <top_module name="adi_common_pkg" />
+            <top_module name="adi_environment_pkg" />
             <top_module name="adi_jesd204_pkg" />
-
+            <top_module name="adi_regmap_adc_pkg" />
             <top_module name="adi_regmap_dac_pkg" />
+            <top_module name="adi_regmap_dmac_pkg" />
             <top_module name="adi_regmap_jesd_rx_pkg" />
             <top_module name="adi_regmap_jesd_tx_pkg" />
             <top_module name="adi_regmap_pkg" />
             <top_module name="adi_regmap_xcvr_pkg" />
+            <top_module name="adi_vip_pkg" />
             <top_module name="adi_xcvr_pkg" />
-            <top_module name="axi4stream_vip_pkg" />
+            <top_module name="attributes" />
             <top_module name="axi_vip_pkg" />
             <top_module name="glbl" />
+            <top_module name="io_vip_if_base_pkg" />
             <top_module name="ipif_pkg" />
+            <top_module name="irq_handler_pkg" />
             <top_module name="logger_pkg" />
             <top_module name="m_axi_sequencer_pkg" />
-
+            <top_module name="math_real" />
+            <top_module name="numeric_std" />
+            <top_module name="pub_sub_pkg" />
             <top_module name="s_axi_sequencer_pkg" />
+            <top_module name="standard" />
             <top_module name="std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_misc" />
+            <top_module name="std_logic_textio" />
+            <top_module name="std_logic_unsigned" />
             <top_module name="system_tb" />
-            <top_module name="test_harness_ddr_axi_vip_0_pkg" />
             <top_module name="test_harness_env_pkg" />
-            <top_module name="test_harness_mng_axi_vip_0_pkg" />
+            <top_module name="textio" />
+            <top_module name="vcomponents" />
+            <top_module name="vip_agent_typedef_pkg" />
+            <top_module name="vital_primitives" />
+            <top_module name="vital_timing" />
             <top_module name="vpkg" />
+            <top_module name="watchdog_pkg" />
             <top_module name="xil_common_vip_pkg" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="13941448950fs"></ZoomStartTime>
-      <ZoomEndTime time="86486448951fs"></ZoomEndTime>
-      <Cursor1Time time="66496271172fs"></Cursor1Time>
+      <ZoomStartTime time="92.198000000 us"></ZoomStartTime>
+      <ZoomEndTime time="216.998000001 us"></ZoomEndTime>
+      <Cursor1Time time="116.798000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="177"></NameColumnWidth>
-      <ValueColumnWidth column_width="201"></ValueColumnWidth>
+      <ValueColumnWidth column_width="197"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="29" />
-   <wvobject fp_name="divider170" type="divider">
-      <obj_property name="label">DUT TX</obj_property>
+   <WVObjectSize size="109" />
+   <wvobject fp_name="divider137" type="divider">
+      <obj_property name="label">TEST SECTION 1</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_adrv9009_tx_jesd/sync">
-      <obj_property name="ElementShortName">sync[0:0]</obj_property>
-      <obj_property name="ObjectShortName">sync[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/axi_adrv9009_tx_jesd/sync_1">
-      <obj_property name="ElementShortName">sync_1[0:0]</obj_property>
-      <obj_property name="ObjectShortName">sync_1[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/rx_phy0_rxdata">
-      <obj_property name="ElementShortName">rx_phy0_rxdata[31:0]</obj_property>
-      <obj_property name="ObjectShortName">rx_phy0_rxdata[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/link_clk">
-      <obj_property name="ElementShortName">link_clk</obj_property>
-      <obj_property name="ObjectShortName">link_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/device_clk">
-      <obj_property name="ElementShortName">device_clk</obj_property>
-      <obj_property name="ObjectShortName">device_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_device_clk">
-      <obj_property name="ElementShortName">rx_device_clk</obj_property>
-      <obj_property name="ObjectShortName">rx_device_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/rx_device_clk_out">
-      <obj_property name="ElementShortName">rx_device_clk_out</obj_property>
-      <obj_property name="ObjectShortName">rx_device_clk_out</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/tx_device_clk_out">
-      <obj_property name="ElementShortName">tx_device_clk_out</obj_property>
-      <obj_property name="ObjectShortName">tx_device_clk_out</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/rx_axi_core_reset">
-      <obj_property name="ElementShortName">rx_axi_core_reset</obj_property>
-      <obj_property name="ObjectShortName">rx_axi_core_reset</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/rx_axi_device_reset">
-      <obj_property name="ElementShortName">rx_axi_device_reset</obj_property>
-      <obj_property name="ObjectShortName">rx_axi_device_reset</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/rx_data_tdata">
-      <obj_property name="ElementShortName">rx_data_tdata[127:0]</obj_property>
-      <obj_property name="ObjectShortName">rx_data_tdata[127:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/rx_data_tvalid">
-      <obj_property name="ElementShortName">rx_data_tvalid</obj_property>
-      <obj_property name="ObjectShortName">rx_data_tvalid</obj_property>
-   </wvobject>
    <wvobject fp_name="divider170" type="divider">
-      <obj_property name="label">Ex Rx</obj_property>
+      <obj_property name="label">DUT TX DMA</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/rx_sysref_0">
-      <obj_property name="ElementShortName">rx_sysref_0</obj_property>
-      <obj_property name="ObjectShortName">rx_sysref_0</obj_property>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_adrv9009_tx_dma/m_src_axi">
+      <obj_property name="ElementShortName">m_src_axi</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/sysref_1">
-      <obj_property name="ElementShortName">sysref_1</obj_property>
-      <obj_property name="ObjectShortName">sysref_1</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_xcvr/rx_data_0">
-      <obj_property name="ElementShortName">rx_data_0[31:0]</obj_property>
-      <obj_property name="ObjectShortName">rx_data_0[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_xcvr/rx_header_0">
-      <obj_property name="ElementShortName">rx_header_0[1:0]</obj_property>
-      <obj_property name="ObjectShortName">rx_header_0[1:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_xcvr/rx_block_sync_0">
-      <obj_property name="ElementShortName">rx_block_sync_0</obj_property>
-      <obj_property name="ObjectShortName">rx_block_sync_0</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/rx_data_tdata">
-      <obj_property name="ElementShortName">rx_data_tdata[127:0]</obj_property>
-      <obj_property name="ObjectShortName">rx_data_tdata[127:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/axi_jesd/rx_data_tvalid">
-      <obj_property name="ElementShortName">rx_data_tvalid</obj_property>
-      <obj_property name="ObjectShortName">rx_data_tvalid</obj_property>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_adrv9009_tx_dma/m_axis">
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
    </wvobject>
    <wvobject fp_name="divider170" type="divider">
-      <obj_property name="label">Ex Tx</obj_property>
+      <obj_property name="label">DUT TX DO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/axi_jesd/device_clk">
-      <obj_property name="ElementShortName">device_clk</obj_property>
-      <obj_property name="ObjectShortName">device_clk</obj_property>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/adrv9009_data_offload/s_axis">
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/axi_jesd/link_clk">
-      <obj_property name="ElementShortName">link_clk</obj_property>
-      <obj_property name="ObjectShortName">link_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/axi_jesd/tx_data_tready">
-      <obj_property name="ElementShortName">tx_data_tready</obj_property>
-      <obj_property name="ObjectShortName">tx_data_tready</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/axi_jesd/tx_phy0_txdata">
-      <obj_property name="ElementShortName">tx_phy0_txdata[31:0]</obj_property>
-      <obj_property name="ObjectShortName">tx_phy0_txdata[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/axi_jesd/tx_phy0_txheader">
-      <obj_property name="ElementShortName">tx_phy0_txheader[1:0]</obj_property>
-      <obj_property name="ObjectShortName">tx_phy0_txheader[1:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_xcvr/tx_0_p">
-      <obj_property name="ElementShortName">tx_0_p</obj_property>
-      <obj_property name="ObjectShortName">tx_0_p</obj_property>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/adrv9009_data_offload/m_axis">
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
    </wvobject>
    <wvobject fp_name="divider170" type="divider">
-      <obj_property name="label">DUT RX</obj_property>
+      <obj_property name="label">DUT TX UPACK</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/s_axis">
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/enable_0">
+      <obj_property name="ElementShortName">enable_0</obj_property>
+      <obj_property name="ObjectShortName">enable_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/enable_1">
+      <obj_property name="ElementShortName">enable_1</obj_property>
+      <obj_property name="ObjectShortName">enable_1</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/fifo_rd_en">
+      <obj_property name="ElementShortName">fifo_rd_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/fifo_rd_valid">
+      <obj_property name="ElementShortName">fifo_rd_valid</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/fifo_rd_underflow">
+      <obj_property name="ElementShortName">fifo_rd_underflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_underflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/fifo_rd_data_0">
+      <obj_property name="ElementShortName">fifo_rd_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_0[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_tx_upack/fifo_rd_data_1">
+      <obj_property name="ElementShortName">fifo_rd_data_1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_1[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider170" type="divider">
+      <obj_property name="label">EX RX CPACK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/enable_0">
+      <obj_property name="ElementShortName">enable_0</obj_property>
+      <obj_property name="ObjectShortName">enable_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/enable_1">
+      <obj_property name="ElementShortName">enable_1</obj_property>
+      <obj_property name="ObjectShortName">enable_1</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_overflow">
+      <obj_property name="ElementShortName">fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_0">
+      <obj_property name="ElementShortName">fifo_wr_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_0[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/fifo_wr_data_1">
+      <obj_property name="ElementShortName">fifo_wr_data_1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_1[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_rx_jesd_exerciser/util_pack/m_axis">
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider316" type="divider">
+      <obj_property name="label">EX RX DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_rx_axi_dma/s_axis">
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_rx_axi_dma/m_dest_axi">
+      <obj_property name="ElementShortName">m_dest_axi</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider138" type="divider">
+      <obj_property name="label">TEST SECTION 2</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider139" type="divider">
+      <obj_property name="label">EX TX DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_axi_dma/m_src_axi">
+      <obj_property name="ElementShortName">m_src_axi</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_axi_dma/m_axis">
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider167" type="divider">
+      <obj_property name="label">EX TX UPACK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/s_axis">
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/enable_0">
+      <obj_property name="ElementShortName">enable_0</obj_property>
+      <obj_property name="ObjectShortName">enable_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/enable_1">
+      <obj_property name="ElementShortName">enable_1</obj_property>
+      <obj_property name="ObjectShortName">enable_1</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/enable_2">
+      <obj_property name="ElementShortName">enable_2</obj_property>
+      <obj_property name="ObjectShortName">enable_2</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/enable_3">
+      <obj_property name="ElementShortName">enable_3</obj_property>
+      <obj_property name="ObjectShortName">enable_3</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/fifo_rd_en">
+      <obj_property name="ElementShortName">fifo_rd_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/fifo_rd_valid">
+      <obj_property name="ElementShortName">fifo_rd_valid</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/fifo_rd_underflow">
+      <obj_property name="ElementShortName">fifo_rd_underflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_underflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/fifo_rd_data_0">
+      <obj_property name="ElementShortName">fifo_rd_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_0[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/fifo_rd_data_1">
+      <obj_property name="ElementShortName">fifo_rd_data_1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_1[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/fifo_rd_data_2">
+      <obj_property name="ElementShortName">fifo_rd_data_2[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_2[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_jesd_exerciser/util_pack/fifo_rd_data_3">
+      <obj_property name="ElementShortName">fifo_rd_data_3[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_3[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider189" type="divider">
+      <obj_property name="label">DUT RX CPACK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/enable_0">
+      <obj_property name="ElementShortName">enable_0</obj_property>
+      <obj_property name="ObjectShortName">enable_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/enable_1">
+      <obj_property name="ElementShortName">enable_1</obj_property>
+      <obj_property name="ObjectShortName">enable_1</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/enable_2">
+      <obj_property name="ElementShortName">enable_2</obj_property>
+      <obj_property name="ObjectShortName">enable_2</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/enable_3">
+      <obj_property name="ElementShortName">enable_3</obj_property>
+      <obj_property name="ObjectShortName">enable_3</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/fifo_wr_overflow">
+      <obj_property name="ElementShortName">fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/fifo_wr_data_0">
+      <obj_property name="ElementShortName">fifo_wr_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_0[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/fifo_wr_data_1">
+      <obj_property name="ElementShortName">fifo_wr_data_1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_1[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/fifo_wr_data_2">
+      <obj_property name="ElementShortName">fifo_wr_data_2[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_2[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/fifo_wr_data_3">
+      <obj_property name="ElementShortName">fifo_wr_data_3[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_3[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/packed_fifo_wr_en">
+      <obj_property name="ElementShortName">packed_fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">packed_fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/packed_fifo_wr_overflow">
+      <obj_property name="ElementShortName">packed_fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">packed_fifo_wr_overflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/packed_fifo_wr_data">
+      <obj_property name="ElementShortName">packed_fifo_wr_data[63:0]</obj_property>
+      <obj_property name="ObjectShortName">packed_fifo_wr_data[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_cpack/packed_sync">
+      <obj_property name="ElementShortName">packed_sync</obj_property>
+      <obj_property name="ObjectShortName">packed_sync</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider206" type="divider">
+      <obj_property name="label">DUT RX DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_dma/fifo_wr_clk">
+      <obj_property name="ElementShortName">fifo_wr_clk</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_dma/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_adrv9009_rx_dma/fifo_wr_din">
+      <obj_property name="ElementShortName">fifo_wr_din[63:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_din[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_dma/fifo_wr_overflow">
+      <obj_property name="ElementShortName">fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_dma/fifo_wr_xfer_req">
+      <obj_property name="ElementShortName">fifo_wr_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_xfer_req</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_adrv9009_rx_dma/m_dest_axi">
+      <obj_property name="ElementShortName">m_dest_axi</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider231" type="divider">
+      <obj_property name="label">TEST SECTION 3</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider232" type="divider">
+      <obj_property name="label">EX TX OS DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_os_axi_dma/m_src_axi">
+      <obj_property name="ElementShortName">m_src_axi</obj_property>
+      <obj_property name="ObjectShortName">m_src_axi</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/ex_tx_os_axi_dma/m_axis">
+      <obj_property name="ElementShortName">m_axis</obj_property>
+      <obj_property name="ObjectShortName">m_axis</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider233" type="divider">
+      <obj_property name="label">EX TX OS UPACK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/s_axis">
+      <obj_property name="ElementShortName">s_axis</obj_property>
+      <obj_property name="ObjectShortName">s_axis</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/enable_0">
+      <obj_property name="ElementShortName">enable_0</obj_property>
+      <obj_property name="ObjectShortName">enable_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/enable_1">
+      <obj_property name="ElementShortName">enable_1</obj_property>
+      <obj_property name="ObjectShortName">enable_1</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/fifo_rd_en">
+      <obj_property name="ElementShortName">fifo_rd_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/fifo_rd_valid">
+      <obj_property name="ElementShortName">fifo_rd_valid</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_valid</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/fifo_rd_underflow">
+      <obj_property name="ElementShortName">fifo_rd_underflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_underflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/fifo_rd_data_0">
+      <obj_property name="ElementShortName">fifo_rd_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_0[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/i_tx_os_jesd_exerciser/util_pack/fifo_rd_data_1">
+      <obj_property name="ElementShortName">fifo_rd_data_1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rd_data_1[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider234" type="divider">
+      <obj_property name="label">DUT RX OS CPACK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/reset">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/enable_0">
+      <obj_property name="ElementShortName">enable_0</obj_property>
+      <obj_property name="ObjectShortName">enable_0</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/enable_1">
+      <obj_property name="ElementShortName">enable_1</obj_property>
+      <obj_property name="ObjectShortName">enable_1</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/fifo_wr_overflow">
+      <obj_property name="ElementShortName">fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/fifo_wr_data_0">
+      <obj_property name="ElementShortName">fifo_wr_data_0[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_0[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/fifo_wr_data_1">
+      <obj_property name="ElementShortName">fifo_wr_data_1[15:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_data_1[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/packed_fifo_wr_en">
+      <obj_property name="ElementShortName">packed_fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">packed_fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/packed_fifo_wr_overflow">
+      <obj_property name="ElementShortName">packed_fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">packed_fifo_wr_overflow</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/packed_fifo_wr_data">
+      <obj_property name="ElementShortName">packed_fifo_wr_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">packed_fifo_wr_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/util_adrv9009_rx_os_cpack/packed_sync">
+      <obj_property name="ElementShortName">packed_sync</obj_property>
+      <obj_property name="ObjectShortName">packed_sync</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider235" type="divider">
+      <obj_property name="label">DUT RX OS DMA</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/fifo_wr_clk">
+      <obj_property name="ElementShortName">fifo_wr_clk</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/fifo_wr_en">
+      <obj_property name="ElementShortName">fifo_wr_en</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_en</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/fifo_wr_din">
+      <obj_property name="ElementShortName">fifo_wr_din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_din[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/fifo_wr_overflow">
+      <obj_property name="ElementShortName">fifo_wr_overflow</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_overflow</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/fifo_wr_xfer_req">
+      <obj_property name="ElementShortName">fifo_wr_xfer_req</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_xfer_req</obj_property>
+   </wvobject>
+   <wvobject type="protoinst" fp_name="/system_tb/test_harness/axi_adrv9009_rx_os_dma/m_dest_axi">
+      <obj_property name="ElementShortName">m_dest_axi</obj_property>
+      <obj_property name="ObjectShortName">m_dest_axi</obj_property>
    </wvobject>
 </wave_config>

@@ -2,39 +2,29 @@ source ../../../scripts/adi_sim.tcl
 
 if {$argc < 1} {
   puts "Expecting at least one argument that specifies the test configuration"
-  set cfg_file cfg2.tcl
-  #exit 1
+  exit 1
 } else {
   set cfg_file [lindex $argv 0]
 }
 
-global ad_project_params
-
-# Disable default harness
-set ad_project_params(CUSTOM_HARNESS) 1
-
-# Read common configuration file
-source "cfgs/common_cfg.tcl"
-# Read configuration file with topology information
+# Read configuration file
 source "cfgs/${cfg_file}"
 
 # Set the project name
 set project_name [file rootname $cfg_file]
 
 # Create the project
-#set bd_design_name "test_harness"
-
 adi_sim_project_xilinx $project_name
 
 source $ad_tb_dir/library/includes/sp_include_axis.tcl
+source $ad_tb_dir/library/includes/sp_include_scoreboard.tcl
+source $ad_tb_dir/library/includes/sp_include_data_offload.tcl
 
 # Add test files to the project
 adi_sim_project_files [list \
   "environment.sv" \
   "tests/test_program.sv" \
   "tests/test_program_sync.sv" \
-  "do_scoreboard.sv" \
-  "data_offload_pkg.sv" \
 ]
 
 #set a default test program

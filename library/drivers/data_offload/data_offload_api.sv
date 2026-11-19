@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2024-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2024-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -69,6 +69,14 @@ package data_offload_api_pkg;
     // -----------------
     //
     // -----------------
+    task set_sync_config(input bit [1:0] sync_config);
+      this.axi_write(GetAddrs(DO_SYNC_CONFIG),
+                        `SET_DO_SYNC_CONFIG_SYNC_CONFIG(sync_config));
+    endtask
+
+    // -----------------
+    //
+    // -----------------
     task enable_oneshot_mode();
       this.axi_write(GetAddrs(DO_CONTROL),
                         `SET_DO_CONTROL_ONESHOT_EN(1));
@@ -102,7 +110,7 @@ package data_offload_api_pkg;
     //
     // -----------------
     task assert_reset();
-      this.axi_write(GetAddrs(DO_CONTROL),
+      this.axi_write(GetAddrs(DO_RESETN_OFFLOAD),
                         `SET_DO_RESETN_OFFLOAD_RESETN(0));
     endtask
 

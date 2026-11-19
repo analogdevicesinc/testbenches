@@ -1,6 +1,6 @@
 // ***************************************************************************
 // ***************************************************************************
-// Copyright (C) 2021-2025 Analog Devices, Inc. All rights reserved.
+// Copyright (C) 2021-2026 Analog Devices, Inc. All rights reserved.
 //
 // In this HDL repository, there are many different and unique modules, consisting
 // of various HDL (Verilog or VHDL) components. The individual modules are
@@ -32,6 +32,7 @@
 //
 // ***************************************************************************
 // ***************************************************************************
+
 `include "utils.svh"
 `include "axi_definitions.svh"
 `include "axis_definitions.svh"
@@ -45,7 +46,6 @@ import data_offload_api_pkg::*;
 
 import `PKGIFY(test_harness, mng_axi_vip)::*;
 import `PKGIFY(test_harness, ddr_axi_vip)::*;
-
 import `PKGIFY(test_harness, adc_src_axis)::*;
 import `PKGIFY(test_harness, adc_dst_axi)::*;
 import `PKGIFY(test_harness, dac_src_axi)::*;
@@ -58,14 +58,13 @@ program test_program;
   timeunit 1ns;
   timeprecision 1ps;
 
-  // declare the class instances
+  // Declare the class instances
   test_harness_env base_env;
-
+  environment #(
+    `AXIS_VIP_PARAMS(test_harness, adc_src_axis), `AXI_VIP_PARAMS(test_harness, adc_dst_axi),
+    `AXI_VIP_PARAMS(test_harness, dac_src_axi), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis)) test_env;
   adi_axi_master_agent #(`AXI_VIP_PARAMS(test_harness, mng_axi_vip)) mng;
   adi_axi_slave_mem_agent #(`AXI_VIP_PARAMS(test_harness, ddr_axi_vip)) ddr;
-  scoreboard_environment #(
-    `AXIS_VIP_PARAMS(test_harness, adc_src_axis), `AXI_VIP_PARAMS(test_harness, adc_dst_axi),
-    `AXI_VIP_PARAMS(test_harness, dac_src_axi), `AXIS_VIP_PARAMS(test_harness, dac_dst_axis)) scb_env;
 
   dmac_api dmac_tx;
   dmac_api dmac_rx;
@@ -85,57 +84,65 @@ program test_program;
       .irq_base_address(`IRQ_C_BA),
       .irq_vip_if(`TH.`IRQ.inst.inst.IF.vif));
 
-    mng = new("", `TH.`MNG_AXI.inst.IF);
-    ddr = new("", `TH.`DDR_AXI.inst.IF);
+    mng = new(.name(""), .master_vip_if(`TH.`MNG_AXI.inst.IF));
+    ddr = new(.name(""), .slave_vip_if(`TH.`DDR_AXI.inst.IF));
 
     `LINK(mng, base_env, mng)
     `LINK(ddr, base_env, ddr)
 
-    scb_env = new("Scoreboard Environment 0",
-                  `TH.`ADC_SRC_AXIS.inst.IF,
-                  `TH.`ADC_DST_AXI.inst.IF,
-                  `TH.`DAC_SRC_AXI.inst.IF,
-                  `TH.`DAC_DST_AXIS.inst.IF);
+    test_env = new(
+      .name("Test Environment"),
+      .adc_src_axis_vip_if(`TH.`ADC_SRC_AXIS.inst.IF),
+      .adc_dst_if(`TH.`ADC_DST_AXI.inst.IF),
+      .dac_src_if(`TH.`DAC_SRC_AXI.inst.IF),
+      .dac_dst_axis_vip_if(`TH.`DAC_DST_AXIS.inst.IF));
 
-    dmac_tx = new("DMAC TX 0", base_env.mng.master_sequencer, `TX_DMA_BA);
-    dmac_rx = new("DMAC RX 0", base_env.mng.master_sequencer, `RX_DMA_BA);
+    dmac_tx = new(
+      .name("DMAC TX"),
+      .bus(base_env.mng.master_sequencer),
+      .base_address(`TX_DMA_BA));
 
-    do_tx = new("Data Offload TX 0", base_env.mng.master_sequencer, `TX_DOFF_BA);
-    do_rx = new("Data Offload RX 0", base_env.mng.master_sequencer, `RX_DOFF_BA);
+    dmac_rx = new(
+      .name("DMAC RX"),
+      .bus(base_env.mng.master_sequencer),
+      .base_address(`RX_DMA_BA));
 
-    //=========================================================================
-    // Setup generator/monitor stubs
-    //=========================================================================
+    do_tx = new(
+      .name("Data Offload TX"),
+      .bus(base_env.mng.master_sequencer),
+      .base_address(`TX_DOFF_BA));
 
-    //=========================================================================
+    do_rx = new(
+      .name("Data Offload RX"),
+      .bus(base_env.mng.master_sequencer),
+      .base_address(`RX_DOFF_BA));
 
     setLoggerVerbosity(ADI_VERBOSITY_NONE);
 
     base_env.start();
-    scb_env.start();
+    test_env.start();
 
     base_env.sys_reset();
 
-    // configure environment sequencers
-    scb_env.configure(`ADC_TRANSFER_LENGTH);
+    // Configure environment sequencers
+    test_env.configure(`ADC_TRANSFER_LENGTH);
 
     `INFO(("Bring up IP from reset."), ADI_VERBOSITY_LOW);
     systemBringUp();
 
-    //do_set_transfer_length(`ADC_TRANSFER_LENGTH);
     do_set_transfer_length(`ADC_TRANSFER_LENGTH/64);
 
     // Start the ADC/DAC stubs
     `INFO(("Call the run()"), ADI_VERBOSITY_LOW);
-    scb_env.run();
+    test_env.run();
 
-    scb_env.adc_src_axis_agent.master_sequencer.start();
+    test_env.adc_src_axis_agent.master_sequencer.start();
 
     // Generate DMA transfers
     `INFO(("Start RX DMA"), ADI_VERBOSITY_LOW);
     rx_dma_transfer(dmac_rx, 32'h80000000, `ADC_TRANSFER_LENGTH);
 
-    scb_env.scoreboard_rx.wait_until_complete();
+    test_env.scoreboard_rx.wait_until_complete();
 
     `INFO(("Initialize the memory"), ADI_VERBOSITY_LOW);
     init_mem_64(32'h80000000, 1024);
@@ -144,9 +151,9 @@ program test_program;
     tx_dma_transfer(dmac_tx, 32'h80000000, 1024);
 
     #1us;
-    scb_env.scoreboard_tx.wait_until_complete();
+    test_env.scoreboard_tx.wait_until_complete();
 
-    scb_env.stop();
+    test_env.stop();
     base_env.stop();
 
     `INFO(("Test bench done!"), ADI_VERBOSITY_NONE);
@@ -155,19 +162,19 @@ program test_program;
   end
 
   task systemBringUp();
-    // bring up the Data Offload instances from reset
-    `INFO(("Bring up RX Data Offload 0"), ADI_VERBOSITY_LOW);
+    // Bring up the Data Offload instances from reset
+    `INFO(("Bring up RX Data Offload"), ADI_VERBOSITY_LOW);
     do_rx.deassert_reset();
-    `INFO(("Bring up TX Data Offload 0"), ADI_VERBOSITY_LOW);
+    `INFO(("Bring up TX Data Offload"), ADI_VERBOSITY_LOW);
     do_tx.deassert_reset();
 
     // Enable tx oneshot mode
     do_tx.enable_oneshot_mode();
 
-    // bring up the DMAC instances from reset
-    `INFO(("Bring up RX DMAC 0"), ADI_VERBOSITY_LOW);
+    // Bring up the DMAC instances from reset
+    `INFO(("Bring up RX DMAC"), ADI_VERBOSITY_LOW);
     dmac_rx.enable_dma();
-    `INFO(("Bring up TX DMAC 0"), ADI_VERBOSITY_LOW);
+    `INFO(("Bring up TX DMAC"), ADI_VERBOSITY_LOW);
     dmac_tx.enable_dma();
   endtask
 

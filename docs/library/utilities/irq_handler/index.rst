@@ -10,7 +10,7 @@ The purpose of this class is to provide an object that can simulate a processor
 interrupt handler. The class relies on the AXI Interrupt Controller from AMD and
 it uses an IO VIP to monitor the IRQ pin. 
 
-.. svg:: library/utilities/irq_handler/irq_handler.svg
+.. svg:: ./irq_handler.svg
    :align: center
 
 Variables

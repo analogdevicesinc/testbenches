@@ -7,9 +7,7 @@ set ad_project_params(LANE_RATE) 16.5
 set ad_project_params(PLL_TYPE) QPLL1
 
 set ad_project_params(RX_LANE_RATE) 16.5
-set ad_project_params(RX_PLL_SEL) 2
 set ad_project_params(TX_LANE_RATE) 16.5
-set ad_project_params(TX_PLL_SEL) 2
 
 set ad_project_params(RX_NUM_LINKS) 1
 set ad_project_params(RX_JESD_M) 2

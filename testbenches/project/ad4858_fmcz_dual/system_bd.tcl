@@ -39,37 +39,7 @@ global ad_project_params
 #  Block design under test
 #
 
-# In simulation, ad_mem_hp1_interconnect with sys_ps8 is not needed - the
-# ddr_axi_vip handles memory. Redefine to no-op before sourcing the BD.
-# Also force DMA m_dest_axi onto sys_cpu_clk to eliminate async CDC in the
-# axi_mem_interconnect - multi-clock CDC causes XSim kernel crashes.
-# Override sys_dma_resetn to match sys_cpu_clk domain.
-set sys_dma_resetn sys_cpu_resetn
-
-rename ad_mem_hp1_interconnect ad_mem_hp1_interconnect_orig
-proc ad_mem_hp1_interconnect {p_clk p_name} {
-  if {[string match "*sys_ps8*" $p_name]} { return }
-  ad_mem_hp1_interconnect_orig sys_cpu_clk $p_name
-}
-
 source $ad_hdl_dir/projects/ad4858_fmcz_dual/common/ad4858_fmcz_bd.tcl
-
-rename ad_mem_hp1_interconnect {}
-rename ad_mem_hp1_interconnect_orig ad_mem_hp1_interconnect
-
-# Eliminate the multi-clock CDC in axi_mem_interconnect that prevents DMA
-# write responses from arriving and keeps wait_transfer_done spinning forever.
-# The interconnect aclk and ddr_axi_vip are both connected to sys_mem_clk
-# (400MHz) while the DMA ports use sys_cpu_clk (100MHz). Move everything to
-# sys_cpu_clk so the entire memory path is single-clock domain.
-disconnect_bd_net [get_bd_nets sys_mem_clk] [get_bd_pins axi_mem_interconnect/aclk]
-ad_connect sys_cpu_clk axi_mem_interconnect/aclk
-disconnect_bd_net [get_bd_nets sys_mem_resetn] [get_bd_pins axi_mem_interconnect/aresetn]
-ad_connect sys_cpu_resetn axi_mem_interconnect/aresetn
-disconnect_bd_net [get_bd_nets sys_mem_clk] [get_bd_pins ddr_axi_vip/aclk]
-ad_connect sys_cpu_clk ddr_axi_vip/aclk
-disconnect_bd_net [get_bd_nets sys_mem_resetn] [get_bd_pins ddr_axi_vip/aresetn]
-ad_connect sys_cpu_resetn ddr_axi_vip/aresetn
 
 # System 200MHz clk
 # Create VIP instance

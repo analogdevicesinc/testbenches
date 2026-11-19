@@ -35,57 +35,18 @@
 
 `include "utils.svh"
 
-package adi_common_pkg;
+package adi_environment_pkg;
 
   import logger_pkg::*;
+  import adi_component_pkg::*;
 
-  class adi_reporter;
-    string name;
-    adi_reporter parent;
-
+  class adi_environment extends adi_component;
     function new(
       input string name,
-      input adi_reporter parent = null);
-
-      this.name = name;
-      this.parent = parent;
-    endfunction
-
-    function string get_path();
-      if (this.parent == null)
-        return this.name;
-      else
-        return $sformatf("%s.%s", this.parent.get_path(), this.name);
-    endfunction: get_path
-
-    function void info(
-      input string message,
-      input adi_verbosity_t verbosity);
-
-      `INFO(("[%s] %s", this.get_path(), message), verbosity);
-    endfunction: info
-
-    function void warning(input string message);
-      `WARNING(("[%s] %s", this.get_path(), message));
-    endfunction: warning
-
-    function void error(input string message);
-      `ERROR(("[%s] %s", this.get_path(), message));
-    endfunction: error
-
-    function void fatal(input string message);
-      `FATAL(("[%s] %s", this.get_path(), message));
-    endfunction: fatal
-  endclass: adi_reporter
-
-
-  class adi_component extends adi_reporter;
-    function new(
-      input string name,
-      input adi_component parent = null);
+      input adi_environment parent = null);
 
       super.new(name, parent);
     endfunction: new
-  endclass: adi_component
+  endclass: adi_environment
 
-endpackage: adi_common_pkg
+endpackage: adi_environment_pkg

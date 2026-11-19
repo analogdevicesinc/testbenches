@@ -38,6 +38,7 @@
 package xcvr_api_pkg;
 
   import logger_pkg::*;
+  import adi_component_pkg::*;
   import adi_api_pkg::*;
   import adi_regmap_xcvr_pkg::*;
   import adi_regmap_pkg::*;

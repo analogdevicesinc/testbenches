@@ -39,7 +39,8 @@
 package m_axis_sequencer_pkg;
 
   import axi4stream_vip_pkg::*;
-  import adi_vip_pkg::*;
+  import adi_agent_pkg::*;
+  import adi_sequencer_pkg::*;
   import logger_pkg::*;
 
   typedef enum {

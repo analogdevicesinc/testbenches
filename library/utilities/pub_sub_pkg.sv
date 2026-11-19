@@ -38,7 +38,7 @@
 package pub_sub_pkg;
 
   import logger_pkg::*;
-  import adi_common_pkg::*;
+  import adi_component_pkg::*;
 
   class adi_subscriber #(type data_type = int) extends adi_component;
 

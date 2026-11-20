@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="325"
+   height="200"
+   viewBox="0 0 85.989575 52.916666"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (unknown)"
+   sodipodi:docname="block_diagram.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="2.2526231"
+     inkscape:cx="104.76675"
+     inkscape:cy="88.341454"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="false">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1.3229166"
+       spacingy="1.3229166"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="10"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="marker3"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path3" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker15"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path15" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker15-7"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path15-5" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:0.264583"
+       x="15.779655"
+       y="37.534405"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="15.779655"
+         y="37.534405">I3C</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="15.779655"
+         y="41.06218"
+         id="tspan2">Controller</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:0.264583"
+       x="66.789459"
+       y="26.23667"
+       id="text5"><tspan
+         sodipodi:role="line"
+         id="tspan5"
+         style="stroke-width:0.264583"
+         x="66.789459"
+         y="26.23667">Test</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="66.789459"
+         y="30.20542"
+         id="tspan9">Program</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:0.264583"
+       x="67.546265"
+       y="6.80371"
+       id="text6"><tspan
+         sodipodi:role="line"
+         id="tspan6"
+         style="stroke-width:0.264583"
+         x="67.546265"
+         y="6.80371">Test Module</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:0.264583"
+       x="24.551474"
+       y="6.508379"
+       id="text7"><tspan
+         sodipodi:role="line"
+         id="tspan7"
+         style="stroke-width:0.264583"
+         x="24.551474"
+         y="6.508379">Top Module</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583"
+       id="rect7"
+       width="15.875"
+       height="13.229166"
+       x="7.937499"
+       y="31.75"
+       ry="2.6458309" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:0.264583"
+       x="25.055489"
+       y="17.761534"
+       id="text3-8"><tspan
+         sodipodi:role="line"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="25.055489"
+         y="17.761534"
+         id="tspan4-2">Test</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:2.82222px;stroke-width:0.264583"
+         x="25.055489"
+         y="21.289309"
+         id="tspan8">Harness</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583"
+       id="rect9"
+       width="13.229166"
+       height="10.583333"
+       x="18.520832"
+       y="13.229166"
+       ry="2.6458328" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583"
+       id="rect10"
+       width="83.34375"
+       height="50.270832"
+       x="1.3229166"
+       y="1.3229166"
+       ry="2.645833" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:1.58749795,1.58749795;stroke-dashoffset:0"
+       id="rect11"
+       width="43.65625"
+       height="47.625"
+       x="2.6458333"
+       y="2.6458333"
+       ry="1.3229165" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:1.58749795,1.58749795;stroke-dashoffset:0"
+       id="rect12"
+       width="33.072914"
+       height="47.625"
+       x="50.270832"
+       y="2.6458333"
+       ry="1.3229165" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583"
+       id="rect13"
+       width="17.197916"
+       height="11.90625"
+       x="58.208328"
+       y="21.166666"
+       ry="2.6458323" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;marker-end:url(#Triangle)"
+       d="m 46.302083,26.458332 h 3.96875"
+       id="path13" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;marker-end:url(#marker15)"
+       d="m 23.8125,41.010414 26.458334,-2e-6"
+       id="path14"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-start:url(#marker3);marker-end:url(#marker15-7)"
+       d="m 23.8125,35.718747 26.458334,-2e-6"
+       id="path14-5"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:0.264583"
+       x="37.073708"
+       y="39.687496"
+       id="text1-1"><tspan
+         sodipodi:role="line"
+         style="font-size:2.11667px;stroke-width:0.264583"
+         x="37.073708"
+         y="39.687496"
+         id="tspan2-7">Offload SDI</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:0.264583"
+       x="36.99929"
+       y="34.395832"
+       id="text1-1-6"><tspan
+         sodipodi:role="line"
+         style="font-size:2.11667px;stroke-width:0.264583"
+         x="36.99929"
+         y="34.395832"
+         id="tspan2-7-0">I3C Bus</tspan></text>
+  </g>
+</svg>

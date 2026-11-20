@@ -34,20 +34,18 @@ Common sections
 
 The **More information** and **Support** sections that are present in
 the Testbenches documentation, are actually separate pages inserted as links.
-They're located at testbenches/projects/common/more_information.rst and /support.rst,
-and cannot be referenced here because they don't have an ID at the beginning
-of the page, so not to have warnings when the documentation is rendered that
-they're not included in any toctree.
+They're located at docs/common/more_information.rst and /support.rst, and
+cannot be referenced here because they don't have an ID at the beginning of the
+page, so not to have warnings when the documentation is rendered that they're
+not included in any toctree.
 
 They are inserted like this:
 
 .. code-block::
 
-   .. include:: ../projects/common/more_information.rst
+   .. include:: ../../../common/more_information.rst
 
-   .. include:: ../projects/common/support.rst
-
-And they will be rendered as sections of the page.
+   .. include:: ../../../common/support.rst
 
 Warnings and messages
 --------------------------------------------------------------------------------
@@ -67,8 +65,6 @@ Here are a couple of examples:
    .. important::
 
       This is an important message!
-
-And they will be rendered as sections of the page.
 
 Class hierarchy
 --------------------------------------------------------------------------------

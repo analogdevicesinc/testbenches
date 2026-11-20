@@ -68,7 +68,7 @@ Incorrect:
 
    fork
      ...
-   join
+   join_any
    disable fork;
 
 Correct:
@@ -78,19 +78,21 @@ Correct:
    fork begin
      fork
        ...
-     join
-    disable fork;
+     join_any
+     disable fork;
    end join
 
 **B2**
 
 Include files should be used in Makefile and system_project.tcl scripts for
-classes that have multiple dependencies.
+classes that have multiple dependencies. If a simulation dependency needs
+multiple other dependencies, then an include file should be created if it
+doesn't already exist.
 
 **B3**
 
-Testbench must finish with all threads stopped, testbench done message must be
-printed and the ``finish()`` system function must be called afterwards.
+Testbench must finish with all VIPs and threads stopped, testbench done message
+must be printed and the ``finish()`` system function must be called afterwards.
 
 **B4**
 
@@ -141,7 +143,7 @@ Correct:
 **B6**
 
 Watchdogs must be used to ensure that the simulation doesn't get stuck during a
-run.
+run, and all code must be covered by one or multiple watchdogs.
 
 **B7**
 
@@ -167,6 +169,114 @@ Use the proper equation type for various comparisons
 
 * == for logical equality (1 and 0 comparison only)
 * === for case equality (1, 0, x and z comparison)
+
+**B9**
+
+``begin``...``end`` blocks must be present for all conditionals and loops, even
+if they contain a single statement.
+
+.. _example-b9:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   if (transfer_done)
+     counter++;
+
+   repeat(5)
+     send_data();
+
+Correct:
+
+.. code-block:: systemverilog
+
+   if (transfer_done) begin
+     counter++;
+   end
+
+   repeat(5) begin
+     send_data();
+   end
+
+**B10**
+
+Definitions must be used only when the value is used in multiple files, or when
+it is defined in the block design using ``adi_sim_add_define``. In every other
+case use ``localparam`` in the SystemVerilog file.
+
+.. _example-b10:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   // used only in this test program
+   `define PATTERN_LENGTH 16
+
+Correct:
+
+.. code-block:: systemverilog
+
+   // used only in this test program
+   localparam PATTERN_LENGTH = 16;
+
+   // definition defined in the block design, see example in rule C2
+   offset = `RX_DMA_BA;
+
+**B11**
+
+Parameters, local parameters and defines must not store values of type ``time``.
+Store the numeric value and apply the time scale where it is used.
+
+.. _example-b11:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   localparam time TIMEOUT = 10us;
+
+   `define TIMEOUT 10us
+
+Correct:
+
+.. code-block:: systemverilog
+
+   localparam TIMEOUT_US = 10;
+
+   #(TIMEOUT_US * 1us);
+
+**B12**
+
+Output variables of the test program must be initialized.
+
+.. _example-b12:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   program test_program(
+     input  logic system_clk,
+     output logic test_done);
+
+Correct:
+
+.. code-block:: systemverilog
+
+   program test_program(
+     input  logic system_clk,
+     output logic test_done);
+
+     initial begin
+       test_done = 1'b0;
+     end
+
+**B13**
+
+``force``...``release`` must be used only in very rare occasions, when there is
+no other way of controlling a signal.
 
 C. Design Under Test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,6 +370,61 @@ towards the use-case of that test program.
 If multiple configurations are created, the configuration file's name should
 hint towards the use-case of that configuration file.
 
+**C8**
+
+``system_tb.sv`` must not contain any combinatorial logic. Its only purpose is
+to connect the test harness with the test program with wires.
+
+.. _example-c8:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   wire sys_rstn;
+
+   assign sys_rstn = ~sys_rst;
+
+Correct:
+
+.. code-block:: systemverilog
+
+   wire sys_clk;
+   wire sys_rst;
+
+   // no assign or always blocks
+
+**C9**
+
+Waveform configuration files must be updated if the block design or the
+configuration files are changed.
+
+**C10**
+
+The interconnect type must match the one recommended by AMD for the board that
+is specified for the simulation.
+
+**C11**
+
+Signals that are internal to an IP must not be accessed. The IP must be treated
+as a black box module.
+
+.. _example-c11:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   // peeking into the IP internals
+   fifo_level = `TH.dut_rx_dma.inst.i_fifo.level;
+
+Correct:
+
+.. code-block:: systemverilog
+
+   // using the registermap through the API
+   status = dma_api.get_status();
+
 D. Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -295,8 +460,9 @@ Correct:
 
 **D2**
 
-Parenthesis must be present at method calls, even if these don't require any
-input values.
+Brackets must be present at method and system function calls and declarations,
+even if these don't require any arguments. This is to distinguish them from
+variables and constants.
 
 .. _example-d2:
 
@@ -331,7 +497,7 @@ Incorrect:
 
 .. code-block:: systemverilog
 
-   class verifier();
+   class verifier;
      ...
    endclass
 
@@ -339,9 +505,99 @@ Correct:
 
 .. code-block:: systemverilog
 
-   class verifier();
+   class verifier;
      ...
    endclass: verifier
+
+**D5**
+
+Argument initial values in method definitions must be used only when the vast
+majority of the calls rely on the same default value, and there is a very low
+chance that forgetting to modify the argument value in a call causes issues.
+
+.. _example-d5:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   // most of the calls use different lengths, a forgotten argument
+   // goes unnoticed
+   task start_transfer(
+     input int length = 1024,
+     input bit cyclic = 1'b0);
+     ...
+   endtask: start_transfer
+
+Correct:
+
+.. code-block:: systemverilog
+
+   task start_transfer(
+     input int length,
+     input bit cyclic);
+     ...
+   endtask: start_transfer
+
+**D6**
+
+On method calls, argument names must be specified alongside the argument values,
+except for logging, macros and system function calls.
+
+.. _example-d6:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   dma_api.setup_transfer(1024, 1'b0);
+
+Correct:
+
+.. code-block:: systemverilog
+
+   dma_api.setup_transfer(
+    .length(1024),
+    .cyclic(1'b0));
+
+**D7**
+
+Multiple arguments in a method call must be broken into multiple lines with
+slight indentation. Single argument calls, logging, macros and system function
+calls may remain in a single line.
+
+.. _example-d7:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   dma_api.setup_transfer(.length(1024), .cyclic(1'b0));
+
+Correct:
+
+.. code-block:: systemverilog
+
+   dma_api.setup_transfer(
+    .length(1024),
+    .cyclic(1'b0));
+
+   dma_api.start(.length(1024));
+
+   this.info($sformatf("Transfer length: %d", length), ADI_VERBOSITY_MEDIUM);
+
+**D8**
+
+Return values of methods for 1 bit variables (true/false) can be without bit
+width specification.
+
+.. _example-d8:
+
+.. code-block:: systemverilog
+
+   function bit is_busy();
+     return 1;
+   endfunction: is_busy
 
 E. Event scheduling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -354,9 +610,9 @@ cases that may arise using multiple threads or there is no other way around it.
 
 **E2**
 
-#0 must not be used. This would only mean that synchronization between events is
-not properly handled and it's prone to error if not used exactly the way it was
-intended to be used.
+#0 and #1 delay must be removed and the logic around it changed. Leaving #0 and
+#1 would mean that synchronization between events is not properly handled and
+it's prone to error if not used exactly the way it was intended to be used.
 
 **E3**
 
@@ -376,6 +632,30 @@ Correct:
 
    #5us;
    #(5*1us);
+
+**E4**
+
+Arbitrary delay events must be used only when there is no other option. Wait for
+a signal change, a register value to match a given value or an event to be
+triggered instead.
+
+.. _example-e4:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   // hoping that the transfer is done by now
+   #100us;
+
+Correct:
+
+.. code-block:: systemverilog
+
+   wait(transfer_done == 1'b1);
+
+   // or
+   @(transfer_done_event);
 
 F. Reporting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -466,7 +746,7 @@ Correct:
 .. code-block:: systemverilog
 
    // always assigned by the parent, invisible to child classes
-   localparam class_id;
+   local int class_id;
    // both parent and child might need access to it, but prevent the outside from accessing it
    protected int device_address;
 
@@ -476,7 +756,7 @@ Correct:
 
 **G3**
 
-ADI_FIFO or ADI_LIFO must be used for queues to avoid push-pull/front-back style
+adi_fifo or adi_lifo must be used for queues to avoid push-pull/front-back style
 differences and other issues.
 
 .. _example-g3:
@@ -492,10 +772,6 @@ differences and other issues.
 Checker or scoreboard class should be used whenever comparing data streams.
 
 **G5**
-
-Use the IRQ handler class when dealing with any interrupt requests from the DUT.
-
-**G6**
 
 Checker and scoreboard classes must use a subscriber class to get data.
 
@@ -560,9 +836,9 @@ Incorrect:
      vip_sequencer vip_seq;
 
      function new();
-       vip_drv = new("Driver");
-       vip_mon = new("Monitor");
-       vip_seq = new("Sequencer");
+       vip_drv = new(.name("Driver"));
+       vip_mon = new(.name("Monitor"));
+       vip_seq = new(.name("Sequencer"));
      endfunction: new
    endclass: vip_agent
 
@@ -576,9 +852,15 @@ Correct:
      vip_sequencer vip_seq;
 
      function new();
-       vip_drv = new("Driver", this);
-       vip_mon = new("Monitor", this);
-       vip_seq = new("Sequencer", this);
+       vip_drv = new(
+        .name("Driver"),
+        .parent(this));
+       vip_mon = new(
+        .name("Monitor"),
+        .parent(this));
+       vip_seq = new(
+        .name("Sequencer"),
+        .parent(this));
      endfunction: new
    endclass: vip_agent
 
@@ -606,7 +888,7 @@ Incorrect:
      vip_agent vip_agnt;
 
      function new();
-       vip_agnt = new("Agent");
+       vip_agnt = new(.name("Agent"));
      endfunction: new
    endclass: environment
 
@@ -618,7 +900,9 @@ Correct:
      vip_agent vip_agnt;
 
      function new();
-       vip_agnt = new("Agent", this);
+       vip_agnt = new(
+        .name("Agent"),
+        .parent(this));
      endfunction: new
    endclass: environment
 
@@ -634,10 +918,10 @@ Incorrect:
 .. code-block:: systemverilog
 
    class vip_agent;
-     protected vif vif_proxy;
+     protected vif proxy_vif;
 
-     function new(virtual interface vif_proxy);
-       this.vif_proxy = vif_proxy;
+     function new(virtual interface proxy_if_type proxy_vif);
+       this.proxy_vif = proxy_vif;
      endfunction: new
    endclass: vip_agent
 
@@ -646,10 +930,10 @@ Correct:
 .. code-block:: systemverilog
 
    class vip_agent;
-     protected vif_class vif_class_proxy;
+     protected vif_class proxy_vif;
 
-     function new(vif_class vif_class_proxy);
-       this.vif_class_proxy = vif_class_proxy;
+     function new(vif_class proxy_vif);
+       this.proxy_vif = proxy_vif;
      endfunction: new
    endclass: vip_agent
 
@@ -666,11 +950,67 @@ inside the environment.
 
    base_env = new(...);
 
-   mng = new("", `TH.`MNG_AXI.inst.IF);
-   ddr = new("", `TH.`DDR_AXI.inst.IF);
+   mng = new(
+    .name(""),
+    .axi_vip_if(`TH.`MNG_AXI.inst.IF));
+   ddr = new(
+    .name(""),
+    .axi_vip_if(`TH.`DDR_AXI.inst.IF));
 
    `LINK(mng, base_env, mng)
    `LINK(ddr, base_env, ddr)
+
+**H9**
+
+Use the clocking VIP when generating clocks. The exception is when the desired
+clock cannot be generated using the clocking VIP.
+
+.. _example-h9:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   always #5ns clk = ~clk;
+
+Correct:
+
+.. code-block:: systemverilog
+
+   clk_vip.set_clk_frq(.user_frequency(100000000));
+   clk_vip.start_clock();
+   ...
+   clk_vip.stop_clock();
+
+**H10**
+
+Use the IO VIP when manipulating signals that are not part of an interface,
+such as AXI or AXI Stream.
+
+**H11**
+
+An IP or VIP definition in the test harness should be touched only once in the
+test program, when assigning it to a class.
+
+.. _example-h11:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   `TH.`IO_VIP.inst.inst.IF.set_io(.o(1'b1));
+   `TH.`IO_VIP.inst.inst.IF.set_io(.o(1'b0));
+
+Correct:
+
+.. code-block:: systemverilog
+
+   io_vip_if_base io_vip;
+
+   io_vip = `TH.`IO_VIP.inst.inst.IF;
+
+   io_vip.set_io(.o(1'b1));
+   io_vip.set_io(.o(1'b0));
 
 I. API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -696,8 +1036,7 @@ that don't have Version, Magic and Scratch registers.
      ...
      // check scratch register
      ...
-     `INFO(("Sanity Test Done"), ADI_VERBOSITY_LOW);
-   endtask
+   endtask: sanity_test
 
 **I3**
 
@@ -710,6 +1049,29 @@ Every ADI IP that has a registermap must have its own API driver class.
 **I5**
 
 IRQ handler class must be used when dealing with interrupt requests.
+
+**I6**
+
+Setting register values must have bit width specifications, in the form of
+``<width>'<identifier><value>``.
+
+.. _example-i6:
+
+Incorrect:
+
+.. code-block:: systemverilog
+
+   dma_api.write_register(
+    .address(DMA_CONTROL),
+    .data(1));
+
+Correct:
+
+.. code-block:: systemverilog
+
+   dma_api.write_register(
+    .address(DMA_CONTROL),
+    .data(32'h0000_0001));
 
 J. Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -768,12 +1130,12 @@ Variable randomization states must always be checked.
 
 .. code-block:: systemverilog
 
-   class randomizer_class;
+   class randomizer_class extends adi_component;
      rand bit switch;
 
      function void randomize_switch();
-       if (!this.switch.randomize()) begin
-         `FATAL(("Randomization failed!"));
+       if (!this.randomize()) begin
+         this.fatal($sformatf("Randomization failed!"));
        end
      endfunction: randomize_switch
    endclass: randomizer_class
@@ -786,7 +1148,7 @@ All random variables must be randomized when the class creation occurs.
 
 .. code-block:: systemverilog
 
-   class randomizer_class;
+   class randomizer_class extends adi_component;
      rand bit switch;
 
      function new();
@@ -795,7 +1157,7 @@ All random variables must be randomized when the class creation occurs.
 
      function void randomize_init();
        if (!this.randomize()) begin
-         `FATAL(("Randomization failed!"));
+         this.fatal($sformatf("Randomization failed!"));
        end
      endfunction: randomize_init
    endclass: randomizer_class

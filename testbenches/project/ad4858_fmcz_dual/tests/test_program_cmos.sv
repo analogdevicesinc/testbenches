@@ -36,6 +36,7 @@
 `include "utils.svh"
 
 import logger_pkg::*;
+import adi_datatypes_pkg::*;
 import test_harness_env_pkg::*;
 import adi_axi_agent_pkg::*;
 import axi_vip_pkg::*;
@@ -174,7 +175,7 @@ program test_program_cmos (
   } test_case_t;
 
   test_case_t current_tc;
-  test_case_t all_tests[$];
+  adi_fifo #(test_case_t) all_tests = new("all_tests", 0);
 
   process current_process;
   string current_process_random_state;
@@ -292,7 +293,7 @@ program test_program_cmos (
             // fires on every OS sub-conversion, resetting the channel index
             // tracking before the CRC packet can be captured.
             if (crc == 1 && os == 1) continue;
-            all_tests.push_back('{packet_format: pf[1:0], crc_en: crc[0], os_en: os[0]});
+            void'(all_tests.push('{packet_format: pf[1:0], crc_en: crc[0], os_en: os[0]}));
           end
         end
       end
@@ -301,7 +302,7 @@ program test_program_cmos (
       repeat(num_tests) begin
         test_idx = $urandom_range(0, all_tests.size() - 1);
 
-        current_tc = all_tests[test_idx];
+        current_tc = all_tests.get(test_idx);
 
         `INFO(("=== AD4858 Dual Test: case %0d (pf=%0d, crc=%0d, os=%0d) ===", test_idx,
               current_tc.packet_format, current_tc.crc_en, current_tc.os_en), ADI_VERBOSITY_LOW);

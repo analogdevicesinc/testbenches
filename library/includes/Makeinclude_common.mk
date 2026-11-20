@@ -10,6 +10,7 @@ include $(ADI_TB_DIR)/library/includes/Makeinclude_axi.mk
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/utils.svh
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/logger_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/adi_common_pkg.sv
+SV_DEPS += $(ADI_TB_DIR)/library/utilities/adi_datatypes.sv
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/adi_vip_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/adi_environment_pkg.sv
 SV_DEPS += $(ADI_TB_DIR)/library/utilities/test_harness_env.sv

@@ -64,13 +64,18 @@ package adi_datatypes_pkg;
       end
     endfunction: push
 
-    function data_type pop();
+    function bit pop(output data_type data);
       if (this.adi_fifo.size() == 0) begin
-        return null;
+        return 1'b0;
       end else begin
-        return this.adi_fifo.pop_front();
+        data = this.adi_fifo.pop_front();
+        return 1'b1;
       end
     endfunction: pop
+
+    function data_type get(input int index);
+      return this.adi_fifo[index];
+    endfunction: get
 
     function int room();
       return depth-this.adi_fifo.size();
@@ -78,7 +83,7 @@ package adi_datatypes_pkg;
 
     function int size();
       return this.adi_fifo.size();
-    endfunction: room
+    endfunction: size
 
     function void clear();
       this.adi_fifo.delete();
@@ -94,7 +99,7 @@ package adi_datatypes_pkg;
         this.adi_fifo.insert(index, data);
         return 1'b1;
       end
-    endfunction: clear
+    endfunction: insert
 
   endclass: adi_fifo
 
@@ -123,13 +128,18 @@ package adi_datatypes_pkg;
       end
     endfunction: push
 
-    function data_type pop();
+    function bit pop(output data_type data);
       if (this.adi_fifo.size() == 0) begin
-        return null;
+        return 1'b0;
       end else begin
-        return this.adi_fifo.pop_front();
+        data = this.adi_fifo.pop_front();
+        return 1'b1;
       end
     endfunction: pop
+
+    function data_type get(input int index);
+      return this.adi_fifo[index];
+    endfunction: get
 
     function int room();
       return depth-this.adi_fifo.size();
@@ -137,7 +147,7 @@ package adi_datatypes_pkg;
 
     function int size();
       return this.adi_fifo.size();
-    endfunction: room
+    endfunction: size
 
     function void clear();
       this.adi_fifo.delete();
@@ -153,7 +163,7 @@ package adi_datatypes_pkg;
         this.adi_fifo.insert(index, data);
         return 1'b1;
       end
-    endfunction: clear
+    endfunction: insert
 
   endclass: adi_lifo
 

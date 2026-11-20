@@ -40,6 +40,7 @@ adi_sim_project_files [list \
   "$ad_tb_dir/library/utilities/utils.svh" \
   "$ad_tb_dir/library/utilities/logger_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_common_pkg.sv" \
+  "$ad_tb_dir/library/utilities/adi_datatypes.sv" \
   "$ad_tb_dir/library/utilities/adi_vip_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_api_pkg.sv" \
   "$ad_tb_dir/library/utilities/adi_environment_pkg.sv" \
